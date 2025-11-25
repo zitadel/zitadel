@@ -1738,3 +1738,385 @@ func TestDeletePasswordComplexitySettings(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPasswordExpirySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.PasswordExpirySettingsRepository()
+
+	settings := []*domain.PasswordExpirySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(10)),
+				MaxAgeDays:     gu.Ptr(uint64(30)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(11)),
+				MaxAgeDays:     gu.Ptr(uint64(31)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(12)),
+				MaxAgeDays:     gu.Ptr(uint64(32)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(13)),
+				MaxAgeDays:     gu.Ptr(uint64(33)),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.PasswordExpirySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListPasswordExpirySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.PasswordExpirySettingsRepository()
+
+	settings := []*domain.PasswordExpirySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(10)),
+				MaxAgeDays:     gu.Ptr(uint64(30)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(11)),
+				MaxAgeDays:     gu.Ptr(uint64(31)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(12)),
+				MaxAgeDays:     gu.Ptr(uint64(32)),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+				ExpireWarnDays: gu.Ptr(uint64(13)),
+				MaxAgeDays:     gu.Ptr(uint64(33)),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.PasswordExpirySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.PasswordExpirySettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.PasswordExpirySettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.PasswordExpirySettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.PasswordExpirySettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetPasswordExpirySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.PasswordExpirySettingsRepository()
+
+	existingSettings := &domain.PasswordExpirySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+			ExpireWarnDays: gu.Ptr(uint64(10)),
+			MaxAgeDays:     gu.Ptr(uint64(30)),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.PasswordExpirySettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.PasswordExpirySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+					ExpireWarnDays: gu.Ptr(uint64(10)),
+					MaxAgeDays:     gu.Ptr(uint64(30)),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.PasswordExpirySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+					ExpireWarnDays: gu.Ptr(uint64(10)),
+					MaxAgeDays:     gu.Ptr(uint64(30)),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.PasswordExpirySettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+					ExpireWarnDays: gu.Ptr(uint64(10)),
+					MaxAgeDays:     gu.Ptr(uint64(30)),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.PasswordExpirySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+					ExpireWarnDays: gu.Ptr(uint64(10)),
+					MaxAgeDays:     gu.Ptr(uint64(30)),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeletePasswordExpirySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.PasswordExpirySettingsRepository()
+
+	existingInstanceSettings := &domain.PasswordExpirySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+			ExpireWarnDays: gu.Ptr(uint64(10)),
+			MaxAgeDays:     gu.Ptr(uint64(30)),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.PasswordExpirySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		PasswordExpirySettingsAttributes: domain.PasswordExpirySettingsAttributes{
+			ExpireWarnDays: gu.Ptr(uint64(10)),
+			MaxAgeDays:     gu.Ptr(uint64(30)),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}

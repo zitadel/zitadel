@@ -762,7 +762,7 @@ func (passwordExpirySettings) SetMaxAgeDays(value uint64) db_json.JsonUpdate {
 
 var _ domain.PasswordExpirySettingsRepository = (*passwordExpirySettings)(nil)
 
-func PasswordExpiryRepository() domain.PasswordExpirySettingsRepository {
+func PasswordExpirySettingsRepository() domain.PasswordExpirySettingsRepository {
 	return &passwordExpirySettings{
 		settings{},
 	}

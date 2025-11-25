@@ -1134,7 +1134,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordExpiryRepository()
+		settingsRepo := repository.PasswordExpirySettingsRepository()
 		updatedAt := event.CreatedAt()
 		settings := domain.PasswordExpirySettings{
 			Settings: domain.Settings{
@@ -1169,7 +1169,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyChanged(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Mlk6y", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordExpiryRepository()
+		settingsRepo := repository.PasswordExpirySettingsRepository()
 		updatedAt := event.CreatedAt()
 		settings := domain.PasswordExpirySettings{
 			Settings: domain.Settings{
@@ -1197,7 +1197,7 @@ func (p *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordExpiryRepository()
+		settingsRepo := repository.PasswordExpirySettingsRepository()
 
 		orgId := &policyEvent.Aggregate().ID
 
