@@ -185,11 +185,11 @@ To allow session state to be shared between pages - which improves performance, 
 Take a loot at the template `_app.tsx`.
 
 ```ts reference
-https://github.com/zitadel/zitadel-nextjs/blob/main/pages/_app.tsx
+https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/_app.tsx
 ```
 
 Last thing: create a `profile.tsx` in /pages which renders the callback page.
 
 ```ts reference
-https://github.com/zitadel/zitadel-nextjs/blob/main/pages/profile.tsx
+https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/profile.tsx
 ```
