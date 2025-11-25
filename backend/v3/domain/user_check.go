@@ -19,9 +19,11 @@ type UserCheckCommand struct {
 	SessionID  string
 	InstanceID string
 
-	FetchedUser           User
-	preferredUserLanguage *language.Tag
+	FetchedUser User
+
+	// Out
 	UserCheckedAt         time.Time
+	PreferredUserLanguage *language.Tag
 }
 
 // NewUserCheckCommand returns a check Commander validating the input user.
@@ -54,7 +56,7 @@ func (u *UserCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 			u.FetchedUser.ID,
 			u.FetchedUser.OrganizationID,
 			u.UserCheckedAt,
-			u.preferredUserLanguage,
+			u.PreferredUserLanguage,
 		),
 	}, nil
 }
@@ -66,13 +68,11 @@ func (u *UserCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	}
 	sessionRepo := opts.sessionRepo
 
-	// human, isHUman := u.fetchedUser.Traits.(*Human)
-	// if isHUman {
-	// TODO(IAM-Marco): Fix when user repo is merged
-	// if !human.PreferredLanguage.IsRoot() {
-	// 		u.preferredUserLanguage = human.PreferredLanguage
-	// }
-	// }
+	if human := u.FetchedUser.Human; human != nil {
+		if !human.PreferredLanguage.IsRoot() {
+			u.PreferredUserLanguage = &human.PreferredLanguage
+		}
+	}
 
 	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(u.SessionID)))
 	if err != nil {
@@ -126,9 +126,7 @@ func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	case *session_grpc.CheckUser_UserId:
 		usrQueryOpt = database.WithCondition(userRepo.IDCondition(searchType.UserId))
 	case *session_grpc.CheckUser_LoginName:
-		// TODO(IAM-Marco): Fix when user repo is merged
-		// usrQueryOpt = database.WithCondition(userRepo.LoginNameCondition(searchType.LoginName))
-		return zerrors.ThrowInvalidArgumentf(nil, "DOM-ioQOFX", "user search %T not implemented", searchType)
+		usrQueryOpt = database.WithCondition(userRepo.LoginNameCondition(database.TextOperationEqual, searchType.LoginName))
 	default:
 		return zerrors.ThrowInvalidArgumentf(nil, "DOM-7B2m0b", "user search %T not implemented", searchType)
 	}
@@ -139,6 +137,10 @@ func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 			return zerrors.ThrowNotFound(err, "DOM-lcZeXI", "user not found")
 		}
 		return zerrors.ThrowInternal(err, "DOM-Y846I0", "failed fetching user")
+	}
+
+	if usr.State != UserStateActive {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive")
 	}
 
 	u.FetchedUser = *usr
