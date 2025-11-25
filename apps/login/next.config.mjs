@@ -41,9 +41,6 @@ const nextConfig = {
     // Add React 19 compatibility optimizations
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,
