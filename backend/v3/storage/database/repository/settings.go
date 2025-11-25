@@ -596,7 +596,7 @@ func (s brandingSettings) Get(ctx context.Context, client database.QueryExecutor
 	return brandingSettings, nil
 }
 
-const queryActivateBrandingSettingsStmt = `SELECT instance_id, organization_id, id, type, owner_type, created_at, updated_at, settings FROM`
+const queryActivateBrandingSettingsStmt = `SELECT instance_id, organization_id, id, type, created_at, updated_at, settings FROM `
 
 func (s brandingSettings) Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
@@ -608,24 +608,27 @@ func (s brandingSettings) Activate(ctx context.Context, client database.QueryExe
 		s.StateCondition(domain.SettingStatePreview),
 	)
 	if !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.NullInstruction))
+		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.DefaultInstruction))
 	}
 
 	// the statement begins with getting settings in preview state
 	builder := database.NewStatementBuilder("WITH preview AS (")
 	builder.WriteString(queryActivateBrandingSettingsStmt + s.qualifiedTableName())
 	writeCondition(builder, condition)
-	builder.WriteString(" ), ")
+	builder.WriteString(" ) ")
 
 	// insert or update settings as active
 	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName())
-	builder.WriteString(` (instance_id, organization_id, id, type, owner_type, state, created_at, updated_at, settings)`)
-	builder.WriteString(`SELECT preview.instance_id, preview.organization_id, preview.id, preview.type, preview.owner_type, 'activated', preview.created_at, preview.updated_at,  preview.settings FROM preview`)
-	builder.WriteString(`ON CONFLICT (instance_id, organization_id, id, type, owner_type, state) DO UPDATE SET` +
-		` settings = EXCLUDED.settings `)
+	builder.WriteString(` (instance_id, organization_id, id, type, state, created_at, updated_at, settings)`)
+	builder.WriteString(` SELECT preview.instance_id, preview.organization_id, preview.id, preview.type, '` + domain.SettingStateActive.String() + `', preview.created_at, preview.updated_at, preview.settings FROM preview`)
+	builder.WriteString(` ON CONFLICT (instance_id, organization_id, type, state) DO UPDATE SET settings = EXCLUDED.settings `)
+	if len(changes) > 0 {
+		builder.WriteString(`, `)
+	}
 	database.Changes(changes).Write(builder)
 
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	stmt := builder.String()
+	return client.Exec(ctx, stmt, builder.Args()...)
 }
 
 // -------------------------------------------------------------

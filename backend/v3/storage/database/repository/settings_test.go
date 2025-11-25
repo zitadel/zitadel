@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -309,7 +310,7 @@ func TestListLoginSettings(t *testing.T) {
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.LoginSettings{settings[0], settings[2]},
+			want:      []*domain.LoginSettings{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -333,7 +334,7 @@ func TestListLoginSettings(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := repo.List(t.Context(), tx,
 				database.WithCondition(tt.condition),
-				database.WithOrderByAscending(repo.PrimaryKeyColumns()...),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
 			)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.EqualExportedValues(t, tt.want, got)
@@ -603,6 +604,697 @@ func TestDeleteLoginSettings(t *testing.T) {
 			name:             "delete organization",
 			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
 			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func TestGetBrandingSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.BrandingSettingsRepository()
+
+	settings := []*domain.BrandingSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+				State:          domain.SettingStatePreview,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+				State:          domain.SettingStatePreview,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+				State:          domain.SettingStatePreview,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+				State:          domain.SettingStatePreview,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+	_, err := repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID))
+	require.NoError(t, err)
+	activeInstanceSetting := *settings[0]
+	activeInstanceSetting.State = domain.SettingStateActive
+
+	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[3].InstanceID, settings[3].ID))
+	require.NoError(t, err)
+	activeOrganizationSetting := *settings[3]
+	activeOrganizationSetting.State = domain.SettingStateActive
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.BrandingSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name: "ok, instance",
+			condition: database.And(
+				repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID),
+				repo.StateCondition(domain.SettingStatePreview),
+			),
+			want: settings[0],
+		},
+		{
+			name: "ok, instance, active",
+			condition: database.And(
+				repo.PrimaryKeyCondition(activeInstanceSetting.InstanceID, activeInstanceSetting.ID),
+				repo.StateCondition(domain.SettingStateActive),
+			),
+			want: &activeInstanceSetting,
+		},
+		{
+			name: "ok, organization",
+			condition: database.And(
+				repo.PrimaryKeyCondition(settings[3].InstanceID, settings[3].ID),
+				repo.StateCondition(domain.SettingStatePreview),
+			),
+			want: settings[3],
+		},
+		{
+			name: "ok, organization",
+			condition: database.And(
+				repo.PrimaryKeyCondition(activeOrganizationSetting.InstanceID, activeOrganizationSetting.ID),
+				repo.StateCondition(domain.SettingStateActive),
+			),
+			want: &activeOrganizationSetting,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListBrandingSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.BrandingSettingsRepository()
+
+	settings := []*domain.BrandingSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				PrimaryColorLight:    gu.Ptr("color"),
+				BackgroundColorLight: gu.Ptr("color"),
+				WarnColorLight:       gu.Ptr("color"),
+				FontColorLight:       gu.Ptr("color"),
+				LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+				PrimaryColorDark:     gu.Ptr("color"),
+				BackgroundColorDark:  gu.Ptr("color"),
+				WarnColorDark:        gu.Ptr("color"),
+				FontColorDark:        gu.Ptr("color"),
+				LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+				HideLoginNameSuffix:  gu.Ptr(true),
+				ErrorMsgPopup:        gu.Ptr(true),
+				DisableWatermark:     gu.Ptr(true),
+				ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+				FontURL:              &url.URL{Scheme: "https", Host: "host"},
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+	_, err := repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID))
+	require.NoError(t, err)
+	activeInstanceSetting := *settings[0]
+	activeInstanceSetting.State = domain.SettingStateActive
+
+	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[2].InstanceID, settings[2].ID))
+	require.NoError(t, err)
+	activeOrganizationSetting := *settings[2]
+	activeOrganizationSetting.State = domain.SettingStateActive
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.BrandingSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.BrandingSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.BrandingSettings{&activeOrganizationSetting, settings[2], &activeInstanceSetting, settings[0]},
+		},
+		{
+			name: "all from instance, preview",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.StateCondition(domain.SettingStatePreview),
+			),
+			want: []*domain.BrandingSettings{settings[2], settings[0]},
+		},
+		{
+			name: "all from instance, active",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.StateCondition(domain.SettingStateActive),
+			),
+			want: []*domain.BrandingSettings{&activeOrganizationSetting, &activeInstanceSetting},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.BrandingSettings{&activeInstanceSetting, settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.BrandingSettings{&activeOrganizationSetting, settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn(), repo.StateColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+
+			if !assert.Len(t, got, len(tt.want)) {
+				return
+			}
+			for i := range got {
+				assert.EqualExportedValues(t, tt.want[i], got[i])
+			}
+		})
+	}
+}
+
+func TestSetBrandingSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.BrandingSettingsRepository()
+
+	existingSettings := &domain.BrandingSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+			PrimaryColorLight:    gu.Ptr("color"),
+			BackgroundColorLight: gu.Ptr("color"),
+			WarnColorLight:       gu.Ptr("color"),
+			FontColorLight:       gu.Ptr("color"),
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     gu.Ptr("color"),
+			BackgroundColorDark:  gu.Ptr("color"),
+			WarnColorDark:        gu.Ptr("color"),
+			FontColorDark:        gu.Ptr("color"),
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  gu.Ptr(true),
+			ErrorMsgPopup:        gu.Ptr(true),
+			DisableWatermark:     gu.Ptr(true),
+			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.BrandingSettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.BrandingSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+					PrimaryColorLight:    gu.Ptr("color"),
+					BackgroundColorLight: gu.Ptr("color"),
+					WarnColorLight:       gu.Ptr("color"),
+					FontColorLight:       gu.Ptr("color"),
+					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					PrimaryColorDark:     gu.Ptr("color"),
+					BackgroundColorDark:  gu.Ptr("color"),
+					WarnColorDark:        gu.Ptr("color"),
+					FontColorDark:        gu.Ptr("color"),
+					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					HideLoginNameSuffix:  gu.Ptr(true),
+					ErrorMsgPopup:        gu.Ptr(true),
+					DisableWatermark:     gu.Ptr(true),
+					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+					FontURL:              &url.URL{Scheme: "https", Host: "host"},
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.BrandingSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+					PrimaryColorLight:    gu.Ptr("color"),
+					BackgroundColorLight: gu.Ptr("color"),
+					WarnColorLight:       gu.Ptr("color"),
+					FontColorLight:       gu.Ptr("color"),
+					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					PrimaryColorDark:     gu.Ptr("color"),
+					BackgroundColorDark:  gu.Ptr("color"),
+					WarnColorDark:        gu.Ptr("color"),
+					FontColorDark:        gu.Ptr("color"),
+					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					HideLoginNameSuffix:  gu.Ptr(true),
+					ErrorMsgPopup:        gu.Ptr(true),
+					DisableWatermark:     gu.Ptr(true),
+					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+					FontURL:              &url.URL{Scheme: "https", Host: "host"},
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.BrandingSettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+					PrimaryColorLight:    gu.Ptr("color"),
+					BackgroundColorLight: gu.Ptr("color"),
+					WarnColorLight:       gu.Ptr("color"),
+					FontColorLight:       gu.Ptr("color"),
+					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					PrimaryColorDark:     gu.Ptr("color"),
+					BackgroundColorDark:  gu.Ptr("color"),
+					WarnColorDark:        gu.Ptr("color"),
+					FontColorDark:        gu.Ptr("color"),
+					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					HideLoginNameSuffix:  gu.Ptr(true),
+					ErrorMsgPopup:        gu.Ptr(true),
+					DisableWatermark:     gu.Ptr(true),
+					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+					FontURL:              &url.URL{Scheme: "https", Host: "host"},
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.BrandingSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+					PrimaryColorLight:    gu.Ptr("color"),
+					BackgroundColorLight: gu.Ptr("color"),
+					WarnColorLight:       gu.Ptr("color"),
+					FontColorLight:       gu.Ptr("color"),
+					LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+					PrimaryColorDark:     gu.Ptr("color"),
+					BackgroundColorDark:  gu.Ptr("color"),
+					WarnColorDark:        gu.Ptr("color"),
+					FontColorDark:        gu.Ptr("color"),
+					LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+					HideLoginNameSuffix:  gu.Ptr(true),
+					ErrorMsgPopup:        gu.Ptr(true),
+					DisableWatermark:     gu.Ptr(true),
+					ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+					FontURL:              &url.URL{Scheme: "https", Host: "host"},
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteBrandingSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.BrandingSettingsRepository()
+
+	existingInstanceSettings := &domain.BrandingSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+			PrimaryColorLight:    gu.Ptr("color"),
+			BackgroundColorLight: gu.Ptr("color"),
+			WarnColorLight:       gu.Ptr("color"),
+			FontColorLight:       gu.Ptr("color"),
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     gu.Ptr("color"),
+			BackgroundColorDark:  gu.Ptr("color"),
+			WarnColorDark:        gu.Ptr("color"),
+			FontColorDark:        gu.Ptr("color"),
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  gu.Ptr(true),
+			ErrorMsgPopup:        gu.Ptr(true),
+			DisableWatermark:     gu.Ptr(true),
+			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.ID))
+	require.NoError(t, err)
+	activeInstanceSetting := *existingInstanceSettings
+	activeInstanceSetting.State = domain.SettingStateActive
+
+	existingOrganizationSettings := &domain.BrandingSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+			PrimaryColorLight:    gu.Ptr("color"),
+			BackgroundColorLight: gu.Ptr("color"),
+			WarnColorLight:       gu.Ptr("color"),
+			FontColorLight:       gu.Ptr("color"),
+			LogoURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			IconURLLight:         &url.URL{Scheme: "https", Host: "host"},
+			PrimaryColorDark:     gu.Ptr("color"),
+			BackgroundColorDark:  gu.Ptr("color"),
+			WarnColorDark:        gu.Ptr("color"),
+			FontColorDark:        gu.Ptr("color"),
+			LogoURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			IconURLDark:          &url.URL{Scheme: "https", Host: "host"},
+			HideLoginNameSuffix:  gu.Ptr(true),
+			ErrorMsgPopup:        gu.Ptr(true),
+			DisableWatermark:     gu.Ptr(true),
+			ThemeMode:            gu.Ptr(domain.BrandingPolicyThemeAuto),
+			FontURL:              &url.URL{Scheme: "https", Host: "host"},
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.ID))
+	require.NoError(t, err)
+	activeOrganizationSetting := *existingOrganizationSettings
+	activeOrganizationSetting.State = domain.SettingStateActive
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name: "delete instance, active",
+			condition: database.And(
+				repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+				repo.StateCondition(domain.SettingStateActive),
+			),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 2,
 		},
 		{
 			name:             "delete organization twice",
