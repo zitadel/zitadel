@@ -2563,8 +2563,8 @@
         },
         "TITLE": "Langkah Selanjutnya"
       },
-      "CREATE_PROJECT_AUTO": "Buatkan proyek untuk saya",
-      "CREATE_PROJECT_AUTO_DESC": "Direkomendasikan jika Anda baru mengenal ZITADEL. Kami akan menangani pengaturan proyek untuk Anda.",
+      "CREATE_PROJECT_AUTO": "Buat proyek secara otomatis",
+      "CREATE_PROJECT_AUTO_DESC": "Disarankan jika Anda baru mengenal ZITADEL. Kami akan menangani pengaturan proyek untuk Anda.",
       "QUICK_CREATE_DESC": "Buat aplikasi dalam tiga langkah mudah.",
       "QUICK_CREATE_FRAMEWORK": "Pilih kerangka kerja Anda",
       "QUICK_CREATE_FRAMEWORK_DESC": "Kami memberikan konfigurasi yang disarankan untuk aplikasi Anda. Pilih kerangka kerja yang Anda gunakan atau akan gunakan.",

@@ -2618,7 +2618,7 @@
       "QUICK_CREATE_FRAMEWORK_DESC": "Nous vous fournissons une configuration recommandée pour votre application. Choisissez le framework que vous utilisez ou que vous comptez utiliser.",
       "QUICK_CREATE_NAME": "Nommez votre application",
       "CREATE": "Créer une application",
-      "CREATE_PROJECT_AUTO": "Créer un projet pour moi",
+      "CREATE_PROJECT_AUTO": "Créer automatiquement un projet",
       "CREATE_PROJECT_AUTO_DESC": "Recommandé si vous êtes nouveau sur ZITADEL. Nous nous occuperons de la configuration du projet pour vous.",
       "CREATE_SELECT_PROJECT": "Sélectionnez votre projet",
       "CREATE_NEW_PROJECT": "Tapez un nom pour créer un nouveau projet",

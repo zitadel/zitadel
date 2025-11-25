@@ -2562,7 +2562,7 @@
         },
         "TITLE": "다음 단계"
       },
-      "CREATE_PROJECT_AUTO": "프로젝트 생성",
+      "CREATE_PROJECT_AUTO": "자동으로 프로젝트 생성",
       "CREATE_PROJECT_AUTO_DESC": "ZITADEL을 처음 사용하는 경우 권장됩니다. 프로젝트 설정을 대신 처리해 드립니다.",
       "QUICK_CREATE_DESC": "세 가지 간단한 단계로 애플리케이션을 생성하세요.",
       "QUICK_CREATE_FRAMEWORK": "프레임워크 선택",

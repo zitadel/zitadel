@@ -140,12 +140,9 @@
                   }
 
                   @if (selectedScenario === 'new') {
-                    <div class="scenario-card new-app-scenario">
-                      <div class="scenario-content">
-                        <div class="scenario-description">
-                          <p>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_NEW_DESC' | translate }}</p>
-                        </div>
-
+                    <div class="new-app-scenario">
+                      <cnsl-info-section>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_NEW_DESC' | translate }}</cnsl-info-section>
+                      <cnsl-card>
                         <div class="integration-steps">
                           @if (hasExample()) {
                             <div class="step-item">
@@ -299,7 +296,7 @@
                             </div>
                           }
 
-                          @if (hasAnyFrameworkContent() && getFrameworkInfo()?.docsLink) {
+                          @if (hasAnyFrameworkContent() && !hasExampleLink() && getFrameworkInfo()?.docsLink) {
                             <div class="step-item">
                               <div class="step-number">{{ (hasExample() ? 1 : 0) + (hasBuildCommands() ? 1 : 0) + 2 }}</div>
                               <div class="step-content">
@@ -317,17 +314,14 @@
                             </div>
                           }
                         </div>
-                      </div>
+                      </cnsl-card>
                     </div>
                   }
 
                   @if (selectedScenario === 'existing') {
-                    <div class="scenario-card existing-app-scenario">
-                      <div class="scenario-content">
-                        <div class="scenario-description">
-                          <p>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_EXISTING_DESC' | translate }}</p>
-                        </div>
-
+                    <div class="existing-app-scenario">
+                      <cnsl-info-section>{{ 'APP.OVERVIEW_DETAIL.SCENARIO_EXISTING_DESC' | translate }}</cnsl-info-section>
+                      <cnsl-card>
                         <div class="integration-steps">
                           @if (hasSdk()) {
                             <div class="step-item">
@@ -470,7 +464,7 @@
                               <div class="integration-resources">
                                 <div class="resource-links">
                                   <a
-                                    [href]="getFrameworkInfo()?.exampleLink || 'https://zitadel.com/docs/guides/integrate'"
+                                    [href]="'https://zitadel.com/docs/guides/integrate'"
                                     target="_blank"
                                     mat-raised-button
                                     color="secondary"
@@ -482,7 +476,7 @@
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </cnsl-card>
                     </div>
                   }
                 </div>

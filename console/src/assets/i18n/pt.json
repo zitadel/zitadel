@@ -2569,8 +2569,8 @@
         },
         "TITLE": "Próximos Passos"
       },
-      "CREATE_PROJECT_AUTO": "Criar projeto para mim",
-      "CREATE_PROJECT_AUTO_DESC": "Recomendado se você é novo no ZITADEL. Nós cuidaremos da configuração do projeto para si.",
+      "CREATE_PROJECT_AUTO": "Criar projeto automaticamente",
+      "CREATE_PROJECT_AUTO_DESC": "Recomendado se você é novo no ZITADEL. Cuidaremos da configuração do projeto para você.",
       "QUICK_CREATE_TITLE": "Criar Aplicação",
       "QUICK_CREATE_DESC": "Crie uma aplicação em três passos simples.",
       "QUICK_CREATE_FRAMEWORK": "Selecione o seu framework",

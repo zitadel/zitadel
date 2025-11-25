@@ -2562,8 +2562,8 @@
         },
         "TITLE": "Sonraki Adımlar"
       },
-      "CREATE_PROJECT_AUTO": "Benim için proje oluştur",
-      "CREATE_PROJECT_AUTO_DESC": "ZITADEL'de yeniyseniz önerilir. Proje kurulumunu sizin için hallederiz.",
+      "CREATE_PROJECT_AUTO": "Projeyi otomatik oluştur",
+      "CREATE_PROJECT_AUTO_DESC": "ZITADEL'de yeniyseniz önerilir. Proje kurulumunu sizin için biz hallederiz.",
       "QUICK_CREATE_DESC": "Üç basit adımda bir uygulama oluşturun.",
       "QUICK_CREATE_FRAMEWORK": "Framework seçin",
       "QUICK_CREATE_FRAMEWORK_DESC": "Uygulamanız için önerilen yapılandırmayı sağlıyoruz. Kullandığınız veya kullanmayı planladığınız framework'ü seçin.",

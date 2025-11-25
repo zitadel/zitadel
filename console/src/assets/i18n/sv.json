@@ -2566,7 +2566,7 @@
         },
         "TITLE": "Nästa steg"
       },
-      "CREATE_PROJECT_AUTO": "Skapa projekt åt mig",
+      "CREATE_PROJECT_AUTO": "Skapa projekt automatiskt",
       "CREATE_PROJECT_AUTO_DESC": "Rekommenderas om du är ny på ZITADEL. Vi hanterar projektinställningen åt dig.",
       "QUICK_CREATE_DESC": "Skapa en applikation i tre enkla steg.",
       "QUICK_CREATE_FRAMEWORK": "Välj ditt ramverk",

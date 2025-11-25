@@ -2617,7 +2617,7 @@
       "CUSTOM_APP_CANCEL": "Cancel",
       "CUSTOM_APP_CREATE": "Create App",
       "CREATE": "Create application",
-      "CREATE_PROJECT_AUTO": "Create project for me",
+      "CREATE_PROJECT_AUTO": "Automatically create project",
       "CREATE_PROJECT_AUTO_DESC": "Recommended if you're new to ZITADEL. We'll handle the project setup for you.",
       "CREATE_SELECT_PROJECT": "Select your project",
       "CREATE_NEW_PROJECT": "Type a name to create a new project",

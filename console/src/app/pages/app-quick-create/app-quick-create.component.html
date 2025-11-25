@@ -90,7 +90,7 @@
             <h3>{{ 'APP.PAGES.CUSTOM_APP_NAME' | translate }}</h3>
             <cnsl-form-field class="name-formfield">
               <cnsl-label>{{ 'APP.PAGES.CUSTOM_APP_NAME_LABEL' | translate }}</cnsl-label>
-              <input cnslInput [(ngModel)]="customAppName" />
+              <input cnslInput name="customAppName" [(ngModel)]="customAppName" />
             </cnsl-form-field>
           </div>
 
@@ -147,24 +147,23 @@
               }
             </div>
           }
-
-          <div class="panel-actions">
-            <button mat-stroked-button (click)="disableCustomAppMode()">
-              {{ 'APP.PAGES.CUSTOM_APP_CANCEL' | translate }}
-            </button>
-            <button
-              color="primary"
-              mat-raised-button
-              (click)="createCustomProjectAndApp()"
-              [disabled]="!customAppType() || !customAuthMethod()"
-            >
-              @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
-                <mat-spinner diameter="20" />
-              } @else {
-                {{ 'APP.PAGES.CUSTOM_APP_CREATE' | translate }}
-              }
-            </button>
-          </div>
+        </div>
+        <div class="panel-actions">
+          <button mat-stroked-button (click)="disableCustomAppMode()">
+            {{ 'APP.PAGES.CUSTOM_APP_CANCEL' | translate }}
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="createCustomProjectAndApp()"
+            [disabled]="!isCustomAppFormValid()"
+          >
+            @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ 'APP.PAGES.CUSTOM_APP_CREATE' | translate }}
+            }
+          </button>
         </div>
       </div>
     }
@@ -183,61 +182,56 @@
         </div>
 
         <div class="panel-content">
-          <div class="panel-content">
-            @if (framework.ecosystem) {
-              <div class="detail-section">
-                <cnsl-info-section>
-                  We will create your project and all necessary configurations for you.
-                </cnsl-info-section>
-              </div>
-              <div class="detail-section">
-                <h3>Ecosystem</h3>
-                <p>{{ framework.ecosystem }}</p>
-              </div>
-            }
+          @if (framework.ecosystem) {
+            <div class="detail-section">
+              <cnsl-info-section> We will create your project and all necessary configurations for you. </cnsl-info-section>
+            </div>
+            <div class="detail-section">
+              <h3 class="detail-title">Ecosystem</h3>
+              <p>{{ framework.ecosystem }}</p>
+            </div>
+          }
 
-            @if (framework.description) {
-              <div class="detail-section">
-                <h3>Description</h3>
-                <p>{{ framework.description }}</p>
-              </div>
-            }
+          @if (framework.description) {
+            <div class="detail-section">
+              <h3 class="detail-title">Description</h3>
+              <p>{{ framework.description }}</p>
+            </div>
+          }
 
-            @if (getAppTypeLabel(framework); as appTypeLabel) {
-              <div class="detail-section">
-                <h3>Application Type</h3>
-                <p>{{ appTypeLabel }}</p>
-              </div>
-            }
+          @if (getAppTypeLabel(framework); as appTypeLabel) {
+            <div class="detail-section">
+              <h3 class="detail-title">Application Type</h3>
+              <p>{{ appTypeLabel }}</p>
+            </div>
+          }
 
-            @if (getAuthMethod(framework); as authMethod) {
-              <div class="detail-section">
-                <h3>Authentication</h3>
-                <p>{{ authMethod }}</p>
-              </div>
-            }
+          @if (getAuthMethod(framework); as authMethod) {
+            <div class="detail-section">
+              <h3 class="detail-title">Authentication</h3>
+              <p>{{ authMethod }}</p>
+            </div>
+          }
 
-            @if (framework.docsLink) {
-              <div class="detail-section">
-                <h3>Documentation</h3>
-                <a [href]="`https://zitadel.com/${framework.docsLink}`" target="_blank" rel="noopener noreferrer">
-                  View Documentation
-                  <mat-icon inline>open_in_new</mat-icon>
-                </a>
-              </div>
+          @if (framework.docsLink) {
+            <div class="detail-section">
+              <h3 class="detail-title">Documentation</h3>
+              <a [href]="`https://zitadel.com/${framework.docsLink}`" target="_blank" rel="noopener noreferrer">
+                View Documentation
+                <mat-icon inline>open_in_new</mat-icon>
+              </a>
+            </div>
+          }
+        </div>
+        <div class="panel-actions">
+          <button mat-stroked-button (click)="deselectFramework()">Cancel</button>
+          <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
+            @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Create App
             }
-          </div>
-
-          <div class="panel-actions">
-            <button mat-stroked-button (click)="deselectFramework()">Cancel</button>
-            <button color="primary" mat-raised-button (click)="createProjectAndContinue(framework)">
-              @if (createProjectMutation.isPending() || createOidcApplicationMutation.isPending()) {
-                <mat-spinner diameter="20" />
-              } @else {
-                Create App
-              }
-            </button>
-          </div>
+          </button>
         </div>
       </div>
     }

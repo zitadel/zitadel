@@ -53,6 +53,7 @@ import {
 } from 'src/app/pages/projects/apps/authmethods';
 import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InputModule } from 'src/app/modules/input/input.module';
 
 type Framework = (typeof frameworksWithOidcConfiguration)[number];
 
@@ -76,6 +77,7 @@ type Framework = (typeof frameworksWithOidcConfiguration)[number];
     FormsModule,
     AppRadioModule,
     FormFieldModule,
+    InputModule,
   ],
 })
 export class AppQuickCreateComponent {
@@ -280,6 +282,10 @@ export class AppQuickCreateComponent {
   public getSelectedAuthMethod(): RadioItemAuthType | undefined {
     const key = this.customAuthMethod();
     return key ? this.authMethods.find((m) => m.key === key) : undefined;
+  }
+
+  public isCustomAppFormValid(): boolean {
+    return !!this.customAppType() && !!this.customAuthMethod();
   }
 
   public getFilteredAuthMethods(): RadioItemAuthType[] {

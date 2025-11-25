@@ -2567,7 +2567,7 @@
         },
         "TITLE": "Następne kroki"
       },
-      "CREATE_PROJECT_AUTO": "Utwórz projekt za mnie",
+      "CREATE_PROJECT_AUTO": "Automatycznie utwórz projekt",
       "CREATE_PROJECT_AUTO_DESC": "Zalecane, jeśli jesteś nowy w ZITADEL. Zajmiemy się konfiguracją projektu za Ciebie.",
       "QUICK_CREATE_TITLE": "Utwórz aplikację",
       "QUICK_CREATE_DESC": "Utwórz aplikację w trzech prostych krokach.",

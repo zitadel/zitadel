@@ -386,6 +386,7 @@
           white-space: nowrap;
           flex: 1;
           justify-content: center;
+          background: if($is-dark-theme, var(--theme-dark-background-500), var(--theme-light-background-500));
 
           &:hover {
             background: map-get($background, card);
@@ -394,7 +395,7 @@
 
           &.active {
             background: $selected-button-bg;
-            color: map-get($primary-color, contrast, 500);
+            color: map-get($foreground, secondary-text);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
           }
 
@@ -429,186 +430,125 @@
         }
       }
 
-      .scenario-card {
-        background: map-get($background, card);
-        border: 1px solid $divider-color;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.2s ease-in-out;
+      // Styles for scenario cards (using cnsl-card component)
+      .new-app-scenario,
+      .existing-app-scenario {
+        .integration-steps {
+          .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 1.5rem 0;
+            width: 100%;
 
-        .scenario-content {
-          padding: 1.5rem;
-
-          .scenario-description {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: map-get($background, app-bar);
-            border-radius: 8px;
-            border-left: 4px solid map-get($primary-color, 500);
-
-            p {
-              margin: 0;
-              font-size: 0.9rem;
-              opacity: 0.9;
-            }
-          }
-
-          .framework-section {
-            margin-bottom: 1.5rem;
-
-            .framework-info {
+            .step-number {
+              background: map-get($primary-color, 500);
+              color: map-get($primary-color, contrast, 500);
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
               display: flex;
               align-items: center;
-              gap: 0.5rem;
-              margin-bottom: 1rem;
-
-              .framework-label {
-                font-size: 0.9rem;
-                opacity: 0.7;
-              }
-
-              strong {
-                color: map-get($primary-color, 500);
-              }
-            }
-          }
-
-          .clone-section {
-            margin-bottom: 1.5rem;
-
-            .note {
-              margin: 1rem 0 0 0;
+              justify-content: center;
               font-size: 0.875rem;
-              opacity: 0.7;
-              font-style: italic;
+              font-weight: 600;
+              margin-right: 1rem;
+              flex-shrink: 0;
             }
-          }
 
-          .generic-new-app {
-            .generic-links {
+            .step-content {
+              flex: 1;
               display: flex;
-              gap: 1rem;
-              margin-top: 1rem;
-              margin-bottom: 1rem;
-              flex-wrap: wrap;
-
-              a {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-              }
-            }
-
-            .note {
-              margin: 0;
-              font-size: 0.875rem;
-              opacity: 0.7;
-              font-style: italic;
-            }
-          }
-
-          .integration-steps {
-            .step-item {
-              display: flex;
-              align-items: flex-start;
-              margin: 1.5rem 0;
+              flex-direction: column;
               width: 100%;
+              gap: 0.5rem;
+              justify-content: flex-start;
+              align-items: flex-start;
 
-              .step-number {
-                background: map-get($primary-color, 500);
-                color: map-get($primary-color, contrast, 500);
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
+              .generic-links {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.875rem;
-                font-weight: 600;
-                margin-right: 1rem;
-                flex-shrink: 0;
+                gap: 1rem;
+                margin-top: 1rem;
+                flex-wrap: wrap;
               }
 
-              .step-content {
-                flex: 1;
+              .framework-actions {
                 display: flex;
-                flex-direction: column;
                 width: 100%;
+                flex-direction: column;
                 gap: 0.5rem;
                 justify-content: flex-start;
                 align-items: flex-start;
 
-                .generic-links {
-                  display: flex;
-                  gap: 1rem;
-                  margin-top: 1rem;
-                  flex-wrap: wrap;
-                }
-
-                .framework-actions {
-                  display: flex;
+                .code-block {
                   width: 100%;
-                  flex-direction: column;
+                }
+
+                a {
+                  display: flex;
+                  align-items: center;
                   gap: 0.5rem;
-                  justify-content: flex-start;
-                  align-items: flex-start;
-
-                  .code-block {
-                    width: 100%;
-                  }
-
-                  a {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                  }
                 }
+              }
 
-                h6 {
-                  margin: 0;
-                  font-size: 1rem;
-                  font-weight: 600;
+              h6 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 600;
+                color: map-get($primary-color, 500);
+              }
+
+              p {
+                margin: 0;
+                font-size: 0.875rem;
+                opacity: 0.8;
+                line-height: 1.4;
+              }
+
+              .client-secret-note {
+                font-size: 0.875rem;
+
+                .secret-link {
                   color: map-get($primary-color, 500);
-                }
+                  text-decoration: underline;
+                  cursor: pointer;
+                  font-weight: 500;
 
-                p {
-                  margin: 0;
-                  font-size: 0.875rem;
-                  opacity: 0.8;
-                  line-height: 1.4;
-                }
-
-                .client-secret-note {
-                  font-size: 0.875rem;
-
-                  .secret-link {
-                    color: map-get($primary-color, 500);
-                    text-decoration: underline;
-                    cursor: pointer;
-                    font-weight: 500;
-
-                    &:hover {
-                      color: map-get($primary-color, 700);
-                    }
+                  &:hover {
+                    color: map-get($primary-color, 700);
                   }
                 }
               }
             }
           }
+        }
 
-          .integration-resources {
-            .resource-links {
+        .integration-resources {
+          .resource-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-items: center;
+
+            a {
               display: flex;
-              gap: 1rem;
-              flex-wrap: wrap;
               align-items: center;
-              justify-items: center;
+              gap: 0.5rem;
+            }
+          }
+        }
 
-              a {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-              }
+        .generic-guidance {
+          .generic-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+
+            a {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
             }
           }
         }
@@ -745,7 +685,7 @@
 
       .step-card {
         padding: 1.5rem;
-        background: map-get($background, card);
+        background: if($is-dark-theme, var(--theme-dark-background-500), var(--theme-light-background-500));
         border: 1px solid $divider-color;
         border-radius: 8px;
         cursor: pointer;

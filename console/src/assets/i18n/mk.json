@@ -2565,8 +2565,8 @@
         },
         "TITLE": "Следни Чекори"
       },
-      "CREATE_PROJECT_AUTO": "Креирај проект за мене",
-      "CREATE_PROJECT_AUTO_DESC": "Препорачано ако сте нови во ZITADEL. Ние ќе се погрижиме за поставувањето на проектот.",
+      "CREATE_PROJECT_AUTO": "Автоматски креирај проект",
+      "CREATE_PROJECT_AUTO_DESC": "Препорачано ако сте нови на ZITADEL. Ние ќе се грижиме за поставувањето на проектот за вас.",
       "QUICK_CREATE_TITLE": "Креирај апликација",
       "QUICK_CREATE_DESC": "Креирајте апликација во три едноставни чекори.",
       "QUICK_CREATE_FRAMEWORK": "Изберете го вашиот framework",

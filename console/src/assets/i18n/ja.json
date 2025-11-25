@@ -2562,8 +2562,8 @@
         },
         "TITLE": "次のステップ"
       },
-      "CREATE_PROJECT_AUTO": "プロジェクトを作成する",
-      "CREATE_PROJECT_AUTO_DESC": "ZITADELが初めての方におすすめです。プロジェクトのセットアップを代行します。",
+      "CREATE_PROJECT_AUTO": "プロジェクトを自動的に作成",
+      "CREATE_PROJECT_AUTO_DESC": "ZITADELが初めての場合に推奨されます。プロジェクトのセットアップは私たちが処理します。",
       "QUICK_CREATE_DESC": "3つの簡単なステップでアプリケーションを作成します。",
       "QUICK_CREATE_FRAMEWORK": "フレームワークを選択",
       "QUICK_CREATE_FRAMEWORK_DESC": "アプリケーションの推奨構成を提供します。使用している、または使用する予定のフレームワークを選択してください。",

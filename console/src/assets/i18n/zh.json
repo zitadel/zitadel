@@ -2567,8 +2567,8 @@
         },
         "TITLE": "下一步"
       },
-      "CREATE_PROJECT_AUTO": "为我创建项目",
-      "CREATE_PROJECT_AUTO_DESC": "如果您是ZITADEL新手，推荐使用此选项。我们将为您处理项目设置。",
+      "CREATE_PROJECT_AUTO": "自动创建项目",
+      "CREATE_PROJECT_AUTO_DESC": "如果您是 ZITADEL 新用户，建议使用此选项。我们将为您处理项目设置。",
       "QUICK_CREATE_DESC": "通过三个简单的步骤创建应用程序。",
       "QUICK_CREATE_FRAMEWORK": "选择框架",
       "QUICK_CREATE_FRAMEWORK_DESC": "我们为您的应用程序提供推荐配置。选择您正在使用或打算使用的框架。",

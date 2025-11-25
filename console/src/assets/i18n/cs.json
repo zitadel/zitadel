@@ -2563,8 +2563,8 @@
         },
         "TITLE": "Další kroky"
       },
-      "CREATE_PROJECT_AUTO": "Vytvořit projekt za mě",
-      "CREATE_PROJECT_AUTO_DESC": "Doporučeno, pokud jste v ZITADEL noví. O nastavení projektu se postaráme my.",
+      "CREATE_PROJECT_AUTO": "Automaticky vytvořit projekt",
+      "CREATE_PROJECT_AUTO_DESC": "Doporučeno, pokud jste noví v ZITADEL. Nastavení projektu zvládneme za vás.",
       "QUICK_CREATE_DESC": "Vytvořte aplikaci ve třech jednoduchých krocích.",
       "QUICK_CREATE_FRAMEWORK": "Vyberte svůj framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "Poskytujeme vám doporučenou konfiguraci pro vaši aplikaci. Vyberte framework, který používáte, nebo framework, který plánujete použít.",

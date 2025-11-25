@@ -2563,8 +2563,8 @@
         },
         "TITLE": "Volgende stappen"
       },
-      "CREATE_PROJECT_AUTO": "Maak project voor mij",
-      "CREATE_PROJECT_AUTO_DESC": "Aanbevolen als je nieuw bent bij ZITADEL. We regelen de projectinrichting voor je.",
+      "CREATE_PROJECT_AUTO": "Automatisch project aanmaken",
+      "CREATE_PROJECT_AUTO_DESC": "Aanbevolen als je nieuw bent bij ZITADEL. Wij regelen de projectconfiguratie voor je.",
       "QUICK_CREATE_DESC": "Maak een applicatie in drie eenvoudige stappen.",
       "QUICK_CREATE_FRAMEWORK": "Selecteer uw framework",
       "QUICK_CREATE_FRAMEWORK_DESC": "We bieden een aanbevolen configuratie voor uw applicatie. Kies het framework dat u gebruikt of gaat gebruiken.",
