@@ -54,6 +54,7 @@ type settingsColumns interface {
 	CreatedAtColumn() database.Column
 	UpdatedAtColumn() database.Column
 	PrimaryKeyColumns() []database.Column
+	UniqueColumns() []database.Column
 }
 
 type settingsConditions interface {
@@ -61,6 +62,7 @@ type settingsConditions interface {
 	OrganizationIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
 	PrimaryKeyCondition(instanceID, id string) database.Condition
+	UniqueCondition(instanceID string, orgID *string, typ SettingType, state SettingState) database.Condition
 }
 
 type settingsChanges interface {
@@ -395,12 +397,12 @@ type NotificationSettingsRepository interface {
 type legalAndSupportSettingsJSONChanges interface {
 	SetSettingFields(value LegalAndSupportSettingsAttributes) database.Change
 
-	SetTOSLink(value url.URL) db_json.JsonUpdate
-	SetPrivacyPolicyLink(value url.URL) db_json.JsonUpdate
-	SetHelpLink(value url.URL) db_json.JsonUpdate
+	SetTOSLink(value string) db_json.JsonUpdate
+	SetPrivacyPolicyLink(value string) db_json.JsonUpdate
+	SetHelpLink(value string) db_json.JsonUpdate
 	SetSupportEmail(value string) db_json.JsonUpdate
-	SetDocsLink(value url.URL) db_json.JsonUpdate
-	SetCustomLink(value url.URL) db_json.JsonUpdate
+	SetDocsLink(value string) db_json.JsonUpdate
+	SetCustomLink(value string) db_json.JsonUpdate
 	SetCustomLinkText(value string) db_json.JsonUpdate
 }
 
@@ -410,13 +412,13 @@ type LegalAndSupportSettings struct {
 }
 
 type LegalAndSupportSettingsAttributes struct {
-	TOSLink           *url.URL `json:"tosLink,omitempty"`
-	PrivacyPolicyLink *url.URL `json:"privacyPolicyLink,omitempty"`
-	HelpLink          *url.URL `json:"helpLink,omitempty"`
-	SupportEmail      *string  `json:"supportEmail,omitempty"`
-	DocsLink          *url.URL `json:"docsLink,omitempty"`
-	CustomLink        *url.URL `json:"customLink,omitempty"`
-	CustomLinkText    *string  `json:"customLinkText,omitempty"`
+	TOSLink           *string `json:"tosLink,omitempty"`
+	PrivacyPolicyLink *string `json:"privacyPolicyLink,omitempty"`
+	HelpLink          *string `json:"helpLink,omitempty"`
+	SupportEmail      *string `json:"supportEmail,omitempty"`
+	DocsLink          *string `json:"docsLink,omitempty"`
+	CustomLink        *string `json:"customLink,omitempty"`
+	CustomLinkText    *string `json:"customLinkText,omitempty"`
 }
 
 type LegalAndSupportSettingsRepository interface {

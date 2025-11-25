@@ -587,27 +587,27 @@ func TestDeleteLoginSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(instanceID, gu.Ptr("foo"), domain.SettingTypeLogin, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLogin, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLogin, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLogin, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLogin, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -1270,35 +1270,42 @@ func TestDeleteBrandingSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeBranding, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
-			name: "delete instance, active",
-			condition: database.And(
-				repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
-				repo.StateCondition(domain.SettingStateActive),
-			),
+			name:             "delete instance, active",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization, active",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStateActive),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice, active",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
-			wantRowsAffected: 2,
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview),
+			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview),
 			wantRowsAffected: 0,
 		},
 	}
@@ -1705,27 +1712,27 @@ func TestDeletePasswordComplexitySettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -2087,27 +2094,27 @@ func TestDeletePasswordExpirySettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -2484,27 +2491,27 @@ func TestDeleteLockoutSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLockout, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLockout, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -2881,27 +2888,27 @@ func TestDeleteSecuritySettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeSecurity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecurity, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -3278,27 +3285,27 @@ func TestDeleteDomainSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeDomain, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeDomain, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -3650,22 +3657,22 @@ func TestDeleteOrganizationSettings(t *testing.T) {
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeOrganization, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -3986,7 +3993,7 @@ func TestDeleteNotificationSettings(t *testing.T) {
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	existingNotificationSettings := &domain.NotificationSettings{
+	existingOrganizationSettings := &domain.NotificationSettings{
 		Settings: domain.Settings{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
@@ -3995,7 +4002,7 @@ func TestDeleteNotificationSettings(t *testing.T) {
 			PasswordChange: gu.Ptr(true),
 		},
 	}
-	err = repo.Set(t.Context(), tx, existingNotificationSettings)
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -4017,22 +4024,22 @@ func TestDeleteNotificationSettings(t *testing.T) {
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingNotificationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingNotificationSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeNotification, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}
@@ -4063,12 +4070,12 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: nil,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4078,12 +4085,12 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: nil,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4093,12 +4100,12 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: gu.Ptr(firstOrgID),
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4108,12 +4115,12 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: gu.Ptr(secondOrgID),
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4182,12 +4189,12 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: nil,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4197,12 +4204,12 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: nil,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4212,12 +4219,12 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: gu.Ptr(firstOrgID),
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4227,12 +4234,12 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				OrganizationID: gu.Ptr(secondOrgID),
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				TOSLink:           gu.Ptr("https://host"),
+				PrivacyPolicyLink: gu.Ptr("https://host"),
+				HelpLink:          gu.Ptr("https://host"),
 				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				DocsLink:          gu.Ptr("https://host"),
+				CustomLink:        gu.Ptr("https://host"),
 				CustomLinkText:    gu.Ptr("linktext"),
 			},
 		},
@@ -4308,12 +4315,12 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 			OrganizationID: gu.Ptr(orgID),
 		},
 		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			TOSLink:           gu.Ptr("https://host"),
+			PrivacyPolicyLink: gu.Ptr("https://host"),
+			HelpLink:          gu.Ptr("https://host"),
 			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			DocsLink:          gu.Ptr("https://host"),
+			CustomLink:        gu.Ptr("https://host"),
 			CustomLinkText:    gu.Ptr("linktext"),
 		},
 	}
@@ -4334,12 +4341,12 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 					OrganizationID: nil,
 				},
 				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					TOSLink:           gu.Ptr("https://host"),
+					PrivacyPolicyLink: gu.Ptr("https://host"),
+					HelpLink:          gu.Ptr("https://host"),
 					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					DocsLink:          gu.Ptr("https://host"),
+					CustomLink:        gu.Ptr("https://host"),
 					CustomLinkText:    gu.Ptr("linktext"),
 				},
 			},
@@ -4352,12 +4359,12 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 					OrganizationID: gu.Ptr(orgID),
 				},
 				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					TOSLink:           gu.Ptr("https://host"),
+					PrivacyPolicyLink: gu.Ptr("https://host"),
+					HelpLink:          gu.Ptr("https://host"),
 					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					DocsLink:          gu.Ptr("https://host"),
+					CustomLink:        gu.Ptr("https://host"),
 					CustomLinkText:    gu.Ptr("linktext"),
 				},
 			},
@@ -4370,12 +4377,12 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 					OrganizationID: nil,
 				},
 				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					TOSLink:           gu.Ptr("https://host"),
+					PrivacyPolicyLink: gu.Ptr("https://host"),
+					HelpLink:          gu.Ptr("https://host"),
 					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					DocsLink:          gu.Ptr("https://host"),
+					CustomLink:        gu.Ptr("https://host"),
 					CustomLinkText:    gu.Ptr("linktext"),
 				},
 			},
@@ -4389,12 +4396,12 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 					OrganizationID: gu.Ptr("foo"),
 				},
 				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					TOSLink:           gu.Ptr("https://host"),
+					PrivacyPolicyLink: gu.Ptr("https://host"),
+					HelpLink:          gu.Ptr("https://host"),
 					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					DocsLink:          gu.Ptr("https://host"),
+					CustomLink:        gu.Ptr("https://host"),
 					CustomLinkText:    gu.Ptr("linktext"),
 				},
 			},
@@ -4425,34 +4432,34 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 			OrganizationID: nil,
 		},
 		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			TOSLink:           gu.Ptr("https://host"),
+			PrivacyPolicyLink: gu.Ptr("https://host"),
+			HelpLink:          gu.Ptr("https://host"),
 			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			DocsLink:          gu.Ptr("https://host"),
+			CustomLink:        gu.Ptr("https://host"),
 			CustomLinkText:    gu.Ptr("linktext"),
 		},
 	}
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	existingLegalAndSupportSettings := &domain.LegalAndSupportSettings{
+	existingOrganizationSettings := &domain.LegalAndSupportSettings{
 		Settings: domain.Settings{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
 		},
 		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			TOSLink:           gu.Ptr("https://host"),
+			PrivacyPolicyLink: gu.Ptr("https://host"),
+			HelpLink:          gu.Ptr("https://host"),
 			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
-			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			DocsLink:          gu.Ptr("https://host"),
+			CustomLink:        gu.Ptr("https://host"),
 			CustomLinkText:    gu.Ptr("linktext"),
 		},
 	}
-	err = repo.Set(t.Context(), tx, existingLegalAndSupportSettings)
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -4474,22 +4481,22 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingLegalAndSupportSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.PrimaryKeyCondition(instanceID, existingLegalAndSupportSettings.ID),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}

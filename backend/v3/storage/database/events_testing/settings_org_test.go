@@ -69,11 +69,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -90,8 +86,8 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			assert.Equal(t, time.Duration(time.Second*10), setting.MFAInitSkipLifetime)
 			assert.Equal(t, time.Duration(time.Second*10), setting.SecondFactorCheckLifetime)
 			assert.Equal(t, time.Duration(time.Second*10), setting.MultiFactorCheckLifetime)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -159,11 +155,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -186,7 +178,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.DisableLoginWithEmail)
 			assert.Equal(t, true, setting.DisableLoginWithPhone)
 			assert.Equal(t, true, setting.ForceMFALocalOnly)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -231,11 +223,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -256,18 +244,14 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.added
 			assert.Equal(t, []domain.MultiFactorType{domain.MultiFactorType(policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION)}, setting.MFAType)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
 		// remove MFAType
@@ -281,11 +265,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -339,11 +319,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -367,18 +343,14 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.secondfactor.added
 			assert.Equal(t, secondFactorTypes, setting.SecondFactorTypes)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 
 		// remove second factor type
@@ -397,18 +369,14 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.login.multifactor.secondfactor.removed
 			assert.Equal(t, secondFactorTypes, setting.SecondFactorTypes)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -455,11 +423,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 
@@ -508,11 +472,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -532,11 +492,7 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLogin),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
 			)
 
@@ -583,12 +539,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -608,8 +559,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.DisableWatermark)
 			assert.Equal(t, domain.BrandingPolicyThemeDark, setting.ThemeMode)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -662,12 +613,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -687,7 +633,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.DisableWatermark)
 			assert.Equal(t, domain.BrandingPolicyThemeLight, setting.ThemeMode)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -724,12 +670,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -743,12 +684,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStateActive),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 
@@ -766,19 +702,14 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStateActive),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
 			// event org.policy.label.activated
 			assert.Equal(t, domain.SettingStateActive, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -843,12 +774,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -856,7 +782,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.logo.added
 			assert.NotNil(t, setting.LogoURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -922,12 +848,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -935,7 +856,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.logo.dark.added
 			assert.NotNil(t, setting.LogoURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -999,12 +920,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1028,12 +944,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1041,7 +952,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.logo.removed
 			assert.Nil(t, setting.LogoURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1105,12 +1016,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1134,12 +1040,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1147,7 +1048,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.logo.dark.removed
 			assert.Nil(t, setting.LogoURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1213,12 +1114,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1226,7 +1122,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.icon.added
 			assert.NotNil(t, setting.IconURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1291,12 +1187,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1304,7 +1195,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.icon.dark.added
 			assert.NotNil(t, setting.IconURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1368,12 +1259,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1397,12 +1283,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1410,7 +1291,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.icon.removed
 			assert.Nil(t, setting.IconURLLight)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1474,12 +1355,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1504,12 +1380,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1517,7 +1388,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.icon.dark.removed
 			assert.Nil(t, setting.IconURLDark)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1583,12 +1454,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1596,7 +1462,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.font.added
 			assert.NotNil(t, setting.FontURL)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1659,12 +1525,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1688,12 +1549,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(instanceID),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(instanceID, &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1701,7 +1557,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.font.removed
 			assert.Nil(t, setting.FontURL)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1738,12 +1594,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1761,12 +1612,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 
@@ -1808,12 +1654,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(t, err)
@@ -1833,12 +1674,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeBranding),
-						settingsRepo.StateCondition(domain.SettingStatePreview),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 
@@ -1849,7 +1685,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
-	settingsRepo := repository.PasswordComplexityRepository()
+	settingsRepo := repository.PasswordComplexitySettingsRepository()
 
 	t.Run("test password complexity added", func(t *testing.T) {
 		ctx := t.Context()
@@ -1879,11 +1715,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1894,8 +1726,8 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.HasLowercase)
 			assert.Equal(t, true, setting.HasNumber)
 			assert.Equal(t, true, setting.HasSymbol)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1938,11 +1770,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1953,7 +1781,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.HasLowercase)
 			assert.Equal(t, true, setting.HasNumber)
 			assert.Equal(t, true, setting.HasSymbol)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -1985,11 +1813,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2007,11 +1831,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 
@@ -2048,11 +1868,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2072,11 +1888,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordComplexity),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
 			)
 
@@ -2087,7 +1899,7 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
-	settingsRepo := repository.PasswordExpiryRepository()
+	settingsRepo := repository.PasswordExpirySettingsRepository()
 
 	t.Run("test password policy added", func(t *testing.T) {
 		ctx := t.Context()
@@ -2115,11 +1927,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2127,8 +1935,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			// event org.policy.password.age.added
 			assert.Equal(t, uint64(10), setting.ExpireWarnDays)
 			assert.Equal(t, uint64(10), setting.MaxAgeDays)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2163,11 +1971,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2175,7 +1979,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			// event org.policy.password.age.changed
 			assert.Equal(t, uint64(40), setting.ExpireWarnDays)
 			assert.Equal(t, uint64(40), setting.MaxAgeDays)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2203,11 +2007,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2225,11 +2025,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 
@@ -2262,11 +2058,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2286,11 +2078,7 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypePasswordExpiry),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
 			)
 
@@ -2328,11 +2116,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2340,7 +2124,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			// event org.policy.lockout.added
 			assert.Equal(t, uint64(1), setting.MaxOTPAttempts)
 			assert.Equal(t, uint64(1), setting.MaxPasswordAttempts)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2375,11 +2159,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2387,7 +2167,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			// event org.policy.lockout.changed
 			assert.Equal(t, uint64(5), setting.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.MaxPasswordAttempts)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2415,11 +2195,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2437,11 +2213,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 
@@ -2474,11 +2246,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2498,11 +2266,7 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeLockout),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
 			)
 
@@ -2541,11 +2305,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2554,8 +2314,8 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, false, setting.LoginNameIncludesDomain)
 			assert.Equal(t, false, setting.RequireOrgDomainVerification)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2595,11 +2355,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2608,7 +2364,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.LoginNameIncludesDomain)
 			assert.Equal(t, true, setting.RequireOrgDomainVerification)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2639,11 +2395,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2663,11 +2415,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 
@@ -2702,11 +2450,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2726,11 +2470,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeDomain),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
 			)
 
@@ -2741,7 +2481,7 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestOrgSettingsReduces(t *testing.T) {
-	settingsRepo := repository.OrganizationSettingRepository()
+	settingsRepo := repository.OrganizationSettingsRepository()
 
 	t.Run("test add org settings added", func(t *testing.T) {
 		ctx := t.Context()
@@ -2769,19 +2509,15 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
 			// event settings.organization.set
 			assert.Equal(t, organizationScopedUsernames, setting.OrganizationScopedUsernames)
-			assert.WithinRange(t, *setting.CreatedAt, before, after)
-			assert.WithinRange(t, *setting.UpdatedAt, before, after)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -2811,11 +2547,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2835,11 +2567,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 
@@ -2874,11 +2602,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2898,11 +2622,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 
@@ -2937,11 +2657,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -2961,11 +2677,7 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				ctx, pool,
 				database.WithCondition(
-					database.And(
-						settingsRepo.InstanceIDCondition(newInstance.ID()),
-						settingsRepo.OrganizationIDCondition(&orgId),
-						settingsRepo.TypeCondition(domain.SettingTypeOrganization),
-					),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeOrganization, domain.SettingStateActive),
 				),
 			)
 

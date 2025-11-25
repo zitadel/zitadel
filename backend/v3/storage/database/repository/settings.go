@@ -133,8 +133,8 @@ func (s settings) set(ctx context.Context, client database.QueryExecutor, settin
 		id,
 		settings.InstanceID,
 		settings.OrganizationID,
-		settings.Type,
-		settings.State,
+		settings.Type.String(),
+		settings.State.String(),
 		settings.Settings,
 		createdAt,
 		updatedAt,
@@ -153,7 +153,7 @@ func (s settings) SetColumns(ctx context.Context, client database.QueryExecutor,
 }
 
 func (s settings) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if err := checkPKCondition(s, condition); err != nil {
+	if err := checkRestrictingColumns(condition, s.UniqueColumns()...); err != nil {
 		return 0, err
 	}
 
@@ -176,6 +176,24 @@ func (s settings) PrimaryKeyCondition(instanceID, id string) database.Condition 
 	return database.And(
 		s.InstanceIDCondition(instanceID),
 		s.IDCondition(id),
+	)
+}
+
+func (s settings) UniqueColumns() []database.Column {
+	return []database.Column{
+		s.InstanceIDColumn(),
+		s.OrganizationIDColumn(),
+		s.TypeColumn(),
+		s.StateColumn(),
+	}
+}
+
+func (s settings) UniqueCondition(instanceID string, orgID *string, typ domain.SettingType, state domain.SettingState) database.Condition {
+	return database.And(
+		s.InstanceIDCondition(instanceID),
+		s.OrganizationIDCondition(orgID),
+		s.TypeCondition(typ),
+		s.StateCondition(state),
 	)
 }
 
@@ -1257,15 +1275,15 @@ func (s legalAndSupportSettings) SetSettingFields(value domain.LegalAndSupportSe
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
-func (s legalAndSupportSettings) SetTOSLink(value url.URL) db_json.JsonUpdate {
+func (s legalAndSupportSettings) SetTOSLink(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"tosLink"}, value)
 }
 
-func (s legalAndSupportSettings) SetPrivacyPolicyLink(value url.URL) db_json.JsonUpdate {
+func (s legalAndSupportSettings) SetPrivacyPolicyLink(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"privacyPolicyLink"}, value)
 }
 
-func (s legalAndSupportSettings) SetHelpLink(value url.URL) db_json.JsonUpdate {
+func (s legalAndSupportSettings) SetHelpLink(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"helpLink"}, value)
 }
 
@@ -1273,11 +1291,11 @@ func (s legalAndSupportSettings) SetSupportEmail(value string) db_json.JsonUpdat
 	return db_json.NewFieldChange([]string{"supportEmail"}, value)
 }
 
-func (s legalAndSupportSettings) SetDocsLink(value url.URL) db_json.JsonUpdate {
+func (s legalAndSupportSettings) SetDocsLink(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"docsLink"}, value)
 }
 
-func (s legalAndSupportSettings) SetCustomLink(value url.URL) db_json.JsonUpdate {
+func (s legalAndSupportSettings) SetCustomLink(value string) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"customLink"}, value)
 }
 
