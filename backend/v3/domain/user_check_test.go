@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
@@ -83,13 +84,14 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Return(&domain.User{
 						ID:             "user-123",
 						OrganizationID: "org-1",
+						State:          domain.UserStateActive,
 					}, nil)
 				return repo
 			},
 			expectedError: nil,
 		},
 		{
-			testName: "when user retrieval fails should return error",
+			testName: "when user not active should return precondition failed error",
 			checkUser: &session_grpc.CheckUser{
 				Search: &session_grpc.CheckUser_UserId{
 					UserId: "user-123",
@@ -101,6 +103,43 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
 							getUserIDCondition(repo, "user-123"),
+						),
+					)).
+					Times(1).
+					Return(&domain.User{
+						ID:             "user-123",
+						OrganizationID: "org-1",
+						State:          domain.UserStateInactive,
+					}, nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive"),
+		},
+		{
+			testName: "when user retrieval fails should return error",
+			checkUser: &session_grpc.CheckUser{
+				Search: &session_grpc.CheckUser_LoginName{
+					LoginName: "user-123",
+				},
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				repo := domainmock.NewMockUserRepository(ctrl)
+
+				loginNameCondition := database.NewTextCondition(
+					database.NewColumn("zitadel.users", "login_name"),
+					database.TextOperationEqual,
+					"user-123",
+				)
+
+				repo.EXPECT().
+					LoginNameCondition(database.TextOperationEqual, "user-123").
+					AnyTimes().
+					Return(loginNameCondition)
+
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
+						database.WithCondition(
+							loginNameCondition,
 						),
 					)).
 					Times(1).
@@ -130,20 +169,6 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				return repo
 			},
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-lcZeXI", "user not found"),
-		},
-		{
-			testName: "when search type is LoginName should attempt to fetch by login name",
-			checkUser: &session_grpc.CheckUser{
-				Search: &session_grpc.CheckUser_LoginName{
-					LoginName: "user@example.com",
-				},
-			},
-			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
-				repo := domainmock.NewMockUserRepository(ctrl)
-
-				return repo
-			},
-			expectedError: zerrors.ThrowInvalidArgumentf(nil, "DOM-ioQOFX", "user search %T not implemented", (*session_grpc.CheckUser_LoginName)(nil)),
 		},
 		{
 			testName: "when search type is unknown should return invalid argument error",
@@ -191,13 +216,15 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 	updateErr := errors.New("update error")
 
 	tt := []struct {
-		testName      string
-		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
-		checkUser     *session_grpc.CheckUser
-		sessionID     string
-		instanceID    string
-		fetchedUser   domain.User
-		expectedError error
+		testName    string
+		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
+		checkUser   *session_grpc.CheckUser
+		sessionID   string
+		instanceID  string
+		fetchedUser domain.User
+
+		expectedError             error
+		expectedPreferredLanguage *language.Tag
 	}{
 		{
 			testName:      "when CheckUser is nil should return no error",
@@ -523,6 +550,9 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			fetchedUser: domain.User{
 				ID:             "user-123",
 				OrganizationID: "org-1",
+				Human: &domain.HumanUser{
+					PreferredLanguage: language.Albanian,
+				},
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -573,6 +603,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
+			expectedPreferredLanguage: &language.Albanian,
 		},
 		{
 			testName: "when session user matches fetched user should execute successfully",
@@ -667,6 +698,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			assert.Equal(t, tc.expectedError, err)
 			if tc.expectedError == nil && tc.checkUser != nil {
 				assert.NotZero(t, cmd.UserCheckedAt)
+				assert.Equal(t, tc.expectedPreferredLanguage, cmd.PreferredUserLanguage)
 			}
 		})
 	}
