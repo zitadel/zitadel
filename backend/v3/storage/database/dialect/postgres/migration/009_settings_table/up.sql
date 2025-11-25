@@ -6,8 +6,8 @@ CREATE TYPE zitadel.settings_type AS ENUM (
     'domain',
     'lockout',
     'security',
-    'organization'
-    'notification'
+    'organization',
+    'notification',
     'legal_and_support'
 );
 
