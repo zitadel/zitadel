@@ -1452,7 +1452,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event event
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lhPul", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.OrganizationSettingRepository()
+		settingsRepo := repository.OrganizationSettingsRepository()
 		updatedAt := event.CreatedAt()
 		settings := domain.OrganizationSettings{
 			Settings: domain.Settings{
@@ -1480,7 +1480,7 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rHiHb", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.OrganizationSettingRepository()
+		settingsRepo := repository.OrganizationSettingsRepository()
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(e.Agg.InstanceID),

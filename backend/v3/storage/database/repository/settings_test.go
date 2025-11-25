@@ -2517,3 +2517,1988 @@ func TestDeleteLockoutSettings(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSecuritySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecuritySettingsRepository()
+
+	settings := []*domain.SecuritySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin1", "origin2"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin3", "origin4"},
+				EnableImpersonation:   gu.Ptr(false),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin5", "origin6"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(false),
+				AllowedOrigins:        []string{"origin7", "origin8"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.SecuritySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListSecuritySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecuritySettingsRepository()
+
+	settings := []*domain.SecuritySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin1", "origin2"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin3", "origin4"},
+				EnableImpersonation:   gu.Ptr(false),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(true),
+				AllowedOrigins:        []string{"origin5", "origin6"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding: gu.Ptr(false),
+				AllowedOrigins:        []string{"origin7", "origin8"},
+				EnableImpersonation:   gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.SecuritySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.SecuritySettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.SecuritySettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.SecuritySettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.SecuritySettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetSecuritySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecuritySettingsRepository()
+
+	existingSettings := &domain.SecuritySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+			EnableIframeEmbedding: gu.Ptr(true),
+			AllowedOrigins:        []string{"origin1", "origin2"},
+			EnableImpersonation:   gu.Ptr(true),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.SecuritySettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.SecuritySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+					EnableIframeEmbedding: gu.Ptr(true),
+					AllowedOrigins:        []string{"origin1", "origin2"},
+					EnableImpersonation:   gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.SecuritySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+					EnableIframeEmbedding: gu.Ptr(true),
+					AllowedOrigins:        []string{"origin1", "origin2"},
+					EnableImpersonation:   gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.SecuritySettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+					EnableIframeEmbedding: gu.Ptr(true),
+					AllowedOrigins:        []string{"origin1", "origin2"},
+					EnableImpersonation:   gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.SecuritySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+					EnableIframeEmbedding: gu.Ptr(true),
+					AllowedOrigins:        []string{"origin1", "origin2"},
+					EnableImpersonation:   gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteSecuritySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecuritySettingsRepository()
+
+	existingInstanceSettings := &domain.SecuritySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+			EnableIframeEmbedding: gu.Ptr(true),
+			AllowedOrigins:        []string{"origin1", "origin2"},
+			EnableImpersonation:   gu.Ptr(true),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.SecuritySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+			EnableIframeEmbedding: gu.Ptr(true),
+			AllowedOrigins:        []string{"origin3", "origin4"},
+			EnableImpersonation:   gu.Ptr(true),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func TestGetDomainSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.DomainSettingsRepository()
+
+	settings := []*domain.DomainSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(false),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(false),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.DomainSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListDomainSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.DomainSettingsRepository()
+
+	settings := []*domain.DomainSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(false),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(false),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			DomainSettingsAttributes: domain.DomainSettingsAttributes{
+				LoginNameIncludesDomain:                gu.Ptr(true),
+				RequireOrgDomainVerification:           gu.Ptr(true),
+				SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(false),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.DomainSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.DomainSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.DomainSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.DomainSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.DomainSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetDomainSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.DomainSettingsRepository()
+
+	existingSettings := &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(true),
+			RequireOrgDomainVerification:           gu.Ptr(true),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.DomainSettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.DomainSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				DomainSettingsAttributes: domain.DomainSettingsAttributes{
+					LoginNameIncludesDomain:                gu.Ptr(true),
+					RequireOrgDomainVerification:           gu.Ptr(true),
+					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.DomainSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				DomainSettingsAttributes: domain.DomainSettingsAttributes{
+					LoginNameIncludesDomain:                gu.Ptr(true),
+					RequireOrgDomainVerification:           gu.Ptr(true),
+					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.DomainSettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				DomainSettingsAttributes: domain.DomainSettingsAttributes{
+					LoginNameIncludesDomain:                gu.Ptr(true),
+					RequireOrgDomainVerification:           gu.Ptr(true),
+					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.DomainSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				DomainSettingsAttributes: domain.DomainSettingsAttributes{
+					LoginNameIncludesDomain:                gu.Ptr(true),
+					RequireOrgDomainVerification:           gu.Ptr(true),
+					SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteDomainSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.DomainSettingsRepository()
+
+	existingInstanceSettings := &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(true),
+			RequireOrgDomainVerification:           gu.Ptr(true),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain:                gu.Ptr(true),
+			RequireOrgDomainVerification:           gu.Ptr(false),
+			SMTPSenderAddressMatchesInstanceDomain: gu.Ptr(true),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func TestGetOrganizationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.OrganizationSettingsRepository()
+
+	settings := []*domain.OrganizationSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.OrganizationSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListOrganizationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.OrganizationSettingsRepository()
+
+	settings := []*domain.OrganizationSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+				OrganizationScopedUsernames: gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.OrganizationSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.OrganizationSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.OrganizationSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.OrganizationSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.OrganizationSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetOrganizationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.OrganizationSettingsRepository()
+
+	existingSettings := &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.OrganizationSettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.OrganizationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+					OrganizationScopedUsernames: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteOrganizationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.OrganizationSettingsRepository()
+
+	existingInstanceSettings := &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.OrganizationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		OrganizationSettingsAttributes: domain.OrganizationSettingsAttributes{
+			OrganizationScopedUsernames: gu.Ptr(true),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func TestGetNotificationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.NotificationSettingsRepository()
+
+	settings := []*domain.NotificationSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.NotificationSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListNotificationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.NotificationSettingsRepository()
+
+	settings := []*domain.NotificationSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+				PasswordChange: gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.NotificationSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.NotificationSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.NotificationSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.NotificationSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.NotificationSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetNotificationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.NotificationSettingsRepository()
+
+	existingSettings := &domain.NotificationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+			PasswordChange: gu.Ptr(true),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.NotificationSettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.NotificationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+					PasswordChange: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.NotificationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+					PasswordChange: gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.NotificationSettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+					PasswordChange: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.NotificationSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+					PasswordChange: gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteNotificationSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.NotificationSettingsRepository()
+
+	existingInstanceSettings := &domain.NotificationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+			PasswordChange: gu.Ptr(true),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingNotificationSettings := &domain.NotificationSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		NotificationSettingsAttributes: domain.NotificationSettingsAttributes{
+			PasswordChange: gu.Ptr(true),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingNotificationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingNotificationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingNotificationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func TestGetLegalAndSupportSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.LegalAndSupportSettingsRepository()
+
+	settings := []*domain.LegalAndSupportSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.LegalAndSupportSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListLegalAndSupportSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.LegalAndSupportSettingsRepository()
+
+	settings := []*domain.LegalAndSupportSettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+				TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				SupportEmail:      gu.Ptr("email"),
+				DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+				CustomLinkText:    gu.Ptr("linktext"),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.LegalAndSupportSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.LegalAndSupportSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.LegalAndSupportSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.LegalAndSupportSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.LegalAndSupportSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetLegalAndSupportSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.LegalAndSupportSettingsRepository()
+
+	existingSettings := &domain.LegalAndSupportSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			SupportEmail:      gu.Ptr("email"),
+			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLinkText:    gu.Ptr("linktext"),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.LegalAndSupportSettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.LegalAndSupportSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					SupportEmail:      gu.Ptr("email"),
+					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLinkText:    gu.Ptr("linktext"),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.LegalAndSupportSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					SupportEmail:      gu.Ptr("email"),
+					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLinkText:    gu.Ptr("linktext"),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.LegalAndSupportSettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					SupportEmail:      gu.Ptr("email"),
+					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLinkText:    gu.Ptr("linktext"),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.LegalAndSupportSettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+					TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					SupportEmail:      gu.Ptr("email"),
+					DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+					CustomLinkText:    gu.Ptr("linktext"),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteLegalAndSupportSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.LegalAndSupportSettingsRepository()
+
+	existingInstanceSettings := &domain.LegalAndSupportSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			SupportEmail:      gu.Ptr("email"),
+			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLinkText:    gu.Ptr("linktext"),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingLegalAndSupportSettings := &domain.LegalAndSupportSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
+			TOSLink:           gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			PrivacyPolicyLink: gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			HelpLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			SupportEmail:      gu.Ptr("email"),
+			DocsLink:          gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLink:        gu.Ptr(url.URL{Scheme: "https", Host: "host"}),
+			CustomLinkText:    gu.Ptr("linktext"),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingLegalAndSupportSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingLegalAndSupportSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingLegalAndSupportSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}

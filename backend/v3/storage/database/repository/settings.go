@@ -179,14 +179,12 @@ func (s settings) PrimaryKeyCondition(instanceID, id string) database.Condition 
 	)
 }
 
+// -------------------------------------------------------------
 // login
+// -------------------------------------------------------------
 type loginSettings struct {
 	settings
 }
-
-// -------------------------------------------------------------
-// login changes
-// -------------------------------------------------------------
 
 func (l loginSettings) SetSettingFields(value domain.LoginSettingsAttributes) database.Change {
 	changes := make([]db_json.JsonUpdate, 0)
@@ -408,14 +406,13 @@ func (s loginSettings) Get(ctx context.Context, client database.QueryExecutor, o
 	return loginSettings, nil
 }
 
-// label
+// -------------------------------------------------------------
+// branding
+// -------------------------------------------------------------
+
 type brandingSettings struct {
 	settings
 }
-
-// -------------------------------------------------------------
-// label changes
-// -------------------------------------------------------------
 
 func (b brandingSettings) SetSettingFields(value domain.BrandingSettingsAttributes) database.Change {
 	changes := make([]db_json.JsonUpdate, 0)
@@ -916,9 +913,7 @@ func (s securitySettings) SetSettingFields(value domain.SecuritySettingsAttribut
 		changes = append(changes, s.SetEnableIframeEmbedding(*value.EnableIframeEmbedding))
 	}
 	if value.AllowedOrigins != nil {
-		// TODO(stebenz): add and remove of origins
-		//changes = append(changes, s.AddAllowedOrigins(*value.AllowedOrigins))
-		//changes = append(changes, s.RemoveAllowedOrigins(*value.AllowedOrigins))
+		changes = append(changes, s.SetAllowedOrigins(value.AllowedOrigins))
 	}
 	if value.EnableImpersonation != nil {
 		changes = append(changes, s.SetEnableImpersonation(*value.EnableImpersonation))
@@ -930,12 +925,8 @@ func (securitySettings) SetEnableIframeEmbedding(value bool) db_json.JsonUpdate 
 	return db_json.NewFieldChange([]string{"enableIframeEmbedding"}, value)
 }
 
-func (securitySettings) AddAllowedOrigins(value string) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, false)
-}
-
-func (securitySettings) RemoveAllowedOrigins(value string) db_json.JsonUpdate {
-	return db_json.NewArrayChange([]string{"allowedOrigins"}, value, true)
+func (securitySettings) SetAllowedOrigins(value []string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"allowedOrigins"}, value)
 }
 
 func (securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
@@ -1104,7 +1095,7 @@ func (l organizationSettings) SetOrganizationScopedUsernames(value bool) db_json
 	return db_json.NewFieldChange([]string{"organizationScopedUsernames"}, value)
 }
 
-func OrganizationSettingRepository() domain.OrganizationSettingsRepository {
+func OrganizationSettingsRepository() domain.OrganizationSettingsRepository {
 	return &organizationSettings{
 		settings{},
 	}
@@ -1153,6 +1144,196 @@ func (s organizationSettings) Get(ctx context.Context, client database.QueryExec
 
 	item := &domain.OrganizationSettings{Settings: *settings}
 	if err = json.Unmarshal(item.Settings.Settings, &item.OrganizationSettingsAttributes); err != nil {
+		return nil, err
+	}
+	item.Settings.Settings = nil
+	return item, nil
+}
+
+// -------------------------------------------------------------
+// notification
+// -------------------------------------------------------------
+type notificationSettings struct {
+	settings
+}
+
+func (s notificationSettings) SetSettingFields(value domain.NotificationSettingsAttributes) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value.PasswordChange != nil {
+		changes = append(changes, s.SetPasswordChange(*value.PasswordChange))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (s notificationSettings) SetPasswordChange(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"passwordChange"}, value)
+}
+
+func NotificationSettingsRepository() domain.NotificationSettingsRepository {
+	return &notificationSettings{
+		settings{},
+	}
+}
+
+var _ domain.NotificationSettingsRepository = (*notificationSettings)(nil)
+
+func (s notificationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.NotificationSettings) (err error) {
+	settings.Type = domain.SettingTypeNotification
+	settings.State = domain.SettingStateActive
+
+	settingsJSON, err := json.Marshal(settings.NotificationSettingsAttributes)
+	if err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.NotificationSettingsAttributes)); err != nil {
+		return err
+	}
+	settings.Settings.Settings = nil
+	return nil
+}
+
+func (s notificationSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.NotificationSettings, error) {
+	settings, err := s.settings.list(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*domain.NotificationSettings, len(settings))
+	for i := range settings {
+		list[i] = &domain.NotificationSettings{Settings: *settings[i]}
+		if json.Unmarshal(list[i].Settings.Settings, &list[i].NotificationSettingsAttributes); err != nil {
+			return nil, err
+		}
+		list[i].Settings.Settings = nil
+	}
+	return list, nil
+}
+
+func (s notificationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.NotificationSettings, error) {
+	settings, err := s.settings.get(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &domain.NotificationSettings{Settings: *settings}
+	if err = json.Unmarshal(item.Settings.Settings, &item.NotificationSettingsAttributes); err != nil {
+		return nil, err
+	}
+	item.Settings.Settings = nil
+	return item, nil
+}
+
+// -------------------------------------------------------------
+// legal and support
+// -------------------------------------------------------------
+type legalAndSupportSettings struct {
+	settings
+}
+
+func (s legalAndSupportSettings) SetSettingFields(value domain.LegalAndSupportSettingsAttributes) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value.TOSLink != nil {
+		changes = append(changes, s.SetTOSLink(*value.TOSLink))
+	}
+	if value.PrivacyPolicyLink != nil {
+		changes = append(changes, s.SetPrivacyPolicyLink(*value.PrivacyPolicyLink))
+	}
+	if value.HelpLink != nil {
+		changes = append(changes, s.SetHelpLink(*value.HelpLink))
+	}
+	if value.SupportEmail != nil {
+		changes = append(changes, s.SetSupportEmail(*value.SupportEmail))
+	}
+	if value.DocsLink != nil {
+		changes = append(changes, s.SetDocsLink(*value.DocsLink))
+	}
+	if value.CustomLink != nil {
+		changes = append(changes, s.SetCustomLink(*value.CustomLink))
+	}
+	if value.CustomLinkText != nil {
+		changes = append(changes, s.SetCustomLinkText(*value.CustomLinkText))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (s legalAndSupportSettings) SetTOSLink(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"tosLink"}, value)
+}
+
+func (s legalAndSupportSettings) SetPrivacyPolicyLink(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"privacyPolicyLink"}, value)
+}
+
+func (s legalAndSupportSettings) SetHelpLink(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"helpLink"}, value)
+}
+
+func (s legalAndSupportSettings) SetSupportEmail(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"supportEmail"}, value)
+}
+
+func (s legalAndSupportSettings) SetDocsLink(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"docsLink"}, value)
+}
+
+func (s legalAndSupportSettings) SetCustomLink(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"customLink"}, value)
+}
+
+func (s legalAndSupportSettings) SetCustomLinkText(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"customLinkText"}, value)
+}
+
+func LegalAndSupportSettingsRepository() domain.LegalAndSupportSettingsRepository {
+	return &legalAndSupportSettings{
+		settings{},
+	}
+}
+
+var _ domain.LegalAndSupportSettingsRepository = (*legalAndSupportSettings)(nil)
+
+func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LegalAndSupportSettings) (err error) {
+	settings.Type = domain.SettingTypeLegalAndSupport
+	settings.State = domain.SettingStateActive
+
+	settingsJSON, err := json.Marshal(settings.LegalAndSupportSettingsAttributes)
+	if err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LegalAndSupportSettingsAttributes)); err != nil {
+		return err
+	}
+	settings.Settings.Settings = nil
+	return nil
+}
+
+func (s legalAndSupportSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LegalAndSupportSettings, error) {
+	settings, err := s.settings.list(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*domain.LegalAndSupportSettings, len(settings))
+	for i := range settings {
+		list[i] = &domain.LegalAndSupportSettings{Settings: *settings[i]}
+		if json.Unmarshal(list[i].Settings.Settings, &list[i].LegalAndSupportSettingsAttributes); err != nil {
+			return nil, err
+		}
+		list[i].Settings.Settings = nil
+	}
+	return list, nil
+}
+
+func (s legalAndSupportSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LegalAndSupportSettings, error) {
+	settings, err := s.settings.get(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &domain.LegalAndSupportSettings{Settings: *settings}
+	if err = json.Unmarshal(item.Settings.Settings, &item.LegalAndSupportSettingsAttributes); err != nil {
 		return nil, err
 	}
 	item.Settings.Settings = nil
