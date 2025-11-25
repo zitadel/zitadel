@@ -20,6 +20,34 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
+func getUserIDCondition(repo *domainmock.MockUserRepository, userID string) database.Condition {
+	idCondition := getTextCondition("zitadel.users", "id", userID)
+
+	repo.EXPECT().
+		IDCondition(userID).
+		AnyTimes().
+		Return(idCondition)
+	return idCondition
+}
+
+func getSessionIDCondition(repo *domainmock.MockSessionRepository, sessionID string) database.Condition {
+	idCondition := getTextCondition("zitadel.sessions", "id", sessionID)
+
+	repo.EXPECT().
+		IDCondition(sessionID).
+		AnyTimes().
+		Return(idCondition)
+	return idCondition
+}
+
+func getTextCondition(tableName, column, value string) database.Condition {
+	return database.NewTextCondition(
+		database.NewColumn(tableName, column),
+		database.TextOperationEqual,
+		value,
+	)
+}
+
 func TestUserCheckCommand_Validate(t *testing.T) {
 	t.Parallel()
 	getErr := errors.New("get error")
@@ -44,17 +72,17 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				},
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
-				repo := domainmock.NewUserRepo(ctrl)
+				repo := domainmock.NewMockUserRepository(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							repo.IDCondition("user-123"),
+							getUserIDCondition(repo, "user-123"),
 						),
 					)).
 					Times(1).
 					Return(&domain.User{
-						ID:    "user-123",
-						OrgID: "org-1",
+						ID:             "user-123",
+						OrganizationID: "org-1",
 					}, nil)
 				return repo
 			},
@@ -68,11 +96,11 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				},
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
-				repo := domainmock.NewUserRepo(ctrl)
+				repo := domainmock.NewMockUserRepository(ctrl)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							repo.IDCondition("user-123"),
+							getUserIDCondition(repo, "user-123"),
 						),
 					)).
 					Times(1).
@@ -89,11 +117,12 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				},
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
-				repo := domainmock.NewUserRepo(ctrl)
+				repo := domainmock.NewMockUserRepository(ctrl)
+
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
 						database.WithCondition(
-							repo.IDCondition("user-123"),
+							getUserIDCondition(repo, "user-123"),
 						),
 					)).
 					Times(1).
@@ -110,7 +139,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				},
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
-				repo := domainmock.NewUserRepo(ctrl)
+				repo := domainmock.NewMockUserRepository(ctrl)
 
 				return repo
 			},
@@ -183,8 +212,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 				},
 			},
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionID: "session-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -193,12 +222,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 				// repo := domainmock.NewSessionRepo(ctrl)
 
 				// TODO(IAM-Marco): Remove idCondition and expectation once Session repository is implemented
-				idCondition := database.NewTextCondition(
-					database.NewColumn("sessions", "id"),
-					database.TextOperationEqual,
-					"session-1",
-				)
-				repo.EXPECT().IDCondition("session-1").Times(1).Return(idCondition)
+				idCondition := getSessionIDCondition(repo, "session-1")
 
 				repo.EXPECT().
 					// TODO(IAM-Marco): Uncomment this down and remove the other Get call once
@@ -225,8 +249,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 				},
 			},
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionID: "session-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -235,12 +259,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 				// repo := domainmock.NewSessionRepo(ctrl)
 
 				// TODO(IAM-Marco): Remove idCondition and expectation once Session repository is implemented
-				idCondition := database.NewTextCondition(
-					database.NewColumn("sessions", "id"),
-					database.TextOperationEqual,
-					"session-1",
-				)
-				repo.EXPECT().IDCondition("session-1").Times(1).Return(idCondition)
+				idCondition := getSessionIDCondition(repo, "session-1")
 
 				repo.EXPECT().
 					// TODO(IAM-Marco): Uncomment this down and remove the other Get call once
@@ -269,8 +288,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -278,12 +297,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 				// repo := domainmock.NewSessionRepo(ctrl)
 
 				// TODO(IAM-Marco): Remove idCondition and expectation once Session repository is implemented
-				idCondition := database.NewTextCondition(
-					database.NewColumn("sessions", "id"),
-					database.TextOperationEqual,
-					"session-1",
-				)
-				repo.EXPECT().IDCondition("session-1").Times(1).Return(idCondition)
+				idCondition := getSessionIDCondition(repo, "session-1")
 
 				repo.EXPECT().
 					// TODO(IAM-Marco): Uncomment this down and remove the other Get call once
@@ -315,8 +329,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -379,8 +393,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -443,8 +457,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -507,8 +521,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -570,8 +584,8 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			sessionID:  "session-1",
 			instanceID: "instance-1",
 			fetchedUser: domain.User{
-				ID:    "user-123",
-				OrgID: "org-1",
+				ID:             "user-123",
+				OrganizationID: "org-1",
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -686,7 +700,7 @@ func TestUserCheckCommand_Events(t *testing.T) {
 			},
 			sessionID:        "session-1",
 			instanceID:       "instance-1",
-			fetchedUser:      domain.User{ID: "user-123", OrgID: "org-1"},
+			fetchedUser:      domain.User{ID: "user-123", OrganizationID: "org-1"},
 			userCheckedAt:    time.Now(),
 			expectedEventLen: 1,
 			expectedError:    nil,
@@ -721,7 +735,7 @@ func TestUserCheckCommand_Events(t *testing.T) {
 				require.True(t, ok)
 
 				assert.Equal(t, tc.fetchedUser.ID, usrCheckedEvent.UserID)
-				assert.Equal(t, tc.fetchedUser.OrgID, usrCheckedEvent.UserResourceOwner)
+				assert.Equal(t, tc.fetchedUser.OrganizationID, usrCheckedEvent.UserResourceOwner)
 				assert.NotZero(t, usrCheckedEvent.CheckedAt)
 			}
 		})

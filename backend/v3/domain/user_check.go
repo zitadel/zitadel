@@ -52,7 +52,7 @@ func (u *UserCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 			ctx,
 			&session.NewAggregate(u.SessionID, u.InstanceID).Aggregate,
 			u.FetchedUser.ID,
-			u.FetchedUser.OrgID,
+			u.FetchedUser.OrganizationID,
 			u.UserCheckedAt,
 			u.preferredUserLanguage,
 		),
