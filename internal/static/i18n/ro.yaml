@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: Codul de inițializare nu a fost găsit
     UsernameNotChanged: Numele de utilizator nu a fost schimbat
     InvalidURLTemplate: Șablonul URL este invalid
+    Locked: Utilizatorul este blocat
     Profile:
       NotFound: Profilul nu a fost găsit
       NotChanged: Profilul nu a fost schimbat
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F nu există
       Passwordless:
         NotExisting: Fără parolă nu există
+      RecoveryCodes:
+        InvalidCode: Codul de recuperare furnizat este invalid
+        MaxCountExceeded: Numărul maxim de coduri de recuperare a fost depășit
+        NotReady: Codurile de recuperare nu sunt gata pentru utilizare
+        ConfigInvalid: Configurația codurilor de recuperare este invalidă
     WebAuthN:
       NotFound: Token-ul WebAuthN nu a putut fi găsit
       BeginRegisterFailed: Înregistrarea WebAuthN a început, dar a eșuat

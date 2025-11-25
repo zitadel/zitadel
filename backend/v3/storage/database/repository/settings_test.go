@@ -3652,7 +3652,7 @@ func TestDeleteOrganizationSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeOrganization, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
@@ -4019,7 +4019,7 @@ func TestDeleteNotificationSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeNotification, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
@@ -4476,7 +4476,7 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
