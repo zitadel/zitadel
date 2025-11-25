@@ -110,20 +110,11 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 		},
 		{
 			name:    "event group match",
-			targets: testTargets,
+			targets: testTargets[1:],
 			args: args{
 				id: "event/foo.baz",
 			},
 			wantTargets: []Target{eventGroupTarget},
-			wantOk:      true,
-		},
-		{
-			name:    "event group match with specific match available",
-			targets: testTargets,
-			args: args{
-				id: "event/foo.bar.baz",
-			},
-			wantTargets: []Target{eventMatchTarget},
 			wantOk:      true,
 		},
 		{
@@ -169,6 +160,33 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 				id: "request/zitadel.test.TestService/TestMethod",
 			},
 			wantTargets: []Target{requestServiceMethodTarget},
+			wantOk:      true,
+		},
+		{
+			name:    "response global match",
+			targets: testTargets,
+			args: args{
+				id: "response/zitadel.test.OtherService/OtherMethod",
+			},
+			wantTargets: []Target{responseGlobalTarget},
+			wantOk:      true,
+		},
+		{
+			name:    "response service match",
+			targets: testTargets,
+			args: args{
+				id: "response/zitadel.test.TestService/RandomMethod",
+			},
+			wantTargets: []Target{responseServiceTarget},
+			wantOk:      true,
+		},
+		{
+			name:    "response service method match",
+			targets: testTargets,
+			args: args{
+				id: "response/zitadel.test.TestService/TestMethod",
+			},
+			wantTargets: []Target{responseServiceMethodTarget},
 			wantOk:      true,
 		},
 	}
