@@ -1311,3 +1311,430 @@ func TestDeleteBrandingSettings(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPasswordComplexitySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.PasswordComplexitySettingsRepository()
+
+	settings := []*domain.PasswordComplexitySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(8)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(10)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(12)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(14)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.PasswordComplexitySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListPasswordComplexitySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.PasswordComplexitySettingsRepository()
+
+	settings := []*domain.PasswordComplexitySettings{
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(8)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: nil,
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(10)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     firstInstanceID,
+				OrganizationID: gu.Ptr(firstOrgID),
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(10)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+		{
+			Settings: domain.Settings{
+				InstanceID:     secondInstanceID,
+				OrganizationID: gu.Ptr(secondOrgID),
+			},
+			PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+				MinLength:    gu.Ptr(uint64(12)),
+				HasLowercase: gu.Ptr(true),
+				HasUppercase: gu.Ptr(true),
+				HasNumber:    gu.Ptr(true),
+				HasSymbol:    gu.Ptr(true),
+			},
+		},
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.PasswordComplexitySettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.PasswordComplexitySettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.PasswordComplexitySettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.PasswordComplexitySettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.PasswordComplexitySettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetPasswordComplexitySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.PasswordComplexitySettingsRepository()
+
+	existingSettings := &domain.PasswordComplexitySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+			MinLength:    gu.Ptr(uint64(8)),
+			HasLowercase: gu.Ptr(true),
+			HasUppercase: gu.Ptr(true),
+			HasNumber:    gu.Ptr(true),
+			HasSymbol:    gu.Ptr(true),
+		},
+	}
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.PasswordComplexitySettings
+		wantErr  error
+	}{
+		{
+			name: "create instance",
+			settings: &domain.PasswordComplexitySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: nil,
+				},
+				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+					MinLength:    gu.Ptr(uint64(8)),
+					HasLowercase: gu.Ptr(true),
+					HasUppercase: gu.Ptr(true),
+					HasNumber:    gu.Ptr(true),
+					HasSymbol:    gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "update organization",
+			settings: &domain.PasswordComplexitySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr(orgID),
+				},
+				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+					MinLength:    gu.Ptr(uint64(10)),
+					HasLowercase: gu.Ptr(true),
+					HasUppercase: gu.Ptr(true),
+					HasNumber:    gu.Ptr(true),
+					HasSymbol:    gu.Ptr(true),
+				},
+			},
+		},
+		{
+			name: "non-existing instance",
+			settings: &domain.PasswordComplexitySettings{
+				Settings: domain.Settings{
+					InstanceID:     "foo",
+					OrganizationID: nil,
+				},
+				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+					MinLength:    gu.Ptr(uint64(8)),
+					HasLowercase: gu.Ptr(true),
+					HasUppercase: gu.Ptr(true),
+					HasNumber:    gu.Ptr(true),
+					HasSymbol:    gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existing org",
+			settings: &domain.PasswordComplexitySettings{
+				Settings: domain.Settings{
+					InstanceID:     instanceID,
+					OrganizationID: gu.Ptr("foo"),
+				},
+				PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+					MinLength:    gu.Ptr(uint64(8)),
+					HasLowercase: gu.Ptr(true),
+					HasUppercase: gu.Ptr(true),
+					HasNumber:    gu.Ptr(true),
+					HasSymbol:    gu.Ptr(true),
+				},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeletePasswordComplexitySettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.PasswordComplexitySettingsRepository()
+
+	existingInstanceSettings := &domain.PasswordComplexitySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: nil,
+		},
+		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+			MinLength:    gu.Ptr(uint64(8)),
+			HasLowercase: gu.Ptr(true),
+			HasUppercase: gu.Ptr(true),
+			HasNumber:    gu.Ptr(true),
+			HasSymbol:    gu.Ptr(true),
+		},
+	}
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := &domain.PasswordComplexitySettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: gu.Ptr(orgID),
+		},
+		PasswordComplexitySettingsAttributes: domain.PasswordComplexitySettingsAttributes{
+			MinLength:    gu.Ptr(uint64(8)),
+			HasLowercase: gu.Ptr(true),
+			HasUppercase: gu.Ptr(true),
+			HasNumber:    gu.Ptr(true),
+			HasSymbol:    gu.Ptr(true),
+		},
+	}
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.PrimaryKeyCondition(instanceID, "foo"),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingInstanceSettings.ID),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.PrimaryKeyCondition(instanceID, existingOrganizationSettings.ID),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}

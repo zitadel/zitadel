@@ -678,7 +678,7 @@ func (passwordComplexitySettings) SetHasSymbol(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"hasSymbol"}, value)
 }
 
-func PasswordComplexityRepository() domain.PasswordComplexitySettingsRepository {
+func PasswordComplexitySettingsRepository() domain.PasswordComplexitySettingsRepository {
 	return &passwordComplexitySettings{
 		settings{},
 	}

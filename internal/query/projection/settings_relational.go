@@ -1031,7 +1031,7 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordComplexityRepository()
+		settingsRepo := repository.PasswordComplexitySettingsRepository()
 		updatedAt := event.CreatedAt()
 		settings := domain.PasswordComplexitySettings{
 			Settings: domain.Settings{
@@ -1070,7 +1070,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityChanged(event eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLrfy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordComplexityRepository()
+		settingsRepo := repository.PasswordComplexitySettingsRepository()
 		updatedAt := event.CreatedAt()
 		settings := domain.PasswordComplexitySettings{
 			Settings: domain.Settings{
@@ -1102,7 +1102,7 @@ func (s *settingsRelationalProjection) reducePasswordComplexityRemoved(event eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.PasswordComplexityRepository()
+		settingsRepo := repository.PasswordComplexitySettingsRepository()
 
 		orgId := &policyEvent.Aggregate().ID
 
