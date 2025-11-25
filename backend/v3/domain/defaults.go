@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 var (
@@ -16,6 +17,7 @@ var (
 	logger           logging.Logger = *logging.NewLogger(slog.Default())
 	legacyEventstore eventstore.LegacyEventstore
 	sysConfig        systemdefaults.SystemDefaults
+	passwordHasher   *crypto.Hasher
 )
 
 func SetPool(p database.Pool) {
@@ -36,4 +38,8 @@ func SetLegacyEventstore(es eventstore.LegacyEventstore) {
 
 func SetSystemConfig(cfg systemdefaults.SystemDefaults) {
 	sysConfig = cfg
+}
+
+func SetPasswordHasher(hasher *crypto.Hasher) {
+	passwordHasher = hasher
 }
