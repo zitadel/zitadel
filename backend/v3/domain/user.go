@@ -92,6 +92,9 @@ type HumanPassword struct {
 	// Unverified is the verification data for setting a new password
 	// If nil, no password change is in progress
 	Unverified *Verification `json:"-"`
+	// FailedAttempts is the number of consecutive failed password attempts
+	// It is reset to 0 on successful verification
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
 }
 
 type HumanEmail struct {
