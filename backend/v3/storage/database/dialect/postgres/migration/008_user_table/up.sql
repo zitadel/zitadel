@@ -252,6 +252,7 @@ CREATE TYPE zitadel.passkey_type AS ENUM (
 CREATE TABLE zitadel.human_passkeys(
     instance_id TEXT NOT NULL
     , token_id TEXT NOT NULL
+    , key_id TEXT NOT NULL
 
     , user_id TEXT NOT NULL
 
@@ -264,6 +265,10 @@ CREATE TABLE zitadel.human_passkeys(
     , name TEXT NOT NULL CHECK (name <> '')
     , sign_count INT NOT NULL DEFAULT 0 CHECK (sign_count >= 0)
     , challenge BYTES NOT NULL
+    , public_key BYTES NOT NULL
+    , attestation_type TEXT NOT NULL CHECK (attestation_type <> '')
+    , authenticator_attestation_guid BYTES NOT NULL
+    , relying_party_id TEXT NOT NULL CHECK (relying_party_id <> '')
 
     , PRIMARY KEY (instance_id, token_id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE

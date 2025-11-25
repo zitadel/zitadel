@@ -17,7 +17,68 @@ func (u userHuman) unqualifiedPasskeysTableName() string {
 
 // AddPasskey implements [domain.HumanUserRepository.AddPasskey].
 func (u userHuman) AddPasskey(passkey *domain.Passkey) database.Change {
-	panic("unimplemented")
+	var (
+		createdAt  any = database.NowInstruction
+		updatedAt  any = database.NowInstruction
+		verifiedAt any = database.NowInstruction
+	)
+	if !passkey.CreatedAt.IsZero() {
+		createdAt = passkey.CreatedAt
+	}
+	if !passkey.UpdatedAt.IsZero() {
+		updatedAt = passkey.UpdatedAt
+	}
+	if !passkey.VerifiedAt.IsZero() {
+		verifiedAt = passkey.VerifiedAt
+	}
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO ")
+			builder.WriteString(u.unqualifiedPasskeysTableName())
+			builder.WriteString(" (")
+			database.Columns{
+				u.passkeyInstanceIDColumn(),
+				u.passkeyUserIDColumn(),
+				u.passkeyIDColumn(),
+				u.passkeyKeyIDColumn(),
+				u.passkeyCreatedAtColumn(),
+				u.passkeyUpdatedAtColumn(),
+				u.passkeyVerifiedAtColumn(),
+				// TODO init_verification_id
+				u.passkeyTypeColumn(),
+				u.passkeyNameColumn(),
+				u.passkeySignCountColumn(),
+				u.passkeyChallengeColumn(),
+				u.passkeyPublicKeyColumn(),
+				u.passkeyAttestationTypeColumn(),
+				u.passkeyAuthenticatorAttestationGUIDColumn(),
+				u.passkeyRelyingPartyIDColumn(),
+			}.WriteUnqualified(builder)
+			builder.WriteString(") SELECT ")
+			database.Columns{
+				existingHumanUser.instanceIDColumn(),
+				existingHumanUser.idColumn(),
+			}.WriteQualified(builder)
+			builder.WriteString(", ")
+			builder.WriteArgs(
+				passkey.ID,
+				passkey.KeyID,
+				createdAt,
+				updatedAt,
+				verifiedAt,
+				// TODO: verification_id
+				passkey.Type,
+				passkey.Name,
+				passkey.SignCount,
+				passkey.Challenge,
+				passkey.PublicKey,
+				passkey.AttestationType,
+				passkey.AuthenticatorAttestationGUID,
+				passkey.RelyingPartyID,
+			)
+
+		}, nil,
+	)
 }
 
 // RemovePasskey implements [domain.HumanUserRepository.RemovePasskey].
@@ -40,140 +101,49 @@ func (u userHuman) RemovePasskey(condition database.Condition) database.Change {
 
 // SetPasskeyAttestationType implements [domain.HumanUserRepository.SetPasskeyAttestationType].
 func (u userHuman) SetPasskeyAttestationType(attestationType string) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyAttestationTypeColumn(), attestationType).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeyAttestationTypeColumn(), attestationType)
 }
 
 // SetPasskeyAuthenticatorAttestationGUID implements [domain.HumanUserRepository.SetPasskeyAuthenticatorAttestationGUID].
 func (u userHuman) SetPasskeyAuthenticatorAttestationGUID(aaguid []byte) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyAuthenticatorAttestationGUIDColumn(), aaguid).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeyAuthenticatorAttestationGUIDColumn(), aaguid)
 }
 
 // SetPasskeyKeyID implements [domain.HumanUserRepository.SetPasskeyKeyID].
 func (u userHuman) SetPasskeyKeyID(keyID []byte) database.Change {
-	panic("unimplemented")
+	return database.NewChange(u.passkeyKeyIDColumn(), keyID)
 }
 
 // SetPasskeyName implements [domain.HumanUserRepository.SetPasskeyName].
 func (u userHuman) SetPasskeyName(name string) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyNameColumn(), name).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeyNameColumn(), name)
 }
 
 // SetPasskeyPublicKey implements [domain.HumanUserRepository.SetPasskeyPublicKey].
 func (u userHuman) SetPasskeyPublicKey(publicKey []byte) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyPublicKeyColumn(), publicKey).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeyPublicKeyColumn(), publicKey)
 }
 
 // SetPasskeySignCount implements [domain.HumanUserRepository.SetPasskeySignCount].
 func (u userHuman) SetPasskeySignCount(signCount uint32) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeySignCountColumn(), signCount).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeySignCountColumn(), signCount)
 }
 
 // SetPasskeyUpdatedAt implements [domain.HumanUserRepository.SetPasskeyUpdatedAt].
 func (u userHuman) SetPasskeyUpdatedAt(updatedAt time.Time) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyUpdatedAtColumn(), updatedAt).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	return database.NewChange(u.passkeyUpdatedAtColumn(), updatedAt)
 }
 
 // SetPasskeyVerifiedAt implements [domain.HumanUserRepository.SetPasskeyVerifiedAt].
 func (u userHuman) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.unqualifiedPasskeysTableName())
-			builder.WriteString(" SET ")
-			database.NewChange(u.passkeyVerifiedAtColumn(), verifiedAt).Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
-			))
-		},
-		nil,
-	)
+	verifiedAtChange := database.NewChange(u.passkeyVerifiedAtColumn(), database.NowInstruction)
+	if !verifiedAt.IsZero() {
+		verifiedAtChange = database.NewChange(u.passkeyVerifiedAtColumn(), verifiedAt)
+	}
+	return database.Changes{
+		verifiedAtChange,
+		database.NewChange(u.passkeyInitVerificationIDColumn(), database.NullInstruction),
+	}
 }
 
 // UpdatePasskey implements [domain.HumanUserRepository.UpdatePasskey].
@@ -234,4 +204,52 @@ func (u userHuman) passkeyInstanceIDColumn() database.Column {
 
 func (u userHuman) passkeyUserIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedPasskeysTableName(), "user_id")
+}
+
+func (u userHuman) passkeyRelyingPartyIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "relying_party_id")
+}
+
+func (u userHuman) passkeyAuthenticatorAttestationGUIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "authenticator_attestation_guid")
+}
+
+func (u userHuman) passkeyAttestationTypeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "attestation_type")
+}
+
+func (u userHuman) passkeyPublicKeyColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "public_key")
+}
+
+func (u userHuman) passkeyChallengeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "challenge")
+}
+
+func (u userHuman) passkeySignCountColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "sign_count")
+}
+
+func (u userHuman) passkeyNameColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "name")
+}
+
+func (u userHuman) passkeyTypeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "type")
+}
+
+func (u userHuman) passkeyVerifiedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "verified_at")
+}
+
+func (u userHuman) passkeyUpdatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "updated_at")
+}
+
+func (u userHuman) passkeyCreatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "created_at")
+}
+
+func (u userHuman) passkeyInitVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedPasskeysTableName(), "init_verification_id")
 }

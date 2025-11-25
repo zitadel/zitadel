@@ -27,7 +27,6 @@ func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 			lastSucceededChange = database.NewChange(u.lastSuccessfulTOTPCheckColumn(), typ.SucceededAt)
 		}
 		return database.NewChanges(
-			// database.NewChange(u.totpFailedAttemptsColumn()),
 			database.NewCTEChange(
 				func(builder *database.StatementBuilder) {
 					builder.WriteString("UPDATE ")

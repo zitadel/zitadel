@@ -210,7 +210,7 @@ type humanTOTPChanges interface {
 type identityProviderLinkChanges interface {
 	// AddIdentityProviderLink adds or updates an identity provider link
 	AddIdentityProviderLink(link *IdentityProviderLink) database.Change
-	UpdateIdentityProviderLink(changes ...database.Change) database.Change
+	UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change
 	// RemoveIdentityProviderLink removes an identity provider link based on the condition
 	RemoveIdentityProviderLink(providerID, providedUserID string) database.Change
 

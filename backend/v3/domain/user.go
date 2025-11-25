@@ -168,7 +168,7 @@ const (
 )
 
 type Passkey struct {
-	ID                           string      `json:"id" db:"id"`
+	ID                           string      `json:"id" db:"token_id"`
 	KeyID                        []byte      `json:"-" db:"key_id"`
 	Name                         string      `json:"name" db:"name"`
 	SignCount                    uint32      `json:"-" db:"sign_count"`

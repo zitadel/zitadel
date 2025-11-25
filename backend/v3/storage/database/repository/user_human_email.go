@@ -13,7 +13,37 @@ import (
 
 // CheckEmailOTP implements [domain.HumanUserRepository.CheckEmailOTP].
 func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
-	panic("unimplemented")
+	switch typ := check.(type) {
+	case *domain.CheckTypeFailed:
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("UPDATE ")
+			builder.WriteString(u.verification.qualifiedTableName())
+			builder.WriteString(" SET ")
+			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
+			))
+		}, nil)
+	case *domain.CheckTypeSucceeded:
+		lastSucceededChange := database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), database.NowInstruction)
+		if !typ.SucceededAt.IsZero() {
+			lastSucceededChange = database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), typ.SucceededAt)
+		}
+		return database.NewChanges(
+			lastSucceededChange,
+			database.NewChangeToNull(u.emailOTPVerificationIDColumn()),
+		)
+	case *domain.CheckTypeInit:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.verifications ()")
+			}
+		)
+	}
+
 }
 
 // DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
@@ -56,4 +86,12 @@ func (u userHuman) EmailColumn() database.Column {
 
 func (u userHuman) emailOTPEnabledAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email_otp_enabled_at")
+}
+
+func (u userHuman) emailOTPVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "email_otp_verification_id")
+}
+
+func (u userHuman) lastSuccessfulEmailOTPCheckColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "email_otp_last_successfully_checked_at")
 }

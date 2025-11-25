@@ -318,7 +318,7 @@ func (u user) metadataValueColumn() database.Column {
 
 // Human implements [domain.UserRepository.Human].
 func (u user) Human() domain.HumanUserRepository {
-	panic("unimplemented")
+	return userHuman{user: u}
 }
 
 // LoadIdentityProviderLinks implements [domain.UserRepository.LoadIdentityProviderLinks].
