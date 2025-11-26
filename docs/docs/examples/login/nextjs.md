@@ -182,7 +182,7 @@ https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/userinfo.ts
 ### Session state
 
 To allow session state to be shared between pages - which improves performance, reduces network traffic and avoids component state changes while rendering - you can use the NextAuth.js Provider in `/pages/_app.tsx`.
-Take a loot at the template `_app.tsx`.
+Take a look at the template `_app.tsx`.
 
 ```ts reference
 https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/_app.tsx
