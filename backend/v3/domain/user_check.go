@@ -92,7 +92,7 @@ func (u *UserCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	updateCount, err := sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(session.ID), sessionRepo.SetFactor(userFactor))
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-netNam", "failed updating session")
 	}
 
 	if updateCount == 0 {
