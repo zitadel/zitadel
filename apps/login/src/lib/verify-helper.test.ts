@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { shouldEnforceMFA } from "./verify-helper";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
@@ -325,14 +325,6 @@ describe("shouldEnforceMFA", () => {
 });
 
 import {
-  describe as describeAdditional,
-  it as itAdditional,
-  expect as expectAdditional,
-  vi,
-  beforeEach as beforeEachAdditional,
-  afterEach,
-} from "vitest";
-import {
   checkPasswordChangeRequired,
   checkEmailVerified,
   checkEmailVerification,
@@ -368,7 +360,7 @@ vi.mock("crypto", () => ({
   },
 }));
 
-describeAdditional("checkPasswordChangeRequired", () => {
+describe("checkPasswordChangeRequired", () => {
   const mockSession: any = {
     id: "session-123",
     factors: {
@@ -389,7 +381,7 @@ describeAdditional("checkPasswordChangeRequired", () => {
     };
   };
 
-  itAdditional("should redirect if password change is required on user", () => {
+  it("should redirect if password change is required on user", () => {
     const humanUser: any = {
       passwordChangeRequired: true,
       passwordChanged: createTimestamp(0),
@@ -397,12 +389,12 @@ describeAdditional("checkPasswordChangeRequired", () => {
 
     const result = checkPasswordChangeRequired(undefined, mockSession, humanUser);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/password/change"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/password/change"),
     });
   });
 
-  itAdditional("should redirect if password is expired based on maxAgeDays", () => {
+  it("should redirect if password is expired based on maxAgeDays", () => {
     const expirySettings: any = {
       maxAgeDays: BigInt(30),
     };
@@ -414,12 +406,12 @@ describeAdditional("checkPasswordChangeRequired", () => {
 
     const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/password/change"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/password/change"),
     });
   });
 
-  itAdditional("should not redirect if password is not expired", () => {
+  it("should not redirect if password is not expired", () => {
     const expirySettings: any = {
       maxAgeDays: BigInt(30),
     };
@@ -431,30 +423,30 @@ describeAdditional("checkPasswordChangeRequired", () => {
 
     const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should include organization in redirect params", () => {
+  it("should include organization in redirect params", () => {
     const humanUser: any = {
       passwordChangeRequired: true,
     };
 
     const result = checkPasswordChangeRequired(undefined, mockSession, humanUser, "custom-org");
 
-    expectAdditional(result?.redirect).toContain("organization=");
+    expect(result?.redirect).toContain("organization=");
   });
 
-  itAdditional("should include requestId in redirect params", () => {
+  it("should include requestId in redirect params", () => {
     const humanUser: any = {
       passwordChangeRequired: true,
     };
 
     const result = checkPasswordChangeRequired(undefined, mockSession, humanUser, undefined, "request-123");
 
-    expectAdditional(result?.redirect).toContain("requestId=request-123");
+    expect(result?.redirect).toContain("requestId=request-123");
   });
 
-  itAdditional("should handle no expiry settings", () => {
+  it("should handle no expiry settings", () => {
     const humanUser: any = {
       passwordChangeRequired: false,
       passwordChanged: createTimestamp(100),
@@ -462,10 +454,10 @@ describeAdditional("checkPasswordChangeRequired", () => {
 
     const result = checkPasswordChangeRequired(undefined, mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should handle no password changed timestamp", () => {
+  it("should handle no password changed timestamp", () => {
     const expirySettings: any = {
       maxAgeDays: BigInt(30),
     };
@@ -476,11 +468,11 @@ describeAdditional("checkPasswordChangeRequired", () => {
 
     const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 });
 
-describeAdditional("checkEmailVerified", () => {
+describe("checkEmailVerified", () => {
   const mockSession: any = {
     factors: {
       user: {
@@ -491,7 +483,7 @@ describeAdditional("checkEmailVerified", () => {
     },
   };
 
-  itAdditional("should redirect if email is not verified", () => {
+  it("should redirect if email is not verified", () => {
     const humanUser: any = {
       email: {
         isVerified: false,
@@ -500,12 +492,12 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/verify"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
     });
   });
 
-  itAdditional("should not redirect if email is verified", () => {
+  it("should not redirect if email is verified", () => {
     const humanUser: any = {
       email: {
         isVerified: true,
@@ -514,10 +506,10 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should include userId in verify redirect", () => {
+  it("should include userId in verify redirect", () => {
     const humanUser: any = {
       email: {
         isVerified: false,
@@ -526,10 +518,10 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser);
 
-    expectAdditional(result?.redirect).toContain("userId=user-123");
+    expect(result?.redirect).toContain("userId=user-123");
   });
 
-  itAdditional("should include send=true parameter", () => {
+  it("should include send=true parameter", () => {
     const humanUser: any = {
       email: {
         isVerified: false,
@@ -538,10 +530,10 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser);
 
-    expectAdditional(result?.redirect).toContain("send=true");
+    expect(result?.redirect).toContain("send=true");
   });
 
-  itAdditional("should include organization in redirect", () => {
+  it("should include organization in redirect", () => {
     const humanUser: any = {
       email: {
         isVerified: false,
@@ -550,10 +542,10 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser, "custom-org");
 
-    expectAdditional(result?.redirect).toContain("organization=custom-org");
+    expect(result?.redirect).toContain("organization=custom-org");
   });
 
-  itAdditional("should include requestId in redirect", () => {
+  it("should include requestId in redirect", () => {
     const humanUser: any = {
       email: {
         isVerified: false,
@@ -562,21 +554,21 @@ describeAdditional("checkEmailVerified", () => {
 
     const result = checkEmailVerified(mockSession, humanUser, undefined, "request-123");
 
-    expectAdditional(result?.redirect).toContain("requestId=request-123");
+    expect(result?.redirect).toContain("requestId=request-123");
   });
 
-  itAdditional("should handle no email on user", () => {
+  it("should handle no email on user", () => {
     const humanUser: any = {};
 
     const result = checkEmailVerified(mockSession, humanUser);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/verify"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
     });
   });
 });
 
-describeAdditional("checkEmailVerification", () => {
+describe("checkEmailVerification", () => {
   const mockSession: any = {
     factors: {
       user: {
@@ -592,7 +584,7 @@ describeAdditional("checkEmailVerification", () => {
     process.env.EMAIL_VERIFICATION = originalEnv;
   });
 
-  itAdditional("should redirect if email not verified and EMAIL_VERIFICATION is true", () => {
+  it("should redirect if email not verified and EMAIL_VERIFICATION is true", () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -603,12 +595,12 @@ describeAdditional("checkEmailVerification", () => {
 
     const result = checkEmailVerification(mockSession, humanUser);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/verify"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
     });
   });
 
-  itAdditional("should not redirect if EMAIL_VERIFICATION is not true", () => {
+  it("should not redirect if EMAIL_VERIFICATION is not true", () => {
     process.env.EMAIL_VERIFICATION = "false";
 
     const humanUser: any = {
@@ -619,10 +611,10 @@ describeAdditional("checkEmailVerification", () => {
 
     const result = checkEmailVerification(mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should not redirect if email is verified", () => {
+  it("should not redirect if email is verified", () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -633,10 +625,10 @@ describeAdditional("checkEmailVerification", () => {
 
     const result = checkEmailVerification(mockSession, humanUser);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should include send=true parameter", () => {
+  it("should include send=true parameter", () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -647,10 +639,10 @@ describeAdditional("checkEmailVerification", () => {
 
     const result = checkEmailVerification(mockSession, humanUser);
 
-    expectAdditional(result?.redirect).toContain("send=true");
+    expect(result?.redirect).toContain("send=true");
   });
 
-  itAdditional("should include organization in redirect", () => {
+  it("should include organization in redirect", () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -661,14 +653,14 @@ describeAdditional("checkEmailVerification", () => {
 
     const result = checkEmailVerification(mockSession, humanUser, "custom-org");
 
-    expectAdditional(result?.redirect).toContain("organization=custom-org");
+    expect(result?.redirect).toContain("organization=custom-org");
   });
 });
 
-describeAdditional("checkUserVerification", () => {
+describe("checkUserVerification", () => {
   let mockCookies: any;
 
-  beforeEachAdditional(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
     mockCookies = {
       get: vi.fn(),
@@ -676,7 +668,7 @@ describeAdditional("checkUserVerification", () => {
     vi.mocked(cookies).mockResolvedValue(mockCookies);
   });
 
-  itAdditional("should return true if verification hash matches", async () => {
+  it("should return true if verification hash matches", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-123",
@@ -688,18 +680,18 @@ describeAdditional("checkUserVerification", () => {
 
     const result = await checkUserVerification("user-123");
 
-    expectAdditional(result).toBe(true);
+    expect(result).toBe(true);
   });
 
-  itAdditional("should return false if fingerprint cookie not found", async () => {
+  it("should return false if fingerprint cookie not found", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue(undefined);
 
     const result = await checkUserVerification("user-123");
 
-    expectAdditional(result).toBe(false);
+    expect(result).toBe(false);
   });
 
-  itAdditional("should return false if fingerprint cookie has no value", async () => {
+  it("should return false if fingerprint cookie has no value", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "",
@@ -707,10 +699,10 @@ describeAdditional("checkUserVerification", () => {
 
     const result = await checkUserVerification("user-123");
 
-    expectAdditional(result).toBe(false);
+    expect(result).toBe(false);
   });
 
-  itAdditional("should return false if verification cookie not found", async () => {
+  it("should return false if verification cookie not found", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-123",
@@ -720,10 +712,10 @@ describeAdditional("checkUserVerification", () => {
 
     const result = await checkUserVerification("user-123");
 
-    expectAdditional(result).toBe(false);
+    expect(result).toBe(false);
   });
 
-  itAdditional("should return false if verification hash does not match", async () => {
+  it("should return false if verification hash does not match", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-123",
@@ -735,10 +727,10 @@ describeAdditional("checkUserVerification", () => {
 
     const result = await checkUserVerification("user-123");
 
-    expectAdditional(result).toBe(false);
+    expect(result).toBe(false);
   });
 
-  itAdditional("should create hash from userId and fingerprint", async () => {
+  it("should create hash from userId and fingerprint", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-456",
@@ -750,11 +742,11 @@ describeAdditional("checkUserVerification", () => {
 
     await checkUserVerification("user-456");
 
-    expectAdditional(crypto.createHash).toHaveBeenCalledWith("sha256");
+    expect(crypto.createHash).toHaveBeenCalledWith("sha256");
   });
 });
 
-describeAdditional("checkMFAFactors", () => {
+describe("checkMFAFactors", () => {
   const mockSession: any = {
     id: "session-123",
     factors: {
@@ -771,12 +763,12 @@ describeAdditional("checkMFAFactors", () => {
     forceMfaLocalOnly: false,
   };
 
-  beforeEachAdditional(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
-  itAdditional("should not require MFA if authenticated with passkey", async () => {
+  it("should not require MFA if authenticated with passkey", async () => {
     const sessionWithPasskey = {
       ...mockSession,
       factors: {
@@ -790,68 +782,68 @@ describeAdditional("checkMFAFactors", () => {
 
     const result = await checkMFAFactors("https://example.com", sessionWithPasskey, mockLoginSettings, []);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 
-  itAdditional("should redirect to TOTP if only TOTP is available", async () => {
+  it("should redirect to TOTP if only TOTP is available", async () => {
     const authMethods = [AuthenticationMethodType.TOTP];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/otp/time-based"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/time-based"),
     });
   });
 
-  itAdditional("should redirect to SMS OTP if only OTP_SMS is available", async () => {
+  it("should redirect to SMS OTP if only OTP_SMS is available", async () => {
     const authMethods = [AuthenticationMethodType.OTP_SMS];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/otp/sms"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/sms"),
     });
   });
 
-  itAdditional("should redirect to Email OTP if only OTP_EMAIL is available", async () => {
+  it("should redirect to Email OTP if only OTP_EMAIL is available", async () => {
     const authMethods = [AuthenticationMethodType.OTP_EMAIL];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/otp/email"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/email"),
     });
   });
 
-  itAdditional("should redirect to U2F if only U2F is available", async () => {
+  it("should redirect to U2F if only U2F is available", async () => {
     const authMethods = [AuthenticationMethodType.U2F];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/u2f"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/u2f"),
     });
   });
 
-  itAdditional("should redirect to MFA selection page if multiple factors available", async () => {
+  it("should redirect to MFA selection page if multiple factors available", async () => {
     const authMethods = [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_SMS];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toEqual({
-      redirect: expectAdditional.stringContaining("/mfa?"),
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/mfa?"),
     });
   });
 
-  itAdditional("should include organization in redirect params", async () => {
+  it("should include organization in redirect params", async () => {
     const authMethods = [AuthenticationMethodType.TOTP];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods, "custom-org");
 
-    expectAdditional(result?.redirect).toContain("organization=custom-org");
+    expect(result?.redirect).toContain("organization=custom-org");
   });
 
-  itAdditional("should include requestId in redirect params", async () => {
+  it("should include requestId in redirect params", async () => {
     const authMethods = [AuthenticationMethodType.TOTP];
 
     const result = await checkMFAFactors(
@@ -863,14 +855,14 @@ describeAdditional("checkMFAFactors", () => {
       "request-123",
     );
 
-    expectAdditional(result?.redirect).toContain("requestId=request-123");
+    expect(result?.redirect).toContain("requestId=request-123");
   });
 
-  itAdditional("should ignore non-MFA authentication methods", async () => {
+  it("should ignore non-MFA authentication methods", async () => {
     const authMethods = [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY];
 
     const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
 
-    expectAdditional(result).toBeUndefined();
+    expect(result).toBeUndefined();
   });
 });
