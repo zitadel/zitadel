@@ -1126,7 +1126,6 @@ module.exports = {
       items: [
         "self-hosting/deploy/overview",
         "self-hosting/deploy/linux",
-        "self-hosting/deploy/macos",
         "self-hosting/deploy/compose",
         "self-hosting/deploy/devcontainer",
         "self-hosting/deploy/kubernetes",

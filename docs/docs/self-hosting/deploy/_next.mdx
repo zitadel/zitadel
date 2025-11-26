@@ -1,9 +1,7 @@
+Here are some natural steps forward to go from your current setup to production:
 
-## What's next
-
-For running a production grade ZITADEL instance in your environment, go on with the [configure ZITADEL](/self-hosting/manage/configure) section.
-
-:::caution
-
-<!-- TODO: Better mark the link in the UI -->
-The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2)
+1. **Get the platform up and running**: Get familiar with the most basic configuration options mentioned on this page to embed the Zitadel platform into your landscape. Learn more about all [configuration options](/docs/self-hosting/manage/configure) to best serve your unique use cases.
+1. **Expose your Zitadel API, Login and Console at a single internal IP or DNS to your private network**: Beware that the Login app requires a non-localhost address for HTTPS. Refer to the reference configuration for your [reverse proxy in Docker Compose](/docs/self-hosting/deploy/reverse-proxy).
+1. **Integrate your applications with Zitadel**: Get confident that Zitadels capabilities fit your requirements. Get a feeling for how Zitadel works [by following the quick start guide from here](https://zitadel.com/docs/guides/start/quickstart#4-create-your-first-project-and-app). Model your organization and auth structures using Zitadel organizations, projects, applications, roles and authorizations. Use actions to exactly tailor the Zitadel API to your unique needs.
+1. **Harden your operations and go live**: Make yourself comfortable with running Zitadel at production scale with the help of our [production setup guide](/docs/self-hosting/manage/production). It covers important topics such as backups, monitoring, scaling and security hardening. For exceptionally fast support with access to the very engineer who coded the behavior you have question about, [get in touch](https://zitadel.com/discoverycall).
+1. **Securely expose your Zitadel platform to the public internet**: [Configure your reverse proxy for TLS](/docs/self-hosting/deploy/reverse-proxy), change your ExternalDomain, ExternalPort and ExternalSecure properties and run `zitadel setup`. Your Zitadel API is reconfigured to expect HTTPS traffic at your external domain and port.

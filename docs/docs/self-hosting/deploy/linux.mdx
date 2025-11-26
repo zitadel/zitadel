@@ -3,6 +3,9 @@ title: Install Zitadel on Linux
 sidebar_label: Linux
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 import Disclaimer from "./_disclaimer.mdx";
 import DefaultUser from "./_defaultuser.mdx";
 import Next from "./_next.mdx";
@@ -36,16 +39,16 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
 
-### Getting Started
+<Tabs>
+<TabItem value="dev" label="Getting Started">
 
 Give the initial super user a password so Zitadel can initialize the database
 
 ```bash
 sudo -u postgres psql -c "ALTER USER postgres password 'postgres';"
 ```
-
-### Getting to Production
-
+</TabItem>
+<TabItem value="prod" label="Getting to Production">
 For production, rather than changing the postgres users password, create a separate superuser with a safe password.
 
 ```bash
@@ -60,6 +63,8 @@ sudo -u postgres psql -c "ALTER USER ${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME}
 From your terminal, you can connect via Unix socket and don't have to enter the password.
 psql -d postgres
 ```
+</TabItem>
+</Tabs>
 
 ## Download The Zitadel API and the Zitadel Login
 
@@ -67,7 +72,7 @@ Download the Zitadel API and Login from [Github](https://github.com/zitadel/zita
 
 ```bash
 LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r')
-ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac;
+ARCH=$(uname -m); case $ARCH in aarch64) ARCH="arm64";; x86_64) ARCH="amd64";; esac;
 mkdir -p zitadel-api zitadel-login
 wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz --strip-components=1 -C zitadel-api
 wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-login.tar.gz -O - | tar -xz -C zitadel-login;
@@ -75,15 +80,17 @@ wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-log
 
 ## Create the API Master Key
 
-- [ ] Describe: what's the master key for?
+- [ ] TODO: Describe what we need the master key for
 
-### Getting Started
+<Tabs>
+<TabItem value="dev" label="Getting Started">
 
 ```bash
 echo -n "MasterkeyNeedsToHave32Characters" > ./zitadel-api-masterkey.txt
 ```
 
-### Getting to Production
+</TabItem>
+<TabItem value="prod" label="Getting to Production">
 
 Generate a random string for the master key, for example
 
@@ -91,10 +98,13 @@ Generate a random string for the master key, for example
 tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-api-masterkey.txt
 ```
 
-::caution
+::warning
 Don't lose or overwrite the masterkey of an existing Zitadel API.
 You won't be able to start the process anymore.
 ::
+
+</TabItem>
+</Tabs>
 
 ## Create an RSA Key pair
 
@@ -102,9 +112,17 @@ To allow the Login to communicate with the API, you will have to run it with a p
 The Login sends then all API requests with a Bearer token that has the private keys signature.
 The API can validate this signature against the public key.
 
-### Getting Started
+<Tabs>
+<TabItem value="dev" label="Getting Started">
+
+:::warning
+Do not use this login-system-user-base64.pem file in production.
+:::
+
+Write a hardcoded RSA key pair for development purposes only.
 
 ```bash
+#
 echo LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRQzJhNG1ueldLbEVGblIKbXJ5ZGhoV1hyMnJJcXJodjZYVlQvb0N4aWJVcENIbWlZOHN2anpjeFY0M2tnYnVHd2l1R25paDh6THRJL0xxUgpzTFQrdGo2VGw2Zi9DTEsvdEJGaG5FN01jUmxMWXVKdThrbkJJUlNxbUZNMWowQWZudlVKaktvU3ZvUU1rRlE4ClhTdnJ3bzhlaGZxQzNOYXBncjB3VzhSa1pLUzlnR0hBalBUQ2duYnNZalhsOXdnOWhLOUFhN2ZsUmx1YzdUUE0KVE9GM3YwcEFEQnlqTiswMDJGb2MvWjBaZEhJYWhxbWRyTjI4WTBYZDhVSUdpNzkyZ0RDRHJETVJsK01MWjNIcgpJQzA5Vm5tT0kvUVNCQzFibzF1SS9mcDQ0L1N6bWZFNlVGdzA5VFVEK0NSTjlMM0FnN2F5TXF1aUxkSk83UHZRCmduOVBnUGFqQWdNQkFBRUNnZ0VBUkNBWEVZYS9ienVTLzVkVkYxTUszMUlRaEE1VndOMmtCcEZHU0lkUUU1bnAKcXY2djAvd2ROWjBvRFkxeGxoc1BuRCtXaVQwQU9IckJ4a1VDNHhqMmQ3SXNlQzhzYWpGNlNFVFNuTUVrSENZNgp3QXBXQnYwdXRhTWJlQ1llWVhEQXZDYy9JSzdycTdGKzgrZ3J6ZWtqLzljelBnbnhWTzdSYnF6bXhFTmR6ckx3ClpJMzhsUWVOZDJMVWhpOTltbE15eElVMDFvV3pFMEpEZFZ6K3BGaFFXV0tZN2VaQVVVUU16d1Y4TDN2R0hjT3oKaG13VmxLS29hNVZ1dkgyU0JlaUpqalkwV3lOZkE5TjJXSm10TENMYkxKV3lmNE9VOUFXVythelJ3SE1HTU80SQozWVYvK2xRdEUweVE2SmlSU01lYlIvSjN6NTZhdDZKNUVBQXd6R3JDNlFLQmdRRHA0eVdvVk9jeHp1Y2pZTHRFCmxQV1VDcWZHcEpjVWRqVlNGalFDRi91RTRPSmFVdlYzWEdNakZTVDZnZm90T3NGTzJ5aGNuSFVyM2VvUDVrNzkKcHMwRmJXcXc1MkZVMHZzeTB1MjBLcGdTNFZScjRNV3lGd0NnUndoNkpaS2lYM2VNY3BRdEcrbDg2ZUVVYjllQgpGajN6VWVadTkrcUR2UUZXVEpYY3RQOS9Gd0tCZ1FESHFyWkoxWUEzVkhsNUU4R3J4VUI5bGdQdzltKzZzdy8zCkl2ZUpuMDY5dXBkczJsdEVzMS9qRDArMHBUaldiM3Bkd3EyM0pDeVk3NWozK0plUCtmNHJiSjBBNlZCV1JRZzkKYTVvcGIzVXpnSGFOQmNNd1R0UUJ4aHUvYlB6dEtkS2NEYnpienpXZ2NwcDVramwxVjZSMEszMVkrbnZ1bEVyMwo4V0hKRHF6Y1ZRS0JnRStId3MxYm1ZWVJVZjF3cmgwaS9lTEtRTVRHUU8xZlNNQlI5bnRqeGs0bjNqQlNsMDl3CkpmSFBCZFQ5RDZJRG9hbjcwZHkwQXcvWWxQZTFHOVVhdkFxRmEwc2VVclZ5VEtLNm9NT3IzQ3hIWE5xV0F3T00KMk5TbmN0VitJejk5Y1B4Y0ZkREU5ZjlZMUFXTUJsN0p2bVVYeTJDZWdxc3JRT0lraHEwWEN1NGZBb0dBS2NzcgorT3g5dUJjd2pnMTZuby9kWGV4R3l1dHFtN1BiaGFtR0V3S0xvdDhwenhrdHZZV21ib3JIN2xJZlFaTjRFNlFxClpJbG41R05TcTZVWFpJVzVsREZaODlUaWdneFZHellvd0wrWjBydnpGTFcrRTZDTWRBcVp5RW54NzFxdndRYUgKSDZPUjRCSGREOUZ4d1lRazRrUXdLcTNUdnk2L09vTUdLdVd0ZlRrQ2dZRUF6ckJZU1NaWWF2c0YrRld4cHkzQwpMTTVGaVo3ZXZRZDBHZ3dFLzkycmQvMnpKc1dFV2E1RUxlMkNUZ2pLaHRDQStHSm5QbXRvd3ZkekRtRG56aDhTCksyRmpQdExJV2hQRXhYV3NpRjlvRzh6T3ZFUHBTdHA5cFk5MEk2dWxSdEZHdmNJaldDM1lmZU5OaVlReHI3K2gKTGVTcEl0Nm4zZDV3SWFkOU9PYkttRDg9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K > login-system-user-base64.pem
 cat <<EOF > login-system-user.pub
 -----BEGIN PUBLIC KEY-----
@@ -119,7 +137,10 @@ owIDAQAB
 EOF
 ```
 
-### Getting to Production
+</TabItem>
+<TabItem value="prod" label="Getting to Production">
+
+Generate a secure RSA key pair for production use:
 
 ```bash
 openssl genrsa -traditional -out ./login-system-user.pem 2048
@@ -127,9 +148,15 @@ openssl rsa -in ./login-system-user.pem -outform PEM -pubout -out ./login-system
 openssl pkcs8 -topk8 -in ./login-system-user.pem -nocrypt | base64 --wrap 0 > ./login-system-user-base64.pem
 ```
 
+</TabItem>
+</Tabs>
+
 ## Run the API
 
-### Getting Started
+<Tabs>
+<TabItem value="dev" label="Getting Started">
+
+- [ ] TODO: Describe
 
 ```bash
 # See "What's next" to learn about how to enable TLS.
@@ -147,27 +174,31 @@ export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom
 ./zitadel-api/zitadel start-from-init --masterkeyFile ./zitadel-api-masterkey.txt
 ```
 
-### Getting to Production
+</TabItem>
+<TabItem value="prod" label="Getting to Production">
+
+- [ ] TODO: Describe and structure
+
 
 ```bash
 # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
-# export ZITADEL_EXTERNALDOMAIN=my.organization.com # Defaults to localhost
+export ZITADEL_EXTERNALDOMAIN=my.organization.com # Defaults to localhost
 
-# Database connection settings.
-# export ZITADEL_DATABASE_POSTGRES_HOST="my.managed.cloud.db" # Defaults to "localhost"
-# export ZITADEL_DATABASE_POSTGRES_PORT="5433" # Defaults to "5432"
+# Change the database connection settings.
+export ZITADEL_DATABASE_POSTGRES_HOST="my.managed.cloud.db" # Defaults to "localhost"
+export ZITADEL_DATABASE_POSTGRES_PORT="5433" # Defaults to "5432"
 # The database is created by the init job if it does not exist.
-# export ZITADEL_DATABASE_POSTGRES_DATABASE="zitadel_api_data" # Defaults to "zitadel"
+export ZITADEL_DATABASE_POSTGRES_DATABASE="zitadel_api_data" # Defaults to "zitadel"
 # The admin user must already exist in the database.
-# export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME="admin" # Defaults to "postgres"
-# export ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD="admin" # Defaults to "postgres"
-# export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE="require" # Defaults to "disable"
+export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME="admin" # Defaults to "postgres"
+export ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD="admin" # Defaults to "postgres"
+export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE="require" # Defaults to "disable"
 # The zitadel user is created by the init job if it does not exist.
 # Defining a password for the unpriviledged user is required.
 # Generate a secure password and store it safely.
-# export ZITADEL_DATABASE_POSTGRES_USER_USERNAME="zitadel-api" Defaults to "zitadel"
-# export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)" # Defaults to ""
-# export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE="require" # Defaults to "disable"
+export ZITADEL_DATABASE_POSTGRES_USER_USERNAME="zitadel-api" Defaults to "zitadel"
+export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)" # Defaults to ""
+export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE="require" # Defaults to "disable"
 
 # To change the initial human admin users username and password, uncomment the following lines.
 # The first login name is formatted like this: <username>@<org_name>.<external_domain>
@@ -176,21 +207,27 @@ export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD="$(tr -dc A-Za-z0-9 </dev/urandom
 # If you can't log in, check the available login names:
 # echo "select * from projections.login_names3;" | psql -h localhost -U postgres -d zitadel
 # The postgres users password is postgres.
-# export ZITADEL_FIRSTINSTANCE_ORG_NAME=My Organization
-# export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=root
-# export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=RootPassword1!
+export ZITADEL_FIRSTINSTANCE_ORG_NAME=My Organization
+export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=root
+export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=RootPassword1!
 
 # Enable debug logs
-# export ZITADEL_LOG_LEVEL=debug     
+export ZITADEL_LOG_LEVEL=debug     
 # Write Access Logs to stdout.
-# export ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
+export ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
 ```
+
+</TabItem>
+</Tabs>
 
 ## Run the Login
 
-### Getting Started
+<Tabs>
+<TabItem value="dev" label="Getting Started">
 
-```bash
+Get started by setting the following environment variables:
+
+```shell
 export ZITADEL_API_URL=http://localhost:8080
 export CUSTOM_REQUEST_HEADERS=x-zitadel-instance-host:localhost
 # If the Login is not custom-built, the base path must be set to /ui/v2/login
@@ -204,20 +241,38 @@ export AUDIENCE=http://localhost:8080
 export SYSTEM_USER_PRIVATE_KEY_FILE=./login-system-user-base64.pem
 # The value for the system user ID must correspond with the Logins system users property name in ZITADEL_SYSTEMAPIUSERS
 export SYSTEM_USER_ID=login-system-user
+```
 
+Run the Login app with NodeJS:
+
+```shell 
 ./zitadel-login/entrypoint.sh node ./zitadel-login/apps/login/server.js
 ```
 
+</TabItem>
+<TabItem value="prod" label="Getting to Production">
 
-### Getting to Production
+Additionally to the environment variables described in the "Getting Started" tab, set the following variable:
 
+```shell
+# Require verified emails for users to be able to log in.
+export EMAIL_VERIFICATION=true
 ```
-export CUSTOM_REQUEST_HEADERS=x-zitadel-instance-host:localhost
-``` 
+
+Use a service manager like pm2 or SystemD to run the Login app in production.
+
+- [ ] TODO: Test this 
+
+```shell
+npm install pm2 -g
+./zitadel-login/entrypoint.sh pm2 start ./zitadel-login/apps/login/server.js
+```
+
+</TabItem>
+</Tabs>
 
 <DefaultUser components={props.components} />
 
-<NoteInstanceNotFound />
+## What's next{#next-steps}
 
-<Next components={props.components} />
-<Disclaimer components={props.components} />
+<Next/>

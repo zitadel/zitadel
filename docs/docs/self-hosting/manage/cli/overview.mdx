@@ -11,7 +11,16 @@ Let's dive in!
 
 ## Download the CLI
 
-Download the CLI for [Linux](/docs/self-hosting/deploy/linux#install-zitadel) or [MacOS](/docs/self-hosting/deploy/macos#install-zitadel).
+```shell
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r')
+ARCH=$(uname -m); case $ARCH in aarch64) ARCH="arm64";; x86_64) ARCH="amd64";; esac;
+
+OS="linux"
+# Or for MacOS, use:
+OS="darwin"
+
+wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_${OS}_${ARCH}.tar.gz  | tar -xJ zitadel && sudo mv zitadel /usr/local/bin
+``` 
 
 ## Quick start
 
