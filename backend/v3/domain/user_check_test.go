@@ -408,7 +408,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					Return(int64(0), updateErr)
 				return repo
 			},
-			expectedError: updateErr,
+			expectedError: zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating session"),
 		},
 		{
 			testName: "when session update returns no rows should return not found error",
