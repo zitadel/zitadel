@@ -91,6 +91,7 @@ describe("redirectToIdp server action", () => {
         await redirectToIdp(undefined, formData);
       } catch (error: any) {
         // Expected redirect
+        expect(error.message).toBeDefined();
       }
 
       const callArgs = vi.mocked(zitadelModule.startIdentityProviderFlow).mock.calls[0][0];
@@ -130,6 +131,7 @@ describe("redirectToIdp server action", () => {
         await redirectToIdp(undefined, formData);
       } catch (error: any) {
         // Expected redirect
+        expect(error.message).toBeDefined();
       }
 
       const callArgs = vi.mocked(zitadelModule.startIdentityProviderFlow).mock.calls[0][0];

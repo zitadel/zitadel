@@ -17,7 +17,6 @@ import type { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import type { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { GetUserByIDResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-// Mock all dependencies
 vi.mock("../zitadel");
 vi.mock("./cookie");
 vi.mock("../client");
@@ -38,7 +37,6 @@ vi.mock("../service-url", () => ({
 }));
 
 describe("registerUser server action", () => {
-  const mockServiceUrl = "https://zitadel-test.zitadel.cloud";
   const mockUserId = "221394658884845598";
   const mockEmail = "john@example.com";
   const mockOrganization = "256088834543534543";
@@ -54,18 +52,15 @@ describe("registerUser server action", () => {
 
   describe("passwordless registration (passkey setup)", () => {
     it("should redirect to /passkey/set when user registers without password", async () => {
-      // Mock add user response
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
       } as AddHumanUserResponse);
 
-      // Mock login settings
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         passkeysType: PasskeysType.ALLOWED,
         allowRegister: true,
       } as LoginSettings);
 
-      // Mock session creation
       vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue({
         id: "session-id",
         factors: {
@@ -86,10 +81,12 @@ describe("registerUser server action", () => {
       });
 
       expect(result).toHaveProperty("redirect");
-      expect(result.redirect).toContain("/passkey/set");
-      expect(result.redirect).toContain(`loginName=${encodeURIComponent(mockEmail)}`);
-      expect(result.redirect).toContain(`organization=${mockOrganization}`);
-      expect(result.redirect).toContain(`requestId=${mockRequestId}`);
+      if ("redirect" in result) {
+        expect(result.redirect).toContain("/passkey/set");
+        expect(result.redirect).toContain(`loginName=${encodeURIComponent(mockEmail)}`);
+        expect(result.redirect).toContain(`organization=${mockOrganization}`);
+        expect(result.redirect).toContain(`requestId=${mockRequestId}`);
+      }
     });
   });
 
@@ -97,19 +94,16 @@ describe("registerUser server action", () => {
     it("should create user with password and check email verification", async () => {
       const mockPassword = "SecurePassword123!";
 
-      // Mock add user response
       vi.mocked(zitadelModule.addHumanUser).mockResolvedValue({
         userId: mockUserId,
       } as AddHumanUserResponse);
 
-      // Mock login settings
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
         allowRegister: true,
         allowUsernamePassword: true,
         passwordCheckLifetime: { seconds: BigInt(300) },
       } as LoginSettings);
 
-      // Mock session creation
       vi.mocked(cookieModule.createSessionAndUpdateCookie).mockResolvedValue({
         id: "session-id",
         factors: {
@@ -121,7 +115,6 @@ describe("registerUser server action", () => {
         },
       } as Session);
 
-      // Mock user retrieval
       vi.mocked(zitadelModule.getUserByID).mockResolvedValue({
         user: {
           userId: mockUserId,
@@ -175,7 +168,9 @@ describe("registerUser server action", () => {
       });
 
       expect(result).toHaveProperty("error");
-      expect(result.error).toBe("errors.couldNotCreateUser");
+      if ("error" in result) {
+        expect(result.error).toBe("errors.couldNotCreateUser");
+      }
     });
 
     it("should return error when session creation fails", async () => {
@@ -197,7 +192,9 @@ describe("registerUser server action", () => {
       });
 
       expect(result).toHaveProperty("error");
-      expect(result.error).toBe("errors.couldNotCreateSession");
+      if ("error" in result) {
+        expect(result.error).toBe("errors.couldNotCreateSession");
+      }
     });
 
     it("should return error when user cannot be found after creation", async () => {
@@ -235,7 +232,9 @@ describe("registerUser server action", () => {
       });
 
       expect(result).toHaveProperty("error");
-      expect(result.error).toBe("errors.userNotFound");
+      if ("error" in result) {
+        expect(result.error).toBe("errors.userNotFound");
+      }
     });
   });
 });
