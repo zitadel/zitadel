@@ -21,34 +21,6 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-func getUserIDCondition(repo *domainmock.MockUserRepository, userID string) database.Condition {
-	idCondition := getTextCondition("zitadel.users", "id", userID)
-
-	repo.EXPECT().
-		IDCondition(userID).
-		AnyTimes().
-		Return(idCondition)
-	return idCondition
-}
-
-func getSessionIDCondition(repo *domainmock.MockSessionRepository, sessionID string) database.Condition {
-	idCondition := getTextCondition("zitadel.sessions", "id", sessionID)
-
-	repo.EXPECT().
-		IDCondition(sessionID).
-		AnyTimes().
-		Return(idCondition)
-	return idCondition
-}
-
-func getTextCondition(tableName, column, value string) database.Condition {
-	return database.NewTextCondition(
-		database.NewColumn(tableName, column),
-		database.TextOperationEqual,
-		value,
-	)
-}
-
 func TestUserCheckCommand_Validate(t *testing.T) {
 	t.Parallel()
 	getErr := errors.New("get error")
