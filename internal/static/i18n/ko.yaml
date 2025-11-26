@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: 초기화 코드를 찾을 수 없습니다
     UsernameNotChanged: 사용자 이름이 변경되지 않았습니다
     InvalidURLTemplate: URL 템플릿이 잘못되었습니다
+    Locked: 사용자가 잠겨 있습니다
     Profile:
       NotFound: 프로필을 찾을 수 없습니다
       NotChanged: 프로필이 변경되지 않았습니다
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F가 존재하지 않습니다
       Passwordless:
         NotExisting: 패스워드리스가 존재하지 않습니다
+      RecoveryCodes:
+        InvalidCode: 잘못된 복구 코드가 제공되었습니다
+        MaxCountExceeded: 최대 복구 코드 수가 초과되었습니다
+        NotReady: 복구 코드가 사용할 준비가 되지 않았습니다
+        ConfigInvalid: 복구 코드 구성이 잘못되었습니다
     WebAuthN:
       NotFound: WebAuthN 토큰을 찾을 수 없습니다
       BeginRegisterFailed: WebAuthN 등록 시작에 실패했습니다
