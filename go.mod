@@ -36,7 +36,6 @@ require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-jose/go-jose/v4 v4.1.3
 	github.com/go-ldap/ldap/v3 v3.4.12
-	github.com/go-resty/resty/v2 v2.16.5
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.5
 	github.com/golang/protobuf v1.5.4

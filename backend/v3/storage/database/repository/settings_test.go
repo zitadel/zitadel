@@ -636,7 +636,6 @@ func TestGetBrandingSettings(t *testing.T) {
 			Settings: domain.Settings{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
-				State:          domain.SettingStatePreview,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    gu.Ptr("color"),
@@ -662,7 +661,6 @@ func TestGetBrandingSettings(t *testing.T) {
 			Settings: domain.Settings{
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
-				State:          domain.SettingStatePreview,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    gu.Ptr("color"),
@@ -688,7 +686,6 @@ func TestGetBrandingSettings(t *testing.T) {
 			Settings: domain.Settings{
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
-				State:          domain.SettingStatePreview,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    gu.Ptr("color"),
@@ -714,7 +711,6 @@ func TestGetBrandingSettings(t *testing.T) {
 			Settings: domain.Settings{
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
-				State:          domain.SettingStatePreview,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				PrimaryColorLight:    gu.Ptr("color"),
@@ -742,12 +738,12 @@ func TestGetBrandingSettings(t *testing.T) {
 		err := repo.Set(t.Context(), tx, setting)
 		require.NoError(t, err)
 	}
-	_, err := repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID))
+	_, err := repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
 	require.NoError(t, err)
 	activeInstanceSetting := *settings[0]
 	activeInstanceSetting.State = domain.SettingStateActive
 
-	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[3].InstanceID, settings[3].ID))
+	_, err = repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[3].InstanceID, settings[3].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
 	require.NoError(t, err)
 	activeOrganizationSetting := *settings[3]
 	activeOrganizationSetting.State = domain.SettingStateActive
@@ -932,12 +928,12 @@ func TestListBrandingSettings(t *testing.T) {
 		err := repo.Set(t.Context(), tx, setting)
 		require.NoError(t, err)
 	}
-	_, err := repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[0].InstanceID, settings[0].ID))
+	_, err := repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[0].InstanceID, settings[0].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
 	require.NoError(t, err)
 	activeInstanceSetting := *settings[0]
 	activeInstanceSetting.State = domain.SettingStateActive
 
-	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(settings[2].InstanceID, settings[2].ID))
+	_, err = repo.Activate(t.Context(), tx, repo.UniqueCondition(settings[2].InstanceID, settings[2].OrganizationID, domain.SettingTypeBranding, domain.SettingStatePreview))
 	require.NoError(t, err)
 	activeOrganizationSetting := *settings[2]
 	activeOrganizationSetting.State = domain.SettingStateActive
@@ -1339,7 +1335,12 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.ID))
+	_, err = repo.Activate(t.Context(), tx,
+		database.And(
+			repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
+			repo.OrganizationIDCondition(existingInstanceSettings.OrganizationID),
+		),
+	)
 	require.NoError(t, err)
 	activeInstanceSetting := *existingInstanceSettings
 	activeInstanceSetting.State = domain.SettingStateActive
@@ -1372,7 +1373,12 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
 	require.NoError(t, err)
 
-	_, err = repo.Activate(t.Context(), tx, repo.PrimaryKeyCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.ID))
+	_, err = repo.Activate(t.Context(), tx,
+		database.And(
+			repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
+			repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+		),
+	)
 	require.NoError(t, err)
 	activeOrganizationSetting := *existingOrganizationSettings
 	activeOrganizationSetting.State = domain.SettingStateActive

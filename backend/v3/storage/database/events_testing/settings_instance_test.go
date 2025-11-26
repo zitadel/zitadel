@@ -4,19 +4,24 @@ package events_test
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
+	"io"
+	"mime/multipart"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
@@ -30,15 +35,44 @@ var picture []byte
 //go:embed font.otf
 var font []byte
 
+func uploadInstanceAsset(ctx context.Context, t *testing.T, instance *integration.Instance, path string, asset io.Reader) {
+	url := http_util.BuildOrigin(instance.Host(), instance.Config.Secure) + "/assets/v1" + path
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", "filename")
+	require.NoError(t, err)
+
+	_, err = io.Copy(part, asset)
+	require.NoError(t, err)
+
+	err = writer.Close()
+	require.NoError(t, err)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	require.NoError(t, err)
+	md, ok := metadata.FromOutgoingContext(ctx)
+	require.True(t, ok)
+	// context information has to be HTTP headers, as the asset API is only HTTP
+	req.Header.Set("authorization", md.Get("authorization")[0])
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
 func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.LoginSettingsRepository()
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
 
-	t.Run("test adding login settings reduces", func(t *testing.T) {
-		IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
+	t.Run("test adding login settings reduces", func(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
@@ -66,8 +100,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test login settings change reduces", func(t *testing.T) {
-		IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
-
 		_, err := newInstance.Client.Admin.UpdateLoginPolicy(IAMCTX, &admin.UpdateLoginPolicyRequest{
 			AllowUsernamePassword:      false,
 			AllowRegister:              false,
@@ -125,8 +157,6 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test added/remove login multifactor type reduces", func(t *testing.T) {
-		IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
-
 		// check inital MFAType value
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -186,18 +216,13 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test added/removed second multifactor reduces", func(t *testing.T) {
-		ctx := t.Context()
 		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		// get current second factor types
 		var secondFactorTypes []domain.SecondFactorType
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
@@ -218,10 +243,10 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		secondFactorTypes = append(secondFactorTypes, domain.SecondFactorType(policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS))
 
 		// check new second factor type is added
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
@@ -244,10 +269,10 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		secondFactorTypes = secondFactorTypes[0 : len(secondFactorTypes)-1]
 
 		// check new second factor type is removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
@@ -261,16 +286,11 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
@@ -281,16 +301,16 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// check login settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLogin, domain.SettingStateActive),
 				),
@@ -303,19 +323,21 @@ func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
-	// settingsRepo := repository.SettingsRepository()
+	t.Parallel()
+
 	settingsRepo := repository.BrandingSettingsRepository()
 
-	t.Run("test adding label settings reduces", func(t *testing.T) {
-		ctx := t.Context()
-		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-		after := time.Now()
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
+	t.Run("test adding label settings reduces", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
@@ -343,11 +365,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label change", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		_, err := newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
 			PrimaryColor:        "#055000",
 			HideLoginNameSuffix: true,
@@ -380,11 +397,11 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
 
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
@@ -411,21 +428,16 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test label settings activated", func(t *testing.T) {
-		ctx := t.Context()
-
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		// activate label
 		before := time.Now()
 		_, err := newInstance.Client.Admin.ActivateLabelPolicy(IAMCTX, &admin.ActivateLabelPolicyRequest{})
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
@@ -439,31 +451,17 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
 		// set logo light
 		before := time.Now()
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/logo")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/logo", bytes.NewReader(picture))
 		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -475,90 +473,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test policy label logo dark added", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set logo dark
-		before := time.Now()
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/logo/dark")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		after := time.Now()
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
-				),
-			)
-			require.NoError(collect, err)
-
-			// event instance.policy.label.logo.dark.added
-			assert.NotNil(collect, setting.LogoURLDark)
-			assert.Equal(collect, domain.SettingStatePreview, setting.State)
-			assert.WithinRange(collect, setting.UpdatedAt, before, after)
-		}, retryDuration, tick)
-	})
-
 	t.Run("test policy label logo light removed", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set logo light
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/logo")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		// check light logo set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
-				),
-			)
-			require.NoError(collect, err)
-
-			assert.NotNil(collect, setting.LogoURLLight)
-		}, retryDuration, tick)
-
-		// remote logo light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
-			Delete("http://localhost:8082" + "/admin/v1" + "/policies/label/logo")
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyLogo(IAMCTX, &admin.RemoveLabelPolicyLogoRequest{})
 		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
 		// check light logo removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -570,53 +497,41 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test policy label logo dark removed", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
+	t.Run("test policy label logo dark added", func(t *testing.T) {
+		before := time.Now()
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/logo/dark", bytes.NewReader(picture))
+		after := time.Now()
 
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set logo dark
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/logo/dark")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		// check dark logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
 
+			// event instance.policy.label.logo.dark.added
 			assert.NotNil(collect, setting.LogoURLDark)
+			assert.Equal(collect, domain.SettingStatePreview, setting.State)
+			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
+	})
 
-		// remove logo dark
+	t.Run("test policy label logo dark removed", func(t *testing.T) {
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
-			Delete("http://localhost:8082" + "/admin/v1" + "/policies/label/logo_dark")
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyLogoDark(IAMCTX, &admin.RemoveLabelPolicyLogoDarkRequest{})
 		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
 		// check dark logo removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -629,31 +544,16 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label icon light added", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set icon light
 		before := time.Now()
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/icon")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/icon", bytes.NewReader(picture))
 		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -666,31 +566,16 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label icon dark added", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set icon dark
 		before := time.Now()
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/icon/dark")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/icon/dark", bytes.NewReader(picture))
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -703,52 +588,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label icon light removed", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set icon light
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/icon")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		// check light icon set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
-				),
-			)
-			require.NoError(collect, err)
-
-			assert.NotNil(collect, setting.IconURLLight)
-		}, retryDuration, tick)
-
-		// remote icon light
+		// remote logo light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
-			Delete("http://localhost:8082" + "/admin/v1" + "/policies/label/icon")
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyIcon(IAMCTX, &admin.RemoveLabelPolicyIconRequest{})
 		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
 		// check light icon removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -761,52 +613,18 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label icon dark removed", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set icon dark
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/icon/dark")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		// check dark icon set
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
-				),
-			)
-			require.NoError(collect, err)
-
-			assert.NotNil(collect, setting.IconURLDark)
-		}, retryDuration, tick)
-
-		// remote icon dark
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
-			Delete("http://localhost:8082" + "/admin/v1" + "/policies/label/icon_dark")
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyIconDark(IAMCTX, &admin.RemoveLabelPolicyIconDarkRequest{})
 		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
 		// check dark icon removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -819,31 +637,16 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy font added", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set logo light
 		before := time.Now()
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/font")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/font", bytes.NewReader(font))
 		after := time.Now()
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -856,51 +659,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy font removed", func(t *testing.T) {
-		ctx := t.Context()
-		token := integration.SystemToken
-
-		instanceRepo := repository.InstanceRepository()
-		instance, err := instanceRepo.Get(ctx, pool, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-		instanceID := instance.ID
-		require.NoError(t, err)
-
-		// set logo light
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
-			Post("http://localhost:8082" + "/assets/v1" + "/instance/policy/label/font")
-		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
-				),
-			)
-			require.NoError(collect, err)
-
-			assert.NotNil(collect, setting.FontURL)
-		}, retryDuration, tick)
-
-		// remote font policy
+		// remote logo light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
-			Delete("http://localhost:8082" + "/admin/v1" + "/policies/label/font")
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyFont(IAMCTX, &admin.RemoveLabelPolicyFontRequest{})
 		require.NoError(t, err)
-		require.Equal(t, 200, out.StatusCode())
 		after := time.Now()
 
 		// check font policy removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(instanceID, nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
 				),
 			)
 			require.NoError(collect, err)
@@ -913,16 +684,11 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-
 		// check label preview settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
@@ -933,10 +699,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// check label activated settings exist
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*50)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*50)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
@@ -947,15 +713,15 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 
 		// check label preview settings deleted
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
@@ -965,10 +731,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// check label activated settings deleted
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStateActive),
 				),
@@ -981,19 +747,20 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.PasswordComplexitySettingsRepository()
 
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 	t.Run("test password complexity added", func(t *testing.T) {
-		ctx := t.Context()
-
-		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-		after := time.Now()
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
@@ -1013,10 +780,6 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password complexity change", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdatePasswordComplexityPolicy(IAMCTX, &admin.UpdatePasswordComplexityPolicyRequest{
 			MinLength:    5,
@@ -1028,10 +791,10 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
@@ -1049,16 +812,11 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		systemctx := integration.WithSystemAuthorization(ctx)
-
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
@@ -1069,16 +827,16 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(systemctx, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// check password complexity settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordComplexity, domain.SettingStateActive),
 				),
@@ -1091,19 +849,20 @@ func TestServer_TestInstancePasswordComplexitySettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.PasswordExpirySettingsRepository()
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
 	t.Run("test password policy added", func(t *testing.T) {
-		ctx := t.Context()
-
-		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-		after := time.Now()
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
@@ -1119,11 +878,6 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password policy changed", func(t *testing.T) {
-		ctx := t.Context()
-
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdatePasswordAgePolicy(IAMCTX, &admin.UpdatePasswordAgePolicyRequest{
 			MaxAgeDays:     30,
@@ -1132,10 +886,10 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
@@ -1150,16 +904,11 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
@@ -1170,16 +919,16 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// check password expiry settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypePasswordExpiry, domain.SettingStateActive),
 				),
@@ -1192,19 +941,21 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.DomainSettingsRepository()
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
 	t.Run("test domain policy added", func(t *testing.T) {
-		ctx := t.Context()
 
-		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-		after := time.Now()
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
@@ -1221,11 +972,6 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test domain policy changed", func(t *testing.T) {
-		ctx := t.Context()
-
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdateDomainPolicy(IAMCTX, &admin.UpdateDomainPolicyRequest{
 			UserLoginMustBeDomain:                  true,
@@ -1235,10 +981,10 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
@@ -1254,16 +1000,11 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
@@ -1274,16 +1015,16 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// check domain settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeDomain, domain.SettingStateActive),
 				),
@@ -1296,19 +1037,21 @@ func TestServer_TestInstanceDomainSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.LockoutSettingsRepository()
 
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
 	t.Run("test lockout policy added", func(t *testing.T) {
-		ctx := t.Context()
-
-		before := time.Now()
-		newInstance := integration.NewInstance(t.Context())
-		after := time.Now()
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
@@ -1325,11 +1068,6 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test password policy changed", func(t *testing.T) {
-		ctx := t.Context()
-
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdateLockoutPolicy(IAMCTX, &admin.UpdateLockoutPolicyRequest{
 			MaxPasswordAttempts: 5,
@@ -1338,10 +1076,10 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
@@ -1356,16 +1094,11 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-
 		// check login settings exist
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
@@ -1376,16 +1109,16 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// delete instance
-		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// check password complexity settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLockout, domain.SettingStateActive),
 				),
@@ -1398,14 +1131,14 @@ func TestServer_TestInstanceLockoutSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
+	t.Parallel()
+
 	settingsRepo := repository.SecuritySettingsRepository()
 
+	newInstance := integration.NewInstance(t.Context())
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
 	t.Run("test security policy set", func(t *testing.T) {
-		ctx := t.Context()
-
-		newInstance := integration.NewInstance(t.Context())
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
 		// 1. set security policy
 		before := time.Now()
 		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
@@ -1416,10 +1149,10 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
@@ -1432,21 +1165,23 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			assert.Equal(collect, true, *setting.EnableImpersonation)
 			assert.WithinRange(collect, setting.CreatedAt, before, after)
 		}, retryDuration, tick)
+	})
 
+	t.Run("test security policy re-set", func(t *testing.T) {
 		// 2. re-set security policy
-		before = time.Now()
-		_, err = newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
+		before := time.Now()
+		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
 			EnableIframeEmbedding: false,
 			AllowedOrigins:        []string{"new_value"},
 			EnableImpersonation:   false,
 		})
 		require.NoError(t, err)
-		after = time.Now()
+		after := time.Now()
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			setting, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
@@ -1462,45 +1197,17 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test delete instance reduces", func(t *testing.T) {
-		ctx := t.Context()
-		newInstance := integration.NewInstance(t.Context())
-
-		SystemCTX := integration.WithSystemAuthorization(ctx)
-		IAMCTX := newInstance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
-
-		// 1. set security policy
-		_, err := newInstance.Client.Admin.SetSecurityPolicy(IAMCTX, &admin.SetSecurityPolicyRequest{
-			EnableIframeEmbedding: true,
-			AllowedOrigins:        []string{"value"},
-			EnableImpersonation:   true,
-		})
-		require.NoError(t, err)
-
-		// 2. check security instance exists
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*20)
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-			setting, err := settingsRepo.Get(
-				ctx, pool,
-				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
-				),
-			)
-			require.NoError(collect, err)
-
-			require.NotNil(t, setting)
-		}, retryDuration, tick)
-
 		// 3. delete instance
-		_, err = newInstance.Client.InstanceV2Beta.DeleteInstance(SystemCTX, &instance.DeleteInstanceRequest{
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: newInstance.ID(),
 		})
 		require.NoError(t, err)
 
 		// 4. check security settings removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Second*10)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*10)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			_, err := settingsRepo.Get(
-				ctx, pool,
+				IAMCTX, pool,
 				database.WithCondition(
 					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecurity, domain.SettingStateActive),
 				),
