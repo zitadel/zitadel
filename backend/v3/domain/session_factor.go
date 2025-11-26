@@ -65,6 +65,38 @@ type SessionFactorPassword struct {
 	LastFailedAt   time.Time
 }
 
+// Matches implements [gomock.Matcher].
+func (s *SessionFactorPassword) Matches(in any) bool {
+	inputFactor, isFactorPassword := in.(*SessionFactorPassword)
+	if !isFactorPassword {
+		return false
+	}
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastVerifiedAt/LastFailedAt not being easily controllable through the tested code,
+	// we check that their in a certain range rather than doing an exact match on time.
+	var isLastVerifiedAtInRange, isLastFailedAtInRange bool
+	if !inputFactor.LastVerifiedAt.IsZero() {
+		lowerThreshold := s.LastVerifiedAt.Add(-timeDelta)
+		upperThreshold := s.LastVerifiedAt.Add(timeDelta)
+		isLastVerifiedAtInRange = !inputFactor.LastVerifiedAt.Before(lowerThreshold) && !inputFactor.LastVerifiedAt.After(upperThreshold)
+	}
+
+	if !inputFactor.LastFailedAt.IsZero() {
+		lowerThreshold := s.LastFailedAt.Add(-timeDelta)
+		upperThreshold := s.LastFailedAt.Add(timeDelta)
+		isLastFailedAtInRange = !inputFactor.LastFailedAt.Before(lowerThreshold) && !inputFactor.LastFailedAt.After(upperThreshold)
+	}
+
+	return isLastVerifiedAtInRange || isLastFailedAtInRange
+}
+
+// String implements [gomock.Matcher].
+func (s *SessionFactorPassword) String() string {
+	return "SessionFactorPassword"
+}
+
 // sessionFactorType implements [SessionFactor].
 func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
 	return SessionFactorTypePassword
