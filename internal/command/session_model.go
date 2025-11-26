@@ -41,28 +41,28 @@ func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAs
 type SessionWriteModel struct {
 	eventstore.WriteModel
 
-	TokenID              string
-	UserID               string
-	UserResourceOwner    string
-	PreferredLanguage    *language.Tag
-	UserCheckedAt        time.Time
-	PasswordCheckedAt    time.Time
-	IntentCheckedAt      time.Time
-	WebAuthNCheckedAt    time.Time
-	TOTPCheckedAt        time.Time
-	OTPSMSCheckedAt      time.Time
-	OTPEmailCheckedAt    time.Time
-	WebAuthNUserVerified bool
-	Metadata             map[string][]byte
-	State                domain.SessionState
-	UserAgent            *domain.UserAgent
-	Expiration           time.Time
+	TokenID               string
+	UserID                string
+	UserResourceOwner     string
+	PreferredLanguage     *language.Tag
+	UserCheckedAt         time.Time
+	PasswordCheckedAt     time.Time
+	IntentCheckedAt       time.Time
+	WebAuthNCheckedAt     time.Time
+	TOTPCheckedAt         time.Time
+	OTPSMSCheckedAt       time.Time
+	OTPEmailCheckedAt     time.Time
+	RecoveryCodeCheckedAt time.Time
+	WebAuthNUserVerified  bool
+	Metadata              map[string][]byte
+	State                 domain.SessionState
+	UserAgent             *domain.UserAgent
+	Expiration            time.Time
 
 	WebAuthNChallenge     *WebAuthNChallengeModel
 	OTPSMSCodeChallenge   *OTPCode
 	OTPEmailCodeChallenge *OTPCode
-
-	aggregate *eventstore.Aggregate
+	aggregate             *eventstore.Aggregate
 }
 
 func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
@@ -108,6 +108,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceLifetimeSet(e)
 		case *session.TerminateEvent:
 			wm.reduceTerminate()
+		case *session.RecoveryCodeCheckedEvent:
+			wm.reduceRecoveryCodeChecked(e)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -131,6 +133,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.OTPSMSCheckedType,
 			session.OTPEmailChallengedType,
 			session.OTPEmailCheckedType,
+			session.RecoveryCodeCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
 			session.LifetimeSetType,
@@ -227,6 +230,10 @@ func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
 
+func (wm *SessionWriteModel) reduceRecoveryCodeChecked(e *session.RecoveryCodeCheckedEvent) {
+	wm.RecoveryCodeCheckedAt = e.CheckedAt
+}
+
 // AuthenticationTime returns the time the user authenticated using the latest time of all checks
 func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 	var authTime time.Time
@@ -269,6 +276,9 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	}
 	if !wm.OTPEmailCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
+	}
+	if !wm.RecoveryCodeCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
 	}
 	return types
 }
