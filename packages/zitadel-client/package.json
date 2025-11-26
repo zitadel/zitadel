@@ -1,6 +1,7 @@
 {
   "packageManager": "pnpm@10.13.1",
   "name": "@zitadel/client",
+  "repository": "https://github.com/zitadel/zitadel",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -80,8 +81,8 @@
     "jose": "^5.3.0"
   },
   "devDependencies": {
-    "@bufbuild/protocompile": "^0.0.1",
     "@bufbuild/buf": "^1.53.0",
+    "@bufbuild/protocompile": "^0.0.1",
     "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",

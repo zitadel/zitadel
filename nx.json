@@ -10,7 +10,15 @@
     ]
   },
   "release": {
+    "docker": {
+      "preVersionCommand": "pnpm nx run-many --verbose --target build-docker",
+      "versionSchemes": {
+        "semantic": "{versionActionsVersion}"
+      },
+      "registryUrl": "ghcr.io"
+    },
     "version": {
+      "preserveLocalDependencyProtocols": false,
       "conventionalCommits": true,
       "git": {
         "commit": false,
@@ -22,8 +30,7 @@
       "@zitadel/api",
       "@zitadel/login",
       "@zitadel/proto",
-      "@zitadel/client",
-      "@zitadel/zitadel"
+      "@zitadel/client"
     ],
     "projectsRelationship": "fixed",
     "changelog": {
@@ -92,12 +99,37 @@
       ]
     },
     {
-      "plugin": "@nx-tools/nx-container",
+      "plugin": "@nx/docker",
       "exclude": [
         "apps/login/integration/api-mock/**"
       ],
       "options": {
-        "defaultEngine": "docker"
+        "buildTarget": {
+          "name": "build-docker",
+          "defaultEngine": "docker",
+          "args": [
+            "--platform",
+            "linux/amd64,linux/arm64",
+            "--label",
+            "\"org.opencontainers.image.created={currentDate}\"",
+            "--label",
+            "\"org.opencontainers.image.revision={commitSha}\"",
+            "--label",
+            "\"org.opencontainers.image.source=https://github.com/zitadel/zitadel\"",
+            "--label",
+            "org.opencontainers.image.licenses=AGPL-3.0",
+            "--label",
+            "\"org.opencontainers.image.vendor=Zitadel\"",
+            "--label",
+            "\"org.opencontainers.image.title=Zitadel\"",
+            "--label",
+            "\"org.opencontainers.image.description=Zitadel - Identity infrastructure, simplified for you.\"",
+            "--label",
+            "\"org.opencontainers.image.documentation=https://zitadel.com/docs\"",
+            "--label",
+            "project={projectName}"
+          ]
+        }
       }
     }
   ]

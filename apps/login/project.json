@@ -1,55 +1,11 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "release": {
+    "docker": {
+      "repositoryName": "zitadel/zitadel-login"
+    }
+  },
   "targets": {
-    "nx-release-publish": {
-      "description": "Publishes the packaged Login application to a GitHub release",
-      "dependsOn": [
-        "pack"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          {
-            "forwardAllArgs": false,
-            "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-login.tar.gz\""
-          }
-        ]
-      }
-    },
-    "container": {
-      "description": "Builds the Login Docker image. This definition configures the implicit target from @nx-tools/nx-container",
-      "options": {
-        "context": "{projectRoot}"
-      },
-      "configurations": {
-        "ci": {
-          "push": false,
-          "load": true,
-          "platforms": [
-            "linux/amd64",
-            "linux/arm64"
-          ],
-          "metadata": {
-            "images": [
-              "ghcr.io/zitadel/login"
-            ],
-            "tags": [
-              "type=semver,pattern={{version}}",
-              "type=semver,pattern={{major}}.{{minor}}",
-              "type=semver,pattern={{major}}",
-              "type=sha,prefix=,suffix=,format=long"
-            ],
-            "labels": [
-              "org.opencontainers.image.licenses=MIT",
-              "org.opencontainers.image.vendor=Zitadel",
-              "org.opencontainers.image.title=Zitadel Login",
-              "org.opencontainers.image.description=Zitadel Login - Identity infrastructure, simplified for you.",
-              "org.opencontainers.image.documentation=https://zitadel.com/docs"
-            ]
-          }
-        }
-      }
-    },
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
       "continuous": true,
@@ -107,6 +63,11 @@
         "{projectRoot}/.next",
         "!{projectRoot}/.next/cache",
         "!{projectRoot}/.next/standalone"
+      ]
+    },
+    "build-docker": {
+      "dependsOn": [
+        "build"
       ]
     },
     "lint": {

@@ -2,6 +2,11 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
+    "release": {
+        "docker": {
+            "repositoryName": "zitadel/zitadel"
+        }
+    },
     "namedInputs": {
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
@@ -27,21 +32,6 @@
         ]
     },
     "targets": {
-        "nx-release-publish": {
-            "description": "Publishes cross-compiled binary tarballs to the GitHub release and publishes Docker images for production and for debugging.",
-            "dependsOn": [
-                "pack-all"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "commands": [
-                    {
-                        "forwardAllArgs": false,
-                        "command": "bash -c \"[[ \\\"${NX_DRY_RUN}\\\" == \\\"true\\\" ]] || gh release upload ${ZITADEL_RELEASE_VERSION} ./.artifacts/pack/zitadel-*-*.tar.gz\""
-                    }
-                ]
-            }
-        },
         "prod": {
             "description": "Runs the Go-based API backend in production mode",
             "continuous": true,
@@ -359,82 +349,6 @@
             ],
             "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
         },
-        "container": {
-            "description": "Builds the API Docker image. This definition configures the implicit target from @nx-tools/nx-container",
-            "dependsOn": [
-                "build-linux"
-            ],
-            "options": {
-                "file": "{projectRoot}/Dockerfile"
-            },
-            "configurations": {
-                "ci": {
-                    "push": false,
-                    "load": true,
-                    "platforms": [
-                        "linux/amd64",
-                        "linux/arm64"
-                    ],
-                    "metadata": {
-                        "images": [
-                            "ghcr.io/zitadel/zitadel"
-                        ],
-                        "tags": [
-                            "type=semver,pattern={{version}}",
-                            "type=semver,pattern={{major}}.{{minor}}",
-                            "type=semver,pattern={{major}}",
-                            "type=sha,prefix=,suffix=,format=long"
-                        ],
-                        "labels": [
-                            "org.opencontainers.image.licenses=AGPL-3.0",
-                            "org.opencontainers.image.vendor=Zitadel",
-                            "org.opencontainers.image.title=Zitadel API",
-                            "org.opencontainers.image.description=Zitadel API - Identity infrastructure, simplified for you.",
-                            "org.opencontainers.image.documentation=https://zitadel.com/docs"
-                        ]
-                    }
-                }
-            }
-        },
-        "container-debug": {
-            "description": "Builds the API Docker image for debugging using the executor from @nx-tools/nx-container",
-            "dependsOn": [
-                "build-linux"
-            ],
-            "executor": "@nx-tools/nx-container:build",
-            "options": {
-                "file": "{projectRoot}/Dockerfile"
-            },
-            "configurations": {
-                "ci": {
-                    "push": false,
-                    "load": true,
-                    "target": "builder",
-                    "platforms": [
-                        "linux/amd64",
-                        "linux/arm64"
-                    ],
-                    "metadata": {
-                        "images": [
-                            "ghcr.io/zitadel/zitadel"
-                        ],
-                        "tags": [
-                            "type=semver,pattern={{version}}",
-                            "type=semver,pattern={{major}}.{{minor}}",
-                            "type=semver,pattern={{major}}",
-                            "type=sha,prefix=,suffix=-debug,format=long"
-                        ],
-                        "labels": [
-                            "org.opencontainers.image.licenses=AGPL-3.0",
-                            "org.opencontainers.image.vendor=Zitadel",
-                            "org.opencontainers.image.title=Zitadel API Debug Image",
-                            "org.opencontainers.image.description=Zitadel API Debug Image - Identity infrastructure, simplified for you.",
-                            "org.opencontainers.image.documentation=https://zitadel.com/docs"
-                        ]
-                    }
-                }
-            }
-        },
         "build-linux": {
             "description": "Builds the Go-based API backend for Linux (amd64 and arm64) into executable binaries.",
             "dependsOn": [
@@ -463,6 +377,15 @@
                     "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build --excludeTaskDependencies",
                     "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build --excludeTaskDependencies"
                 ]
+            }
+        },
+        "build-docker": {
+            "dependsOn": [
+                "build-linux"
+            ],
+            "options": {
+                "cwd": "{workspaceRoot}",
+                "file": "{projectRoot}/Dockerfile"
             }
         },
         "pack": {
