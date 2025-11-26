@@ -69,3 +69,17 @@ func NewUnexpectedTextQueryOperationError[T any](assertedType T) error {
 func (u *UnexpectedTextQueryOperationError[T]) Error() string {
 	return fmt.Sprintf("Message=unexpected text query operation type '%T'", u.assertedType)
 }
+
+type PasswordVerificationError struct {
+	failedAttempts uint8
+}
+
+func NewPasswordVerificationError(failedPassAttempts uint8) error {
+	return &PasswordVerificationError{
+		failedAttempts: failedPassAttempts,
+	}
+}
+
+func (e *PasswordVerificationError) Error() string {
+	return fmt.Sprintf("Message=failed password attempts (%d)", e.failedAttempts)
+}
