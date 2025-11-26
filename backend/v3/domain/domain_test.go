@@ -3,7 +3,9 @@ package domain_test
 import (
 	"os"
 	"testing"
+	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -50,4 +52,29 @@ func getTextCondition(tableName, column, value string) database.Condition {
 		database.TextOperationEqual,
 		value,
 	)
+}
+
+func getSessionPasswordFactorChange(repo *domainmock.MockSessionRepository, lastVerified, lastFailed *time.Time) database.Change {
+	sessionPasswordFactor := &domain.SessionFactorPassword{}
+	var factorChange database.Change
+	if lastVerified != nil {
+		sessionPasswordFactor.LastVerifiedAt = *lastVerified
+		factorChange = database.NewChange(
+			database.NewColumn("zitadel.sessions", "password_factor_last_verified"),
+			*lastVerified,
+		)
+	}
+	if lastFailed != nil {
+		sessionPasswordFactor.LastFailedAt = *lastFailed
+		factorChange = database.NewChange(
+			database.NewColumn("zitadel.sessions", "password_factor_last_failed"),
+			*lastFailed,
+		)
+	}
+
+	repo.EXPECT().
+		SetFactor(sessionPasswordFactor).
+		AnyTimes().
+		Return(factorChange)
+	return factorChange
 }
