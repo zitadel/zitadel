@@ -194,6 +194,17 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 	panic(fmt.Sprintf("undefined verification type %T", verification))
 }
 
+// CheckPassword implements [domain.HumanUserRepository.CheckPassword].
+func (u userHuman) CheckPassword(check domain.PasswordCheckType) database.Change {
+	switch check.(type) {
+	case *domain.CheckTypeSucceeded:
+		return database.NewChange(u.failedPasswordAttemptsColumn(), 0)
+	case *domain.CheckTypeFailed:
+		return database.NewIncrementColumnChange(u.failedPasswordAttemptsColumn())
+	}
+	panic(fmt.Sprintf("undefined password check type %T", check))
+}
+
 // SetPasswordChangeRequired implements [domain.HumanUserRepository.SetPasswordChangeRequired].
 func (u userHuman) SetPasswordChangeRequired(required bool) database.Change {
 	return database.NewChange(u.passwordChangeRequiredColumn(), true)
