@@ -125,33 +125,6 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 	return project.ID
 }
 
-// func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
-//	t.Helper()
-//	user := domain.User{
-//		InstanceID: instanceID,
-//		OrgID:      orgID,
-//		ID:         gofakeit.UUID(),
-//		Username:   gofakeit.Username(),
-//		Traits: &domain.Human{
-//			FirstName: gofakeit.FirstName(),
-//			LastName:  gofakeit.LastName(),
-//			Email: &domain.Email{
-//				Address:    gofakeit.Email(),
-//				VerifiedAt: gofakeit.Date(),
-//			},
-//			Phone: &domain.Phone{
-//				Number:     gofakeit.Phone(),
-//				VerifiedAt: gofakeit.Date(),
-//			},
-//		},
-//	}
-//	userRepo := repository.UserRepository()
-//	err := userRepo.Create(t.Context(), tx, &user)
-//	require.NoError(t, err)
-//
-//	return user.ID
-// }
-
 func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID, projectID, key string) string {
 	t.Helper()
 	if key == "" {
@@ -169,4 +142,49 @@ func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID,
 	require.NoError(t, err)
 
 	return projectRole.Key
+}
+
+// func createUser(t *testing.T, tx database.Transaction, instanceID, orgID string) (userID string) {
+//	t.Helper()
+//	user := domain.User{
+//		InstanceID: instanceID,
+//		OrganizationID:      orgID,
+//		ID:         gofakeit.UUID(),
+//		Username:   gofakeit.Username(),
+//		Human: &domain.HumanUser{
+//			FirstName: gofakeit.FirstName(),
+//			LastName:  gofakeit.LastName(),
+//			Email: domain.HumanEmail{
+//				Address:    gofakeit.Email(),
+//				VerifiedAt: gofakeit.Date(),
+//			},
+//			Phone: &domain.HumanPhone{
+//				Number:     gofakeit.Phone(),
+//				VerifiedAt: gofakeit.Date(),
+//			},
+//		},
+//	}
+//	userRepo := repository.UserRepository()
+//	err := userRepo.Create(t.Context(), tx, &user)
+//	require.NoError(t, err)
+//
+//	return user.ID
+// }
+
+func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grantingOrgID, grantedOrgID, projectID string, roleKeys []string) string {
+	t.Helper()
+	projectGrant := domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     gofakeit.UUID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  grantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               roleKeys,
+	}
+	projectGrantRepo := repository.ProjectGrantRepository()
+	err := projectGrantRepo.Create(t.Context(), tx, &projectGrant)
+	require.NoError(t, err)
+
+	return projectGrant.ID
 }

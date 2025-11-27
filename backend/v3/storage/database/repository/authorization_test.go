@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -21,8 +22,11 @@ func TestCreateAuthorization(t *testing.T) {
 
 	instanceID := createInstance(t, tx)
 	organizationID := createOrganization(t, tx, instanceID)
+	// create a project
 	projectID := createProject(t, tx, instanceID, organizationID)
 	require.NotNil(t, projectID)
+
+	// create project roles
 	role1 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role1")
 	role2 := createProjectRole(t, tx, instanceID, organizationID, projectID, "role2")
 	// TODO: uncomment when user table is available
@@ -32,6 +36,7 @@ func TestCreateAuthorization(t *testing.T) {
 
 	authorizationRepo := repository.AuthorizationRepository()
 
+	// create project authorization
 	existingAuthorization := &domain.Authorization{
 		ID:         integration.ID(),
 		UserID:     userID,
@@ -43,33 +48,15 @@ func TestCreateAuthorization(t *testing.T) {
 	err := authorizationRepo.Create(t.Context(), tx, existingAuthorization)
 	require.NoError(t, err)
 
+	// create a project grant
+	grantedOrganizationID := createOrganization(t, tx, instanceID)
+	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, projectID, []string{role1})
+
 	tests := []struct {
 		name          string
 		authorization *domain.Authorization
 		wantErr       error
 	}{
-		{
-			name: "create authorization without roles",
-			authorization: &domain.Authorization{
-				ID:         integration.ID(),
-				UserID:     userID,
-				ProjectID:  projectID,
-				InstanceID: instanceID,
-				State:      domain.AuthorizationStateActive,
-				Roles:      nil,
-			},
-		},
-		{
-			name: "create authorization with roles",
-			authorization: &domain.Authorization{
-				ID:         integration.ID(),
-				UserID:     userID,
-				ProjectID:  projectID,
-				InstanceID: instanceID,
-				State:      domain.AuthorizationStateActive,
-				Roles:      []string{role1, role2},
-			},
-		},
 		{
 			name: "non-existent instance",
 			authorization: &domain.Authorization{
@@ -103,6 +90,19 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      []string{"role3"},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "non-existent project grant",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				GrantID:    gu.Ptr("random-id"),
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      nil,
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -142,6 +142,65 @@ func TestCreateAuthorization(t *testing.T) {
 				Roles:      nil,
 			},
 			wantErr: database.NewCheckError("authorizations", "", nil),
+		},
+		{
+			name: "create authorization without roles",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      nil,
+			},
+		},
+		{
+			name: "create authorization with roles",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      []string{role1, role2},
+			},
+		},
+		{
+			name: "create authorization for project grant with valid role",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				GrantID:    gu.Ptr(grantID),
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      []string{role1},
+			},
+		},
+		{
+			name: "create authorization for project grant with unassigned role",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				GrantID:    gu.Ptr(grantID),
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      []string{role2},
+			},
+			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name: "create authorization for project grant without roles",
+			authorization: &domain.Authorization{
+				ID:         integration.ID(),
+				UserID:     userID,
+				ProjectID:  projectID,
+				GrantID:    gu.Ptr(grantID),
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      nil,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -189,7 +248,7 @@ func TestGetAuthorization(t *testing.T) {
 
 	// create authorization with roles
 	authorizationRepo := repository.AuthorizationRepository()
-	authorizationWithRolesUser1 := &domain.Authorization{
+	authorizationWithRolesUser := &domain.Authorization{
 		ID:         integration.ID(),
 		UserID:     userID,
 		ProjectID:  projectID,
@@ -197,11 +256,11 @@ func TestGetAuthorization(t *testing.T) {
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1, role2},
 	}
-	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser1)
+	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser)
 	require.NoError(t, err)
 
 	// create authorization without roles
-	authorizationWithoutRolesUser1 := &domain.Authorization{
+	authorizationWithoutRolesUser := &domain.Authorization{
 		ID:         integration.ID(),
 		UserID:     userID,
 		ProjectID:  projectID,
@@ -209,7 +268,34 @@ func TestGetAuthorization(t *testing.T) {
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
 	}
-	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser1)
+	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser)
+	require.NoError(t, err)
+
+	// create authorization for a project grant with/without roles
+	grantedOrganizationID := createOrganization(t, tx, instanceID)
+	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, projectID, []string{role1})
+
+	authorizationProjectGrantWithRoles := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     userID,
+		ProjectID:  projectID,
+		GrantID:    gu.Ptr(grantID),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      []string{role1},
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithRoles)
+	require.NoError(t, err)
+
+	authorizationProjectGrantWithoutRoles := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     userID,
+		ProjectID:  projectID,
+		GrantID:    gu.Ptr(grantID),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithoutRoles)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -234,25 +320,79 @@ func TestGetAuthorization(t *testing.T) {
 		{
 			name: "get authorization with roles",
 			condition: authorizationRepo.PrimaryKeyCondition(
-				authorizationWithRolesUser1.InstanceID,
-				authorizationWithRolesUser1.ID,
+				authorizationWithRolesUser.InstanceID,
+				authorizationWithRolesUser.ID,
 			),
-			want: authorizationWithRolesUser1,
+			want: authorizationWithRolesUser,
 		},
 		{
 			name: "get authorization without roles",
 			condition: authorizationRepo.PrimaryKeyCondition(
-				authorizationWithoutRolesUser1.InstanceID,
-				authorizationWithoutRolesUser1.ID,
+				authorizationWithoutRolesUser.InstanceID,
+				authorizationWithoutRolesUser.ID,
 			),
-			want: authorizationWithoutRolesUser1,
+			want: authorizationWithoutRolesUser,
 		},
 		{
 			name: "get authorization, multiple rows, error",
 			condition: database.And(
-				authorizationRepo.InstanceIDCondition(authorizationWithRolesUser1.InstanceID),
+				authorizationRepo.InstanceIDCondition(authorizationWithRolesUser.InstanceID),
 			),
 			wantErr: new(database.MultipleRowsFoundError),
+		},
+		{
+			name: "get authorization with role condition",
+			condition: database.And(authorizationRepo.PrimaryKeyCondition(
+				authorizationWithRolesUser.InstanceID,
+				authorizationWithRolesUser.ID,
+			),
+				authorizationRepo.RoleCondition(database.TextOperationEqual, role1)),
+			want: &domain.Authorization{
+				ID:         authorizationWithRolesUser.ID,
+				UserID:     userID,
+				ProjectID:  projectID,
+				InstanceID: instanceID,
+				State:      domain.AuthorizationStateActive,
+				Roles:      []string{role1},
+				CreatedAt:  authorizationWithRolesUser.CreatedAt,
+				UpdatedAt:  authorizationWithRolesUser.UpdatedAt,
+			},
+		},
+		{
+			name: "get authorization with non-existent role, error",
+			condition: database.And(authorizationRepo.PrimaryKeyCondition(
+				authorizationWithRolesUser.InstanceID,
+				authorizationWithRolesUser.ID,
+			),
+				authorizationRepo.RoleCondition(database.TextOperationEqual, "random-role")),
+			wantErr: new(database.NoRowFoundError),
+		},
+		{
+			name: "get authorization with grant ID condition (with roles)",
+			condition: database.And(authorizationRepo.PrimaryKeyCondition(
+				authorizationProjectGrantWithRoles.InstanceID,
+				authorizationProjectGrantWithRoles.ID,
+			),
+				authorizationRepo.GrantIDCondition(grantID)),
+			want: authorizationProjectGrantWithRoles,
+		},
+		{
+			name: "get authorization with grant ID condition (without roles)",
+			condition: database.And(authorizationRepo.PrimaryKeyCondition(
+				authorizationProjectGrantWithoutRoles.InstanceID,
+				authorizationProjectGrantWithoutRoles.ID,
+			),
+				authorizationRepo.GrantIDCondition(grantID)),
+			want: authorizationProjectGrantWithoutRoles,
+		},
+		{
+			name: "get authorization for project grant with non-existent grant ID, error",
+			condition: database.And(authorizationRepo.PrimaryKeyCondition(
+				authorizationProjectGrantWithoutRoles.InstanceID,
+				authorizationProjectGrantWithoutRoles.ID,
+			),
+				authorizationRepo.GrantIDCondition("random-id")),
+			wantErr: new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -333,10 +473,10 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization without roles for user1 for project2
 	authorizationWithoutRolesUser1Project2 := &domain.Authorization{
-		ID:         "authorization4-user1",
-		UserID:     user1ID,
-		ProjectID:  project2ID,
-		
+		ID:        "authorization4-user1",
+		UserID:    user1ID,
+		ProjectID: project2ID,
+
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
 		Roles:      nil,
@@ -346,10 +486,10 @@ func TestListAuthorization(t *testing.T) {
 
 	// create authorization with roles for user2 for project1
 	authorizationWithRolesUser2Project1 := &domain.Authorization{
-		ID:         "authorization5-user2",
-		UserID:     user2ID,
-		ProjectID:  project1ID,
-		
+		ID:        "authorization5-user2",
+		UserID:    user2ID,
+		ProjectID: project1ID,
+
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project1Role1, project1Role2},
@@ -362,7 +502,6 @@ func TestListAuthorization(t *testing.T) {
 		ID:         "authorization6-user2",
 		UserID:     user2ID,
 		ProjectID:  project1ID,
-		
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
 		Roles:      nil,
@@ -375,7 +514,6 @@ func TestListAuthorization(t *testing.T) {
 		ID:         "authorization7-user2",
 		UserID:     user2ID,
 		ProjectID:  project2ID,
-		
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project2Role1, project2Role2},
@@ -388,12 +526,38 @@ func TestListAuthorization(t *testing.T) {
 		ID:         "authorization8-user2",
 		UserID:     user2ID,
 		ProjectID:  project2ID,
-		
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser2Project2)
+	require.NoError(t, err)
+
+	// create a project grant
+	grantedOrganizationID := createOrganization(t, tx, instanceID)
+	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, project1ID, []string{project1Role1, project1Role2})
+
+	authorizationProjectGrantWithRoles := &domain.Authorization{
+		ID:         "authorization9-user1",
+		UserID:     user1ID,
+		ProjectID:  project1ID,
+		GrantID:    gu.Ptr(grantID),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      []string{project1Role1},
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithRoles)
+	require.NoError(t, err)
+
+	authorizationProjectGrantWithoutRoles := &domain.Authorization{
+		ID:         "authorization10-user2",
+		UserID:     user2ID,
+		ProjectID:  project1ID,
+		GrantID:    gu.Ptr(grantID),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithoutRoles)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -431,6 +595,7 @@ func TestListAuthorization(t *testing.T) {
 			},
 			want: []*domain.Authorization{
 				authorizationWithRolesUser1Project1,
+				authorizationProjectGrantWithoutRoles,
 				authorizationWithoutRolesUser1Project1,
 				authorizationWithRolesUser1Project2,
 				authorizationWithoutRolesUser1Project2,
@@ -438,6 +603,7 @@ func TestListAuthorization(t *testing.T) {
 				authorizationWithoutRolesUser2Project1,
 				authorizationWithRolesUser2Project2,
 				authorizationWithoutRolesUser2Project2,
+				authorizationProjectGrantWithRoles,
 			},
 		},
 		{
@@ -449,12 +615,14 @@ func TestListAuthorization(t *testing.T) {
 						authorizationRepo.UserIDCondition(user1ID),
 					),
 				),
+				database.WithOrderByAscending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
 				authorizationWithRolesUser1Project1,
 				authorizationWithoutRolesUser1Project1,
 				authorizationWithRolesUser1Project2,
 				authorizationWithoutRolesUser1Project2,
+				authorizationProjectGrantWithRoles,
 			},
 		},
 		{
@@ -468,6 +636,7 @@ func TestListAuthorization(t *testing.T) {
 				),
 			},
 			want: []*domain.Authorization{
+				authorizationProjectGrantWithoutRoles,
 				authorizationWithRolesUser2Project1,
 				authorizationWithoutRolesUser2Project1,
 				authorizationWithRolesUser2Project2,
@@ -505,6 +674,7 @@ func TestListAuthorization(t *testing.T) {
 			want: []*domain.Authorization{
 				authorizationWithoutRolesUser2Project1,
 				authorizationWithRolesUser2Project1,
+				authorizationProjectGrantWithoutRoles,
 			},
 		},
 		{
@@ -520,8 +690,8 @@ func TestListAuthorization(t *testing.T) {
 				database.WithOrderByDescending(authorizationRepo.IDColumn()),
 			},
 			want: []*domain.Authorization{
+				authorizationProjectGrantWithRoles,
 				authorizationWithoutRolesUser2Project1,
-				authorizationWithRolesUser2Project1,
 			},
 		},
 		{
@@ -574,7 +744,46 @@ func TestListAuthorization(t *testing.T) {
 					CreatedAt:  authorizationWithRolesUser2Project1.CreatedAt,
 					UpdatedAt:  authorizationWithRolesUser2Project1.UpdatedAt,
 				},
+				{
+					ID:         "authorization9-user1",
+					UserID:     user1ID,
+					ProjectID:  project1ID,
+					GrantID:    gu.Ptr(grantID),
+					InstanceID: instanceID,
+					State:      domain.AuthorizationStateActive,
+					Roles:      []string{project1Role1},
+					CreatedAt:  authorizationProjectGrantWithRoles.CreatedAt,
+					UpdatedAt:  authorizationProjectGrantWithRoles.UpdatedAt,
+				},
 			},
+		},
+		{
+			name: "list all authorizations for project grant",
+			condition: []database.QueryOption{
+				database.WithCondition(
+					database.And(
+						authorizationRepo.InstanceIDCondition(instanceID),
+						authorizationRepo.GrantIDCondition(grantID),
+					),
+				),
+				database.WithOrderByDescending(authorizationRepo.IDColumn()),
+			},
+			want: []*domain.Authorization{
+				authorizationProjectGrantWithRoles,
+				authorizationProjectGrantWithoutRoles,
+			},
+		},
+		{
+			name: "list all authorizations for non-existent project grant",
+			condition: []database.QueryOption{
+				database.WithCondition(
+					database.And(
+						authorizationRepo.InstanceIDCondition(instanceID),
+						authorizationRepo.GrantIDCondition("random-id"),
+					),
+				),
+			},
+			want: []*domain.Authorization{},
 		},
 	}
 	for _, tt := range tests {
@@ -772,6 +981,12 @@ func TestAuthorizationUpdate_setRoles(t *testing.T) {
 			roles:     []string{role1, role2},
 			condition: authorizationRepo.InstanceIDCondition(authorization1.InstanceID),
 			wantErr:   new(database.MissingConditionError),
+		},
+		{
+			name:      "non-existent role",
+			roles:     []string{"random-role"},
+			condition: authorizationRepo.PrimaryKeyCondition(authorization1.InstanceID, authorization1.ID),
+			wantErr:   new(database.ForeignKeyError),
 		},
 		{
 			name:             "set single role",
