@@ -145,6 +145,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if otp := checks.GetOtpEmail(); otp != nil {
 		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetCode()))
 	}
+	if recoveryCode := checks.GetRecoveryCode(); recoveryCode != nil {
+		sessionChecks = append(sessionChecks, command.CheckRecoveryCode(recoveryCode.GetCode()))
+	}
 	return sessionChecks, nil
 }
 
