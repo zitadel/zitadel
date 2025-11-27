@@ -42,26 +42,15 @@ const insertAuthorizationWithRolesStmt = `WITH roles AS (
 // Create implements [domain.AuthorizationRepository].
 func (a authorization) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
 	var builder *database.StatementBuilder
-	if len(authorization.Roles) == 0 {
-		builder = database.NewStatementBuilder(insertAuthorizationStmt,
-			authorization.InstanceID,
-			authorization.ID,
-			authorization.UserID,
-			authorization.GrantID,
-			authorization.ProjectID,
-			authorization.State,
-		)
-	} else {
-		builder = database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
-			authorization.InstanceID,
-			authorization.ID,
-			authorization.UserID,
-			authorization.GrantID,
-			authorization.ProjectID,
-			authorization.State,
-			authorization.Roles,
-		)
-	}
+	builder = database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
+		authorization.InstanceID,
+		authorization.ID,
+		authorization.UserID,
+		authorization.GrantID,
+		authorization.ProjectID,
+		authorization.State,
+		authorization.Roles,
+	)
 
 	if err := client.QueryRow(
 		ctx,

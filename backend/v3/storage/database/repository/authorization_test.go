@@ -1096,6 +1096,20 @@ func TestDeleteAuthorization(t *testing.T) {
 	))
 	require.NoError(t, err)
 
+	grantedOrganizationID := createOrganization(t, tx, instanceID)
+	grantID := createProjectGrant(t, tx, instanceID, organizationID, grantedOrganizationID, projectID, []string{role1})
+	authorizationProjectGrant := &domain.Authorization{
+		ID:         integration.ID(),
+		UserID:     integration.ID(),
+		ProjectID:  projectID,
+		GrantID:    gu.Ptr(grantID),
+		InstanceID: instanceID,
+		State:      domain.AuthorizationStateActive,
+		Roles:      []string{role1},
+	}
+	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrant)
+	require.NoError(t, err)
+
 	tests := []struct {
 		name             string
 		condition        database.Condition
@@ -1138,6 +1152,14 @@ func TestDeleteAuthorization(t *testing.T) {
 				deletedAuthorization.ID,
 			),
 			wantRowsAffected: 0,
+		},
+		{
+			name: "delete project grant authorization",
+			condition: authorizationRepo.PrimaryKeyCondition(
+				instanceID,
+				authorizationProjectGrant.ID,
+			),
+			wantRowsAffected: 1,
 		},
 	}
 	for _, tt := range tests {
