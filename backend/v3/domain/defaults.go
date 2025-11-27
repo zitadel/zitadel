@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	pool             database.Pool
-	tracer           tracing.Tracer
-	logger           logging.Logger = *logging.NewLogger(slog.Default())
-	legacyEventstore eventstore.LegacyEventstore
-	sysConfig        systemdefaults.SystemDefaults
-	passwordHasher   *crypto.Hasher
+	pool              database.Pool
+	tracer            tracing.Tracer
+	logger            logging.Logger = *logging.NewLogger(slog.Default())
+	legacyEventstore  eventstore.LegacyEventstore
+	sysConfig         systemdefaults.SystemDefaults
+	passwordHasher    *crypto.Hasher
+	idpEncryptionAlgo crypto.EncryptionAlgorithm
 )
 
 func SetPool(p database.Pool) {
@@ -42,4 +43,8 @@ func SetSystemConfig(cfg systemdefaults.SystemDefaults) {
 
 func SetPasswordHasher(hasher *crypto.Hasher) {
 	passwordHasher = hasher
+}
+
+func SetIDPEncryptionAlgorithm(idpEncryptionAlg crypto.EncryptionAlgorithm) {
+	idpEncryptionAlgo = idpEncryptionAlg
 }
