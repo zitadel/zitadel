@@ -77,13 +77,18 @@ func (a *authorizationRelationalProjection) reduceUserGrantAdded(event eventstor
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FrDVPk", "reduce.wrong.db.pool %T", ex)
 		}
+
 		repo := repository.AuthorizationRepository()
+		var grantID *string
+		if e.ProjectGrantID != "" {
+			grantID = gu.Ptr(e.ProjectGrantID)
+		}
 		return repo.Create(ctx, v3_sql.SQLTx(tx), &repoDomain.Authorization{
 			InstanceID: e.Aggregate().InstanceID,
 			ID:         e.Aggregate().ID,
 			UserID:     e.UserID,
 			ProjectID:  e.ProjectID,
-			GrantID:    gu.Ptr(e.ProjectGrantID),
+			GrantID:    grantID,
 			Roles:      e.RoleKeys,
 			CreatedAt:  e.CreationDate(),
 			UpdatedAt:  e.CreationDate(),

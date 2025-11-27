@@ -14,7 +14,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
+	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_AuthorizationReduces(t *testing.T) {
@@ -85,7 +88,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
@@ -98,7 +101,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	t.Run("user grant deactivate reduces", func(t *testing.T) {
 		// create user
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
-		// prepare project
+		// prepare project and project roles
 		projectID := prepareProjectAndProjectRoles(t, orgID, nil)
 		// create authorization
 		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
@@ -114,7 +117,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
@@ -148,7 +151,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
@@ -179,7 +182,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
 			))
@@ -188,6 +191,398 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
 	})
 
+	t.Run("user removed reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
+
+		// create authorization with roles
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: orgID,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete the user
+		_, err = UserClient.DeleteUser(CTX, &user_v2.DeleteUserRequest{
+			UserId: user.UserId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is deleted
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
+	})
+
+	t.Run("project removed reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
+
+		// create authorization with roles
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: orgID,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete the project
+		_, err = ProjectClient.DeleteProject(CTX, &project_v2beta.DeleteProjectRequest{
+			Id: projectID,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is deleted
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
+	})
+
+	t.Run("project role removed reduces", func(t *testing.T) {
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
+
+		// create authorization with roles
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: orgID,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete a project role
+		_, err = ProjectClient.RemoveProjectRole(CTX, &project_v2beta.RemoveProjectRoleRequest{
+			ProjectId: projectID,
+			RoleKey:   role2,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is updated
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not updated within %v: %v", retryDuration, err)
+	})
+
+	t.Run("user grant added for a project grant reduces", func(t *testing.T) {
+		// prepare project and project roles
+		role1 := "role1"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1})
+
+		// granted organization
+		grantedOrganizationName := integration.OrganizationName()
+		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
+
+		// create project grant
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+			ProjectId:             projectID,
+			RoleKeys:              []string{role1},
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
+
+		// create authorization
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1},
+			OrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+	})
+
+	t.Run("project grant removed reduces", func(t *testing.T) {
+		// prepare project and project roles
+		role1 := "role1"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1})
+
+		// granted organization
+		grantedOrganizationName := integration.OrganizationName()
+		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
+
+		// create project grant
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+			ProjectId:             projectID,
+			RoleKeys:              []string{role1},
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
+
+		// create authorization
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1},
+			OrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete project grant
+		_, err = ProjectClient.DeleteProjectGrant(CTX, &project_v2beta.DeleteProjectGrantRequest{
+			ProjectId:             projectID,
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is deleted
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
+	})
+
+	t.Run("project grant updated reduces", func(t *testing.T) {
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
+
+		// granted organization
+		grantedOrganizationName := integration.OrganizationName()
+		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
+
+		// create project grant
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+			ProjectId:             projectID,
+			RoleKeys:              []string{role1, role2},
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
+
+		// create authorization
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// update project grant
+		_, err = ProjectClient.UpdateProjectGrant(CTX, &project_v2beta.UpdateProjectGrantRequest{
+			ProjectId:             projectID,
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+			RoleKeys:              []string{role1},
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is updated
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not updated within %v: %v", retryDuration, err)
+	})
+
+	t.Run("org removed reduces", func(t *testing.T) {
+		// create a new organization
+		orgName := integration.OrganizationName()
+		orgResp := Instance.CreateOrganization(CTX, orgName, integration.Email())
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgResp.OrganizationId, []string{role1, role2})
+		// create authorization with roles
+		createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectID,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: orgResp.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete the organization
+		_, err = OrgClient.DeleteOrganization(CTX, &org_v2beta.DeleteOrganizationRequest{
+			Id: orgResp.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is deleted
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
+	})
+
+	t.Run("instance removed reduces", func(t *testing.T) {
+		// create a new instance
+		instance := integration.NewInstance(CTX)
+		// create a new organization
+		orgResp := instance.CreateOrganization(CTX, integration.OrganizationName(), integration.Email())
+		// create a user
+		user := instance.CreateHumanUserVerified(CTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectResp := instance.CreateProject(CTX, t, orgResp.OrganizationId, integration.ProjectName(), false, false)
+		_ = instance.AddProjectRole(CTX, t, projectResp.Id, role1, "display", "")
+		_ = instance.AddProjectRole(CTX, t, projectResp.Id, role2, "display", "")
+
+		// create authorization with roles
+		createdAuthorization, err := instance.Client.AuthorizationV2.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
+			UserId:         user.UserId,
+			ProjectId:      projectResp.Id,
+			RoleKeys:       []string{role1, role2},
+			OrganizationId: orgResp.OrganizationId,
+		})
+		require.NoError(t, err)
+
+		// ensure authorization exists
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instance.ID(), createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1, role2}, az.Roles)
+			assert.Equal(collect, domain.AuthorizationStateActive, az.State)
+			assert.NotNil(collect, az.CreatedAt)
+			assert.NotNil(collect, az.UpdatedAt)
+		}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+
+		// delete the instance
+		_, err = Instance.Client.InstanceV2.DeleteInstance(CTX, &instance_v2.DeleteInstanceRequest{
+			InstanceId: instance.ID(),
+		})
+		require.NoError(t, err)
+
+		// ensure authorization is deleted
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instance.ID(), createdAuthorization.Id),
+			))
+			require.Empty(collect, az)
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
+	})
 }
 
 func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) string {
@@ -201,12 +596,21 @@ func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) s
 		return project.Id
 	}
 
+	// Wait for the project to be created in the relational db before adding roles
+	projectRepo := repository.ProjectRepository()
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := projectRepo.Get(CTX, pool, database.WithCondition(
+			projectRepo.PrimaryKeyCondition(Instance.ID(), project.Id),
+		))
+		require.NoError(collect, err)
+	}, retryDuration, tick, "project not found")
+
 	for _, role := range roles {
 		_, err = ProjectClient.AddProjectRole(CTX, &project_v2beta.AddProjectRoleRequest{
 			ProjectId:   project.GetId(),
 			RoleKey:     role,
 			DisplayName: "display",
-			Group:       nil,
 		})
 		require.NoError(t, err)
 	}

@@ -20,6 +20,10 @@ func (a authorization) unqualifiedTableName() string {
 	return "authorizations"
 }
 
+func (a authorization) qualifiedTableName() string {
+	return "zitadel." + a.unqualifiedTableName()
+}
+
 func (a authorization) unqualifiedAuthorizationRolesTableName() string {
 	return "authorization_roles"
 }
@@ -151,29 +155,7 @@ func (a authorization) Update(ctx context.Context, client database.QueryExecutor
 	if roles != nil {
 		return a.setRoles(ctx, client, condition, roles, changes...)
 	}
-	return a.update(ctx, client, condition, changes)
-}
-
-// update updates the authorization table when there are no roles to be set.
-func (a authorization) update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes []database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if !condition.IsRestrictingColumn(a.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(a.InstanceIDColumn())
-	}
-	if !database.Changes(changes).IsOnColumn(a.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(a.UpdatedAtColumn(), database.NullInstruction))
-	}
-
-	builder := database.NewStatementBuilder("UPDATE zitadel.authorizations SET ")
-	database.Changes(changes).Write(builder)
-	writeCondition(builder, condition)
-
-	stmt := builder.String()
-
-	rowsAffected, err := client.Exec(ctx, stmt, builder.Args()...)
-	return rowsAffected, err
+	return updateOne(ctx, client, a, condition, changes...)
 }
 
 // setRoles sets the roles of an authorization.
