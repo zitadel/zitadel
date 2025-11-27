@@ -143,7 +143,7 @@ type LoginSettingsAttributes struct {
 	AllowRegister              *bool             `json:"allowRegister,omitempty"`
 	AllowExternalIDP           *bool             `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   *bool             `json:"forceMfa,omitempty"`
-	ForceMFALocalOnly          *bool             `json:"forceMFALocalOnly,omitempty"`
+	ForceMFALocalOnly          *bool             `json:"forceMfaLocalOnly,omitempty"`
 	HidePasswordReset          *bool             `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     *bool             `json:"ignoreUnknownUsernames,omitempty"`
 	AllowDomainDiscovery       *bool             `json:"allowDomainDiscovery,omitempty"`

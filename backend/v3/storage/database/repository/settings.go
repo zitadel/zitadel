@@ -283,7 +283,7 @@ func (loginSettings) SetForceMFA(value bool) db_json.JsonUpdate {
 }
 
 func (loginSettings) SetForceMFALocalOnly(value bool) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"forceMFALocalOnly"}, value)
+	return db_json.NewFieldChange([]string{"forceMfaLocalOnly"}, value)
 }
 
 func (loginSettings) SetHidePasswordReset(value bool) db_json.JsonUpdate {
