@@ -10,6 +10,7 @@ import (
 )
 
 func TestFieldChange(t *testing.T) {
+    t.Parallel()
 	for _, test := range []struct {
 		name   string
 		change database.Change
@@ -40,6 +41,7 @@ func TestFieldChange(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
+            t.Parallel()
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
@@ -50,6 +52,7 @@ func TestFieldChange(t *testing.T) {
 }
 
 func TestArrayChange(t *testing.T) {
+    t.Parallel()
 	for _, test := range []struct {
 		name   string
 		change database.Change
@@ -103,6 +106,7 @@ func TestArrayChange(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
+            t.Parallel()
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
@@ -113,6 +117,7 @@ func TestArrayChange(t *testing.T) {
 }
 
 func TestArrayMixedChange(t *testing.T) {
+    t.Parallel()
 	for _, test := range []struct {
 		name   string
 		change database.Change
@@ -170,6 +175,7 @@ func TestArrayMixedChange(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
+            t.Parallel()
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
@@ -181,6 +187,7 @@ func TestArrayMixedChange(t *testing.T) {
 
 // TODO
 func TestFieldArrayMixedChange(t *testing.T) {
+    t.Parallel()
 	for _, test := range []struct {
 		name   string
 		change database.Change
@@ -240,6 +247,7 @@ func TestFieldArrayMixedChange(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
+            t.Parallel()
 			builder := database.StatementBuilder{}
 			err := test.change.Write(&builder)
 			require.NoError(t, err)
