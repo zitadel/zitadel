@@ -13,7 +13,7 @@ type sessionMetadataColumns interface {
 	SessionIDColumn() database.Column
 }
 
-type sessionMetadataConditions interface {
+type SessionMetadataConditions interface {
 	MetadataConditions
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, sessionID, key string) database.Condition

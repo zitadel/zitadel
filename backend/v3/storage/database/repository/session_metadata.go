@@ -15,33 +15,25 @@ func (s sessionMetadata) unqualifiedTableName() string {
 
 func (s sessionMetadata) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
-		s.InstanceIDColumn(),
-		s.SessionIDColumn(),
-		s.KeyColumn(),
+		s.instanceIDColumn(),
+		s.sessionIDColumn(),
+		s.keyColumn(),
 	}
 }
 
-func (s sessionMetadata) InstanceIDColumn() database.Column {
+func (s sessionMetadata) instanceIDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "instance_id")
 }
 
-func (s sessionMetadata) SessionIDColumn() database.Column {
+func (s sessionMetadata) sessionIDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "session_id")
 }
 
-func (s sessionMetadata) KeyColumn() database.Column {
+func (s sessionMetadata) keyColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "key")
 }
 
-func (s sessionMetadata) CreatedAtColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "created_at")
-}
-
-func (s sessionMetadata) UpdatedAtColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "updated_at")
-}
-
-func (s sessionMetadata) ValueColumn() database.Column {
+func (s sessionMetadata) valueColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "value")
 }
 
@@ -50,30 +42,30 @@ func (s sessionMetadata) ValueColumn() database.Column {
 // -------------------------------------------------------------
 
 // PrimaryKeyCondition implements [domain.SessionMetadataRepository].
-func (s sessionMetadata) PrimaryKeyCondition(instanceID string, orgID string, key string) database.Condition {
+func (s sessionMetadata) PrimaryKeyCondition(instanceID string, sessionID string, key string) database.Condition {
 	return database.And(
 		s.InstanceIDCondition(instanceID),
-		s.SessionIDCondition(orgID),
+		s.SessionIDCondition(sessionID),
 		s.KeyCondition(database.TextOperationEqual, key),
 	)
 }
 
 // InstanceIDCondition implements [domain.SessionMetadataRepository].
 func (s sessionMetadata) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(s.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(s.instanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // SessionIDCondition implements [domain.SessionMetadataRepository].
-func (s sessionMetadata) SessionIDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(s.SessionIDColumn(), database.TextOperationEqual, orgID)
+func (s sessionMetadata) SessionIDCondition(sessionID string) database.Condition {
+	return database.NewTextCondition(s.sessionIDColumn(), database.TextOperationEqual, sessionID)
 }
 
 // KeyCondition implements [domain.SessionMetadataRepository].
 func (s sessionMetadata) KeyCondition(op database.TextOperation, key string) database.Condition {
-	return database.NewTextCondition(s.KeyColumn(), op, key)
+	return database.NewTextCondition(s.keyColumn(), op, key)
 }
 
 // ValueCondition implements [domain.SessionMetadataRepository].
 func (s sessionMetadata) ValueCondition(op database.BytesOperation, value []byte) database.Condition {
-	return database.NewBytesCondition[[]byte](database.SHA256Column(s.ValueColumn()), op, database.SHA256Value(value))
+	return database.NewBytesCondition[[]byte](database.SHA256Column(s.valueColumn()), op, database.SHA256Value(value))
 }

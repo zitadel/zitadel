@@ -1,6 +1,6 @@
 CREATE TABLE zitadel.session_user_agents (
     instance_id TEXT
-    , fingerprint_id TEXT
+    , fingerprint_id TEXT CHECK (fingerprint_id <> '')
     , ip INET
     , description TEXT
     , headers JSONB
@@ -10,13 +10,13 @@ CREATE TABLE zitadel.session_user_agents (
 
 CREATE TABLE zitadel.sessions (
     instance_id TEXT NOT NULL
-    , id TEXT NOT NULL
-    , token BYTEA
+    , id TEXT NOT NULL CHECK (id <> '')
+    , token TEXT
     , user_agent_id TEXT
     , lifetime INTERVAL
     , expiration TIMESTAMPTZ
     , user_id TEXT -- this column in used for referential integrity
-    , creator_id TEXT -- this column in used for referential integrity
+    , creator_id TEXT
     , created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
     , updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 
@@ -25,7 +25,6 @@ CREATE TABLE zitadel.sessions (
 --     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, user_agent_id) REFERENCES zitadel.session_user_agents(instance_id, fingerprint_id) ON DELETE SET NULL (user_agent_id)
 );
-
 
 CREATE OR REPLACE FUNCTION update_expiration()
     RETURNS TRIGGER AS $$
@@ -55,17 +54,17 @@ EXECUTE FUNCTION update_expiration();
 CREATE TYPE zitadel.session_factor_type AS ENUM (
     'user',
     'password',
-    'passkey', -- is a challenge
+    'passkey', -- is also a challenge
     'identity_provider_intent',
     'totp',
-    'otp_sms', -- is a challenge
-    'otp_email' -- is a challenge
+    'otp_sms', -- is also a challenge
+    'otp_email' -- is also a challenge
 );
 
 CREATE TABLE zitadel.session_factors (
     instance_id TEXT NOT NULL
     , session_id TEXT NOT NULL
-    , type session_factor_type NOT NULL
+    , type zitadel.session_factor_type NOT NULL
     , last_challenged_at TIMESTAMPTZ -- this is only set if the type is a challenge
     , challenged_payload JSONB
     , last_verified_at TIMESTAMPTZ
@@ -80,12 +79,6 @@ CREATE TABLE zitadel.session_factors (
 --     FOR EACH ROW
 --     WHEN (NEW.type = 'user' AND NEW.last_verified_at > OLD.last_verified_at)
 -- EXECUTE FUNCTION zitadel.set_session_user();
---
--- CREATE TRIGGER trg_sync_session_identity_provider
---     AFTER INSERT OR UPDATE OR DELETE ON zitadel.session_factors
---     FOR EACH ROW
---     WHEN (NEW.type = 'identity_provider_intent' AND NEW.last_verified_at > OLD.last_verified_at)
--- EXECUTE FUNCTION zitadel.set_session_identity_provider();
 
 CREATE TABLE zitadel.session_metadata (
     instance_id TEXT NOT NULL

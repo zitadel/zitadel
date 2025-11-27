@@ -443,9 +443,9 @@ func (p *sessionRelationalProjection) reduceMetadataSet(event eventstore.Event) 
 		return nil, err
 	}
 
-	metadataList := make([]domain.SessionMetadata, 0, len(e.Metadata))
+	metadataList := make([]*domain.SessionMetadata, 0, len(e.Metadata))
 	for key, value := range e.Metadata {
-		metadataList = append(metadataList, domain.SessionMetadata{
+		metadataList = append(metadataList, &domain.SessionMetadata{
 			Metadata: domain.Metadata{
 				Key:   key,
 				Value: value,

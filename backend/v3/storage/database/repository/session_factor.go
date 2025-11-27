@@ -20,50 +20,50 @@ func (s sessionFactor) unqualifiedTableName() string {
 
 func (s sessionFactor) PrimaryKeyColumns() []database.Column {
 	return []database.Column{
-		s.InstanceIDColumn(),
-		s.SessionIDColumn(),
-		s.TypeColumn(),
+		s.instanceIDColumn(),
+		s.sessionIDColumn(),
+		s.typeColumn(),
 	}
 }
 
-func (s sessionFactor) InstanceIDColumn() database.Column {
+func (s sessionFactor) instanceIDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "instance_id")
 }
 
-func (s sessionFactor) SessionIDColumn() database.Column {
+func (s sessionFactor) sessionIDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "session_id")
 }
 
-func (s sessionFactor) TypeColumn() database.Column {
+func (s sessionFactor) typeColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "type")
 }
 
-func (s sessionFactor) LastChallengedAtColumn() database.Column {
+func (s sessionFactor) lastChallengedAtColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "last_challenged_at")
 }
 
-func (s sessionFactor) LastFailedAtColumn() database.Column {
+func (s sessionFactor) lastFailedAtColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "last_failed_at")
 }
 
-func (s sessionFactor) LastVerifiedAtColumn() database.Column {
+func (s sessionFactor) lastVerifiedAtColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "last_verified_at")
 }
 
-func (s sessionFactor) ChallengedPayloadColumn() database.Column {
+func (s sessionFactor) challengedPayloadColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "challenged_payload")
 }
 
-func (s sessionFactor) VerifiedPayloadColumn() database.Column {
+func (s sessionFactor) verifiedPayloadColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "verified_payload")
 }
 
 //TODO: below conditions need to be fixed
 
 func (s sessionFactor) FactorTypeCondition(factorType domain.SessionFactorType) database.Condition {
-	return database.NewTextCondition(s.TypeColumn(), database.TextOperationEqual, "factorType")
+	return database.NewNumberCondition(s.typeColumn(), database.NumberOperationEqual, factorType)
 }
 
 func (s sessionFactor) LastVerifiedBeforeCondition(lastVerifiedAt time.Time) database.Condition {
-	return database.NewTextCondition(s.LastVerifiedAtColumn(), database.TextOperationContains, "")
+	return database.NewNumberCondition(s.lastVerifiedAtColumn(), database.NumberOperationLessThan, lastVerifiedAt)
 }

@@ -8,19 +8,19 @@ import (
 )
 
 type Session struct {
-	InstanceID string            `json:"instance_id,omitempty" db:"instance_id"`
-	ID         string            `json:"id,omitempty" db:"id"`
-	Token      string            `json:"token,omitempty" db:"token"`
-	Lifetime   time.Duration     `json:"lifetime,omitempty" db:"lifetime"`
-	Expiration time.Time         `json:"expiration,omitzero" db:"expiration"`
-	UserID     string            `json:"user_id,omitempty" db:"user_id"`
-	CreatorID  string            `json:"creator_id,omitempty" db:"creator_id"`
-	CreatedAt  time.Time         `json:"created_at,omitzero" db:"created_at"`
-	UpdatedAt  time.Time         `json:"updated_at,omitzero" db:"updated_at"`
-	Factors    SessionFactors    `json:"factors,omitempty"`
-	Challenges SessionChallenges `json:"challenges,omitempty"`
-	Metadata   []SessionMetadata `json:"metadata,omitempty"`
-	UserAgent  *SessionUserAgent `json:"user_agent,omitempty"`
+	InstanceID string             `json:"instance_id,omitempty" db:"instance_id"`
+	ID         string             `json:"id,omitempty" db:"id"`
+	Token      string             `json:"token,omitempty" db:"token"`
+	Lifetime   time.Duration      `json:"lifetime,omitempty" db:"lifetime"`
+	Expiration time.Time          `json:"expiration,omitzero" db:"expiration"`
+	UserID     string             `json:"user_id,omitempty" db:"user_id"`
+	CreatorID  string             `json:"creator_id,omitempty" db:"creator_id"`
+	CreatedAt  time.Time          `json:"created_at,omitzero" db:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at,omitzero" db:"updated_at"`
+	Factors    SessionFactors     `json:"factors,omitempty"`
+	Challenges SessionChallenges  `json:"challenges,omitempty"`
+	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
+	UserAgent  *SessionUserAgent  `json:"user_agent,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
@@ -63,13 +63,6 @@ type sessionColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
-	//
-	//// FactorColumns returns the columns for the factors fields.
-	//FactorColumns() sessionFactorColumns
-	//// MetadataColumns returns the columns for the metadata fields.
-	//MetadataColumns() sessionMetadataColumns
-	//// UserAgentColumns returns the columns for the user agent fields.
-	//UserAgentColumns() sessionUserAgentColumns
 }
 
 // sessionConditions define all the conditions for the session table.
@@ -86,18 +79,20 @@ type sessionConditions interface {
 	UserIDCondition(userID string) database.Condition
 	// CreatorIDCondition returns an equal filter on the creator id field.
 	CreatorIDCondition(creatorID string) database.Condition
+	// ExpirationCondition returns a filter on the expiration field.
+	ExpirationCondition(op database.NumberOperation, expiration time.Time) database.Condition
 	// CreatedAtCondition returns a filter on the created at field.
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
 	// UpdatedAtCondition returns a filter on the updated at field.
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
-
+	// ExistsFactor returns a filter on the session's factors.
 	ExistsFactor(condition database.Condition) database.Condition
 	// FactorConditions returns the conditions for the factors fields.
 	FactorConditions() SessionFactorConditions
-	//// MetadataConditions returns the conditions for the metadata fields.
-	//MetadataConditions() sessionMetadataConditions
-	//// UserAgentConditions returns the conditions for the user agent fields.
-	//UserAgentConditions() sessionUserAgentConditions
+	// ExistsMetadata returns a filter on the session's metadata.
+	ExistsMetadata(condition database.Condition) database.Condition
+	// MetadataConditions returns the conditions for the metadata fields.
+	MetadataConditions() SessionMetadataConditions
 }
 
 type sessionChanges interface {
@@ -117,7 +112,5 @@ type sessionChanges interface {
 	// ClearFactor resets the factor's verification.
 	ClearFactor(factor SessionFactorType) database.Change
 	// SetMetadata adds or updates the metadata of the session.
-	SetMetadata(metadata []SessionMetadata) database.Change
-	// SetUserAgent adds or updates the user agent of the session.
-	SetUserAgent(userAgent SessionUserAgent) database.Change
+	SetMetadata(metadata []*SessionMetadata) database.Change
 }

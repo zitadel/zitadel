@@ -8,22 +8,24 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-//go:generate enumer -type=SessionFactorType -trimprefix=SessionFactorType -transform snake
+//go:generate enumer -type=SessionFactorType -trimprefix SessionFactorType -transform snake -linecomment -sql
 type SessionFactorType uint8
 
 const (
 	SessionFactorTypeUnknown SessionFactorType = iota
 	SessionFactorTypeUser
 	SessionFactorTypePassword
-	SessionFactorTypePasskey // formerly known as WebAuthn
+	// SessionFactorTypePasskey was formerly known as WebAuthn
+	SessionFactorTypePasskey
 	SessionFactorTypeIdentityProviderIntent
+	// SessionFactorTypeTOTP used to be called OTP in some places
 	SessionFactorTypeTOTP
-	SessionFactorTypeOTPSMS
+	SessionFactorTypeOTPSMS // otp_sms
 	SessionFactorTypeOTPEmail
 )
 
 type SessionFactor interface {
-	sessionFactorType() SessionFactorType
+	SessionFactorType() SessionFactorType
 }
 
 type SessionFactorUser struct {
@@ -31,8 +33,8 @@ type SessionFactorUser struct {
 	LastVerifiedAt time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorUser) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorUser) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeUser
 }
 
@@ -41,8 +43,8 @@ type SessionFactorPassword struct {
 	LastFailedAt   time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorPassword) SessionFactorType() SessionFactorType {
 	return SessionFactorTypePassword
 }
 
@@ -50,8 +52,8 @@ type SessionFactorIdentityProviderIntent struct {
 	LastVerifiedAt time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorIdentityProviderIntent) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorIdentityProviderIntent) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeIdentityProviderIntent
 }
 
@@ -60,8 +62,8 @@ type SessionFactorPasskey struct {
 	UserVerified   bool
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorPasskey) SessionFactorType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
 
@@ -70,8 +72,8 @@ type SessionFactorTOTP struct {
 	LastFailedAt   time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorTOTP) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorTOTP) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeTOTP
 }
 
@@ -80,8 +82,8 @@ type SessionFactorOTPSMS struct {
 	LastFailedAt   time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorOTPSMS) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorOTPSMS) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
 
@@ -90,12 +92,16 @@ type SessionFactorOTPEmail struct {
 	LastFailedAt   time.Time
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorOTPEmail) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorOTPEmail) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
 type SessionFactors []SessionFactor
+
+func (s *SessionFactors) AppendTo(factor SessionFactor) {
+	*s = append(*s, factor)
+}
 
 // GetUserFactor returns the user factor from the factors.
 func (s SessionFactors) GetUserFactor() *SessionFactorUser {
@@ -196,6 +202,10 @@ func (s *SessionChallengeOTPEmail) sessionChallengeType() SessionFactorType {
 }
 
 type SessionChallenges []SessionChallenge
+
+func (s *SessionChallenges) AppendTo(challenge SessionChallenge) {
+	*s = append(*s, challenge)
+}
 
 // GetPasskeyChallenge returns the passkey challenge from the challenges.
 func (s SessionChallenges) GetPasskeyChallenge() *SessionChallengePasskey {
