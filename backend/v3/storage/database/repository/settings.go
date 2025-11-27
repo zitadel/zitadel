@@ -383,7 +383,7 @@ func (s loginSettings) Set(ctx context.Context, client database.QueryExecutor, s
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LoginSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LoginSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -394,11 +394,11 @@ func (s loginSettings) SetColumns(ctx context.Context, client database.QueryExec
 	settings.Type = domain.SettingTypeLogin
 	settings.State = domain.SettingStateActive
 
-	return s.settings.set(ctx, client, settings, changes...)
+	return s.set(ctx, client, settings, changes...)
 }
 
 func (s loginSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +415,7 @@ func (s loginSettings) List(ctx context.Context, client database.QueryExecutor, 
 }
 
 func (s loginSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -577,7 +577,7 @@ func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.BrandingSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.BrandingSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -588,11 +588,11 @@ func (s brandingSettings) SetColumns(ctx context.Context, client database.QueryE
 	settings.Type = domain.SettingTypeBranding
 	settings.State = domain.SettingStatePreview
 
-	return s.settings.set(ctx, client, settings, changes...)
+	return s.set(ctx, client, settings, changes...)
 }
 
 func (s brandingSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.BrandingSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -609,7 +609,7 @@ func (s brandingSettings) List(ctx context.Context, client database.QueryExecuto
 }
 
 func (s brandingSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.BrandingSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +723,7 @@ func (s passwordComplexitySettings) Set(ctx context.Context, client database.Que
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.PasswordComplexitySettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.PasswordComplexitySettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -731,7 +731,7 @@ func (s passwordComplexitySettings) Set(ctx context.Context, client database.Que
 }
 
 func (s passwordComplexitySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.PasswordComplexitySettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -748,7 +748,7 @@ func (s passwordComplexitySettings) List(ctx context.Context, client database.Qu
 }
 
 func (s passwordComplexitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -805,7 +805,7 @@ func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryEx
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.PasswordExpirySettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.PasswordExpirySettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -813,7 +813,7 @@ func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryEx
 }
 
 func (s passwordExpirySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.PasswordExpirySettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -830,7 +830,7 @@ func (s passwordExpirySettings) List(ctx context.Context, client database.QueryE
 }
 
 func (s passwordExpirySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordExpirySettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -893,7 +893,7 @@ func (s lockoutSettings) Set(ctx context.Context, client database.QueryExecutor,
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LockoutSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LockoutSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -901,7 +901,7 @@ func (s lockoutSettings) Set(ctx context.Context, client database.QueryExecutor,
 }
 
 func (s lockoutSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LockoutSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -918,7 +918,7 @@ func (s lockoutSettings) List(ctx context.Context, client database.QueryExecutor
 }
 
 func (s lockoutSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LockoutSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -981,7 +981,7 @@ func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.SecuritySettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.SecuritySettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -989,7 +989,7 @@ func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor
 }
 
 func (s securitySettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.SecuritySettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1006,7 +1006,7 @@ func (s securitySettings) List(ctx context.Context, client database.QueryExecuto
 }
 
 func (s securitySettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1069,7 +1069,7 @@ func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, 
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.DomainSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.DomainSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -1077,7 +1077,7 @@ func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, 
 }
 
 func (s domainSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.DomainSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1094,7 +1094,7 @@ func (s domainSettings) List(ctx context.Context, client database.QueryExecutor,
 }
 
 func (s domainSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1143,7 +1143,7 @@ func (s organizationSettings) Set(ctx context.Context, client database.QueryExec
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.OrganizationSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.OrganizationSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -1151,7 +1151,7 @@ func (s organizationSettings) Set(ctx context.Context, client database.QueryExec
 }
 
 func (s organizationSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1168,7 +1168,7 @@ func (s organizationSettings) List(ctx context.Context, client database.QueryExe
 }
 
 func (s organizationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1217,7 +1217,7 @@ func (s notificationSettings) Set(ctx context.Context, client database.QueryExec
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.NotificationSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.NotificationSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -1225,7 +1225,7 @@ func (s notificationSettings) Set(ctx context.Context, client database.QueryExec
 }
 
 func (s notificationSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.NotificationSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1242,7 +1242,7 @@ func (s notificationSettings) List(ctx context.Context, client database.QueryExe
 }
 
 func (s notificationSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.NotificationSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1333,7 +1333,7 @@ func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryE
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.settings.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LegalAndSupportSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LegalAndSupportSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
@@ -1341,7 +1341,7 @@ func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryE
 }
 
 func (s legalAndSupportSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LegalAndSupportSettings, error) {
-	settings, err := s.settings.list(ctx, client, opts...)
+	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1358,7 +1358,7 @@ func (s legalAndSupportSettings) List(ctx context.Context, client database.Query
 }
 
 func (s legalAndSupportSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LegalAndSupportSettings, error) {
-	settings, err := s.settings.get(ctx, client, opts...)
+	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
