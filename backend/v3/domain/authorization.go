@@ -19,7 +19,7 @@ type Authorization struct {
 	ID         string             `json:"id,omitempty" db:"id"`
 	UserID     string             `json:"userId" db:"user_id"`
 	ProjectID  string             `json:"projectId" db:"project_id"`
-	GrantID    string             `json:"grantId" db:"grant_id"`
+	GrantID    *string            `json:"grantId" db:"grant_id"`
 	InstanceID string             `json:"instanceId,omitempty" db:"instance_id"`
 	State      AuthorizationState `json:"state,omitempty" db:"state"`
 	CreatedAt  time.Time          `json:"createdAt,omitempty" db:"created_at"`

@@ -15,8 +15,8 @@ CREATE TABLE zitadel.authorizations
     updated_at  TIMESTAMPTZ                 NOT NULL DEFAULT NOW(),
     PRIMARY KEY (instance_id, id),
 --     FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE,
-    FOREIGN KEY (instance_id, project_id) REFERENCES zitadel.projects (instance_id, id) ON DELETE CASCADE
---     FOREIGN KEY (instance_id, grant_id) REFERENCES zitadel.project_grants (instance_id, id) ON DELETE CASCADE
+    FOREIGN KEY (instance_id, project_id) REFERENCES zitadel.projects (instance_id, id) ON DELETE CASCADE,
+    FOREIGN KEY (instance_id, grant_id) REFERENCES zitadel.project_grants (instance_id, id) ON DELETE CASCADE
 );
 
 CREATE TABLE zitadel.authorization_roles
@@ -28,8 +28,8 @@ CREATE TABLE zitadel.authorization_roles
     grant_id         TEXT,
     PRIMARY KEY (instance_id, authorization_id, role_key),
     FOREIGN KEY (instance_id, authorization_id) REFERENCES zitadel.authorizations (instance_id, id) ON DELETE CASCADE,
-    FOREIGN KEY (instance_id, project_id, role_key) REFERENCES zitadel.project_roles (instance_id, project_id, key) ON DELETE CASCADE
---     FOREIGN KEY (instance_id, grant_id, role_key) REFERENCES zitadel.project_grant_roles (instance_id, grant_id, role_key) ON DELETE CASCADE
+    FOREIGN KEY (instance_id, project_id, role_key) REFERENCES zitadel.project_roles (instance_id, project_id, key) ON DELETE CASCADE,
+    FOREIGN KEY (instance_id, grant_id, role_key) REFERENCES zitadel.project_grant_roles (instance_id, grant_id, key) ON DELETE CASCADE
 );
 
 CREATE TRIGGER trigger_set_updated_at

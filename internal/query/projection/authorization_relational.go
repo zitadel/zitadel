@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/muhlemmer/gu"
+
 	repoDomain "github.com/zitadel/zitadel/backend/v3/domain"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -81,7 +83,7 @@ func (a *authorizationRelationalProjection) reduceUserGrantAdded(event eventstor
 			ID:         e.Aggregate().ID,
 			UserID:     e.UserID,
 			ProjectID:  e.ProjectID,
-			GrantID:    e.ProjectGrantID,
+			GrantID:    gu.Ptr(e.ProjectGrantID),
 			Roles:      e.RoleKeys,
 			CreatedAt:  e.CreationDate(),
 			UpdatedAt:  e.CreationDate(),
