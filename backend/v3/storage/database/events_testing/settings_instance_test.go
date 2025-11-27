@@ -25,7 +25,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
@@ -365,23 +364,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	})
 
 	t.Run("test policy label change", func(t *testing.T) {
-		_, err := newInstance.Client.Mgmt.AddCustomLabelPolicy(IAMCTX, &management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055000",
-			HideLoginNameSuffix: true,
-			WarnColor:           "#055000",
-			BackgroundColor:     "#055000",
-			FontColor:           "#055000",
-			PrimaryColorDark:    "#055000",
-			BackgroundColorDark: "#055000",
-			WarnColorDark:       "#055000",
-			FontColorDark:       "#055000",
-			DisableWatermark:    true,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
-		})
-		require.NoError(t, err)
-
 		before := time.Now()
-		_, err = newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
+		_, err := newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
 			PrimaryColor:        "#055000",
 			HideLoginNameSuffix: true,
 			WarnColor:           "#055000",
@@ -1214,6 +1198,191 @@ func TestServer_TestInstanceSecuritySettingsReduces(t *testing.T) {
 			)
 
 			// event instance.removed
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
+
+func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
+	t.Parallel()
+
+	settingsRepo := repository.NotificationSettingsRepository()
+
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
+	t.Run("test add notification settings set", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, true, *setting.PasswordChange)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test add notification settings re-set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Admin.UpdateNotificationPolicy(IAMCTX, &admin.UpdateNotificationPolicyRequest{
+			PasswordChange: false,
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, false, *setting.PasswordChange)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+			require.NoError(collect, err)
+
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
+
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
+
+func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
+	t.Parallel()
+
+	settingsRepo := repository.LegalAndSupportSettingsRepository()
+
+	before := time.Now()
+	newInstance := integration.NewInstance(t.Context())
+	after := time.Now()
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
+	t.Run("test add legal and support settings set", func(t *testing.T) {
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, "", *setting.TOSLink)
+			assert.Equal(t, "", *setting.PrivacyPolicyLink)
+			assert.Equal(t, "", *setting.HelpLink)
+			assert.Equal(t, "", *setting.SupportEmail)
+			assert.Equal(t, "https://zitadel.com/docs", *setting.DocsLink)
+			assert.Equal(t, "", *setting.CustomLink)
+			assert.Equal(t, "", *setting.CustomLinkText)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test add legal and support settings re-set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:        "https://tos.example2.com",
+			PrivacyLink:    "https://privacy.example2.com",
+			HelpLink:       "https://help.example2.com",
+			SupportEmail:   "support@example2.com",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Custom link text2",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
+			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
+			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
+			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
+			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
+			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
+			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+			require.NoError(collect, err)
+
+			require.NotNil(t, setting)
+		}, retryDuration, tick)
+
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+
 			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})

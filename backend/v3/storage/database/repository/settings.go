@@ -624,7 +624,15 @@ func (s brandingSettings) Get(ctx context.Context, client database.QueryExecutor
 
 const queryActivateBrandingSettingsStmt = `SELECT instance_id, organization_id, id, type, created_at, updated_at, settings FROM `
 
-func (s brandingSettings) Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+func (s brandingSettings) Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	return s.activateAt(ctx, client, condition, time.Now())
+}
+
+func (s brandingSettings) ActivateAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, updatedAt time.Time) (int64, error) {
+	return s.activateAt(ctx, client, condition, updatedAt)
+}
+
+func (s brandingSettings) activateAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, updatedAt time.Time) (int64, error) {
 	condition = database.And(
 		condition,
 		s.TypeCondition(domain.SettingTypeBranding),
@@ -633,9 +641,6 @@ func (s brandingSettings) Activate(ctx context.Context, client database.QueryExe
 	// if you want to update the roles you have to have a unique condition, otherwise multiple branding settings get activated
 	if err := checkRestrictingColumns(condition, s.UniqueColumns()...); err != nil {
 		return 0, err
-	}
-	if !database.Changes(changes).IsOnColumn(s.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(s.UpdatedAtColumn(), database.DefaultInstruction))
 	}
 
 	// the statement begins with getting settings in preview state
@@ -647,14 +652,15 @@ func (s brandingSettings) Activate(ctx context.Context, client database.QueryExe
 	// insert or update settings as active
 	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName())
 	builder.WriteString(` (instance_id, organization_id, id, type, state, created_at, updated_at, settings)`)
-	builder.WriteString(` SELECT preview.instance_id, preview.organization_id, preview.id, preview.type, '` + domain.SettingStateActive.String() + `', preview.created_at, preview.updated_at, preview.settings FROM preview`)
-	builder.WriteString(` ON CONFLICT (instance_id, organization_id, type, state) DO UPDATE SET settings = EXCLUDED.settings `)
-	if len(changes) > 0 {
-		builder.WriteString(`, `)
-	}
-	if err := database.Changes(changes).Write(builder); err != nil {
-		return 0, err
-	}
+
+	builder.WriteString(` SELECT preview.instance_id, preview.organization_id, preview.id, preview.type, `)
+	builder.WriteArg(domain.SettingStateActive)
+	builder.WriteString(`, preview.created_at, `)
+	builder.WriteArg(updatedAt)
+	builder.WriteString(`, preview.settings FROM preview`)
+
+	builder.WriteString(` ON CONFLICT (instance_id, organization_id, type, state) DO UPDATE SET settings = EXCLUDED.settings, updated_at = `)
+	builder.WriteArg(updatedAt)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }

@@ -232,7 +232,8 @@ type BrandingSettingsRepository interface {
 	brandingSettingsJSONChanges
 
 	StateCondition(typ SettingState) database.Condition
-	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	Activate(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	ActivateAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, updatedAt time.Time) (int64, error)
 	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 }
 

@@ -22,13 +22,6 @@ import (
 
 const (
 	SettingsRelationalProjectionTable = "zitadel.settings"
-
-	SettingIDCol          = "id"
-	SettingInstanceIDCol  = "instance_id"
-	SettingsOrgIDCol      = "org_id"
-	SettingsTypeCol       = "type"
-	SettingsLabelStateCol = "label_state"
-	SettingsSettingsCol   = "settings"
 )
 
 type settingsRelationalProjection struct{}
@@ -204,7 +197,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.PrivacyPolicyChangedEventType,
-					Reduce: s.reduceDomainPolicyChanged,
+					Reduce: s.reducePrivacyPolicyChanged,
 				},
 				{
 					Event:  org.PrivacyPolicyRemovedEventType,
@@ -357,7 +350,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.NotificationPolicyChangedEventType,
 					Reduce: s.reduceNotificationPolicyChanged,
 				},
-				// 		// Security Policy
+				// Privacy policy
 				{
 					Event:  instance.PrivacyPolicyAddedEventType,
 					Reduce: s.reducePrivacyPolicyAdded,
@@ -772,12 +765,12 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 		}
 
 		settingsRepo := repository.BrandingSettingsRepository()
-		_, err := settingsRepo.Activate(ctx, v3_sql.SQLTx(tx),
+		_, err := settingsRepo.ActivateAt(ctx, v3_sql.SQLTx(tx),
 			database.And(
 				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
 				settingsRepo.OrganizationIDCondition(orgId),
 			),
-			settingsRepo.SetUpdatedAt(&policyEvent.Creation),
+			policyEvent.Creation,
 		)
 		return err
 	}), nil
@@ -1649,15 +1642,15 @@ func (p *settingsRelationalProjection) reducePrivacyPolicyAdded(event eventstore
 
 func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
-	var policyEvent policy.PrivacyPolicyAddedEvent
+	var policyEvent policy.PrivacyPolicyChangedEvent
 	switch e := event.(type) {
-	case *org.PrivacyPolicyAddedEvent:
-		policyEvent = e.PrivacyPolicyAddedEvent
+	case *org.PrivacyPolicyChangedEvent:
+		policyEvent = e.PrivacyPolicyChangedEvent
 		orgId = &policyEvent.Aggregate().ResourceOwner
-	case *instance.PrivacyPolicyAddedEvent:
-		policyEvent = e.PrivacyPolicyAddedEvent
+	case *instance.PrivacyPolicyChangedEvent:
+		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, instance.PrivacyPolicyAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, instance.PrivacyPolicyChangedEventType})
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
@@ -1667,7 +1660,10 @@ func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventsto
 		}
 
 		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		email := string(policyEvent.SupportEmail)
+		var email string
+		if policyEvent.SupportEmail != nil {
+			email = string(*policyEvent.SupportEmail)
+		}
 		settings := domain.LegalAndSupportSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
@@ -1675,13 +1671,13 @@ func (s *settingsRelationalProjection) reducePrivacyPolicyChanged(event eventsto
 				UpdatedAt:      policyEvent.Creation,
 			},
 			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           &policyEvent.TOSLink,
-				PrivacyPolicyLink: &policyEvent.PrivacyLink,
-				HelpLink:          &policyEvent.HelpLink,
+				TOSLink:           policyEvent.TOSLink,
+				PrivacyPolicyLink: policyEvent.PrivacyLink,
+				HelpLink:          policyEvent.HelpLink,
 				SupportEmail:      &email,
-				DocsLink:          &policyEvent.DocsLink,
-				CustomLink:        &policyEvent.CustomLink,
-				CustomLinkText:    &policyEvent.CustomLinkText,
+				DocsLink:          policyEvent.DocsLink,
+				CustomLink:        policyEvent.CustomLink,
+				CustomLinkText:    policyEvent.CustomLinkText,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

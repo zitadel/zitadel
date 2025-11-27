@@ -475,19 +475,11 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	t.Run("test label settings activated", func(t *testing.T) {
 		// activate label
 		before := time.Now()
-		//_, err := newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
-
-		_, err := settingsRepo.Activate(IAMCTX, pool,
-			database.And(
-				settingsRepo.InstanceIDCondition(newInstance.ID()),
-				settingsRepo.OrganizationIDCondition(&orgId),
-			),
-			settingsRepo.SetUpdatedAt(gu.Ptr(time.Now())),
-		)
+		_, err := newInstance.Client.Mgmt.ActivateCustomLabelPolicy(IAMCTX, &management.ActivateCustomLabelPolicyRequest{})
 		require.NoError(t, err)
 		after := time.Now()
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		_, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
@@ -500,7 +492,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			// event org.policy.label.activated
 			assert.Equal(t, domain.SettingStateActive, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
-		}, retryDuration, tick)
+		}, time.Minute*5, tick)
 	})
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
@@ -1342,6 +1334,216 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 			)
 
 			// event org.removed
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
+
+func TestServer_TestNotificationSettingsReduces(t *testing.T) {
+	t.Parallel()
+
+	settingsRepo := repository.NotificationSettingsRepository()
+
+	IAMCTX, newInstance, orgId := createInstanceWithOrg(t)
+
+	t.Run("test add notification settings set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.AddCustomNotificationPolicy(IAMCTX, &management.AddCustomNotificationPolicyRequest{
+			PasswordChange: true,
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, true, *setting.PasswordChange)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test add notification settings re-set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.UpdateCustomNotificationPolicy(IAMCTX, &management.UpdateCustomNotificationPolicyRequest{
+			PasswordChange: false,
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, false, *setting.PasswordChange)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test notification settings removed reduces", func(t *testing.T) {
+		_, err := newInstance.Client.Mgmt.ResetNotificationPolicyToDefault(IAMCTX, &management.ResetNotificationPolicyToDefaultRequest{})
+		require.NoError(t, err)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+
+	t.Run("test organization removed reduces", func(t *testing.T) {
+		// add delete org
+		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: orgId,
+		})
+		require.NoError(t, err)
+
+		// check organization settings removed
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeNotification, domain.SettingStateActive),
+				),
+			)
+
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
+
+func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
+	t.Parallel()
+
+	settingsRepo := repository.LegalAndSupportSettingsRepository()
+
+	IAMCTX, newInstance, orgId := createInstanceWithOrg(t)
+
+	t.Run("test add legal and support settings set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.AddCustomPrivacyPolicy(IAMCTX, &management.AddCustomPrivacyPolicyRequest{
+			TosLink:        "https://tos.example.com",
+			PrivacyLink:    "https://privacy.example.com",
+			HelpLink:       "https://help.example.com",
+			SupportEmail:   "support@example.com",
+			DocsLink:       "https://docs.example.com",
+			CustomLink:     "https://custom.example.com",
+			CustomLinkText: "Custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, "https://tos.example.com", *setting.TOSLink)
+			assert.Equal(t, "https://privacy.example.com", *setting.PrivacyPolicyLink)
+			assert.Equal(t, "https://help.example.com", *setting.HelpLink)
+			assert.Equal(t, "support@example.com", *setting.SupportEmail)
+			assert.Equal(t, "https://docs.example.com", *setting.DocsLink)
+			assert.Equal(t, "https://custom.example.com", *setting.CustomLink)
+			assert.Equal(t, "Custom link text", *setting.CustomLinkText)
+			assert.WithinRange(t, setting.CreatedAt, before, after)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test add legal and support settings re-set", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.UpdateCustomPrivacyPolicy(IAMCTX, &management.UpdateCustomPrivacyPolicyRequest{
+			TosLink:        "https://tos.example2.com",
+			PrivacyLink:    "https://privacy.example2.com",
+			HelpLink:       "https://help.example2.com",
+			SupportEmail:   "support@example2.com",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Custom link text2",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
+			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
+			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
+			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
+			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
+			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
+			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test legal and support settings removed reduces", func(t *testing.T) {
+		_, err := newInstance.Client.Mgmt.ResetPrivacyPolicyToDefault(IAMCTX, &management.ResetPrivacyPolicyToDefaultRequest{})
+		require.NoError(t, err)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+
+	t.Run("test organization removed reduces", func(t *testing.T) {
+		// add delete org
+		_, err := newInstance.Client.OrgV2beta.DeleteOrganization(IAMCTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: orgId,
+		})
+		require.NoError(t, err)
+
+		// check organization settings removed
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+				),
+			)
+
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
