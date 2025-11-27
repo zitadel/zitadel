@@ -328,6 +328,8 @@ type idProviderChanges interface {
 	SetUpdatedAt(createdAt *time.Time) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/id_provider.mock.go . IDProviderRepository
+
 type IDProviderRepository interface {
 	Repository
 
