@@ -406,7 +406,7 @@ func (s loginSettings) List(ctx context.Context, client database.QueryExecutor, 
 	list := make([]*domain.LoginSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.LoginSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].LoginSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].LoginSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -600,7 +600,7 @@ func (s brandingSettings) List(ctx context.Context, client database.QueryExecuto
 	list := make([]*domain.BrandingSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.BrandingSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].BrandingSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].BrandingSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -652,7 +652,9 @@ func (s brandingSettings) Activate(ctx context.Context, client database.QueryExe
 	if len(changes) > 0 {
 		builder.WriteString(`, `)
 	}
-	database.Changes(changes).Write(builder)
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -737,7 +739,7 @@ func (s passwordComplexitySettings) List(ctx context.Context, client database.Qu
 	list := make([]*domain.PasswordComplexitySettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.PasswordComplexitySettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].PasswordComplexitySettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].PasswordComplexitySettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -752,7 +754,7 @@ func (s passwordComplexitySettings) Get(ctx context.Context, client database.Que
 	}
 
 	item := &domain.PasswordComplexitySettings{Settings: *settings}
-	if err = json.Unmarshal(item.Settings.Settings, &item.PasswordComplexitySettingsAttributes); err != nil {
+	if err := json.Unmarshal(item.Settings.Settings, &item.PasswordComplexitySettingsAttributes); err != nil {
 		return nil, err
 	}
 	item.Settings.Settings = nil
@@ -819,7 +821,7 @@ func (s passwordExpirySettings) List(ctx context.Context, client database.QueryE
 	list := make([]*domain.PasswordExpirySettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.PasswordExpirySettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].PasswordExpirySettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].PasswordExpirySettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -907,7 +909,7 @@ func (s lockoutSettings) List(ctx context.Context, client database.QueryExecutor
 	list := make([]*domain.LockoutSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.LockoutSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].LockoutSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].LockoutSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -995,7 +997,7 @@ func (s securitySettings) List(ctx context.Context, client database.QueryExecuto
 	list := make([]*domain.SecuritySettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.SecuritySettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].SecuritySettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].SecuritySettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -1083,7 +1085,7 @@ func (s domainSettings) List(ctx context.Context, client database.QueryExecutor,
 	list := make([]*domain.DomainSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.DomainSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].DomainSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].DomainSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -1157,7 +1159,7 @@ func (s organizationSettings) List(ctx context.Context, client database.QueryExe
 	list := make([]*domain.OrganizationSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.OrganizationSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].OrganizationSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].OrganizationSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -1231,7 +1233,7 @@ func (s notificationSettings) List(ctx context.Context, client database.QueryExe
 	list := make([]*domain.NotificationSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.NotificationSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].NotificationSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].NotificationSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -1347,7 +1349,7 @@ func (s legalAndSupportSettings) List(ctx context.Context, client database.Query
 	list := make([]*domain.LegalAndSupportSettings, len(settings))
 	for i := range settings {
 		list[i] = &domain.LegalAndSupportSettings{Settings: *settings[i]}
-		if json.Unmarshal(list[i].Settings.Settings, &list[i].LegalAndSupportSettingsAttributes); err != nil {
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].LegalAndSupportSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
