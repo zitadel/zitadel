@@ -51,6 +51,12 @@ func WithUserRepo(repo UserRepository) InvokeOpt {
 	}
 }
 
+func WithIDPRepo(repo IDProviderRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.idpRepo = repo
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -87,6 +93,7 @@ type InvokeOpts struct {
 	instanceDomainRepo     InstanceDomainRepository
 	sessionRepo            SessionRepository
 	userRepo               UserRepository
+	idpRepo                IDProviderRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
