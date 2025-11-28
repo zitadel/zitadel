@@ -419,7 +419,7 @@ func TestListAuthorization(t *testing.T) {
 	project1ID := createProject(t, tx, instanceID, organizationID)
 	require.NotNil(t, project1ID)
 	project1Role1 := createProjectRole(t, tx, instanceID, organizationID, project1ID, "project1Role1")
-	project1Role2 := createProjectRole(t, tx, instanceID, organizationID, project1ID, "project2Role2")
+	project1Role2 := createProjectRole(t, tx, instanceID, organizationID, project1ID, "project1Role2")
 
 	project2ID := createProject(t, tx, instanceID, organizationID)
 	require.NotNil(t, project2ID)
@@ -784,6 +784,22 @@ func TestListAuthorization(t *testing.T) {
 				),
 			},
 			want: []*domain.Authorization{},
+		},
+		{
+			name: "list all authorizations with exists role condition",
+			condition: []database.QueryOption{
+				database.WithCondition(
+					database.And(
+						authorizationRepo.InstanceIDCondition(instanceID),
+						authorizationRepo.ExistsRole(authorizationRepo.RoleCondition(database.TextOperationEqual, project2Role2)),
+					),
+				),
+				database.WithOrderByAscending(authorizationRepo.IDColumn()),
+			},
+			want: []*domain.Authorization{
+				authorizationWithRolesUser1Project2,
+				authorizationWithRolesUser2Project2,
+			},
 		},
 	}
 	for _, tt := range tests {

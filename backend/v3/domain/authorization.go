@@ -65,6 +65,8 @@ type authorizationConditions interface {
 	UserIDCondition(userID string) database.Condition
 	// RoleCondition returns a filter on the role_key field from the authorization_roles table.
 	RoleCondition(op database.TextOperation, role string) database.Condition
+	// ExistsRole returns a filter that checks for the existence of a role key in the authorization_roles table.
+	ExistsRole(cond database.Condition) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state AuthorizationState) database.Condition
 }

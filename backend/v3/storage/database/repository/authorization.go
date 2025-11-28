@@ -28,6 +28,10 @@ func (a authorization) unqualifiedAuthorizationRolesTableName() string {
 	return "authorization_roles"
 }
 
+func (a authorization) qualifiedAuthorizationRolesTableName() string {
+	return "zitadel." + a.unqualifiedAuthorizationRolesTableName()
+}
+
 // -------------------------------------------------------------
 // repository
 // -------------------------------------------------------------
@@ -45,8 +49,7 @@ const insertAuthorizationWithRolesStmt = `WITH roles AS (
 
 // Create implements [domain.AuthorizationRepository].
 func (a authorization) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
-	var builder *database.StatementBuilder
-	builder = database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
+	builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
 		authorization.InstanceID,
 		authorization.ID,
 		authorization.UserID,
@@ -278,6 +281,20 @@ func (a authorization) UserIDCondition(userID string) database.Condition {
 // RoleCondition implements [domain.authorizationConditions]
 func (a authorization) RoleCondition(op database.TextOperation, role string) database.Condition {
 	return database.NewTextCondition(database.NewColumn(a.unqualifiedAuthorizationRolesTableName(), "role_key"), op, role)
+}
+
+// ExistsRole implements [domain.authorizationConditions]
+// ExistsRole creates a correlated [database.Exists] condition on the authorization_roles table.
+// Use this filter to make sure the authorization returned contains a specific role.
+func (a authorization) ExistsRole(cond database.Condition) database.Condition {
+	return database.Exists(
+		a.qualifiedAuthorizationRolesTableName(),
+		database.And(
+			database.NewColumnCondition(a.InstanceIDColumn(), database.NewColumn(a.unqualifiedAuthorizationRolesTableName(), "instance_id")),
+			database.NewColumnCondition(a.IDColumn(), database.NewColumn(a.unqualifiedAuthorizationRolesTableName(), "authorization_id")),
+			cond,
+		),
+	)
 }
 
 // StateCondition implements [domain.authorizationConditions]

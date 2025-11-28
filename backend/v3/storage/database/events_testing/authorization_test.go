@@ -3,7 +3,6 @@
 package events_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -328,6 +327,45 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		}, retryDuration, tick, "authorization not deleted within %v: %v", retryDuration, err)
 	})
 
+	t.Run("project grant updated reduces", func(t *testing.T) {
+		// prepare project and project roles
+		role1, role2 := "role1", "role2"
+		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
+		// granted organization
+		grantedOrganizationName := integration.OrganizationName()
+		grantedOrganization := Instance.CreateOrganization(CTX, grantedOrganizationName, integration.Email())
+		// create project grant
+		_, err := ProjectClient.CreateProjectGrant(CTX, &project_v2beta.CreateProjectGrantRequest{
+			ProjectId:             projectID,
+			RoleKeys:              []string{role1, role2},
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+		})
+		require.NoError(t, err)
+		// create user
+		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
+		// create authorization with roles
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		// update project grant
+		//beforeUpdate := time.Now()
+		_, err = ProjectClient.UpdateProjectGrant(CTX, &project_v2beta.UpdateProjectGrantRequest{
+			ProjectId:             projectID,
+			GrantedOrganizationId: grantedOrganization.OrganizationId,
+			RoleKeys:              []string{role1},
+		})
+		require.NoError(t, err)
+		//afterUpdate := time.Now().Add(500 * time.Millisecond) // add some buffer for eventual consistency of cascading changes
+
+		// ensure authorization is updated
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
+				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
+			))
+			require.NoError(collect, err)
+			assert.Equal(collect, []string{role1}, az.Roles)
+			//assert.WithinRange(collect, az.UpdatedAt, beforeUpdate, afterUpdate)
+		}, retryDuration, tick, "authorization not updated within %v: %v", retryDuration, err)
+	})
+
 	t.Run("org removed reduces", func(t *testing.T) {
 		// create a new organization
 		orgName := integration.OrganizationName()
@@ -419,9 +457,6 @@ func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, proje
 	})
 	require.NoError(t, err)
 	afterCreate := time.Now().Add(500 * time.Millisecond)
-
-	fmt.Println("before create:", beforeCreate)
-	fmt.Println("after create:", afterCreate)
 	// ensure authorization exists
 	authzRepo := repository.AuthorizationRepository()
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
