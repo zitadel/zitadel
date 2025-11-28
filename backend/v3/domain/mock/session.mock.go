@@ -196,11 +196,12 @@ func (c *MockSessionRepositoryCreatedAtConditionCall) DoAndReturn(f func(databas
 }
 
 // Delete mocks base method.
-func (m *MockSessionRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error {
+func (m *MockSessionRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, client, condition)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete.
@@ -216,19 +217,19 @@ type MockSessionRepositoryDeleteCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockSessionRepositoryDeleteCall) Return(arg0 error) *MockSessionRepositoryDeleteCall {
-	c.Call = c.Call.Return(arg0)
+func (c *MockSessionRepositoryDeleteCall) Return(arg0 int64, arg1 error) *MockSessionRepositoryDeleteCall {
+	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition) error) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition) error) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

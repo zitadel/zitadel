@@ -12,20 +12,17 @@ import (
 )
 
 type DeleteSessionCommand struct {
-	ID                   string  `json:"id"`
-	Token                *string `json:"token"`
-	SessionTokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+	ID    string  `json:"id"`
+	Token *string `json:"token"`
 }
 
 func NewDeleteSessionCommand(
 	id string,
 	token *string,
-	sessionTokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error),
 ) *DeleteSessionCommand {
 	return &DeleteSessionCommand{
-		ID:                   id,
-		Token:                token,
-		SessionTokenVerifier: sessionTokenVerifier,
+		ID:    id,
+		Token: token,
 	}
 }
 
@@ -42,18 +39,21 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 // Execute implements [Commander].
 func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	sessionRepo := opts.sessionRepo
+	instance := authz.GetInstance(ctx)
 
 	deletedRows, err := sessionRepo.Delete(ctx, opts.DB(),
-		sessionRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
+		sessionRepo.PrimaryKeyCondition(instance.InstanceID(), cmd.ID),
 	)
-
-	if deletedRows > 1 {
-		err = zerrors.ThrowInternalf(nil, "DOM-wv33rsKpRw", "expecting 1 row deleted, got %d", deletedRows)
+	if err != nil {
 		return err
 	}
 
+	if deletedRows > 1 {
+		return zerrors.ThrowInternalf(nil, "DOM-wv33rsKpRw", "expecting 1 row deleted, got %d", deletedRows)
+	}
+
 	if deletedRows < 1 {
-		err = zerrors.ThrowNotFound(nil, "DOM-g1lDb1qs1f", "session not found")
+		return zerrors.ThrowNotFound(nil, "DOM-g1lDb1qs1f", "session not found")
 	}
 	return err
 }
@@ -76,7 +76,7 @@ func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts)
 		}
 	}
 	if cmd.Token != nil {
-		if err := cmd.SessionTokenVerifier(ctx, *cmd.Token, cmd.ID, sessionToDelete.TokenID); err != nil {
+		if err := opts.sessionTokenVerifier(ctx, *cmd.Token, cmd.ID, sessionToDelete.TokenID); err != nil {
 			return err
 		}
 	}

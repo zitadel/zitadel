@@ -8,14 +8,12 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	v2_object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	v2_session "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func DeleteSession(ctx context.Context, request *connect.Request[v2_session.DeleteSessionRequest]) (*connect.Response[v2_session.DeleteSessionResponse], error) {
-	// TODO stebenz cryptoalgorithm
-	sessionDeleteCmd := domain.NewDeleteSessionCommand(request.Msg.GetSessionId(), authz.SessionTokenVerifier(nil))
+	sessionDeleteCmd := domain.NewDeleteSessionCommand(request.Msg.GetSessionId(), request.Msg.SessionToken)
 
 	err := domain.Invoke(ctx, sessionDeleteCmd) //domain.WithSessionRepo(repository.SessionRepository()),
 

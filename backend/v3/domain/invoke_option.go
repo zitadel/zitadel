@@ -63,6 +63,15 @@ func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
 	}
 }
 
+// WithSessionTokenVerifier sets the verifier for session tokens used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithSessionTokenVerifier(verifier SessionTokenVerifier) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionTokenVerifier = verifier
+	}
+}
+
 // InvokeOpts are passed to each command
 type InvokeOpts struct {
 	// db is the database client.
@@ -74,6 +83,7 @@ type InvokeOpts struct {
 	legacyEventstore       eventstore.LegacyEventstore
 	Invoker                Invoker
 	Permissions            PermissionChecker
+	sessionTokenVerifier   SessionTokenVerifier
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
@@ -110,7 +120,8 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		invoker = &noopInvoker{}
 	}
 	return &InvokeOpts{
-		Invoker:     invoker,
-		Permissions: &noopPermissionChecker{}, // prevent panics for now
+		Invoker:              invoker,
+		Permissions:          &noopPermissionChecker{}, // prevent panics for now
+		sessionTokenVerifier: noopSessionTokenVerifier(),
 	}
 }
