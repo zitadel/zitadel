@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -35,11 +36,48 @@ func SessionRepository() domain.SessionRepository {
 }
 
 const querySessionStmt = `
-SELECT sessions.instance_id, sessions.id, sessions.token, sessions.lifetime, sessions.expiration, sessions.user_id, sessions.creator_id, sessions.created_at, sessions.updated_at` +
-	` , jsonb_agg(distinct jsonb_build_object('instanceId', session_factors.instance_id, 'sessionId', session_factors.session_id, 'type', session_factors.type, 'last_challenged_at', session_factors.last_challenged_at, 'challenged_payload', session_factors.challenged_payload, 'last_verified_at', session_factors.last_verified_at, 'verified_payload', session_factors.verified_payload)) FILTER (WHERE session_factors.session_id IS NOT NULL) AS factors` +
-	` , jsonb_agg(distinct jsonb_build_object('instanceId', session_metadata.instance_id, 'sessionId', session_metadata.session_id, 'key', session_metadata.key, 'value', encode(session_metadata.value, 'base64'), 'createdAt', session_metadata.created_at, 'updatedAt', session_metadata.updated_at)) FILTER (WHERE session_metadata.session_id IS NOT NULL) AS metadata` +
-	` , CASE WHEN session_user_agents.fingerprint_id IS NOT NULL THEN jsonb_build_object('fingerprint_id', session_user_agents.fingerprint_id, 'description', session_user_agents.description, 'ip', session_user_agents.ip, 'headers', session_user_agents.headers) ELSE NULL END as user_agent` +
-	` FROM zitadel.sessions`
+SELECT 
+	sessions.instance_id
+	, sessions.id
+	, sessions.token
+	, sessions.lifetime
+	, sessions.expiration
+	, sessions.user_id
+	, sessions.creator_id
+	, sessions.created_at
+	, sessions.updated_at
+	, jsonb_agg(distinct 
+		jsonb_build_object(
+			'instanceId', session_factors.instance_id
+			, 'sessionId', session_factors.session_id
+			, 'type', session_factors.type
+			, 'lastChallengedAt', session_factors.last_challenged_at
+			, 'challengedPayload', session_factors.challenged_payload
+			, 'lastVerifiedAt', session_factors.last_verified_at
+			, 'verifiedPayload', session_factors.verified_payload
+		)
+	)
+	FILTER (WHERE session_factors.session_id IS NOT NULL) AS factors
+	, jsonb_agg(distinct
+		jsonb_build_object(
+			'instanceId', session_metadata.instance_id
+			, 'sessionId', session_metadata.session_id
+			, 'key', session_metadata.key
+			, 'value', encode(session_metadata.value, 'base64')
+			, 'createdAt', session_metadata.created_at
+			, 'updatedAt', session_metadata.updated_at
+		)
+	)
+	FILTER (WHERE session_metadata.session_id IS NOT NULL) AS metadata
+	, CASE WHEN session_user_agents.fingerprint_id IS NOT NULL THEN
+		jsonb_build_object(
+			'fingerprintId', session_user_agents.fingerprint_id
+			, 'description', session_user_agents.description
+			, 'ip', session_user_agents.ip
+			, 'headers', session_user_agents.headers
+		)
+	END as user_agent
+	FROM zitadel.sessions`
 
 // Get implements [domain.SessionRepository].
 func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Session, error) {
@@ -105,7 +143,8 @@ func (s session) List(ctx context.Context, client database.QueryExecutor, opts .
 	return scanSessions(ctx, client, &builder)
 }
 
-const upsertSessionUserAgentStmt = `WITH user_agent AS (
+const upsertSessionUserAgentStmt = `
+WITH user_agent AS (
 	INSERT INTO zitadel.session_user_agents(
 		instance_id, fingerprint_id, description, ip, headers
 	)
@@ -221,7 +260,7 @@ func (s session) SetChallenge(challenge domain.SessionChallenge) database.Change
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
-				builder.WriteArgs(domain.SessionFactorTypePasskey, c.LastChallengedAt, c) //TODO: json?
+				builder.WriteArgs(domain.SessionFactorTypePasskey, c.LastChallengedAt, c)
 				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
 			}, nil,
 		)
@@ -229,7 +268,7 @@ func (s session) SetChallenge(challenge domain.SessionChallenge) database.Change
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
-				builder.WriteArgs(domain.SessionFactorTypeOTPSMS, c.LastChallengedAt, c) //TODO: json?
+				builder.WriteArgs(domain.SessionFactorTypeOTPSMS, c.LastChallengedAt, c)
 				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
 			}, nil,
 		)
@@ -237,12 +276,12 @@ func (s session) SetChallenge(challenge domain.SessionChallenge) database.Change
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_challenged_at, challenged_payload) SELECT instance_id, id, ")
-				builder.WriteArgs(domain.SessionFactorTypeOTPEmail, c.LastChallengedAt, c) //TODO: json?
+				builder.WriteArgs(domain.SessionFactorTypeOTPEmail, c.LastChallengedAt, c)
 				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_challenged_at = EXCLUDED.last_challenged_at, challenged_payload = EXCLUDED.challenged_payload")
 			}, nil,
 		)
 	}
-	return nil //TODO: error?
+	return nil
 }
 
 // SetFactor implements [domain.sessionChanges].
@@ -308,7 +347,7 @@ func (s session) SetFactor(factor domain.SessionFactor) database.Change {
 			}, nil,
 		)
 	default:
-		return nil //TODO: error?
+		return nil
 	}
 }
 
@@ -316,7 +355,7 @@ func (s session) SetFactor(factor domain.SessionFactor) database.Change {
 func (s session) ClearFactor(factorType domain.SessionFactorType) database.Change {
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE zitadel.session_factors SET last_verified_at = NULL WHERE instance_id = (SELECT instance_id FROM existing_session) AND session_id = (SELECT id FROM existing_session) AND type = ")
+			builder.WriteString("UPDATE zitadel.session_factors sf SET last_verified_at = NULL FROM existing_session es WHERE sf.instance_id = es.instance_id AND sf.session_id = es.id AND sf.type = ")
 			builder.WriteArg(factorType)
 		}, nil)
 }
@@ -337,7 +376,7 @@ func (s session) SetMetadata(metadata []*domain.SessionMetadata) database.Change
 	}
 	changes[len(metadata)] = database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM zitadel.session_metadata WHERE instance_id = (SELECT instance_id FROM existing_session) AND session_id = (SELECT id FROM existing_session) AND key NOT IN (")
+			builder.WriteString("DELETE FROM zitadel.session_metadata WHERE instance_id = (SELECT instance_id FROM existing_session) AND session_id = (SELECT id from existing_session) AND key NOT IN (")
 			builder.WriteArgs(keys...)
 			builder.WriteString(")")
 		}, nil)
@@ -498,120 +537,13 @@ func (s session) UpdatedAtColumn() database.Column {
 
 type rawSession struct {
 	*domain.Session
-	Token      *string                           `db:"token"`
+	Token      *string                           `json:"token" db:"token"`
 	Lifetime   *time.Duration                    `json:"lifetime" db:"lifetime"`
 	Expiration *time.Time                        `json:"expiration" db:"expiration"`
-	UserID     *string                           `json:"user_id" db:"user_id"`
-	CreatorID  *string                           `json:"creator_id" db:"creator_id"`
+	UserID     *string                           `json:"userID" db:"user_id"`
+	CreatorID  *string                           `json:"creatorID" db:"creator_id"`
 	Factors    JSONArray[rawFactor]              `json:"factors,omitempty" db:"factors"`
 	Metadata   JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
-	//UserAgent  *rawUserAgent                     `json:"userAgent,omitempty" db:"useragent"`
-}
-
-type rawFactor struct {
-	Type              string                `json:"type" db:"type"`
-	LastChallengedAt  time.Time             `json:"last_challenged_at" db:"last_challenged_at"`
-	ChallengedPayload JSON[json.RawMessage] `json:"challenged_payload" db:"challenged_payload"`
-	LastVerifiedAt    time.Time             `json:"last_verified_at" db:"last_verified_at"`
-	VerifiedPayload   JSON[json.RawMessage] `json:"verified_payload" db:"verified_payload"`
-}
-
-func (f *rawFactor) ToDomain() (domain.SessionFactor, domain.SessionChallenge, error) {
-	factorType, err := domain.SessionFactorTypeString(f.Type)
-	if err != nil {
-		return nil, nil, err
-	}
-	switch factorType {
-	case domain.SessionFactorTypeUser:
-		return f.userFactorToDomain()
-	case domain.SessionFactorTypePassword:
-		if f.LastVerifiedAt.IsZero() {
-			return nil, nil, nil
-		}
-		return &domain.SessionFactorPassword{
-			LastVerifiedAt: f.LastVerifiedAt,
-		}, nil, nil
-	case domain.SessionFactorTypePasskey:
-		return f.passkeyFactorToDomain()
-	case domain.SessionFactorTypeIdentityProviderIntent:
-		if f.LastVerifiedAt.IsZero() {
-			return nil, nil, nil
-		}
-		return &domain.SessionFactorIdentityProviderIntent{
-			LastVerifiedAt: f.LastVerifiedAt,
-		}, nil, nil
-	case domain.SessionFactorTypeTOTP:
-		if f.LastVerifiedAt.IsZero() {
-			return nil, nil, nil
-		}
-		return &domain.SessionFactorTOTP{
-			LastVerifiedAt: f.LastVerifiedAt,
-			//LastFailedAt:   time.Time{},
-		}, nil, nil
-	case domain.SessionFactorTypeOTPSMS:
-		return f.otpSMSFactorToDomain()
-	case domain.SessionFactorTypeOTPEmail:
-		return f.otpEmailFactorToDomain()
-	default:
-		return nil, nil, nil //TODO: error?
-	}
-}
-
-func (f *rawFactor) userFactorToDomain() (factor domain.SessionFactor, _ domain.SessionChallenge, err error) {
-	if f.LastVerifiedAt.IsZero() {
-		return nil, nil, nil
-	}
-	factor = new(domain.SessionFactorUser)
-	if err := json.Unmarshal(f.VerifiedPayload.Value, factor); err != nil {
-		return nil, nil, err
-	}
-	return factor, nil, nil
-}
-
-func (f *rawFactor) passkeyFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
-		challenge = new(domain.SessionChallengePasskey)
-		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
-			return nil, nil, err
-		}
-	}
-	if !f.LastVerifiedAt.IsZero() {
-		factor = new(domain.SessionFactorPasskey)
-		if err := json.Unmarshal(f.VerifiedPayload.Value, factor); err != nil {
-			return nil, nil, err
-		}
-	}
-	return factor, challenge, nil
-}
-
-func (f *rawFactor) otpSMSFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
-		challenge = new(domain.SessionChallengeOTPSMS)
-		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
-			return nil, nil, err
-		}
-	}
-	if !f.LastVerifiedAt.IsZero() {
-		factor = &domain.SessionFactorOTPSMS{
-			LastVerifiedAt: f.LastVerifiedAt,
-		}
-	}
-	return factor, challenge, nil
-}
-
-func (f *rawFactor) otpEmailFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
-		challenge = new(domain.SessionChallengeOTPEmail)
-		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
-			return nil, nil, err
-		}
-	}
-	if !f.LastVerifiedAt.IsZero() {
-		factor = &domain.SessionFactorOTPEmail{
-			LastVerifiedAt: f.LastVerifiedAt,
-		}
-	}
-	return factor, challenge, nil
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {
@@ -650,21 +582,11 @@ func scanSessions(ctx context.Context, querier database.Querier, builder *databa
 }
 
 func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
-	if raw.Token != nil {
-		raw.Session.Token = *raw.Token
-	}
-	if raw.Lifetime != nil {
-		raw.Session.Lifetime = *raw.Lifetime
-	}
-	if raw.Expiration != nil {
-		raw.Session.Expiration = *raw.Expiration
-	}
-	if raw.UserID != nil {
-		raw.Session.UserID = *raw.UserID
-	}
-	if raw.CreatorID != nil {
-		raw.Session.CreatorID = *raw.CreatorID
-	}
+	raw.Session.Token = gu.Value(raw.Token)
+	raw.Session.Lifetime = gu.Value(raw.Lifetime)
+	raw.Session.Expiration = gu.Value(raw.Expiration)
+	raw.Session.UserID = gu.Value(raw.UserID)
+	raw.Session.CreatorID = gu.Value(raw.CreatorID)
 
 	for _, factor := range raw.Factors {
 		f, ch, err := factor.ToDomain()
@@ -678,9 +600,7 @@ func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
 			raw.Session.Challenges.AppendTo(ch)
 		}
 	}
-	//if len(raw.Metadata) > 0 {
 	raw.Session.Metadata = raw.Metadata
-	//}
 	return raw.Session, nil
 }
 

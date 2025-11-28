@@ -8,19 +8,19 @@ import (
 )
 
 type Session struct {
-	InstanceID string             `json:"instance_id,omitempty" db:"instance_id"`
+	InstanceID string             `json:"instanceId,omitempty" db:"instance_id"`
 	ID         string             `json:"id,omitempty" db:"id"`
 	Token      string             `json:"token,omitempty" db:"token"`
 	Lifetime   time.Duration      `json:"lifetime,omitempty" db:"lifetime"`
 	Expiration time.Time          `json:"expiration,omitzero" db:"expiration"`
-	UserID     string             `json:"user_id,omitempty" db:"user_id"`
-	CreatorID  string             `json:"creator_id,omitempty" db:"creator_id"`
-	CreatedAt  time.Time          `json:"created_at,omitzero" db:"created_at"`
-	UpdatedAt  time.Time          `json:"updated_at,omitzero" db:"updated_at"`
+	UserID     string             `json:"userId,omitempty" db:"user_id"`
+	CreatorID  string             `json:"creatorId,omitempty" db:"creator_id"`
+	CreatedAt  time.Time          `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time          `json:"updatedAt,omitzero" db:"updated_at"`
 	Factors    SessionFactors     `json:"factors,omitempty"`
 	Challenges SessionChallenges  `json:"challenges,omitempty"`
 	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
-	UserAgent  *SessionUserAgent  `json:"user_agent,omitempty"`
+	UserAgent  *SessionUserAgent  `json:"userAgent,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository

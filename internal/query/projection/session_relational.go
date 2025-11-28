@@ -466,11 +466,6 @@ func (p *sessionRelationalProjection) reduceMetadataSet(event eventstore.Event) 
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
 			sessionRepo.SetMetadata(metadataList),
 		)
-		if err != nil {
-			return err
-		}
-		session, err := sessionRepo.Get(ctx, v3Tx, database.WithCondition(condition))
-		_, _ = session, err
 		return err
 	}), nil
 }
