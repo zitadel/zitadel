@@ -10,7 +10,7 @@ import (
 type Session struct {
 	InstanceID string            `json:"instance_id,omitempty" db:"instance_id"`
 	ID         string            `json:"id,omitempty" db:"id"`
-	Token      string            `json:"token,omitempty" db:"token"`
+	TokenID    string            `json:"token_id,omitempty" db:"token_id"`
 	Lifetime   time.Duration     `json:"lifetime,omitempty" db:"lifetime"`
 	Expiration time.Time         `json:"expiration,omitzero" db:"expiration"`
 	UserID     string            `json:"user_id,omitempty" db:"user_id"`
@@ -41,7 +41,7 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
 }
 
 // sessionColumns define all the columns of the session table.
