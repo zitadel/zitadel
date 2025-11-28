@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projeler",
-      "DESCRIPTION": "Bir proje, kullanıcılarınızı doğrulamak için kullanabileceğiniz bir veya daha fazla uygulamayı barındırır. Ayrıca kullanıcılarınızı projelerle yetkilendirebilirsiniz. Diğer organizasyonlardan kullanıcıların uygulamalarınıza giriş yapmasına izin vermek için onlara projenize erişim izni verin.<br/><br/>Bir proje bulamazsanız, proje sahibiyle veya ilgili haklara sahip biriyle iletişime geçerek erişim sağlayın.",
+      "DESCRIPTION": "Bir proje, kullanıcılarınızı doğrulamak için kullanabileceğiniz bir veya daha fazla uygulamayı barındırır. Örneğin, web ön yüzünüz, mobil uygulamanız ve arka ucunuz için birer tane olmak üzere 3 uygulamalı tek bir projeniz olabilir. Ayrıca kullanıcılarınızı projelerle yetkilendirebilirsiniz. Diğer organizasyonlardan kullanıcıların uygulamalarınıza giriş yapmasına izin vermek için onlara projenize erişim izni verin.<br><br>Bir proje bulamazsanız, proje sahibiyle veya ilgili haklara sahip biriyle iletişime geçerek erişim sağlayın.",
       "OWNED": {
         "TITLE": "Sahip Olunan Projeler",
         "DESCRIPTION": "Bunlar sahip olduğunuz projelerdir. Bu proje ayarlarını, yetkilendirmelerini ve uygulamalarını yönetebilirsiniz."
