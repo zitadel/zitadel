@@ -90,7 +90,7 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	// userRepo := opts.userRepo.LoadIdentityProviderLinks()
 
 	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(i.sessionID)))
-	if handleGetError(err, "DOM-EhIgey", "session") != nil {
+	if err := handleGetError(err, "DOM-EhIgey", "session"); err != nil {
 		return nil
 	}
 
@@ -104,8 +104,8 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 
 	// TODO(IAM-Marco): Uncomment when IDP intents are available
 	// intent, err := idpIntentRepo.Get(ctx, opts.DB(), database.WithCondition(idpIntentRepo.IDCondition(i.CheckIntent.GetIdpIntentId())))
-	// if handleGetError(err, "DOM-5XkWJV", "intent") != nil {
-	// 	return nil
+	// if err := handleGetError(err, "DOM-5XkWJV", "intent"); err != nil {
+	// 	return err
 	// }
 
 	// if intent.State != IntentStateSucceeded {
@@ -124,8 +124,8 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	// }
 
 	// user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.IDCondition(session.UserID)))
-	// if handleGetError(err, "DOM-Vnx2G9", "intent") != nil {
-	// 	return nil
+	// if err := handleGetError(err, "DOM-Vnx2G9", "intent"); err != nil {
+	// 	return err
 	// }
 	// if user.Human == nil {
 	// 	return zerrors.ThrowInternal(nil, "DOM-FkX5lZ", "user not human")
