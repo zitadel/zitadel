@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Proyectos",
-      "DESCRIPTION": "Un proyecto alberga una o más aplicaciones, que puedes usar para autenticar a tus usuarios. También puedes autorizar a tus usuarios con proyectos. Para permitir que usuarios de otras organizaciones se registren en tus aplicaciones, otórgales acceso a tu proyecto.<br/><br/>Si no encuentras un proyecto, contacta al dueño del proyecto o alguien con los derechos correspondientes para obtener acceso.",
+      "DESCRIPTION": "Un proyecto alberga una o más aplicaciones, que puedes usar para autenticar a tus usuarios. Por ejemplo, podrías tener un solo proyecto con 3 aplicaciones: una para tu frontend web, otra para tu aplicación móvil y otra para tu backend. También puedes autorizar a tus usuarios con proyectos. Para permitir que usuarios de otras organizaciones se registren en tus aplicaciones, otórgales acceso a tu proyecto.<br/><br/>Si no encuentras un proyecto, contacta al dueño del proyecto o alguien con los derechos correspondientes para obtener acceso.",
       "OWNED": {
         "TITLE": "Proyectos Propios",
         "DESCRIPTION": "Estos son los proyectos que posees. Puedes gestionar los ajustes de estos proyectos, autorizaciones y aplicaciones."
