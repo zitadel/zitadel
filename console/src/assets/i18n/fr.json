@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projets",
-      "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
+      "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pourriez avoir un seul projet avec 3 applications ; une pour votre frontend web, une pour votre application mobile et une pour votre backend. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
       "OWNED": {
         "TITLE": "Projets Possédés",
         "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les autorisations et les applications."
