@@ -1,7 +1,11 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type wrongIDPTypeError struct {
@@ -87,6 +91,25 @@ func NewPasswordVerificationError(failedPassAttempts uint8) error {
 
 func (e *PasswordVerificationError) Error() string {
 	return fmt.Sprintf("Message=failed password attempts (%d)", e.failedAttempts)
+}
+
+// handleGetError wraps DB errors coming from Get calls into [zerrors] errors.
+//
+//   - errorID should be in the format <package short name>-<random id>
+//   - objectType should be the string representation of a DB object (e.g. 'user', 'session', 'idp'...)
+//
+// The function wraps [database.NoRowFoundError] to [zerrors.NotFound] error
+// and any other error to [zerrors.InternalError]
+func handleGetError(inputErr error, errorID, objectType string) error {
+	if inputErr == nil {
+		return nil
+	}
+
+	if errors.Is(inputErr, &database.NoRowFoundError{}) {
+		return zerrors.ThrowNotFoundf(inputErr, errorID, "%s not found", objectType)
+	}
+
+	return zerrors.ThrowInternalf(inputErr, errorID, "failed fetching %s", objectType)
 }
 
 func (err *PasswordVerificationError) Is(target error) bool {
