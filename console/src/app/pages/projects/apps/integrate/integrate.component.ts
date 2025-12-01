@@ -142,7 +142,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.showRenameWarning.next(false);
         this.toast.showInfo('APP.TOAST.CREATED', true);
-        if (resp.clientSecret) {
+        if (resp.clientSecret || (this.framework() && this.framework()?.id === 'react')) {
           this.showSavedDialog(resp);
         } else {
           this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });
@@ -191,6 +191,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       data: {
         clientSecret: clientSecret,
         clientId: clientId,
+        frameworkId: this.framework()?.id,
       },
     });
 

@@ -45,6 +45,7 @@
     "google-protobuf": "~3.21.4",
     "grpc-web": "~1.5.0",
     "i18n-iso-countries": "^7.14.0",
+    "jszip": "^3.10.1",
     "libphonenumber-js": "^1.12.6",
     "material-design-icons-iconfont": "^6.7.0",
     "moment": "^2.30.1",

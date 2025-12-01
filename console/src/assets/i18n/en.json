@@ -492,6 +492,7 @@
     "VIEW": "Show",
     "SELECTIONDELETE": "Delete selection",
     "DELETE": "Delete",
+    "DOWNLOAD_QUICKSTART": "Download Quickstart",
     "REMOVE": "Remove",
     "VERIFY": "Verify",
     "FINISH": "Finish",
