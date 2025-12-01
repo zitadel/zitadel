@@ -37,7 +37,7 @@ type UserRepository interface {
 type userConditions interface {
 	PrimaryKeyCondition(instanceID, userID string) database.Condition
 	InstanceIDCondition(instanceID string) database.Condition
-	OrgIDCondition(orgID string) database.Condition
+	OrganizationIDCondition(orgID string) database.Condition
 	IDCondition(userID string) database.Condition
 	UsernameCondition(op database.TextOperation, username string) database.Condition
 	StateCondition(state UserState) database.Condition
@@ -101,7 +101,7 @@ type humanConditions interface {
 	EmailCondition(op database.TextOperation, email string) database.Condition
 	PhoneCondition(op database.TextOperation, phone string) database.Condition
 	PasskeyIDCondition(passkeyID string) database.Condition
-	IdentityProviderIDCondition(idpID string) database.Condition
+	LinkedIdentityProviderIDCondition(idpID string) database.Condition
 	ProvidedUserIDCondition(providedUserID string) database.Condition
 	ProvidedUsernameCondition(username string) database.Condition
 
@@ -127,8 +127,10 @@ type humanChanges interface {
 	// SetAvatarKey sets the avatar key field
 	// If avatarKey is nil, it will be set to NULL in the database
 	SetAvatarKey(avatarKey *string) database.Change
-	// SetMultifactorInitializationSkippedAt sets the multifactor initialization skipped at field
-	SetMultifactorInitializationSkippedAt(skippedAt time.Time) database.Change
+	// SkipMultifactorInitializationAt sets the multifactor initialization skipped at field
+	SkipMultifactorInitializationAt(skippedAt time.Time) database.Change
+	// SkipMultifactorInitializationAt sets the multifactor initialization skipped at field
+	SkipMultifactorInitialization() database.Change
 
 	// SetPassword sets the password based on the verification
 	SetPassword(verification VerificationType) database.Change
@@ -212,7 +214,7 @@ type humanTOTPChanges interface {
 type identityProviderLinkChanges interface {
 	// AddIdentityProviderLink adds or updates an identity provider link
 	AddIdentityProviderLink(link *IdentityProviderLink) database.Change
-	UpdateIdentityProviderLink(changes ...database.Change) database.Change
+	UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change
 	// RemoveIdentityProviderLink removes an identity provider link based on the condition
 	RemoveIdentityProviderLink(providerID, providedUserID string) database.Change
 

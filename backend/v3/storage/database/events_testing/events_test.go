@@ -22,6 +22,7 @@ import (
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	v2beta_user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func getEnv(key, fallback string) string {
@@ -51,6 +52,7 @@ var (
 	ProjectClient v2beta_project.ProjectServiceClient
 	AdminClient   admin.AdminServiceClient
 	MgmtClient    mgmt.ManagementServiceClient
+	UserClient    v2beta_user.UserServiceClient
 )
 
 var pool database.Pool
@@ -69,6 +71,7 @@ func TestMain(m *testing.M) {
 		ProjectClient = Instance.Client.Projectv2Beta
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
+		UserClient = Instance.Client.UserV2beta
 
 		defer func() {
 			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{
