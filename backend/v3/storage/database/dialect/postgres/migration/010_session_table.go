@@ -12,5 +12,5 @@ var (
 )
 
 func init() {
-	registerSQLMigration(9, up010SessionTable, down010SessionTable)
+	registerSQLMigration(9, up010SessionTable, down010SessionTable) // TODO: needs to be set to 10 after user (9) is merged
 }
