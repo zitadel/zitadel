@@ -83,6 +83,50 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public appId: string = '';
   public app?: App.AsObject;
 
+
+  public downloadEnv = () => {
+    this.issuer$.pipe(take(1)).subscribe((issuer) => {
+      const content = `# Port number where your React development server will listen for incoming HTTP requests.
+# Change this if port 3000 is already in use on your system.
+VITE_PORT=3000
+
+
+
+
+# Your ZITADEL instance domain URL. Found in your ZITADEL console under
+# instance settings. Include the full https:// URL.
+# Example: https://my-company-abc123.zitadel.cloud
+VITE_ZITADEL_DOMAIN="${issuer}"
+
+# Application Client ID from your ZITADEL application settings. This unique
+# identifier tells ZITADEL which application is making the authentication
+# request.
+VITE_ZITADEL_CLIENT_ID="${this.app?.oidcConfig?.clientId ?? 'your-client-id'}"
+
+# OAuth callback URL where ZITADEL redirects after user authentication. This
+# MUST exactly match a Redirect URI configured in your ZITADEL application.
+VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+
+
+# URL where users are redirected after logout. This should match a Post Logout
+# Redirect URI configured in your ZITADEL application settings.
+VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/"
+
+# URL where users are redirected after successful login. This is typically
+# your profile or dashboard page.
+VITE_POST_LOGIN_URL="/profile"`;
+
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '.env';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  };
+
+
   public apiURLs$ = this.envSvc.env.pipe(
     mergeMap((env) =>
       this.wellknownURLs$.pipe(
