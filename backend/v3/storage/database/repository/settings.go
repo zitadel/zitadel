@@ -25,6 +25,23 @@ func (settings) unqualifiedTableName() string {
 // columns
 // -------------------------------------------------------------
 
+// PrimaryKeyColumns implements [domain.Repository].
+func (s settings) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		s.InstanceIDColumn(),
+		s.IDColumn(),
+	}
+}
+
+func (s settings) UniqueColumns() []database.Column {
+	return []database.Column{
+		s.InstanceIDColumn(),
+		s.OrganizationIDColumn(),
+		s.TypeColumn(),
+		s.StateColumn(),
+	}
+}
+
 func (s settings) IDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "id")
 }
@@ -61,6 +78,22 @@ func (s settings) UpdatedAtColumn() database.Column {
 // conditions
 // -------------------------------------------------------------
 
+func (s settings) PrimaryKeyCondition(instanceID, id string) database.Condition {
+	return database.And(
+		s.InstanceIDCondition(instanceID),
+		s.IDCondition(id),
+	)
+}
+
+func (s settings) UniqueCondition(instanceID string, orgID *string, typ domain.SettingType, state domain.SettingState) database.Condition {
+	return database.And(
+		s.InstanceIDCondition(instanceID),
+		s.OrganizationIDCondition(orgID),
+		s.TypeCondition(typ),
+		s.StateCondition(state),
+	)
+}
+
 func (s settings) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(s.InstanceIDColumn(), database.TextOperationEqual, id)
 }
@@ -88,9 +121,9 @@ func (s settings) StateCondition(typ domain.SettingState) database.Condition {
 // changes
 // -------------------------------------------------------------
 
-func (s settings) SetSettings(settings string) database.Change {
-	return database.NewChange(s.SettingsColumn(), settings)
-}
+// func (s settings) SetSettings(settings string) database.Change {
+// 	return database.NewChange(s.SettingsColumn(), settings)
+// }
 
 func (s settings) SetUpdatedAt(updatedAt *time.Time) database.Change {
 	return database.NewChangePtr(s.UpdatedAtColumn(), updatedAt)
@@ -159,39 +192,6 @@ func (s settings) Delete(ctx context.Context, client database.QueryExecutor, con
 
 	writeCondition(&builder, condition)
 	return client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
-// PrimaryKeyColumns implements [domain.Repository].
-func (s settings) PrimaryKeyColumns() []database.Column {
-	return []database.Column{
-		s.InstanceIDColumn(),
-		s.IDColumn(),
-	}
-}
-
-func (s settings) PrimaryKeyCondition(instanceID, id string) database.Condition {
-	return database.And(
-		s.InstanceIDCondition(instanceID),
-		s.IDCondition(id),
-	)
-}
-
-func (s settings) UniqueColumns() []database.Column {
-	return []database.Column{
-		s.InstanceIDColumn(),
-		s.OrganizationIDColumn(),
-		s.TypeColumn(),
-		s.StateColumn(),
-	}
-}
-
-func (s settings) UniqueCondition(instanceID string, orgID *string, typ domain.SettingType, state domain.SettingState) database.Condition {
-	return database.And(
-		s.InstanceIDCondition(instanceID),
-		s.OrganizationIDCondition(orgID),
-		s.TypeCondition(typ),
-		s.StateCondition(state),
-	)
 }
 
 // -------------------------------------------------------------

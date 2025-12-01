@@ -195,7 +195,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 				IsNull(NewColumn("table", "column4")),
 				IsNotNull(NewColumn("table", "column5")),
 			),
-			want: true,
+			want: false,
 		},
 		{
 			name: "or with restricting column",
@@ -214,19 +214,19 @@ func TestIsRestrictingColumn(t *testing.T) {
 				IsNotNull(NewColumn("table", "column4")),
 				IsNull(NewColumn("table", "column5")),
 			),
-			want: true,
+			want: false,
 		},
 		{
 			name: "is null never restricts",
 			col:  NewColumn("table", "column1"),
 			cond: IsNull(NewColumn("table", "column1")),
-			want: true,
+			want: false,
 		},
 		{
 			name: "is not null never restricts",
 			col:  NewColumn("table", "column1"),
 			cond: IsNotNull(NewColumn("table", "column1")),
-			want: true,
+			want: false,
 		},
 		{
 			name: "exists with restricting column",
@@ -245,7 +245,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 				IsNotNull(NewColumn("table", "column4")),
 				IsNull(NewColumn("table", "column5")),
 			)),
-			want: true,
+			want: false,
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {

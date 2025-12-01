@@ -66,7 +66,7 @@ type settingsConditions interface {
 }
 
 type settingsChanges interface {
-	SetSettings(settings string) database.Change
+	// SetSettings(settings string) database.Change
 	SetUpdatedAt(updatedAt *time.Time) database.Change
 }
 

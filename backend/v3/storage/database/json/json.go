@@ -56,10 +56,7 @@ func (c *FieldChange) writeUpdate(builder *database.StatementBuilder, changes js
 	builder.WriteArg(path)
 	builder.WriteString(", ")
 	builder.WriteArg(value)
-	builder.WriteString(", " + "true")
-	builder.WriteString(", 'delete_key'")
-
-	builder.WriteString(")")
+	builder.WriteString(", true, 'delete_key')")
 
 	return nil
 }
@@ -92,9 +89,8 @@ func (c *ArrayChange) getPathValue() ([]string, string, error) {
 func (c *ArrayChange) writeUpdate(builder *database.StatementBuilder, changes jsonChanges, i int) error {
 	if c.remove {
 		return c.removeFromArray(builder, changes, i)
-	} else {
-		return c.addToArray(builder, changes, i)
 	}
+	return c.addToArray(builder, changes, i)
 }
 
 func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jsonChanges, i int) error {
@@ -121,8 +117,7 @@ func (c *ArrayChange) addToArray(builder *database.StatementBuilder, changes jso
 	builder.WriteArg(path)
 	builder.WriteString(", ")
 	builder.WriteArg(value)
-	builder.WriteString("::TEXT")
-	builder.WriteString(")")
+	builder.WriteString("::TEXT)")
 
 	// zitadel.jsonb_array_append
 	builder.WriteString(", ")
@@ -187,7 +182,7 @@ func (c *jsonChanges) Matches(x any) bool {
 		return false
 	}
 
-	if c.column != toMatch.column {
+	if !c.column.Equals(toMatch.column) {
 		return false
 	}
 
