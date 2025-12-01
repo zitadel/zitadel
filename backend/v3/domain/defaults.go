@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
 var (
@@ -19,6 +20,8 @@ var (
 	sysConfig         systemdefaults.SystemDefaults
 	passwordHasher    *crypto.Hasher
 	idpEncryptionAlgo crypto.EncryptionAlgorithm
+
+	webauthnConfig *webauthn.Config
 )
 
 func SetPool(p database.Pool) {
@@ -47,4 +50,8 @@ func SetPasswordHasher(hasher *crypto.Hasher) {
 
 func SetIDPEncryptionAlgorithm(idpEncryptionAlg crypto.EncryptionAlgorithm) {
 	idpEncryptionAlgo = idpEncryptionAlg
+}
+
+func SetWebAuthNConfig(cfg *webauthn.Config) {
+	webauthnConfig = cfg
 }
