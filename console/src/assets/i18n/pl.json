@@ -2401,7 +2401,8 @@
       "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
       "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
       "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
-      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)"
+      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)",
+      "5": "Kody odzyskiwania"
     }
   },
   "LOGINPOLICY": {

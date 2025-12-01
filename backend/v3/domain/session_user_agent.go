@@ -14,7 +14,7 @@ type SessionUserAgent struct {
 	Header        http.Header `json:"headers,omitempty" db:"headers"`
 }
 
-type sessionUserAgentColumns interface {
+type SessionUserAgentColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	InstanceIDColumn() database.Column
 	// FingerprintIDColumn returns the column for the fingerprint id field.
@@ -27,7 +27,7 @@ type sessionUserAgentColumns interface {
 	HeadersColumn() database.Column
 }
 
-type sessionUserAgentConditions interface {
+type SessionUserAgentConditions interface {
 	// PrimaryKeyCondition returns a filter on the primary key fields.
 	PrimaryKeyCondition(instanceID, fingerprintID string) database.Condition
 	// InstanceIDCondition returns an equal filter on the instance id field.

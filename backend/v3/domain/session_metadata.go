@@ -7,7 +7,7 @@ type SessionMetadata struct {
 	SessionID string `json:"sessionId,omitempty" db:"session_id"`
 }
 
-type sessionMetadataColumns interface {
+type SessionMetadataColumns interface {
 	MetadataColumns
 	// SessionIDColumn returns the column for the session id field.
 	SessionIDColumn() database.Column

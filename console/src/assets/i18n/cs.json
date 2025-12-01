@@ -2410,7 +2410,8 @@
       "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
       "2": "Otisk prstu, bezpečnostní klíče, Face ID a další",
       "3": "Jednorázové heslo e-mailem (Email OTP)",
-      "4": "Jednorázové heslo SMS (SMS OTP)"
+      "4": "Jednorázové heslo SMS (SMS OTP)",
+      "5": "Obnovovací kódy"
     }
   },
   "LOGINPOLICY": {
