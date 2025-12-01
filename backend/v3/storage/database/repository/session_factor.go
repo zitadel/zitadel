@@ -129,7 +129,7 @@ func (f *rawFactor) passwordFactorToDomain() (domain.SessionFactor, domain.Sessi
 }
 
 func (f *rawFactor) passkeyFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
+	if !f.LastChallengedAt.IsZero() && f.LastChallengedAt.After(f.LastVerifiedAt) {
 		challenge = new(domain.SessionChallengePasskey)
 		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
 			return nil, nil, err
@@ -163,7 +163,7 @@ func (f *rawFactor) totpFactorToDomain() (domain.SessionFactor, domain.SessionCh
 }
 
 func (f *rawFactor) otpSMSFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
+	if !f.LastChallengedAt.IsZero() && f.LastChallengedAt.After(f.LastVerifiedAt) {
 		challenge = new(domain.SessionChallengeOTPSMS)
 		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
 			return nil, nil, err
@@ -178,7 +178,7 @@ func (f *rawFactor) otpSMSFactorToDomain() (factor domain.SessionFactor, challen
 }
 
 func (f *rawFactor) otpEmailFactorToDomain() (factor domain.SessionFactor, challenge domain.SessionChallenge, err error) {
-	if !f.LastChallengedAt.IsZero() {
+	if !f.LastChallengedAt.IsZero() && f.LastChallengedAt.After(f.LastVerifiedAt) {
 		challenge = new(domain.SessionChallengeOTPEmail)
 		if err := json.Unmarshal(f.ChallengedPayload.Value, &challenge); err != nil {
 			return nil, nil, err

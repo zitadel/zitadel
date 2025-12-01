@@ -21,7 +21,9 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func getEnv(key, fallback string) string {
@@ -49,6 +51,8 @@ var (
 	SystemClient  system.SystemServiceClient
 	OrgClient     v2beta_org.OrganizationServiceClient
 	ProjectClient v2beta_project.ProjectServiceClient
+	SessionClient session.SessionServiceClient
+	UserClient    user.UserServiceClient
 	AdminClient   admin.AdminServiceClient
 	MgmtClient    mgmt.ManagementServiceClient
 )
@@ -67,6 +71,8 @@ func TestMain(m *testing.M) {
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
 		ProjectClient = Instance.Client.Projectv2Beta
+		SessionClient = Instance.Client.SessionV2
+		UserClient = Instance.Client.UserV2
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
 

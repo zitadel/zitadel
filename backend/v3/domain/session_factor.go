@@ -157,7 +157,7 @@ func GetFactor[T SessionFactor](factors SessionFactors) (T, bool) {
 }
 
 type SessionChallenge interface {
-	sessionChallengeType() SessionFactorType
+	SessionChallengeType() SessionFactorType
 }
 
 type SessionChallengePasskey struct {
@@ -168,8 +168,8 @@ type SessionChallengePasskey struct {
 	RPID                 string                             `json:"rpId,omitempty" db:"rp_id"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengePasskey) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengePasskey) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
 
@@ -182,8 +182,8 @@ type SessionChallengeOTPSMS struct {
 	TriggeredAtOrigin string              `json:"triggeredAtOrigin,omitempty" db:"triggered_at_origin"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengeOTPSMS) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengeOTPSMS) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
 
@@ -196,8 +196,8 @@ type SessionChallengeOTPEmail struct {
 	TriggeredAtOrigin string              `json:"triggeredAtOrigin,omitempty" db:"triggered_at_origin"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengeOTPEmail) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengeOTPEmail) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
