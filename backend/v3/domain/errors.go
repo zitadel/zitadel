@@ -105,3 +105,23 @@ func handleGetError(inputErr error, errorID, objectType string) error {
 
 	return zerrors.ThrowInternalf(inputErr, errorID, "failed fetching %s", objectType)
 }
+
+func handleUpdateError(inputErr error, expectedRowCount, actualRowCount int64, errorID, objectType string) error {
+	if inputErr == nil && expectedRowCount == actualRowCount {
+		return nil
+	}
+
+	if inputErr != nil {
+		return zerrors.ThrowInternalf(inputErr, errorID, "failed updating %s", objectType)
+	}
+
+	if actualRowCount == 0 {
+		return zerrors.ThrowNotFoundf(nil, errorID, "%s not found", objectType)
+	}
+
+	if actualRowCount != expectedRowCount {
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedRowCount, actualRowCount), errorID, "unexpected number of rows updated")
+	}
+
+	return nil
+}
