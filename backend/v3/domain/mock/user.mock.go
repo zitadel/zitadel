@@ -1162,6 +1162,7 @@ func (c *MockUserRepositoryStateConditionCall) DoAndReturn(f func(domain.UserSta
 	return c
 }
 
+<<<<<<< HEAD
 // TypeColumn mocks base method.
 func (m *MockUserRepository) TypeColumn() database.Column {
 	m.ctrl.T.Helper()
@@ -1200,6 +1201,8 @@ func (c *MockUserRepositoryTypeColumnCall) DoAndReturn(f func() database.Column)
 	return c
 }
 
+=======
+>>>>>>> main
 // TypeCondition mocks base method.
 func (m *MockUserRepository) TypeCondition(userType domain.UserType) database.Condition {
 	m.ctrl.T.Helper()
