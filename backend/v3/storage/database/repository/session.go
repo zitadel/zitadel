@@ -216,7 +216,7 @@ func sessionCTE(change database.Change, i, j int, builder *database.StatementBui
 	}
 	if cte, ok := change.(database.CTEChange); ok {
 		name := fmt.Sprintf("cte_%d_%d", i, j)
-		builder.WriteString(fmt.Sprintf(", %s as (", name))
+		fmt.Fprintf(builder, ", %s as (", name)
 		cte.SetName(name)
 		cte.WriteCTE(builder)
 		builder.WriteString(") ")
@@ -597,7 +597,7 @@ func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
 			raw.Session.Factors.AppendTo(f)
 		}
 		if ch != nil {
-			raw.Session.Challenges.AppendTo(ch)
+			raw.Challenges.AppendTo(ch)
 		}
 	}
 	raw.Session.Metadata = raw.Metadata

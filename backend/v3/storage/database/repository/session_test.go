@@ -843,37 +843,6 @@ func TestSession_Update(t *testing.T) {
 			},
 			rowsAffected: 1,
 		},
-		//{
-		//	name: "update session user agent",
-		//	testFunc: func(t *testing.T) *domain.Session {
-		//		session := &domain.Session{
-		//			InstanceID: instanceId,
-		//			ID:         gofakeit.Name(),
-		//			Lifetime:   time.Hour * 24,
-		//			CreatorID:  gofakeit.Name(),
-		//		}
-		//		err := sessionRepo.Create(t.Context(), tx, session)
-		//		require.NoError(t, err)
-		//
-		//		// update with updated values
-		//		session.UserAgent = &domain.SessionUserAgent{
-		//			FingerprintID: gu.Ptr("fingerprint-id"),
-		//			Description:   gu.Ptr("description"),
-		//			IP:            net.IPv4(192, 168, 0, 1),
-		//			Header:        http.Header{"User-Agent": []string{"new-user-agent"}},
-		//		}
-		//		return session
-		//	},
-		//	update: []database.Change{
-		//		sessionRepo.SetUserAgent(domain.SessionUserAgent{
-		//			FingerprintID: gu.Ptr("fingerprint-id"),
-		//			Description:   gu.Ptr("description"),
-		//			IP:            net.IPv4(192, 168, 0, 1),
-		//			Header:        http.Header{"User-Agent": []string{"new-user-agent"}},
-		//		}),
-		//	},
-		//	rowsAffected: 1,
-		//},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

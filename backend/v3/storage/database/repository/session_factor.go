@@ -39,24 +39,8 @@ func (s sessionFactor) typeColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "type")
 }
 
-func (s sessionFactor) lastChallengedAtColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "last_challenged_at")
-}
-
-func (s sessionFactor) lastFailedAtColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "last_failed_at")
-}
-
 func (s sessionFactor) lastVerifiedAtColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "last_verified_at")
-}
-
-func (s sessionFactor) challengedPayloadColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "challenged_payload")
-}
-
-func (s sessionFactor) verifiedPayloadColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "verified_payload")
 }
 
 // -------------------------------------------------------------
@@ -103,6 +87,8 @@ func (f *rawFactor) ToDomain() (domain.SessionFactor, domain.SessionChallenge, e
 		return f.otpSMSFactorToDomain()
 	case domain.SessionFactorTypeOTPEmail:
 		return f.otpEmailFactorToDomain()
+	case domain.SessionFactorTypeUnknown:
+		return nil, nil, nil
 	default:
 		return nil, nil, nil
 	}
