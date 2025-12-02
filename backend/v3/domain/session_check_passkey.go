@@ -27,14 +27,14 @@ type PasskeyCheckCommand struct {
 	sessionID  string
 	instanceID string
 
-	fetchedUser    *User
-	fetchedSession *Session
+	FetchedUser    *User
+	FetchedSession *Session
 
 	// For Events()
-	lastVeriedAt  time.Time
-	userVerified  bool
-	pkeyID        string
-	pkeySignCount uint32
+	LastVeriedAt  time.Time
+	UserVerified  bool
+	PKeyID        string
+	PKeySignCount uint32
 }
 
 func NewPasskeyCheckCommand(sessionID, instanceID string, request *session_grpc.CheckWebAuthN, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
@@ -61,16 +61,16 @@ func (p *PasskeyCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]e
 		return nil, nil
 	}
 
-	passkeyChallenge := p.fetchedSession.Challenges.GetPasskeyChallenge()
+	passkeyChallenge := p.FetchedSession.Challenges.GetPasskeyChallenge()
 
 	toReturn := make([]eventstore.Command, 2)
 
 	sessionAgg := &session.NewAggregate(p.sessionID, p.instanceID).Aggregate
-	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.lastVeriedAt, p.userVerified)
+	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVeriedAt, p.UserVerified)
 	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
-		toReturn[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.pkeyID, p.pkeySignCount)
+		toReturn[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
 	} else {
-		toReturn[1] = user.NewHumanU2FSignCountChangedEvent(ctx, sessionAgg, p.pkeyID, p.pkeySignCount)
+		toReturn[1] = user.NewHumanU2FSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
 	}
 
 	return toReturn, nil
@@ -85,49 +85,44 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 
-	passkeyChallenge := p.fetchedSession.Challenges.GetPasskeyChallenge()
+	passkeyChallenge := p.FetchedSession.Challenges.GetPasskeyChallenge()
 
-	var selectedPkeys []*Passkey
-	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
-		selectedPkeys = p.fetchedUser.Human.Passkeys.GetPasskeysOfType([]PasskeyType{PasskeyTypePasswordless})
-	} else {
-		selectedPkeys = p.fetchedUser.Human.Passkeys.GetPasskeysOfType([]PasskeyType{PasskeyTypeU2F, PasskeyTypeUnspecified})
-	}
+	userPKeys := p.FetchedUser.Human.Passkeys
 
 	webAuthnUsr := &webAuthNUser{
-		userID:      p.fetchedUser.ID,
-		username:    p.fetchedUser.Username,
-		displayName: p.fetchedUser.Human.DisplayName,
-		creds:       PasskeysToCredentials(ctx, selectedPkeys, passkeyChallenge.RPID),
+		userID:      p.FetchedUser.ID,
+		username:    p.FetchedUser.Username,
+		displayName: p.FetchedUser.Human.DisplayName,
+		creds:       PasskeysToCredentials(ctx, userPKeys, passkeyChallenge.RPID),
 	}
 	credentialAssertionData, err := json.Marshal(p.CheckPasskey.GetCredentialAssertionData())
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-asd", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "DOM-I84Iyp", "Errors.Internal")
 	}
 
-	webAuthCreds, err := p.finishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.fetchedUser.ID), webAuthnUsr, credentialAssertionData, passkeyChallenge.RPID)
+	webAuthCreds, err := p.finishLoginFn(ctx, p.getWebAuthNSessionData(passkeyChallenge, p.FetchedUser.ID), webAuthnUsr, credentialAssertionData, passkeyChallenge.RPID)
 	if err != nil && (webAuthCreds == nil || webAuthCreds.ID == nil) {
 		return err
 	}
 
 	var matchingPKey *Passkey
-	for _, pkey := range selectedPkeys {
+	for _, pkey := range userPKeys {
 		if bytes.Equal(pkey.KeyID, webAuthCreds.ID) {
 			matchingPKey = pkey
 			break
 		}
 	}
 	if matchingPKey == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.WebAuthN.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-uuxodH", "Errors.User.WebAuthN.NotFound")
 	}
 
-	p.userVerified = webAuthCreds.Flags.UserVerified
-	p.lastVeriedAt = time.Now()
+	p.UserVerified = webAuthCreds.Flags.UserVerified
+	p.LastVeriedAt = time.Now()
 	rowCount, err := sessionRepo.Update(ctx, opts.DB(),
 		sessionRepo.IDCondition(p.sessionID),
-		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.lastVeriedAt, UserVerified: p.userVerified}),
+		sessionRepo.SetFactor(&SessionFactorPasskey{LastVerifiedAt: p.LastVeriedAt, UserVerified: p.UserVerified}),
 	)
-	if err := handleUpdateError(err, 1, rowCount, "DOM-asd", "session"); err != nil {
+	if err := handleUpdateError(err, 1, rowCount, "DOM-Uadvap", "session"); err != nil {
 		return err
 	}
 
@@ -135,7 +130,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 		userRepo.Human().PasskeyIDCondition(matchingPKey.ID),
 		userRepo.Human().SetPasskeySignCount(webAuthCreds.Authenticator.SignCount),
 	)
-	if err := handleUpdateError(err, 1, rowCount, "DOM-asd", "user"); err != nil {
+	if err := handleUpdateError(err, 1, rowCount, "DOM-wdwZYk", "user"); err != nil {
 		return err
 	}
 
@@ -156,22 +151,32 @@ func (p *PasskeyCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (e
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo.LoadPasskeys()
 
-	p.fetchedSession, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
-	if err := handleGetError(err, "DOM-asd", "session"); err != nil {
+	p.FetchedSession, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
+	if err := handleGetError(err, "DOM-CUnePh", "session"); err != nil {
 		return err
 	}
 
-	passkeyChallenge := p.fetchedSession.Challenges.GetPasskeyChallenge()
+	passkeyChallenge := p.FetchedSession.Challenges.GetPasskeyChallenge()
 	if passkeyChallenge == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.Session.WebAuthN.NoChallenge")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-lQhNR4", "Errors.Session.WebAuthN.NoChallenge")
 	}
 
-	if p.fetchedSession.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.UserIDMissing")
+	if p.FetchedSession.UserID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-jy0zq7", "Errors.User.UserIDMissing")
 	}
 
-	p.fetchedUser, err = userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.IDCondition(p.fetchedSession.UserID)))
-	if err := handleGetError(err, "DOM-asd", "user"); err != nil {
+	var passKeyCondition database.Condition
+	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
+		passKeyCondition = userRepo.Human().PasskeyTypeCondition(database.NumberOperationEqual, PasskeyTypePasswordless)
+	} else {
+		passKeyCondition = userRepo.Human().PasskeyTypeCondition(database.NumberOperationNotEqual, PasskeyTypePasswordless)
+	}
+
+	p.FetchedUser, err = userRepo.Get(ctx, opts.DB(),
+		database.WithCondition(userRepo.IDCondition(p.FetchedSession.UserID)),
+		database.WithCondition(passKeyCondition),
+	)
+	if err := handleGetError(err, "DOM-pB6Mlm", "user"); err != nil {
 		return err
 	}
 
