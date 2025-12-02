@@ -1379,17 +1379,17 @@ func (c *MockHumanUserRepositoryPasskeyKeyIDConditionCall) DoAndReturn(f func(st
 }
 
 // PasskeyTypeCondition mocks base method.
-func (m *MockHumanUserRepository) PasskeyTypeCondition(passkeyType domain.PasskeyType) database.Condition {
+func (m *MockHumanUserRepository) PasskeyTypeCondition(op database.NumberOperation, passkeyType domain.PasskeyType) database.Condition {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PasskeyTypeCondition", passkeyType)
+	ret := m.ctrl.Call(m, "PasskeyTypeCondition", op, passkeyType)
 	ret0, _ := ret[0].(database.Condition)
 	return ret0
 }
 
 // PasskeyTypeCondition indicates an expected call of PasskeyTypeCondition.
-func (mr *MockHumanUserRepositoryMockRecorder) PasskeyTypeCondition(passkeyType any) *MockHumanUserRepositoryPasskeyTypeConditionCall {
+func (mr *MockHumanUserRepositoryMockRecorder) PasskeyTypeCondition(op, passkeyType any) *MockHumanUserRepositoryPasskeyTypeConditionCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasskeyTypeCondition", reflect.TypeOf((*MockHumanUserRepository)(nil).PasskeyTypeCondition), passkeyType)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasskeyTypeCondition", reflect.TypeOf((*MockHumanUserRepository)(nil).PasskeyTypeCondition), op, passkeyType)
 	return &MockHumanUserRepositoryPasskeyTypeConditionCall{Call: call}
 }
 
@@ -1405,13 +1405,13 @@ func (c *MockHumanUserRepositoryPasskeyTypeConditionCall) Return(arg0 database.C
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockHumanUserRepositoryPasskeyTypeConditionCall) Do(f func(domain.PasskeyType) database.Condition) *MockHumanUserRepositoryPasskeyTypeConditionCall {
+func (c *MockHumanUserRepositoryPasskeyTypeConditionCall) Do(f func(database.NumberOperation, domain.PasskeyType) database.Condition) *MockHumanUserRepositoryPasskeyTypeConditionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockHumanUserRepositoryPasskeyTypeConditionCall) DoAndReturn(f func(domain.PasskeyType) database.Condition) *MockHumanUserRepositoryPasskeyTypeConditionCall {
+func (c *MockHumanUserRepositoryPasskeyTypeConditionCall) DoAndReturn(f func(database.NumberOperation, domain.PasskeyType) database.Condition) *MockHumanUserRepositoryPasskeyTypeConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
