@@ -46,6 +46,16 @@ func getHumanUserIDCondition(repo *domainmock.MockHumanUserRepository, userID st
 	return idCondition
 }
 
+func getPasskeyCondition(repo *domainmock.MockHumanUserRepository, pkeyID string) database.Condition {
+	idCondition := getTextCondition("zitadel.users", "passkey_id", pkeyID)
+
+	repo.EXPECT().
+		PasskeyIDCondition(pkeyID).
+		AnyTimes().
+		Return(idCondition)
+	return idCondition
+}
+
 func getTextCondition(tableName, column, value string) database.Condition {
 	return database.NewTextCondition(
 		database.NewColumn(tableName, column),
@@ -77,4 +87,39 @@ func getSessionPasswordFactorChange(repo *domainmock.MockSessionRepository, last
 		AnyTimes().
 		Return(factorChange)
 	return factorChange
+}
+
+func getSessionPasskeyFactorChange(repo *domainmock.MockSessionRepository, lastVerified time.Time, userVerified bool) database.Change {
+	sessionPasskeyFactor := &domain.SessionFactorPasskey{
+		LastVerifiedAt: lastVerified,
+		UserVerified:   userVerified,
+	}
+	factorChange := make(database.Changes, 2)
+	factorChange[0] = database.NewChange(
+		database.NewColumn("zitadel.sessions", "password_factor_last_verified"),
+		lastVerified,
+	)
+	factorChange[1] = database.NewChange(
+		database.NewColumn("zitadel.sessions", "passkey_factor_user_verified"),
+		userVerified,
+	)
+
+	repo.EXPECT().
+		SetFactor(sessionPasskeyFactor).
+		AnyTimes().
+		Return(factorChange)
+	return factorChange
+}
+
+func getHumanPasskeySignCount(repo *domainmock.MockHumanUserRepository, signCount uint32) database.Change {
+	signCountChange := database.NewChange(
+		database.NewColumn("zitadel.humans", "pkey_sign_count"),
+		signCount,
+	)
+	repo.EXPECT().
+		SetPasskeySignCount(signCount).
+		AnyTimes().
+		Return(signCountChange)
+
+	return signCountChange
 }
