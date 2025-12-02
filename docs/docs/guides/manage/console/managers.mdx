@@ -56,3 +56,12 @@ InternalAuthZ:
         - "iam.read"
         - "iam.write"
 ```
+
+import PermissionTable from '@site/src/components/PermissionTable';
+import permissionData from '@site/docs/self-hosting/manage/configure/defaults.yaml';
+
+# Manager Permission Matrix
+
+This table is generated dynamically from our configuration file.
+
+<PermissionTable data={permissionData} />
