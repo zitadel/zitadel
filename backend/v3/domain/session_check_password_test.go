@@ -1076,7 +1076,7 @@ func TestPasswordCheckCommand_Events(t *testing.T) {
 				case *session.PasswordCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.PasswordCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMicro(), actualAssertedType.CheckedAt.UnixMicro(), 1.5)
+					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 1.5)
 				}
 			}
 		})

@@ -68,7 +68,7 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 				case *session.IntentCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.IntentCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMicro(), actualAssertedType.CheckedAt.UnixMicro(), 1.5)
+					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 1.5)
 				case *idpintent.ConsumedEvent:
 					_, ok := events[i].(*idpintent.ConsumedEvent)
 					require.True(t, ok)
