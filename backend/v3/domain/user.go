@@ -221,7 +221,6 @@ func (pl PasskeyList) GetPasskeysOfType(wantedTypes []PasskeyType) PasskeyList {
 }
 
 //go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType -json -sql
-
 type PasskeyType uint8
 
 const (
