@@ -3,6 +3,8 @@ package domain
 import (
 	"time"
 
+	"github.com/golang/mock/gomock"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -115,6 +117,34 @@ type SessionFactorPasskey struct {
 	LastVerifiedAt time.Time
 	UserVerified   bool
 }
+
+// Matches implements [gomock.Matcher].
+func (s *SessionFactorPasskey) Matches(in any) bool {
+	inputFactor, isFactorPasskey := in.(*SessionFactorPasskey)
+	if !isFactorPasskey {
+		return false
+	}
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastVerifiedAt not being easily controllable through the tested code,
+	// we check that it's in a certain range rather than doing an exact match on time.
+	var isLastVerifiedAtInRange bool
+	if !inputFactor.LastVerifiedAt.IsZero() {
+		lowerThreshold := s.LastVerifiedAt.Add(-timeDelta)
+		upperThreshold := s.LastVerifiedAt.Add(timeDelta)
+		isLastVerifiedAtInRange = !inputFactor.LastVerifiedAt.Before(lowerThreshold) && !inputFactor.LastVerifiedAt.After(upperThreshold)
+	}
+
+	return isLastVerifiedAtInRange
+}
+
+// String implements [gomock.Matcher].
+func (s *SessionFactorPasskey) String() string {
+	return "SessionFactorPasskey"
+}
+
+var _ gomock.Matcher = (*SessionFactorPasskey)(nil)
 
 // sessionFactorType implements [SessionFactor].
 func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
