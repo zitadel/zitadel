@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekt",
-      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
+      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapp och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
       "OWNED": {
         "TITLE": "Ägda projekt",
         "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
