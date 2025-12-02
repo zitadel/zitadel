@@ -60,7 +60,10 @@ func (p projectRole) Update(ctx context.Context, client database.QueryExecutor, 
 		changes = append(changes, database.NewChange(p.UpdatedAtColumn(), database.NullInstruction))
 	}
 	builder := database.NewStatementBuilder(`UPDATE zitadel.project_roles SET `)
-	database.Changes(changes).Write(builder)
+	err := database.Changes(changes).Write(builder)
+	if err != nil {
+		return 0, err
+	}
 	writeCondition(builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
