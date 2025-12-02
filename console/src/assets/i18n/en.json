@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projects",
-      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications; one each for your web frontend, your mobile app, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
+      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile app, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
         "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
