@@ -41,8 +41,8 @@
   z-index: 5;
   border-right: 2px solid var(--ifm-color-emphasis-300);
   text-align: left;
-  font-family: var(--ifm-font-family-monospace);
-  color: var(--ifm-color-primary);
+  /*font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-primary);*/
 }
 
 /* Top Left Corner Intersection */
