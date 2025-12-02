@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Código de inicialização não encontrado
     UsernameNotChanged: Nome de usuário não alterado
     InvalidURLTemplate: O modelo de URL é inválido
+    Locked: Usuário está bloqueado
     Profile:
       NotFound: Perfil não encontrado
       NotChanged: Perfil não alterado
@@ -176,6 +177,11 @@ Errors:
         NotExisting: U2F não existe
       Passwordless:
         NotExisting: Autenticação sem senha não existe
+      RecoveryCodes:
+        InvalidCode: Código de recuperação inválido fornecido
+        MaxCountExceeded: Número máximo de códigos de recuperação excedido
+        NotReady: Códigos de recuperação não estão prontos para uso
+        ConfigInvalid: Configuração de códigos de recuperação é inválida
     WebAuthN:
       NotFound: Token WebAuthN não pôde ser encontrado
       BeginRegisterFailed: Falha ao iniciar o registro do WebAuthN

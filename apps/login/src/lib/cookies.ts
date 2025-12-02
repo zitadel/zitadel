@@ -127,7 +127,7 @@ export async function updateSessionCookie<T>({
       return setSessionHttpOnlyCookie(sessions, iFrameEnabled);
     }
   } else {
-    throw "updateSessionCookie<T>: session id now found";
+    throw "updateSessionCookie<T>: session id not found";
   }
 }
 
