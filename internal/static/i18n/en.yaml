@@ -1386,8 +1386,8 @@ Application:
       NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
       Code:
         RedirectUris:
-          HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
-          CustomOnlyForNative: Grant type code only allows custom redirect uris for apptype native  (e.g appname:// )
+          HttpOnlyForWeb: Grant type "code" only allows http redirect uris for apptype "web".
+          CustomOnlyForNative: Grant type "code" only allows custom redirect uris for apptype "native"  (e.g appname:// )
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
