@@ -103,15 +103,16 @@ func (m Changes) Write(builder *StatementBuilder) error {
 
 // Matches implements [gomock.Matcher].
 func (c Changes) Matches(x any) bool {
-	toMatch, ok := x.(*Changes)
+	toMatch, ok := x.(Changes)
 	if !ok {
+
 		return false
 	}
-	if len(c) != len(*toMatch) {
+	if len(c) != len(toMatch) {
 		return false
 	}
 	for i := range c {
-		if !c[i].Matches((*toMatch)[i]) {
+		if !c[i].Matches(toMatch[i]) {
 			return false
 		}
 	}
