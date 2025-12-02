@@ -21,7 +21,7 @@ Start a docs server
 pnpm nx run @zitadel/docs:dev
 
 # Or serve a production build
-pnpm nx run @zitadel/docs:start
+pnpm nx run @zitadel/docs:build
 ```
 
 The site will be available at http://localhost:3100
