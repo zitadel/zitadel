@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -196,12 +197,12 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							uint64(20211109),
-							testNow,
+							nil,
 							1,
 							"app1",
 							true,
 							[]byte("public2"),
-							"fingerprint2",
+							nil,
 						},
 					},
 				),
@@ -232,12 +233,12 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
 						Sequence:      20211109,
-						Expiration:    testNow,
+						Expiration:    time.Time{},
 						Type:          domain.AuthNKeyTypeJSON,
 						ApplicationID: "app1",
 						Enabled:       true,
 						PublicKey:     []byte("public2"),
-						Fingerprint:   "fingerprint2",
+						Fingerprint:   "",
 					},
 				},
 			},

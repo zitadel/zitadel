@@ -56,7 +56,7 @@ func (*authNKeyProjection) Init() *old_handler.Check {
 			handler.NewColumn(AuthNKeyAggregateIDCol, handler.ColumnTypeText),
 			handler.NewColumn(AuthNKeySequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(AuthNKeyObjectIDCol, handler.ColumnTypeText),
-			handler.NewColumn(AuthNKeyExpirationCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(AuthNKeyExpirationCol, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(AuthNKeyIdentifierCol, handler.ColumnTypeText),
 			handler.NewColumn(AuthNKeyPublicKeyCol, handler.ColumnTypeBytes),
 			handler.NewColumn(AuthNKeyEnabledCol, handler.ColumnTypeBool, handler.Default(true)),
@@ -176,7 +176,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		identifier  string
 		publicKey   []byte
 		keyType     domain.AuthNKeyType
-		fingerprint string
+		fingerprint sql.NullString
 		enabled     bool
 	}
 	switch e := event.(type) {
@@ -205,7 +205,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: !e.ExpirationDate.IsZero()}
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
-		authNKeyEvent.fingerprint = e.Fingerprint
+		authNKeyEvent.fingerprint = sql.NullString{String: e.Fingerprint, Valid: true}
 		authNKeyEvent.enabled = false
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})

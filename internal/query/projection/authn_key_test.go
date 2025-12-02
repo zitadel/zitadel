@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -55,8 +56,8 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"clientId",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
-								"",   // fingerprint is not set for apps
-								true, // apps keys are enabled by default
+								sql.NullString{}, // fingerprint is not set for apps
+								true,             // apps keys are enabled by default
 							},
 						},
 					},
@@ -94,8 +95,8 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"agg-id",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeJSON,
-								"",   // fingerprint is not set for users
-								true, // user keys are enabled by default
+								sql.NullString{}, // fingerprint is not set for users
+								true,             // user keys are enabled by default
 							},
 						},
 					},
@@ -133,7 +134,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								"agg-id",
 								[]byte("publicKey"),
 								domain.AuthNKeyTypeNONE,
-								"fingerprint",
+								sql.NullString{String: "fingerprint", Valid: true},
 								false, // target keys are disabled by default
 							},
 						},

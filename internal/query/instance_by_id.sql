@@ -43,7 +43,7 @@ with features as (
             where k.instance_id = et.instance_id
               and k.object_id = t.id
               and k.enabled = true
-              and k.expiration > now()
+              and k.expiration IS NULL or k.expiration > now()
             limit 1) k on true
 		where e.instance_id = $1
 		order by et.position asc

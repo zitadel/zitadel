@@ -377,6 +377,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		authNKeys := make([]*AuthNKey, 0)
 		var count uint64
 		for rows.Next() {
+			var expiration sql.NullTime
 			var fingerprint sql.NullString
 			authNKey := new(AuthNKey)
 			err := rows.Scan(
@@ -386,7 +387,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.ChangeDate,
 				&authNKey.ResourceOwner,
 				&authNKey.Sequence,
-				&authNKey.Expiration,
+				&expiration,
 				&authNKey.Type,
 				&authNKey.ApplicationID,
 				&authNKey.Enabled,
@@ -396,6 +397,9 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 			)
 			if err != nil {
 				return nil, err
+			}
+			if expiration.Valid {
+				authNKey.Expiration = expiration.Time
 			}
 			if fingerprint.Valid {
 				authNKey.Fingerprint = fingerprint.String

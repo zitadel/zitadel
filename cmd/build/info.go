@@ -26,7 +26,7 @@ func init() {
 	}
 	if version == "" {
 		logging.Warn("no build version set, using timestamp as version")
-		version = dateTime.UTC().Format(time.RFC3339)
+		version = date
 	}
 }
 
