@@ -86,11 +86,14 @@ func (s settings) PrimaryKeyCondition(instanceID, id string) database.Condition 
 }
 
 func (s settings) UniqueCondition(instanceID string, orgID *string, typ domain.SettingType, state domain.SettingState) database.Condition {
-	return database.And(
-		s.InstanceIDCondition(instanceID),
-		s.OrganizationIDCondition(orgID),
-		s.TypeCondition(typ),
-		s.StateCondition(state),
+	return database.ForceRestrictingColumn(
+		database.And(
+			s.InstanceIDCondition(instanceID),
+			s.OrganizationIDCondition(orgID),
+			s.TypeCondition(typ),
+			s.StateCondition(state),
+		),
+		true,
 	)
 }
 
@@ -633,11 +636,6 @@ func (s brandingSettings) ActivateAt(ctx context.Context, client database.QueryE
 }
 
 func (s brandingSettings) activateAt(ctx context.Context, client database.QueryExecutor, condition database.Condition, updatedAt time.Time) (int64, error) {
-	condition = database.And(
-		condition,
-		s.TypeCondition(domain.SettingTypeBranding),
-		s.StateCondition(domain.SettingStatePreview),
-	)
 	// if you want to update the roles you have to have a unique condition, otherwise multiple branding settings get activated
 	if err := checkRestrictingColumns(condition, s.UniqueColumns()...); err != nil {
 		return 0, err
