@@ -106,7 +106,7 @@ export function UsernameForm({
           autoComplete="username"
           autoCapitalize="none"
           autoCorrect="off"
-          spellCheck="false"
+          spellCheck={false}
           {...register("loginName", { required: t("required.loginName") })}
           label={inputLabel}
           data-testid="username-text-input"
