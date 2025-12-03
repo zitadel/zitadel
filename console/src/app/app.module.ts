@@ -74,8 +74,8 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
 import { PosthogService } from './services/posthog.service';
-import { NewHeaderComponent } from './modules/new-header/new-header.component';
-import { provideTanStackQuery, QueryClient, withDevtools } from '@tanstack/angular-query-experimental';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { provideNgIconsConfig } from '@ng-icons/core';
 
@@ -177,7 +177,6 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
-    NewHeaderComponent,
     CdkOverlayOrigin,
   ],
   providers: [
@@ -249,10 +248,7 @@ const authConfig: AuthConfig = {
     LanguagesService,
     PosthogService,
     { provide: 'windowObject', useValue: window },
-    provideTanStackQuery(
-      new QueryClient(),
-      withDevtools(() => ({ loadDevtools: 'auto' })),
-    ),
+    provideTanStackQuery(new QueryClient(), withDevtools()),
     provideNgIconsConfig({
       size: '1rem',
     }),
