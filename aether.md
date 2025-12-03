@@ -361,6 +361,14 @@ allow update: if request.resource.status == resource.status ||
                  (resource.status == "draft" && request.resource.status == "published");
 ```
 
+### Flexible API Filtering (Optional)
+
+To support the dynamic nature of the new architecture and future extensibility, we propose adopting a **flexible filtering syntax** for API list and search operations, conceptually similar to Stripe's API or a subset of CEL.
+
+- **Problem**: Traditional APIs often require versioning every single filter parameter (e.g., `filter_by_name`, `filter_by_status`). This becomes unmanageable with custom schemas and dynamic extensions.
+- **Solution**: A unified `filter` or `query` parameter that accepts a structured expression string.
+- **Benefit**: This avoids breaking changes when new fields are added and allows clients to construct complex queries (e.g., `status == "active" && created_at > "2024-01-01"`) without requiring backend code changes for each new filter combination.
+
 ### UI Concept (Console Reimplementation)
 
 The ZITADEL Console will be reimagined as a Next.js application to support this new architecture, focusing on a resource-centric view and intuitive collection management.
