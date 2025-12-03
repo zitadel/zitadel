@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/passwap"
@@ -475,18 +476,21 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 
 func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 	t.Parallel()
+	listErr := errors.New("list error")
 
 	tt := []struct {
 		testName    string
 		humanRepo   func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository
+		lockoutRepo func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
 		updatedHash string
 		checkType   domain.VerificationType
 		checkTime   time.Time
 		fetchedUser domain.User
 
-		expectedChanges   int
-		expectedError     error
-		expectedHashedPsw string
+		expectedChanges    int
+		expectedError      error
+		expectedHashedPsw  string
+		expectedUserLocked bool
 	}{
 		{
 			testName: "when check type succeeded with empty hash should return only check password change",
@@ -510,46 +514,167 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			expectedHashedPsw: "new-hash",
 		},
 		{
-			testName: "when check type failed should return only check password change",
+			testName: "when check type failed and no lockout policy should return internal error",
 			humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				return repo
 			},
-			updatedHash:     "",
-			checkType:       &domain.VerificationTypeFailed{},
+			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
+				repo := domainmock.NewLockoutSettingsRepo(ctrl)
+
+				instanceAndOrg := database.And(repo.InstanceIDCondition("instance-1"), repo.OrganizationIDCondition(gu.Ptr("org-1")))
+				orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+				onlyInstance := database.And(repo.InstanceIDCondition("instance-1"), orgNullOrEmpty)
+				orCondition := database.Or(instanceAndOrg, onlyInstance)
+
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orCondition)),
+						dbmock.QueryOptions(database.WithOrderByAscending(repo.OrganizationIDColumn(), repo.InstanceIDColumn())),
+						dbmock.QueryOptions(database.WithLimit(1)),
+					).Times(1).
+					Return(nil, nil)
+
+				return repo
+			},
+			updatedHash: "",
+			checkType:   &domain.VerificationTypeFailed{},
+			fetchedUser: domain.User{
+				OrganizationID: "org-1",
+			},
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 0), "DOM-mmsrCt", "unexpected number of rows returned"),
+		},
+		{
+			testName: "when check type failed and get lockout policy returns error should return error",
+			humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
+				repo := domainmock.NewHumanRepo(ctrl)
+				return repo
+			},
+			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
+				repo := domainmock.NewLockoutSettingsRepo(ctrl)
+
+				instanceAndOrg := database.And(repo.InstanceIDCondition("instance-1"), repo.OrganizationIDCondition(gu.Ptr("org-1")))
+				orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+				onlyInstance := database.And(repo.InstanceIDCondition("instance-1"), orgNullOrEmpty)
+				orCondition := database.Or(instanceAndOrg, onlyInstance)
+
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orCondition)),
+						dbmock.QueryOptions(database.WithOrderByAscending(repo.OrganizationIDColumn(), repo.InstanceIDColumn())),
+						dbmock.QueryOptions(database.WithLimit(1)),
+					).Times(1).
+					Return(nil, listErr)
+
+				return repo
+			},
+			updatedHash:   "",
+			checkType:     &domain.VerificationTypeFailed{},
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-3B8Z6s", "failed fetching lockout settings"),
+			fetchedUser: domain.User{
+				OrganizationID: "org-1",
+			},
+		},
+		{
+			testName: "when check type failed with nil max attempts should return check type failed change",
+			humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
+				repo := domainmock.NewHumanRepo(ctrl)
+				return repo
+			},
+			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
+				repo := domainmock.NewLockoutSettingsRepo(ctrl)
+
+				instanceAndOrg := database.And(repo.InstanceIDCondition("instance-1"), repo.OrganizationIDCondition(gu.Ptr("org-1")))
+				orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+				onlyInstance := database.And(repo.InstanceIDCondition("instance-1"), orgNullOrEmpty)
+				orCondition := database.Or(instanceAndOrg, onlyInstance)
+
+				setting := &domain.LockoutSettings{
+					Settings:                  domain.Settings{},
+					LockoutSettingsAttributes: domain.LockoutSettingsAttributes{},
+				}
+
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orCondition)),
+						dbmock.QueryOptions(database.WithOrderByAscending(repo.OrganizationIDColumn(), repo.InstanceIDColumn())),
+						dbmock.QueryOptions(database.WithLimit(1)),
+					).Times(1).
+					Return([]*domain.LockoutSettings{
+						setting,
+					}, nil)
+
+				return repo
+			},
+			updatedHash: "",
+			checkType:   &domain.VerificationTypeFailed{},
+			fetchedUser: domain.User{
+				OrganizationID: "org-1",
+			},
 			expectedChanges: 1,
 		},
-		// TODO(IAM-Marco): Fix when settings repo is merged
-		// {
-		// 	testName: "when check type failed and get lockout policy returns error should return error",
-		// 	humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
-		// 		repo := domainmock.NewMockHumanUserRepository(ctrl)
-		// 		repo.EXPECT().
-		// 			CheckPassword(&domain.CheckTypeFailed{}).
-		// 			Times(1).
-		// 			Return(gomock.Any())
-		// 		return repo
-		// 	},
-		// 	updatedHash:     "",
-		// 	checkType:       &domain.CheckTypeFailed{},
-		// 	expectedError:   errors.New("lockout policy error"),
-		// 	fetchedUser: domain.User{
-		// 		OrganizationID: "org-1",
-		// 	},
-		// },
+		{
+			testName: "when check type failed and user max attempts >= lockout policy max attempts should return check type and user locked changes",
+			humanRepo: func(ctrl *gomock.Controller, checkTime time.Time) domain.HumanUserRepository {
+				repo := domainmock.NewHumanRepo(ctrl)
+				return repo
+			},
+			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
+				repo := domainmock.NewLockoutSettingsRepo(ctrl)
+
+				instanceAndOrg := database.And(repo.InstanceIDCondition("instance-1"), repo.OrganizationIDCondition(gu.Ptr("org-1")))
+				orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+				onlyInstance := database.And(repo.InstanceIDCondition("instance-1"), orgNullOrEmpty)
+				orCondition := database.Or(instanceAndOrg, onlyInstance)
+
+				setting := &domain.LockoutSettings{
+					Settings: domain.Settings{},
+					LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
+						MaxPasswordAttempts: gu.Ptr(uint64(1)),
+					},
+				}
+
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orCondition)),
+						dbmock.QueryOptions(database.WithOrderByAscending(repo.OrganizationIDColumn(), repo.InstanceIDColumn())),
+						dbmock.QueryOptions(database.WithLimit(1)),
+					).Times(1).
+					Return([]*domain.LockoutSettings{
+						setting,
+					}, nil)
+
+				return repo
+			},
+			updatedHash: "",
+			checkType:   &domain.VerificationTypeFailed{},
+			fetchedUser: domain.User{
+				OrganizationID: "org-1",
+				Human:          &domain.HumanUser{Password: domain.HumanPassword{FailedAttempts: 2}},
+			},
+			expectedChanges:    2,
+			expectedUserLocked: true,
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
+
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, &session_grpc.CheckPassword{Password: "test"})
+			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, func(_, _ string) (_ string, _ error) { return "", nil }, &session_grpc.CheckPassword{Password: "test"})
 			cmd.FetchedUser = tc.fetchedUser
 			cmd.CheckTime = time.Now()
 
-			opts := &domain.InvokeOpts{}
+			opts := &domain.InvokeOpts{
+				Invoker: domain.NewTransactionInvoker(nil),
+			}
+			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
+			if tc.lockoutRepo != nil {
+				domain.WithLockoutSettingsRepo(tc.lockoutRepo(ctrl))(opts)
+			}
 
 			// Test
 			changes, err := cmd.GetPasswordCheckChanges(ctx, opts, tc.humanRepo(ctrl, cmd.CheckTime), tc.updatedHash, tc.checkType)
@@ -557,6 +682,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedHashedPsw, cmd.UpdatedHashedPsw)
+			assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
 			assert.Len(t, changes, tc.expectedChanges)
 		})
 	}
@@ -565,13 +691,13 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 func TestPasswordCheckCommand_Execute(t *testing.T) {
 	t.Parallel()
 
-	domain.SetPasswordHasher(&crypto.Hasher{})
 	userUpdateErr := errors.New("user update error")
 	sessionUpdateErr := errors.New("session update error")
 
 	tt := []struct {
 		testName      string
 		humanRepo     func(ctrl *gomock.Controller) domain.HumanUserRepository
+		lockoutRepo   func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		verifier      func(password string, hash string) (string, error)
 		checkPassword *session_grpc.CheckPassword
@@ -583,6 +709,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 		expectedError             error
 		expectedValidated         bool
 		expectedValidationSuccess bool
+		expectedUserLocked        bool
 	}{
 		{
 			testName:      "when checkPassword is nil should return no error",
@@ -839,6 +966,33 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			verifier: func(password string, hash string) (string, error) {
 				return "", passwap.ErrPasswordMismatch
 			},
+			lockoutRepo: func(ctrl *gomock.Controller) domain.LockoutSettingsRepository {
+				repo := domainmock.NewLockoutSettingsRepo(ctrl)
+
+				instanceAndOrg := database.And(repo.InstanceIDCondition("instance-1"), repo.OrganizationIDCondition(gu.Ptr("org-1")))
+				orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+				onlyInstance := database.And(repo.InstanceIDCondition("instance-1"), orgNullOrEmpty)
+				orCondition := database.Or(instanceAndOrg, onlyInstance)
+
+				setting := &domain.LockoutSettings{
+					Settings: domain.Settings{},
+					LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
+						MaxPasswordAttempts: gu.Ptr(uint64(1)),
+					},
+				}
+
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(orCondition)),
+						dbmock.QueryOptions(database.WithOrderByAscending(repo.OrganizationIDColumn(), repo.InstanceIDColumn())),
+						dbmock.QueryOptions(database.WithLimit(1)),
+					).Times(1).
+					Return([]*domain.LockoutSettings{
+						setting,
+					}, nil)
+
+				return repo
+			},
 			humanRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.IDCondition("user-1")
@@ -862,6 +1016,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			expectedError:             zerrors.ThrowInvalidArgument(domain.NewPasswordVerificationError(3), "DOM-3gcfDV", "Errors.User.Password.Invalid"),
 			expectedValidated:         true,
 			expectedValidationSuccess: false,
+			expectedUserLocked:        true,
 		},
 	}
 
@@ -887,6 +1042,9 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			if tc.sessionRepo != nil {
 				domain.WithSessionRepo(tc.sessionRepo(ctrl))(opts)
 			}
+			if tc.lockoutRepo != nil {
+				domain.WithLockoutSettingsRepo(tc.lockoutRepo(ctrl))(opts)
+			}
 			if tc.humanRepo != nil {
 				humanRepo := tc.humanRepo(ctrl)
 				userRepo := domainmock.NewMockUserRepository(ctrl)
@@ -902,8 +1060,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			if tc.checkPassword != nil {
 				assert.Equal(t, tc.expectedValidated, cmd.IsValidated)
 				assert.Equal(t, tc.expectedValidationSuccess, cmd.IsValidationSuccessful)
-				// TODO(IAM-Marco): Fix when settings repo is merged
-				// assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
+				assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
 				assert.Equal(t, tc.tarpitCalled, tarpitCalled)
 			}
 		})
