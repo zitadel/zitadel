@@ -39,18 +39,6 @@ CREATE TRIGGER set_expiration
     FOR EACH ROW
 EXECUTE FUNCTION update_expiration();
 
--- CREATE INDEX idx_sessions_token ON zitadel.sessions (instance_id, token); --TODO: sha256
-
--- CREATE OR REPLACE FUNCTION zitadel.set_session_user()
---     RETURNS TRIGGER AS $$
--- BEGIN
---     -- this should mostly be a noop because the user_id should not change
---     UPDATE zitadel.sessions SET user_id = NEW.payload->>'userId' WHERE instance_id = NEW.instance_id AND id = NEW.session_id AND user_id <> NEW.payload->>'userId';
---
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
 CREATE TYPE zitadel.session_factor_type AS ENUM (
     'user',
     'password',
@@ -73,12 +61,6 @@ CREATE TABLE zitadel.session_factors (
     , PRIMARY KEY (instance_id, session_id, type)
     , FOREIGN KEY (instance_id, session_id) REFERENCES zitadel.sessions(instance_id, id) ON DELETE CASCADE
 );
-
--- CREATE TRIGGER trg_sync_session_user
---     AFTER INSERT OR UPDATE OR DELETE ON zitadel.session_factors
---     FOR EACH ROW
---     WHEN (NEW.type = 'user' AND NEW.last_verified_at > OLD.last_verified_at)
--- EXECUTE FUNCTION zitadel.set_session_user();
 
 CREATE TABLE zitadel.session_metadata (
     instance_id TEXT NOT NULL

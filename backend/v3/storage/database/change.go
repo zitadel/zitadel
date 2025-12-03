@@ -94,7 +94,7 @@ func (c Changes) IsOnColumn(col Column) bool {
 }
 
 // Write implements [Change].
-func (c Changes) Write(builder *StatementBuilder) {
+func (c Changes) Write(builder *StatementBuilder) error {
 	var hadChanges bool
 	for _, change := range c {
 		ch, ok := change.(NoChange)
@@ -104,7 +104,9 @@ func (c Changes) Write(builder *StatementBuilder) {
 		if hadChanges && hasChanges {
 			builder.WriteString(", ")
 		}
-		change.Write(builder)
+		if err := change.Write(builder); err != nil {
+			return err
+		}
 		// if the change had changes, mark that we had changes for the next iteration
 		if hasChanges {
 			hadChanges = hasChanges
