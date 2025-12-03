@@ -447,20 +447,31 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				UserVerificationRequirement: 2,
 			},
 			user: &domain.User{
-				Human: &domain.HumanUser{},
+				Human: &domain.HumanUser{
+					Passkeys: []*domain.Passkey{
+						{
+							ID:    "passkey-1",
+							KeyID: []byte("key-id-1"),
+						},
+						{
+							ID:    "passkey-2",
+							KeyID: []byte("key-id-2"),
+						},
+					},
+				},
 			},
 			session: &domain.Session{
 				ID: "session-id",
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
-					Challenge: "challenge",
+					Challenge: "Y2hhbGxlbmdl",
 				}, []byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`), "example.com", nil
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
-					Challenge:        "challenge",
+					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
 				}
@@ -483,20 +494,31 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				UserVerificationRequirement: 2, // to set userVerification to "preferred"
 			},
 			user: &domain.User{
-				Human: &domain.HumanUser{},
+				Human: &domain.HumanUser{
+					Passkeys: []*domain.Passkey{
+						{
+							ID:    "passkey-1",
+							KeyID: []byte("key-id-1"),
+						},
+						{
+							ID:    "passkey-2",
+							KeyID: []byte("key-id-2"),
+						},
+					},
+				},
 			},
 			session: &domain.Session{
 				ID: "session-id",
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
-					Challenge: "challenge",
+					Challenge: "Y2hhbGxlbmdl",
 				}, []byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`), "example.com", nil
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
-					Challenge:        "challenge",
+					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
 				}
@@ -519,20 +541,31 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				UserVerificationRequirement: 2, // to set userVerification to "preferred"
 			},
 			user: &domain.User{
-				Human: &domain.HumanUser{},
+				Human: &domain.HumanUser{
+					Passkeys: []*domain.Passkey{
+						{
+							ID:    "passkey-1",
+							KeyID: []byte("key-id-1"),
+						},
+						{
+							ID:    "passkey-2",
+							KeyID: []byte("key-id-2"),
+						},
+					},
+				},
 			},
 			session: &domain.Session{
 				ID: "session-id",
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
-					Challenge: "challenge",
+					Challenge: "Y2hhbGxlbmdl",
 				}, []byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`), "example.com", nil
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
-					Challenge:        "challenge",
+					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
 				}
@@ -555,20 +588,31 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				UserVerificationRequirement: 2, // to set userVerification to "preferred"
 			},
 			user: &domain.User{
-				Human: &domain.HumanUser{},
+				Human: &domain.HumanUser{
+					Passkeys: []*domain.Passkey{
+						{
+							ID:    "passkey-1",
+							KeyID: []byte("key-id-1"),
+						},
+						{
+							ID:    "passkey-2",
+							KeyID: []byte("key-id-2"),
+						},
+					},
+				},
 			},
 			session: &domain.Session{
 				ID: "session-id",
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
-					Challenge: "challenge",
+					Challenge: "Y2hhbGxlbmdl",
 				}, []byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`), "example.com", nil
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
-					Challenge:        "challenge",
+					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
 				}
