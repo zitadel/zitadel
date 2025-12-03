@@ -9,12 +9,11 @@ import (
 )
 
 var (
-	pool              database.Pool
-	legacyEventstore  eventstore.LegacyEventstore
-	sysConfig         systemdefaults.SystemDefaults
-	passwordHasher    *crypto.Hasher
-	idpEncryptionAlgo crypto.EncryptionAlgorithm
-
+	pool                        database.Pool
+	legacyEventstore            eventstore.LegacyEventstore
+	sysConfig                   systemdefaults.SystemDefaults
+	passwordHasher              *crypto.Hasher
+	idpEncryptionAlgo           crypto.EncryptionAlgorithm
 	sessionTokenDecryptor       SessionTokenDecryptor
 	mfaEncryptionAlgo           crypto.EncryptionAlgorithm
 	otpSMSSecretGeneratorConfig *crypto.GeneratorConfig
@@ -49,10 +48,10 @@ func SetOTPSMSSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 	otpSMSSecretGeneratorConfig = cfg
 }
 
-func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
-	mfaEncryptionAlgo = mfaEncryptionAlg
-}
-
 func SetWebAuthNConfig(cfg *webauthn.Config) {
 	webauthnConfig = cfg
+}
+
+func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
+	mfaEncryptionAlgo = mfaEncryptionAlg
 }
