@@ -157,8 +157,9 @@ func IsNull(column Column) *isNull {
 }
 
 // IsRestrictingColumn implements [Condition].
+// It returns false because it cannot be used for restricting a column.
 func (i isNull) IsRestrictingColumn(col Column) bool {
-	return true
+	return false
 }
 
 var _ Condition = (*isNull)(nil)
@@ -193,8 +194,9 @@ func IsNotNull(column Column) *isNotNull {
 }
 
 // IsRestrictingColumn implements [Condition].
+// It returns false because it cannot be used for restricting a column.
 func (i isNotNull) IsRestrictingColumn(col Column) bool {
-	return true
+	return false
 }
 
 var _ Condition = (*isNotNull)(nil)

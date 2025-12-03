@@ -110,10 +110,7 @@ func (i instance) Update(ctx context.Context, client database.QueryExecutor, id 
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instances SET `)
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
+	database.Changes(changes).Write(&builder)
 	idCondition := i.IDCondition(id)
 	writeCondition(&builder, idCondition)
 
@@ -152,19 +149,15 @@ func (i instance) SetUpdatedAt(time time.Time) database.Change {
 func (i instance) SetIAMProject(id string) database.Change {
 	return database.NewChange(i.IAMProjectIDColumn(), id)
 }
-
 func (i instance) SetDefaultOrg(id string) database.Change {
 	return database.NewChange(i.DefaultOrgIDColumn(), id)
 }
-
 func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
 	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
 }
-
 func (i instance) SetConsoleClientID(id string) database.Change {
 	return database.NewChange(i.ConsoleClientIDColumn(), id)
 }
-
 func (i instance) SetConsoleAppID(id string) database.Change {
 	return database.NewChange(i.ConsoleAppIDColumn(), id)
 }
@@ -189,6 +182,7 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 
 // ExistsDomain creates a correlated [database.Exists] condition on instance_domains.
 // Use this filter to make sure the Instance returned contains a specific domain.
+// of the instance in the aggregated result.
 // Example usage:
 //
 //	domainRepo := instanceRepo.Domains(true) // ensure domains are loaded/aggregated

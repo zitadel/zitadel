@@ -64,8 +64,7 @@ func TestChangeWrite(t *testing.T) {
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			var builder StatementBuilder
-			err := test.change.Write(&builder)
-			require.NoError(t, err)
+			test.change.Write(&builder)
 			assert.Equal(t, test.want.stmt, builder.String())
 			require.Len(t, builder.Args(), len(test.want.args))
 			for i, arg := range test.want.args {
