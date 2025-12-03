@@ -57,6 +57,12 @@ func WithIDPRepo(repo IDProviderRepository) InvokeOpt {
 	}
 }
 
+func WithLockoutSettingsRepo(repo LockoutSettingsRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.lockoutSettingRepo = repo
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -94,6 +100,9 @@ type InvokeOpts struct {
 	sessionRepo            SessionRepository
 	userRepo               UserRepository
 	idpRepo                IDProviderRepository
+
+	// Settings repos
+	lockoutSettingRepo LockoutSettingsRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
