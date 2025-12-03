@@ -1,20 +1,21 @@
-import { Component, Inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { InputModule } from '../../input/input.module';
-import { requiredValidator } from '../../form-field/validators/validators';
-import { MessageInitShape } from '@bufbuild/protobuf';
-import { DurationSchema } from '@bufbuild/protobuf/wkt';
-import { MatSelectModule } from '@angular/material/select';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import {Component, Inject} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {TranslateModule} from '@ngx-translate/core';
+import {CommonModule} from '@angular/common';
+import {FormBuilder, FormControl, ReactiveFormsModule} from '@angular/forms';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {InputModule} from '../../input/input.module';
+import {requiredValidator} from '../../form-field/validators/validators';
+import {MessageInitShape} from '@bufbuild/protobuf';
+import {DurationSchema} from '@bufbuild/protobuf/wkt';
+import {MatSelectModule} from '@angular/material/select';
+import {PayloadType, PayloadTypeJson, Target} from '@zitadel/proto/zitadel/action/v2/target_pb';
 import {
   CreateTargetRequestSchema,
   UpdateTargetRequestSchema,
-} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+} from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import {getEnumKeyFromValue, getEnumKeys} from "../../../utils/enum.utils";
 
 type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
 
@@ -36,6 +37,7 @@ type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
 export class ActionTwoAddTargetDialogComponent {
   protected readonly targetTypes = ['restCall', 'restWebhook', 'restAsync'] as const;
   protected readonly targetForm: ReturnType<typeof this.buildTargetForm>;
+  protected readonly payloadTypes: string[] = getEnumKeys(PayloadType);
 
   constructor(
     private fb: FormBuilder,
@@ -56,6 +58,7 @@ export class ActionTwoAddTargetDialogComponent {
       endpoint: data.target.endpoint,
       timeout: Number(data.target.timeout?.seconds),
       type: this.data.target?.targetType?.case ?? 'restWebhook',
+      payloadType: getEnumKeyFromValue(PayloadType, this.data.target?.payloadType ?? PayloadType.UNSPECIFIED) || this.payloadTypes[0],
       interruptOnError:
         data.target.targetType.case === 'restWebhook' || data.target.targetType.case === 'restCall'
           ? data.target.targetType.value.interruptOnError
@@ -70,6 +73,10 @@ export class ActionTwoAddTargetDialogComponent {
         nonNullable: true,
         validators: [requiredValidator],
       }),
+      payloadType: new FormControl<string>(getEnumKeyFromValue(PayloadType, PayloadType.UNSPECIFIED) || this.payloadTypes[0], {
+        nonNullable: true,
+        validators: [requiredValidator],
+      }),
       endpoint: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
       timeout: new FormControl<number>(10, { nonNullable: true, validators: [requiredValidator] }),
       interruptOnError: new FormControl<boolean>(false, { nonNullable: true }),
@@ -81,7 +88,7 @@ export class ActionTwoAddTargetDialogComponent {
       return;
     }
 
-    const { type, name, endpoint, timeout, interruptOnError } = this.targetForm.getRawValue();
+    const { type, name, endpoint, timeout, interruptOnError, payloadType } = this.targetForm.getRawValue();
 
     const timeoutDuration: MessageInitShape<typeof DurationSchema> = {
       seconds: BigInt(timeout),
@@ -100,6 +107,7 @@ export class ActionTwoAddTargetDialogComponent {
       endpoint,
       timeout: timeoutDuration,
       targetType,
+      payloadType: PayloadType[payloadType as keyof typeof PayloadType],
     };
 
     this.dialogRef.close(

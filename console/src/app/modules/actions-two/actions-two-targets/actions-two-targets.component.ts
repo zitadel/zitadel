@@ -7,11 +7,11 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import {
   CreateTargetRequestSchema,
   UpdateTargetRequestSchema,
-} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+} from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
@@ -73,6 +73,8 @@ export class ActionsTwoTargetsComponent {
     if (!request) {
       return;
     }
+
+    console.log(request);
 
     try {
       if ('id' in request) {
