@@ -277,6 +277,7 @@ type humanPasskeyConditions interface {
 	PasskeyIDCondition(passkeyID string) database.Condition
 	PasskeyKeyIDCondition(keyID string) database.Condition
 	PasskeyChallengeCondition(challenge string) database.Condition
+	PasskeyTypeCondition(passkeyType PasskeyType) database.Condition
 }
 
 type humanPasskeyChanges interface {
