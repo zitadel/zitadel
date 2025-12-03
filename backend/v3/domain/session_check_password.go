@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/passwap"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -161,14 +162,42 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	p.IsValidated = true
 	p.IsValidationSuccessful = err == nil
 
+	// TODO(IAM-Marco): The error returned here will block the transaction and stop events from being emitted.
+	// This error is functional so it should be returned AND the transaction should succeed. How can we fix it?
 	return err
 }
 
-// TODO(IAM-Marco): Change opts to settingsRepo when available
-func (p *PasswordCheckCommand) getLockoutPolicy(ctx context.Context, opts *InvokeOpts, orgID string) (any, error) {
-	// TODO(IAM-Marco): Get lockout policy using settings repo once it is merged
+func (p *PasswordCheckCommand) getLockoutPolicy(ctx context.Context, opts *InvokeOpts, orgID string) (*LockoutSettings, error) {
+	lockoutSettingRepo := opts.lockoutSettingRepo
 
-	return nil, nil
+	// We need the organization lockout policy first, and if not available, the instance (default) policy.
+	// So we retrieve all records with a matching instance ID and organization ID OR
+	// all records with a matching instance ID and NULL (or empty) organization ID.
+	// Then we assume NULLs are sorted as largest numbers (that's the case in Postgres),
+	// so we sort ascending by organization ID.
+	// We limit the result to 1 so that we get either the org policy or the instance one.
+	settings, err := lockoutSettingRepo.List(ctx, opts.DB(),
+		p.listLockoutSettingCondition(lockoutSettingRepo, orgID),
+		database.WithOrderByAscending(lockoutSettingRepo.OrganizationIDColumn(), lockoutSettingRepo.InstanceIDColumn()),
+		database.WithLimit(1),
+	)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "DOM-3B8Z6s", "failed fetching lockout settings")
+	}
+
+	if rowsReturned := len(settings); rowsReturned != 1 {
+		return nil, zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, int64(rowsReturned)), "DOM-mmsrCt", "unexpected number of rows returned")
+	}
+
+	return settings[0], nil
+}
+
+func (p *PasswordCheckCommand) listLockoutSettingCondition(repo LockoutSettingsRepository, orgID string) database.QueryOption {
+	instanceAndOrg := database.And(repo.InstanceIDCondition(p.instanceID), repo.OrganizationIDCondition(&orgID))
+	orgNullOrEmpty := database.Or(repo.OrganizationIDCondition(nil), repo.OrganizationIDCondition(gu.Ptr("")))
+	onlyInstance := database.And(repo.InstanceIDCondition(p.instanceID), orgNullOrEmpty)
+
+	return database.WithCondition(database.Or(instanceAndOrg, onlyInstance))
 }
 
 func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts *InvokeOpts, humanRepo HumanUserRepository, updatedHash string, checkType PasswordCheckType) (database.Changes, error) {
@@ -182,16 +211,18 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 			dbUpdates = append(dbUpdates, humanRepo.SetPassword(&VerificationTypeSkipped{Value: &updatedHash, VerifiedAt: p.CheckTime}))
 		}
 	case *CheckTypeFailed:
-		// TODO(IAM-Marco): Fix once settings repo is merged
-		_, err := p.getLockoutPolicy(ctx, opts, p.FetchedUser.OrganizationID)
+		lockoutPolicy, err := p.getLockoutPolicy(ctx, opts, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
 		}
 
-		// if (lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 && p.fetchedUser.Human.Password.FailedAttempts+1 >= lockoutPolicy.MaxPasswordAttempts) {
-		// dbUpdates = append(dbUpdates, humanRepo.SetState(UserStateLocked))
-		// p.isUserLocked = true
-		// }
+		if lockoutPolicy != nil &&
+			lockoutPolicy.MaxPasswordAttempts != nil && *lockoutPolicy.MaxPasswordAttempts > 0 &&
+			uint64(p.FetchedUser.Human.Password.FailedAttempts+1) >= *lockoutPolicy.MaxPasswordAttempts {
+
+			dbUpdates = append(dbUpdates, humanRepo.SetState(UserStateLocked))
+			p.IsUserLocked = true
+		}
 	}
 
 	return dbUpdates, nil
