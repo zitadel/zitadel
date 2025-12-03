@@ -155,6 +155,25 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}, nil
 }
 
+func (w *Config) BeginWebAuthNLogin(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
+	if err != nil {
+		return nil, nil, "", err
+	}
+	assertion, sessionData, err := webAuthNServer.BeginLogin(user, webauthn.WithUserVerification(userVerification))
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn login could not be started")
+		return nil, nil, "", zerrors.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
+	}
+	cred, err = json.Marshal(assertion)
+	if err != nil {
+		return nil, nil, "", zerrors.ThrowInternal(err, "WEBAU-2M0s9", "Errors.User.WebAuthN.MarshalError")
+	}
+	// todo: do we need to explicitly return webAuthNServer.Config.RPID?
+	// I see when the rpID is empty, it's obtained from the context. Is that why?
+	return sessionData, cred, webAuthNServer.Config.RPID, nil
+}
+
 func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) (*webauthn.Credential, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
