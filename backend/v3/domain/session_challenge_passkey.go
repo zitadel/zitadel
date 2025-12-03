@@ -28,6 +28,8 @@ var _ Transactional = (*PasskeyChallengeCommand)(nil)
 
 type beginLoginFn func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error)
 
+// PasskeyChallengeCommand handles the passkey challenge creation during session creation.
+// It supports both U2F and passwordless flows based on user verification requirements.
 type PasskeyChallengeCommand struct {
 	RequestChallengePasskey *session_grpc.RequestChallenges_WebAuthN
 
@@ -35,13 +37,14 @@ type PasskeyChallengeCommand struct {
 	InstanceID string
 	BeginLogin beginLoginFn
 
-	User             *User
-	Session          *Session
-	ChallengePasskey *SessionChallengePasskey
+	User    *User
+	Session *Session
 
-	WebAuthNChallenge *session_grpc.Challenges_WebAuthN // todo: review
+	ChallengePasskey  *SessionChallengePasskey          // the generated passkey challenge that is stored in the session.
+	WebAuthNChallenge *session_grpc.Challenges_WebAuthN // challenge to be set in the CreateSessionResponse
 }
 
+// NewPasskeyChallengeCommand creates a new PasskeyChallengeCommand.
 func NewPasskeyChallengeCommand(
 	sessionID,
 	instanceID string,
@@ -60,8 +63,12 @@ func NewPasskeyChallengeCommand(
 	return passkeyChallengeCmd
 }
 
+// RequiresTransaction implements [Transactional].
 func (p *PasskeyChallengeCommand) RequiresTransaction() {}
 
+// Validate implements [Commander].
+// It retrieves the session, the user, and the user's passkeys based on the user verification requirement,
+// and validates that the user is active.
 func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if p.RequestChallengePasskey == nil {
 		return nil
@@ -76,12 +83,8 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "missing user id in session")
 	}
 
-	// retrieve user and passkeys based on user verification requirement
-	passkeyType := PasskeyTypeU2F
-	userVerification := UserVerificationRequirementToDomain(p.RequestChallengePasskey.GetUserVerificationRequirement())
-	if userVerification == old_domain.UserVerificationRequirementRequired {
-		passkeyType = PasskeyTypePasswordless
-	}
+	// retrieve user and their passkeys based on user verification requirement
+	passkeyType := determinePasskeyType(p.RequestChallengePasskey.GetUserVerificationRequirement())
 	userRepo := opts.userRepo.LoadPasskeys()
 	p.User, err = userRepo.Get(
 		ctx,
@@ -101,50 +104,36 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 	return nil
 }
 
+// Execute implements [Commander].
+// It begins the WebAuthN login process and updates the session with the passkey challenge.
 func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	if p.RequestChallengePasskey == nil {
 		return nil
 	}
 	// begin webauthn login
-	sessionRepo := opts.sessionRepo
-	challenge := &session_grpc.Challenges_WebAuthN{
+	userVerificationDomain := UserVerificationRequirementToDomain(p.RequestChallengePasskey.GetUserVerificationRequirement())
+	sessionData, credentialAssertionData, rpID, err := p.beginWebAuthNLogin(ctx, userVerificationDomain)
+	if err != nil {
+		return err
+	}
+	// set the challenge for CreateSessionResponse
+	// todo: review: set in the CreateSessionResponse in the current implementation
+	p.WebAuthNChallenge = &session_grpc.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	if p.User.Human == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user")
-	}
-	webUser := &webAuthNUser{
-		userID:      p.User.ID,
-		username:    p.User.Username,
-		displayName: p.User.Human.DisplayName,
-		creds:       PasskeysToCredentials(ctx, p.User.Human.Passkeys, p.RequestChallengePasskey.GetDomain()),
-	}
-	userVerification := UserVerificationFromDomain(UserVerificationRequirementToDomain(p.RequestChallengePasskey.GetUserVerificationRequirement()))
-	sessionData, credentialAssertionData, rpID, err := p.BeginLogin(
-		ctx,
-		webUser,
-		p.RequestChallengePasskey.GetDomain(),
-		userVerification,
-	)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-Fy333Q", "failed to begin webauthn login")
-	}
-	// todo: where is this challenge used? set in the CreateSessionResponse in the current implementation
-	if err = json.Unmarshal(credentialAssertionData, challenge.PublicKeyCredentialRequestOptions); err != nil {
+	if err = json.Unmarshal(credentialAssertionData, p.WebAuthNChallenge.PublicKeyCredentialRequestOptions); err != nil {
 		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "failed to unmarshal credential assertion data")
 	}
 
-	// todo: review
-	p.WebAuthNChallenge = challenge
-
-	// set challenge in session
+	// update the session with the passkey challenge
 	p.ChallengePasskey = &SessionChallengePasskey{
 		Challenge:            sessionData.Challenge,
 		AllowedCredentialIDs: sessionData.AllowedCredentialIDs,
-		UserVerification:     UserVerificationRequirementToDomain(p.RequestChallengePasskey.GetUserVerificationRequirement()),
+		UserVerification:     userVerificationDomain,
 		RPID:                 rpID,
 		LastChallengedAt:     time.Now(),
 	}
+	sessionRepo := opts.sessionRepo
 	updated, err := sessionRepo.Update(
 		ctx,
 		opts.DB(),
@@ -157,6 +146,8 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 	return nil
 }
 
+// Events implements [Commander].
+// It creates a WebAuthN challenged event if a passkey challenge was requested and created.
 func (p *PasskeyChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	if p.RequestChallengePasskey == nil {
 		return nil, nil
@@ -178,4 +169,37 @@ func (p *PasskeyChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) 
 
 func (p *PasskeyChallengeCommand) String() string {
 	return "PasskeyChallengeCommand"
+}
+
+// beginWebAuthNLogin starts the WebAuthN login process for the user with the specified user verification requirement.
+func (p *PasskeyChallengeCommand) beginWebAuthNLogin(ctx context.Context, userVerificationDomain old_domain.UserVerificationRequirement) (*webauthn.SessionData, []byte, string, error) {
+	if p.User.Human == nil {
+		return nil, nil, "", zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user")
+	}
+	webUser := &webAuthNUser{
+		userID:      p.User.ID,
+		username:    p.User.Username,
+		displayName: p.User.Human.DisplayName,
+		creds:       PasskeysToCredentials(ctx, p.User.Human.Passkeys, p.RequestChallengePasskey.GetDomain()),
+	}
+	sessionData, credentialAssertionData, rpID, err := p.BeginLogin(
+		ctx,
+		webUser,
+		p.RequestChallengePasskey.GetDomain(),
+		UserVerificationFromDomain(userVerificationDomain),
+	)
+	if err != nil {
+		return nil, nil, "", zerrors.ThrowInternal(err, "DOM-Fy333Q", "failed to begin webauthn login")
+	}
+	return sessionData, credentialAssertionData, rpID, nil
+}
+
+// determinePasskeyType determines the passkey type (U2F or Passwordless) based on the user verification requirement.
+func determinePasskeyType(pbUserVerificationRequirement session_grpc.UserVerificationRequirement) PasskeyType {
+	passkeyType := PasskeyTypeU2F
+	userVerification := UserVerificationRequirementToDomain(pbUserVerificationRequirement)
+	if userVerification == old_domain.UserVerificationRequirementRequired {
+		passkeyType = PasskeyTypePasswordless
+	}
+	return passkeyType
 }
