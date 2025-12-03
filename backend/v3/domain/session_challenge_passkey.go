@@ -38,6 +38,8 @@ type PasskeyChallengeCommand struct {
 	User             *User
 	Session          *Session
 	ChallengePasskey *SessionChallengePasskey
+
+	WebAuthNChallenge *session_grpc.Challenges_WebAuthN // todo: review
 }
 
 func NewPasskeyChallengeCommand(
@@ -131,6 +133,9 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 	if err = json.Unmarshal(credentialAssertionData, challenge.PublicKeyCredentialRequestOptions); err != nil {
 		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "failed to unmarshal credential assertion data")
 	}
+
+	// todo: review
+	p.WebAuthNChallenge = challenge
 
 	// set challenge in session
 	p.ChallengePasskey = &SessionChallengePasskey{
