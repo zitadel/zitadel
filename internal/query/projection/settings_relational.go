@@ -765,7 +765,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 
 		settingsRepo := repository.BrandingSettingsRepository()
 		_, err := settingsRepo.ActivateAt(ctx, v3_sql.SQLTx(tx),
-			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, orgId, domain.SettingTypeBranding, domain.SettingStateActive),
+			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 			policyEvent.Creation,
 		)
 		return err
