@@ -68,6 +68,9 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       <TextInput
         type="text"
         autoComplete="username"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck="false"
         {...register("loginName", { required: t("required.username") })}
         label={t("labels.username")}
         data-testid="username-text-input"

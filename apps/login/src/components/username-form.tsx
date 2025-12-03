@@ -104,6 +104,9 @@ export function UsernameForm({
         <TextInput
           type="text"
           autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck="false"
           {...register("loginName", { required: t("required.loginName") })}
           label={inputLabel}
           data-testid="username-text-input"
