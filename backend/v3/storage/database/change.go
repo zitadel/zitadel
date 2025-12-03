@@ -97,7 +97,7 @@ func (c Changes) Write(builder *StatementBuilder) {
 	var hadChanges bool
 	for _, change := range c {
 		ch, ok := change.(NoChange)
-		hasChanges := !ok || ch.NoChange()
+		hasChanges := !ok || !ch.NoChange()
 		// if the previous change actually wrote a change to the builder
 		// and this change has changes, add a comma
 		if hadChanges && hasChanges {
