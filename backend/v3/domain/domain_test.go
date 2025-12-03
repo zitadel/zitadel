@@ -54,6 +54,8 @@ func getPasskeyTypeCondition(repo *domainmock.MockHumanUserRepository, passkeyTy
 		AnyTimes().
 		Return(typeCondition)
 	return typeCondition
+}
+
 func getPasskeyCondition(repo *domainmock.MockHumanUserRepository, pkeyID string) database.Condition {
 	idCondition := getTextCondition("zitadel.users", "passkey_id", pkeyID)
 
