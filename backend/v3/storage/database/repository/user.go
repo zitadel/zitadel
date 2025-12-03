@@ -18,8 +18,7 @@ func UserRepository() domain.UserRepository {
 }
 
 func MachineUserRepository() domain.MachineUserRepository {
-	// TODO: implement machine user repository
-	return nil
+	return &userMachine{user: user{}}
 }
 
 type user struct {
@@ -27,11 +26,21 @@ type user struct {
 	tableName    string
 }
 
+func (u user) HumanRepository() domain.HumanUserRepository {
+	return userHuman{user: u}
+}
+
 // existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
 var existingUser = user{tableName: "existing_user"}
 
 // Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
+	if user.Human != nil {
+		return userHuman{user: u}.Create(ctx, client, user)
+	}
+	if user.Machine != nil {
+		return userMachine{user: u}.Create(ctx, client, user)
+	}
 	panic("unimplemented")
 }
 
