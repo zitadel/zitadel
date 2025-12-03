@@ -35,7 +35,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER set_expiration
-    BEFORE INSERT OR UPDATE OF updated_at, lifetime ON zitadel.sessions
+    BEFORE INSERT OR UPDATE OF lifetime ON zitadel.sessions
     FOR EACH ROW
 EXECUTE FUNCTION update_expiration();
 

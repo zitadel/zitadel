@@ -1092,12 +1092,12 @@ func TestSession_List(t *testing.T) {
 		}
 		err = sessionRepo.Create(t.Context(), tx, session)
 		require.NoError(t, err)
+		session.Expiration = session.CreatedAt.Add(session.Lifetime)
 
 		changes := make([]database.Change, 0, 4)
 		updated := time.Now()
 		changes = append(changes, sessionRepo.SetUpdatedAt(updated))
 		session.UpdatedAt = updated
-		session.Expiration = updated.Add(session.Lifetime)
 		metadata := []*domain.SessionMetadata{
 			{
 				Metadata: domain.Metadata{

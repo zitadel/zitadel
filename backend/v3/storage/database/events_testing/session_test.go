@@ -154,7 +154,40 @@ func TestServer_SessionReduces(t *testing.T) {
 				ID:         createdSession.GetSessionId(),
 				Token:      createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
-				Expiration: updatedSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
+				Expiration: createdSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
+				UserID:     "",
+				CreatorID:  creatorID,
+				CreatedAt:  createdSession.GetDetails().GetChangeDate().AsTime(),
+				UpdatedAt:  updatedSession.GetDetails().GetChangeDate().AsTime(),
+				Factors:    nil,
+				Challenges: nil,
+				Metadata:   metadata,
+				UserAgent:  userAgent,
+			}, dbSession)
+		}, retryDuration, tick, "session not found within %v: %v", retryDuration, err)
+	})
+
+	var lifetimeUpdated time.Time
+
+	t.Run("lifetime set reduces", func(t *testing.T) {
+		updatedSession, err = SessionClient.SetSession(CTX, &session.SetSessionRequest{
+			SessionId: createdSession.GetSessionId(),
+			Lifetime:  durationpb.New(lifetime),
+		})
+		require.NoError(t, err)
+		lifetimeUpdated = updatedSession.GetDetails().GetChangeDate().AsTime()
+
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			dbSession, err := sessionRepo.Get(CTX, pool, database.WithCondition(
+				sessionRepo.PrimaryKeyCondition(instanceID, createdSession.GetSessionId()),
+			))
+			require.NoError(collect, err)
+			assertSessionsEqual(collect, &domain.Session{
+				InstanceID: instanceID,
+				ID:         createdSession.GetSessionId(),
+				Token:      createdSession.GetSessionToken(),
+				Lifetime:   lifetime,
+				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     "",
 				CreatorID:  creatorID,
 				CreatedAt:  createdSession.GetDetails().GetChangeDate().AsTime(),
@@ -212,7 +245,6 @@ func TestServer_SessionReduces(t *testing.T) {
 					ReturnCode: true,
 				},
 			},
-			Metadata: map[string][]byte{"key1": []byte("value1")},
 		})
 		require.NoError(t, err)
 		firstFactorCheckTime = updatedSession.GetDetails().GetChangeDate().AsTime()
@@ -227,7 +259,7 @@ func TestServer_SessionReduces(t *testing.T) {
 				ID:         createdSession.GetSessionId(),
 				Token:      createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
-				Expiration: updatedSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
+				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
 				CreatorID:  creatorID,
 				CreatedAt:  createdSession.GetDetails().GetChangeDate().AsTime(),
@@ -318,7 +350,7 @@ func TestServer_SessionReduces(t *testing.T) {
 				ID:         createdSession.GetSessionId(),
 				Token:      createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
-				Expiration: updatedSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
+				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
 				CreatorID:  creatorID,
 				CreatedAt:  createdSession.GetDetails().GetChangeDate().AsTime(),
@@ -377,7 +409,7 @@ func TestServer_SessionReduces(t *testing.T) {
 				ID:         createdSession.GetSessionId(),
 				Token:      createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
-				Expiration: passwordSet.GetDetails().GetChangeDate().AsTime().Add(lifetime),
+				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
 				CreatorID:  creatorID,
 				CreatedAt:  createdSession.GetDetails().GetChangeDate().AsTime(),
