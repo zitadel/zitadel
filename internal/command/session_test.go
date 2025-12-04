@@ -17,6 +17,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -422,7 +423,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 
 func TestCommands_updateSession(t *testing.T) {
 	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().EncryptionKeyID().Return("id")
 		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
 			func(code []byte, keyID string) (string, error) {

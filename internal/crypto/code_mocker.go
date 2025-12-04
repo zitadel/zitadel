@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/mock/gomock"
 
+	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -17,24 +18,8 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 	)
 }
 
-// CreateMockEncryptionAlgWithCode compares the length of the value to be encrypted with the length of the provided code.
-// It will return an error if they do not match.
-// The provided code will be used to encrypt in favor of the value passed to the encryption.
-// This function is intended to be used where the passed value is not in control, but where the returned encryption requires a static value.
-func CreateMockEncryptionAlgWithCode(ctrl *gomock.Controller, code string) EncryptionAlgorithm {
-	return createMockEncryptionAlgorithm(
-		ctrl,
-		func(c []byte) ([]byte, error) {
-			if len(c) != len(code) {
-				return nil, zerrors.ThrowInvalidArgumentf(nil, "id", "invalid code length - expected %d, got %d", len(code), len(c))
-			}
-			return []byte(code), nil
-		},
-	)
-}
-
-func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func(c []byte) ([]byte, error)) *MockEncryptionAlgorithm {
-	mCrypto := NewMockEncryptionAlgorithm(ctrl)
+func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func(c []byte) ([]byte, error)) *cryptomock.MockEncryptionAlgorithm {
+	mCrypto := cryptomock.NewMockEncryptionAlgorithm(ctrl)
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
@@ -61,7 +46,7 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 }
 
 func createMockCrypto(t *testing.T) EncryptionAlgorithm {
-	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
+	mCrypto := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
 	return mCrypto
 }
