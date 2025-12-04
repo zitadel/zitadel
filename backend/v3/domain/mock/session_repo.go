@@ -23,25 +23,31 @@ type SessionRepo struct {
 }
 
 func (s *SessionRepo) EXPECT() *MockSessionRepositoryMockRecorder {
+	s.mock.ctrl.T.Helper()
 	return s.mock.EXPECT()
 }
 
 func (s *SessionRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Session, error) {
+	s.mock.ctrl.T.Helper()
 	return s.mock.Get(ctx, client, opts...)
 }
 
 func (s *SessionRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Session, error) {
+	s.mock.ctrl.T.Helper()
 	return s.mock.List(ctx, client, opts...)
 }
 
 func (s *SessionRepo) Create(ctx context.Context, client database.QueryExecutor, user *domain.Session) error {
+	s.mock.ctrl.T.Helper()
 	return s.mock.Create(ctx, client, user)
 }
 
 func (s *SessionRepo) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	s.mock.ctrl.T.Helper()
 	return s.mock.Update(ctx, client, condition, changes...)
 }
 
 func (s *SessionRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) error {
+	s.mock.ctrl.T.Helper()
 	return s.mock.Delete(ctx, client, condition)
 }

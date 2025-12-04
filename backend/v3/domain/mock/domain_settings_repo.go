@@ -23,21 +23,26 @@ func NewDomainSettingsRepo(ctrl *gomock.Controller) *DomainSettingsRepo {
 }
 
 func (dsr *DomainSettingsRepo) EXPECT() *MockDomainSettingsRepositoryMockRecorder {
+	dsr.mock.ctrl.T.Helper()
 	return dsr.mock.EXPECT()
 }
 
 func (dsr *DomainSettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.DomainSettings, error) {
+	dsr.mock.ctrl.T.Helper()
 	return dsr.mock.Get(ctx, client, opts...)
 }
 
 func (dsr *DomainSettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.DomainSettings, error) {
+	dsr.mock.ctrl.T.Helper()
 	return dsr.mock.List(ctx, client, opts...)
 }
 
 func (dsr *DomainSettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.DomainSettings) error {
+	dsr.mock.ctrl.T.Helper()
 	return dsr.mock.Set(ctx, client, settings)
 }
 
 func (dsr *DomainSettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	dsr.mock.ctrl.T.Helper()
 	return dsr.mock.Delete(ctx, client, condition)
 }

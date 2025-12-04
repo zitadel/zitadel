@@ -23,21 +23,26 @@ func NewSecuritySettingsRepo(ctrl *gomock.Controller) *SecuritySettingsRepo {
 }
 
 func (ssr *SecuritySettingsRepo) EXPECT() *MockSecuritySettingsRepositoryMockRecorder {
+	ssr.mock.ctrl.T.Helper()
 	return ssr.mock.EXPECT()
 }
 
 func (ssr *SecuritySettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecuritySettings, error) {
+	ssr.mock.ctrl.T.Helper()
 	return ssr.mock.Get(ctx, client, opts...)
 }
 
 func (ssr *SecuritySettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.SecuritySettings, error) {
+	ssr.mock.ctrl.T.Helper()
 	return ssr.mock.List(ctx, client, opts...)
 }
 
 func (ssr *SecuritySettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) error {
+	ssr.mock.ctrl.T.Helper()
 	return ssr.mock.Set(ctx, client, settings)
 }
 
 func (ssr *SecuritySettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	ssr.mock.ctrl.T.Helper()
 	return ssr.mock.Delete(ctx, client, condition)
 }

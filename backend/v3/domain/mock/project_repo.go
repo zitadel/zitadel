@@ -23,25 +23,31 @@ type ProjectRepo struct {
 }
 
 func (r *ProjectRepo) EXPECT() *MockProjectRepositoryMockRecorder {
+	r.mock.ctrl.T.Helper()
 	return r.mock.EXPECT()
 }
 
 func (r *ProjectRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.Project, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Get(ctx, client, opts...)
 }
 
 func (r *ProjectRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Project, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.List(ctx, client, opts...)
 }
 
 func (r *ProjectRepo) Create(ctx context.Context, client database.QueryExecutor, org *domain.Project) error {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Create(ctx, client, org)
 }
 
 func (r *ProjectRepo) Update(ctx context.Context, client database.QueryExecutor, conditions database.Condition, changes ...database.Change) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Update(ctx, client, conditions, changes...)
 }
 
 func (r *ProjectRepo) Delete(ctx context.Context, client database.QueryExecutor, conditions database.Condition) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Delete(ctx, client, conditions)
 }
