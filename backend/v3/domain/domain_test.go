@@ -56,10 +56,28 @@ func getPasskeyCondition(repo *domainmock.MockHumanUserRepository, pkeyID string
 	return idCondition
 }
 
+func getPasskeyTypeCondition(repo *domainmock.MockHumanUserRepository, passkeyType domain.PasskeyType) database.Condition {
+	typeCondition := getNumberCondition("zitadel.human_users", "passkeys", int(passkeyType))
+
+	repo.EXPECT().
+		PasskeyTypeCondition(database.NumberOperationEqual, passkeyType).
+		AnyTimes().
+		Return(typeCondition)
+	return typeCondition
+}
+
 func getTextCondition(tableName, column, value string) database.Condition {
 	return database.NewTextCondition(
 		database.NewColumn(tableName, column),
 		database.TextOperationEqual,
+		value,
+	)
+}
+
+func getNumberCondition(tableName, column string, value int) database.Condition {
+	return database.NewNumberCondition(
+		database.NewColumn(tableName, column),
+		database.NumberOperationEqual,
 		value,
 	)
 }
