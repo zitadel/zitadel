@@ -212,6 +212,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 		}
 	case *CheckTypeFailed:
 		lockoutPolicy, err := p.getLockoutPolicy(ctx, opts, p.FetchedUser.OrganizationID)
+		lockoutPolicy, err := getLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, p.instanceID, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
 		}
