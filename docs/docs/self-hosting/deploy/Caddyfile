@@ -1,0 +1,4 @@
+{$ZITADEL_EXTERNALDOMAIN:localhost} {
+	reverse_proxy /ui/v2/login* api:3000
+	reverse_proxy * api:8080
+}
