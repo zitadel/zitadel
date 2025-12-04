@@ -17,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -386,7 +385,6 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 	t.Parallel()
 
-	domain.SetPasswordHasher(&crypto.Hasher{Swapper: &passwap.Swapper{}})
 	tt := []struct {
 		testName          string
 		inputErr          error
@@ -456,7 +454,6 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 	t.Parallel()
 	listErr := errors.New("list error")
-	domain.SetPasswordHasher(&crypto.Hasher{Swapper: &passwap.Swapper{}})
 
 	tt := []struct {
 		testName    string
@@ -702,7 +699,6 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 func TestPasswordCheckCommand_Execute(t *testing.T) {
 	t.Parallel()
 
-	domain.SetPasswordHasher(&crypto.Hasher{Swapper: &passwap.Swapper{}})
 	userUpdateErr := errors.New("user update error")
 	sessionUpdateErr := errors.New("session update error")
 
@@ -1116,7 +1112,6 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 
 func TestPasswordCheckCommand_Events(t *testing.T) {
 	t.Parallel()
-	domain.SetPasswordHasher(&crypto.Hasher{})
 	userAgg := user.NewAggregate("user-1", "org-1").Aggregate
 	sessAgg := session.NewAggregate("session-1", "instance-1").Aggregate
 
