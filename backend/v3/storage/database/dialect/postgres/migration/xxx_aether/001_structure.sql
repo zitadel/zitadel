@@ -1,0 +1,9 @@
+DROP SCHEMA IF EXISTS aether CASCADE;
+CREATE SCHEMA IF NOT EXISTS aether;
+SET search_path TO aether;
+
+CREATE EXTENSION IF NOT EXISTS ltree SCHEMA aether;
+
+CREATE TABLE aether.instances(
+    id TEXT NOT NULL PRIMARY KEY
+);
