@@ -48,7 +48,7 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 		database.NewChange(instanceRepo.NameColumn(), u.Name),
 	)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-PkVMNR", "failed updating instance")
 	}
 
 	if updateCount == 0 {
@@ -85,7 +85,7 @@ func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(u.ID)))
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-j05Hdo", "failed fetching instance")
 	}
 
 	if instance.Name == u.Name {

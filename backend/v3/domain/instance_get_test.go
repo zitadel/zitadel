@@ -107,6 +107,7 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
 	getErr := errors.New("get error")
+	notFoundErr := database.NewNoRowFoundError(nil)
 
 	tt := []struct {
 		testName string
@@ -141,7 +142,32 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID: "instance-1",
-			expectedError:   getErr,
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-lvsRce", "failed fetching instance"),
+		},
+		{
+			testName: "when instance is not found should return not found error",
+			instanceRepo: func(ctrl *gomock.Controller) domain.InstanceRepository {
+				instanceRepo := domainmock.NewInstanceRepo(ctrl)
+
+				instanceRepo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(instanceRepo)
+
+				instanceRepo.EXPECT().
+					Get(
+						gomock.Any(),
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(
+							instanceRepo.IDCondition("instance-1"),
+						)),
+					).
+					Times(1).
+					Return(nil, notFoundErr)
+				return instanceRepo
+			},
+			inputInstanceID: "instance-1",
+			expectedError:   zerrors.ThrowNotFound(notFoundErr, "DOM-QVrUwc", "instance not found"),
 		},
 		{
 			testName: "when retrieving instance succeeds should set instance on struct and return no error",
