@@ -212,7 +212,6 @@
           "DEACTIVATED_ON": "Деактивирован"
         }
       },
-
       "MESSAGE_TEXTS": {
         "TITLE": "Тексты сообщений",
         "DESCRIPTION": "Настройте тексты ваших уведомлений по электронной почте или SMS. Если вы хотите отключить некоторые языки, ограничьте их в настройках языка ваших экземпляров.",
@@ -404,6 +403,43 @@
         "description": "Обеспечьте пользователям доступ к вашему приложению и настройте их роль.",
         "action": "Предоставить пользователю"
       }
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Setup your brand",
+        "description": "Define coloring and shape of your login and upload your logo and icons.",
+        "action": "Setup branding"
+      },
+      "instance.smtp.config.added": {
+        "title": "Setup your SMTP settings",
+        "description": "Set your own mail server settings.",
+        "action": "Setup SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Create a project",
+        "description": "Add a project and define its roles and authorizations.",
+        "action": "Create project"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Register your app",
+        "description": "Register your web, native, api or saml application and setup an authentication flow.",
+        "action": "Register app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log in to your app",
+        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "action": "Log in"
+      },
+      "user.human.added": {
+        "title": "Add users",
+        "description": "Add your application users",
+        "action": "Add user"
+      },
+      "user.grant.added": {
+        "title": "Grant users",
+        "description": "Allow users to access your application and setup their role.",
+        "action": "Grant user"
+      }
     }
   },
   "MENU": {
@@ -435,7 +471,8 @@
     "TOS": "Пользовательское соглашение",
     "OPENSHORTCUTSTOOLTIP": "Нажмите ? для просмотра сочетания клавиш",
     "SETTINGS": "Настройки",
-    "CUSTOMERPORTAL": "Клиентский портал"
+    "CUSTOMERPORTAL": "Клиентский портал",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Интегрируйте ZITADEL в свое приложение",
@@ -457,9 +494,11 @@
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Рамки изменений",
-        "ОПИСАНИЕ": "Выберите один из доступных фреймворков для быстрой настройки вашего приложения"
+        "ОПИСАНИЕ": "Выберите один из доступных фреймворков для быстрой настройки вашего приложения",
+        "DESCRIPTION": "Choose one of the available frameworks for quick setup of your application."
       }
-    }
+    },
+    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes."
   },
   "ACTIONS": {
     "ACTIONS": "Действия",
@@ -986,7 +1025,8 @@
         "DELETESUCCESS": "Удалён успешно!",
         "CROPPERERROR": "Произошла ошибка при загрузке файла. При необходимости попробуйте другой формат и размер."
       },
-      "COUNTRY": "Страна"
+      "COUNTRY": "Страна",
+      "PREFERREDLOGINNAME": "Preferred login name"
     },
     "MACHINE": {
       "TITLE": "Сведения о служебном пользователе",
@@ -1382,7 +1422,10 @@
           "LABEL_UNTIL": "ДО"
         },
         "OTHER": "Другой",
-        "OTHERS": "Другие"
+        "OTHERS": "Другие",
+        "ASC": "Ascending",
+        "DESC": "Descending",
+        "SORT": "Sort"
       },
       "DIALOG": {
         "TITLE": "Детали события"
@@ -1547,7 +1590,12 @@
       "SECURITY": "Настройки безопасности",
       "EVENTS": "События",
       "FAILEDEVENTS": "Неудачные события",
-      "VIEWS": "Отображение"
+      "VIEWS": "Отображение",
+      "ACTIONS": "Actions",
+      "SMS_PROVIDER": "SMS/Phone Provider",
+      "SMTP_PROVIDER": "SMTP Provider",
+      "TARGETS": "Targets",
+      "VERIFIED_DOMAINS": "Verified domains"
     },
     "GROUPS": {
       "GENERAL": "Общая информация",
@@ -1557,7 +1605,8 @@
       "TEXTS": "Тексты и языки",
       "APPEARANCE": "Вид",
       "OTHER": "Другое",
-      "STORAGE": "хранилище"
+      "STORAGE": "хранилище",
+      "ACTIONS": "Actions"
     },
     "BETA": "БЕТА"
   },
@@ -1607,7 +1656,8 @@
       "TLS": "Безопасность транспортного уровня (TLS)",
       "SAVED": "Успешно сохранено!",
       "NOCHANGES": "Без изменений!",
-      "REQUIREDWARN": "Для того, чтобы отправлять уведомления с вашего домена, вам необходимо ввести свои данные SMTP."
+      "REQUIREDWARN": "Для того, чтобы отправлять уведомления с вашего домена, вам необходимо ввести свои данные SMTP.",
+      "REPLYTOADDRESS": "Reply-to Address"
     },
     "SMS": {
       "TITLE": "Настройки СМС",
@@ -1634,7 +1684,8 @@
         "REMOVED": "Twilio удалён",
         "CHANGETOKEN": "Изменить токен",
         "SETTOKEN": "Установить токен",
-        "TOKENSET": "Токен успешно установлен."
+        "TOKENSET": "Токен успешно установлен.",
+        "UPDATED": "Twilio updated successfully."
       }
     },
     "OIDC": {
@@ -1673,7 +1724,9 @@
       "ALLOWEDORIGINS": "Разрешённые URL-адреса",
       "IMPERSONATIONTITLE": "Олицетворение",
       "IMPERSONATIONENABLED": "Разрешить олицетворение",
-      "IMPERSONATIONDESCRIPTION": "Этот параметр позволяет в принципе использовать олицетворение. Обратите внимание, что имитатору также необходимо назначить соответствующие роли `*_IMPERSONATOR`."
+      "IMPERSONATIONDESCRIPTION": "Этот параметр позволяет в принципе использовать олицетворение. Обратите внимание, что имитатору также необходимо назначить соответствующие роли `*_IMPERSONATOR`.",
+      "IFRAMEDESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
+      "IFRAMETITLE": "iFrame"
     },
     "FEATURES": {
       "LOGINDEFAULTORG": "Организация по умолчанию для входа",
@@ -1774,6 +1827,11 @@
         "ERROR": "Пользователь не найден!",
         "PRIMARYBUTTON": "далее",
         "SECONDARYBUTTON": "зарегистрироваться"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Auto Mode",
+        "THEME_MODE_LIGHT": "Light Mode only",
+        "THEME_MODE_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {
@@ -1991,7 +2049,8 @@
       "MFAINITSKIPLIFETIME": "Срок действия MFA",
       "SECONDFACTORCHECKLIFETIME": "Проверка срока действия двухфакторной аутентификации",
       "MULTIFACTORCHECKLIFETIME": "Проверка срока действия мультифактора",
-      "INHOURS": "Часы"
+      "INHOURS": "Часы",
+      "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login."
     },
     "RESET": "Сбросить значение по умолчанию для экземпляра",
     "CREATECUSTOM": "Создать пользовательскую политику",
@@ -2098,16 +2157,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Статус",
       "0": "Не определён",
       "1": "Активен",
-      "2": "Неактивен"
+      "2": "Неактивен",
+      "TITLE": "Статус"
     },
     "TYPE": {
-      "TITLE": "Тип",
       "0": "Неизвестный",
       "1": "Частный",
-      "2": "Доступный"
+      "2": "Доступный",
+      "TITLE": "Тип"
     },
     "NAME": "Название",
     "NAMEDIALOG": {
@@ -2259,7 +2318,8 @@
       "UPDATED": "Проект изменён.",
       "GRANTUPDATED": "Допуск изменён.",
       "DELETED": "Проект удалён."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2323,6 +2383,10 @@
       "APPLE": {
         "TITLE": "Войти через Apple",
         "DESCRIPTION": "Введите учетные данные вашего поставщика Apple."
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2482,7 +2546,17 @@
     "ISIDTOKENMAPPING": "Карта из ID-токена",
     "ISIDTOKENMAPPING_DESC": "Если этот флажок установлен, информация о поставщике сопоставляется с маркером идентификатора, а не с конечной точкой информации о пользователе.",
     "USEPKCE": "Используйте ПКСЕ",
-    "USEPKCE_DESC": "Определяет, включены ли параметры code_challenge и code_challenge_method в запрос аутентификации."
+    "USEPKCE_DESC": "Определяет, включены ли параметры code_challenge и code_challenge_method в запрос аутентификации.",
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2555,7 +2629,11 @@
         "DELETE_TITLE": "Удалить конфигурацию SMTP",
         "DELETE_DESCRIPTION": "Вы собираетесь удалить конфигурацию. Подтвердите это действие, введя имя отправителя.",
         "DELETED": "Конфигурация SMTP удалена.",
-        "SENDER": "Введите {{ value }}, чтобы удалить эту конфигурацию SMTP."
+        "SENDER": "Введите {{ value }}, чтобы удалить эту конфигурацию SMTP.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2631,7 +2709,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Следующие шаги",
         "0": {
           "TITLE": "Добавить роли",
           "DESC": "Введите свои роли в проекте"
@@ -2643,8 +2720,24 @@
         "2": {
           "TITLE": "Помощь и поддержка",
           "DESC": "Ознакомьтесь с нашей документацией по созданию приложений или обратитесь в нашу службу поддержки"
-        }
-      }
+        },
+        "TITLE": "Следующие шаги"
+      },
+      "CREATE_PROJECT_AUTO": "Автоматически создать проект",
+      "CREATE_PROJECT_AUTO_DESC": "Рекомендуется, если вы новичок в ZITADEL. Мы позаботимся о настройке проекта за вас.",
+      "QUICK_CREATE_TITLE": "Создать приложение",
+      "QUICK_CREATE_DESC": "Создайте приложение в три простых шага.",
+      "QUICK_CREATE_FRAMEWORK": "Выберите ваш фреймворк",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Мы предоставляем рекомендуемую конфигурацию для вашего приложения. Выберите фреймворк, который вы используете или планируете использовать.",
+      "QUICK_CREATE_NAME": "Назовите ваше приложение",
+      "CUSTOM_APP_TITLE": "Пользовательское приложение",
+      "CUSTOM_APP_DESC": "Мы создадим ваш проект и приложение с выбранной ниже конфигурацией.",
+      "CUSTOM_APP_NAME": "Название приложения",
+      "CUSTOM_APP_NAME_LABEL": "Название",
+      "CUSTOM_APP_TYPE": "Тип приложения",
+      "CUSTOM_APP_AUTH_METHOD": "Метод аутентификации",
+      "CUSTOM_APP_CANCEL": "Отмена",
+      "CUSTOM_APP_CREATE": "Создать приложение"
     },
     "NAMEDIALOG": {
       "TITLE": "Переименовать приложение",
@@ -2752,7 +2845,9 @@
             "DESCRIPTION": "Одностраничные приложения (SPA) и все JS-фреймворки, выполняемые в браузерах."
           }
         }
-      }
+      },
+      "DEVMODE_DISABLED": "Disabled",
+      "DEVMODE_ENABLED": "Enabled"
     },
     "API": {
       "INFO": {
@@ -2783,7 +2878,12 @@
       "DOWNLOADCERT": "Скачать сертификат SAML",
       "CREATEMETADATA": "Создать метаданные",
       "ENTITYID": "Идентификатор объекта",
-      "ACSURL": "URL-адрес конечной точки ACS"
+      "ACSURL": "URL-адрес конечной точки ACS",
+      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "Upload XML file"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2833,6 +2933,90 @@
     "LOGINV2": {
       "USEV2": "Использовать новый интерфейс входа",
       "BASEURL": "Настраиваемый базовый URL для нового интерфейса входа"
+    },
+    "QUICKSTART": "Быстрый старт",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Быстрый старт",
+      "DESCRIPTION": "Запустите своё приложение с аутентификацией ZITADEL.",
+      "GETSTARTED": "Начните работу с вашим приложением",
+      "GETSTARTED_DESC": "Это руководство поможет вам быстро и легко интегрировать аутентификацию ZITADEL в ваше приложение.",
+      "FRAMEWORK": "Фреймворк",
+      "VIEWDOCS": "Просмотреть документацию",
+      "VIEWEXAMPLE": "Просмотреть пример",
+      "ENVVARS": "Переменные окружения",
+      "ENVVARS_DESC": "Добавьте эти переменные окружения в своё приложение:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "С чего вы начинаете?",
+      "QUICKSTART_SUBTITLE": "Выберите вариант, который лучше всего описывает вашу ситуацию:",
+      "OPTION1": "Вариант 1: Клонировать пример приложения",
+      "OPTION1_DESC": "Быстро начните с рабочего примера приложения:",
+      "OPTION1_NOTE": "После клонирования обновите переменные окружения данными вашего приложения.",
+      "OPTION2": "Вариант 2: Интегрировать существующее приложение",
+      "OPTION2_DESC": "Интегрируйте аутентификацию ZITADEL в ваше существующее приложение:",
+      "STEP1": "Установите ZITADEL SDK для вашего фреймворка",
+      "STEP2": "Настройте переменные окружения",
+      "STEP3": "Добавьте аутентификацию в приложение",
+      "STEP4": "Протестируйте интеграцию",
+      "GENERIC": "Общая интеграция",
+      "GENERIC_DESC": "Выберите из наших подробных примеров и руководств:",
+      "ALLEXAMPLES": "Все примеры",
+      "INTEGRATION_GUIDE": "Руководство по интеграции",
+      "NEXTSTEPS": "Следующие шаги",
+      "CONFIGURE": "Настроить параметры",
+      "CONFIGURE_DESC": "Настройте OIDC-конфигурацию вашего приложения",
+      "REDIRECTS": "Настроить перенаправления",
+      "REDIRECTS_DESC": "Настройте URL-адреса перенаправления и выхода",
+      "URLS_DESC": "Просмотреть важные URL-адреса для интеграции",
+      "TERMINAL": "Терминал",
+      "SCENARIO_NEW_TITLE": "Я хочу создать совершенно новое приложение",
+      "SCENARIO_NEW_DESC": "Отлично! Мы поможем вам быстро начать работу с готовым примером, в котором аутентификация ZITADEL уже встроена.",
+      "SCENARIO_NEW_TOGGLE": "У меня ещё нет приложения",
+      "SCENARIO_EXISTING_TITLE": "Я хочу интегрировать существующее приложение",
+      "SCENARIO_EXISTING_DESC": "Замечательно! Мы проведём вас шаг за шагом по процессу добавления аутентификации ZITADEL.",
+      "SCENARIO_EXISTING_TOGGLE": "У меня уже есть приложение",
+      "CLONE_EXAMPLE": "Клонировать пример",
+      "CLONE_NOTE": "После клонирования просто обновите файл .env данными вашего приложения — и всё готово!",
+      "BROWSE_EXAMPLES": "Просмотреть все примеры",
+      "GENERIC_NEW_NOTE": "Выберите пример, соответствующий вашему технологическому стеку, и клонируйте его, чтобы быстро начать.",
+      "EXISTING_STEP1_TITLE": "Установите SDK",
+      "EXISTING_STEP1_DESC": "Добавьте SDK в свой проект",
+      "EXISTING_STEP2_TITLE": "Добавьте конфигурацию",
+      "EXISTING_STEP2_DESC": "Скопируйте и вставьте эти переменные окружения в конфигурационный файл вашего приложения",
+      "EXISTING_STEP3_TITLE": "Настройте аутентификацию",
+      "EXISTING_STEP3_DESC": "Следуйте нашему пошаговому руководству по интеграции, чтобы добавить аутентификацию",
+      "VIEW_SDKS": "Просмотреть документацию SDK",
+      "AUTH_STATUS_CHECKING": "Проверка статуса аутентификации...",
+      "AUTH_STATUS_SUCCESS": "Ваше приложение успешно аутентифицировано в ZITADEL.",
+      "AUTH_STATUS_PENDING": "Ожидание первой аутентификации пользователя.",
+      "AUTH_STATUS_PENDING_DESC": "Следуйте руководству по интеграции ниже для настройки аутентификации.",
+      "SUCCESS_TITLE": "🎉 Отлично! Ваше приложение успешно подключено",
+      "SUCCESS_DESC": "Ваше приложение успешно прошло аутентификацию в ZITADEL. Теперь вы можете использовать переменные окружения, указанные ниже.",
+      "ENVVARS_AUTHENTICATED_DESC": "Используйте эти переменные окружения в своём приложении:",
+      "INTEGRATION_ENVVARS_TITLE": "Конфигурация вашего приложения",
+      "INTEGRATION_ENVVARS_DESC": "Добавьте эти переменные окружения в своё приложение для подключения к ZITADEL:",
+      "NEW_STEP1_TITLE": "Клонируйте пример приложения",
+      "NEW_STEP1_DESC": "Быстро начните с работающего примера с встроенной аутентификацией ZITADEL.",
+      "NEW_STEP2_TITLE": "Настройте переменные окружения",
+      "NEW_STEP2_DESC": "Добавьте эти переменные окружения в своё приложение. Вставьте их в файл .env в корне проекта или скачайте готовый файл.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Обновите файл .env.example этими значениями, затем переименуйте его в .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Замените 'your-client-secret' на ваш фактический client secret. Если вы не сохранили его при создании приложения, вы можете ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "сгенерировать новый здесь",
+      "NEW_STEP3_TITLE": "Запустите и протестируйте приложение",
+      "NEW_STEP3_DESC": "Установите зависимости.",
+      "NEW_STEP3_DESC2": "Запустите приложение и протестируйте процесс аутентификации.",
+      "NEW_STEP4_TITLE": "Просмотреть документацию",
+      "NEW_STEP4_DESC": "Следуйте нашему руководству, чтобы настроить и расширить функциональность вашего приложения с помощью ZITADEL.",
+      "STEP4_ACTION": "Просмотреть документацию",
+      "GENERIC_NEW_TITLE": "Выберите точку старта",
+      "GENERIC_EXISTING_TITLE": "Выберите подход к интеграции",
+      "GENERIC_EXISTING_NOTE": "Так как для вашего фреймворка нет отдельного SDK, вы можете использовать наши общие руководства или работать напрямую с OIDC/OAuth2-эндпоинтами.",
+      "API_DOCS": "Документация API",
+      "NEW_STEP_DOCS_TITLE": "Посмотреть полную документацию",
+      "NEW_STEP_DOCS_DESC": "Узнайте больше о расширенных настройках и лучших практиках для вашего фреймворка.",
+      "EXISTING_STEP_DOCS_TITLE": "Подробнее об интеграции",
+      "EXISTING_STEP_DOCS_DESC": "Изучите нашу подробную документацию по расширенной настройке и устранению неполадок.",
+      "SELECT_FRAMEWORK": "Выберите фреймворк",
+      "SELECT_FRAMEWORK_DESC": "Выберите фреймворк, который вы используете, чтобы получить адаптированные примеры и инструкции по интеграции."
     }
   },
   "GENDERS": {
@@ -2867,10 +3051,10 @@
     "ADD": "Добавить менеджера",
     "CREATIONTYPE": "Тип создания",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Организация",
       "0": "Собственный проект",
       "1": "Допуск проекта",
+      "2": "Организация",
+      "3": "IAM",
       "4": "Проект"
     },
     "EDITROLE": "Изменить роли",

@@ -435,7 +435,8 @@
     "TOS": "Användarvillkor",
     "OPENSHORTCUTSTOOLTIP": "Skriv ? för att visa tangentbordsgenvägar",
     "SETTINGS": "Inställningar",
-    "CUSTOMERPORTAL": "Kundportal"
+    "CUSTOMERPORTAL": "Kundportal",
+    "TARGETS": "Mål"
   },
   "QUICKSTART": {
     "TITLE": "Integrera ZITADEL i din applikation",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
     "METHODS": {
+      "1": "är lika med",
       "5": "innehåller",
-      "7": "slutar med",
-      "1": "är lika med"
+      "7": "slutar med"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1506,7 +1507,9 @@
       "SECURITY": "Säkerhetsinställningar",
       "EVENTS": "Händelser",
       "FAILEDEVENTS": "Misslyckade händelser",
-      "VIEWS": "Vy"
+      "VIEWS": "Vy",
+      "ACTIONS": "Åtgärder",
+      "TARGETS": "Mål"
     },
     "GROUPS": {
       "GENERAL": "Allmän information",
@@ -1516,7 +1519,8 @@
       "TEXTS": "Texter och språk",
       "APPEARANCE": "Utseende",
       "OTHER": "Övrigt",
-      "STORAGE": "Lagring"
+      "STORAGE": "Lagring",
+      "ACTIONS": "Åtgärder"
     },
     "BETA": "BETA"
   },
@@ -1973,7 +1977,6 @@
         "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Varumärkesinställning",
         "0": {
           "TITLE": "Ospecificerad",
           "DESC": "Så snart användaren identifieras kommer varumärket för den identifierade användarens organisation att visas, innan systemets standard visas."
@@ -1986,6 +1989,7 @@
           "TITLE": "Använd användarorganisationens inställning",
           "DESC": "Varumärket för projektets organisation kommer att visas, men så snart användaren identifieras kommer inställningen för den identifierade användarens organisation att visas."
         },
+        "TITLE": "Varumärkesinställning",
         "DIALOG": {
           "TITLE": "Varumärkesinställning",
           "DESCRIPTION": "Välj beteendet för inloggningen när du använder projektet."
@@ -2017,16 +2021,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Status",
       "0": "Ej definierad",
       "1": "Aktiv",
-      "2": "Inaktiv"
+      "2": "Inaktiv",
+      "TITLE": "Status"
     },
     "TYPE": {
-      "TITLE": "Typ",
       "0": "Okänd typ",
       "1": "Ägd",
-      "2": "Beviljad"
+      "2": "Beviljad",
+      "TITLE": "Typ"
     },
     "NAME": "Namn",
     "NAMEDIALOG": {
@@ -2176,7 +2180,8 @@
       "UPDATED": "Projekt ändrat.",
       "GRANTUPDATED": "Bidrag ändrat.",
       "DELETED": "Projekt borttaget."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Klicka för att redigera projektnamn"
   },
   "ROLES": {
     "DIALOG": {
@@ -2276,10 +2281,10 @@
       "2": "inaktiv"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Hyresgäst-ID",
       "0": "Allmän",
       "1": "Organisationer",
-      "2": "Konsumenter"
+      "2": "Konsumenter",
+      "3": "Hyresgäst-ID"
     },
     "AZUREADTENANTTYPE": "Hyresgästtyp",
     "AZUREADTENANTID": "Hyresgäst-ID",
@@ -2378,7 +2383,8 @@
       "SIGNEDREQUEST": "Signerad begäran",
       "NAMEIDFORMAT": "NameID-format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Anpassat mappningsattributnamn",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "SIGNATUREALGORITHM": "Signaturalgoritm"
     },
     "TOAST": {
       "SAVED": "Sparat framgångsrikt.",
@@ -2547,7 +2553,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Nästa steg",
         "0": {
           "TITLE": "Lägg till roller",
           "DESC": "Ange dina projektroller"
@@ -2559,8 +2564,24 @@
         "2": {
           "TITLE": "Hjälp & Support",
           "DESC": "Läs vår dokumentation om att skapa applikationer eller kontakta vår support"
-        }
-      }
+        },
+        "TITLE": "Nästa steg"
+      },
+      "CREATE_PROJECT_AUTO": "Skapa projekt automatiskt",
+      "CREATE_PROJECT_AUTO_DESC": "Rekommenderas om du är ny på ZITADEL. Vi hanterar projektinställningen åt dig.",
+      "QUICK_CREATE_DESC": "Skapa en applikation i tre enkla steg.",
+      "QUICK_CREATE_FRAMEWORK": "Välj ditt ramverk",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Vi tillhandahåller en rekommenderad konfiguration för din applikation. Välj det ramverk du använder eller tänker använda.",
+      "QUICK_CREATE_NAME": "Namnge din applikation",
+      "QUICK_CREATE_TITLE": "Skapa applikation",
+      "CUSTOM_APP_TITLE": "Anpassad applikation",
+      "CUSTOM_APP_DESC": "Vi kommer att skapa ditt projekt och din applikation med konfigurationen du väljer nedan.",
+      "CUSTOM_APP_NAME": "Applikationsnamn",
+      "CUSTOM_APP_NAME_LABEL": "Namn",
+      "CUSTOM_APP_TYPE": "Applikationstyp",
+      "CUSTOM_APP_AUTH_METHOD": "Autentiseringsmetod",
+      "CUSTOM_APP_CANCEL": "Avbryt",
+      "CUSTOM_APP_CREATE": "Skapa app"
     },
     "NAMEDIALOG": {
       "TITLE": "Byt namn på app",
@@ -2753,6 +2774,90 @@
     "LOGINV2": {
       "USEV2": "Använd nya inloggningsgränssnittet",
       "BASEURL": "Anpassad bas-URL för det nya inloggningsgränssnittet"
+    },
+    "QUICKSTART": "Snabbstart",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Snabbstart",
+      "DESCRIPTION": "Få din applikation igång med ZITADEL-autentisering.",
+      "GETSTARTED": "Kom igång med din applikation",
+      "GETSTARTED_DESC": "Den här guiden hjälper dig att snabbt och enkelt integrera ZITADEL-autentisering i din applikation.",
+      "FRAMEWORK": "Ramverk",
+      "VIEWDOCS": "Visa Dokumentation",
+      "VIEWEXAMPLE": "Visa Exempel",
+      "ENVVARS": "Miljövariabler",
+      "ENVVARS_DESC": "Lägg till dessa miljövariabler i din applikation:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Var vill du börja?",
+      "QUICKSTART_SUBTITLE": "Välj det alternativ som bäst beskriver din situation:",
+      "OPTION1": "Alternativ 1: Klona Exempelapplikation",
+      "OPTION1_DESC": "Kom igång snabbt med en fungerande exempelapplikation:",
+      "OPTION1_NOTE": "Efter kloning, uppdatera miljövariablerna med dina applikationsdetaljer.",
+      "OPTION2": "Alternativ 2: Integrera Befintlig Applikation",
+      "OPTION2_DESC": "Integrera ZITADEL-autentisering i din befintliga applikation:",
+      "STEP1": "Installera ZITADEL SDK för ditt ramverk",
+      "STEP2": "Konfigurera dina miljövariabler",
+      "STEP3": "Lägg till autentisering i din applikation",
+      "STEP4": "Testa integrationen",
+      "GENERIC": "Allmän Integration",
+      "GENERIC_DESC": "Välj från våra omfattande exempel och guider:",
+      "ALLEXAMPLES": "Alla Exempel",
+      "INTEGRATION_GUIDE": "Integrationsguide",
+      "NEXTSTEPS": "Nästa Steg",
+      "CONFIGURE": "Konfigurera Inställningar",
+      "CONFIGURE_DESC": "Anpassa din apps OIDC-konfiguration",
+      "REDIRECTS": "Ställ in Omdirigeringar",
+      "REDIRECTS_DESC": "Konfigurera omdirigerings- och utloggnings-URL:er",
+      "URLS_DESC": "Visa viktiga URL:er för integration",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Jag vill skapa en helt ny applikation",
+      "SCENARIO_NEW_DESC": "Perfekt! Vi hjälper dig att snabbt komma igång med ett fungerande exempel som har inbyggd ZITADEL-autentisering.",
+      "SCENARIO_NEW_TOGGLE": "Jag har inte en applikation ännu",
+      "SCENARIO_EXISTING_TITLE": "Jag vill integrera i en befintlig applikation",
+      "SCENARIO_EXISTING_DESC": "Bra! Vi guidar dig steg för steg för att lägga till ZITADEL-autentisering i din nuvarande applikation.",
+      "SCENARIO_EXISTING_TOGGLE": "Jag har en befintlig applikation",
+      "CLONE_EXAMPLE": "Klona Exempel",
+      "CLONE_NOTE": "Efter kloning, uppdatera .env-filen med dina applikationsdetaljer ovan och du är redo!",
+      "BROWSE_EXAMPLES": "Bläddra bland Alla Exempel",
+      "GENERIC_NEW_NOTE": "Välj ett exempel som matchar din teknikstack och klona det för att snabbt komma igång.",
+      "EXISTING_STEP1_TITLE": "Installera SDK",
+      "EXISTING_STEP1_DESC": "Lägg till SDK:n i ditt projekt",
+      "EXISTING_STEP2_TITLE": "Lägg till din konfiguration",
+      "EXISTING_STEP2_DESC": "Kopiera och klistra in dessa miljövariabler i din applikations konfigurationsfil",
+      "EXISTING_STEP3_TITLE": "Ställ in autentisering",
+      "EXISTING_STEP3_DESC": "Följ vår steg-för-steg integrationsguide för att lägga till autentisering i din applikation",
+      "VIEW_SDKS": "Visa SDK Dokumentation",
+      "AUTH_STATUS_CHECKING": "Kontrollerar autentiseringsstatus...",
+      "AUTH_STATUS_SUCCESS": "Din app har autentiserats med ZITADEL.",
+      "AUTH_STATUS_PENDING": "Väntar på första användarautentisering.",
+      "AUTH_STATUS_PENDING_DESC": "Följ integrationsguiden nedan för att konfigurera autentisering.",
+      "SUCCESS_TITLE": "🎉 Fantastiskt! Din app är framgångsrikt ansluten",
+      "SUCCESS_DESC": "Din applikation har autentiserats framgångsrikt med ZITADEL. Du kan nu använda miljövariablerna nedan för din integration.",
+      "ENVVARS_AUTHENTICATED_DESC": "Använd dessa miljövariabler i din applikation:",
+      "INTEGRATION_ENVVARS_TITLE": "Din Applikations Konfiguration",
+      "INTEGRATION_ENVVARS_DESC": "Lägg till dessa miljövariabler i din applikation för att ansluta till ZITADEL:",
+      "NEW_STEP1_TITLE": "Klona exempelapplikationen",
+      "NEW_STEP1_DESC": "Kom igång snabbt med ett fungerande exempel som har inbyggd ZITADEL-autentisering.",
+      "NEW_STEP2_TITLE": "Konfigurera dina miljövariabler",
+      "NEW_STEP2_DESC": "Lägg till dessa miljövariabler i din applikation. Klistra in dem i en .env-fil i projektets rot eller ladda ner .env-filen och spara den.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Uppdatera exempelns .env.example-fil med dessa värden och döp sedan om den till .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Byt ut 'your-client-secret' mot din faktiska klienthemlighet. Om du inte sparade den under appskapandet, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "generera en ny här",
+      "NEW_STEP3_TITLE": "Kör och testa din applikation",
+      "NEW_STEP3_DESC": "Installera beroenden.",
+      "NEW_STEP3_DESC2": "Starta din applikation och testa autentiseringsflödet.",
+      "NEW_STEP4_TITLE": "Visa dokumentationen",
+      "NEW_STEP4_DESC": "Följ vår guide om hur du anpassar och utökar din applikation med ZITADEL.",
+      "STEP4_ACTION": "Visa Dokumentation",
+      "GENERIC_NEW_TITLE": "Välj din startpunkt",
+      "GENERIC_EXISTING_TITLE": "Välj din integrationsmetod",
+      "GENERIC_EXISTING_NOTE": "Eftersom inget specifikt SDK är tillgängligt för ditt ramverk kan du använda våra generella integrationsguider eller arbeta direkt med OIDC/OAuth2-endpoints.",
+      "API_DOCS": "API Dokumentation",
+      "NEW_STEP_DOCS_TITLE": "Visa omfattande dokumentation",
+      "NEW_STEP_DOCS_DESC": "Lär dig mer om avancerade konfigurationsalternativ och bästa praxis för ditt ramverk.",
+      "EXISTING_STEP_DOCS_TITLE": "Lär dig mer om integration",
+      "EXISTING_STEP_DOCS_DESC": "Utforska vår detaljerade dokumentation för avancerad konfiguration och felsökning.",
+      "SELECT_FRAMEWORK": "Välj ditt ramverk",
+      "SELECT_FRAMEWORK_DESC": "Välj det ramverk du använder för skräddarsydda integrationsanvisningar och exempel."
     }
   },
   "GENDERS": {
@@ -2787,10 +2892,10 @@
     "ADD": "Lägg till en administratör",
     "CREATIONTYPE": "Skapandetyp",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organisation",
       "0": "Eget Projekt",
       "1": "Beviljat Projekt",
+      "2": "Organisation",
+      "3": "IAM",
       "4": "Projekt"
     },
     "EDITROLE": "Redigera roller",

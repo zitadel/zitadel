@@ -435,7 +435,8 @@
     "TOS": "Условия за ползване",
     "OPENSHORTCUTSTOOLTIP": "Тип ? ",
     "SETTINGS": "Настройки",
-    "CUSTOMERPORTAL": "Портал за клиенти"
+    "CUSTOMERPORTAL": "Портал за клиенти",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Интегрирайте ZITADEL във вашето приложение",
@@ -526,7 +527,8 @@
       "SHOWUSER": "Покажи потребител {{value}}"
     },
     "DOWNLOAD": "Изтегляне",
-    "APPLY": "Прилагам"
+    "APPLY": "Прилагам",
+    "SETUP": "Setup"
   },
   "ACTIONSTWO": {
     "BETA_NOTE": "В момента използвате новата версия Actions V2, която е в бета фаза. Предишната версия 1 все още е достъпна, но ще бъде спряна в бъдеще. Моля, съобщавайте за всякакви проблеми или изпратете обратна връзка.",
@@ -1501,7 +1503,9 @@
       "SECURITY": "Настройки на сигурността",
       "EVENTS": "Събития",
       "FAILEDEVENTS": "Неуспешни събития",
-      "VIEWS": "Изгледи"
+      "VIEWS": "Изгледи",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Главна информация",
@@ -1511,7 +1515,8 @@
       "TEXTS": "Текстове и езици",
       "APPEARANCE": "Външен вид",
       "OTHER": "други",
-      "STORAGE": "Съхранение"
+      "STORAGE": "Съхранение",
+      "ACTIONS": "Actions"
     },
     "BETA": "БЕТА"
   },
@@ -2172,7 +2177,8 @@
       "UPDATED": "Проектът е променен.",
       "GRANTUPDATED": "Грант се промени.",
       "DELETED": "Проектът е изтрит."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2230,6 +2236,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Въведете идентификационните данни за вашия LDAP доставчик"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2364,7 +2378,26 @@
     "ISIDTOKENMAPPING": "Съответствие от ID токен",
     "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка.",
     "USEPKCE": "Използвайте PKCE",
-    "USEPKCE_DESC": "Определя дали параметрите code_challenge и code_challenge_method са включени в заявката за удостоверяване"
+    "USEPKCE_DESC": "Определя дали параметрите code_challenge и code_challenge_method са включени в заявката за удостоверяване",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "EMPTY": "No IdP available",
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2437,7 +2470,11 @@
         "DELETE_TITLE": "Изтриване на SMTP конфигурация",
         "DELETE_DESCRIPTION": "На път сте да изтриете конфигурация. Потвърдете това действие, като въведете името на подателя",
         "DELETED": "SMTP конфигурацията е изтрита",
-        "SENDER": "Въведете {{ value }}, за да изтриете тази SMTP конфигурация."
+        "SENDER": "Въведете {{ value }}, за да изтриете тази SMTP конфигурация.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2484,11 +2521,18 @@
       "TITLE": "Приложение",
       "ID": "документ за самоличност",
       "DESCRIPTION": "Тук можете да редактирате данните на вашето приложение и неговата конфигурация.",
-      "CREATE": "Създайте приложение",
-      "CREATE_SELECT_PROJECT": "Първо изберете своя проект",
-      "CREATE_NEW_PROJECT": "или създайте нов <a href='{{url}}' title='Create project'>тук</a>.",
-      "CREATE_DESC_TITLE": "Въведете подробностите за вашето приложение стъпка по стъпка",
-      "CREATE_DESC_SUB": "Автоматично ще се генерира препоръчителна конфигурация.",
+      "QUICK_CREATE_TITLE": "Създаване на приложение",
+      "QUICK_CREATE_DESC": "Създайте приложение в три лесни стъпки.",
+      "QUICK_CREATE_FRAMEWORK": "Изберете вашия framework",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Предоставяме ви препоръчителна конфигурация за вашето приложение. Изберете framework-а, който използвате или възнамерявате да използвате.",
+      "QUICK_CREATE_NAME": "Именувайте вашето приложение",
+      "CREATE": "Създаване на приложение",
+      "CREATE_PROJECT_AUTO": "Автоматично създаване на проект",
+      "CREATE_PROJECT_AUTO_DESC": "Препоръчва се, ако сте нов в ZITADEL. Ние ще се погрижим за настройката на проекта вместо вас.",
+      "CREATE_SELECT_PROJECT": "Изберете вашия проект",
+      "CREATE_NEW_PROJECT": "Въведете име, за да създадете нов проект",
+      "CREATE_DESC_TITLE": "Въведете детайли за приложението стъпка по стъпка",
+      "CREATE_DESC_SUB": "Препоръчителната конфигурация ще бъде генерирана автоматично.",
       "STATE": "Статус",
       "DATECREATED": "Създаден",
       "DATECHANGED": "Променен",
@@ -2526,7 +2570,15 @@
           "DESC": "Прочетете нашата документация за създаване на приложения или се свържете с нашата поддръжка"
         },
         "TITLE": "Следващи стъпки"
-      }
+      },
+      "CUSTOM_APP_TITLE": "Персонализирано приложение",
+      "CUSTOM_APP_DESC": "Ще създадем вашия проект и приложение с конфигурацията, която изберете по-долу.",
+      "CUSTOM_APP_NAME": "Име на приложението",
+      "CUSTOM_APP_NAME_LABEL": "Име",
+      "CUSTOM_APP_TYPE": "Тип приложение",
+      "CUSTOM_APP_AUTH_METHOD": "Метод за удостоверяване",
+      "CUSTOM_APP_CANCEL": "Отказ",
+      "CUSTOM_APP_CREATE": "Създаване на приложение"
     },
     "NAMEDIALOG": {
       "TITLE": "Преименуване на приложението",
@@ -2719,6 +2771,90 @@
     "LOGINV2": {
       "USEV2": "Използвайте новия интерфейс за вход",
       "BASEURL": "Персонализиран основен URL адрес за новия интерфейс за вход"
+    },
+    "QUICKSTART": "Бърз старт",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Бърз старт",
+      "DESCRIPTION": "Стартирайте вашето приложение с удостоверяване чрез ZITADEL.",
+      "GETSTARTED": "Започнете с вашето приложение",
+      "GETSTARTED_DESC": "Това ръководство ще ви помогне бързо и лесно да интегрирате удостоверяване чрез ZITADEL във вашето приложение.",
+      "FRAMEWORK": "Фреймуърк",
+      "VIEWDOCS": "Виж документацията",
+      "VIEWEXAMPLE": "Виж пример",
+      "ENVVARS": "Променливи на средата",
+      "ENVVARS_DESC": "Добавете тези променливи на средата към вашето приложение:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Каква е началната ви точка?",
+      "QUICKSTART_SUBTITLE": "Изберете опцията, която най-добре описва вашата ситуация:",
+      "OPTION1": "Опция 1: Клонирайте примерното приложение",
+      "OPTION1_DESC": "Стартирайте бързо с работещо примерно приложение:",
+      "OPTION1_NOTE": "След клониране обновете променливите на средата с детайлите на вашето приложение.",
+      "OPTION2": "Опция 2: Интегрирайте съществуващо приложение",
+      "OPTION2_DESC": "Интегрирайте удостоверяване чрез ZITADEL във вашето съществуващо приложение:",
+      "STEP1": "Инсталирайте ZITADEL SDK за вашия фреймуърк",
+      "STEP2": "Конфигурирайте вашите променливи на средата",
+      "STEP3": "Добавете удостоверяване към вашето приложение",
+      "STEP4": "Тествайте интеграцията",
+      "GENERIC": "Обща интеграция",
+      "GENERIC_DESC": "Изберете от нашите изчерпателни примери и ръководства:",
+      "ALLEXAMPLES": "Всички примери",
+      "INTEGRATION_GUIDE": "Ръководство за интеграция",
+      "NEXTSTEPS": "Следващи стъпки",
+      "CONFIGURE": "Конфигурирайте настройки",
+      "CONFIGURE_DESC": "Персонализирайте OIDC конфигурацията на приложението",
+      "REDIRECTS": "Настройте пренасочвания",
+      "REDIRECTS_DESC": "Конфигурирайте URL адресите за пренасочване и излизане",
+      "URLS_DESC": "Вижте важни URL адреси за интеграция",
+      "TERMINAL": "Терминал",
+      "SCENARIO_NEW_TITLE": "Искам да създам чисто ново приложение",
+      "SCENARIO_NEW_DESC": "Чудесно! Ще ви помогнем да започнете бързо с работещ пример, който има вградено удостоверяване чрез ZITADEL.",
+      "SCENARIO_NEW_TOGGLE": "Нямам приложение",
+      "SCENARIO_EXISTING_TITLE": "Искам да интегрирам в съществуващо приложение",
+      "SCENARIO_EXISTING_DESC": "Супер! Ще ви преведем през стъпките за добавяне на удостоверяване чрез ZITADEL.",
+      "SCENARIO_EXISTING_TOGGLE": "Имам съществуващо приложение",
+      "CLONE_EXAMPLE": "Клонирайте пример",
+      "CLONE_NOTE": "След клониране просто обновете .env файла с вашите детайли и сте готови!",
+      "BROWSE_EXAMPLES": "Разгледайте всички примери",
+      "GENERIC_NEW_NOTE": "Изберете пример, който съответства на вашия технологичен стек и го клонирайте, за да започнете бързо.",
+      "EXISTING_STEP1_TITLE": "Инсталирайте SDK",
+      "EXISTING_STEP1_DESC": "Добавете SDK към вашия проект",
+      "EXISTING_STEP2_TITLE": "Добавете вашата конфигурация",
+      "EXISTING_STEP2_DESC": "Копирайте и поставете тези променливи на средата във файла за конфигурация на вашето приложение",
+      "EXISTING_STEP3_TITLE": "Настройте удостоверяването",
+      "EXISTING_STEP3_DESC": "Следвайте нашето ръководство стъпка по стъпка, за да добавите удостоверяване",
+      "VIEW_SDKS": "Виж SDK документация",
+      "AUTH_STATUS_CHECKING": "Проверка на състоянието на удостоверяване...",
+      "AUTH_STATUS_SUCCESS": "Вашето приложение е удостоверено със ZITADEL.",
+      "AUTH_STATUS_PENDING": "Изчакване на първа потребителска автентификация.",
+      "AUTH_STATUS_PENDING_DESC": "Следвайте ръководството за интеграция по-долу, за да настроите удостоверяването.",
+      "SUCCESS_TITLE": "🎉 Чудесно! Вашето приложение е успешно свързано",
+      "SUCCESS_DESC": "Вашето приложение успешно е удостоверено със ZITADEL. Вече можете да използвате променливите на средата по-долу.",
+      "ENVVARS_AUTHENTICATED_DESC": "Използвайте тези променливи на средата във вашето приложение:",
+      "INTEGRATION_ENVVARS_TITLE": "Конфигурация на вашето приложение",
+      "INTEGRATION_ENVVARS_DESC": "Добавете тези променливи на средата, за да свържете приложението със ZITADEL:",
+      "NEW_STEP1_TITLE": "Клонирайте примерното приложение",
+      "NEW_STEP1_DESC": "Стартирайте бързо с работещ пример с вградено удостоверяване.",
+      "NEW_STEP2_TITLE": "Конфигурирайте вашите променливи",
+      "NEW_STEP2_DESC": "Добавете тези променливи към приложението си. Поставете ги в .env файл в корена на проекта или изтеглете готовия файл.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Обновете файла .env.example с тези стойности и го преименувайте на .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Заменете 'your-client-secret' с вашия реален клиентски секрет. Ако не сте го запазили, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "генерирайте нов тук",
+      "NEW_STEP3_TITLE": "Стартирайте и тествайте приложението",
+      "NEW_STEP3_DESC": "Инсталирайте зависимости.",
+      "NEW_STEP3_DESC2": "Стартирайте приложението и тествайте потока за удостоверяване.",
+      "NEW_STEP4_TITLE": "Вижте документацията",
+      "NEW_STEP4_DESC": "Следвайте нашето ръководство за персонализиране и разширяване на приложението.",
+      "STEP4_ACTION": "Виж документация",
+      "GENERIC_NEW_TITLE": "Изберете начална точка",
+      "GENERIC_EXISTING_TITLE": "Изберете подход за интеграция",
+      "GENERIC_EXISTING_NOTE": "Тъй като няма конкретен SDK за вашия фреймуърк, можете да използвате общите ни ръководства или директно OIDC/OAuth2.",
+      "API_DOCS": "API документация",
+      "NEW_STEP_DOCS_TITLE": "Вижте подробната документация",
+      "NEW_STEP_DOCS_DESC": "Научете повече за напреднали настройки и добри практики.",
+      "EXISTING_STEP_DOCS_TITLE": "Научете повече за интеграцията",
+      "EXISTING_STEP_DOCS_DESC": "Разгледайте подробно нашата документация за конфигурация и отстраняване на проблеми.",
+      "SELECT_FRAMEWORK": "Изберете вашия фреймуърк",
+      "SELECT_FRAMEWORK_DESC": "Изберете фреймуърка, който използвате, за да получите персонализирани инструкции и примери."
     }
   },
   "GENDERS": {
