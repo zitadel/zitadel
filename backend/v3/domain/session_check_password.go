@@ -15,11 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// tarpitFn represents a tarpit function
-//
-// The input is the number of failed attempts after which the tarpit is started
-type tarpitFn func(failedAttempts uint64)
-
 type CheckPasswordType struct {
 	Password string
 }
