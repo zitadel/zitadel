@@ -326,9 +326,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 	settingsRepo := repository.BrandingSettingsRepository()
 
-	before := time.Now()
+	before := time.Now().Add(-time.Second)
 	newInstance := integration.NewInstance(t.Context())
-	after := time.Now()
+	after := time.Now().Add(time.Second)
 
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
@@ -413,10 +413,10 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 	t.Run("test label settings activated", func(t *testing.T) {
 		// activate label
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		_, err := newInstance.Client.Admin.ActivateLabelPolicy(IAMCTX, &admin.ActivateLabelPolicyRequest{})
 		require.NoError(t, err)
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -436,9 +436,9 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 	t.Run("test policy label logo light added", func(t *testing.T) {
 		// set logo light
-		before := time.Now()
+		before := time.Now().Add(-time.Second)
 		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/logo", bytes.NewReader(picture))
-		after := time.Now()
+		after := time.Now().Add(time.Second)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
