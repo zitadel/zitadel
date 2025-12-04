@@ -202,7 +202,9 @@ func (s session) Update(ctx context.Context, client database.QueryExecutor, cond
 		sessionCTE(change, i, 0, &builder)
 	}
 	builder.WriteString("UPDATE zitadel.sessions SET ")
-	database.Changes(changes).Write(&builder)
+	if err := database.Changes(changes).Write(&builder); err != nil {
+		return 0, err
+	}
 	writeCondition(&builder, condition)
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
