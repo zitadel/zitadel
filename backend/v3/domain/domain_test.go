@@ -5,13 +5,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/passwap"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
+		domain.SetPasswordHasher(&crypto.Hasher{Swapper: &passwap.Swapper{}})
 		return m.Run()
 	}())
 }
