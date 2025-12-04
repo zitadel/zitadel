@@ -642,6 +642,48 @@ describe("sendLoginname", () => {
       // Verify org discovery was NOT called since org was provided
       expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
+
+    test("should redirect to password when ignoreUnknownUsernames is true, allowRegister is true, but allowUsernamePassword is false (User not found)", async () => {
+      mockSearchUsers.mockResolvedValue({ result: [] });
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: false,
+        ignoreUnknownUsernames: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true, user found but rejected due to disableLoginWithEmail", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" }, phone: { phone: "123456" } } },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithEmail: true,
+        ignoreUnknownUsernames: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
   });
 
   describe("Edge cases", () => {
