@@ -23,21 +23,26 @@ func NewLegalAndSupportSettingsRepo(ctrl *gomock.Controller) *LegalAndSupportSet
 }
 
 func (lssr *LegalAndSupportSettingsRepo) EXPECT() *MockLegalAndSupportSettingsRepositoryMockRecorder {
+	lssr.mock.ctrl.T.Helper()
 	return lssr.mock.EXPECT()
 }
 
 func (lssr *LegalAndSupportSettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LegalAndSupportSettings, error) {
+	lssr.mock.ctrl.T.Helper()
 	return lssr.mock.Get(ctx, client, opts...)
 }
 
 func (lssr *LegalAndSupportSettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LegalAndSupportSettings, error) {
+	lssr.mock.ctrl.T.Helper()
 	return lssr.mock.List(ctx, client, opts...)
 }
 
 func (lssr *LegalAndSupportSettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LegalAndSupportSettings) error {
+	lssr.mock.ctrl.T.Helper()
 	return lssr.mock.Set(ctx, client, settings)
 }
 
 func (lssr *LegalAndSupportSettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	lssr.mock.ctrl.T.Helper()
 	return lssr.mock.Delete(ctx, client, condition)
 }
