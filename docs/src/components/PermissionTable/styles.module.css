@@ -1,0 +1,73 @@
+.container {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 2rem 0;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.table {
+  border-collapse: separate; /* Required for sticky to work */
+  border-spacing: 0;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.table th,
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  border-right: 1px solid var(--ifm-color-emphasis-200);
+  white-space: nowrap;
+}
+
+/* Sticky Header Row */
+.table thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--ifm-background-surface-color);
+  z-index: 10;
+  border-bottom: 2px solid var(--ifm-color-emphasis-300);
+  text-align: left;
+  font-weight: bold;
+}
+
+/* Sticky First Column (Permission Name) */
+.table tbody th {
+  position: sticky;
+  left: 0;
+  background-color: var(--ifm-background-surface-color);
+  z-index: 5;
+  border-right: 2px solid var(--ifm-color-emphasis-300);
+  text-align: left;
+  /*font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-primary);*/
+}
+
+/* Top Left Corner Intersection */
+.table thead th:first-child {
+  left: 0;
+  z-index: 20;
+  border-right: 2px solid var(--ifm-color-emphasis-300);
+}
+
+/* Cell Coloring */
+.yes {
+  background-color: rgba(0, 255, 0, 0.1); /* Light green tint */
+  color: var(--ifm-color-success);
+  text-align: center;
+  font-weight: bold;
+}
+
+.no {
+  color: var(--ifm-color-emphasis-400);
+  text-align: center;
+  font-size: 0.8em;
+}
+
+/* Dark mode adjustments automatically handled by Docusaurus CSS vars, 
+   but ensuring background opacity works */
+[data-theme='dark'] .yes {
+  background-color: rgba(0, 255, 0, 0.15);
+}
