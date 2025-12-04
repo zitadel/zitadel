@@ -9,6 +9,14 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// tarpitFn represents a tarpit function
+//
+// The input is the number of failed attempts after which the tarpit is started
+type tarpitFn func(failedAttempts uint64)
+
+// totpValidateFn represents a function to validate TOTP
+type totpValidateFn func(toValidate, verifier string) bool
+
 func getLockoutPolicy(ctx context.Context, db database.QueryExecutor, lockoutSettingsRepo LockoutSettingsRepository, instanceID, orgID string) (*LockoutSettings, error) {
 	// We need the organization lockout policy first, and if not available, the instance (default) policy.
 	// So we retrieve all records with a matching instance ID and organization ID OR
