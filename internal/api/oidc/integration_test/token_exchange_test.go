@@ -52,13 +52,6 @@ func setTokenExchangeFeature(t *testing.T, instance *integration.Instance, value
 	time.Sleep(time.Second)
 }
 
-func resetFeatures(t *testing.T, instance *integration.Instance) {
-	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	_, err := instance.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
-	require.NoError(t, err)
-	time.Sleep(time.Second)
-}
-
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
@@ -147,7 +140,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userResp := instance.CreateHumanUser(ctx)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
@@ -371,7 +364,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	setTokenExchangeFeature(t, instance, true)
 	setImpersonationPolicy(t, instance, true)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
@@ -591,7 +584,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx)
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)

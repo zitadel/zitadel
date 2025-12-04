@@ -1,0 +1,65 @@
+ExternalSecure: false
+TLS.Enabled: false
+
+FirstInstance:
+  PatPath: /pat/zitadel-admin-sa.pat
+  Org:
+    Human:
+      UserName: zitadel-admin
+      FirstName: ZITADEL
+      LastName: Admin
+      Password: Password1!
+      PasswordChangeRequired: false
+      PreferredLanguage: en
+    Machine:
+      Machine:
+        Username: zitadel-admin-sa
+        Name: Admin
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
+    LoginClient:
+      Machine:
+        Username: login-client-sa
+        Name: Login Client
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
+
+DefaultInstance:
+  LoginPolicy:
+    AllowUsernamePassword: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWUSERNAMEPASSWORD
+    AllowRegister: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWREGISTER
+    AllowExternalIDP: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWEXTERNALIDP
+    ForceMFA: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_FORCEMFA
+    HidePasswordReset: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_HIDEPASSWORDRESET
+    IgnoreUnknownUsernames: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_IGNOREUNKNOWNUSERNAMES
+    AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
+    # 1 is allowed, 0 is not allowed
+    PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
+    # DefaultRedirectURL is empty by default because we use the Console UI
+    DefaultRedirectURI: # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
+    # 240h = 10d
+    PasswordCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDCHECKLIFETIME
+    # 240h = 10d
+    ExternalLoginCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_EXTERNALLOGINCHECKLIFETIME
+    # 720h = 30d
+    MfaInitSkipLifetime: 0h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME
+    SecondFactorCheckLifetime: 18h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_SECONDFACTORCHECKLIFETIME
+    MultiFactorCheckLifetime: 12h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MULTIFACTORCHECKLIFETIME
+  PrivacyPolicy:
+    TOSLink: "https://zitadel.com/docs/legal/terms-of-service"
+    PrivacyLink: "https://zitadel.com/docs/legal/policies/privacy-policy"
+    HelpLink: "https://zitadel.com/docs"
+    SupportEmail: "support@zitadel.com"
+    DocsLink: "https://zitadel.com/docs"
+
+Database:
+  EventPushConnRatio: 0.2 # 4
+  ProjectionSpoolerConnRatio: 0.3 # 6
+  postgres:
+    Host: db
+    MaxOpenConns: 20
+    MaxIdleConns: 20
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
+    User.Password: zitadel
+
+Logstore.Access.Stdout.Enabled: true
+Log.Formatter.Format: json

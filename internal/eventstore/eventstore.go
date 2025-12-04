@@ -2,17 +2,27 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"sort"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func init() {
+	// this is needed to ensure that position is marshaled as a number
+	// otherwise it will be marshaled as a string
+	decimal.MarshalJSONWithoutQuotes = true
+}
 
 // Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
@@ -84,6 +94,19 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 // PushWithClient pushes the events in a single transaction using the provided database client
 // an event needs at least an aggregate
 func (es *Eventstore) PushWithClient(ctx context.Context, client database.ContextQueryExecuter, cmds ...Command) ([]Event, error) {
+	var dbClient new_db.QueryExecutor
+	switch client := client.(type) {
+	case *sql.DB:
+		dbClient = new_sql.SQLPool(client)
+	case *sql.Tx:
+		dbClient = new_sql.SQLTx(client)
+	case *sql.Conn:
+		dbClient = new_sql.SQLConn(client)
+	}
+	return es.PushWithNewClient(ctx, dbClient, cmds...)
+}
+
+func (es *Eventstore) PushWithNewClient(ctx context.Context, client new_db.QueryExecutor, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -101,7 +124,7 @@ retry:
 	for i := 0; i <= es.maxRetries; i++ {
 		events, err = es.pusher.Push(ctx, client, cmds...)
 		// if there is a transaction passed the calling function needs to retry
-		if _, ok := client.(database.Tx); ok {
+		if _, ok := client.(new_db.Transaction); ok {
 			break retry
 		}
 		var pgErr *pgconn.PgError
@@ -229,11 +252,11 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 	})
 }
 
-// LatestSequence filters the latest sequence for the given search query
-func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
+// LatestPosition filters the latest position for the given search query
+func (es *Eventstore) LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error) {
 	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
 
-	return es.querier.LatestSequence(ctx, queryFactory)
+	return es.querier.LatestPosition(ctx, queryFactory)
 }
 
 // InstanceIDs returns the distinct instance ids found by the search query
@@ -265,8 +288,8 @@ type Querier interface {
 	Health(ctx context.Context) error
 	// FilterToReducer calls r for every event returned from the storage
 	FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r Reducer) error
-	// LatestSequence returns the latest sequence found by the search query
-	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
+	// LatestPosition returns the latest position found by the search query
+	LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
 	// Client returns the underlying database connection
@@ -277,9 +300,7 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, client database.ContextQueryExecuter, commands ...Command) (_ []Event, err error)
-	// Client returns the underlying database connection
-	Client() *database.DB
+	Push(ctx context.Context, client new_db.QueryExecutor, commands ...Command) (_ []Event, err error)
 }
 
 type FillFieldsEvent interface {

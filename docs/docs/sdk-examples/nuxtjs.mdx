@@ -1,0 +1,88 @@
+---
+title: Nuxt.js
+sidebar_label: Nuxt.js
+framework_url: https://nuxt.com
+auth_library: next-auth
+auth_library_url: https://next-auth.js.org
+example_repo: https://github.com/zitadel/example-auth-nuxtjs
+auth_flow: pkce
+status: stable
+---
+
+## Overview
+
+[Nuxt.js](https://nuxt.com) is the intuitive [Vue.js](https://vuejs.org) framework that enables you to create full-stack web applications with server-side rendering, file-based routing, and auto-imports. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
+
+#### Auth library
+
+This example uses **[@sidebase/nuxt-auth](https://www.npmjs.com/package/@sidebase/nuxt-auth)**, a Nuxt module that wraps **[NextAuth.js/Auth.js](https://next-auth.js.org)** for seamless authentication integration. Under the hood, it leverages **[next-auth](https://www.npmjs.com/package/next-auth)** with the **[openid-client](https://www.npmjs.com/package/openid-client)** library to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](/docs/concepts/pkce), perform token exchange, and handle [session management](https://zitadel.com/docs/concepts/structure/sessions).
+
+---
+
+## What this example demonstrates
+
+This [Nuxt.js](https://nuxt.com) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with the **[PKCE flow](/docs/concepts/pkce)**. Users begin on a public landing page where they can initiate sign-in with Zitadel through the **[@sidebase/nuxt-auth](https://www.npmjs.com/package/@sidebase/nuxt-auth)** module. After successful authentication, they're redirected to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+
+The example implements secure [session management](https://zitadel.com/docs/concepts/structure/sessions) using [JWT tokens](https://zitadel.com/docs/concepts/structure/tokens) with automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) capabilities through [refresh tokens](https://zitadel.com/docs/concepts/structure/tokens#refresh-token). Protected routes automatically redirect unauthenticated users to the sign-in flow using [Nuxt middleware](https://nuxt.com/docs/guide/directory-structure/middleware), ensuring sensitive areas remain secure. The application also includes complete **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** functionality that properly terminates both the local session and the Zitadel session through the [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), redirecting users back to the application with proper CSRF protection using state parameters.
+
+---
+
+## Getting started
+
+### Prerequisites
+
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/`)
+5. Copy your **Client ID** for use in the next steps
+
+> **Note:** Make sure to enable **Dev Mode** in the Zitadel Console if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your Zitadel application configured:
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-nuxtjs).
+2. Create a `.env` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). **Use these exact environment variable names:**
+```
+   PORT=3000
+   SESSION_DURATION=3600
+   NUXT_AUTH_SECRET=your-very-secret-and-strong-session-key
+   ZITADEL_DOMAIN=https://your-zitadel-domain
+   ZITADEL_CLIENT_ID=your-client-id
+   ZITADEL_CLIENT_SECRET=your-randomly-generated-client-secret
+   ZITADEL_CALLBACK_URL=http://localhost:3000/api/auth/callback/zitadel
+   ZITADEL_POST_LOGOUT_URL=http://localhost:3000/
+   AUTH_ORIGIN=http://localhost:3000
+```
+Replace these values with:
+   - Your actual Zitadel instance URL (the **Issuer** from your [ZITADEL instance settings](https://zitadel.com/docs/guides/manage/console/overview))
+   - The **Client ID** you copied when creating the application
+   - A randomly generated **NUXT_AUTH_SECRET** for session encryption (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+   - The **callback URI** you configured in the PKCE setup (must match exactly)
+   - The **post-logout redirect URI** you configured in the PKCE setup
+3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
+```bash
+   npm install
+   npm run dev
+```
+
+The application will be running at `http://localhost:3000` where you can test the complete authentication flow.
+
+---
+
+## Learn more and resources
+
+* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
+* **PKCE concept:** [/docs/concepts/pkce](/docs/concepts/pkce)
+* **PKCE application setup:** [/docs/guides/integrate/login/oidc/pkce-setup](/docs/guides/integrate/login/oidc/pkce-setup)
+* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* **Framework docs:** [https://nuxt.com](https://nuxt.com)
+* **@sidebase/nuxt-auth:** [https://www.npmjs.com/package/@sidebase/nuxt-auth](https://www.npmjs.com/package/@sidebase/nuxt-auth)
+* **NextAuth.js/Auth.js:** [https://next-auth.js.org](https://next-auth.js.org)
+* **Example repository:** [https://github.com/zitadel/example-auth-nuxtjs](https://github.com/zitadel/example-auth-nuxtjs)
+* **All framework examples:** [/docs/examples](/docs/examples)

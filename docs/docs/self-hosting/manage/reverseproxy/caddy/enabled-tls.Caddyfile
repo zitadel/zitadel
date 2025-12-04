@@ -1,5 +1,6 @@
 https://127.0.0.1.sslip.io {
 	tls /etc/certs/selfsigned.crt /etc/certs/selfsigned.key
+	reverse_proxy /ui/v2/login/* http://login-enabled-tls:3000
 	reverse_proxy https://zitadel-enabled-tls:8080 {
 		transport http {
 			tls_insecure_skip_verify

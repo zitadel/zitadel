@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
     InvalidURLTemplate: URL Template ist ungültig
+    Locked: Benutzer ist gesperrt
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profil nicht verändert
@@ -115,6 +116,7 @@ Errors:
       AlreadyVerified: Telefonnummer bereits verifiziert
       Empty: Telefonnummer ist leer
       NotChanged: Telefonnummer wurde nicht geändert
+      VerifyingRemovalIsNotSupported: Verifizieren der Telefonnummer Entfernung wird nicht unterstützt
     Address:
       NotFound: Adresse nicht gefunden
       NotChanged: Adresse wurde nicht geändert
@@ -176,6 +178,11 @@ Errors:
         NotExisting: U2F existiert nicht
       Passwordless:
         NotExisting: Passwortlos existiert nicht
+      RecoveryCodes:
+        InvalidCode: Ungültiger Wiederherstellungscode angegeben
+        MaxCountExceeded: Maximale Anzahl von Wiederherstellungscodes überschritten
+        NotReady: Wiederherstellungscodes sind nicht bereit für die Verwendung
+        ConfigInvalid: Wiederherstellungscodes-Konfiguration ist ungültig
     WebAuthN:
       NotFound: WebAuthN Token konnte nicht gefunden werden
       BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten
@@ -193,7 +200,7 @@ Errors:
     AlreadyExists: Instanz exisitiert bereits
     NotChanged: Instanz wurde nicht verändert
   Org:
-    AlreadyExists: Organisationsname existiert bereits
+    AlreadyExists: Der Name oder die ID der Organisation ist bereits vorhanden
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv
@@ -435,8 +442,6 @@ Errors:
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
     IDMissing: ID fehlt
-    NotActive: Benutzer Berechtigung ist nicht aktiv
-    NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
     RoleKeyNotFound: Rolle konnte nicht gefunden werden
   Member:

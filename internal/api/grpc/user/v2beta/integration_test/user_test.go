@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,6 +30,7 @@ import (
 var (
 	CTX       context.Context
 	IamCTX    context.Context
+	LoginCTX  context.Context
 	UserCTX   context.Context
 	SystemCTX context.Context
 	Instance  *integration.Instance
@@ -44,10 +44,11 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
-		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		UserCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeNoPermission)
+		IamCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		CTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2beta
 		return m.Run()
 	}())
@@ -639,7 +640,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -866,7 +867,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1192,7 +1193,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1210,7 +1211,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				SystemCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1226,7 +1227,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				IamCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1242,7 +1243,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				CTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			wantErr: true,
@@ -1253,7 +1254,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				UserCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(gofakeit.Username()),
+					Username: gu.Ptr(integration.Username()),
 				},
 			},
 			wantErr: true,
@@ -1291,6 +1292,17 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.LockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.LockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.LockUserRequest) error { return nil },
 			},
@@ -1405,6 +1417,17 @@ func TestServer_UnLockUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.UnlockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.UnlockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "unlock, not locked",
 			args: args{
 				ctx: CTX,
@@ -1507,6 +1530,17 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.DeactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.DeactivateUserRequest) error { return nil },
 			},
@@ -1621,6 +1655,17 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.ReactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.ReactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "reactivate, not deactivated",
 			args: args{
 				ctx: CTX,
@@ -1706,12 +1751,11 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	projectResp := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 	type args struct {
 		ctx     context.Context
 		req     *user.DeleteUserRequest
-		prepare func(request *user.DeleteUserRequest) error
+		prepare func(request *user.DeleteUserRequest)
 	}
 	tests := []struct {
 		name    string
@@ -1726,7 +1770,18 @@ func TestServer_DeleteUser(t *testing.T) {
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(request *user.DeleteUserRequest) error { return nil },
+				nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeleteUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.DeleteUserRequest) {},
 			},
 			wantErr: true,
 		},
@@ -1735,10 +1790,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1753,10 +1807,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
-					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1771,13 +1824,12 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
+					Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
-					return err
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1790,8 +1842,9 @@ func TestServer_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.prepare(tt.args.req)
-			require.NoError(t, err)
+			if tt.args.prepare != nil {
+				tt.args.prepare(tt.args.req)
+			}
 
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
@@ -1886,7 +1939,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpID := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
@@ -1941,7 +1994,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1972,7 +2025,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2003,7 +2056,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2034,7 +2087,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2061,7 +2114,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2085,7 +2138,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2109,7 +2162,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				postForm: true,
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+				postForm:           true,
 			},
 			wantErr: false,
 		},
@@ -2123,9 +2178,11 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			if tt.want.url != "" {
+			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
+
+				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
@@ -2136,7 +2193,15 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				}
 			}
 			if tt.want.postForm {
-				assert.NotEmpty(t, got.GetPostForm())
+				assert.Equal(t, tt.want.url, got.GetFormData().GetUrl())
+
+				require.Len(t, got.GetFormData().GetFields(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				for _, existing := range tt.want.parametersExisting {
+					assert.Contains(t, got.GetFormData().GetFields(), existing)
+				}
+				for key, equal := range tt.want.parametersEqual {
+					assert.Equal(t, got.GetFormData().GetFields()[key], equal)
+				}
 			}
 			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
 				Details: tt.want.details,
@@ -2146,8 +2211,8 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
-	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
+	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, integration.IDPName()).GetId()
+	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, integration.IDPName()).GetId()
 	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
 	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())

@@ -4,12 +4,12 @@ package org_test
 
 import (
 	"context"
-	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -27,7 +27,7 @@ type orgAttr struct {
 }
 
 func createOrganization(ctx context.Context, name string) orgAttr {
-	orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
+	orgResp := Instance.CreateOrganization(ctx, name, integration.Email())
 	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
 	return orgAttr{
 		ID:      orgResp.GetOrganizationId(),
@@ -36,6 +36,23 @@ func createOrganization(ctx context.Context, name string) orgAttr {
 	}
 }
 
+func createOrganizationWithCustomOrgID(ctx context.Context, name string, orgID string) orgAttr {
+	orgResp := Instance.CreateOrganizationWithCustomOrgID(ctx, name, orgID)
+	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
+	return orgAttr{
+		ID:      orgResp.GetOrganizationId(),
+		Name:    name,
+		Details: orgResp.GetDetails(),
+	}
+}
+
+// TODO(IAM-Marco): When permission checks will be implemented, this test needs to be updated to
+// add the feature flag switch:
+//
+//	relTableState := integration.RelationalTablesEnableMatrix()
+//
+// See TestServer_ListOrganizations in org/v2beta/integration_test
+// See https://github.com/zitadel/zitadel/issues/10219
 func TestServer_ListOrganizations(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -89,11 +106,12 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Queries: []*org.SearchQuery{
 						OrganizationIdQuery(Instance.DefaultOrg.Id),
 					},
+					SortingColumn: org.OrganizationFieldName_ORGANIZATION_FIELD_NAME_NAME,
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					count := 3
 					orgs := make([]orgAttr, count)
-					prefix := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
+					prefix := integration.OrganizationName()
 					for i := 0; i < count; i++ {
 						name := prefix + strconv.Itoa(i)
 						orgs[i] = createOrganization(ctx, name)
@@ -101,6 +119,10 @@ func TestServer_ListOrganizations(t *testing.T) {
 					request.Queries = []*org.SearchQuery{
 						OrganizationNamePrefixQuery(prefix),
 					}
+
+					slices.SortFunc(orgs, func(a, b orgAttr) int {
+						return -1 * strings.Compare(a.Name, b.Name)
+					})
 					return orgs, nil
 				},
 			},
@@ -152,6 +174,35 @@ func TestServer_ListOrganizations(t *testing.T) {
 						},
 						Id:            Instance.DefaultOrg.Id,
 						PrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+					},
+				},
+			},
+		},
+		{
+			name: "list org by custom id, ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{},
+				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
+					orgs := make([]orgAttr, 1)
+					name := integration.OrganizationName()
+					orgID := integration.ID()
+					orgs[0] = createOrganizationWithCustomOrgID(ctx, name, orgID)
+					request.Queries = []*org.SearchQuery{
+						OrganizationIdQuery(orgID),
+					}
+					return orgs, nil
+				},
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 					},
 				},
 			},
@@ -229,9 +280,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 				&org.ListOrganizationsRequest{},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
-					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
-					orgs[0] = createOrganization(ctx, name)
-					domain := gofakeit.DomainName()
+					orgs[0] = createOrganization(ctx, integration.OrganizationName())
+					domain := integration.DomainName()
 					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
 						Domain: domain,
 					})
@@ -265,7 +315,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Queries: []*org.SearchQuery{},
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
-					name := gofakeit.Name()
+					name := integration.OrganizationName()
 					orgResp := createOrganization(ctx, name)
 					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.ID)
 					request.Queries = []*org.SearchQuery{

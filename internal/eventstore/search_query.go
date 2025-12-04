@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -23,9 +25,7 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
-	lockRows              bool
-	lockOption            LockOption
-	positionAfter         float64
+	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -76,8 +76,8 @@ func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 	return b.tx
 }
 
-func (b SearchQueryBuilder) GetPositionAfter() float64 {
-	return b.positionAfter
+func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
+	return b.positionAtLeast
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -96,10 +96,6 @@ func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 	return q.creationDateBefore
 }
 
-func (q SearchQueryBuilder) GetLockRows() (bool, LockOption) {
-	return q.lockRows, q.lockOption
-}
-
 // ensureInstanceID makes sure that the instance id is always set
 func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
 	if b.instanceID == nil && len(b.instanceIDs) == 0 && authz.GetInstance(ctx).InstanceID() != "" {
@@ -113,7 +109,7 @@ type SearchQuery struct {
 	aggregateIDs   []string
 	eventTypes     []EventType
 	eventData      map[string]interface{}
-	positionAfter  float64
+	positionAfter  decimal.Decimal
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -132,7 +128,7 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 	return q.eventData
 }
 
-func (q SearchQuery) GetPositionAfter() float64 {
+func (q SearchQuery) GetPositionAfter() decimal.Decimal {
 	return q.positionAfter
 }
 
@@ -156,8 +152,8 @@ type Columns int8
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent = iota + 1
-	// ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence
+	// ColumnsMaxPosition represents the latest sequence of the filtered events
+	ColumnsMaxPosition
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs
 
@@ -284,9 +280,9 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	return builder
 }
 
-// PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
-	builder.positionAfter = position
+// PositionAtLeast filters for events which happened after the specified time
+func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
+	builder.positionAtLeast = position
 	return builder
 }
 
@@ -317,27 +313,6 @@ func (builder *SearchQueryBuilder) CreationDateBefore(creationDate time.Time) *S
 		return builder
 	}
 	builder.creationDateBefore = creationDate
-	return builder
-}
-
-type LockOption int
-
-const (
-	// Wait until the previous lock on all of the selected rows is released (default)
-	LockOptionWait LockOption = iota
-	// With NOWAIT, the statement reports an error, rather than waiting, if a selected row cannot be locked immediately.
-	LockOptionNoWait
-	// With SKIP LOCKED, any selected rows that cannot be immediately locked are skipped.
-	LockOptionSkipLocked
-)
-
-// LockRowsDuringTx locks the found rows for the duration of the transaction,
-// using the [`FOR UPDATE`](https://www.postgresql.org/docs/17/sql-select.html#SQL-FOR-UPDATE-SHARE) lock strength.
-// The lock is removed on transaction commit or rollback.
-func (builder *SearchQueryBuilder) LockRowsDuringTx(tx *sql.Tx, option LockOption) *SearchQueryBuilder {
-	builder.tx = tx
-	builder.lockRows = true
-	builder.lockOption = option
 	return builder
 }
 
@@ -393,7 +368,7 @@ func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	return query
 }
 
-func (query *SearchQuery) PositionAfter(position float64) *SearchQuery {
+func (query *SearchQuery) PositionAfter(position decimal.Decimal) *SearchQuery {
 	query.positionAfter = position
 	return query
 }

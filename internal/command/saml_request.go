@@ -119,6 +119,9 @@ func (c *Commands) FailSAMLRequest(ctx context.Context, id string, reason domain
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled")
 	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+		return nil, nil, err
+	}
 	err = c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewFailedEvent(
 		ctx,
 		&samlrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,

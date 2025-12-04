@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -299,6 +300,8 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 		tokens = s.Tokens
 	case *jwt.Session:
 		tokens = s.Tokens
+	case *github.Session:
+		tokens = s.Tokens()
 	case *azuread.Session:
 		tokens = s.Tokens()
 	case *apple.Session:

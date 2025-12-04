@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: 초기화 코드를 찾을 수 없습니다
     UsernameNotChanged: 사용자 이름이 변경되지 않았습니다
     InvalidURLTemplate: URL 템플릿이 잘못되었습니다
+    Locked: 사용자가 잠겨 있습니다
     Profile:
       NotFound: 프로필을 찾을 수 없습니다
       NotChanged: 프로필이 변경되지 않았습니다
@@ -116,6 +117,7 @@ Errors:
       AlreadyVerified: 전화번호가 이미 인증되었습니다
       Empty: 전화번호가 비어 있습니다
       NotChanged: 전화번호가 변경되지 않았습니다
+      VerifyingRemovalIsNotSupported: 전화번호 제거를 확인하는 것은 지원되지 않습니다
     Address:
       NotFound: 주소를 찾을 수 없습니다
       NotChanged: 주소가 변경되지 않았습니다
@@ -177,6 +179,11 @@ Errors:
         NotExisting: U2F가 존재하지 않습니다
       Passwordless:
         NotExisting: 패스워드리스가 존재하지 않습니다
+      RecoveryCodes:
+        InvalidCode: 잘못된 복구 코드가 제공되었습니다
+        MaxCountExceeded: 최대 복구 코드 수가 초과되었습니다
+        NotReady: 복구 코드가 사용할 준비가 되지 않았습니다
+        ConfigInvalid: 복구 코드 구성이 잘못되었습니다
     WebAuthN:
       NotFound: WebAuthN 토큰을 찾을 수 없습니다
       BeginRegisterFailed: WebAuthN 등록 시작에 실패했습니다
@@ -194,7 +201,7 @@ Errors:
     AlreadyExists: 인스턴스가 이미 존재합니다
     NotChanged: 인스턴스가 변경되지 않았습니다
   Org:
-    AlreadyExists: 조직 이름이 이미 사용 중입니다
+    AlreadyExists: 조직 이름 또는 ID가 이미 사용 중입니다
     Invalid: 조직이 유효하지 않습니다
     AlreadyDeactivated: 조직이 이미 비활성화되었습니다
     AlreadyActive: 조직이 이미 활성화되었습니다
@@ -436,8 +443,6 @@ Errors:
     Invalid: 사용자 권한이 유효하지 않습니다
     NotChanged: 사용자 권한이 변경되지 않았습니다
     IDMissing: ID가 누락되었습니다
-    NotActive: 사용자 권한이 활성 상태가 아닙니다
-    NotInactive: 사용자 권한이 비활성 상태가 아닙니다
     NoPermissionForProject: 사용자가 이 프로젝트에 대한 권한이 없습니다
     RoleKeyNotFound: 역할을 찾을 수 없습니다
   Member:

@@ -38,10 +38,10 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/zitadel/zitadel/pkg/actions"
+	"github.com/zitadel/zitadel-go/v3/pkg/actions"
 )
 
-const signingKey = "somekey"
+const signingKey = "somekey" // signing key received after creating the target
 
 // webhook HandleFunc to read the request body and then print out the contents
 func webhook(w http.ResponseWriter, req *http.Request) {
@@ -54,7 +54,7 @@ func webhook(w http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close()
 	// validate signature
-	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
+	if err := actions.ValidateRequestPayload(sentBody, &req.Header, signingKey); err != nil {
 		// if the signed content is not equal the sent content return an error
 		http.Error(w, "error", http.StatusInternalServerError)
 		return
@@ -72,6 +72,12 @@ func main() {
 }
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
@@ -79,7 +85,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -93,7 +99,15 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 }'
 ```
 
-Save the returned ID to set in the execution.
+Example response after creating the target:
+```json
+{
+    "id": "344649040681500814",
+    "creationDate": "2025-10-31T15:00:36.432595dZ",
+    "signingKey": "somekey"
+}
+```
+Save the returned ID to set in the execution. Use the `signingKey` to validate the request signature.
 
 ## Set execution
 
@@ -103,20 +117,18 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
-        {
-            "target": "<TargetID returned>"
-        }
+        "<TargetID returned>"
     ]
 }'
 ```
@@ -127,17 +139,27 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "344648897353810062",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini+test@mouse.com"
+        }
     }
 }'
 ```
@@ -145,21 +167,51 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 Your server should now print out something like the following. Check out
 the [Sent information Request](./usage#sent-information-request) payload description.
 
-```shell
+```json
 {
-  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
-  "instanceID": "262851882718855632",
-  "orgID": "262851882718921168",
-  "projectID": "262851882719052240",
-  "userID": "262851882718986704",
-  "request": {
-    "profile": {
-      "given_name": "Example_given",
-      "family_name": "Example_family"
-    },
-    "email": {
-      "email": "example@example.com"
+  "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
+  "instanceID": "344648897353744526",
+  "orgID": "344648897353810062",
+  "projectID": "344648897353875598",
+  "userID": "344648897354465422",
+  "request":
+  {
+    "organizationId": "344648897353810062",
+    "human":
+    {
+      "profile":
+      {
+        "givenName": "Minnie",
+        "familyName": "Mouse",
+        "nickName": "Mini",
+        "displayName": "Minnie Mouse",
+        "preferredLanguage": "en",
+        "gender": "GENDER_FEMALE"
+      },
+      "email":
+      {
+        "email": "mini+test@mouse.com"
+      }
     }
+  },
+  "headers":
+  {
+    "Content-Type":
+    [
+      "application/grpc"
+    ],
+    "Host":
+    [
+      "localhost:8080"
+    ],
+    "X-Forwarded-For":
+    [
+      "::1"
+    ],
+    "X-Forwarded-Host":
+    [
+      "localhost:8080"
+    ]
   }
 }
 ```

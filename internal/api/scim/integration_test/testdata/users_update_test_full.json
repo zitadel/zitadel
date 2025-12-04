@@ -7,7 +7,7 @@
       "value": {
         "emails":[
           {
-            "value":"babs@example.com",
+            "value":"{{ .Username }}+2@example.com",
             "type":"home",
             "primary": true
           }

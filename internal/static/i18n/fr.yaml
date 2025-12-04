@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Code d'initialisation non trouvé
     UsernameNotChanged: Nom d'utilisateur non modifié
     InvalidURLTemplate: Le modèle d'URL n'est pas valide
+    Locked: L'utilisateur est verrouillé
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
@@ -115,6 +116,7 @@ Errors:
       AlreadyVerified: Téléphone déjà vérifié
       Empty: Téléphone est vide
       NotChanged: Téléphone n'a pas changé
+      VerifyingRemovalIsNotSupported: La vérification de la suppression n'est pas prise en charge
     Address:
       NotFound: Adresse non trouvée
       NotChanged: L'adresse n'a pas changé
@@ -176,6 +178,11 @@ Errors:
         NotExisting: L'U2F n'existe pas
       Passwordless:
         NotExisting: Passwordless n'existe pas
+      RecoveryCodes:
+        InvalidCode: Code de récupération invalide fourni
+        MaxCountExceeded: Nombre maximum de codes de récupération dépassé
+        NotReady: Les codes de récupération ne sont pas prêts à être utilisés
+        ConfigInvalid: La configuration des codes de récupération est invalide
     WebAuthN:
       NotFound: Le token WebAuthN n'a pas été trouvé
       BeginRegisterFailed: L'enregistrement de WebAuthN a échoué
@@ -193,7 +200,7 @@ Errors:
     AlreadyExists: L'instance existe déjà
     NotChanged: L'instance n'a pas changé
   Org:
-    AlreadyExists: Le nom de l'organisation est déjà pris
+    AlreadyExists: Le nom de l'organisation ou l'identifiant est déjà pris
     Invalid: L'organisation n'est pas valide
     AlreadyDeactivated: L'organisation est déjà désactivée
     AlreadyActive: L'organisation est déjà active
@@ -435,8 +442,6 @@ Errors:
     Invalid: La subvention d'utilisateur n'est pas valide
     NotChanged: L'autorisation de l'utilisateur n'a pas été modifiée.
     IDMissing: Id manquant
-    NotActive: La subvention de l'utilisateur n'est pas active
-    NotInactive: La subvention à l'utilisateur n'est pas désactivée
     NoPermissionForProject: L'utilisateur n'a aucune autorisation pour ce projet
     RoleKeyNotFound: Rôle non trouvé
   Member:

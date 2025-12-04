@@ -16,9 +16,11 @@ type SAMLIDPAddedEvent struct {
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       string                   `json:"binding,omitempty"`
+	SignatureAlgorithm            string                   `json:"signatureAlgorithm,omitempty"`
 	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
+	FederatedLogoutEnabled        bool                     `json:"federatedLogoutEnabled,omitempty"`
 	Options
 }
 
@@ -31,8 +33,10 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options Options,
 ) *SAMLIDPAddedEvent {
 	return &SAMLIDPAddedEvent{
@@ -44,8 +48,10 @@ func NewSAMLIDPAddedEvent(
 		Certificate:                   certificate,
 		Binding:                       binding,
 		WithSignedRequest:             withSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithm,
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: transientMappingAttributeName,
+		FederatedLogoutEnabled:        federatedLogoutEnabled,
 		Options:                       options,
 	}
 }
@@ -81,8 +87,10 @@ type SAMLIDPChangedEvent struct {
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       *string                  `json:"binding,omitempty"`
 	WithSignedRequest             *bool                    `json:"withSignedRequest,omitempty"`
+	SignatureAlgorithm            *string                  `json:"signatureAlgorithm,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName *string                  `json:"transientMappingAttributeName,omitempty"`
+	FederatedLogoutEnabled        *bool                    `json:"federatedLogoutEnabled,omitempty"`
 	OptionChanges
 }
 
@@ -142,6 +150,12 @@ func ChangeSAMLWithSignedRequest(withSignedRequest bool) func(*SAMLIDPChangedEve
 	}
 }
 
+func ChangeSAMLSignatureAlgorithm(signatureAlgorithm string) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.SignatureAlgorithm = &signatureAlgorithm
+	}
+}
+
 func ChangeSAMLNameIDFormat(nameIDFormat *domain.SAMLNameIDFormat) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.NameIDFormat = nameIDFormat
@@ -151,6 +165,12 @@ func ChangeSAMLNameIDFormat(nameIDFormat *domain.SAMLNameIDFormat) func(*SAMLIDP
 func ChangeSAMLTransientMappingAttributeName(name string) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.TransientMappingAttributeName = &name
+	}
+}
+
+func ChangeSAMLFederatedLogoutEnabled(federatedLogoutEnabled bool) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.FederatedLogoutEnabled = &federatedLogoutEnabled
 	}
 }
 

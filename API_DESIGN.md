@@ -48,6 +48,52 @@ When creating a new service, start with version `2`, as version `1` is reserved 
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
 
+### Deprecations
+
+As a rule of thumb, redundant API methods are deprecated.
+
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` MUST be set to true.
+- One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
+- Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
+
+#### Example
+
+```protobuf
+// Delete the user phone
+//
+// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+//
+// Delete the phone number of a user.
+rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+  option (google.api.http) = {
+    delete: "/v2/users/{user_id}/phone"
+    body: "*"
+  };
+
+  option (zitadel.protoc_gen_zitadel.v2.options) = {
+    auth_option: {
+      permission: "authenticated"
+    }
+  };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    deprecated: true;
+    responses: {
+      key: "200"
+      value: {
+        description: "OK";
+      }
+    };
+    responses: {
+      key: "404";
+      value: {
+        description: "User ID does not exist.";
+      }
+    }
+  };
+}
+```
+
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
@@ -89,6 +135,8 @@ message CreateUserRequest {
 ```
 
 Only allow providing a context where it is required. The context MUST not be provided if not required.
+If the context is required but deferrable, the context can be defaulted.
+For example, creating an Authorization without an organization id will default the organization id to the projects resource owner.
 For example, when retrieving or updating a user, the `organization_id` is not required, since the user can be determined by the user's id.
 However, it is possible to provide the `organization_id` as a filter to retrieve a list of users of a specific organization.
 
@@ -160,6 +208,8 @@ The same applies to messages that are returned by multiple resources.
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
 as part of an authorization or a manager role, where only limited information is needed.
 
+On the other hand, types that always follow the same pattern and are used in multiple resources, such as `IDFilter`, `TimestampFilter` or `InIDsFilter` SHOULD be globalized and reused.
+
 ##### Re-using messages
 
 Prevent reusing messages for the creation and the retrieval of a resource.
@@ -202,7 +252,7 @@ Methods on a resource MUST be named using the following convention:
 | Create    | Create\<resource\> | Create a new resource. If the new resource conflicts with an existing resources uniqueness (id, loginname, ...) the creation MUST be prevented and an error returned.                                                                       |
 | Update    | Update\<resource\> | Update an existing resource. In most cases this SHOULD allow partial updates. If there are exception, they MUST be explicitly documented on the endpoint. The resource MUST already exists. An error is returned otherwise.                 |
 | Delete    | Delete\<resource\> | Delete an existing resource. If the resource does not exist, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented.                                                                    |
-| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. It SHOULD allow partial changes. |
+| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. |
 | Get       | Get\<resource\>    | Retrieve a single resource by its unique identifier. If the resource does not exist, an error MUST be returned.                                                                                                                             |
 | List      | List\<resource\>   | Retrieve a list of resources. The endpoint SHOULD provide options to filter, sort and paginate.                                                                                                                                             |
 
@@ -249,7 +299,7 @@ Which results in an example path for status changes like `/v2beta/users/12345678
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+Permissions granted to the user might be organization specific and can therefore only be checked based on the queried resource.
 In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
 If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
 In any case, the required permissions need to be documented in the [API documentation](#documentation).

@@ -25,8 +25,6 @@ const (
 	LabelPolicyFontAddedEventType   = "policy.label.font.added"
 	LabelPolicyFontRemovedEventType = "policy.label.font.removed"
 
-	LabelPolicyAssetsRemovedEventType = "policy.label.assets.removed"
-
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
 
@@ -70,7 +68,6 @@ func NewLabelPolicyAddedEvent(
 	disableWatermark bool,
 	themeMode domain.LabelPolicyThemeMode,
 ) *LabelPolicyAddedEvent {
-
 	return &LabelPolicyAddedEvent{
 		BaseEvent:           *base,
 		PrimaryColor:        primaryColor,

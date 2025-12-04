@@ -11,7 +11,8 @@ import (
 )
 
 type GenerateMachineSecret struct {
-	ClientSecret string
+	PermissionCheck PermissionCheck
+	ClientSecret    string
 }
 
 func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, resourceOwner string, set *GenerateMachineSecret) (*domain.ObjectDetails, error) {
@@ -35,14 +36,14 @@ func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, res
 
 func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *GenerateMachineSecret) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
+		if a.ResourceOwner == "" && set.PermissionCheck == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bzoqjs", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, set.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -62,9 +63,10 @@ func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *Generate
 	}
 }
 
-func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string, permissionCheck PermissionCheck) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg))
+	//nolint:staticcheck
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg, permissionCheck))
 	if err != nil {
 		return nil, err
 	}
@@ -81,16 +83,16 @@ func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resou
 	}, nil
 }
 
-func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
+func prepareRemoveMachineSecret(a *user.Aggregate, check PermissionCheck) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
+		if a.ResourceOwner == "" && check == nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bzosjs", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter, check)
 			if err != nil {
 				return nil, err
 			}
@@ -109,17 +111,8 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 
 func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, resourceOwner, updated string) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds := append(
-		make([]eventstore.Command, 0, 2),
-		user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate),
-	)
 	if updated != "" {
-		cmds = append(cmds, user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated))
+		cmds := []eventstore.Command{user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated)}
+		c.asyncPush(ctx, cmds...)
 	}
-	c.asyncPush(ctx, cmds...)
-}
-
-func (c *Commands) MachineSecretCheckFailed(ctx context.Context, userID, resourceOwner string) {
-	agg := user.NewAggregate(userID, resourceOwner)
-	c.asyncPush(ctx, user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate))
 }

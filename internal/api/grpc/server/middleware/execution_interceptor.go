@@ -3,23 +3,26 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_middleware"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
-	"github.com/zitadel/zitadel/internal/query"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
+func ExecutionHandler(alg crypto.EncryptionAlgorithm) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, info.FullMethod)
-
+		requestTargets := execution.QueryExecutionTargetsForRequest(ctx, info.FullMethod)
 		// call targets otherwise return req
-		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req)
+		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -29,11 +32,12 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response)
+		responseTargets := execution.QueryExecutionTargetsForResponse(ctx, info.FullMethod)
+		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response, alg)
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (_ interface{}, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req interface{}, alg crypto.EncryptionAlgorithm) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -42,6 +46,7 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 		return req, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoRequest{
 		FullMethod: fullMethod,
@@ -50,12 +55,13 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info)
+	return execution.CallTargets(ctx, targets, info, alg)
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req, resp interface{}, alg crypto.EncryptionAlgorithm) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -64,6 +70,7 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		return resp, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoResponse{
 		FullMethod: fullMethod,
@@ -73,20 +80,22 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
 		Response:   Message{resp.(proto.Message)},
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info)
+	return execution.CallTargets(ctx, targets, info, alg)
 }
 
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 type Message struct {
@@ -124,13 +133,14 @@ func (c *ContextInfoRequest) GetContent() interface{} {
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Response   Message     `json:"response,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {

@@ -38,6 +38,11 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 	if err != nil {
 		return nil, err
 	}
+
+	if resourceOwner == "" {
+		resourceOwner = application.ResourceOwner
+	}
+
 	if !application.State.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-sak25", "Errors.Project.App.NotFound")
 	}
@@ -56,6 +61,10 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 	keyWriteModel := NewApplicationKeyWriteModel(key.AggregateID, key.ApplicationID, key.KeyID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := c.checkPermissionUpdateApplication(ctx, keyWriteModel.ResourceOwner, keyWriteModel.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -108,6 +117,10 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 	}
 	if !keyWriteModel.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Project.App.Key.NotFound")
+	}
+
+	if err := c.checkPermissionUpdateApplication(ctx, keyWriteModel.ResourceOwner, keyWriteModel.AggregateID); err != nil {
+		return nil, err
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))

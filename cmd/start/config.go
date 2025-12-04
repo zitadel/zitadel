@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/serviceping"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
@@ -81,6 +82,7 @@ type Config struct {
 	LogStore            *logstore.Configs
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
+	ServicePing         *serviceping.Config
 }
 
 type QuotasConfig struct {
@@ -92,6 +94,36 @@ type QuotasConfig struct {
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
+	config, err := readConfig(v)
+	logging.OnError(err).Fatal("unable to read config")
+
+	err = config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
+
+	err = config.Tracing.NewTracer()
+	logging.OnError(err).Fatal("unable to set tracer")
+
+	err = config.Metrics.NewMeter()
+	logging.OnError(err).Fatal("unable to set meter")
+
+	err = config.Profiler.NewProfiler()
+	logging.OnError(err).Fatal("unable to set profiler")
+
+	id.Configure(config.Machine)
+	if config.Actions != nil {
+		actions.SetHTTPConfig(&config.Actions.HTTP)
+	}
+
+	err = config.SystemDefaults.Validate()
+	logging.OnError(err).Fatal("system defaults config invalid")
+
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
+
+	return config
+}
+
+func readConfig(v *viper.Viper) (*Config, error) {
 	config := new(Config)
 
 	err := v.Unmarshal(config,
@@ -113,27 +145,5 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read config")
-
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
-	err = config.Tracing.NewTracer()
-	logging.OnError(err).Fatal("unable to set tracer")
-
-	err = config.Metrics.NewMeter()
-	logging.OnError(err).Fatal("unable to set meter")
-
-	err = config.Profiler.NewProfiler()
-	logging.OnError(err).Fatal("unable to set profiler")
-
-	id.Configure(config.Machine)
-	if config.Actions != nil {
-		actions.SetHTTPConfig(&config.Actions.HTTP)
-	}
-
-	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
-	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
-
-	return config
+	return config, err
 }

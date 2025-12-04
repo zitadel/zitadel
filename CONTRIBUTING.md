@@ -1,10 +1,83 @@
-# Contributing to ZITADEL
+# Contributing to Zitadel
+
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Docusaurus (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+
+## Quick Start
+
+1. Clone the repository: `git clone https://github.com/zitadel/zitadel` or [open it in a local Dev Container](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/zitadel/zitadel) or [create a GitHub Codespace](https://codespaces.new/zitadel/zitadel)
+2. If you cloned the repository to your local machine, install the required development dependencies
+   - [Node.js v22.x](https://nodejs.org/en/download/) - Required for UI development and to run development commands `pnpm nx ...`
+   - [Go 1.24.x](https://go.dev/doc/install) - Required for API development
+   - [Docker](https://docs.docker.com/engine/install/) - Required for supporting services like the development database and for tests.
+   - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies) - Required for Browser UI tests
+   <details>
+      <summary>WSL2 on Windows 10 users (click to expand)</summary>
+      
+      For Cypress tests on WSL2, you may need to configure X11 forwarding. Following suggestions [here](https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10) and [here](https://github.com/microsoft/WSL/issues/4106). Use at your own risk.
+
+      1. Install `VcXsrv Windows X Server`
+      2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+      3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
+      4. Disable access control when starting XLaunch
+   </details>
+3. Use [Corepack](https://pnpm.io/installation#using-corepack) to make sure you have [pnpm](https://pnpm.io/) installed in the correct version: `corepack enable`.
+4. Install node module dependencies: `pnpm install`
+5. Generate code `pnpm nx run-many --target generate`
+6. Optionally, install the following VSCode plugins:
+   - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
+   - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
+   - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
+   - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
+   - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner tooling
+
+Jump to the dedicated sections for developing a specific project:
+
+- [Contributing to the API](#contribute-to-api)
+- [Contributing to the Login](#contribute-to-login)
+- [Contributing to the Console](#contribute-to-console)
+- [Contributing to the Docs](#contribute-to-docs)
+- [Contributing translations](#contribute-translations)
+
+## Development Commands Cheat Sheet
+
+This repository contains multiple interconnected projects.
+You can build and start any project with Nx commands.
+
+| Task                          | Command                                     | Notes                        | Details                                                                                                                                                                                          |
+| ----------------------------- | ------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Production**                | `pnpm nx run PROJECT:prod`                  | Production server            |                                                                                                                                                                                                  |
+| **Develop**                   | `pnpm nx run PROJECT:dev`                   | Development server           |                                                                                                                                                                                                  |
+| **Generate**                  | `pnpm nx run PROJECT:generate`              | Generate .gitignored files   |                                                                                                                                                                                                  |
+| **Generate Go Files**         | `pnpm nx run @zitadel/api:generate-go`      | Regenerate checked-in files  | This is needed to generate files using [Stringer](https://pkg.go.dev/golang.org/x/tools/cmd/stringer), [Enumer](https://github.com/dmarkham/enumer) or [gomock](https://github.com/uber-go/mock) |
+| **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
+| **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn mnore about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
+| **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
+| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Console and opening the interactive Test Suite](#pass-console-quality-checks)                                                                               |
+| **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
+| **Test**                      | `pnpm nx run PROJECT:test`                  | Run all tests                |                                                                                                                                                                                                  |
+| **Lint**                      | `pnpm nx run PROJECT:lint`                  | Check code style             |                                                                                                                                                                                                  |
+| **Lint Fix**                  | `pnpm nx run PROJECT:lint-fix`              | Auto-fix style issues        |                                                                                                                                                                                                  |
+
+Replace `PROJECT` with one of the following:
+
+- `@zitadel/zitadel` (you can omit this root level project when using `pnpm nx run`, like `pnpm nx run db`)
+- `@zitadel/api`
+- `@zitadel/login`
+- `@zitadel/console`
+- `@zitadel/docs`
+- `@zitadel/client`
+- `@zitadel/proto`
+
+Instead of the project names, you can also use their directory names for `PROJECT`, like `pnpm nx run login:dev`.
+Alternatively, you can use the infix-notation, like `pnpm nx dev @zitadel/login` or `pnpm nx dev login`.
+To stream all logs instead of opening the interactive terminal, disable the TUI with `pnpm nx --tui false ...`.
+If a command is stuck because a process is already running, stop the Nx daemon and try again: `pnpm nx daemon --stop`.
 
 ## Introduction
 
-Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
+Thank you for your interest in contributing! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
 
-Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
+Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclosing these issues to [security@zitadel.com](mailto:security@zitadel.com).
 
 The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
@@ -12,27 +85,33 @@ If you want to give an answer or be part of discussions please be kind. Treat ot
 
 ## What can I contribute?
 
-For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing. You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+For people who are new to Zitadel: We flag issues which are a good starting point to start contributing.
+You can find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+We add the label "good first issue" for problems we think are a good starting point to contribute to Zitadel.
 
-Make ZITADEL more popular and give it a ⭐
+- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [All issues](https://github.com/zitadel/zitadel/issues)
 
-Help shaping the future of ZITADEL:
+Help shape the future of Zitadel:
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
 - Share your thoughts and ideas in the [discussions section](https://github.com/zitadel/zitadel/discussions)
 
-[Contribute](#how-to-contribute)
-
-- [Contribute code](#contribute)
-- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
-- [Translate](#contribute-internationalization) and improve texts
+Make Zitadel more popular and give it a ⭐
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
+[Contribute](#how-to-contribute)
+
+- [Contribute API code](#contribute-to-api)
+- [Contribute frontend code](#contribute-to-frontend)
+- If you found a mistake on our [Docs page](https://zitadel.com/docs) or something is missing please read [the Docs section](#contribute-to-docs)
+- [Translate](#contribute-translations) and improve texts
+
 ## How to contribute
 
-We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
+We strongly recommend [talking to us](https://zitadel.com/contact) before you start contributing to streamline your work with ours.
 
 We accept contributions through pull requests.
 You need a github account for that.
@@ -40,14 +119,29 @@ If you are unfamiliar with git have a look at Github's documentation on [creatin
 Please draft the pull request as soon as possible.
 Go through the following checklist before you submit the final pull request:
 
-### Submit a pull request (PR)
+### Components
+
+The code consists of the following parts:
+
+| name               | description                                        | language                                                                                                  | where to find                                       | Development Guide                                   |
+| ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#contribute-to-api)             |
+| API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
+| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
+| Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
+| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)   |
+| translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
+
+Please follow the guides to validate and test the code before you contribute.
+
+### Submitting a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
    `git checkout -b my-fix-branch main`
 
-3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
+3. Make your changes following the [guidelines](#how-to-contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
@@ -87,7 +181,7 @@ Must be one of the following:
 
 #### Scope
 
-This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
+This is optional to indicate which component is affected. If in doubt, leave blank (`<type>: <short summary>`)
 
 #### Short summary
 
@@ -103,25 +197,6 @@ Please make sure you cover your changes with tests before marking a Pull Request
 - [ ] Integration tests against the gRPC server ensure that all probable login and registration flows are covered."
 - [ ] Integration tests ensure that certain commands emit expected events that trigger notifications.
 - [ ] Integration tests ensure that certain events trigger expected notifications.
-
-## Contribute
-
-The code consists of the following parts:
-
-| name            | description                                                        | language                                                                    | where to find                                      |
-| --------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API                 | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
-| console         | Frontend the user interacts with after log in                      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
-| login           | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template)      | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API                                          | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
-| docs            | Project documentation made with docusaurus                         | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
-
-Please validate and test the code before you contribute.
-
-We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
-
-- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-- [All issues](https://github.com/zitadel/zitadel/issues)
 
 ### General Guidelines
 
@@ -143,87 +218,105 @@ Choose alternative words depending on the context.
 
 ### API
 
-ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
+Zitadel follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
 The API is designed to be used by different clients, such as web applications, mobile applications, and other services.
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-### Developing ZITADEL with Dev Containers
+## Contribute to API
 
-Follow the instructions provided by your code editor/IDE to initiate the development container. This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers". The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+To start developing, make sure you followed the [quick start](#quick-start) steps.
 
-When you are connected to the container run the following commands to start ZITADEL.
+### Develop the API
 
-```bash
-make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
-```
-
-ZITADEL serves traffic as soon as you can see the following log line:
-
-`INFO[0001] server is listening on [::]:8080`
-
-### Backend/login
-
-By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
-With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
-Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
-Once you are happy with your changes, you run end-to-end tests and tear everything down.
-
-ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
-
-The commands in this section are tested against the following software versions:
-
-- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Go version 1.22](https://go.dev/doc/install)
-- [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
-
-Make some changes to the source code, then run the database locally.
+Optionally build the Console
 
 ```bash
-# You just need the db service to develop the backend against.
-docker compose --file ./e2e/docker-compose.yaml up --detach db
+pnpm nx run @zitadel/api:build-console
 ```
 
-Build the binary. This takes some minutes, but you can speed up rebuilds.
+Optionally start the Login in another terminal
 
 ```bash
-make compile
+pnpm nx run @zitadel/login:prod
 ```
 
-> Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `make core_api`  
-> Running unit tests: `make core_unit_test`  
-> Generating the console: `make console_build console_move`  
-> Build the binary: `make compile`
+Run the local development database.
 
-You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
-You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
-Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
+```bash
+pnpm nx db
+```
 
-#### Run Local Unit Tests
+Start a debug session in your IDE.
+For example, in VSCode, you can use a `launch.json` configuration like this.
+
+```json
+   {
+      "name": "Debug Zitadel API",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "env": {
+            "ZITADEL_DATABASE_POSTGRES_HOST": "${env:DEVCONTAINER_DB_HOST}"
+      },
+      "program": "main.go",
+      "args": [
+            "start-from-init",
+            "--config",
+            "${workspaceFolder}/apps/api/prod-default.yaml",
+            "--steps",
+            "${workspaceFolder}/apps/api/prod-default.yaml",
+            "--masterkey",
+            "MasterkeyNeedsToHave32Characters"
+      ]
+   }
+```
+
+If you have built the Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+Call the API using the generated [](./admin.pat) with [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
+
+```bash
+grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zitadel.user.v2.UserService.ListUsers
+```
+
+To connect to the database and explore Zitadel data, run `psql "host=${DEVCONTAINER_DB_HOST:-localhost} dbname=zitadel sslmode=disable"`.
+
+### Run API Unit Tests
 
 To test the code without dependencies, run the unit tests:
 
 ```bash
-make core_unit_test
+pnpm nx run @zitadel/api:test-unit
 ```
 
-#### Run Local Integration Tests
+### Run API Integration Tests
 
-Integration tests are run as gRPC clients against a running ZITADEL server binary.
-The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
-It is also possible to run a ZITADEL sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
+API tests are run as gRPC clients against a running Zitadel server binary.
+The server binary is [built with coverage enabled](https://go.dev/doc/build-cover).
 
-In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
 
 ```bash
-make core_integration_db_up core_integration_server_start
+pnpm nx run @zitadel/api:test-integration
 ```
 
-When this job is finished, you can run individual package integration test through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
-Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results. Pas `-count 1` to disable test caching.
+To develop and run the test cases from within your IDE or by the command line, start only the database and the API.
+The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test.
+Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
+Because of the server-client split, Go is usually unaware of changes in server code and tends to cache test results.
+Pass `-count 1` to disable test caching.
+
+Start the ephemeral database for integration tests.
+
+```bash
+pnpm nx run @zitadel/api:test-integration-run-db
+```
+
+In another terminal, start the API.
+
+```bash
+pnpm nx run @zitadel/api:test-integration-run-api
+```
 
 Example command to run a single package integration test:
 
@@ -234,188 +327,288 @@ go test -count 1 -tags integration ./internal/api/grpc/management/integration_te
 To run all available integration tests:
 
 ```bash
-make core_integration_test_packages
+go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")
 ```
 
-When you change any ZITADEL server code, be sure to rebuild and restart the server before the next test run.
+It is also possible to run the API in a debugger and run the integrations tests against it.
+
+First, start the ephemeral database for integration tests.
 
 ```bash
-make core_integration_server_stop core_integration_server_start
+pnpm nx run @zitadel/api:test-integration-run-db
 ```
 
-To cleanup after testing (deletes the database!):
+When starting the debugger, make sure the Zitadel binary starts with `start-from-init --config=./apps/api/test-integration-api.yaml --steps=./apps/api/test-integration-api.yaml --masterkey=MasterkeyNeedsToHave32Characters"`
+
+To cleanup after testing (deletes the ephemeral database!):
 
 ```bash
-make core_integration_server_stop core_integration_db_down
+pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-integration
 ```
 
-The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
+### Run Functional UI Tests
 
-#### Run Local End-to-End Tests
-
-To test the whole system, including the console UI and the login UI, run the E2E tests.
+To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
-# Build the production docker image
-export ZITADEL_IMAGE=zitadel:local GOOS=linux
-make docker_image
-
-# If you made changes in the e2e directory, make sure you reformat the files
-make console_lint
+# If you made changes in the tests/functional-ui directory, make sure you reformat the files
+pnpm nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
+pnpm nx run @zitadel/functional-ui:test
 ```
 
-When you are happy with your changes, you can cleanup your environment.
+## Contribute Frontend Code
+
+This repository uses **pnpm** as package manager and **Nx** for build orchestration.
+
+### Project Overview
+
+Choose your contribution area:
+
+- **[Login App](#contribute-to-login)** (Next.js/React) - Modern authentication flows
+- **[Console](#contribute-to-console)** (Angular) - Admin dashboard and user management
+- **[Docs](#contribute-to-docs)** (Docusaurus) - Project documentation
+- **[Client Packages](#client-packages)** - Shared libraries for API communication
+
+### Project Dependencies
+
+```
+apps/login → packages/zitadel-client → packages/zitadel-proto
+console → packages/zitadel-client → packages/zitadel-proto
+docs → (independent)
+```
+
+**Nx handles this automatically** - when you change `zitadel-proto`, Nx rebuilds dependent projects.
+
+### Contribute to Login
+
+The Login UI is a Next.js application that provides the user interface for authentication flows.
+It is MIT-licensed, so you are free to change and deploy it as you like.
+It's located in the `apps/login` directory and uses pnpm and Nx for development.
+Get familiar with the [Login ui docs](https://zitadel.com/docs/guides/integrate/login-ui).
+
+To start developing, make sure you followed the [quick start](#quick-start) steps.
+
+#### Develop the Login against a local API
+
+Run the local development database.
 
 ```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
+pnpm nx db
 ```
 
-#### Run Local End-to-End Tests Against Your Dev Server Console
-
-If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
-But you will have to install the relevant node dependencies.
+In another terminal, start the API
 
 ```bash
-# Install dependencies
-(cd ./e2e && npm install)
-
-# Run the tests interactively
-(cd ./e2e && npm run open:golangangular)
-
-# Run the tests non-interactively
-(cd ./e2e && npm run e2e:golangangular)
+pnpm nx run @zitadel/api:prod
 ```
 
-When you are happy with your changes, you can cleanup your environment.
+In another terminal, start the Login development server
 
 ```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
+pnpm nx run @zitadel/login:dev
 ```
 
-### Console
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
-By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
-You use the ZITADEL container as backend for your console.
-The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
-
-We use angular-eslint/Prettier for linting/formatting, so please run `yarn lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
-
-Once you are happy with your changes, you run end-to-end tests and tear everything down.
-
-The commands in this section are tested against the following software versions:
-
-- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Node version v16.17.0](https://nodejs.org/en/download/)
-- [npm version 8.18.0](https://docs.npmjs.com/try-the-latest-stable-version-of-npm)
-- [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
-
-<details>
-  <summary>Note for WSL2 on Windows 10</summary>
-  Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
-
-1. Install `VcXsrv Windows X Server`
-2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
-4. When starting XLaunch, make sure to disable access control
-</details>
-
-Run the database and the latest backend locally.
-
-```bash
-# Change to the console directory
-cd ./console
-
-# You just need the db and the zitadel services to develop the console against.
-docker compose --file ../e2e/docker-compose.yaml up --detach zitadel
-```
-
-When the backend is ready, you have the latest zitadel exposed at http://localhost:8080.
-You can now run a local development server with live code reloading at http://localhost:4200.
-To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
-
-1. Navigate to <http://localhost:8080/ui/console/projects>.
-2. When prompted, login with _zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost_ and _Password1!_
-3. Select the _ZITADEL_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
-
-You can run the local console development server now.
-
-```bash
-# Install npm dependencies
-yarn install
-
-# Generate source files from Protos
-yarn generate
-
-# Start the server
-yarn start
-
-# If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json yarn start
-```
-
-Navigate to http://localhost:4200/.
 Make some changes to the source code and see how the browser is automatically updated.
-After making changes to the code, you should run the end-to-end-tests.
-Open another shell.
 
-```bash
-# Reformat your console code
-yarn lint:fix
+#### Develop against a Cloud instance
 
-# Change to the e2e directory
-cd .. && cd e2e/
+If you don't want to build and run a local API, you can just run the Login development server and point it to a cloud instance.
 
-# If you made changes in the e2e directory, make sure you reformat the files here too
-npm run lint:fix
+1. Create a personal access token and point your instance to your local Login, [as described in the Docs](https://zitadel.com/docs/self-hosting/manage/login-client).
+2. Save the following file to `apps/login/.env.dev.local`
 
-# Install npm dependencies
-npm install
-
-# Run all e2e tests
-npm run e2e:angular -- --headed
+```env
+ZITADEL_API_URL=https://[your-cloud-instance-domain]
+ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
 ```
 
-You can also open the test suite interactively for fast feedback on specific tests.
+3. Start the development server.
 
 ```bash
-# Run tests interactively
-npm run open:angular
+pnpm nx run @zitadel/login:dev
 ```
 
-If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+#### Login Architecture
+
+The Login application consists of multiple packages:
+
+- `@zitadel/login` - Main Next.js application
+- `@zitadel/client` - TypeScript client library for Zitadel APIs
+- `@zitadel/proto` - Protocol buffer definitions and generated code
+
+The build process uses Nx and pnpm to orchestrate dependencies:
+
+#### Pass Login Quality Checks
+
+Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-npm run open:golangangular
-npm run e2e:golangangular
+# Run Login-related linting builds and unit tests
+pnpm nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test
 ```
 
-When you are happy with your changes, you can format your code and cleanup your environment
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+#### <a name="login-deploy"></a>Deploy
+
+- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+- Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
+- Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
+
+### Contribute to Console
+
+To learn more about the Console, go to the Consoles [README.md](./console/README.md).
+
+To start developing, make sure you followed the [quick start](#quick-start) steps.
+
+#### Develop the Console against a local API
+
+Run the local development database.
 
 ```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose down
+pnpm nx db
 ```
 
-## Contribute docs
+In another terminal, start the API
 
-Project documentation is made with docusaurus and is located under [./docs](./docs).
+```bash
+pnpm nx run @zitadel/api:prod
+```
 
-### Local testing
+In another terminal, start the Login
 
-Please refer to the [README](./docs/README.md) for more information and local testing.
+```bash
+pnpm nx run @zitadel/login:prod
+```
 
-### Style guide
+Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
+
+In another terminal, start the Console development server
+
+```bash
+pnpm nx run @zitadel/console:dev
+```
+
+Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+Make some changes to the source code and see how the browser is automatically updated.
+
+#### Develop against a Cloud instance
+
+If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
+
+Save the following file to console/.env.local
+
+```env
+ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/environment.json
+```
+
+Start the development server.
+
+```bash
+pnpm nx run @zitadel/console:dev
+```
+
+Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
+
+Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+#### Configure Console Dev Server Redirects
+
+To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
+
+1. Navigate to http://localhost:8080/ui/console/projects.
+2. Select the _ZITADEL_ project.
+3. Select the _Console_ application.
+4. Select _Redirect Settings_
+5. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+7. Select the _Save_ button
+
+#### Pass Console Quality Checks
+
+Run the quality checks for the code you changed.
+
+```bash
+# Run console-related linting builds and unit tests
+pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
+```
+
+Run functional UI tests against a locally built API and a dev server Console.
+
+Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
+Alternatively, create the file `tests/functional-ui/.env.open.local` with the following content:
+
+```conf
+CYPRESS_BASE_URL=http://localhost:8080/ui/console
+```
+
+```bash
+# Run the API and the Console dev server
+# Beware this doesn't work from within a dev container.
+pnpm nx run @zitadel/functional-ui:open
+```
+
+Or run all tests to completion.
+
+```bash
+# Run the tests
+pnpm nx run @zitadel/functional-ui:test
+```
+
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+### Contribute to Client Packages
+
+To start developing, make sure you followed the [quick start](#quick-start) steps.
+
+**`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
+
+```bash
+pnpm nx run @zitadel/proto:generate  # Regenerate after proto changes
+```
+
+**`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
+
+```bash
+pnpm nx run @zitadel/client:build  # Build after changes
+```
+
+### Contribute to Docs
+
+Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
+
+To start developing, make sure you followed the [quick start](#quick-start) steps.
+
+#### Local Development
+
+```bash
+# Start development server (recommended)
+pnpm nx run @zitadel/docs:dev
+
+# Or start production server
+pnpm nx run @zitadel/docs:prod
+```
+
+The Docs build process automatically:
+
+1. Downloads required protoc plugins
+2. Generates gRPC documentation from proto files
+3. Generates API documentation from OpenAPI specs
+4. Copies configuration files
+5. Builds the Docusaurus site
+
+#### Local testing
+
+The documentation server will be available at http://localhost:3000 with live reload for fast development feedback.
+
+#### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
@@ -431,14 +624,24 @@ The style guide covers a lot of material, so their [highlights](https://develope
 - Use active voice: make clear who's performing the action.
 - Use descriptive link text.
 
-### Docs pull request
+#### Docs pull request
 
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
-## Contribute internationalization
+#### Pass Quality Checks
 
-ZITADEL loads translations from four files:
+Verify the Docs build correctly.
+
+```bash
+pnpm nx run @zitadel/docs:build
+```
+
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+## Contribute Translations
+
+Zitadel loads translations from four files:
 
 - [Console texts](./console/src/assets/i18n)
 - [Login interface](./internal/api/ui/login/static/i18n)
@@ -449,16 +652,12 @@ You may edit the texts in these files or create a new file for additional langua
 Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
 
-You also have to add some changes to the following files: 
+You also have to add some changes to the following files:
+
 - [Register Local File](./console/src/app/app.module.ts)
 - [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
-
-## Want to start ZITADEL?
-
-You can find an installation guide for all the different environments here:
-[https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ## **Did you find a security flaw?**
 
@@ -466,14 +665,14 @@ You can find an installation guide for all the different environments here:
 
 ## Product management
 
-The ZITADEL Team works with an agile product management methodology.
+The Zitadel Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
 
 ### Sprint
 
 We want to deliver a new release every second week. So we plan everything in two-week sprints.
 Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
-After a sprint ends a new version of ZITADEL will be released, and publish to [ZITADEL Cloud](https://zitadel.cloud) the following Monday.
+After a sprint ends a new version of Zitadel will be released, and publish to [Zitadel Cloud](https://zitadel.cloud) the following Monday.
 
 If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
 To show the community the needed information, each issue gets attributes and labels.
@@ -493,15 +692,16 @@ The state should reflect the progress of the issue and what is going on right no
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
 - **📋 Sprint backlog**: The issue is scheduled for the current sprint.
 - **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
+- **❌ Blocked**: The issue is blocked until another issue is resolved/done.
 - **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
 - **✅ Done**: The issue is implemented and merged to main.
 
 #### Priority
 
-Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
+Priority shows you the priority the Zitadel team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
 
 - **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because the software is not usable or highly vulnerable.
-- **🏔 High**: These are the issues the ZITADEL team is currently focusing on and will be implemented as soon as possible.
+- **🏔 High**: These are the issues the Zitadel team is currently focusing on and will be implemented as soon as possible.
 - **🏕 Medium**: After all the high issues are done these will be next.
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
 
@@ -516,18 +716,18 @@ Everything that is higher than 8 should be split in smaller parts.
 
 There are a few general labels that don't belong to a specific category.
 
-- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
-- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on Zitadel.
+- **help wanted**: The author is seeking help on this topic, this may be from an internal Zitadel team member or external contributors.
 
 #### Category
 
-The category shows which part of ZITADEL is affected.
+The category shows which part of Zitadel is affected.
 
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
-- **category: ci**: ci is all about continues integration and pipelines.
-- **category: design**: All about the ux/ui of ZITADEL
+- **category: ci**: ci is all about continuous integration and pipelines.
+- **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the ZITADEL management console (Angular) and on the other hand the login (gohtml)
+- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 

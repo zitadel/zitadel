@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Initialisatiecode niet gevonden
     UsernameNotChanged: Gebruikersnaam niet veranderd
     InvalidURLTemplate: URL-sjabloon is ongeldig
+    Locked: Gebruiker is vergrendeld
     Profile:
       NotFound: Profiel niet gevonden
       NotChanged: Profiel niet veranderd
@@ -115,6 +116,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd
@@ -176,6 +178,11 @@ Errors:
         NotExisting: U2F bestaat niet
       Passwordless:
         NotExisting: Wachtwoordloos bestaat niet
+      RecoveryCodes:
+        InvalidCode: Ongeldige herstelcode opgegeven
+        MaxCountExceeded: Maximum aantal herstelcodes overschreden
+        NotReady: Herstelcodes zijn niet klaar voor gebruik
+        ConfigInvalid: Configuratie van herstelcodes is ongeldig
     WebAuthN:
       NotFound: WebAuthN Token kon niet worden gevonden
       BeginRegisterFailed: WebAuthN begin registratie mislukt
@@ -193,7 +200,7 @@ Errors:
     AlreadyExists: Instantie bestaat al
     NotChanged: Instantie is niet veranderd
   Org:
-    AlreadyExists: Organisatienaam is al in gebruik
+    AlreadyExists: Organisatienaam of -id is al in gebruik
     Invalid: Organisatie is ongeldig
     AlreadyDeactivated: Organisatie is al gedeactiveerd
     AlreadyActive: Organisatie is al actief
@@ -435,8 +442,6 @@ Errors:
     Invalid: Gebruikerstoekenning is ongeldig
     NotChanged: Gebruikerstoekenning is niet veranderd
     IDMissing: ID ontbreekt
-    NotActive: Gebruikerstoekenning is niet actief
-    NotInactive: Gebruikerstoekenning is niet gedeactiveerd
     NoPermissionForProject: Gebruiker heeft geen rechten op dit project
     RoleKeyNotFound: Rol niet gevonden
   Member:

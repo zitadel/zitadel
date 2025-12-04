@@ -65,6 +65,12 @@ func main() {
 
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
@@ -72,7 +78,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -96,7 +102,7 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -107,9 +113,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
         }
     },
     "targets": [
-        {
-            "target": "<TargetID returned>"
-        }
+        "<TargetID returned>"
     ]
 }'
 ```

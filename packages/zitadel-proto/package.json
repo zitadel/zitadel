@@ -1,0 +1,90 @@
+{
+  "packageManager": "pnpm@10.13.1",
+  "name": "@zitadel/proto",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "cjs/**",
+    "es/**",
+    "types/**",
+    "zitadel/**",
+    "google/**",
+    "validate/**",
+    "protoc-gen-openapiv2/**"
+  ],
+  "exports": {
+    "./zitadel/*": {
+      "types": "./types/zitadel/*.d.ts",
+      "import": "./es/zitadel/*.js",
+      "require": "./cjs/zitadel/*.js"
+    },
+    "./zitadel/*.js": {
+      "types": "./types/zitadel/*.d.ts",
+      "import": "./es/zitadel/*.js",
+      "require": "./cjs/zitadel/*.js"
+    },
+    "./validate/*": {
+      "types": "./types/validate/*.d.ts",
+      "import": "./es/validate/*.js",
+      "require": "./cjs/validate/*.js"
+    },
+    "./validate/*.js": {
+      "types": "./types/validate/*.d.ts",
+      "import": "./es/validate/*.js",
+      "require": "./cjs/validate/*.js"
+    },
+    "./google/*": {
+      "types": "./types/google/*.d.ts",
+      "import": "./es/google/*.js",
+      "require": "./cjs/google/*.js"
+    },
+    "./google/*.js": {
+      "types": "./types/google/*.d.ts",
+      "import": "./es/google/*.js",
+      "require": "./cjs/google/*.js"
+    },
+    "./protoc-gen-openapiv2/*": {
+      "types": "./types/protoc-gen-openapiv2/*.d.ts",
+      "import": "./es/protoc-gen-openapiv2/*.js",
+      "require": "./cjs/protoc-gen-openapiv2/*.js"
+    },
+    "./protoc-gen-openapiv2/*.js": {
+      "types": "./types/protoc-gen-openapiv2/*.d.ts",
+      "import": "./es/protoc-gen-openapiv2/*.js",
+      "require": "./cjs/protoc-gen-openapiv2/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "zitadel/*": [
+        "./types/zitadel/*"
+      ],
+      "validate/*": [
+        "./types/validate/*"
+      ],
+      "google/*": [
+        "./types/google/*"
+      ],
+      "protoc-gen-openapiv2/*": [
+        "./types/protoc-gen-openapiv2/*"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "generate": "buf generate ../../proto",
+    "clean": "rm -rf zitadel node_modules google protoc-gen-openapiv2 validate cjs types es"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.6.1"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.55.1",
+    "glob": "^11.0.0"
+  }
+}

@@ -43,6 +43,7 @@ type SessionCommands struct {
 	getCodeVerifier      func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
+	tarpit               func(failedAttempts uint64)
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
@@ -60,6 +61,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		getCodeVerifier:      c.phoneCodeVerifierFromConfig,
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
+		tarpit:               c.tarpit,
 	}
 }
 
@@ -76,7 +78,7 @@ func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag)
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
+		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil, cmd.tarpit)
 		if err != nil {
 			return commands, err
 		}
@@ -135,6 +137,7 @@ func CheckTOTP(code string) SessionCommand {
 			cmd.eventstore.FilterToQueryReducer,
 			cmd.totpAlg,
 			nil,
+			cmd.tarpit,
 		)
 		if err != nil {
 			return commands, err
@@ -216,6 +219,10 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
+func (s *SessionCommands) RecoveryCodeChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewRecoveryCodeCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 	// trigger activity log for session for user
 	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI, s.eventstore.FilterToQueryReducer)
@@ -285,7 +292,13 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.eventCommands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte, userAgent *domain.UserAgent, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(
+	ctx context.Context,
+	cmds []SessionCommand,
+	metadata map[string][]byte,
+	userAgent *domain.UserAgent,
+	lifetime time.Duration,
+) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -295,15 +308,27 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	if err != nil {
 		return nil, err
 	}
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
+		return nil, err
+	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
 	cmd.Start(ctx, userAgent)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(
+	ctx context.Context,
+	sessionID string,
+	cmds []SessionCommand,
+	metadata map[string][]byte,
+	lifetime time.Duration,
+) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
+		return nil, err
+	}
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -328,7 +353,9 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 			return nil, err
 		}
 	}
-	if sessionWriteModel.CheckIsActive() != nil {
+
+	// exclude expiration check as expired tokens can be deleted
+	if sessionWriteModel.State == domain.SessionStateUnspecified || sessionWriteModel.State == domain.SessionStateTerminated {
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 	}
 	terminate := session.NewTerminateEvent(ctx, &session.NewAggregate(sessionWriteModel.AggregateID, sessionWriteModel.ResourceOwner).Aggregate)
@@ -378,6 +405,17 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	changed := sessionWriteModelToSessionChanged(checks.sessionWriteModel)
 	changed.NewToken = sessionToken
 	return changed, nil
+}
+
+// checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
+// In case the user is not set, and the userResourceOwner is not set (also the case for the session creation),
+// it will check permission on the instance.
+func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel) error {
+	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
+	if err != nil {
+		return err
+	}
+	return c.checkPermission(ctx, domain.PermissionSessionWrite, userResourceOwner, model.UserID)
 }
 
 // checkSessionTerminationPermission will check that the provided sessionToken is correct or

@@ -50,6 +50,7 @@ var (
 		` projections.orgs1.resource_owner,` +
 		` projections.orgs1.org_state,` +
 		` projections.orgs1.sequence,` +
+		` projections.orgs1.instance_id,` +
 		` projections.orgs1.name,` +
 		` projections.orgs1.primary_domain` +
 		` FROM projections.orgs1`
@@ -60,6 +61,7 @@ var (
 		"resource_owner",
 		"org_state",
 		"sequence",
+		"instance_id",
 		"name",
 		"primary_domain",
 	}
@@ -242,6 +244,7 @@ func Test_OrgPrepares(t *testing.T) {
 						"ro",
 						domain.OrgStateActive,
 						uint64(20211108),
+						"instance-id",
 						"org-name",
 						"zitadel.ch",
 					},
@@ -254,6 +257,7 @@ func Test_OrgPrepares(t *testing.T) {
 				ResourceOwner: "ro",
 				State:         domain.OrgStateActive,
 				Sequence:      20211108,
+				instanceID:    "instance-id",
 				Name:          "org-name",
 				Domain:        "zitadel.ch",
 			},

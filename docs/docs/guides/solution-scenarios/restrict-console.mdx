@@ -57,7 +57,7 @@ More detailed information about creating a PAT and manager roles you can find [h
 
 Then you have to send the following request:
 ```bash
-curl -L -X PUT "https://$CUSTOM_DOMAIN/management/v1/projects/$PROJECT_ID" \
+curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/$PROJECT_ID" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $PAT" \

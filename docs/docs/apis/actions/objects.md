@@ -145,7 +145,7 @@ This object contains context information about the request to the [authorization
 - `requestedOrgDomain` *bool*
 - `applicationResourceOwner` *string*
 - `privateLabelingSetting` *Number*
-  <ul><li>0: Unspecified</li><li>1: Enforce project resource owner policy</li><li>2: Allow login user resource owner policy</li></ul>
+  <ul><li>0: Unspecified</li><li>1: Enforce project's policy</li><li>2: Allow user's organization login policy</li></ul>
 - `selectedIdpConfigId` *string*
 - `linkingUsers` Array of [*ExternalUser*](#external-user)
 - `passwordVerified` *bool*

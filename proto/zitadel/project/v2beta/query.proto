@@ -1,0 +1,297 @@
+syntax = "proto3";
+
+package zitadel.project.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2beta;project";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+import "zitadel/filter/v2beta/filter.proto";
+
+message ProjectGrant {
+  // The unique identifier of the organization which granted the project to the granted_organization_id.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the granted project creation.
+  google.protobuf.Timestamp creation_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the granted project (e.g. creation, activation, deactivation).
+  google.protobuf.Timestamp change_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // The ID of the organization the project is granted to.
+  string granted_organization_id = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The name of the organization the project is granted to.
+  string granted_organization_name = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Some Organization\""
+    }
+  ];
+  // The roles of the granted project.
+  repeated string granted_role_keys = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"role.super.man\"]"
+    }
+  ];
+  // The ID of the granted project.
+  string project_id = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The name of the granted project.
+  string project_name = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ZITADEL\""
+    }
+  ];
+  // Describes the current state of the granted project.
+  ProjectGrantState state = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the project";
+    }
+  ];
+}
+
+enum ProjectGrantState {
+  PROJECT_GRANT_STATE_UNSPECIFIED = 0;
+  PROJECT_GRANT_STATE_ACTIVE = 1;
+  PROJECT_GRANT_STATE_INACTIVE = 2;
+}
+
+message Project {
+  // The unique identifier of the project.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The unique identifier of the organization the project belongs to.
+  string organization_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the project creation.
+  google.protobuf.Timestamp creation_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the project (e.g. creation, activation, deactivation).
+  google.protobuf.Timestamp change_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // The name of the project.
+  string name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Describes the current state of the project.
+  ProjectState state = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the project";
+    }
+  ];
+  // Describes if the roles of the user should be added to the token.
+  bool project_role_assertion = 7;
+  // When enabled ZITADEL will check if a user has an authorization to use this project assigned when login into an application of this project.
+  bool authorization_required = 8;
+  // When enabled ZITADEL will check if the organization of the user, that is trying to log in, has access to this project (either owns the project or is granted).
+  bool project_access_required = 9;
+  // Defines from where the private labeling should be triggered.
+  PrivateLabelingSetting private_labeling_setting = 10;
+
+  // The ID of the organization the project is granted to.
+  optional string granted_organization_id = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The name of the organization the project is granted to.
+  optional string granted_organization_name = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Some Organization\""
+    }
+  ];
+  // Describes the current state of the granted project.
+  GrantedProjectState granted_state = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the granted project";
+    }
+  ];
+}
+
+enum ProjectState {
+  PROJECT_STATE_UNSPECIFIED = 0;
+  PROJECT_STATE_ACTIVE = 1;
+  PROJECT_STATE_INACTIVE = 2;
+}
+
+enum GrantedProjectState {
+  GRANTED_PROJECT_STATE_UNSPECIFIED = 0;
+  GRANTED_PROJECT_STATE_ACTIVE = 1;
+  GRANTED_PROJECT_STATE_INACTIVE = 2;
+}
+
+enum PrivateLabelingSetting {
+  PRIVATE_LABELING_SETTING_UNSPECIFIED = 0;
+  PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY = 1;
+  PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY = 2;
+}
+
+enum ProjectFieldName {
+  PROJECT_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_FIELD_NAME_ID = 1;
+  PROJECT_FIELD_NAME_CREATION_DATE = 2;
+  PROJECT_FIELD_NAME_CHANGE_DATE = 3;
+  PROJECT_FIELD_NAME_NAME = 4;
+}
+
+enum ProjectGrantFieldName {
+  PROJECT_GRANT_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_GRANT_FIELD_NAME_PROJECT_ID = 1;
+  PROJECT_GRANT_FIELD_NAME_CREATION_DATE = 2;
+  PROJECT_GRANT_FIELD_NAME_CHANGE_DATE = 3;
+}
+
+enum ProjectRoleFieldName {
+  PROJECT_ROLE_FIELD_NAME_UNSPECIFIED = 0;
+  PROJECT_ROLE_FIELD_NAME_KEY = 1;
+  PROJECT_ROLE_FIELD_NAME_CREATION_DATE = 2;
+  PROJECT_ROLE_FIELD_NAME_CHANGE_DATE = 3;
+}
+
+message ProjectSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    ProjectNameFilter project_name_filter = 1;
+    zitadel.filter.v2beta.InIDsFilter in_project_ids_filter = 2;
+    zitadel.filter.v2beta.IDFilter project_resource_owner_filter = 3;
+    zitadel.filter.v2beta.IDFilter project_grant_resource_owner_filter = 4;
+    zitadel.filter.v2beta.IDFilter project_organization_id_filter = 5;
+  }
+}
+
+message ProjectNameFilter {
+  // Defines the name of the project to query for.
+  string project_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+message ProjectGrantSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    ProjectNameFilter project_name_filter = 1;
+    ProjectRoleKeyFilter role_key_filter = 2;
+    zitadel.filter.v2beta.InIDsFilter in_project_ids_filter = 3;
+    zitadel.filter.v2beta.IDFilter project_resource_owner_filter = 4;
+    zitadel.filter.v2beta.IDFilter project_grant_resource_owner_filter = 5;
+  }
+}
+
+message ProjectRole {
+  // ID of the project.
+  string project_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // Key of the project role.
+  string key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"role.super.man\""
+    }
+  ];
+  // The timestamp of the project role creation.
+  google.protobuf.Timestamp creation_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the project role.
+  google.protobuf.Timestamp change_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // Display name of the project role.
+  string display_name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Super man\""
+    }
+  ];
+  // Group of the project role.
+  string group = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"people\""
+    }
+  ];
+}
+
+message ProjectRoleSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    ProjectRoleKeyFilter role_key_filter = 1;
+    ProjectRoleDisplayNameFilter display_name_filter = 2;
+  }
+}
+
+message ProjectRoleKeyFilter {
+  string key = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"role.super.man\""
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message ProjectRoleDisplayNameFilter {
+  string display_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"SUPER\""
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}

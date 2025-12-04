@@ -43,6 +43,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		checkPermission             domain.PermissionCheck
 		defaultSecretGenerators     *SecretGenerators
+		defaultEmailCodeURLTemplate func(ctx context.Context) string
 	}
 	type args struct {
 		ctx             context.Context
@@ -60,6 +61,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := org.NewAggregate("org1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	totpSecret := "TOTPSecret"
@@ -191,7 +193,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
@@ -199,6 +201,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -233,13 +236,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -302,9 +306,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 		{
 			name: "add human (with initial code), no permission",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:         mockEncryptedCode("userinit", time.Hour),
@@ -326,9 +328,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -339,13 +339,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -416,6 +417,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -487,6 +489,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
 						user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -498,15 +501,16 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("emailverify"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							false,
 							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockEncryptedCode("emailverify", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:                     mockEncryptedCode("emailverify", time.Hour),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -546,6 +550,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -620,6 +625,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -643,16 +649,17 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
 					),
 				),
-				checkPermission:    newMockPermissionCheckAllowed(),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				newCode:                     mockEncryptedCode("emailCode", time.Hour),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -688,13 +695,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -752,13 +760,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -816,13 +825,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -880,7 +890,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -933,7 +943,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -948,6 +958,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1021,13 +1032,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1131,13 +1143,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1236,13 +1249,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "+41711234567", language.English),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1309,6 +1323,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1413,13 +1428,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1483,13 +1499,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(),
@@ -1505,7 +1522,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEvent(
+						user.NewHumanEmailCodeAddedEventV2(
 							context.Background(),
 							&userAgg.Aggregate,
 							&crypto.CryptoValue{
@@ -1515,6 +1532,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("mailVerify"),
 							},
 							time.Hour,
+							"http://example.com/{{.user}}/email/{{.code}}",
+							false,
 							"authRequestID",
 						),
 						user.NewUserIDPLinkAddedEvent(
@@ -1526,9 +1545,10 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockEncryptedCode("mailVerify", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:                     mockEncryptedCode("mailVerify", time.Hour),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1570,13 +1590,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(),
@@ -1650,13 +1671,98 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectPush(
+						user.NewHumanRegisteredEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							language.English,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+							"userAgentID",
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+							"authRequestID",
+						),
+						user.NewHumanOTPAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							totpSecretEnc,
+						),
+						user.NewHumanOTPVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: language.English,
+					Register:          true,
+					UserAgentID:       "userAgentID",
+					AuthRequestID:     "authRequestID",
+					TOTPSecret:        totpSecret,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "register human with TOTPSecret, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&orgAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1733,7 +1839,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1779,14 +1885,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "register human (validate domain), ok",
+			name: "register human (validate domain), orgScopedUsername, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1801,6 +1907,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", true, true),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1812,7 +1919,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							language.English,
 							domain.GenderUnspecified,
 							"email@example.com",
-							false,
+							true,
 							"userAgentID",
 						),
 						user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1868,7 +1975,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1890,6 +1997,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1957,7 +2065,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1983,6 +2091,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -2059,6 +2168,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						CryptoMFA: cryptoAlg,
 					},
 				},
+				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
 			}
 			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
 			if tt.res.err == nil {
@@ -2096,6 +2206,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		checkPermission             domain.PermissionCheck
 		defaultSecretGenerators     *SecretGenerators
+		defaultEmailCodeURLTemplate func(ctx context.Context) string
+		tarpit                      Tarpit
 	}
 	type args struct {
 		ctx     context.Context
@@ -2111,6 +2223,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := user.NewAggregate("org1", "org1")
 
 	tests := []struct {
 		name   string
@@ -2131,6 +2244,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2156,6 +2270,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2177,6 +2292,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2203,23 +2319,74 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&userAgg.Aggregate,
 							"username",
 							"changed",
 							true,
+							false,
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Username: gu.Ptr("changed"),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human username, orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, false, "", language.English),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&orgAgg.Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
+					expectPush(
+						user.NewUsernameChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"changed",
+							false,
+							true,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2247,6 +2414,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2274,6 +2442,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2322,6 +2491,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2356,6 +2526,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2402,14 +2573,16 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							false,
 							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("emailCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newCode:                     mockEncryptedCode("emailCode", time.Hour),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2440,6 +2613,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2469,6 +2643,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2506,6 +2681,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2541,6 +2717,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2582,14 +2759,16 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("emailCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newCode:                     mockEncryptedCode("emailCode", time.Hour),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2672,6 +2851,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2747,6 +2927,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2777,6 +2958,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2814,6 +2996,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2849,6 +3032,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				tarpit:          expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2928,6 +3112,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				tarpit:                      expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2955,6 +3140,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				eventstore:         expectEventstore(),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2988,6 +3174,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3020,6 +3207,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3035,6 +3223,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3059,6 +3248,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				eventstore:         expectEventstore(),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3093,6 +3283,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckNotAllowed(),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3147,6 +3338,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckAllowed(),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3180,6 +3372,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3203,6 +3396,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3237,9 +3431,27 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck of user locking relevant events
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								0,
+								0,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordCheckFailedEvent(context.Background(),
+							&userAgg.Aggregate,
+							nil,
+						),
+					),
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(1),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3311,6 +3523,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3365,6 +3578,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3429,6 +3643,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3487,6 +3702,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3509,7 +3725,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "change human password and password encoded, password code, encoded used",
+			name: "change human password encoded, old password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -3561,15 +3777,15 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:            "passwordnotused",
+						OldPassword:         "password",
 						EncodedPasswordHash: "$plain$x$password2",
-						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -3594,6 +3810,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				checkPermission:             tt.fields.checkPermission,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 				userEncryption:              tt.args.codeAlg,
+				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
+				tarpit:                      tt.fields.tarpit.tarpit,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {
@@ -3609,6 +3827,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				assert.Equal(t, tt.res.wantEmailCode, tt.args.human.EmailCode)
 				assert.Equal(t, tt.res.wantPhoneCode, tt.args.human.PhoneCode)
 			}
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
 }

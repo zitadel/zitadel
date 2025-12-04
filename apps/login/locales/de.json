@@ -1,0 +1,457 @@
+{
+  "common": {
+    "back": "Zurück",
+    "title": "Anmelden mit Zitadel"
+  },
+  "accounts": {
+    "title": "Konten",
+    "description": "Wählen Sie das Konto aus, das Sie verwenden möchten.",
+    "addAnother": "Ein weiteres Konto hinzufügen",
+    "noResults": "Keine Konten gefunden",
+    "verified": "verifiziert",
+    "expired": "abgelaufen"
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+    "noResults": "Keine Konten gefunden",
+    "clear": "Session beenden",
+    "verifiedAt": "Zuletzt aktiv: {time}",
+    "success": {
+      "title": "Logout erfolgreich",
+      "description": "Sie haben sich erfolgreich abgemeldet."
+    }
+  },
+  "loginname": {
+    "title": "Willkommen zurück!",
+    "description": "Geben Sie Ihre Anmeldedaten ein.",
+    "register": "Neuen Benutzer registrieren",
+    "submit": "Weiter",
+    "labels": {
+      "loginname": "Loginname",
+      "username": "Benutzername",
+      "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",
+      "usernameOrEmail": "Benutzername oder E-Mail"
+    },
+    "required": {
+      "loginName": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "internalError": "Ein interner Fehler ist aufgetreten",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "couldNotSearchUsers": "Benutzer konnten nicht durchsucht werden",
+      "couldNotGetDomain": "Domain konnte nicht abgerufen werden",
+      "couldNotGetHost": "Host konnte nicht abgerufen werden",
+      "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+      "moreThanOneUserFound": "Mehr als ein Benutzer gefunden. Bitte geben Sie einen eindeutigen Identifikator an.",
+      "userNotFound": "Benutzer im System nicht gefunden",
+      "couldNotCreateSession": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "initialUserNotSupported": "Initialer Benutzer wird nicht unterstützt",
+      "usernamePasswordNotAllowed": "Benutzername und Passwort nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden.",
+      "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ein Fehler ist aufgetreten",
+      "multipleUsersFound": "Mehrere Benutzer gefunden",
+      "userNotFound": "Benutzer im System nicht gefunden"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Passwort",
+      "description": "Geben Sie Ihr Passwort ein.",
+      "resetPassword": "Passwort zurücksetzen",
+      "submit": "Weiter",
+      "labels": {
+        "password": "Passwort"
+      },
+      "required": {
+        "password": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden"
+      },
+      "info": {
+        "passwordResetSent": "Passwort wurde zurückgesetzt. Bitte prüfen Sie Ihre E-Mails"
+      }
+    },
+    "set": {
+      "title": "Passwort festlegen",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+      "noCodeReceived": "Keinen Code erhalten?",
+      "resend": "Erneut senden",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Code",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich",
+        "newPassword": "Bitte geben Sie ein Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
+      }
+    },
+    "change": {
+      "title": "Passwort ändern",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "submit": "Weiter",
+      "labels": {
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
+      "required": {
+        "newPassword": "Bitte geben Sie ein neues Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotChangePassword": "Passwort konnte nicht geändert werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "unknownError": "Unbekannter Fehler"
+      }
+    },
+    "complexity": {
+      "length": "Muss mindestens {minLength} Zeichen lang sein.",
+      "hasSymbol": "Muss ein Symbol enthalten.",
+      "hasNumber": "Muss eine Zahl enthalten.",
+      "hasUppercase": "Muss einen Großbuchstaben enthalten.",
+      "hasLowercase": "Muss einen Kleinbuchstaben enthalten.",
+      "equals": "Passwortbestätigung stimmt überein.",
+      "matches": "Stimmt überein",
+      "doesNotMatch": "Stimmt nicht überein"
+    },
+    "errors": {
+      "noHostFound": "Kein Host gefunden",
+      "couldNotSendResetLink": "Passwort-Zurücksetzungslink konnte nicht gesendet werden",
+      "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+      "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Authentifizierung fehlgeschlagen.",
+      "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+      "userNotFound": "Benutzer nicht im System gefunden",
+      "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",
+      "userInitialStateNotSupported": "Anfangszustand des Benutzers wird nicht unterstützt",
+      "codeOrVerificationRequired": "Sie müssen einen Code angeben oder eine gültige Benutzerverifizierung durchführen",
+      "verificationRequired": "Die Benutzerverifizierung muss durchgeführt werden",
+      "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+      "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
+      "failedPrecondition": "Vorbedingung fehlgeschlagen",
+      "sessionNotValid": "Sitzung ist nicht gültig"
+    }
+  },
+  "idp": {
+    "title": "Mit SSO anmelden",
+    "description": "Wählen Sie einen der folgenden Anbieter, um sich anzumelden",
+    "orSignInWith": "oder melden Sie sich an mit",
+    "signInWithApple": "Mit Apple anmelden",
+    "signInWithGoogle": "Mit Google anmelden",
+    "signInWithAzureAD": "Mit AzureAD anmelden",
+    "signInWithGithub": "Mit GitHub anmelden",
+    "signInWithGitlab": "Mit GitLab anmelden",
+    "loginError": {
+      "title": "Anmeldung fehlgeschlagen",
+      "description": "Beim Anmelden ist ein Fehler aufgetreten."
+    },
+    "linkingError": {
+      "title": "Konto-Verknüpfung fehlgeschlagen",
+      "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    },
+    "completeRegister": {
+      "title": "Registrierung abschließen",
+      "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
+    },
+    "accountNotFound": {
+      "title": "Konto nicht gefunden",
+      "description": "Wir konnten kein Konto finden, das mit Ihren Identitätsanbieter-Anmeldedaten verknüpft ist.",
+      "info": "Es wurde kein bestehendes Konto gefunden. Bitte melden Sie sich mit einem bestehenden Konto an oder wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "registrationFailed": {
+      "title": "Registrierung nicht verfügbar",
+      "description": "Wir konnten den Registrierungsprozess nicht abschließen.",
+      "info": "Die Organisation für die Registrierung konnte nicht ermittelt werden. Bitte wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "processing": {
+      "message": "Authentifizierung wird verarbeitet...",
+      "noRedirect": "Keine Weiterleitung oder Fehler vom Server erhalten",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "errors": {
+      "missingParameters": "Erforderliche Parameter fehlen",
+      "missingIdpInfo": "IDP-Informationen fehlen",
+      "idpNotFound": "Identitätsanbieter nicht gefunden",
+      "linkingNotAllowed": "Verknüpfung ist für diesen Identitätsanbieter nicht erlaubt",
+      "linkingFailed": "Verknüpfung des Identitätsanbieters zum Konto fehlgeschlagen",
+      "autoLinkingFailed": "Automatische Verknüpfung des Kontos fehlgeschlagen",
+      "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
+      "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
+      "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+    }
+  },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
+    "submit": "Weiter",
+    "labels": {
+      "username": "Benutzername",
+      "password": "Passwort"
+    },
+    "required": {
+      "username": "Dieses Feld ist erforderlich",
+      "password": "Dieses Feld ist erforderlich"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Bestätigen Sie Ihre Identität",
+      "description": "Wählen Sie einen der folgenden Faktoren.",
+      "noResults": "Keine zweiten Faktoren verfügbar, um sie einzurichten."
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "description": "Wählen Sie einen der folgenden zweiten Faktoren.",
+      "skip": "Überspringen"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "2-Faktor bestätigen",
+      "totpDescription": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
+      "smsDescription": "Geben Sie den Code ein, den Sie per SMS erhalten haben.",
+      "emailDescription": "Geben Sie den Code ein, den Sie per E-Mail erhalten haben.",
+      "noCodeReceived": "Keinen Code erhalten?",
+      "resendCode": "Code erneut senden",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "totpDescription": "Scannen Sie den QR-Code mit Ihrer Authentifizierungs-App.",
+      "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
+      "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
+      "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Mit einem Passkey authentifizieren",
+      "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
+      "usePassword": "Passwort verwenden",
+      "submit": "Weiter",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey-Challenge konnte nicht angefordert werden",
+        "couldNotVerifyPasskey": "Passkey konnte nicht verifiziert werden",
+        "noResponseReceived": "Passkey-Verifizierung fehlgeschlagen - keine Antwort erhalten",
+        "noRedirectProvided": "Passkey-Verifizierung abgeschlossen, aber keine Weiterleitung bereitgestellt",
+        "couldNotRetrievePasskey": "Fehler beim Abrufen des Passkeys",
+        "verificationCancelled": "Passkey-Verifizierung wurde abgebrochen",
+        "verificationFailed": "Fehler bei der Passkey-Verifizierung",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+        "userNotFound": "Benutzer nicht im System gefunden",
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotSetSession": "Sitzung konnte nicht gesetzt werden",
+        "couldNotGetUser": "Benutzerdaten konnten nicht abgerufen werden",
+        "couldNotRetrieveSessionCookie": "Sitzungs-Cookie konnte nicht abgerufen werden"
+      }
+    },
+    "set": {
+      "title": "Passkey einrichten",
+      "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
+      "info": {
+        "description": "Ein Passkey ist eine Authentifizierungsmethode auf einem Gerät wie Ihr Fingerabdruck, Apple FaceID oder ähnliches.",
+        "link": "Passwortlose Authentifizierung"
+      },
+      "skip": "Überspringen",
+      "submit": "Weiter"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "2-Faktor bestätigen",
+      "description": "Bestätigen Sie Ihr Konto mit Ihrem Gerät."
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "description": "Richten Sie ein Gerät als zweiten Faktor ein.",
+      "submit": "Weiter"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Passwort"
+    },
+    "disabled": {
+      "title": "Registrierung deaktiviert",
+      "description": "Die Registrierung ist deaktiviert. Bitte wenden Sie sich an den Administrator."
+    },
+    "missingdata": {
+      "title": "Registrierung fehlgeschlagen",
+      "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
+    },
+    "title": "Registrieren",
+    "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
+    "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
+    "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
+    "termsOfService": "Nutzungsbedingungen",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "submit": "Weiter",
+    "password": {
+      "title": "Passwort festlegen",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "submit": "Weiter",
+      "labels": {
+        "password": "Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
+      "required": {
+        "password": "Bitte geben Sie ein Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      }
+    },
+    "labels": {
+      "firstname": "Vorname",
+      "lastname": "Nachname",
+      "email": "E-Mail"
+    },
+    "required": {
+      "firstname": "Dieses Feld ist erforderlich",
+      "lastname": "Dieses Feld ist erforderlich",
+      "email": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "couldNotCreateUser": "Benutzer konnte nicht erstellt werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "userNotFound": "Benutzer nicht im System gefunden",
+      "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+    }
+  },
+  "invite": {
+    "title": "Benutzer einladen",
+    "description": "Geben Sie die E-Mail-Adresse des Benutzers ein, den Sie einladen möchten.",
+    "info": "Der Benutzer erhält eine E-Mail mit einem Link, um sich zu registrieren.",
+    "notAllowed": "Sie haben keine Berechtigung, Benutzer einzuladen.",
+    "submit": "Einladen",
+    "success": {
+      "title": "Einladung erfolgreich",
+      "description": "Der Benutzer wurde erfolgreich eingeladen.",
+      "verified": "Der Benutzer wurde eingeladen und hat seine E-Mail bereits verifiziert.",
+      "notVerifiedYet": "Der Benutzer wurde eingeladen. Er erhält eine E-Mail mit weiteren Anweisungen.",
+      "submit": "Weiteren Benutzer einladen"
+    }
+  },
+  "signedin": {
+    "title": "Willkommen {user}!",
+    "description": "Sie sind angemeldet.",
+    "continue": "Weiter",
+    "error": {
+      "title": "Fehler",
+      "description": "Ein Fehler ist aufgetreten."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Keine Benutzer-ID angegeben!",
+    "successTitle": "Benutzer verifiziert",
+    "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
+    "setupAuthenticator": "Authentifikator einrichten",
+    "verify": {
+      "title": "Benutzer verifizieren",
+      "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
+      "noCodeReceived": "Keinen Code erhalten?",
+      "resendCode": "Code erneut senden",
+      "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "E-Mail konnte nicht erneut gesendet werden",
+      "couldNotVerifyUser": "Benutzer konnte nicht verifiziert werden",
+      "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
+      "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
+      "couldNotVerify": "Konnte nicht verifizieren",
+      "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
+      "couldNotLoadAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "noHostFound": "Kein Host gefunden",
+      "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
+      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
+      "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
+      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden"
+    }
+  },
+  "authenticator": {
+    "title": "Authentifizierungsmethode auswählen",
+    "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
+    "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
+    "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!",
+    "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter"
+  },
+  "device": {
+    "usercode": {
+      "title": "Gerätecode",
+      "description": "Geben Sie den Code ein.",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
+    },
+    "request": {
+      "title": "{appName} möchte eine Verbindung herstellen:",
+      "disclaimer": "{appName} hat Zugriff auf:",
+      "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+      "submit": "Zulassen",
+      "deny": "Ablehnen"
+    },
+    "scope": {
+      "openid": "Überprüfen Ihrer Identität.",
+      "email": "Zugriff auf Ihre E-Mail-Adresse.",
+      "profile": "Zugriff auf Ihre vollständigen Profilinformationen.",
+      "offline_access": "Erlauben Sie den Offline-Zugriff auf Ihr Konto."
+    }
+  },
+  "error": {
+    "noUserCode": "Kein Benutzercode angegeben!",
+    "noDeviceRequest": " Es wurde keine Geräteanforderung gefunden. Bitte überprüfen Sie die URL.",
+    "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
+    "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "tryagain": "Erneut versuchen",
+    "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
+  }
+}

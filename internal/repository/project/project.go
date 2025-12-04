@@ -184,10 +184,7 @@ func NewProjectChangeEvent(
 	aggregate *eventstore.Aggregate,
 	oldName string,
 	changes []ProjectChanges,
-) (*ProjectChangeEvent, error) {
-	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
-	}
+) *ProjectChangeEvent {
 	changeEvent := &ProjectChangeEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -199,7 +196,7 @@ func NewProjectChangeEvent(
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent, nil
+	return changeEvent
 }
 
 type ProjectChanges func(event *ProjectChangeEvent)

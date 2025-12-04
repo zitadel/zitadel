@@ -1793,8 +1793,10 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
+					provider.SignatureAlgorithm,
 					provider.NameIDFormat,
 					provider.TransientMappingAttributeName,
+					provider.FederatedLogoutEnabled,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1846,8 +1848,10 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
+				provider.SignatureAlgorithm,
 				provider.NameIDFormat,
 				provider.TransientMappingAttributeName,
+				provider.FederatedLogoutEnabled,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1891,8 +1895,10 @@ func (c *Commands) prepareRegenerateInstanceSAMLProviderCertificate(a *instance.
 				c.idpConfigEncryption,
 				writeModel.Binding,
 				writeModel.WithSignedRequest,
+				writeModel.SignatureAlgorithm,
 				writeModel.NameIDFormat,
 				writeModel.TransientMappingAttributeName,
+				writeModel.FederatedLogoutEnabled,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {

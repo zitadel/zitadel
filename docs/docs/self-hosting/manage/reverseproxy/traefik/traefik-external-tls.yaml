@@ -8,17 +8,29 @@ entrypoints:
     address: ":443"
 http:
   routers:
-    router:
+    zitadel:
       entryPoints:
         - "web"
       service: "zitadel"
-      rule: 'PathPrefix(`/`)'
+      rule: '!PathPrefix(`/ui/v2/login`)'
+      tls: {}
+    login:
+      entryPoints:
+        - "web"
+      service: "login"
+      rule: 'PathPrefix(`/ui/v2/login`)'
       tls: {}
   services:
     zitadel:
       loadBalancer:
+        passHostHeader: true
         servers:
           - url: "h2c://zitadel-external-tls:8080"
+    login:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://login-external-tls:3000"
 tls:
   stores:
     default:

@@ -145,8 +145,9 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		idGenerator  id.Generator
-		tokenCreator func(sessionID string) (string, string, error)
+		idGenerator     id.Generator
+		tokenCreator    func(sessionID string) (string, string, error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -195,6 +196,22 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"missing permission",
+			fields{
+				idGenerator:     mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"negative lifetime",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -203,6 +220,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -230,6 +248,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -275,6 +294,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				eventstore:          expectEventstore(tt.expect...)(t),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
+				checkPermission:     tt.fields.checkPermission,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -285,8 +305,8 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore    func(*testing.T) *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -320,6 +340,36 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 		},
 		{
+			"no token, no permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:       context.Background(),
+				sessionID: "sessionID",
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"no change",
 			fields{
 				eventstore: expectEventstore(
@@ -339,9 +389,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:       context.Background(),
@@ -362,8 +410,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore(t),
-				sessionTokenVerifier: tt.fields.tokenVerifier,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -1043,6 +1091,7 @@ func TestCheckTOTP(t *testing.T) {
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
+		tarpit            Tarpit
 	}
 
 	tests := []struct {
@@ -1061,6 +1110,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
@@ -1076,6 +1126,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -1095,6 +1146,7 @@ func TestCheckTOTP(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
@@ -1121,6 +1173,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1150,6 +1203,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1177,6 +1231,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
 				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
@@ -1205,6 +1260,7 @@ func TestCheckTOTP(t *testing.T) {
 						user.NewUserLockedEvent(ctx, userAgg),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
@@ -1216,8 +1272,199 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantErrorCommands, gotCmds)
+			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
+		})
+	}
+}
+
+func TestCheckRecoveryCode(t *testing.T) {
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
+
+	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
+
+	hasher := mockPasswordHasher("x")
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(ctx, 1, domain.RecoveryCodesConfig{
+		Format:   domain.RecoveryCodeFormatUUID,
+		MaxCount: 10,
+		Length:   10,
+	}, hasher)
+	require.NoError(t, err)
+	validCode := rawCodes[0]
+	invalidCode := "invalid-code"
+
+	type fields struct {
+		sessionWriteModel *SessionWriteModel
+		eventstore        func(*testing.T) *eventstore.Eventstore
+		hasher            *crypto.Hasher
+	}
+
+	tests := []struct {
+		name              string
+		code              string
+		fields            fields
+		wantEventCommands []eventstore.Command
+		wantErrorCommands []eventstore.Command
+		wantErr           error
+	}{
+		{
+			name: "missing userID",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(),
+				hasher:     hasher,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9s2", "Errors.User.UserIDMissing"),
+		},
+		{
+			name: "filter error",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+				hasher: hasher,
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "recovery codes not ready",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(), // No codes added
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
+		},
+		{
+			name: "invalid code",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "invalid code, locked",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+				user.NewUserLockedEvent(ctx, userAgg),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "user locked",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
+		},
+		{
+			name: "ok",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+				),
+				hasher: hasher,
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, "$plain$x$"+validCode, nil),
+				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &SessionCommands{
+				sessionWriteModel: tt.fields.sessionWriteModel,
+				eventstore:        tt.fields.eventstore(t),
+				hasher:            tt.fields.hasher,
+				now:               func() time.Time { return testNow },
+			}
+			gotCmds, err := CheckRecoveryCode(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)

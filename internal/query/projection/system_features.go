@@ -57,14 +57,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.SystemTriggerIntrospectionProjectionsEventType,
-				Reduce: reduceSystemSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.SystemLegacyIntrospectionEventType,
-				Reduce: reduceSystemSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.SystemUserSchemaEventType,
 				Reduce: reduceSystemSetFeature[bool],
 			},
@@ -75,10 +67,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 			{
 				Event:  feature_v2.SystemImprovedPerformanceEventType,
 				Reduce: reduceSystemSetFeature[[]feature.ImprovedPerformanceType],
-			},
-			{
-				Event:  feature_v2.SystemDisableUserTokenEvent,
-				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
 				Event:  feature_v2.SystemEnableBackChannelLogout,

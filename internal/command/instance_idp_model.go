@@ -921,8 +921,10 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) (*instance.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
@@ -933,8 +935,10 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		binding,
 		withSignedRequest,
+		signatureAlgorithm,
 		nameIDFormat,
 		transientMappingAttributeName,
+		federatedLogoutEnabled,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

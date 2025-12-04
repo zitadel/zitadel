@@ -106,7 +106,14 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service SessionService {
 
-  // Search sessions
+  // List sessions
+  //
+  // Searches for sessions matching the given query. You can search by session ID, user ID,
+  // creation date, creator, user agent or expiration date.
+  //
+  // Required permissions:
+  //   - `session.read`
+  //   - no permission required to search for own sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
       post: "/v2/sessions/search"
@@ -120,8 +127,6 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Search sessions";
-      description: "Search for sessions"
       responses: {
         key: "200"
         value: {
@@ -142,7 +147,19 @@ service SessionService {
     };
   }
 
-  // GetSession a session
+  // Get Session
+  //
+  // Retrieve a session by its ID. Returns all information about the session, including
+  // the factors that were verified, the metadata, user agent information and possible expiration date.
+  // The session token is required unless either of the following conditions is met:
+  //   - the caller created the session
+  //   - the authenticated user requests their own session (checked user)
+  //   - the security token provided in the authorization header has the same user agent as the session
+  //   - the caller is granted the permission session.read permission on either the instance or on the checked user's organization
+  //
+  // Required permissions:
+  //   - `session.read`
+  //   - no permission required to get own sessions (see above) or when providing the current session token
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
       get: "/v2/sessions/{session_id}"
@@ -155,8 +172,6 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get a session";
-      description: "Get a session and all its information like the time of the user or password verification"
       responses: {
         key: "200"
         value: {
@@ -166,7 +181,16 @@ service SessionService {
     };
   }
 
-  // Create a new session
+  // Create Session
+  //
+  // Create a new session with initial checks, metadata and challenges for further verification.
+  // A token will be returned, which is required for using the session as authentication, e.g.
+  // when authenticating an OIDC auth request or SAML request.
+  // Additionally, the session token can be used as OAuth2 access token to authenticate against
+  // the ZITADEL APIs.
+  //
+  // Required permissions:
+  //   - `session.write`
   rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {
     option (google.api.http) = {
       post: "/v2/sessions"
@@ -183,8 +207,6 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create a new session";
-      description: "Create a new session. A token will be returned, which is required for further updates of the session."
       responses: {
         key: "200"
         value: {
@@ -194,7 +216,14 @@ service SessionService {
     };
   }
 
-  // Update a session
+  // Set Session
+  //
+  // Update an existing session with new information like additional checks or metadata
+  // or request additional challenges.
+  // A new session token will be returned. Note that the previous token will be invalidated.
+  //
+  // Required permissions:
+  //   - `session.write`
   rpc SetSession (SetSessionRequest) returns (SetSessionResponse) {
     option (google.api.http) = {
       patch: "/v2/sessions/{session_id}"
@@ -208,8 +237,6 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Update an existing session";
-      description: "Update an existing session with new information."
       responses: {
         key: "200"
         value: {
@@ -219,7 +246,17 @@ service SessionService {
     };
   }
 
-  // Terminate a session
+  // DeleteSession
+  //
+  // Terminate an existing session. This invalidates the session and its token.
+  // The session can no longer be used for the authentication of other resources
+  // or to authenticate against the ZITADEL APIs.
+  //
+  // You can only terminate your own session, unless you are granted the `session.delete` permission.
+  //
+  // Required permissions:
+  //   - `session.delete`
+  //   - no permission required for own sessions or when providing the current session token
   rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
     option (google.api.http) = {
       delete: "/v2/sessions/{session_id}"
@@ -233,8 +270,6 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Terminate an existing session";
-      description: "Terminate your own session or if granted any other session."
       responses: {
         key: "200"
         value: {
@@ -246,41 +281,89 @@ service SessionService {
 }
 
 message ListSessionsRequest{
+  // List limitations and ordering.
   zitadel.object.v2.ListQuery query = 1;
+
+  // The criteria to be used when searching for sessions.
+  // Multiple queries will be combined with a logical AND.
   repeated SearchQuery queries = 2;
+
+  // The column to be used for sorting the sessions.
   zitadel.session.v2.SessionFieldName sorting_column = 3;
 }
 
 message ListSessionsResponse{
+  // Contains details about the response, such as the total number of sessions.
   zitadel.object.v2.ListDetails details = 1;
+
+  // The sessions matching the search query. There might be more sessions available
+  // than returned in this response. Use the details field to see if there are more sessions
+  // available and to get the total count of sessions matching the query.
   repeated Session sessions = 2;
 }
 
 message GetSessionRequest{
-  string session_id = 1;
-  optional string session_token = 2;
+  // The unique identifier of the session to be retrieved.
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+  ];
+
+  // The current token of the session, previously returned on the create / update request.
+  // The token is required unless either of the following conditions is met:
+  // - the caller created the session
+  // - the authenticated user requests their own session (checked user)
+  // - the security token provided in the authorization header has the same user agent as the session
+  // - the caller is granted the permission session.read permission on either the instance or on the checked user's organization
+  optional string session_token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"222430354126975533\"";
+    }
+   ];
 }
+
 message GetSessionResponse{
   Session session = 1;
 }
 
 message CreateSessionRequest{
-  Checks checks = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
-    }
-  ];
-  map<string, bytes> metadata = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"custom key value list to be stored on the session\"";
-    }
-  ];
+  // The checks to be performed during session creation.
+  // Note that a user check can only be performed once per session and cannot be changed afterwards.
+  // Some checks require that the user is already checked, either in the previous or the same
+  // request. For example, a password check requires that the user is already checked.
+  // Other checks, like WebAuthN or IDP intent, require that the user is already checked and a challenge
+  // was requested in any previous request.
+  // On successful checks, the session's `factors` field will be updated.
+  Checks checks = 1;
+
+  // Custom key value list to be stored on the session.
+  map<string, bytes> metadata = 2;
+
+  // Challenges to be requested for further verification.
+  // The challenges will be created and returned in the response.
+  // The challenges can then be used for further checks with the following SetSession method.
   RequestChallenges challenges = 3;
+
+  // Store information about the user agent of the client.
+  // This information is stored on the session and can be used for auditing or security purposes.
+  // Sessions can also be filtered by user agent information.
   UserAgent user_agent = 4;
+
+  // Duration after which the session will be automatically invalidated.
+  // If not set, the session will not expire automatically and must be deleted manually.
+  // Note that an expired session cannot be used for authentication anymore, but will still be listed
+  // until it is deleted.
   optional google.protobuf.Duration lifetime = 5 [
     (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
       example:"\"18000s\""
     }
   ];
@@ -288,53 +371,74 @@ message CreateSessionRequest{
 
 message CreateSessionResponse{
   zitadel.object.v2.Details details = 1;
+
+  // Unique identifier of the session.
   string session_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"id of the session\"";
       example: "\"222430354126975533\"";
     }
   ];
-  string session_token = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
-    }
-  ];
+
+  // The current token of the session, which is required for using the session as authentication,
+  // e.g.when authenticating an OIDC auth request or SAML request.
+  // Additionally, the session token can be used as OAuth2 access token to authenticate against
+  // the ZITADEL APIs.
+  string session_token = 3;
+
+  // The challenges that were requested for the session.
+  // The challenges can be used for further checks with the SetSession method.
   Challenges challenges = 4;
 }
 
 message SetSessionRequest{
+  // The unique identifier of the session to be updated.
   string session_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "\"id of the session to update\"";
       example: "\"222430354126975533\"";
     }
   ];
+
+  // Deprecated: the session token is no longer required when updating a session
+  // and will be ignored when provided.
   string session_token = 2 [
-    (validate.rules).string = {min_len: 0, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      description: "\"DEPRECATED: this field is ignored.\"";
-    }
+    deprecated=true
   ];
-  Checks checks = 3[
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
-    }
-  ];
-  map<string, bytes> metadata = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"custom key value list to be stored on the session\"";
-    }
-  ];
+
+  // Additional checks to be performed on the session.
+  // Successful checks will be stated as factors on the session.
+  // Re-executing a check that was already successful will overwrite the previous check time.
+  // For example, if a password check was already successful, it can be re-checked to update the check time.
+  // Note that a user check can only be performed once per session and cannot be changed afterwards.
+  // Some checks require that the user is already checked, either in the previous or the same request.
+  // For example, a password check requires that the user is already checked.
+  // Other checks, like WebAuthN or IDP intent, require that the user is already checked and a challenge
+  // was requested in any previous request.
+  // On successful checks, the session's `factors` field will be updated.
+  Checks checks = 3;
+
+  // Additional custom key value pairs to be stored on the session.
+  // Existing keys will be overwritten. To delete a key, set its value to an empty byte array.
+  // Note that metadata keys cannot be changed once the session has been created.
+  // You need to create a new entry and delete the old one instead.
+  map<string, bytes> metadata = 4;
+
+  // Additional challenges to be requested for further verification.
+  // The challenges will be created and returned in the response.
+  // The challenges can then be used for further checks with the following SetSession method.
+  // Requesting a challenge that was already requested will overwrite the previous challenge.
   RequestChallenges challenges = 5;
+
+  // Update the duration after which the session will be automatically invalidated.
+  // If not set, the lifetime will not be changed.
+  // Note that an expired session cannot be used for authentication anymore, but will still be listed
+  // until it is deleted.
   optional google.protobuf.Duration lifetime = 6 [
     (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
       example:"\"18000s\""
     }
   ];
@@ -342,29 +446,38 @@ message SetSessionRequest{
 
 message SetSessionResponse{
   zitadel.object.v2.Details details = 1;
-  string session_token = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
-    }
-  ];
+
+  // The current token of the session, which is required for using the session as authentication,
+  // e.g.when authenticating an OIDC auth request or SAML request.
+  // Additionally, the session token can be used as OAuth2 access token to authenticate against
+  // the ZITADEL APIs.
+  // The previous token was invalidated and can no longer be used.
+  string session_token = 2;
+
+  // The challenges that were requested for the session.
+  // The challenges can be used for further checks with the SetSession method.
   Challenges challenges = 3;
 }
 
 message DeleteSessionRequest{
+  // The unique identifier of the session to be terminated.
   string session_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "\"id of the session to terminate\"";
       example: "\"222430354126975533\"";
     }
   ];
-  optional string session_token = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"The current token of the session, previously returned on the create / update request. The token is required unless the authenticated user terminates the own session or is granted the `session.delete` permission.\"";
-    }
-  ];
+
+  // The current token of the session, previously returned on the create / update request.
+  // The token is required unless either of the following conditions is met:
+  // - the caller created the session
+  // - the authenticated user requests their own session (checked user)
+  // - the security token provided in the authorization header has the same user agent as the session
+  // - the caller is granted the permission session.delete permission on either the instance or on the checked user's organization
+  optional string session_token = 2;
 }
 
 message DeleteSessionResponse{
@@ -372,55 +485,88 @@ message DeleteSessionResponse{
 }
 
 message Checks {
-  optional CheckUser user = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"checks the user and updates the session on success\"";
-    }
-  ];
-  optional CheckPassword password = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request. On failed password check id: \"COMMAND-3M0fs\" wll be returned. On user locked out id: \"COMMAND-JLK35\"/\"COMMAND-SFA3t\" will be returned\"";
-    }
-  ];
-  optional CheckWebAuthN web_auth_n = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the public key credential issued by the WebAuthN client. Requires that the user is already checked and a WebAuthN challenge to be requested, in any previous request.\"";
-    }
-  ];
-  optional CheckIDPIntent idp_intent = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the IDP intent. Requires that the userlink is already checked and a successful idp intent.\"";
-    }
-  ];
-  optional CheckTOTP totp = 5 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
-    }
-  ];
-  optional CheckOTP otp_sms = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the One-Time Password sent over SMS and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
-    }
-  ];
-  optional CheckOTP otp_email = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
-    }
-  ];
+  // Check the user by its user ID or login name.
+  // A user check can only be performed once per session and cannot be changed afterwards.
+  // On successful user check, the session's `factors` field will be updated with a `user` factor
+  // containing the checked user's ID, login name, display name, organization ID and verification time.
+  // Note that some other checks require that the user is already checked, either in the previous
+  // or the same request. For example, a password check requires that the user is already checked.
+  optional CheckUser user = 1;
+
+  // Check the password and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful password check, the session's `factors` field will be updated with a `password` factor,
+  // containing the verification time.
+  // On failed password check id: "COMMAND-3M0fs" wll be returned.
+  // On user locked out id: "COMMAND-JLK35"/"COMMAND-SFA3t" will be returned.
+  optional CheckPassword password = 2;
+
+  // Check the public key credential issued by the WebAuthN client.
+  // Requires that the user is already checked and a WebAuthN challenge to be requested,
+  // in any previous request.
+  // On successful WebAuthN check, the session's `factors` field will be updated with a `webauthn` factor,
+  // containing the verification time and if the user presence was verified.
+  optional CheckWebAuthN web_auth_n = 3;
+
+  // Check the IDP intent and update the session on success.
+  // Requires that the user is already checked and an IDP intent succeeded and has not expired yet.
+  // Note that the IDP intent must be either matching the same user as checked in the session,
+  // or there must not be an external IDP linked to the intent's user.
+  // On successful IDP intent check, the session's `factors` field will be updated with an `intent` factor,
+  // containing the verification time.
+  optional CheckIDPIntent idp_intent = 4;
+
+  // Check the Time-based One-Time Password and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful TOTP check, the session's `factors` field will be updated with a `totp` factor,
+  // containing the verification time.
+  optional CheckTOTP totp = 5;
+
+  // Check the One-Time Password sent over SMS and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful OTP SMS check, the session's `factors` field will be updated with an `otp` factor,
+  // containing the verification time.
+  // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
+  optional CheckOTP otp_sms = 6;
+
+  // Check the One-Time Password sent over Email and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful OTP Email check, the session's `factors` field will be updated with an `otp` factor,
+  // containing the verification time.
+  // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
+  optional CheckOTP otp_email = 7;
+
+  // Check the Recovery Code and update the session on success.
+  // Requires that the user is already checked, either in the previous or the same request.
+  // On successful Recovery Code check, the session's `factors` field will be updated with a `recovery_code` factor,
+  // containing the verification time.
+  optional CheckRecoveryCode recovery_code = 8;
 }
 
 message CheckUser {
+  // Search the user either by its user ID or login name.
   oneof search {
+    option (validate.required) = true;
+
+    // The unique identifier of the user to be checked.
     string user_id = 1 [
       (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1;
         max_length: 200;
         example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
       }
     ];
+
+    // The login name of the user to be checked. It will search case insensitive.
+    // Note this only checks for the computed login name and not for any organization scoped usernames.
+    // Also note that it will not check for emails or phone numbers, even if the corresponding
+    // setting is enabled. Use the user service ListUsers method to find a user by email or phone number first
+    // to obtain the user ID or login name.
     string login_name = 2 [
       (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1;
         max_length: 200;
@@ -431,8 +577,10 @@ message CheckUser {
 }
 
 message CheckPassword {
+  // The password of the user to be checked.
   string password = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -442,11 +590,11 @@ message CheckPassword {
 }
 
 message CheckWebAuthN {
+  // The JSON representation of the public key credential issued by the WebAuthN client.
   google.protobuf.Struct credential_assertion_data = 1 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "JSON representation of public key credential issued by the webAuthN client";
       min_length: 55;
       max_length: 1048576; //1 MB
     }
@@ -454,19 +602,22 @@ message CheckWebAuthN {
 }
 
 message CheckIDPIntent {
+  // The ID of the idp intent, previously returned on the success response of the IDP callback.
   string idp_intent_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the idp intent, previously returned on the success response of the IDP callback"
       min_length: 1;
       max_length: 200;
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+
+  // The token of the idp intent, previously returned on the success response of the IDP callback.
   string idp_intent_token = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "token of the idp intent, previously returned on the success response of the IDP callback"
       min_length: 1;
       max_length: 200;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
@@ -475,8 +626,10 @@ message CheckIDPIntent {
 }
 
 message CheckTOTP {
+  // The Time-based One-Time Password generated by the user's TOTP authenticator app.
   string code = 1 [
     (validate.rules).string = {min_len: 6, max_len: 6},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 6;
       max_length: 6;
@@ -486,11 +639,27 @@ message CheckTOTP {
 }
 
 message CheckOTP {
+  // The One-Time Password sent over SMS or Email of the user to be checked.
   string code = 1 [
     (validate.rules).string = {min_len: 1},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       example: "\"3237642\"";
+    }
+  ];
+}
+
+message CheckRecoveryCode {
+  // The Recovery Code of the user to be checked.
+  // The code must match the exact code previously generated for the user, including dashes if any.
+  // On successful check, the recovery code will be invalidated and cannot be used again.
+  string code = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"1234567890\"";
     }
   ];
 }

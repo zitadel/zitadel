@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,18 +12,18 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp *user.SetPhoneResponse, err error) {
+func (s *Server) SetPhone(ctx context.Context, req *connect.Request[user.SetPhoneRequest]) (resp *connect.Response[user.SetPhoneResponse], err error) {
 	var phone *domain.Phone
 
-	switch v := req.GetVerification().(type) {
+	switch v := req.Msg.GetVerification().(type) {
 	case *user.SetPhoneRequest_SendCode:
-		phone, err = s.command.ChangeUserPhone(ctx, req.GetUserId(), req.GetPhone(), s.userCodeAlg)
+		phone, err = s.command.ChangeUserPhone(ctx, req.Msg.GetUserId(), req.Msg.GetPhone(), s.userCodeAlg)
 	case *user.SetPhoneRequest_ReturnCode:
-		phone, err = s.command.ChangeUserPhoneReturnCode(ctx, req.GetUserId(), req.GetPhone(), s.userCodeAlg)
+		phone, err = s.command.ChangeUserPhoneReturnCode(ctx, req.Msg.GetUserId(), req.Msg.GetPhone(), s.userCodeAlg)
 	case *user.SetPhoneRequest_IsVerified:
-		phone, err = s.command.ChangeUserPhoneVerified(ctx, req.GetUserId(), req.GetPhone())
+		phone, err = s.command.ChangeUserPhoneVerified(ctx, req.Msg.GetUserId(), req.Msg.GetPhone())
 	case nil:
-		phone, err = s.command.ChangeUserPhone(ctx, req.GetUserId(), req.GetPhone(), s.userCodeAlg)
+		phone, err = s.command.ChangeUserPhone(ctx, req.Msg.GetUserId(), req.Msg.GetPhone(), s.userCodeAlg)
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-Ahng0", "verification oneOf %T in method SetPhone not implemented", v)
 	}
@@ -30,42 +31,42 @@ func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp 
 		return nil, err
 	}
 
-	return &user.SetPhoneResponse{
+	return connect.NewResponse(&user.SetPhoneResponse{
 		Details: &object.Details{
 			Sequence:      phone.Sequence,
 			ChangeDate:    timestamppb.New(phone.ChangeDate),
 			ResourceOwner: phone.ResourceOwner,
 		},
 		VerificationCode: phone.PlainCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) RemovePhone(ctx context.Context, req *user.RemovePhoneRequest) (resp *user.RemovePhoneResponse, err error) {
+func (s *Server) RemovePhone(ctx context.Context, req *connect.Request[user.RemovePhoneRequest]) (resp *connect.Response[user.RemovePhoneResponse], err error) {
 	details, err := s.command.RemoveUserPhone(ctx,
-		req.GetUserId(),
+		req.Msg.GetUserId(),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user.RemovePhoneResponse{
+	return connect.NewResponse(&user.RemovePhoneResponse{
 		Details: &object.Details{
 			Sequence:      details.Sequence,
 			ChangeDate:    timestamppb.New(details.EventDate),
 			ResourceOwner: details.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) ResendPhoneCode(ctx context.Context, req *user.ResendPhoneCodeRequest) (resp *user.ResendPhoneCodeResponse, err error) {
+func (s *Server) ResendPhoneCode(ctx context.Context, req *connect.Request[user.ResendPhoneCodeRequest]) (resp *connect.Response[user.ResendPhoneCodeResponse], err error) {
 	var phone *domain.Phone
-	switch v := req.GetVerification().(type) {
+	switch v := req.Msg.GetVerification().(type) {
 	case *user.ResendPhoneCodeRequest_SendCode:
-		phone, err = s.command.ResendUserPhoneCode(ctx, req.GetUserId(), s.userCodeAlg)
+		phone, err = s.command.ResendUserPhoneCode(ctx, req.Msg.GetUserId(), s.userCodeAlg)
 	case *user.ResendPhoneCodeRequest_ReturnCode:
-		phone, err = s.command.ResendUserPhoneCodeReturnCode(ctx, req.GetUserId(), s.userCodeAlg)
+		phone, err = s.command.ResendUserPhoneCodeReturnCode(ctx, req.Msg.GetUserId(), s.userCodeAlg)
 	case nil:
-		phone, err = s.command.ResendUserPhoneCode(ctx, req.GetUserId(), s.userCodeAlg)
+		phone, err = s.command.ResendUserPhoneCode(ctx, req.Msg.GetUserId(), s.userCodeAlg)
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-ResendUserPhoneCode", "verification oneOf %T in method SetPhone not implemented", v)
 	}
@@ -73,30 +74,30 @@ func (s *Server) ResendPhoneCode(ctx context.Context, req *user.ResendPhoneCodeR
 		return nil, err
 	}
 
-	return &user.ResendPhoneCodeResponse{
+	return connect.NewResponse(&user.ResendPhoneCodeResponse{
 		Details: &object.Details{
 			Sequence:      phone.Sequence,
 			ChangeDate:    timestamppb.New(phone.ChangeDate),
 			ResourceOwner: phone.ResourceOwner,
 		},
 		VerificationCode: phone.PlainCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) VerifyPhone(ctx context.Context, req *user.VerifyPhoneRequest) (*user.VerifyPhoneResponse, error) {
+func (s *Server) VerifyPhone(ctx context.Context, req *connect.Request[user.VerifyPhoneRequest]) (*connect.Response[user.VerifyPhoneResponse], error) {
 	details, err := s.command.VerifyUserPhone(ctx,
-		req.GetUserId(),
-		req.GetVerificationCode(),
+		req.Msg.GetUserId(),
+		req.Msg.GetVerificationCode(),
 		s.userCodeAlg,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &user.VerifyPhoneResponse{
+	return connect.NewResponse(&user.VerifyPhoneResponse{
 		Details: &object.Details{
 			Sequence:      details.Sequence,
 			ChangeDate:    timestamppb.New(details.EventDate),
 			ResourceOwner: details.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }

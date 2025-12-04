@@ -60,6 +60,12 @@ func main() {
 }
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the
@@ -68,7 +74,7 @@ target can be created as follows:
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -92,7 +98,7 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -103,9 +109,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
         }
     },
     "targets": [
-        {
-            "target": "<TargetID returned>"
-        }
+        "<TargetID returned>"
     ]
 }'
 ```
@@ -116,17 +120,27 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "userId": {
-        "givenName": "Test",
-        "familyName": "User"
-    },
-    "email": {
-        "email": "example@test.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
@@ -136,22 +150,25 @@ the [Sent information Event](./usage#sent-information-event) payload description
 
 ```json
 {
-  "aggregateID": "313014806065971608",
+  "aggregateID": "336494809936035843",
   "aggregateType": "user",
-  "resourceOwner": "312909075211944344",
-  "instanceID": "312909075211878808",
+  "resourceOwner": "336392597046099971",
+  "instanceID": "336392597046034435",
   "version": "v2",
   "sequence": 1,
   "event_type": "user.human.added",
-  "created_at": "2025-03-27T10:22:43.262665+01:00",
-  "userID": "312909075212468632",
-  "event_payload": {
-    "userName":"example@test.com",
-    "firstName":"Test",
-    "lastName":"User",
-    "displayName":"Test User",
-    "preferredLanguage":"und",
-    "email":"example@test.com"
+  "created_at": "2025-09-05T08:55:36.156333Z",
+  "userID": "336392597046755331",
+  "event_payload":
+  {
+    "email": "mini@mouse.com",
+    "gender": 1,
+    "lastName": "Mouse",
+    "nickName": "Mini",
+    "userName": "mini@mouse.com",
+    "firstName": "Minnie",
+    "displayName": "Minnie Mouse",
+    "preferredLanguage": "en"
   }
 }
 ```
@@ -160,12 +177,14 @@ The event_payload is base64 encoded and has the following content:
 
 ```json
 {
-  "userName": "example@test.com",
-  "firstName": "Test",
-  "lastName": "User",
-  "displayName": "Test User",
-  "preferredLanguage": "und",
-  "email": "example@test.com"
+  "email": "mini@mouse.com",
+  "gender": 1,
+  "lastName": "Mouse",
+  "nickName": "Mini",
+  "userName": "mini@mouse.com",
+  "firstName": "Minnie",
+  "displayName": "Minnie Mouse",
+  "preferredLanguage": "en"
 }
 ```
 

@@ -124,6 +124,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+			handler.WithIndex(handler.NewIndex("email", []string{HumanUserInstanceIDCol, "LOWER(" + HumanEmailCol + ")"})),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(MachineUserIDCol, handler.ColumnTypeText),

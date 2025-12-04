@@ -1,0 +1,10 @@
+Database:
+  postgres:
+    Database: existing_database
+    # Admin credentials should be the same as the application user credentials
+    Admin:
+      Username: zitadel-user
+      ExistingDatabase: existing_database # this is used to connect the admin to the previously created database
+    # Application user credentials
+    User:
+      Username: zitadel-user

@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -74,7 +73,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "invalid admin type",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{},
 				},
@@ -82,10 +81,22 @@ func TestServer_AddOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no admin, custom org ID",
+			ctx:  CTX,
+			req: &org.AddOrganizationRequest{
+				Name:  integration.OrganizationName(),
+				OrgId: gu.Ptr("custom-org-ID"),
+			},
+			want: &org.AddOrganizationResponse{
+				OrganizationId: "custom-org-ID",
+				CreatedAdmins:  []*org.AddOrganizationResponse_CreatedAdmin{},
+			},
+		},
+		{
 			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
@@ -96,7 +107,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user.SetHumanEmail_ReturnCode{
 										ReturnCode: &user.ReturnEmailVerificationCode{},
 									},
@@ -121,7 +132,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
@@ -134,7 +145,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user.SetHumanEmail_IsVerified{
 										IsVerified: true,
 									},

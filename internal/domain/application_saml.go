@@ -11,9 +11,9 @@ type SAMLApp struct {
 	AppName      string
 	EntityID     string
 	Metadata     []byte
-	MetadataURL  string
-	LoginVersion LoginVersion
-	LoginBaseURI string
+	MetadataURL  *string
+	LoginVersion *LoginVersion
+	LoginBaseURI *string
 
 	State AppState
 }
@@ -31,11 +31,14 @@ func (a *SAMLApp) GetMetadata() []byte {
 }
 
 func (a *SAMLApp) GetMetadataURL() string {
-	return a.MetadataURL
+	if a.MetadataURL != nil {
+		return *a.MetadataURL
+	}
+	return ""
 }
 
 func (a *SAMLApp) IsValid() bool {
-	if a.MetadataURL == "" && a.Metadata == nil {
+	if (a.MetadataURL == nil || *a.MetadataURL == "") && a.Metadata == nil {
 		return false
 	}
 	return true

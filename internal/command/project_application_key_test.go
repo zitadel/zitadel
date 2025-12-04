@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	permissionmock "github.com/zitadel/zitadel/internal/domain/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -17,9 +18,10 @@ import (
 
 func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
-		keySize     int
+		eventstore          func(*testing.T) *eventstore.Eventstore
+		idGenerator         id.Generator
+		keySize             int
+		permissionCheckMock domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -39,9 +41,8 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "no aggregateid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:          expectEventstore(),
+				permissionCheckMock: permissionmock.MockPermissionCheckOK(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -57,9 +58,8 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "no appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:          expectEventstore(),
+				permissionCheckMock: permissionmock.MockPermissionCheckOK(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -77,10 +77,8 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
+				eventstore:          expectEventstore(expectFilter()),
+				permissionCheckMock: permissionmock.MockPermissionCheckOK(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -97,10 +95,9 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 			},
 		},
 		{
-			name: "create key not allowed, precondition error",
+			name: "create key not allowed, precondition error 1",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -121,7 +118,8 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "key1"),
+				idGenerator:         id_mock.NewIDGeneratorExpectIDs(t, "key1"),
+				permissionCheckMock: permissionmock.MockPermissionCheckOK(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -138,10 +136,9 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 			},
 		},
 		{
-			name: "create key not allowed, precondition error",
+			name: "permission check failed",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -162,8 +159,9 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "key1"),
-				keySize:     10,
+				idGenerator:         id_mock.NewIDGeneratorExpectIDs(t, "key1"),
+				keySize:             10,
+				permissionCheckMock: permissionmock.MockPermissionCheckErr(zerrors.ThrowPermissionDenied(nil, "mock.err", "mock permission check failed")),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -174,6 +172,47 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 					ApplicationID: "app1",
 				},
 				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			name: "create key not allowed, precondition error 2",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewApplicationAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"app",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewAPIConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"client1@project",
+								"secret",
+								domain.APIAuthMethodTypeBasic),
+						),
+					),
+				),
+				idGenerator:         id_mock.NewIDGeneratorExpectIDs(t, "key1"),
+				keySize:             10,
+				permissionCheckMock: permissionmock.MockPermissionCheckOK(),
+			},
+			args: args{
+				ctx: context.Background(),
+				key: &domain.ApplicationKey{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					ApplicationID: "app1",
+				},
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -183,9 +222,10 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				idGenerator:        tt.fields.idGenerator,
 				applicationKeySize: tt.fields.keySize,
+				checkPermission:    tt.fields.permissionCheckMock,
 			}
 			got, err := r.AddApplicationKey(tt.args.ctx, tt.args.key, tt.args.resourceOwner)
 			if tt.res.err == nil {
