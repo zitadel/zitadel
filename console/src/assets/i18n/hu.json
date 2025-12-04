@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projektek",
-      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
+      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Például lehet egyetlen projekted 3 alkalmazással; egy a webes frontendhez, egy a mobilalkalmazásodhoz és egy a backendhez. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
       "OWNED": {
         "TITLE": "Tulajdonolt Projektek",
         "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, jogosultságait és alkalmazásait te menedzselheted."
@@ -2421,7 +2421,8 @@
       "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
       "2": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
       "3": "Egyszeri Jelszó Emailben (Email OTP)",
-      "4": "Egyszeri jelszó SMS-ben (SMS OTP)"
+      "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
+      "5": "Helyreállítási kódok"
     }
   },
   "LOGINPOLICY": {

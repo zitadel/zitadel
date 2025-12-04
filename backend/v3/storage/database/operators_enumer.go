@@ -94,11 +94,11 @@ func (i NumberOperation) IsANumberOperation() bool {
 	return false
 }
 
-const _TextOperationName = "=<>LIKELIKELIKELIKELIKELIKE"
+const _TextOperationName = "=<>LIKELIKELIKELIKELIKELIKE=<>"
 
-var _TextOperationIndex = [...]uint8{0, 1, 3, 7, 11, 15, 19, 23, 27}
+var _TextOperationIndex = [...]uint8{0, 1, 3, 7, 11, 15, 19, 23, 27, 28, 30}
 
-const _TextOperationLowerName = "=<>likelikelikelikelikelike"
+const _TextOperationLowerName = "=<>likelikelikelikelikelike=<>"
 
 func (i TextOperation) String() string {
 	i -= 1
@@ -120,9 +120,11 @@ func _TextOperationNoOp() {
 	_ = x[TextOperationContainsIgnoreCase-(6)]
 	_ = x[TextOperationEndsWithIgnoreCase-(7)]
 	_ = x[TextOperationStartsWithIgnoreCase-(8)]
+	_ = x[TextOperationEqualIgnoreCase-(9)]
+	_ = x[TextOperationNotEqualIgnoreCase-(10)]
 }
 
-var _TextOperationValues = []TextOperation{TextOperationEqual, TextOperationNotEqual, TextOperationStartsWith, TextOperationContains, TextOperationEndsWith, TextOperationContainsIgnoreCase, TextOperationEndsWithIgnoreCase, TextOperationStartsWithIgnoreCase}
+var _TextOperationValues = []TextOperation{TextOperationEqual, TextOperationNotEqual, TextOperationStartsWith, TextOperationContains, TextOperationEndsWith, TextOperationContainsIgnoreCase, TextOperationEndsWithIgnoreCase, TextOperationStartsWithIgnoreCase, TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase}
 
 var _TextOperationNameToValueMap = map[string]TextOperation{
 	_TextOperationName[0:1]:        TextOperationEqual,
@@ -141,6 +143,10 @@ var _TextOperationNameToValueMap = map[string]TextOperation{
 	_TextOperationLowerName[19:23]: TextOperationEndsWithIgnoreCase,
 	_TextOperationName[23:27]:      TextOperationStartsWithIgnoreCase,
 	_TextOperationLowerName[23:27]: TextOperationStartsWithIgnoreCase,
+	_TextOperationName[27:28]:      TextOperationEqualIgnoreCase,
+	_TextOperationLowerName[27:28]: TextOperationEqualIgnoreCase,
+	_TextOperationName[28:30]:      TextOperationNotEqualIgnoreCase,
+	_TextOperationLowerName[28:30]: TextOperationNotEqualIgnoreCase,
 }
 
 var _TextOperationNames = []string{
@@ -152,6 +158,8 @@ var _TextOperationNames = []string{
 	_TextOperationName[15:19],
 	_TextOperationName[19:23],
 	_TextOperationName[23:27],
+	_TextOperationName[27:28],
+	_TextOperationName[28:30],
 }
 
 // TextOperationString retrieves an enum value from the enum constants string name.
