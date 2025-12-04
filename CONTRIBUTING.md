@@ -654,7 +654,8 @@ If you have added support for a new language, please also ensure that it is adde
 
 You also have to add some changes to the following files:
 
-- [Register Local File](./console/src/app/app.module.ts)
+- [Register Local File](./console/src/app/app.module.ts) - Import and register the Angular locale, register `i18n-iso-countries` locale
+- [Exclude from Angular prebundle](./console/angular.json) - Add `i18n-iso-countries/langs/<locale>.json` to `prebundle.exclude`
 - [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
