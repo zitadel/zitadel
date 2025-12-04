@@ -1,37 +1,10 @@
-import { faker } from "@faker-js/faker";
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { code } from "./code";
-import { codeScreenExpect } from "./code-screen";
-import { loginScreenExpect, loginWithPassword, loginWithPasswordAndPhoneOTP } from "./login";
-import { OtpType, PasswordUserWithOTP } from "./user";
+import { test } from "./fixtures.js";
+import { codeScreenExpect } from "./code-screen.js";
+import { loginScreenExpect, loginWithPassword, loginWithPasswordAndPhoneOTP } from "./login.js";
+import { resendCode, verifySMSOTPFromMockServer, verifyOTPCode } from "./code.js";
+import { eventualSMSOTP } from "./mock.js";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUserWithOTP({
-      email: faker.internet.email(),
-      isEmailVerified: true,
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      organization: "",
-      phone: faker.phone.number({ style: "international" }),
-      isPhoneVerified: true,
-      password: "Password1!",
-      passwordChangeRequired: false,
-      type: OtpType.sms,
-    });
-
-    await user.ensure(page);
-    await use(user);
-    await user.cleanup();
-  },
-});
-
-test.skip("DOESN'T WORK: username, password and sms otp login, enter code manually", async ({ user, page }) => {
+test("username, password and sms otp login, enter code manually", async ({ userCreator, userService, page }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -39,11 +12,14 @@ test.skip("DOESN'T WORK: username, password and sms otp login, enter code manual
   // User receives a sms with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
-  await loginScreenExpect(page, user.getFullName());
+  await userCreator.create()
+  await userCreator.addSMSOTPFactor();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  await verifySMSOTPFromMockServer(page, userCreator.phone);
+  await loginScreenExpect(page, userCreator.fullName);
 });
 
-test.skip("DOESN'T WORK: username, password and sms otp login, resend code", async ({ user, page }) => {
+test("username, password and sms otp login, resend code", async ({ userCreator, userService, page }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -52,11 +28,17 @@ test.skip("DOESN'T WORK: username, password and sms otp login, resend code", asy
   // User clicks resend code
   // User receives a new sms with a verification code
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
-  await loginScreenExpect(page, user.getFullName());
+  await userCreator.create()
+  await userCreator.addSMSOTPFactor();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  // drain first code
+  await eventualSMSOTP(userCreator.phone);
+  await resendCode(page);
+  await verifySMSOTPFromMockServer(page, userCreator.phone);
+  await loginScreenExpect(page, userCreator.fullName);
 });
 
-test("username, password and sms otp login, wrong code", async ({ user, page }) => {
+test("username, password and sms otp login, wrong code", async ({ userCreator, userService, page }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -64,8 +46,12 @@ test("username, password and sms otp login, wrong code", async ({ user, page }) 
   // User receives a sms with a verification code
   // User enters a wrong code
   // Error message - "Invalid code" is shown
+  await userCreator.create()
+  await userCreator.addSMSOTPFactor();
+  await loginWithPassword(page, userCreator.username, userCreator.password);
+  // await valid code exists
+  await eventualSMSOTP(userCreator.phone);
   const c = "wrongcode";
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  await code(page, c);
+  await verifyOTPCode(page, c);
   await codeScreenExpect(page, c);
 });

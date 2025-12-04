@@ -10,7 +10,8 @@
       "defaultConfiguration": "default",
       "configurations": {
         "default": {},
-        "test-login-integration": {}
+        "test-login-integration": {},
+        "test-login-acceptance": {}
       }
     },
     "dev": {
@@ -18,7 +19,13 @@
       "continuous": true,
       "dependsOn": [
         "^build"
-      ]
+      ],
+      "defaultConfiguration": "default",
+      "configurations": {
+        "default": {},
+        "test-login-integration": {},
+        "test-login-acceptance": {}
+      }
     },
     "build": {
       "description": "Builds the Next.js Login application in standalone mode for production",
@@ -27,10 +34,7 @@
         "^build"
       ],
       "inputs": [
-        "default",
         "{workspaceRoot}/pnpm-lock.yaml",
-        "!{projectRoot}/.env.*",
-        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
@@ -48,8 +52,6 @@
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
-        "!{projectRoot}/.env.*",
-        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
@@ -70,14 +72,20 @@
       "description": "Checks code formatting with Prettier",
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
       ]
     },
     "lint-check-next": {
       "description": "Runs Next.js specific lint checks",
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
       ]
     },
     "test": {

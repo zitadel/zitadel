@@ -1,6 +1,6 @@
 // Note, we should use a provider such as Google to test this, where we know OIDC standard is properly implemented
 
-import test from "@playwright/test";
+import { test } from "@playwright/test";
 
 test("login with Generic OIDC IDP", async ({ page }) => {
   test.skip();

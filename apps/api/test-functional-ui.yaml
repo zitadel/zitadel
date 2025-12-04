@@ -5,7 +5,6 @@ ExternalSecure: false
 
 Database:
   postgres:
-    # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     database: zitadel
     AwaitInitialConn: 5m
     MaxOpenConns: 15

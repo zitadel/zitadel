@@ -1,4 +1,4 @@
-import test from "@playwright/test";
+import { test } from "@playwright/test";
 
 test("login with mfa setup, mfa setup prompt", async ({ page }) => {
   test.skip();

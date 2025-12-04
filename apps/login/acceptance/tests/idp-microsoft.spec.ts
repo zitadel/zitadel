@@ -1,7 +1,7 @@
 // Note for all tests, in case Microsoft doesn't deliver all relevant information per default
 // We should add an action in the needed cases
 
-import test from "@playwright/test";
+import { test } from "@playwright/test";
 
 test("login with Microsoft IDP", async ({ page }) => {
   test.skip();
