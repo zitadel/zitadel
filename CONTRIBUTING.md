@@ -660,6 +660,13 @@ You also have to add some changes to the following files:
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
+### Login v2 (Next.js)
+
+The new Login UI (Next.js) has its own translation files that are maintained separately:
+
+- [Login v2 locale files](./apps/login/locales) - Add a new `<locale>.json` file with translations
+- [Register language in LANGS](./apps/login/src/lib/i18n.ts) - Add the language to the `LANGS` array with native name and code
+
 ## **Did you find a security flaw?**
 
 - Please read [Security Policy](./SECURITY.md).
