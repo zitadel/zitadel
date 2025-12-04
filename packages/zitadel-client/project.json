@@ -1,7 +1,10 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/client",
   "namedInputs": {
-    "sources": ["{projectRoot}/src/**/*"]
+    "sources": [
+      "{projectRoot}/src/**/*"
+    ]
   },
   "targets": {
     "test": {
@@ -22,22 +25,26 @@
         "default"
       ],
       "cache": true
-    }, 
+    },
     "lint-check-knip": {
       "description": "Checks for unused dependencies with knip",
       "inputs": [
         "default"
       ],
       "cache": true
-    }, 
+    },
     "build": {
       "description": "Builds the TypeScript client library",
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml"
       ],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^generate"]
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "dependsOn": [
+        "^generate"
+      ]
     }
   }
 }

@@ -1,6 +1,7 @@
 {
   "packageManager": "pnpm@10.13.1",
   "name": "@zitadel/proto",
+  "repository": "https://github.com/zitadel/zitadel",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

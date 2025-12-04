@@ -1,7 +1,7 @@
 # ZITADEL Proto
 
 This package provides the Protocol Buffers (proto) definitions used by ZITADEL projects. It includes the proto files and generated code for interacting with ZITADEL's gRPC APIs.
-
+ 
 ## Installation
 
 To install the package, use npm or yarn:

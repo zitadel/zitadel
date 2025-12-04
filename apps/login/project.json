@@ -1,5 +1,10 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "release": {
+    "docker": {
+      "repositoryName": "zitadel/zitadel-login"
+    }
+  },
   "targets": {
     "prod": {
       "description": "Runs the Next.js Login application in production mode from the standalone build",
@@ -58,6 +63,11 @@
         "{projectRoot}/.next",
         "!{projectRoot}/.next/cache",
         "!{projectRoot}/.next/standalone"
+      ]
+    },
+    "build-docker": {
+      "dependsOn": [
+        "build"
       ]
     },
     "lint": {
@@ -123,12 +133,14 @@
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
         "!{projectRoot}/acceptance/**/*",
-        { "env": "LOGIN_BASE_URL" }
+        {
+          "env": "LOGIN_BASE_URL"
+        }
       ]
     },
     "test-integration-stop": {
-        "description": "Stops the gRPC mock container used for integration tests.",
-        "command": "nx run @zitadel/login-api-mock:down"
+      "description": "Stops the gRPC mock container used for integration tests.",
+      "command": "nx run @zitadel/login-api-mock:down"
     },
     "pack": {
       "description": "Packages the standalone Login application build into an archive",
