@@ -1,5 +1,8 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { shouldEnforceMFA } from "./verify-helper";
+import { cookies } from "next/headers";
+import { getFingerprintIdCookie } from "./fingerprint";
+import crypto from "crypto";
 
 // Mock function to create timestamps - following the same pattern as session.test.ts
 function createMockTimestamp(offsetMs = 3600000): any {
@@ -318,5 +321,548 @@ describe("shouldEnforceMFA", () => {
       const result = shouldEnforceMFA(mockSession, mockLoginSettings);
       expect(result).toBe(true); // Should require MFA since userVerified is falsy
     });
+  });
+});
+
+import {
+  checkPasswordChangeRequired,
+  checkEmailVerified,
+  checkEmailVerification,
+  checkMFAFactors,
+  checkUserVerification,
+} from "./verify-helper";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+// Mock dependencies
+vi.mock("@zitadel/client", () => ({
+  timestampDate: vi.fn((ts: any) => new Date(Number(ts.seconds) * 1000)),
+  timestampFromMs: vi.fn((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any),
+}));
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(),
+}));
+
+vi.mock("./fingerprint", () => ({
+  getFingerprintIdCookie: vi.fn(),
+}));
+
+vi.mock("./zitadel", () => ({
+  getUserByID: vi.fn(),
+}));
+
+vi.mock("crypto", () => ({
+  default: {
+    createHash: vi.fn(() => ({
+      update: vi.fn().mockReturnThis(),
+      digest: vi.fn(() => "mockedhash123"),
+    })),
+  },
+}));
+
+describe("checkPasswordChangeRequired", () => {
+  const mockSession: any = {
+    id: "session-123",
+    factors: {
+      user: {
+        id: "user-123",
+        loginName: "user@example.com",
+        organizationId: "org-123",
+      },
+    },
+  };
+
+  const createTimestamp = (daysAgo: number): any => {
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    return {
+      seconds: BigInt(Math.floor(date.getTime() / 1000)),
+      nanos: 0,
+    };
+  };
+
+  it("should redirect if password change is required on user", () => {
+    const humanUser: any = {
+      passwordChangeRequired: true,
+      passwordChanged: createTimestamp(0),
+    };
+
+    const result = checkPasswordChangeRequired(undefined, mockSession, humanUser);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/password/change"),
+    });
+  });
+
+  it("should redirect if password is expired based on maxAgeDays", () => {
+    const expirySettings: any = {
+      maxAgeDays: BigInt(30),
+    };
+
+    const humanUser: any = {
+      passwordChangeRequired: false,
+      passwordChanged: createTimestamp(35), // 35 days ago
+    };
+
+    const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/password/change"),
+    });
+  });
+
+  it("should not redirect if password is not expired", () => {
+    const expirySettings: any = {
+      maxAgeDays: BigInt(30),
+    };
+
+    const humanUser: any = {
+      passwordChangeRequired: false,
+      passwordChanged: createTimestamp(20), // 20 days ago
+    };
+
+    const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should include organization in redirect params", () => {
+    const humanUser: any = {
+      passwordChangeRequired: true,
+    };
+
+    const result = checkPasswordChangeRequired(undefined, mockSession, humanUser, "custom-org");
+
+    expect(result?.redirect).toContain("organization=");
+  });
+
+  it("should include requestId in redirect params", () => {
+    const humanUser: any = {
+      passwordChangeRequired: true,
+    };
+
+    const result = checkPasswordChangeRequired(undefined, mockSession, humanUser, undefined, "request-123");
+
+    expect(result?.redirect).toContain("requestId=request-123");
+  });
+
+  it("should handle no expiry settings", () => {
+    const humanUser: any = {
+      passwordChangeRequired: false,
+      passwordChanged: createTimestamp(100),
+    };
+
+    const result = checkPasswordChangeRequired(undefined, mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should handle no password changed timestamp", () => {
+    const expirySettings: any = {
+      maxAgeDays: BigInt(30),
+    };
+
+    const humanUser: any = {
+      passwordChangeRequired: false,
+    };
+
+    const result = checkPasswordChangeRequired(expirySettings, mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("checkEmailVerified", () => {
+  const mockSession: any = {
+    factors: {
+      user: {
+        id: "user-123",
+        loginName: "user@example.com",
+        organizationId: "org-123",
+      },
+    },
+  };
+
+  it("should redirect if email is not verified", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
+    });
+  });
+
+  it("should not redirect if email is verified", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: true,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should include userId in verify redirect", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser);
+
+    expect(result?.redirect).toContain("userId=user-123");
+  });
+
+  it("should include send=true parameter", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser);
+
+    expect(result?.redirect).toContain("send=true");
+  });
+
+  it("should include organization in redirect", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser, "custom-org");
+
+    expect(result?.redirect).toContain("organization=custom-org");
+  });
+
+  it("should include requestId in redirect", () => {
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerified(mockSession, humanUser, undefined, "request-123");
+
+    expect(result?.redirect).toContain("requestId=request-123");
+  });
+
+  it("should handle no email on user", () => {
+    const humanUser: any = {};
+
+    const result = checkEmailVerified(mockSession, humanUser);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
+    });
+  });
+});
+
+describe("checkEmailVerification", () => {
+  const mockSession: any = {
+    factors: {
+      user: {
+        loginName: "user@example.com",
+        organizationId: "org-123",
+      },
+    },
+  };
+
+  const originalEnv = process.env.EMAIL_VERIFICATION;
+
+  afterEach(() => {
+    process.env.EMAIL_VERIFICATION = originalEnv;
+  });
+
+  it("should redirect if email not verified and EMAIL_VERIFICATION is true", () => {
+    process.env.EMAIL_VERIFICATION = "true";
+
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerification(mockSession, humanUser);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/verify"),
+    });
+  });
+
+  it("should not redirect if EMAIL_VERIFICATION is not true", () => {
+    process.env.EMAIL_VERIFICATION = "false";
+
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerification(mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should not redirect if email is verified", () => {
+    process.env.EMAIL_VERIFICATION = "true";
+
+    const humanUser: any = {
+      email: {
+        isVerified: true,
+      },
+    };
+
+    const result = checkEmailVerification(mockSession, humanUser);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should include send=true parameter", () => {
+    process.env.EMAIL_VERIFICATION = "true";
+
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerification(mockSession, humanUser);
+
+    expect(result?.redirect).toContain("send=true");
+  });
+
+  it("should include organization in redirect", () => {
+    process.env.EMAIL_VERIFICATION = "true";
+
+    const humanUser: any = {
+      email: {
+        isVerified: false,
+      },
+    };
+
+    const result = checkEmailVerification(mockSession, humanUser, "custom-org");
+
+    expect(result?.redirect).toContain("organization=custom-org");
+  });
+});
+
+describe("checkUserVerification", () => {
+  let mockCookies: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockCookies = {
+      get: vi.fn(),
+    };
+    vi.mocked(cookies).mockResolvedValue(mockCookies);
+  });
+
+  it("should return true if verification hash matches", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "fingerprint-123",
+    } as any);
+
+    mockCookies.get.mockReturnValue({
+      value: "mockedhash123",
+    });
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(true);
+  });
+
+  it("should return false if fingerprint cookie not found", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue(undefined);
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if fingerprint cookie has no value", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "",
+    } as any);
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if verification cookie not found", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "fingerprint-123",
+    } as any);
+
+    mockCookies.get.mockReturnValue(undefined);
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if verification hash does not match", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "fingerprint-123",
+    } as any);
+
+    mockCookies.get.mockReturnValue({
+      value: "wronghash",
+    });
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
+  it("should create hash from userId and fingerprint", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "fingerprint-456",
+    } as any);
+
+    mockCookies.get.mockReturnValue({
+      value: "mockedhash123",
+    });
+
+    await checkUserVerification("user-456");
+
+    expect(crypto.createHash).toHaveBeenCalledWith("sha256");
+  });
+});
+
+describe("checkMFAFactors", () => {
+  const mockSession: any = {
+    id: "session-123",
+    factors: {
+      user: {
+        id: "user-123",
+        loginName: "user@example.com",
+        organizationId: "org-123",
+      },
+    },
+  };
+
+  const mockLoginSettings: any = {
+    forceMfa: false,
+    forceMfaLocalOnly: false,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  it("should not require MFA if authenticated with passkey", async () => {
+    const sessionWithPasskey = {
+      ...mockSession,
+      factors: {
+        ...mockSession.factors,
+        webAuthN: {
+          verifiedAt: createMockTimestamp(),
+          userVerified: true,
+        },
+      },
+    };
+
+    const result = await checkMFAFactors("https://example.com", sessionWithPasskey, mockLoginSettings, []);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should redirect to TOTP if only TOTP is available", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/time-based"),
+    });
+  });
+
+  it("should redirect to SMS OTP if only OTP_SMS is available", async () => {
+    const authMethods = [AuthenticationMethodType.OTP_SMS];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/sms"),
+    });
+  });
+
+  it("should redirect to Email OTP if only OTP_EMAIL is available", async () => {
+    const authMethods = [AuthenticationMethodType.OTP_EMAIL];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/otp/email"),
+    });
+  });
+
+  it("should redirect to U2F if only U2F is available", async () => {
+    const authMethods = [AuthenticationMethodType.U2F];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/u2f"),
+    });
+  });
+
+  it("should redirect to MFA selection page if multiple factors available", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_SMS];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/mfa?"),
+    });
+  });
+
+  it("should include organization in redirect params", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods, "custom-org");
+
+    expect(result?.redirect).toContain("organization=custom-org");
+  });
+
+  it("should include requestId in redirect params", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP];
+
+    const result = await checkMFAFactors(
+      "https://example.com",
+      mockSession,
+      mockLoginSettings,
+      authMethods,
+      undefined,
+      "request-123",
+    );
+
+    expect(result?.redirect).toContain("requestId=request-123");
+  });
+
+  it("should ignore non-MFA authentication methods", async () => {
+    const authMethods = [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY];
+
+    const result = await checkMFAFactors("https://example.com", mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toBeUndefined();
   });
 });

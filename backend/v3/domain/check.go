@@ -1,11 +1,15 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+)
 
 type Check struct {
-	Code           []byte     `db:"code"`
-	ExpiresAt      *time.Time `db:"expires_at"`
-	FailedAttempts uint8      `db:"failed_attempts"`
+	Code           *crypto.CryptoValue `db:"code"`
+	ExpiresAt      *time.Time          `db:"expires_at"`
+	FailedAttempts uint8               `db:"failed_attempts"`
 }
 
 type CheckType interface {
@@ -24,7 +28,7 @@ type CheckTypeInit struct {
 	// Expiry is the duration after which the check expires.
 	Expiry *time.Duration
 	// Code to be used for the check.
-	Code []byte
+	Code *crypto.CryptoValue
 }
 
 // isCheckType implements [CheckType].
