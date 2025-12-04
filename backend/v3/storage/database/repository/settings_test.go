@@ -1252,34 +1252,42 @@ func TestActivateBrandingSettings(t *testing.T) {
 	}{
 		{
 			name: "activate instance",
-			condition: database.And(
-				repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "activate organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				existingOrganizationSettings.OrganizationID,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "non-existing instance",
-			condition: database.And(
-				repo.InstanceIDCondition("foo"),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				"foo",
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 0,
 		},
 
 		{
 			name: "non-existing organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(gu.Ptr("foo")),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				gu.Ptr("foo"),
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 0,
 		},
@@ -1370,27 +1378,33 @@ func TestActivateAtBrandingSettings(t *testing.T) {
 	}{
 		{
 			name: "activate instance",
-			condition: database.And(
-				repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "activate organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+			condition: repo.UniqueCondition(
+				existingOrganizationSettings.InstanceID,
+				existingOrganizationSettings.OrganizationID,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "non-existing instance",
-			condition: database.And(
-				repo.InstanceIDCondition("foo"),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				"foo",
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 0,
@@ -1398,9 +1412,11 @@ func TestActivateAtBrandingSettings(t *testing.T) {
 
 		{
 			name: "non-existing organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(gu.Ptr("foo")),
+			condition: repo.UniqueCondition(
+				existingOrganizationSettings.InstanceID,
+				gu.Ptr("foo"),
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 0,
@@ -1454,9 +1470,11 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = repo.Activate(t.Context(), tx,
-		database.And(
-			repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-			repo.OrganizationIDCondition(existingInstanceSettings.OrganizationID),
+		repo.UniqueCondition(
+			existingInstanceSettings.InstanceID,
+			existingInstanceSettings.OrganizationID,
+			domain.SettingTypeBranding,
+			domain.SettingStatePreview,
 		),
 	)
 	require.NoError(t, err)
@@ -1492,9 +1510,11 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = repo.Activate(t.Context(), tx,
-		database.And(
-			repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-			repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+		repo.UniqueCondition(
+			existingOrganizationSettings.InstanceID,
+			existingOrganizationSettings.OrganizationID,
+			domain.SettingTypeBranding,
+			domain.SettingStatePreview,
 		),
 	)
 	require.NoError(t, err)
