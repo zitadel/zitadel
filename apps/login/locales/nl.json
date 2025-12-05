@@ -19,7 +19,7 @@
     "verifiedAt": "Laatst actief: {time}",
     "success": {
       "title": "Succesvol uitgelogd",
-      "description": "U bent succesvol uitgelogd."
+      "description": "Je bent succesvol uitgelogd."
     }
   },
   "loginname": {
@@ -260,7 +260,7 @@
   "passkey": {
     "verify": {
       "title": "Authenticeer met een passkey",
-      "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+      "description": "Jouw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
       "usePassword": "Gebruik wachtwoord",
       "submit": "Doorgaan",
       "errors": {
