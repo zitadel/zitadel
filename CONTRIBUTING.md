@@ -654,10 +654,21 @@ If you have added support for a new language, please also ensure that it is adde
 
 You also have to add some changes to the following files:
 
-- [Register Local File](./console/src/app/app.module.ts)
+- [Register Local File](./console/src/app/app.module.ts) - Import and register the Angular locale, register `i18n-iso-countries` locale
+- [Exclude from Angular prebundle](./console/angular.json) - Add `i18n-iso-countries/langs/<locale>.json` to `prebundle.exclude`
 - [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
+
+### Login v2 (Next.js)
+
+The new Login UI (Next.js) has its own translation files that are maintained separately:
+
+- [Login v2 locale files](./apps/login/locales) - Add a new `<locale>.json` file with translations
+- [Register language in LANGS](./apps/login/src/lib/i18n.ts) - Add the language to the `LANGS` array with native name and code
+- [System default translations](./internal/query/v2-default.json) - Add translations to the backend default translations file (required for Login v2 to work correctly)
+
+**Important**: The `v2-default.json` file contains system default translations served by the API. If a language is not present in this file, the API will fall back to the instance's default language (typically English), which will override the locale-specific translations. This is why adding translations to both `apps/login/locales/<locale>.json` AND `internal/query/v2-default.json` is required for Login v2.
 
 ## **Did you find a security flaw?**
 
