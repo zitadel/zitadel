@@ -666,6 +666,9 @@ The new Login UI (Next.js) has its own translation files that are maintained sep
 
 - [Login v2 locale files](./apps/login/locales) - Add a new `<locale>.json` file with translations
 - [Register language in LANGS](./apps/login/src/lib/i18n.ts) - Add the language to the `LANGS` array with native name and code
+- [System default translations](./internal/query/v2-default.json) - Add translations to the backend default translations file (required for Login v2 to work correctly)
+
+**Important**: The `v2-default.json` file contains system default translations served by the API. If a language is not present in this file, the API will fall back to the instance's default language (typically English), which will override the locale-specific translations. This is why adding translations to both `apps/login/locales/<locale>.json` AND `internal/query/v2-default.json` is required for Login v2.
 
 ## **Did you find a security flaw?**
 
