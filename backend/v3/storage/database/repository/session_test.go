@@ -206,7 +206,6 @@ func TestSession_Create(t *testing.T) {
 
 func TestSession_Update(t *testing.T) {
 	beforeUpdate := time.Now()
-	testNow := time.Now()
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	defer func() {
@@ -233,6 +232,7 @@ func TestSession_Update(t *testing.T) {
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
+	testNow := time.Now()
 	tests := []struct {
 		name         string
 		testFunc     func(t *testing.T) *domain.Session
