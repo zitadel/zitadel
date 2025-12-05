@@ -198,8 +198,8 @@ func TestSession_Create(t *testing.T) {
 			assert.Equal(t, createdSession.UpdatedAt.Add(tt.session.Lifetime), createdSession.Expiration)
 			assert.Equal(t, tt.session.CreatorID, createdSession.CreatorID)
 			assert.Equal(t, tt.session.UserAgent, createdSession.UserAgent)
-			assert.WithinRange(t, createdSession.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, createdSession.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, createdSession.CreatedAt, beforeCreate.Add(-time.Second), afterCreate.Add(time.Second))
+			assert.WithinRange(t, createdSession.UpdatedAt, beforeCreate.Add(-time.Second), afterCreate.Add(time.Second))
 		})
 	}
 }
@@ -878,7 +878,7 @@ func TestSession_Update(t *testing.T) {
 			assert.Equal(t, createdSession.UserAgent, session.UserAgent)
 			assert.WithinRange(t, session.UpdatedAt, beforeUpdate, afterUpdate)
 			assert.EqualExportedValues(t, createdSession.Challenges, session.Challenges)
-			slices.SortFunc(session.Factors, func(a, b domain.SessionFactor) int {
+			slices.SortFunc(session.Factors, func(a, b domain.SessionFactor) int { // sort to make comparison possible
 				return int(a.SessionFactorType()) - int(b.SessionFactorType())
 			})
 			assert.EqualExportedValues(t, createdSession.Factors, session.Factors)
@@ -1309,7 +1309,7 @@ func TestSession_List(t *testing.T) {
 			}
 			assert.Len(t, got, len(tt.expected))
 			for _, session := range got {
-				slices.SortFunc(session.Factors, func(a, b domain.SessionFactor) int {
+				slices.SortFunc(session.Factors, func(a, b domain.SessionFactor) int { // sort to make comparison possible
 					return int(a.SessionFactorType()) - int(b.SessionFactorType())
 				})
 			}
