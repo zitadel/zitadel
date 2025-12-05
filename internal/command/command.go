@@ -224,6 +224,9 @@ func StartCommands(
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
+
+	// TODO(IAM-Marco): This needs to be migrated to relational. The settings repository is missing the structure for it though
+	new_domain.SetPhoneCodeVerifier(repo.phoneCodeVerifierFromConfig)
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
