@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Progetti",
-      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua app mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "OWNED": {
         "TITLE": "Progetti di Proprietà",
         "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
@@ -2402,7 +2402,8 @@
       "1": "One Time Password per Authenticator App (TOTP)",
       "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
       "3": "One Time Password per Email (Email OTP)",
-      "4": "One Time Password per SMS (SMS OTP)"
+      "4": "One Time Password per SMS (SMS OTP)",
+      "5": "Codici di recupero"
     }
   },
   "LOGINPOLICY": {

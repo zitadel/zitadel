@@ -27,23 +27,24 @@ type Sessions struct {
 }
 
 type Session struct {
-	ID             string
-	CreationDate   time.Time
-	ChangeDate     time.Time
-	Sequence       uint64
-	State          domain.SessionState
-	ResourceOwner  string
-	Creator        string
-	UserFactor     SessionUserFactor
-	PasswordFactor SessionPasswordFactor
-	IntentFactor   SessionIntentFactor
-	WebAuthNFactor SessionWebAuthNFactor
-	TOTPFactor     SessionTOTPFactor
-	OTPSMSFactor   SessionOTPFactor
-	OTPEmailFactor SessionOTPFactor
-	Metadata       map[string][]byte
-	UserAgent      domain.UserAgent
-	Expiration     time.Time
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	Sequence           uint64
+	State              domain.SessionState
+	ResourceOwner      string
+	Creator            string
+	UserFactor         SessionUserFactor
+	PasswordFactor     SessionPasswordFactor
+	IntentFactor       SessionIntentFactor
+	WebAuthNFactor     SessionWebAuthNFactor
+	TOTPFactor         SessionTOTPFactor
+	OTPSMSFactor       SessionOTPFactor
+	OTPEmailFactor     SessionOTPFactor
+	RecoveryCodeFactor SessionRecoveryCodeFactor
+	Metadata           map[string][]byte
+	UserAgent          domain.UserAgent
+	Expiration         time.Time
 }
 
 type SessionUserFactor struct {
@@ -73,6 +74,10 @@ type SessionTOTPFactor struct {
 
 type SessionOTPFactor struct {
 	OTPCheckedAt time.Time
+}
+
+type SessionRecoveryCodeFactor struct {
+	RecoveryCodeCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -214,6 +219,10 @@ var (
 	}
 	SessionColumnOTPEmailCheckedAt = Column{
 		name:  projection.SessionColumnOTPEmailCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnRecoveryCodeCheckedAt = Column{
+		name:  projection.SessionColumnRecoveryCodeCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -387,6 +396,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
+			SessionColumnRecoveryCodeCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 			SessionColumnUserAgentFingerprintID.identifier(),
@@ -402,23 +412,24 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			session := new(Session)
 
 			var (
-				userID              sql.NullString
-				userResourceOwner   sql.NullString
-				userCheckedAt       sql.NullTime
-				loginName           sql.NullString
-				displayName         sql.NullString
-				passwordCheckedAt   sql.NullTime
-				intentCheckedAt     sql.NullTime
-				webAuthNCheckedAt   sql.NullTime
-				webAuthNUserPresent sql.NullBool
-				totpCheckedAt       sql.NullTime
-				otpSMSCheckedAt     sql.NullTime
-				otpEmailCheckedAt   sql.NullTime
-				metadata            database.Map[[]byte]
-				token               sql.NullString
-				userAgentIP         sql.NullString
-				userAgentHeader     database.Map[[]string]
-				expiration          sql.NullTime
+				userID                 sql.NullString
+				userResourceOwner      sql.NullString
+				userCheckedAt          sql.NullTime
+				loginName              sql.NullString
+				displayName            sql.NullString
+				passwordCheckedAt      sql.NullTime
+				intentCheckedAt        sql.NullTime
+				webAuthNCheckedAt      sql.NullTime
+				webAuthNUserPresent    sql.NullBool
+				totpCheckedAt          sql.NullTime
+				otpSMSCheckedAt        sql.NullTime
+				otpEmailCheckedAt      sql.NullTime
+				recoveryCodesCheckedAt sql.NullTime
+				metadata               database.Map[[]byte]
+				token                  sql.NullString
+				userAgentIP            sql.NullString
+				userAgentHeader        database.Map[[]string]
+				expiration             sql.NullTime
 			)
 
 			err := row.Scan(
@@ -441,6 +452,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 				&totpCheckedAt,
 				&otpSMSCheckedAt,
 				&otpEmailCheckedAt,
+				&recoveryCodesCheckedAt,
 				&metadata,
 				&token,
 				&session.UserAgent.FingerprintID,
@@ -469,6 +481,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
+			session.RecoveryCodeFactor.RecoveryCodeCheckedAt = recoveryCodesCheckedAt.Time
 			session.Metadata = metadata
 			session.UserAgent.Header = http.Header(userAgentHeader)
 			if userAgentIP.Valid {
@@ -500,6 +513,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
+			SessionColumnRecoveryCodeCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnUserAgentFingerprintID.identifier(),
 			SessionColumnUserAgentIP.identifier(),
@@ -518,22 +532,23 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 				session := new(Session)
 
 				var (
-					userID              sql.NullString
-					userResourceOwner   sql.NullString
-					userCheckedAt       sql.NullTime
-					loginName           sql.NullString
-					displayName         sql.NullString
-					passwordCheckedAt   sql.NullTime
-					intentCheckedAt     sql.NullTime
-					webAuthNCheckedAt   sql.NullTime
-					webAuthNUserPresent sql.NullBool
-					totpCheckedAt       sql.NullTime
-					otpSMSCheckedAt     sql.NullTime
-					otpEmailCheckedAt   sql.NullTime
-					metadata            database.Map[[]byte]
-					userAgentIP         sql.NullString
-					userAgentHeader     database.Map[[]string]
-					expiration          sql.NullTime
+					userID                 sql.NullString
+					userResourceOwner      sql.NullString
+					userCheckedAt          sql.NullTime
+					loginName              sql.NullString
+					displayName            sql.NullString
+					passwordCheckedAt      sql.NullTime
+					intentCheckedAt        sql.NullTime
+					webAuthNCheckedAt      sql.NullTime
+					webAuthNUserPresent    sql.NullBool
+					totpCheckedAt          sql.NullTime
+					otpSMSCheckedAt        sql.NullTime
+					otpEmailCheckedAt      sql.NullTime
+					recoveryCodesCheckedAt sql.NullTime
+					metadata               database.Map[[]byte]
+					userAgentIP            sql.NullString
+					userAgentHeader        database.Map[[]string]
+					expiration             sql.NullTime
 				)
 
 				err := rows.Scan(
@@ -556,6 +571,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 					&totpCheckedAt,
 					&otpSMSCheckedAt,
 					&otpEmailCheckedAt,
+					&recoveryCodesCheckedAt,
 					&metadata,
 					&session.UserAgent.FingerprintID,
 					&userAgentIP,
@@ -580,6 +596,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
+				session.RecoveryCodeFactor.RecoveryCodeCheckedAt = recoveryCodesCheckedAt.Time
 				session.Metadata = metadata
 				session.UserAgent.Header = http.Header(userAgentHeader)
 				if userAgentIP.Valid {
