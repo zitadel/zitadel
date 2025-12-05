@@ -1,6 +1,7 @@
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { createOTelConnectInterceptor } from "./otel-connect-interceptor";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -1204,24 +1205,30 @@ export async function listAuthenticationMethodTypes({ serviceUrl, userId }: { se
 }
 
 export function createServerTransport(token: string, baseUrl: string) {
+  const interceptors: any[] = [];
+
+  // Add OpenTelemetry interceptor for automatic tracing of all RPC calls
+  interceptors.push(createOTelConnectInterceptor("zitadel-login-grpc"));
+
+  // Add custom headers interceptor if configured
+  if (process.env.CUSTOM_REQUEST_HEADERS) {
+    interceptors.push((next: any) => {
+      return (req: any) => {
+        process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
+          const kv = header.indexOf(":");
+          if (kv > 0) {
+            req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+          } else {
+            console.warn(`Skipping malformed header: ${header}`);
+          }
+        });
+        return next(req);
+      };
+    });
+  }
+
   return libCreateServerTransport(token, {
     baseUrl,
-    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
-      ? undefined
-      : [
-          (next) => {
-            return (req) => {
-              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
-                const kv = header.indexOf(":");
-                if (kv > 0) {
-                  req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
-                } else {
-                  console.warn(`Skipping malformed header: ${header}`);
-                }
-              });
-              return next(req);
-            };
-          },
-        ],
+    interceptors,
   });
 }
