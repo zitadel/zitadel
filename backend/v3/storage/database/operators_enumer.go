@@ -28,12 +28,12 @@ func _NumberOperationNoOp() {
 	_ = x[NumberOperationEqual-(1)]
 	_ = x[NumberOperationNotEqual-(2)]
 	_ = x[NumberOperationLessThan-(3)]
-	_ = x[NumberOperationAtLeast-(4)]
+	_ = x[NumberOperationLessThanOrEqual-(4)]
 	_ = x[NumberOperationGreaterThan-(5)]
-	_ = x[NumberOperationAtMost-(6)]
+	_ = x[NumberOperationGreaterThanOrEqual-(6)]
 }
 
-var _NumberOperationValues = []NumberOperation{NumberOperationEqual, NumberOperationNotEqual, NumberOperationLessThan, NumberOperationAtLeast, NumberOperationGreaterThan, NumberOperationAtMost}
+var _NumberOperationValues = []NumberOperation{NumberOperationEqual, NumberOperationNotEqual, NumberOperationLessThan, NumberOperationLessThanOrEqual, NumberOperationGreaterThan, NumberOperationGreaterThanOrEqual}
 
 var _NumberOperationNameToValueMap = map[string]NumberOperation{
 	_NumberOperationName[0:1]:      NumberOperationEqual,
@@ -42,12 +42,12 @@ var _NumberOperationNameToValueMap = map[string]NumberOperation{
 	_NumberOperationLowerName[1:3]: NumberOperationNotEqual,
 	_NumberOperationName[3:4]:      NumberOperationLessThan,
 	_NumberOperationLowerName[3:4]: NumberOperationLessThan,
-	_NumberOperationName[4:6]:      NumberOperationAtLeast,
-	_NumberOperationLowerName[4:6]: NumberOperationAtLeast,
+	_NumberOperationName[4:6]:      NumberOperationLessThanOrEqual,
+	_NumberOperationLowerName[4:6]: NumberOperationLessThanOrEqual,
 	_NumberOperationName[6:7]:      NumberOperationGreaterThan,
 	_NumberOperationLowerName[6:7]: NumberOperationGreaterThan,
-	_NumberOperationName[7:9]:      NumberOperationAtMost,
-	_NumberOperationLowerName[7:9]: NumberOperationAtMost,
+	_NumberOperationName[7:9]:      NumberOperationGreaterThanOrEqual,
+	_NumberOperationLowerName[7:9]: NumberOperationGreaterThanOrEqual,
 }
 
 var _NumberOperationNames = []string{
