@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("idp");
   return { title: t("title") };

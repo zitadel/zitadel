@@ -3,7 +3,7 @@
 import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -27,15 +27,7 @@ type Props = {
   allowRegister: boolean;
 };
 
-export function UsernameForm({
-  loginName,
-  requestId,
-  organization,
-  suffix,
-  loginSettings,
-  submit,
-  allowRegister,
-}: Props) {
+export function UsernameForm({ loginName, requestId, organization, suffix, loginSettings, submit, allowRegister }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -82,15 +74,14 @@ export function UsernameForm({
   useEffect(() => {
     if (submit && loginName) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      submitLoginName({ loginName }, organization);
+      startTransition(() => {
+        submitLoginName({ loginName }, organization);
+      });
     }
-  }, []);
+  }, [submit, loginName, organization, submitLoginName]);
 
   let inputLabel = t("labels.loginname");
-  if (
-    loginSettings?.disableLoginWithEmail &&
-    loginSettings?.disableLoginWithPhone
-  ) {
+  if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {
     inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
     inputLabel = t("labels.usernameOrPhoneNumber");

@@ -13,6 +13,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<Record<string | number | symbol, string | undefined>>;

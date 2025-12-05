@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 /**
  * Linking failed page - shown when IDP linking fails
  */
+
 export default async function LinkingFailedPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
