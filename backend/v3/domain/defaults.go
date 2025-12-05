@@ -21,6 +21,7 @@ var (
 	passwordHasher    *crypto.Hasher
 	idpEncryptionAlgo crypto.EncryptionAlgorithm
 	mfaEncryptionAlgo crypto.EncryptionAlgorithm
+	otpEncryptionAlgo crypto.EncryptionAlgorithm
 
 	webauthnConfig *webauthn.Config
 )
@@ -59,4 +60,8 @@ func SetWebAuthNConfig(cfg *webauthn.Config) {
 
 func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
 	mfaEncryptionAlgo = mfaEncryptionAlg
+}
+
+func SetOTPEncryptionAlgorithm(otpEncryptionAlg crypto.EncryptionAlgorithm) {
+	otpEncryptionAlgo = otpEncryptionAlg
 }
