@@ -67,7 +67,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "happy path",
 			idp: domain.IdentityProvider{
 				InstanceID:        instanceId,
-				OrgID:             &orgId,
+				OrganizationID:    &orgId,
 				ID:                gofakeit.Name(),
 				State:             domain.IDPStateActive,
 				Name:              gofakeit.Name(),
@@ -83,10 +83,10 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "create idp without name",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				ID:         gofakeit.Name(),
-				State:      domain.IDPStateActive,
+				InstanceID:     instanceId,
+				OrganizationID: &orgId,
+				ID:             gofakeit.Name(),
+				State:          domain.IDPStateActive,
 				// Name:              gofakeit.Name(),
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
 				AllowCreation:     true,
@@ -105,7 +105,7 @@ func TestCreateIDProvider(t *testing.T) {
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -133,7 +133,7 @@ func TestCreateIDProvider(t *testing.T) {
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -190,7 +190,7 @@ func TestCreateIDProvider(t *testing.T) {
 					idpRepo := repository.IDProviderRepository()
 					idp := domain.IdentityProvider{
 						InstanceID:        newInstId,
-						OrgID:             &newOrgId,
+						OrganizationID:    &newOrgId,
 						ID:                id,
 						State:             domain.IDPStateActive,
 						Name:              name,
@@ -209,12 +209,12 @@ func TestCreateIDProvider(t *testing.T) {
 					// change the instanceID to a different instance
 					idp.InstanceID = instanceId
 					// change the OrgId to a different organization
-					idp.OrgID = &orgId
+					idp.OrganizationID = &orgId
 					return &idp
 				},
 				idp: domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                id,
 					State:             domain.IDPStateActive,
 					Name:              name,
@@ -231,8 +231,8 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "adding idp with no id",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
+				InstanceID:     instanceId,
+				OrganizationID: &orgId,
 				// ID:                gofakeit.Name(),
 				State:             domain.IDPStateActive,
 				Name:              gofakeit.Name(),
@@ -249,10 +249,10 @@ func TestCreateIDProvider(t *testing.T) {
 		{
 			name: "adding idp with no name",
 			idp: domain.IdentityProvider{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				ID:         gofakeit.Name(),
-				State:      domain.IDPStateActive,
+				InstanceID:     instanceId,
+				OrganizationID: &orgId,
+				ID:             gofakeit.Name(),
+				State:          domain.IDPStateActive,
 				// Name:              gofakeit.Name(),
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
 				AllowCreation:     true,
@@ -268,7 +268,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with no instance id",
 			idp: domain.IdentityProvider{
 				// InstanceID:        instanceId,
-				OrgID:             &orgId,
+				OrganizationID:    &orgId,
 				State:             domain.IDPStateActive,
 				Name:              gofakeit.Name(),
 				Type:              gu.Ptr(domain.IDPTypeOIDC),
@@ -285,7 +285,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with non existent instance id",
 			idp: domain.IdentityProvider{
 				InstanceID:        gofakeit.Name(),
-				OrgID:             &orgId,
+				OrganizationID:    &orgId,
 				State:             domain.IDPStateActive,
 				ID:                gofakeit.Name(),
 				Name:              gofakeit.Name(),
@@ -303,7 +303,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with non existent org id",
 			idp: domain.IdentityProvider{
 				InstanceID:        instanceId,
-				OrgID:             gu.Ptr(gofakeit.Name()),
+				OrganizationID:    gu.Ptr(gofakeit.Name()),
 				State:             domain.IDPStateActive,
 				ID:                gofakeit.Name(),
 				Name:              gofakeit.Name(),
@@ -353,7 +353,7 @@ func TestCreateIDProvider(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.idp.InstanceID, idp.InstanceID)
-			assert.Equal(t, tt.idp.OrgID, idp.OrgID)
+			assert.Equal(t, tt.idp.OrganizationID, idp.OrganizationID)
 			assert.Equal(t, tt.idp.State, idp.State)
 			assert.Equal(t, tt.idp.ID, idp.ID)
 			assert.Equal(t, tt.idp.Name, idp.Name)
@@ -422,7 +422,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -448,7 +448,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -474,7 +474,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -500,7 +500,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -526,7 +526,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -552,7 +552,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -579,7 +579,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -638,7 +638,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, createdIDP.InstanceID, idp.InstanceID)
-			assert.Equal(t, createdIDP.OrgID, idp.OrgID)
+			assert.Equal(t, createdIDP.OrganizationID, idp.OrganizationID)
 			assert.Equal(t, createdIDP.State, idp.State)
 			assert.Equal(t, createdIDP.ID, idp.ID)
 			assert.Equal(t, createdIDP.Name, idp.Name)
@@ -720,7 +720,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             &orgId,
+						OrganizationID:    &orgId,
 						ID:                id,
 						State:             domain.IDPStateActive,
 						Name:              gofakeit.Name(),
@@ -747,7 +747,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             &orgId,
+						OrganizationID:    &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive,
 						Name:              name,
@@ -773,7 +773,7 @@ func TestGetIDProvider(t *testing.T) {
 				stylingType := 2
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -797,7 +797,7 @@ func TestGetIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -822,7 +822,7 @@ func TestGetIDProvider(t *testing.T) {
 			testFunc: func(t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             &orgId,
+					OrganizationID:    &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive,
 					Name:              gofakeit.Name(),
@@ -849,7 +849,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             &orgId,
+						OrganizationID:    &orgId,
 						ID:                id,
 						State:             domain.IDPStateActive,
 						Name:              gofakeit.Name(),
@@ -864,7 +864,7 @@ func TestGetIDProvider(t *testing.T) {
 
 					err := idpRepo.Create(t.Context(), tx, &idp)
 					require.NoError(t, err)
-					idp.OrgID = gu.Ptr("non-existent-orgID")
+					idp.OrganizationID = gu.Ptr("non-existent-orgID")
 					return &idp
 				},
 				idpIdentifierCondition: idpRepo.IDCondition(id),
@@ -878,7 +878,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             &orgId,
+						OrganizationID:    &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive,
 						Name:              name,
@@ -914,7 +914,7 @@ func TestGetIDProvider(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						idpRepo.InstanceIDCondition(idp.InstanceID),
-						idpRepo.OrgIDCondition(idp.OrgID),
+						idpRepo.OrgIDCondition(idp.OrganizationID),
 						tt.idpIdentifierCondition,
 					),
 				),
@@ -926,7 +926,7 @@ func TestGetIDProvider(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, returnedIDP.InstanceID, idp.InstanceID)
-			assert.Equal(t, returnedIDP.OrgID, idp.OrgID)
+			assert.Equal(t, returnedIDP.OrganizationID, idp.OrganizationID)
 			assert.Equal(t, returnedIDP.State, idp.State)
 			assert.Equal(t, returnedIDP.ID, idp.ID)
 			assert.Equal(t, returnedIDP.Name, idp.Name)
@@ -957,7 +957,7 @@ func TestListIDProvider(t *testing.T) {
 	idps := [...]*domain.IdentityProvider{
 		{
 			InstanceID:        instanceID,
-			OrgID:             &orgID,
+			OrganizationID:    &orgID,
 			ID:                "1",
 			State:             domain.IDPStateActive,
 			Name:              "1",
@@ -971,7 +971,7 @@ func TestListIDProvider(t *testing.T) {
 		},
 		{
 			InstanceID:        instanceID,
-			OrgID:             &orgID,
+			OrganizationID:    &orgID,
 			ID:                "2",
 			State:             domain.IDPStateActive,
 			Name:              "2",
@@ -986,7 +986,7 @@ func TestListIDProvider(t *testing.T) {
 		{
 
 			InstanceID:        instanceID,
-			OrgID:             &orgID,
+			OrganizationID:    &orgID,
 			ID:                "3",
 			State:             domain.IDPStateInactive,
 			Name:              "3",
@@ -1002,7 +1002,7 @@ func TestListIDProvider(t *testing.T) {
 		{
 
 			InstanceID:        instanceID,
-			OrgID:             nil,
+			OrganizationID:    nil,
 			ID:                "4",
 			State:             domain.IDPStateActive,
 			Name:              "4",
@@ -1017,7 +1017,7 @@ func TestListIDProvider(t *testing.T) {
 		{
 
 			InstanceID:        instanceID,
-			OrgID:             nil,
+			OrganizationID:    nil,
 			ID:                "5",
 			State:             domain.IDPStateActive,
 			Name:              "5",
@@ -1032,7 +1032,7 @@ func TestListIDProvider(t *testing.T) {
 		{
 
 			InstanceID:        instanceID,
-			OrgID:             nil,
+			OrganizationID:    nil,
 			ID:                "6",
 			State:             domain.IDPStateInactive,
 			Name:              "6",
@@ -1205,7 +1205,7 @@ func TestListIDProvider(t *testing.T) {
 			}
 			for i, want := range tt.want {
 				assert.Equal(t, got[i].InstanceID, want.InstanceID)
-				assert.Equal(t, got[i].OrgID, want.OrgID)
+				assert.Equal(t, got[i].OrganizationID, want.OrganizationID)
 				assert.Equal(t, got[i].State, want.State)
 				assert.Equal(t, got[i].ID, want.ID)
 				assert.Equal(t, got[i].Name, want.Name)
@@ -1277,7 +1277,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             &orgId,
+							OrganizationID:    &orgId,
 							ID:                id,
 							State:             domain.IDPStateActive,
 							Name:              gofakeit.Name(),
@@ -1307,7 +1307,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             &orgId,
+							OrganizationID:    &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive,
 							Name:              name,
@@ -1342,7 +1342,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             &orgId,
+							OrganizationID:    &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive,
 							Name:              name,

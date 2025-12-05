@@ -508,11 +508,11 @@ func TestGetOrganization(t *testing.T) {
 					require.NoError(t, err)
 
 					d := &domain.AddOrganizationDomain{
-						InstanceID: org.InstanceID,
-						OrgID:      org.ID,
-						Domain:     gofakeit.DomainName(),
-						IsVerified: true,
-						IsPrimary:  true,
+						InstanceID:     org.InstanceID,
+						OrganizationID: org.ID,
+						Domain:         gofakeit.DomainName(),
+						IsVerified:     true,
+						IsPrimary:      true,
 					}
 					err = orgDomainRepo.Add(t.Context(), tx, d)
 					require.NoError(t, err)
@@ -520,7 +520,7 @@ func TestGetOrganization(t *testing.T) {
 					org.Domains = []*domain.OrganizationDomain{
 						{
 							InstanceID:     d.InstanceID,
-							OrgID:          d.OrgID,
+							OrganizationID: d.OrganizationID,
 							ValidationType: d.ValidationType,
 							Domain:         d.Domain,
 							IsPrimary:      d.IsPrimary,
@@ -1067,21 +1067,21 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 		domainRepo := repository.OrganizationDomainRepository()
 
 		domain1 := &domain.AddOrganizationDomain{
-			InstanceID: org.InstanceID,
-			OrgID:      org.ID,
-			Domain:     "domain1.com",
-			IsVerified: true,
-			IsPrimary:  true,
+			InstanceID:     org.InstanceID,
+			OrganizationID: org.ID,
+			Domain:         "domain1.com",
+			IsVerified:     true,
+			IsPrimary:      true,
 		}
 		err = domainRepo.Add(t.Context(), tx, domain1)
 		require.NoError(t, err)
 
 		domain2 := &domain.AddOrganizationDomain{
-			InstanceID: org.InstanceID,
-			OrgID:      org.ID,
-			Domain:     "domain2.com",
-			IsVerified: false,
-			IsPrimary:  false,
+			InstanceID:     org.InstanceID,
+			OrganizationID: org.ID,
+			Domain:         "domain2.com",
+			IsVerified:     false,
+			IsPrimary:      false,
 		}
 		err = domainRepo.Add(t.Context(), tx, domain2)
 		require.NoError(t, err)

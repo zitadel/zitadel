@@ -23,13 +23,13 @@ CREATE TABLE zitadel.identity_providers (
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     
     , PRIMARY KEY (instance_id, id)
-    , CONSTRAINT identity_providers_id_unique UNIQUE NULLS NOT DISTINCT (instance_id, org_id, id)
-    , CONSTRAINT identity_providers_name_unique UNIQUE NULLS NOT DISTINCT (instance_id, org_id, name)
+    , CONSTRAINT identity_providers_id_unique UNIQUE NULLS NOT DISTINCT (instance_id, organization_id, id)
+    , CONSTRAINT identity_providers_name_unique UNIQUE NULLS NOT DISTINCT (instance_id, organization_id, name)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)
-    , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations(instance_id, id)
+    , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id)
 );
 
--- CREATE INDEX idx_identity_providers_org_id ON identity_providers(instance_id, org_id) WHERE org_id IS NOT NULL;
+-- CREATE INDEX idx_identity_providers_organization_id ON identity_providers(instance_id, organization_id) WHERE organization_id IS NOT NULL;
 CREATE INDEX idx_identity_providers_state ON zitadel.identity_providers(instance_id, state);
 CREATE INDEX idx_identity_providers_type ON zitadel.identity_providers(instance_id, type);
 -- CREATE INDEX idx_identity_providers_created_at ON identity_providers(created_at);

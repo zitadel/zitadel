@@ -60,7 +60,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "happy path",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -71,7 +71,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "add verified domain",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      false,
@@ -82,7 +82,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "add primary domain",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      true,
@@ -93,7 +93,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "add domain without domain name",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         "",
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -108,7 +108,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 
 				organizationDomain := &domain.AddOrganizationDomain{
 					InstanceID:     instanceID,
-					OrgID:          orgID,
+					OrganizationID: orgID,
 					Domain:         domainName,
 					IsVerified:     false,
 					IsPrimary:      false,
@@ -121,7 +121,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				// return same domain again
 				return &domain.AddOrganizationDomain{
 					InstanceID:     instanceID,
-					OrgID:          orgID,
+					OrganizationID: orgID,
 					Domain:         domainName,
 					IsVerified:     true,
 					IsPrimary:      true,
@@ -134,7 +134,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "add domain with non-existent instance",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     "non-existent-instance",
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -146,7 +146,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			name: "add domain with non-existent organization",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          "non-existent-org",
+				OrganizationID: "non-existent-org",
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -157,7 +157,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 		{
 			name: "add domain without instance id",
 			organizationDomain: domain.AddOrganizationDomain{
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -254,7 +254,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 
 	domain1 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
-		OrgID:          orgID,
+		OrganizationID: orgID,
 		Domain:         gofakeit.DomainName(),
 		IsVerified:     true,
 		IsPrimary:      true,
@@ -262,7 +262,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 	}
 	domain2 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
-		OrgID:          orgID,
+		OrganizationID: orgID,
 		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
@@ -290,7 +290,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
@@ -307,7 +307,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         domain2.Domain,
 				IsVerified:     false,
 				IsPrimary:      false,
@@ -325,7 +325,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
@@ -342,7 +342,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			},
 			expected: &domain.OrganizationDomain{
 				InstanceID:     instanceID,
-				OrgID:          orgID,
+				OrganizationID: orgID,
 				Domain:         domain1.Domain,
 				IsVerified:     true,
 				IsPrimary:      true,
@@ -371,7 +371,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Equal(t, test.expected.InstanceID, result.InstanceID)
-			assert.Equal(t, test.expected.OrgID, result.OrgID)
+			assert.Equal(t, test.expected.OrganizationID, result.OrganizationID)
 			assert.Equal(t, test.expected.Domain, result.Domain)
 			assert.Equal(t, test.expected.IsVerified, result.IsVerified)
 			assert.Equal(t, test.expected.IsPrimary, result.IsPrimary)
@@ -425,7 +425,7 @@ func TestListOrganizationDomains(t *testing.T) {
 	domains := []domain.AddOrganizationDomain{
 		{
 			InstanceID:     instance.ID,
-			OrgID:          organization.ID,
+			OrganizationID: organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      true,
@@ -433,7 +433,7 @@ func TestListOrganizationDomains(t *testing.T) {
 		},
 		{
 			InstanceID:     instance.ID,
-			OrgID:          organization.ID,
+			OrganizationID: organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     false,
 			IsPrimary:      false,
@@ -441,7 +441,7 @@ func TestListOrganizationDomains(t *testing.T) {
 		},
 		{
 			InstanceID:     instance.ID,
-			OrgID:          organization.ID,
+			OrganizationID: organization.ID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      false,
@@ -528,7 +528,7 @@ func TestListOrganizationDomains(t *testing.T) {
 
 			for _, result := range results {
 				assert.Equal(t, instance.ID, result.InstanceID)
-				assert.Equal(t, organization.ID, result.OrgID)
+				assert.Equal(t, organization.ID, result.OrganizationID)
 				assert.NotEmpty(t, result.Domain)
 				assert.NotEmpty(t, result.CreatedAt)
 				assert.NotEmpty(t, result.UpdatedAt)
@@ -579,7 +579,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 	// add domain
 	organizationDomain := &domain.AddOrganizationDomain{
 		InstanceID:     instance.ID,
-		OrgID:          organization.ID,
+		OrganizationID: organization.ID,
 		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
@@ -740,7 +740,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 	// add domains
 	domain1 := &domain.AddOrganizationDomain{
 		InstanceID:     instance.ID,
-		OrgID:          organization.ID,
+		OrganizationID: organization.ID,
 		Domain:         gofakeit.DomainName(),
 		IsVerified:     true,
 		IsPrimary:      true,
@@ -748,7 +748,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 	}
 	domain2 := &domain.AddOrganizationDomain{
 		InstanceID:     instance.ID,
-		OrgID:          organization.ID,
+		OrganizationID: organization.ID,
 		Domain:         gofakeit.DomainName(),
 		IsVerified:     false,
 		IsPrimary:      false,
@@ -862,7 +862,7 @@ func TestOrganizationDomainConditions(t *testing.T) {
 		{
 			name:      "org id condition",
 			condition: domainRepo.OrgIDCondition("org-123"),
-			expected:  "org_domains.org_id = $1",
+			expected:  "org_domains.organization_id = $1",
 		},
 		{
 			name:      "is primary true",
@@ -960,13 +960,13 @@ func TestOrganizationDomainColumns(t *testing.T) {
 			name:      "org id column qualified",
 			column:    domainRepo.OrgIDColumn(),
 			qualified: true,
-			expected:  "org_domains.org_id",
+			expected:  "org_domains.organization_id",
 		},
 		{
 			name:      "org id column unqualified",
 			column:    domainRepo.OrgIDColumn(),
 			qualified: false,
-			expected:  "org_id",
+			expected:  "organization_id",
 		},
 		{
 			name:      "domain column qualified",

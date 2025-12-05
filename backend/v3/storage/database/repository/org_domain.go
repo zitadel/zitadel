@@ -53,7 +53,7 @@ func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domai
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(o.qualifiedTableName())
 	builder.WriteString(` (instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, defaultTimestamp(domain.CreatedAt), defaultTimestamp(domain.UpdatedAt))
+	builder.WriteArgs(domain.InstanceID, domain.OrganizationID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, defaultTimestamp(domain.CreatedAt), defaultTimestamp(domain.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)

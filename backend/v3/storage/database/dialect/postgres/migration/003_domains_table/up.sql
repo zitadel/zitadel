@@ -40,11 +40,11 @@ CREATE TABLE zitadel.org_domains(
   , created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
   , updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 
-  , PRIMARY KEY (instance_id, org_id, domain)
+  , PRIMARY KEY (instance_id, organization_id, domain)
 
-  , FOREIGN KEY (instance_id, org_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
+  , FOREIGN KEY (instance_id, organization_id) REFERENCES zitadel.organizations(instance_id, id) ON DELETE CASCADE
 
-  , UNIQUE (instance_id, org_id, domain)
+  , UNIQUE (instance_id, organization_id, domain)
 );
 
 CREATE INDEX idx_org_domain ON zitadel.org_domains(instance_id, domain);
@@ -74,7 +74,7 @@ BEGIN
     WHERE instance_id = NEW.instance_id
         AND domain = NEW.domain
         AND is_verified = TRUE
-        AND (TG_OP = 'INSERT' OR (org_id != NEW.org_id))
+        AND (TG_OP = 'INSERT' OR (organization_id != NEW.organization_id))
     ) THEN
       RAISE EXCEPTION 'org domain is already taken';
   END IF;
@@ -121,7 +121,7 @@ BEGIN
   UPDATE zitadel.org_domains 
   SET is_primary = FALSE, updated_at = NOW()
   WHERE instance_id = NEW.instance_id 
-    AND org_id = NEW.org_id
+    AND organization_id = NEW.organization_id
     AND domain != NEW.domain 
     AND is_primary = TRUE;
   

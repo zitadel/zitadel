@@ -47,7 +47,7 @@ func (i idProvider) Create(ctx context.Context, client database.QueryExecutor, i
 	builder.WriteString(` (instance_id, organization_id, id, state, name, type, allow_creation, allow_auto_creation, allow_auto_update, allow_linking, auto_linking_field, styling_type, payload, created_at, updated_at) VALUES (`)
 	builder.WriteArgs(
 		idp.InstanceID,
-		idp.OrgID,
+		idp.OrganizationID,
 		idp.ID,
 		idp.State,
 		idp.Name,
