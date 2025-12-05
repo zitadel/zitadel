@@ -31,7 +31,7 @@
     },
     "PROJECTS": {
       "TITLE": "Proyek",
-      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
+      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Misalnya, Anda mungkin memiliki satu proyek dengan 3 aplikasi; satu untuk frontend web Anda, satu untuk aplikasi seluler Anda, dan satu untuk backend Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
       "OWNED": {
         "TITLE": "Proyek Milik",
         "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, otorisasi, dan aplikasi proyek ini."
@@ -2193,7 +2193,8 @@
       "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
       "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
       "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
-      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)"
+      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)",
+      "5": "Kode Pemulihan"
     }
   },
   "LOGINPOLICY": {

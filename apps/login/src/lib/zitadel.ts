@@ -659,7 +659,8 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
 
   const emailAndPhoneQueries: SearchQuery[] = [];
   if (loginSettings.disableLoginWithEmail && loginSettings.disableLoginWithPhone) {
-    return { error: t("errors.userNotFound") };
+    // Both email and phone login are disabled, return empty result
+    return { result: [] };
   } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
     const phoneQuery = PhoneQuery(searchValue);
     emailAndPhoneQueries.push(phoneQuery);
@@ -719,7 +720,8 @@ export async function searchUsers({ serviceUrl, searchValue, loginSettings, orga
     return emailOrPhoneResult;
   }
 
-  return { error: t("errors.userNotFound") };
+  // No users found - return empty result, not an error
+  return { result: [] };
 }
 
 export async function getDefaultOrg({ serviceUrl }: { serviceUrl: string }): Promise<Organization | null> {

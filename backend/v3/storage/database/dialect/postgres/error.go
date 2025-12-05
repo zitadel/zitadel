@@ -51,6 +51,9 @@ func wrapPgError(err *pgconn.PgError) error {
 	// 23502: not_null_violation - A value violates a NOT NULL constraint.
 	case "23502":
 		return database.NewNotNullError(err.TableName, err.ConstraintName, err)
+	// 22P02: integrity violation - A value is being inserted into a enum that is not valid
+	case "22P02":
+		return database.NewCheckError(err.TableName, err.ConstraintName, err)
 	default:
 		return database.NewUnknownError(err)
 	}
