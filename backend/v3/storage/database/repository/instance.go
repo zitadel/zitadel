@@ -68,7 +68,7 @@ func (i instance) Create(ctx context.Context, client database.QueryExecutor, ins
 	builder := database.NewStatementBuilder(`INSERT INTO `)
 	builder.WriteString(i.qualifiedTableName())
 	builder.WriteString(` (id, name, default_organization_id, iam_project_id, console_client_id, console_application_id, default_language, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage, defaultTimestamp(instance.CreatedAt), defaultTimestamp(instance.UpdatedAt))
+	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleApplicationID, instance.DefaultLanguage, defaultTimestamp(instance.CreatedAt), defaultTimestamp(instance.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)

@@ -30,13 +30,13 @@ func TestCreateIDProvider(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                   instanceId,
+		Name:                 gofakeit.Name(),
+		DefaultOrgID:         "defaultOrgId",
+		IAMProjectID:         "iamProject",
+		ConsoleClientID:      "consoleCLient",
+		ConsoleApplicationID: "consoleApp",
+		DefaultLanguage:      "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -163,13 +163,13 @@ func TestCreateIDProvider(t *testing.T) {
 					// create instance
 					newInstId := gofakeit.Name()
 					instance := domain.Instance{
-						ID:              newInstId,
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                   newInstId,
+						Name:                 gofakeit.Name(),
+						DefaultOrgID:         "defaultOrgId",
+						IAMProjectID:         "iamProject",
+						ConsoleClientID:      "consoleCLient",
+						ConsoleApplicationID: "consoleApp",
+						DefaultLanguage:      "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()
 					err := instanceRepo.Create(t.Context(), tx, &instance)
@@ -385,13 +385,13 @@ func TestUpdateIDProvider(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                   instanceId,
+		Name:                 gofakeit.Name(),
+		DefaultOrgID:         "defaultOrgId",
+		IAMProjectID:         "iamProject",
+		ConsoleClientID:      "consoleCLient",
+		ConsoleApplicationID: "consoleApp",
+		DefaultLanguage:      "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -668,13 +668,13 @@ func TestGetIDProvider(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                   instanceId,
+		Name:                 gofakeit.Name(),
+		DefaultOrgID:         "defaultOrgId",
+		IAMProjectID:         "iamProject",
+		ConsoleClientID:      "consoleCLient",
+		ConsoleApplicationID: "consoleApp",
+		DefaultLanguage:      "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -1235,13 +1235,13 @@ func TestDeleteIDProvider(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                   instanceId,
+		Name:                 gofakeit.Name(),
+		DefaultOrgID:         "defaultOrgId",
+		IAMProjectID:         "iamProject",
+		ConsoleClientID:      "consoleCLient",
+		ConsoleApplicationID: "consoleApp",
+		DefaultLanguage:      "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err = instanceRepo.Create(t.Context(), tx, &instance)

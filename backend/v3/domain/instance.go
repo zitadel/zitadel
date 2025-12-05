@@ -11,15 +11,15 @@ import (
 )
 
 type Instance struct {
-	ID              string    `json:"id,omitempty" db:"id"`
-	Name            string    `json:"name,omitempty" db:"name"`
-	DefaultOrgID    string    `json:"defaultOrgId,omitempty" db:"default_organization_id"`
-	IAMProjectID    string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
-	ConsoleClientID string    `json:"consoleClientId,omitempty" db:"console_client_id"`
-	ConsoleAppID    string    `json:"consoleAppId,omitempty" db:"console_app_id"`
-	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
-	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+	ID                   string    `json:"id,omitempty" db:"id"`
+	Name                 string    `json:"name,omitempty" db:"name"`
+	DefaultOrgID         string    `json:"defaultOrgId,omitempty" db:"default_organization_id"`
+	IAMProjectID         string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
+	ConsoleClientID      string    `json:"consoleClientId,omitempty" db:"console_client_id"`
+	ConsoleApplicationID string    `json:"consoleAppId,omitempty" db:"console_application_id"`
+	DefaultLanguage      string    `json:"defaultLanguage,omitempty" db:"default_language"`
+	CreatedAt            time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt            time.Time `json:"updatedAt" db:"updated_at"`
 
 	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
