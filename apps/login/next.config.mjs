@@ -37,7 +37,8 @@ const nextConfig = {
   output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true,
   experimental: {
-    dynamicIO: true,
+    //dynamicIO: true,
+    useCache: true,
     // Add React 19 compatibility optimizations
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
   },
