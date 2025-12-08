@@ -3,7 +3,7 @@ import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -18,16 +18,12 @@ export default async function Page(props: {
   const { organization, userId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization,
   });
 
   let authMethods: AuthenticationMethodType[] = [];
@@ -43,9 +39,7 @@ export default async function Page(props: {
   }
 
   if (userId) {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId,
+    const userResponse = await getUserByID({ serviceConfig, userId,
     });
     if (userResponse) {
       user = userResponse.user;
@@ -58,9 +52,7 @@ export default async function Page(props: {
       }
     }
 
-    const authMethodsResponse = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
+    const authMethodsResponse = await listAuthenticationMethodTypes({ serviceConfig, userId,
     });
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
