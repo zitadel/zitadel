@@ -1,12 +1,14 @@
 package zerrors
 
 import (
+	"log/slog"
 	"strings"
 )
 
 // Error is a stdlib error extension.
 // It contains parameters to identify errors through all application layers
 type Error interface {
+	slog.LogValuer
 	GetParent() error
 	GetMessage() string
 	SetMessage(string)

@@ -1,7 +1,9 @@
 package gerrors
 
 import (
+	"context"
 	"errors"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -11,21 +13,21 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 
+	slogctx "github.com/veqryn/slog-context"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
-func ZITADELToGRPCError(err error) error {
+func ZITADELToGRPCError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
-	code, key, id, ok := ExtractZITADELError(err)
-	if !ok {
-		return status.Convert(err).Err()
-	}
+
+	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
+	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err, "code", code)
 
 	errorInfo := getErrorInfo(id, key, err)
 
@@ -38,20 +40,21 @@ func ZITADELToGRPCError(err error) error {
 	return s.Err()
 }
 
-func ZITADELToConnectError(err error) error {
+func ZITADELToConnectError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
 	connectError := new(connect.Error)
 	if errors.As(err, &connectError) {
+		// Connect error may be returned by other middlewares,
+		// so we assume it's a client error and log as warning.
+		slogctx.FromCtx(ctx).WarnContext(ctx, connectError.Message(), "err", connectError.Unwrap(), "code", connectError.Code())
 		return err
 	}
-	code, key, id, ok := ExtractZITADELError(err)
-	if !ok {
-		return status.Convert(err).Err()
-	}
+	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
+	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err, "code", code)
 
 	errorInfo := getErrorInfo(id, key, err)
 
@@ -62,43 +65,48 @@ func ZITADELToConnectError(err error) error {
 	return cErr
 }
 
-func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
+func ExtractZITADELError(err error) (code codes.Code, msg, id string) {
 	if err == nil {
-		return codes.OK, "", "", false
+		return codes.OK, "", ""
 	}
+	code, msg, id, _ = extractError(err)
+	return code, msg, id
+}
+
+func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	connErr := new(pgconn.ConnectError)
 	if ok := errors.As(err, &connErr); ok {
-		return codes.Internal, "db connection error", "", true
+		return codes.Internal, "db connection error", "", slog.LevelError
 	}
 	zitadelErr := new(zerrors.ZitadelError)
 	if ok := errors.As(err, &zitadelErr); !ok {
-		return codes.Unknown, err.Error(), "", false
+		return codes.Unknown, err.Error(), "", slog.LevelError
 	}
 	switch {
 	case zerrors.IsErrorAlreadyExists(err):
-		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
 	case zerrors.IsDeadlineExceeded(err):
-		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	case zerrors.IsInternal(err):
-		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	case zerrors.IsErrorInvalidArgument(err):
-		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
 	case zerrors.IsNotFound(err):
-		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
 	case zerrors.IsPermissionDenied(err):
-		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
 	case zerrors.IsPreconditionFailed(err):
-		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
 	case zerrors.IsUnauthenticated(err):
-		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
 	case zerrors.IsUnavailable(err):
-		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	case zerrors.IsUnimplemented(err):
-		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
 	case zerrors.IsResourceExhausted(err):
-		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	default:
-		return codes.Unknown, err.Error(), "", false
+		return codes.Unknown, err.Error(), "", slog.LevelError
 	}
 }
 
