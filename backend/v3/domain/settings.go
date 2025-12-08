@@ -523,10 +523,6 @@ type SecretGeneratorAttrs struct {
 }
 
 type SecretGeneratorAttrsWithExpiry struct {
-	Length              *uint          `json:"length,omitempty"`
-	Expiry              *time.Duration `json:"expiry,omitempty"`
-	IncludeLowerLetters *bool          `json:"includeLowerLetters,omitempty"`
-	IncludeUpperLetters *bool          `json:"includeUpperLetters,omitempty"`
-	IncludeDigits       *bool          `json:"includeDigits,omitempty"`
-	IncludeSymbols      *bool          `json:"includeSymbols,omitempty"`
+	Expiry *time.Duration `json:"expiry,omitempty"`
+	SecretGeneratorAttrs
 }

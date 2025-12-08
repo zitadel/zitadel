@@ -5034,12 +5034,14 @@ func createDefaultSecretGeneratorAttrs() domain.SecretGeneratorAttrs {
 
 func createDefaultSecretGeneratorAttrsWithExpiry(expiry time.Duration) domain.SecretGeneratorAttrsWithExpiry {
 	return domain.SecretGeneratorAttrsWithExpiry{
-		Length:              gu.Ptr(uint(32)),
-		Expiry:              gu.Ptr(expiry),
-		IncludeUpperLetters: gu.Ptr(true),
-		IncludeLowerLetters: gu.Ptr(true),
-		IncludeDigits:       gu.Ptr(true),
-		IncludeSymbols:      gu.Ptr(false),
+		Expiry: gu.Ptr(expiry),
+		SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
+			Length:              gu.Ptr(uint(32)),
+			IncludeUpperLetters: gu.Ptr(true),
+			IncludeLowerLetters: gu.Ptr(true),
+			IncludeDigits:       gu.Ptr(true),
+			IncludeSymbols:      gu.Ptr(false),
+		},
 	}
 }
 
