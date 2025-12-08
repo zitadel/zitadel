@@ -1376,6 +1376,151 @@ func (s legalAndSupportSettings) Get(ctx context.Context, client database.QueryE
 }
 
 // -------------------------------------------------------------
+// secret generators
+// -------------------------------------------------------------
+
+type secretGeneratorSettings struct {
+	settings
+}
+
+func (s secretGeneratorSettings) SetSettingFields(value domain.SecretGeneratorSettingsAttributes) database.Change {
+	changes := make([]db_json.JsonUpdate, 0)
+	if value.ClientSecret != nil {
+		changes = append(changes, s.SetClientSecret(*value.ClientSecret))
+	}
+	if value.InitializeUserCode != nil {
+		changes = append(changes, s.SetInitializeUserCode(*value.InitializeUserCode))
+	}
+	if value.EmailVerificationCode != nil {
+		changes = append(changes, s.SetEmailVerificationCode(*value.EmailVerificationCode))
+	}
+	if value.PhoneVerificationCode != nil {
+		changes = append(changes, s.SetPhoneVerificationCode(*value.PhoneVerificationCode))
+	}
+	if value.PasswordVerificationCode != nil {
+		changes = append(changes, s.SetPasswordVerificationCode(*value.PasswordVerificationCode))
+	}
+	if value.PasswordlessInitCode != nil {
+		changes = append(changes, s.SetPasswordlessInitCode(*value.PasswordlessInitCode))
+	}
+	if value.DomainVerification != nil {
+		changes = append(changes, s.SetDomainVerification(*value.DomainVerification))
+	}
+	if value.OTPSMS != nil {
+		changes = append(changes, s.SetOTPSMS(*value.OTPSMS))
+	}
+	if value.OTPEmail != nil {
+		changes = append(changes, s.SetOTPEmail(*value.OTPEmail))
+	}
+	if value.InviteCode != nil {
+		changes = append(changes, s.SetInviteCode(*value.InviteCode))
+	}
+	if value.SigningKey != nil {
+		changes = append(changes, s.SetSigningKey(*value.SigningKey))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (s secretGeneratorSettings) SetClientSecret(value domain.ClientSecretAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"clientSecret"}, value)
+}
+
+func (s secretGeneratorSettings) SetInitializeUserCode(value domain.InitializeUserCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"initializeUserCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetEmailVerificationCode(value domain.EmailVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"emailVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPhoneVerificationCode(value domain.PhoneVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"phoneVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPasswordVerificationCode(value domain.PasswordVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"passwordVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPasswordlessInitCode(value domain.PasswordlessInitCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"passwordlessInitCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetDomainVerification(value domain.DomainVerificationAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"domainVerification"}, value)
+}
+
+func (s secretGeneratorSettings) SetOTPSMS(value domain.OTPSMSAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"otpSms"}, value)
+}
+
+func (s secretGeneratorSettings) SetOTPEmail(value domain.OTPEmailAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"otpEmail"}, value)
+}
+
+func (s secretGeneratorSettings) SetInviteCode(value domain.InviteCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"inviteCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetSigningKey(value domain.SigningKeyAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"signingKey"}, value)
+}
+
+func SecretGeneratorSettingsRepository() domain.SecretGeneratorSettingsRepository {
+	return &secretGeneratorSettings{
+		settings{},
+	}
+}
+
+var _ domain.SecretGeneratorSettingsRepository = (*secretGeneratorSettings)(nil)
+
+func (s secretGeneratorSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecretGeneratorSettings) (err error) {
+	settings.Type = domain.SettingTypeSecretGenerator
+	settings.State = domain.SettingStateActive
+
+	settingsJSON, err := json.Marshal(settings.SecretGeneratorSettingsAttributes)
+	if err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.SecretGeneratorSettingsAttributes)); err != nil {
+		return err
+	}
+	settings.Settings.Settings = nil
+	return nil
+}
+
+func (s secretGeneratorSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.SecretGeneratorSettings, error) {
+	settings, err := s.list(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*domain.SecretGeneratorSettings, len(settings))
+	for i := range settings {
+		list[i] = &domain.SecretGeneratorSettings{Settings: *settings[i]}
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].SecretGeneratorSettingsAttributes); err != nil {
+			return nil, err
+		}
+		list[i].Settings.Settings = nil
+	}
+	return list, nil
+}
+
+func (s secretGeneratorSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecretGeneratorSettings, error) {
+	settings, err := s.get(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &domain.SecretGeneratorSettings{Settings: *settings}
+	if err = json.Unmarshal(item.Settings.Settings, &item.SecretGeneratorSettingsAttributes); err != nil {
+		return nil, err
+	}
+	item.Settings.Settings = nil
+	return item, nil
+}
+
+// -------------------------------------------------------------
 // helpers
 // -------------------------------------------------------------
 

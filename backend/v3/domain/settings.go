@@ -23,6 +23,7 @@ const (
 	SettingTypeOrganization
 	SettingTypeNotification
 	SettingTypeLegalAndSupport
+	SettingTypeSecretGenerator
 )
 
 //go:generate enumer -type SettingState -transform snake -trimprefix SettingState -sql
@@ -427,4 +428,105 @@ type LegalAndSupportSettingsAttributes struct {
 type LegalAndSupportSettingsRepository interface {
 	settingsRepository[LegalAndSupportSettings]
 	legalAndSupportSettingsJSONChanges
+}
+
+type SecretGeneratorSettings struct {
+	Settings
+	SecretGeneratorSettingsAttributes
+}
+
+type SecretGeneratorSettingsRepository interface {
+	settingsRepository[SecretGeneratorSettings]
+	secretGeneratorSettingsJSONChanges
+}
+
+type secretGeneratorSettingsJSONChanges interface {
+	SetSettingFields(value SecretGeneratorSettingsAttributes) database.Change
+
+	SetClientSecret(value ClientSecretAttributes) db_json.JsonUpdate
+	SetInitializeUserCode(value InitializeUserCodeAttributes) db_json.JsonUpdate
+	SetEmailVerificationCode(value EmailVerificationCodeAttributes) db_json.JsonUpdate
+	SetPhoneVerificationCode(value PhoneVerificationCodeAttributes) db_json.JsonUpdate
+	SetPasswordVerificationCode(value PasswordVerificationCodeAttributes) db_json.JsonUpdate
+	SetPasswordlessInitCode(value PasswordlessInitCodeAttributes) db_json.JsonUpdate
+	SetDomainVerification(value DomainVerificationAttributes) db_json.JsonUpdate
+	SetOTPSMS(value OTPSMSAttributes) db_json.JsonUpdate
+	SetOTPEmail(value OTPEmailAttributes) db_json.JsonUpdate
+	SetInviteCode(value InviteCodeAttributes) db_json.JsonUpdate
+	SetSigningKey(value SigningKeyAttributes) db_json.JsonUpdate
+}
+
+type SecretGeneratorSettingsAttributes struct {
+	ClientSecret             *ClientSecretAttributes             `json:"clientSecret,omitempty"`
+	InitializeUserCode       *InitializeUserCodeAttributes       `json:"initializeUserCode,omitempty"`
+	EmailVerificationCode    *EmailVerificationCodeAttributes    `json:"emailVerificationCode,omitempty"`
+	PhoneVerificationCode    *PhoneVerificationCodeAttributes    `json:"phoneVerificationCode,omitempty"`
+	PasswordVerificationCode *PasswordVerificationCodeAttributes `json:"passwordVerificationCode,omitempty"`
+	PasswordlessInitCode     *PasswordlessInitCodeAttributes     `json:"passwordlessInitCode,omitempty"`
+	DomainVerification       *DomainVerificationAttributes       `json:"domainVerification,omitempty"`
+	OTPSMS                   *OTPSMSAttributes                   `json:"otpSms,omitempty"`
+	OTPEmail                 *OTPEmailAttributes                 `json:"otpEmail,omitempty"`
+	InviteCode               *InviteCodeAttributes               `json:"inviteCode,omitempty"`
+	SigningKey               *SigningKeyAttributes               `json:"signingKey,omitempty"`
+}
+
+type ClientSecretAttributes struct {
+	SecretGeneratorAttrs
+}
+
+type InitializeUserCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type EmailVerificationCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type PhoneVerificationCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type PasswordVerificationCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type PasswordlessInitCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type DomainVerificationAttributes struct {
+	SecretGeneratorAttrs
+}
+
+type OTPSMSAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type OTPEmailAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type InviteCodeAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type SigningKeyAttributes struct {
+	SecretGeneratorAttrs
+}
+
+type SecretGeneratorAttrs struct {
+	Length              *uint `json:"length,omitempty"`
+	IncludeLowerLetters *bool `json:"includeLowerLetters,omitempty"`
+	IncludeUpperLetters *bool `json:"includeUpperLetters,omitempty"`
+	IncludeDigits       *bool `json:"includeDigits,omitempty"`
+	IncludeSymbols      *bool `json:"includeSymbols,omitempty"`
+}
+
+type SecretGeneratorAttrsWithExpiry struct {
+	Length              *uint          `json:"length,omitempty"`
+	Expiry              *time.Duration `json:"expiry,omitempty"`
+	IncludeLowerLetters *bool          `json:"includeLowerLetters,omitempty"`
+	IncludeUpperLetters *bool          `json:"includeUpperLetters,omitempty"`
+	IncludeDigits       *bool          `json:"includeDigits,omitempty"`
+	IncludeSymbols      *bool          `json:"includeSymbols,omitempty"`
 }

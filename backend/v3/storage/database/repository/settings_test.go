@@ -4774,3 +4774,320 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	settings := []*domain.SecretGeneratorSettings{
+		createSecretGeneratorSettings(firstInstanceID, nil),
+		createSecretGeneratorSettings(secondInstanceID, nil),
+		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
+		createSecretGeneratorSettings(secondInstanceID, gu.Ptr(secondOrgID)),
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.SecretGeneratorSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	settings := []*domain.SecretGeneratorSettings{
+		createSecretGeneratorSettings(firstInstanceID, nil),
+		createSecretGeneratorSettings(secondInstanceID, nil),
+		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
+		createSecretGeneratorSettings(secondInstanceID, gu.Ptr(secondOrgID)),
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.SecretGeneratorSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.SecretGeneratorSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.SecretGeneratorSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.SecretGeneratorSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.SecretGeneratorSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	existingSettings := createSecretGeneratorSettings(instanceID, gu.Ptr(orgID))
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.SecretGeneratorSettings
+		wantErr  error
+	}{
+		{
+			name:     "create instance",
+			settings: createSecretGeneratorSettings(instanceID, nil),
+		},
+		{
+			name:     "update organization",
+			settings: createSecretGeneratorSettings(instanceID, gu.Ptr(orgID)),
+		},
+		{
+			name:     "non-existing instance",
+			settings: createSecretGeneratorSettings("foo", nil),
+			wantErr:  new(database.ForeignKeyError),
+		},
+		{
+			name:     "non-existing org",
+			settings: createSecretGeneratorSettings(instanceID, gu.Ptr("foo")),
+			wantErr:  new(database.ForeignKeyError),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	existingInstanceSettings := createSecretGeneratorSettings(instanceID, nil)
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := createSecretGeneratorSettings(instanceID, gu.Ptr(orgID))
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func createDefaultSecretGeneratorAttrs() domain.SecretGeneratorAttrs {
+	return domain.SecretGeneratorAttrs{
+		Length:              gu.Ptr(uint(32)),
+		IncludeUpperLetters: gu.Ptr(true),
+		IncludeLowerLetters: gu.Ptr(true),
+		IncludeDigits:       gu.Ptr(true),
+		IncludeSymbols:      gu.Ptr(false),
+	}
+}
+
+func createDefaultSecretGeneratorAttrsWithExpiry(expiry time.Duration) domain.SecretGeneratorAttrsWithExpiry {
+	return domain.SecretGeneratorAttrsWithExpiry{
+		Length:              gu.Ptr(uint(32)),
+		Expiry:              gu.Ptr(expiry),
+		IncludeUpperLetters: gu.Ptr(true),
+		IncludeLowerLetters: gu.Ptr(true),
+		IncludeDigits:       gu.Ptr(true),
+		IncludeSymbols:      gu.Ptr(false),
+	}
+}
+
+func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSettingsAttributes {
+	attrs := createDefaultSecretGeneratorAttrs()
+	return domain.SecretGeneratorSettingsAttributes{
+		ClientSecret: &domain.ClientSecretAttributes{
+			SecretGeneratorAttrs: attrs,
+		},
+		InitializeUserCode: &domain.InitializeUserCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(24 * time.Hour),
+		},
+		EmailVerificationCode: &domain.EmailVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		PhoneVerificationCode: &domain.PhoneVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		PasswordVerificationCode: &domain.PasswordVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		PasswordlessInitCode: &domain.PasswordlessInitCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(10 * time.Minute),
+		},
+		DomainVerification: &domain.DomainVerificationAttributes{
+			SecretGeneratorAttrs: attrs,
+		},
+		OTPSMS: &domain.OTPSMSAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		OTPEmail: &domain.OTPEmailAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		InviteCode: &domain.InviteCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+		},
+		SigningKey: &domain.SigningKeyAttributes{
+			SecretGeneratorAttrs: attrs,
+		},
+	}
+}
+
+func createSecretGeneratorSettings(instanceID string, organizationID *string) *domain.SecretGeneratorSettings {
+	return &domain.SecretGeneratorSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: organizationID,
+		},
+		SecretGeneratorSettingsAttributes: createDefaultSecretGeneratorSettingsAttributes(),
+	}
+}
