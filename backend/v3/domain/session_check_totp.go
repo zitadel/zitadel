@@ -128,9 +128,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		return err
 	}
 
-	if policy != nil &&
-		policy.MaxOTPAttempts != nil && *policy.MaxOTPAttempts > 0 &&
-		uint64(t.FetchedUser.Human.TOTP.Check.FailedAttempts+1) >= *policy.MaxOTPAttempts {
+	if shouldLockUser(policy, uint64(t.FetchedUser.Human.TOTP.Check.FailedAttempts)) {
 		changes = append(changes, humanRepo.SetState(UserStateLocked))
 		t.IsUserLocked = true
 	}

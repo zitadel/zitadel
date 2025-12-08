@@ -47,3 +47,9 @@ func listLockoutSettingCondition(repo LockoutSettingsRepository, instanceID, org
 
 	return database.WithCondition(database.Or(instanceAndOrg, onlyInstance))
 }
+
+func shouldLockUser(lockoutSetting *LockoutSettings, userFailedAttempts uint64) bool {
+	return lockoutSetting != nil &&
+		lockoutSetting.MaxOTPAttempts != nil && *lockoutSetting.MaxOTPAttempts > 0 &&
+		userFailedAttempts+1 >= *lockoutSetting.MaxOTPAttempts
+}
