@@ -1,48 +1,48 @@
-import { headers } from "next/headers";
+import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 
 /**
  * Gets the original host that the user sees in their browser URL.
  * When using rewrites this function prioritizes forwarded headers that preserve the original host.
  *
- * ⚠️ SERVER-SIDE ONLY: This function can only be used in:
- * - Server Actions (functions with "use server")
- * - Server Components (React components that run on the server)
- * - Route Handlers (API routes)
- * - Middleware
- *
  * @returns The host string (e.g., "zitadel.com")
  * @throws Error if no host is found
  */
-export async function getOriginalHost(): Promise<string> {
-  const _headers = await headers();
+export function getInstanceHost(headers: ReadonlyHeaders): string | null {
+  // use standard proxy headers (x-forwarded-host → host) for both multi-tenant and self-hosted, do not use x-zitadel-instance-host
+  const instanceHost = headers.get("x-zitadel-instance-host") || headers.get("x-zitadel-forward-host");
 
-  // Priority order:
-  // 1. x-forwarded-host - Set by proxies/CDNs with the original host
-  // 2. x-original-host - Alternative header sometimes used
-  // 3. host - Fallback to the current host header
-  const host = _headers.get("x-forwarded-host") || _headers.get("x-original-host") || _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found in headers");
-  }
-
-  return host;
+  return instanceHost;
 }
 
 /**
- * Gets the original host with protocol prefix.
- * Automatically detects if localhost should use http:// or https://
+ * Gets the public host that the user sees in their browser URL.
+ * Only considers standard proxy headers (x-forwarded-host and host).
+ * Does NOT include x-zitadel-instance-host.
  *
- * ⚠️ SERVER-SIDE ONLY: This function can only be used in:
- * - Server Actions (functions with "use server")
- * - Server Components (React components that run on the server)
- * - Route Handlers (API routes)
- * - Middleware
+ * Use this when you need the public-facing host that the user actually sees,
+ * not the internal instance host used for API routing.
  *
- * @returns The full URL prefix (e.g., "https://zitadel.com")
+ * @returns The public host string (e.g., "accounts.company.com")
+ * @throws Error if no host is found
  */
-export async function getOriginalHostWithProtocol(): Promise<string> {
-  const host = await getOriginalHost();
+export function getPublicHost(headers: ReadonlyHeaders): string {
+  // Only use standard proxy headers (x-zitadel-public-host → x-zitadel-forward-host → x-forwarded-host → host)
+  // Do NOT use x-zitadel-instance-host as it may differ from what the user sees
+  const publicHost =
+    headers.get("x-zitadel-public-host") ||
+    headers.get("x-zitadel-forward-host") ||
+    headers.get("x-forwarded-host") ||
+    headers.get("host");
+
+  if (!publicHost || typeof publicHost !== "string") {
+    throw new Error("No host found in headers");
+  }
+
+  return publicHost;
+}
+
+export function getPublicHostWithProtocol(headers: ReadonlyHeaders): string {
+  const host = getPublicHost(headers);
   const protocol = host.includes("localhost") ? "http://" : "https://";
   return `${protocol}${host}`;
 }

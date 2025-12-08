@@ -5,9 +5,9 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getSession, ServiceConfig } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -18,11 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title", { user: "" }) };
 }
 
-async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
+async function loadSessionById(serviceConfig: ServiceConfig, sessionId: string, organization?: string) {
   const recent = await getSessionCookieById({ sessionId, organization });
-  return getSession({
-    serviceUrl,
-    sessionId: recent.id,
+  return getSession({ serviceConfig, sessionId: recent.id,
     sessionToken: recent.token,
   }).then((response) => {
     if (response?.session) {
@@ -35,13 +33,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
   // complete device authorization flow if device requestId is present
@@ -75,17 +71,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
+    ? await loadSessionById(serviceConfig, sessionId, organization)
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
       });
 
   let loginSettings;
   if (!requestId) {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization,
+    loginSettings = await getLoginSettings({ serviceConfig, organization,
     });
   }
 
