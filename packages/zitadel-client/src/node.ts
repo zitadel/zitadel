@@ -1,5 +1,14 @@
-import { createGrpcTransport, GrpcTransportOptions } from "@connectrpc/connect-node";
-import { importPKCS8, SignJWT } from "jose";
+import {
+  createGrpcTransport,
+  GrpcTransportOptions,
+} from "@connectrpc/connect-node";
+import {
+  createRemoteJWKSet,
+  importPKCS8,
+  jwtVerify,
+  JWTPayload,
+  SignJWT,
+} from "jose";
 import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
 
 /**
@@ -7,10 +16,16 @@ import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
  * @param token
  * @param opts
  */
-export function createServerTransport(token: string, opts: GrpcTransportOptions) {
+export function createServerTransport(
+  token: string,
+  opts: GrpcTransportOptions
+) {
   return createGrpcTransport({
     ...opts,
-    interceptors: [...(opts.interceptors || []), NewAuthorizationBearerInterceptor(token)],
+    interceptors: [
+      ...(opts.interceptors || []),
+      NewAuthorizationBearerInterceptor(token),
+    ],
   });
 }
 
@@ -33,4 +48,37 @@ export async function newSystemToken({
     .setSubject(subject)
     .setAudience(audience)
     .sign(await importPKCS8(key, "RS256"));
+}
+
+/**
+ * Verify a signed JWT with the given keys endpoint.
+ * @param token
+ * @param keysEndpoint
+ * @param options
+ */
+export async function verifyJwt<T = JWTPayload>(
+  token: string,
+  keysEndpoint: string,
+  options?: {
+    issuer?: string;
+    audience?: string;
+    instanceHost?: string;
+    publicHost?: string;
+  },
+): Promise<T & JWTPayload> {
+   const headers: Record<string, string> = {};
+   if (options?.instanceHost) {
+     headers["x-zitadel-instance-host"] = options.instanceHost;
+   }
+   if (options?.publicHost) {
+     headers["x-zitadel-public-host"] = options.publicHost;
+   }
+  const JWKS = createRemoteJWKSet(new URL(keysEndpoint), {headers: headers});
+
+  const { payload } = await jwtVerify(token, JWKS, {
+    issuer: options?.issuer,
+    audience: options?.audience,
+  });
+
+  return payload as T & JWTPayload;
 }

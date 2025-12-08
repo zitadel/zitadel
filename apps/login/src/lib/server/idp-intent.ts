@@ -1,6 +1,6 @@
 "use server";
 
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import {
   retrieveIDPIntent,
   getIDPByID,
@@ -13,6 +13,7 @@ import {
   getActiveIdentityProviders,
   getUserByID,
   getDefaultOrg,
+  ServiceConfig,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
@@ -31,11 +32,11 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 async function resolveOrganizationForUser({
   organization,
   addHumanUser,
-  serviceUrl,
+  serviceConfig,
 }: {
   organization?: string;
   addHumanUser?: AddHumanUserRequest;
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
 }): Promise<string | undefined> {
   if (organization) return organization;
 
@@ -43,16 +44,12 @@ async function resolveOrganizationForUser({
     const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
     const suffix = matched?.[1] ?? "";
 
-    const orgs = await getOrgsByDomain({
-      serviceUrl,
-      domain: suffix,
+    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix,
     });
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
-      const orgLoginSettings = await getLoginSettings({
-        serviceUrl,
-        organization: orgToCheckForDiscovery,
+      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
         return orgToCheckForDiscovery;
@@ -61,7 +58,7 @@ async function resolveOrganizationForUser({
   }
 
   // Fallback to default organization if no org was resolved through discovery
-  const defaultOrg = await getDefaultOrg({ serviceUrl });
+  const defaultOrg = await getDefaultOrg({ serviceConfig });
   return defaultOrg?.id;
 }
 
@@ -72,19 +69,15 @@ async function resolveOrganizationForUser({
  * 2. The specific IDP is activated for the organization
  *
  */
-export async function validateIDPLinkingPermissions({
-  serviceUrl,
-  userOrganizationId,
+export async function validateIDPLinkingPermissions({ serviceConfig, userOrganizationId,
   idpId,
 }: {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   userOrganizationId: string;
   idpId: string;
 }): Promise<boolean> {
   // Check organization login settings
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: userOrganizationId,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: userOrganizationId,
   });
 
   if (!loginSettings?.allowExternalIdp) {
@@ -92,9 +85,7 @@ export async function validateIDPLinkingPermissions({
   }
 
   // Check if the IDP is activated for the organization and allows linking
-  const activeIDPs = await getActiveIdentityProviders({
-    serviceUrl,
-    orgId: userOrganizationId,
+  const activeIDPs = await getActiveIdentityProviders({ serviceConfig, orgId: userOrganizationId,
     linking_allowed: true,
   });
 
@@ -132,7 +123,7 @@ export async function processIDPCallback({
   postErrorRedirectUrl?: string;
 }): Promise<{ redirect?: string; error?: string }> {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const t = await getTranslations("idp");
 
@@ -155,9 +146,7 @@ export async function processIDPCallback({
     });
 
     // Consume the single-use token ONCE
-    const intent = await retrieveIDPIntent({
-      serviceUrl,
-      id,
+    const intent = await retrieveIDPIntent({ serviceConfig, id,
       token,
     });
 
@@ -171,9 +160,7 @@ export async function processIDPCallback({
     }
 
     // Get IDP configuration
-    const idp = await getIDPByID({
-      serviceUrl,
-      id: idpInformation.idpId,
+    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId,
     });
 
     if (!idp) {
@@ -207,9 +194,7 @@ export async function processIDPCallback({
       // Auto-update user if enabled
       if (options?.isAutoUpdate && updateHumanUser) {
         try {
-          await updateHuman({
-            serviceUrl,
-            request: create(UpdateHumanUserRequestSchema, {
+          await updateHuman({ serviceConfig, request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
               profile: updateHumanUser.profile,
               email: updateHumanUser.email,
@@ -259,7 +244,7 @@ export async function processIDPCallback({
 
       try {
         // Get user to retrieve their organization
-        const targetUser = await getUserByID({ serviceUrl, userId });
+        const targetUser = await getUserByID({ serviceConfig, userId });
 
         if (!targetUser || !targetUser.details?.resourceOwner) {
           console.error("[IDP Process] User not found or missing organization");
@@ -268,9 +253,7 @@ export async function processIDPCallback({
         }
 
         // Validate IDP linking permissions
-        const isAllowed = await validateIDPLinkingPermissions({
-          serviceUrl,
-          userOrganizationId: targetUser.details.resourceOwner,
+        const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: targetUser.details.resourceOwner,
           idpId: idpInformation.idpId,
         });
 
@@ -280,9 +263,7 @@ export async function processIDPCallback({
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
         }
 
-        await addIDPLink({
-          serviceUrl,
-          idp: {
+        await addIDPLink({ serviceConfig, idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
             userName: idpInformation.userName,
@@ -328,21 +309,17 @@ export async function processIDPCallback({
       const email = addHumanUser?.email?.email;
 
       if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-        foundUser = await listUsers({ serviceUrl, email, organizationId: organization }).then((response) => {
+        foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
           return response.result ? response.result[0] : null;
         });
       } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
-        foundUser = await listUsers({
-          serviceUrl,
-          userName: idpInformation.userName,
+        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
           organizationId: organization,
         }).then((response) => {
           return response.result ? response.result[0] : null;
         });
       } else {
-        foundUser = await listUsers({
-          serviceUrl,
-          userName: idpInformation.userName,
+        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
           email,
           organizationId: organization,
         }).then((response) => {
@@ -359,9 +336,7 @@ export async function processIDPCallback({
           }
 
           // Validate IDP linking permissions
-          const isAllowed = await validateIDPLinkingPermissions({
-            serviceUrl,
-            userOrganizationId: foundUser.details.resourceOwner,
+          const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: foundUser.details.resourceOwner,
             idpId: idpInformation.idpId,
           });
 
@@ -371,9 +346,7 @@ export async function processIDPCallback({
             return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
           }
 
-          await addIDPLink({
-            serviceUrl,
-            idp: {
+          await addIDPLink({ serviceConfig, idp: {
               id: idpInformation.idpId,
               userId: idpInformation.userId,
               userName: idpInformation.userName,
@@ -419,7 +392,7 @@ export async function processIDPCallback({
       const orgToRegisterOn = await resolveOrganizationForUser({
         organization,
         addHumanUser,
-        serviceUrl,
+        serviceConfig,
       });
 
       if (!orgToRegisterOn) {
@@ -438,9 +411,7 @@ export async function processIDPCallback({
       });
 
       try {
-        const newUser = await addHuman({
-          serviceUrl,
-          request: addHumanUserWithOrganization,
+        const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization,
         });
         console.log("[IDP Process] User auto-created successfully, creating session");
 
@@ -480,7 +451,7 @@ export async function processIDPCallback({
       const orgToRegisterOn = await resolveOrganizationForUser({
         organization,
         addHumanUser,
-        serviceUrl,
+        serviceConfig,
       });
 
       if (!orgToRegisterOn) {

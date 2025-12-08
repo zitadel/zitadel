@@ -9,6 +9,7 @@ import {
   getSAMLRequest,
   getSecuritySettings,
   startIdentityProviderFlow,
+  ServiceConfig,
 } from "@/lib/zitadel";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { idpTypeToSlug } from "@/lib/idp";
@@ -47,7 +48,7 @@ const gotoAccounts = ({
 };
 
 export interface FlowInitiationParams {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   requestId: string;
   sessions: Session[];
   sessionCookies: any[];
@@ -58,11 +59,9 @@ export interface FlowInitiationParams {
  * Handle OIDC flow initiation
  */
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
-  const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { authRequest } = await getAuthRequest({
-    serviceUrl,
-    authRequestId: requestId.replace("oidc_", ""),
+  const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", ""),
   });
 
   let organization = "";
@@ -85,9 +84,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         console.log("Extracted org domain:", orgDomain);
         if (orgDomain) {
-          const orgs = await getOrgsByDomain({
-            serviceUrl,
-            domain: orgDomain,
+          const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain,
           });
 
           if (orgs.result && orgs.result.length === 1) {
@@ -102,9 +99,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const matched = IDP_SCOPE_REGEX.exec(idpScope);
       idpId = matched?.[1] ?? "";
 
-      const identityProviders = await getActiveIdentityProviders({
-        serviceUrl,
-        orgId: organization ? organization : undefined,
+      const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization ? organization : undefined,
       }).then((resp) => {
         return resp.identityProviders;
       });
@@ -137,9 +132,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           params.set("organization", organization);
         }
 
-        let url: string | null = await startIdentityProviderFlow({
-          serviceUrl,
-          idpId,
+        let url: string | null = await startIdentityProviderFlow({ serviceConfig, idpId,
           urls: {
             successUrl: `${origin}/idp/${provider}/process?` + new URLSearchParams(params),
             failureUrl: `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
@@ -215,13 +208,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
-      const securitySettings = await getSecuritySettings({
-        serviceUrl,
-      });
+      const securitySettings = await getSecuritySettings({ serviceConfig, });
 
-      const selectedSession = await findValidSession({
-        serviceUrl,
-        sessions,
+      const selectedSession = await findValidSession({ serviceConfig, sessions,
         authRequest,
       });
 
@@ -251,9 +240,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         sessionToken: cookie.token,
       };
 
-      const { callbackUrl } = await createCallback({
-        serviceUrl,
-        req: create(CreateCallbackRequestSchema, {
+      const { callbackUrl } = await createCallback({ serviceConfig, req: create(CreateCallbackRequestSchema, {
           authRequestId: requestId.replace("oidc_", ""),
           callbackKind: {
             case: "session",
@@ -275,9 +262,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({
-        serviceUrl,
-        sessions,
+      let selectedSession = await findValidSession({ serviceConfig, sessions,
         authRequest,
       });
 
@@ -305,9 +290,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       };
 
       try {
-        const { callbackUrl } = await createCallback({
-          serviceUrl,
-          req: create(CreateCallbackRequestSchema, {
+        const { callbackUrl } = await createCallback({ serviceConfig, req: create(CreateCallbackRequestSchema, {
             authRequestId: requestId.replace("oidc_", ""),
             callbackKind: {
               case: "session",
@@ -359,11 +342,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
  * Handle SAML flow initiation
  */
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
-  const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { samlRequest } = await getSAMLRequest({
-    serviceUrl,
-    samlRequestId: requestId.replace("saml_", ""),
+  const { samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", ""),
   });
 
   if (!samlRequest) {
@@ -378,9 +359,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
   }
 
   // Try to find a valid session
-  let selectedSession = await findValidSession({
-    serviceUrl,
-    sessions,
+  let selectedSession = await findValidSession({ serviceConfig, sessions,
     samlRequest,
   });
 
@@ -410,9 +389,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
   };
 
   try {
-    const { url, binding } = await createResponse({
-      serviceUrl,
-      req: create(CreateResponseRequestSchema, {
+    const { url, binding } = await createResponse({ serviceConfig, req: create(CreateResponseRequestSchema, {
         samlRequestId: requestId.replace("saml_", ""),
         responseKind: {
           case: "session",
