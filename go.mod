@@ -9,6 +9,7 @@ require (
 	cloud.google.com/go/storage v1.57.1
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpcreflect v1.3.0
+	connectrpc.com/otelconnect v0.8.0
 	dario.cat/mergo v1.0.2
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
