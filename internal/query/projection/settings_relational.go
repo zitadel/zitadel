@@ -1886,7 +1886,7 @@ func (s *settingsRelationalProjection) reduceSecretGeneratorRemoved(event events
 
 		settingsRepo := repository.SecretGeneratorSettingsRepository()
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
-			settingsRepo.UniqueCondition(e.Aggregate().InstanceID, &e.Aggregate().ID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			settingsRepo.UniqueCondition(e.Aggregate().InstanceID, nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
 		)
 		return err
 	}), nil
