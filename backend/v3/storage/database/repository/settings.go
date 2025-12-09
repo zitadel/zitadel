@@ -1384,7 +1384,7 @@ type secretGeneratorSettings struct {
 }
 
 func (s secretGeneratorSettings) SetSettingFields(value domain.SecretGeneratorSettingsAttributes) database.Change {
-	changes := make([]db_json.JsonUpdate, 0)
+	changes := make([]db_json.JsonUpdate, 0, 11)
 	if value.ClientSecret != nil {
 		changes = append(changes, s.SetClientSecret(*value.ClientSecret))
 	}
