@@ -41,6 +41,7 @@ type OTPCheckCommand struct {
 	smsChallenge   *SessionChallengeOTPSMS
 	emailChallenge *SessionChallengeOTPEmail
 
+	// For Events()
 	IsSMSCheckSucceeded   bool
 	IsEmailCheckSucceeded bool
 	IsUserLocked          bool
@@ -99,27 +100,27 @@ func (o *OTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]event
 	case OTPSMSRequestType:
 		if o.IsSMSCheckSucceeded {
 			toReturn[0] = user.NewHumanOTPSMSCheckSucceededEvent(ctx, &userAgg, nil)
-		} else {
-			toReturn[0] = user.NewHumanOTPSMSCheckFailedEvent(ctx, &userAgg, nil)
-			if o.IsUserLocked {
-				toReturn[1] = user.NewUserLockedEvent(ctx, &userAgg)
-				toReturn = append(toReturn, session.NewOTPSMSCheckedEvent(ctx, &sessionAgg, o.CheckTime))
-			} else {
-				toReturn[1] = session.NewOTPSMSCheckedEvent(ctx, &sessionAgg, o.CheckTime)
-			}
+			toReturn[1] = session.NewOTPSMSCheckedEvent(ctx, &sessionAgg, o.CheckTime)
+			return toReturn, nil
 		}
+		toReturn[0] = user.NewHumanOTPSMSCheckFailedEvent(ctx, &userAgg, nil)
+		if o.IsUserLocked {
+			toReturn[1] = user.NewUserLockedEvent(ctx, &userAgg)
+			return append(toReturn, session.NewOTPSMSCheckedEvent(ctx, &sessionAgg, o.CheckTime)), nil
+		}
+		toReturn[1] = session.NewOTPSMSCheckedEvent(ctx, &sessionAgg, o.CheckTime)
 	case OTPEmailRequestType:
 		if o.IsEmailCheckSucceeded {
 			toReturn[0] = user.NewHumanOTPEmailCheckSucceededEvent(ctx, &userAgg, nil)
-		} else {
-			toReturn[0] = user.NewHumanOTPEmailCheckFailedEvent(ctx, &userAgg, nil)
-			if o.IsUserLocked {
-				toReturn[1] = user.NewUserLockedEvent(ctx, &userAgg)
-				toReturn = append(toReturn, session.NewOTPEmailCheckedEvent(ctx, &sessionAgg, o.CheckTime))
-			} else {
-				toReturn[1] = session.NewOTPEmailCheckedEvent(ctx, &sessionAgg, o.CheckTime)
-			}
+			toReturn[1] = session.NewOTPEmailCheckedEvent(ctx, &sessionAgg, o.CheckTime)
+			return toReturn, nil
 		}
+		toReturn[0] = user.NewHumanOTPEmailCheckFailedEvent(ctx, &userAgg, nil)
+		if o.IsUserLocked {
+			toReturn[1] = user.NewUserLockedEvent(ctx, &userAgg)
+			return append(toReturn, session.NewOTPEmailCheckedEvent(ctx, &sessionAgg, o.CheckTime)), nil
+		}
+		toReturn[1] = session.NewOTPEmailCheckedEvent(ctx, &sessionAgg, o.CheckTime)
 	}
 
 	return toReturn, nil
@@ -135,7 +136,7 @@ func (o *OTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err er
 	userRepo := opts.userRepo
 
 	var verificationError error
-	var sessionFactorToUpdate func(lastVerified, lastFailed time.Time) SessionFactor
+	var sessionFactorToUpdate func(lastVerified, lastFailed time.Time) database.Change
 	var changesFn changesFn
 	var lastVerified, lastFailed time.Time
 
@@ -150,11 +151,11 @@ func (o *OTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err er
 		)
 		o.IsSMSCheckSucceeded = verificationError == nil
 
-		sessionFactorToUpdate = func(lastVerified, lastFailed time.Time) SessionFactor {
-			return &SessionFactorOTPSMS{
+		sessionFactorToUpdate = func(lastVerified, lastFailed time.Time) database.Change {
+			return sessionRepo.SetFactor(&SessionFactorOTPSMS{
 				LastVerifiedAt: lastVerified,
 				LastFailedAt:   lastFailed,
-			}
+			})
 		}
 
 		changesFn = o.getSMSOTPChanges
@@ -168,17 +169,17 @@ func (o *OTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err er
 			o.emailChallenge.Code,
 		)
 		o.IsEmailCheckSucceeded = verificationError == nil
-		sessionFactorToUpdate = func(lastVerified, lastFailed time.Time) SessionFactor {
-			return &SessionFactorOTPEmail{
+		sessionFactorToUpdate = func(lastVerified, lastFailed time.Time) database.Change {
+			return sessionRepo.SetFactor(&SessionFactorOTPEmail{
 				LastVerifiedAt: lastVerified,
 				LastFailedAt:   lastFailed,
-			}
+			})
 		}
 
 		changesFn = o.getEmailOTPChanges
 
 	default:
-		return zerrors.ThrowInvalidArgument(nil, "DOM-asd", "invalid OTP request type")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-LFE7va", "invalid OTP request type")
 	}
 	o.CheckTime = time.Now()
 
@@ -188,17 +189,17 @@ func (o *OTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err er
 		lastFailed = o.CheckTime
 	}
 
+	sessionChange := sessionFactorToUpdate(lastVerified, lastFailed)
 	rowCount, err := sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(o.sessionID),
-		sessionRepo.SetFactor(sessionFactorToUpdate(lastVerified, lastFailed)),
+		sessionChange,
 	)
-	if err := handleUpdateError(err, 1, rowCount, "DOM-asd", "session"); err != nil {
+	if err := handleUpdateError(err, 1, rowCount, "DOM-h8SL2F", "session"); err != nil {
 		return err
 	}
 
 	userChanges := changesFn(ctx, opts.DB(), opts.lockoutSettingRepo, userRepo.Human(), verificationError != nil, o.CheckTime)
-
 	rowCount, err = userRepo.Update(ctx, opts.DB(), userRepo.IDCondition(o.FetchedUser.ID), userChanges)
-	if err := handleUpdateError(err, 1, rowCount, "DOM-asd", "user"); err != nil {
+	if err := handleUpdateError(err, 1, rowCount, "DOM-k04c4g", "user"); err != nil {
 		return err
 	}
 
@@ -210,7 +211,7 @@ func (o *OTPCheckCommand) executeCheck(ctx context.Context,
 	challengeExpiry time.Duration, challengeCode *crypto.CryptoValue) (err error) {
 	if generatorID == "" {
 		if challengeCode == nil {
-			return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.Code.NotFound")
+			return zerrors.ThrowPreconditionFailed(nil, "DOM-LOWT6u", "Errors.User.Code.NotFound")
 		}
 		return o.otpCodeVerifyFunc(
 			time.Now(), // o.smsChallenge is missing creation date (neither email challenge has)
@@ -222,11 +223,11 @@ func (o *OTPCheckCommand) executeCheck(ctx context.Context,
 	}
 
 	if o.phonecodeVerifyFunc == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.Code.NotConfigured")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Cq1y9C", "Errors.User.Code.NotConfigured")
 	}
 	verifier, err := o.phonecodeVerifyFunc(ctx, generatorID)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-asd", "failed fetching phone verifier")
+		return zerrors.ThrowInternal(err, "DOM-JB24yW", "failed fetching phone verifier")
 	}
 
 	return verifier.VerifyCode(verificationID, o.CheckOTP.GetCode())
@@ -296,23 +297,23 @@ func (o *OTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err e
 	userRepo := opts.userRepo
 
 	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
-	if err := handleGetError(err, "DOM-asd", "session"); err != nil {
+	if err := handleGetError(err, "DOM-eppPwQ", "session"); err != nil {
 		return err
 	}
 
 	user, err := userRepo.Get(ctx, opts.DB(),
 		database.WithCondition(userRepo.IDCondition(session.UserID)),
 	)
-	if err := handleGetError(err, "DOM-asd", "user"); err != nil {
+	if err := handleGetError(err, "DOM-TxDSma", "user"); err != nil {
 		return err
 	}
 
 	if user.Human == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "user not human")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-pBmqRN", "user not human")
 	}
 
 	if o.CheckOTP.GetCode() == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-asd", "Errors.User.Code.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-u7KQi4", "Errors.User.Code.Empty")
 	}
 
 	o.FetchedUser = user
@@ -327,21 +328,21 @@ func (o *OTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err e
 		return o.validateEmailOTP(session.Challenges.GetOTPEmailChallenge(), user.Human.Email)
 	}
 
-	return zerrors.ThrowInvalidArgument(nil, "DOM-asd", "invalid OTP request type")
+	return zerrors.ThrowInvalidArgument(nil, "DOM-oeUlih", "invalid OTP request type")
 }
 
 func (o *OTPCheckCommand) validateEmailOTP(otpChallenge *SessionChallengeOTPEmail, userEmail HumanEmail) error {
 	if otpChallenge == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "no OTP Email challenge set")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-2DlM76", "no OTP Email challenge set")
 	}
 
 	if userEmail.OTP.EnabledAt.IsZero() {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-2uf0SY", "Errors.User.MFA.OTP.NotReady")
 	}
 
 	// TODO(IAM-Marco): otpChallenge.GeneratorID doesn't exist on EmailChallenge, I assume it's not a mistake
 	if otpChallenge.Code == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.Code.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-RegOgD", "Errors.User.Code.NotFound")
 	}
 
 	return nil
@@ -349,19 +350,19 @@ func (o *OTPCheckCommand) validateEmailOTP(otpChallenge *SessionChallengeOTPEmai
 
 func (o *OTPCheckCommand) validateSMSOTP(otpChallenge *SessionChallengeOTPSMS, userPhone *HumanPhone) (err error) {
 	if otpChallenge == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "no OTP SMS challenge set")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-UpslUc", "no OTP SMS challenge set")
 	}
 
 	if userPhone == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "no phone set")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-fzSWTO", "no phone set")
 	}
 
 	if userPhone.OTP.EnabledAt.IsZero() {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-iJZ4jp", "Errors.User.MFA.OTP.NotReady")
 	}
 
 	if otpChallenge.Code == nil && otpChallenge.GeneratorID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-asd", "Errors.User.Code.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-tAK4Cc", "Errors.User.Code.NotFound")
 	}
 
 	return nil
