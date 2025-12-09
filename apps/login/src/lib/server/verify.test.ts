@@ -52,7 +52,7 @@ vi.mock("next-intl/server", () => ({
   ),
 }));
 vi.mock("../service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("sendVerification server action", () => {
@@ -180,7 +180,7 @@ describe("sendVerification server action", () => {
 
       // Verify that verifyInviteCode was called with correct parameters
       expect(vi.mocked(zitadelModule.verifyInviteCode)).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         verificationCode: mockCode,
       });

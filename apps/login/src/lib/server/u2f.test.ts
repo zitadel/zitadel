@@ -30,7 +30,7 @@ vi.mock("next/server", () => ({
   })),
 }));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("U2F server actions", () => {
@@ -42,8 +42,8 @@ describe("U2F server actions", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    const { getOriginalHost } = await import("./host");
-    vi.mocked(getOriginalHost).mockResolvedValue("zitadel.com:443");
+    const { getPublicHost } = await import("./host");
+    vi.mocked(getPublicHost).mockReturnValue("zitadel.com:443");
   });
 
   afterEach(() => {
@@ -82,7 +82,7 @@ describe("U2F server actions", () => {
       const result = await addU2F({ sessionId: mockSessionId });
 
       expect(zitadelModule.registerU2F).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         domain: "zitadel.com",
       });
@@ -90,8 +90,8 @@ describe("U2F server actions", () => {
     });
 
     it("should extract hostname from host with port", async () => {
-      const { getOriginalHost } = await import("./host");
-      vi.mocked(getOriginalHost).mockResolvedValue("localhost:3000");
+      const { getPublicHost } = await import("./host");
+      vi.mocked(getPublicHost).mockReturnValue("localhost:3000");
 
       const mockSessionCookie = {
         id: mockSessionId,
@@ -112,7 +112,7 @@ describe("U2F server actions", () => {
       await addU2F({ sessionId: mockSessionId });
 
       expect(zitadelModule.registerU2F).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         domain: "localhost",
       });
@@ -150,8 +150,8 @@ describe("U2F server actions", () => {
     });
 
     it("should throw error when hostname cannot be extracted", async () => {
-      const { getOriginalHost } = await import("./host");
-      vi.mocked(getOriginalHost).mockResolvedValue("");
+      const { getPublicHost } = await import("./host");
+      vi.mocked(getPublicHost).mockReturnValue("");
 
       const mockSessionCookie = {
         id: mockSessionId,
@@ -209,7 +209,7 @@ describe("U2F server actions", () => {
       });
 
       expect(zitadelModule.verifyU2FRegistration).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         request: expect.objectContaining({
           u2fId: mockU2FId,
           publicKeyCredential: mockPublicKeyCredential,
@@ -242,7 +242,7 @@ describe("U2F server actions", () => {
       });
 
       expect(zitadelModule.verifyU2FRegistration).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         request: expect.objectContaining({
           tokenName: "Dell , Windows, Firefox",
         }),
@@ -274,7 +274,7 @@ describe("U2F server actions", () => {
       });
 
       expect(zitadelModule.verifyU2FRegistration).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         request: expect.objectContaining({
           tokenName: "My YubiKey",
         }),
@@ -338,7 +338,7 @@ describe("U2F server actions", () => {
       });
 
       expect(zitadelModule.verifyU2FRegistration).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         request: expect.objectContaining({
           tokenName: " macOS, Safari",
         }),

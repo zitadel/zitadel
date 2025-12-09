@@ -52,7 +52,7 @@ vi.mock("next-intl/server", () => ({
   ),
 }));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("Password server actions", () => {
@@ -65,8 +65,8 @@ describe("Password server actions", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    const { getOriginalHostWithProtocol } = await import("./host");
-    vi.mocked(getOriginalHostWithProtocol).mockResolvedValue("https://localhost:3000");
+    const { getPublicHostWithProtocol } = await import("./host");
+    vi.mocked(getPublicHostWithProtocol).mockResolvedValue("https://localhost:3000");
   });
 
   afterEach(() => {
@@ -94,7 +94,7 @@ describe("Password server actions", () => {
 
       expect(result).not.toHaveProperty("error");
       expect(zitadelModule.passwordReset).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         urlTemplate: expect.stringContaining("code={{.Code}}"),
       });
@@ -119,7 +119,7 @@ describe("Password server actions", () => {
       });
 
       expect(zitadelModule.passwordReset).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         urlTemplate: expect.stringContaining("requestId=oidc_request123"),
       });

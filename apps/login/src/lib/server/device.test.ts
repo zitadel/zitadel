@@ -18,7 +18,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(() => Promise.resolve(new Map())),
 }));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("Device server actions", () => {
@@ -54,7 +54,7 @@ describe("Device server actions", () => {
 
       expect(result).toEqual(mockResponse);
       expect(zitadelModule.authorizeOrDenyDeviceAuthorization).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         deviceAuthorizationId: mockDeviceAuthorizationId,
         session: mockSession,
       });
@@ -74,7 +74,7 @@ describe("Device server actions", () => {
 
       expect(result).toEqual(mockResponse);
       expect(zitadelModule.authorizeOrDenyDeviceAuthorization).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         deviceAuthorizationId: mockDeviceAuthorizationId,
         session: undefined,
       });
@@ -118,7 +118,7 @@ describe("Device server actions", () => {
 
       expect(result).toEqual(mockRequest);
       expect(zitadelModule.getDeviceAuthorizationRequest).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userCode: mockUserCode,
       });
     });

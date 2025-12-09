@@ -24,7 +24,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(() => Promise.resolve(new Map())),
 }));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("completeAuthFlow", () => {
@@ -81,7 +81,7 @@ describe("completeAuthFlow", () => {
 
       expect(result).toEqual({ redirect: mockRedirectUrl });
       expect(oidcModule.loginWithOIDCAndSession).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         authRequest: "request123",
         sessionId: mockSessionId,
         sessions: [mockSession],
@@ -149,7 +149,7 @@ describe("completeAuthFlow", () => {
 
       expect(result).toEqual({ redirect: mockRedirectUrl });
       expect(samlModule.loginWithSAMLAndSession).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         samlRequest: "request789",
         sessionId: mockSessionId,
         sessions: [mockSession],
@@ -237,7 +237,7 @@ describe("completeAuthFlow", () => {
       });
 
       expect(zitadelModule.listSessions).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         ids: ["session1", "session2"],
       });
     });
@@ -300,7 +300,7 @@ describe("completeAuthFlow", () => {
       });
 
       expect(zitadelModule.listSessions).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         ids: ["session1", "session3"],
       });
     });

@@ -26,8 +26,11 @@ vi.mock("./cookie");
 vi.mock("next/headers", () => ({
   headers: vi.fn(() => Promise.resolve(new Map())),
 }));
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => Promise.resolve((key: string) => key)),
+}));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("Session server actions", () => {
@@ -41,8 +44,8 @@ describe("Session server actions", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    const { getOriginalHost } = await import("./host");
-    vi.mocked(getOriginalHost).mockResolvedValue("localhost:3000");
+    const { getPublicHost } = await import("./host");
+    vi.mocked(getPublicHost).mockReturnValue("localhost:3000");
   });
 
   afterEach(() => {
@@ -68,7 +71,7 @@ describe("Session server actions", () => {
 
       expect(result).toEqual({ redirect: "https://app.example.com/callback" });
       expect(zitadelModule.humanMFAInitSkipped).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
       });
       expect(clientModule.completeFlowOrGetUrl).toHaveBeenCalledWith(
@@ -197,7 +200,7 @@ describe("Session server actions", () => {
 
       const result = await continueWithSession(invalidSession);
 
-      expect(result).toBeUndefined();
+      expect(result).toEqual({ error: "couldNotContinueSession" });
     });
   });
 

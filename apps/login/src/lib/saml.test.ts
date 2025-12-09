@@ -271,7 +271,7 @@ describe("saml", () => {
     };
 
     const baseParams = {
-      serviceUrl: "https://example.com",
+      serviceConfig: { baseUrl: "https://example.com" },
       samlRequest: "saml-request-id",
       sessionId: "session-123",
       sessions: [mockSession],
@@ -300,7 +300,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(baseParams);
 
       expect(isSessionValid).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         session: mockSession,
       });
     });
@@ -314,7 +314,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(baseParams);
 
       expect(createResponse).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         req: expect.objectContaining({
           samlRequestId: "saml-request-id",
           responseKind: {
@@ -483,7 +483,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(params);
 
       expect(isSessionValid).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         session: mockSession,
       });
     });
@@ -508,7 +508,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(params);
 
       expect(createResponse).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         req: expect.objectContaining({
           responseKind: {
             case: "session",

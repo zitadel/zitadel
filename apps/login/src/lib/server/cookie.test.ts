@@ -24,7 +24,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(() => Promise.resolve(new Map())),
 }));
 vi.mock("@/lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://zitadel-test.zitadel.cloud" } })),
 }));
 
 describe("Cookie server actions", () => {
@@ -98,12 +98,12 @@ describe("Cookie server actions", () => {
 
       expect(result).toEqual(mockSession);
       expect(zitadelModule.createSessionFromChecks).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         checks: mockChecks,
         lifetime: mockLifetime,
       });
       expect(zitadelModule.getSession).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         sessionId: mockSessionId,
         sessionToken: mockSessionToken,
       });
@@ -133,7 +133,7 @@ describe("Cookie server actions", () => {
       });
 
       expect(zitadelModule.createSessionFromChecks).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         checks: mockChecks,
         lifetime: {
           seconds: BigInt(24 * 60 * 60),
@@ -226,7 +226,7 @@ describe("Cookie server actions", () => {
 
       expect(result).toEqual(mockSession);
       expect(zitadelModule.createSessionForUserIdAndIdpIntent).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         idpIntent: mockIdpIntent,
         lifetime: { seconds: BigInt(3600), nanos: 0 },
@@ -248,7 +248,7 @@ describe("Cookie server actions", () => {
       });
 
       expect(zitadelModule.createSessionForUserIdAndIdpIntent).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         userId: mockUserId,
         idpIntent: mockIdpIntent,
         lifetime: {
@@ -329,7 +329,7 @@ describe("Cookie server actions", () => {
         challenges: undefined,
       });
       expect(zitadelModule.setSession).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
+        serviceConfig: { baseUrl: mockServiceUrl },
         sessionId: mockSessionId,
         sessionToken: mockSessionToken,
         challenges: undefined,
