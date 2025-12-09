@@ -3,6 +3,9 @@ name: Package und Publish Archives and Images
 on:
   workflow_call:
     inputs:
+      go_version:
+        required: true
+        type: string
       node_version:
         required: true
         type: string
@@ -57,7 +60,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version: ${{ inputs.go_version }}
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:

@@ -80,6 +80,7 @@ const (
 	wantIntentFactor
 	wantOTPSMSFactor
 	wantOTPEmailFactor
+	wantRecoveryCodeFactor
 )
 
 func verifyFactors(t assert.TestingT, factors *session.Factors, creationDate, changeDate *timestamppb.Timestamp, userID string, want []wantFactor) {
@@ -122,11 +123,18 @@ func verifyFactors(t assert.TestingT, factors *session.Factors, creationDate, ch
 			pf := factors.GetOtpEmail()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
+		case wantRecoveryCodeFactor:
+			pf := factors.GetRecoveryCode()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), creationDateWithSkew, changeDateWithSkew)
 		}
 	}
 }
 
 func TestServer_CreateSession(t *testing.T) {
+	lockedUser := createLockedUser(CTX, t)
+	deactivatedUser := createDeactivatedUser(CTX, t)
+
 	tests := []struct {
 		name                 string
 		req                  *session.CreateSessionRequest
@@ -190,7 +198,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: DeactivatedUser.GetUserId(),
+							UserId: deactivatedUser.GetUserId(),
 						},
 					},
 				},
@@ -203,7 +211,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: LockedUser.GetUserId(),
+							UserId: lockedUser.GetUserId(),
 						},
 					},
 				},
@@ -552,6 +560,19 @@ func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
 	require.NoError(t, err)
 }
 
+func registerRecoveryCode(ctx context.Context, t *testing.T, userID string) []string {
+	_, err := Instance.Client.UserV2.RemoveRecoveryCodes(ctx, &user.RemoveRecoveryCodesRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+	recoveryCodes, err := Instance.Client.UserV2.GenerateRecoveryCodes(ctx, &user.GenerateRecoveryCodesRequest{
+		UserId: userID,
+		Count:  5,
+	})
+	require.NoError(t, err)
+	return recoveryCodes.GetRecoveryCodes()
+}
+
 func TestServer_SetSession_flow_totp(t *testing.T) {
 	userExisting := createFullUser(CTX)
 
@@ -725,6 +746,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 	totpSecret := registerTOTP(userAuthCtx, t, User.GetUserId())
 	registerOTPSMS(userAuthCtx, t, User.GetUserId())
 	registerOTPEmail(userAuthCtx, t, User.GetUserId())
+	recoveryCodes := registerRecoveryCode(userAuthCtx, t, User.GetUserId())
+	recoveryCode := recoveryCodes[0]
 
 	t.Run("check webauthn, user not verified (U2F)", func(t *testing.T) {
 
@@ -834,6 +857,20 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
+	})
+
+	t.Run("check Recovery Code", func(t *testing.T) {
+		resp, err := Client.SetSession(LoginCTX, &session.SetSessionRequest{
+			SessionId: createResp.GetSessionId(),
+			Checks: &session.Checks{
+				RecoveryCode: &session.CheckRecoveryCode{
+					Code: recoveryCode,
+				},
+			},
+		})
+		require.NoError(t, err)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), createResp.GetDetails().GetChangeDate(), resp.GetDetails().GetChangeDate(), nil, nil, 0, User.GetUserId(), wantUserFactor, wantWebAuthNFactor, wantRecoveryCodeFactor)
 	})
 }
 
@@ -965,6 +1002,28 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 		}
 		assert.Nil(tt, sessionResp)
 	}, retryDuration, tick)
+}
+
+func Test_ZITADEL_API_missing_mfa(t *testing.T) {
+	mfaUser := createFullUser(CTX)
+
+	// make sure the session works even with a not fully set up MFA factor
+	_, err := Instance.Client.UserV2.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+		UserId: mfaUser.GetUserId(),
+	})
+	require.NoError(t, err)
+	id, token, _, _ := Instance.CreatePasswordSession(t, LoginCTX, mfaUser.GetUserId(), integration.UserPassword)
+	ctx := integration.WithAuthorizationToken(context.Background(), token)
+	sessionResp, err := Instance.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.NoError(t, err)
+
+	// now fully set up MFA and make sure the session is rejected without MFA
+	registerTOTP(CTX, t, mfaUser.GetUserId())
+	id, token, _, _ = Instance.CreatePasswordSession(t, LoginCTX, mfaUser.GetUserId(), integration.UserPassword)
+	ctx = integration.WithAuthorizationToken(context.Background(), token)
+	sessionResp, err = Instance.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {

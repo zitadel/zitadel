@@ -6,6 +6,7 @@
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go"
@@ -61,7 +62,7 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -v -ldflags=\"-s -w\"'",
+            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
@@ -347,10 +348,11 @@
             "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
             "executor": "nx:run-commands",
             "options": {
+                "parallel": false,
                 "commands": [
                     "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\".artifacts/pack/zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
                 ]
             }
         },

@@ -1,214 +1,279 @@
-/**
- * Unit tests for the IDP server actions.
- *
- * These tests replace the integration tests from register-idp.cy.ts which tested:
- * - IDP redirect URL generation
- * - Starting identity provider flow
- * - Redirecting users to the correct IDP authentication URL
- */
-
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { redirectToIdp } from "./idp";
-import * as zitadelModule from "../zitadel";
 
-// Mock all dependencies
-vi.mock("../zitadel");
-vi.mock("./cookie");
-vi.mock("./host");
-vi.mock("../client");
+// Mock all the dependencies
 vi.mock("next/headers", () => ({
-  headers: vi.fn(() => Promise.resolve(new Map())),
+  headers: vi.fn(),
 }));
+
 vi.mock("next/navigation", () => ({
   redirect: vi.fn((url: string) => {
-    // Throw error to simulate redirect behavior
     throw new Error(`REDIRECT: ${url}`);
   }),
 }));
+
 vi.mock("../service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://zitadel-test.zitadel.cloud" })),
+  getServiceConfig: vi.fn(),
 }));
 
-describe("redirectToIdp server action", () => {
-  const mockServiceUrl = "https://zitadel-test.zitadel.cloud";
-  const mockIdpId = "idp-123";
-  const mockIdpUrl = "https://accounts.google.com/oauth2/auth?client_id=...";
-  const mockOrganization = "256088834543534543";
-  const mockRequestId = "req123";
+vi.mock("./host", () => ({
+  getInstanceHost: vi.fn(),
+  getPublicHost: vi.fn(),
+}));
+
+vi.mock("../zitadel", () => ({
+  startIdentityProviderFlow: vi.fn(),
+}));
+
+describe("redirectToIdp", () => {
+  let mockHeaders: any;
+  let mockGetServiceUrlFromHeaders: any;
+  let mockGetInstanceHost: any;
+  let mockGetPublicHost: any;
+  let mockStartIdentityProviderFlow: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    const { getOriginalHost } = await import("./host");
-    vi.mocked(getOriginalHost).mockResolvedValue("localhost:3000");
+    // Import mocked modules
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { getInstanceHost, getPublicHost } = await import("./host");
+    const { startIdentityProviderFlow } = await import("../zitadel");
+
+    // Setup mocks
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
+    mockGetInstanceHost = vi.mocked(getInstanceHost);
+    mockGetPublicHost = vi.mocked(getPublicHost);
+    mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
+
+    // Default mock implementations
+    mockHeaders.mockResolvedValue({} as any);
+    mockGetServiceUrlFromHeaders.mockReturnValue({
+      serviceConfig: { baseUrl: "https://api.example.com" },
+    });
+    mockGetInstanceHost.mockReturnValue("example.com");
+    mockGetPublicHost.mockReturnValue("example.com");
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  describe("IDP flow initiation", () => {
-    it("should start IDP flow and redirect to IDP URL", async () => {
-      // Mock IDP flow start
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue(mockIdpUrl);
-
+  describe("postErrorRedirectUrl parameter handling", () => {
+    test("should include postErrorRedirectUrl in success and failure URLs when provided", async () => {
       const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "google");
-      formData.set("organization", mockOrganization);
-      formData.set("requestId", mockRequestId);
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("requestId", "req123");
+      formData.append("organization", "org123");
+      formData.append("postErrorRedirectUrl", "https://app.example.com/error");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idpId: "idp123",
+        urls: {
+          successUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
+          failureUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
+        },
+      });
+
+      // Verify both URLs contain all expected parameters
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      const successUrl = callArgs.urls.successUrl;
+      const failureUrl = callArgs.urls.failureUrl;
+
+      expect(successUrl).toContain("requestId=req123");
+      expect(successUrl).toContain("organization=org123");
+      expect(successUrl).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
+
+      expect(failureUrl).toContain("requestId=req123");
+      expect(failureUrl).toContain("organization=org123");
+      expect(failureUrl).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
+    });
+
+    test("should not include postErrorRedirectUrl in URLs when not provided", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("requestId", "req123");
+      formData.append("organization", "org123");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        idpId: "idp123",
+        urls: {
+          successUrl: expect.not.stringContaining("postErrorRedirectUrl"),
+          failureUrl: expect.not.stringContaining("postErrorRedirectUrl"),
+        },
+      });
+
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      expect(callArgs.urls.successUrl).not.toContain("postErrorRedirectUrl");
+      expect(callArgs.urls.failureUrl).not.toContain("postErrorRedirectUrl");
+    });
+
+    test("should not include postErrorRedirectUrl when it is an empty string", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("postErrorRedirectUrl", "");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      expect(callArgs.urls.successUrl).not.toContain("postErrorRedirectUrl");
+      expect(callArgs.urls.failureUrl).not.toContain("postErrorRedirectUrl");
+    });
+
+    test("should include postErrorRedirectUrl in LDAP redirect URL", async () => {
+      const formData = new FormData();
+      formData.append("id", "ldap123");
+      formData.append("provider", "ldap");
+      formData.append("requestId", "req123");
+      formData.append("organization", "org123");
+      formData.append("postErrorRedirectUrl", "/custom-error");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT: /idp/ldap?");
+        expect(error.message).toContain("requestId=req123");
+        expect(error.message).toContain("organization=org123");
+        expect(error.message).toContain("postErrorRedirectUrl=%2Fcustom-error");
+      }
+    });
+
+    test("should handle postErrorRedirectUrl with special characters", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("postErrorRedirectUrl", "https://app.example.com/error?code=123&message=test");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      const successUrl = new URL(callArgs.urls.successUrl);
+      const failureUrl = new URL(callArgs.urls.failureUrl);
+
+      // Verify the URL is properly encoded
+      expect(successUrl.searchParams.get("postErrorRedirectUrl")).toBe(
+        "https://app.example.com/error?code=123&message=test",
+      );
+      expect(failureUrl.searchParams.get("postErrorRedirectUrl")).toBe(
+        "https://app.example.com/error?code=123&message=test",
+      );
+    });
+
+    test("should preserve postErrorRedirectUrl alongside linkOnly parameter", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("linkOnly", "true");
+      formData.append("postErrorRedirectUrl", "/custom-error");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      const successUrl = callArgs.urls.successUrl;
+      const failureUrl = callArgs.urls.failureUrl;
+
+      // Both parameters should be present
+      expect(successUrl).toContain("link=true");
+      expect(successUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
+      expect(failureUrl).toContain("link=true");
+      expect(failureUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
+    });
+
+    test("should handle relative postErrorRedirectUrl paths", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "github");
+      formData.append("postErrorRedirectUrl", "/loginname");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+      expect(callArgs.urls.successUrl).toContain("postErrorRedirectUrl=%2Floginname");
+      expect(callArgs.urls.failureUrl).toContain("postErrorRedirectUrl=%2Floginname");
+    });
+  });
+
+  describe("General redirect behavior", () => {
+    test("should return error when IDP flow returns null", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+
+      mockStartIdentityProviderFlow.mockResolvedValue(null);
+
+      const result = await redirectToIdp(undefined, formData);
+
+      expect(result).toEqual({ error: "Unexpected response from IDP flow" });
+    });
+
+    test("should redirect when IDP flow returns a valid URL", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
 
       try {
         await redirectToIdp(undefined, formData);
         // Should not reach here
         expect(true).toBe(false);
       } catch (error: any) {
-        // Should redirect
-        expect(error.message).toContain("REDIRECT:");
-        expect(error.message).toContain(mockIdpUrl);
-      }
-
-      expect(vi.mocked(zitadelModule.startIdentityProviderFlow)).toHaveBeenCalledWith({
-        serviceUrl: mockServiceUrl,
-        idpId: mockIdpId,
-        urls: expect.objectContaining({
-          successUrl: expect.stringContaining("/idp/google/success"),
-          failureUrl: expect.stringContaining("/idp/google/failure"),
-        }),
-      });
-    });
-
-    it("should include query parameters in success and failure URLs", async () => {
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue(mockIdpUrl);
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "google");
-      formData.set("organization", mockOrganization);
-      formData.set("requestId", mockRequestId);
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        // Expected redirect
-        expect(error.message).toBeDefined();
-      }
-
-      const callArgs = vi.mocked(zitadelModule.startIdentityProviderFlow).mock.calls[0][0];
-      expect(callArgs.urls.successUrl).toContain(`organization=${mockOrganization}`);
-      expect(callArgs.urls.successUrl).toContain(`requestId=${mockRequestId}`);
-      expect(callArgs.urls.failureUrl).toContain(`organization=${mockOrganization}`);
-      expect(callArgs.urls.failureUrl).toContain(`requestId=${mockRequestId}`);
-    });
-
-    it("should handle LDAP provider differently by redirecting to LDAP page", async () => {
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "ldap");
-      formData.set("organization", mockOrganization);
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        expect(error.message).toContain("REDIRECT:");
-        expect(error.message).toContain("/idp/ldap");
-        expect(error.message).toContain(`idpId=${mockIdpId}`);
-      }
-
-      // Should not call startIdentityProviderFlow for LDAP
-      expect(vi.mocked(zitadelModule.startIdentityProviderFlow)).not.toHaveBeenCalled();
-    });
-
-    it("should handle linkOnly parameter", async () => {
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue(mockIdpUrl);
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "github");
-      formData.set("linkOnly", "true");
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        // Expected redirect
-        expect(error.message).toBeDefined();
-      }
-
-      const callArgs = vi.mocked(zitadelModule.startIdentityProviderFlow).mock.calls[0][0];
-      expect(callArgs.urls.successUrl).toContain("link=true");
-    });
-  });
-
-  describe("error handling", () => {
-    it("should return error when IDP flow cannot be started", async () => {
-      // Mock IDP flow start failure
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue(null);
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "google");
-
-      const result = await redirectToIdp(undefined, formData);
-
-      expect(result).toHaveProperty("error");
-      expect(result?.error).toBe("Unexpected response from IDP flow");
-    });
-
-    it("should return error when IDP flow returns unexpected response", async () => {
-      // Mock unexpected response (empty string instead of URL)
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue("");
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "google");
-
-      const result = await redirectToIdp(undefined, formData);
-
-      expect(result).toHaveProperty("error");
-      expect(result?.error).toBe("Unexpected response from IDP flow");
-    });
-  });
-
-  describe("different IDP providers", () => {
-    it("should handle Google IDP", async () => {
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue("https://accounts.google.com/oauth2/auth");
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "google");
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        expect(error.message).toContain("accounts.google.com");
-      }
-    });
-
-    it("should handle GitHub IDP", async () => {
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue("https://github.com/login/oauth/authorize");
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "github");
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        expect(error.message).toContain("github.com");
-      }
-    });
-
-    it("should handle GitLab IDP", async () => {
-      vi.mocked(zitadelModule.startIdentityProviderFlow).mockResolvedValue("https://gitlab.com/oauth/authorize");
-
-      const formData = new FormData();
-      formData.set("id", mockIdpId);
-      formData.set("provider", "gitlab");
-
-      try {
-        await redirectToIdp(undefined, formData);
-      } catch (error: any) {
-        expect(error.message).toContain("gitlab.com");
+        // Redirect throws in tests
+        expect(error.message).toBe("REDIRECT: https://idp.example.com/auth");
       }
     });
   });

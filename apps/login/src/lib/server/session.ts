@@ -13,6 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -20,8 +21,8 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service-url";
-import { getOriginalHost } from "./host";
+import { getServiceConfig } from "../service-url";
+import { getPublicHost } from "./host";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -37,14 +38,11 @@ export async function skipMFAAndContinueWithNextUrl({
   organization?: string;
 }): Promise<{ redirect: string } | { error: string }> {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization });
 
-  await humanMFAInitSkipped({ serviceUrl, userId });
+  await humanMFAInitSkipped({ serviceConfig, userId });
 
   if (requestId && sessionId) {
     return completeFlowOrGetUrl(
@@ -72,12 +70,11 @@ export type ContinueWithSessionCommand = Session & { requestId?: string };
 
 export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors?.user?.organizationId,
-  });
+  const t = await getTranslations("error");
+
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors?.user?.organizationId });
 
   if (requestId && session.id && session.factors?.user) {
     return completeFlowOrGetUrl(
@@ -97,6 +94,9 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
       loginSettings?.defaultRedirectUri,
     );
   }
+
+  // Fallback error if we couldn't determine where to redirect
+  return { error: t("couldNotContinueSession") };
 }
 
 export type UpdateSessionCommand = {
@@ -124,8 +124,8 @@ export async function updateSession(options: UpdateSessionCommand) {
   }
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const host = getPublicHost(_headers);
 
   if (!host) {
     return { error: "Could not get host" };
@@ -137,10 +137,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN.domain = hostname;
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
   let lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -148,7 +145,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       ? loginSettings?.secondFactorCheckLifetime
       : undefined;
 
-  if (!lifetime) {
+  if (!lifetime || !lifetime.seconds) {
     console.warn("No lifetime provided for session, defaulting to 24 hours");
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
@@ -171,10 +168,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   // if password, check if user has MFA methods
   let authMethods;
   if (checks && checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId: session.factors.user.id,
-    });
+    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }
@@ -194,19 +188,19 @@ type ClearSessionOptions = {
 
 export async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const { sessionId } = options;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
-    serviceUrl,
+    serviceConfig,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
 
-  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const securitySettings = await getSecuritySettings({ serviceConfig });
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {
