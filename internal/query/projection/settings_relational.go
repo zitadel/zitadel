@@ -1800,13 +1800,13 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 func (p *settingsRelationalProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorAddedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-yTuWKA", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-jNhP6P", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.SecretGeneratorSettingsRepository()
@@ -1838,13 +1838,13 @@ func (p *settingsRelationalProjection) reduceSecretGeneratorAdded(event eventsto
 func (s *settingsRelationalProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorChangedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-HhaZbQ", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLrfy", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-3SidEv", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.SecretGeneratorSettingsRepository()
@@ -1882,7 +1882,7 @@ func (s *settingsRelationalProjection) reduceSecretGeneratorRemoved(event events
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOUC9O", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.SecretGeneratorSettingsRepository()
@@ -1951,6 +1951,8 @@ func setSecretGeneratorSettingsAttrs(generatorType legacy_domain.SecretGenerator
 		secretGeneratorSettingsAttrs.SigningKey = &domain.SigningKeyAttributes{
 			SecretGeneratorAttrs: attrs,
 		}
+	case legacy_domain.SecretGeneratorTypeUnspecified:
+		return domain.SecretGeneratorSettingsAttributes{}, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n3fK", "unspecified secret generator type")
 	default:
 		return domain.SecretGeneratorSettingsAttributes{}, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9mG7f", "unknown secret generator type %s", generatorType)
 	}
