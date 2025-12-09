@@ -1,4 +1,4 @@
-package tracing
+package instrumentation
 
 import (
 	"context"
@@ -59,7 +59,7 @@ func TestSpanKindBased(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sampler := SpanKindBased(tt.args.sampler, tt.args.kinds...)
+			sampler := spanKindBased(tt.args.sampler, tt.args.kinds...)
 			assert.Equal(t, tt.want.description, sampler.Description())
 
 			p := sdk_trace.NewTracerProvider(sdk_trace.WithSampler(sampler))

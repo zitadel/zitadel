@@ -5,8 +5,7 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"go.opentelemetry.io/otel"
 )
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
@@ -26,7 +25,7 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
 		otelhttp.WithPublicEndpoint(),
 		otelhttp.WithSpanNameFormatter(spanNameFormatter),
-		otelhttp.WithMeterProvider(metrics.GetMetricsProvider()))
+		otelhttp.WithMeterProvider(otel.GetMeterProvider()))
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {

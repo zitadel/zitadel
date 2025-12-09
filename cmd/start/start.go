@@ -132,7 +132,12 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer shutdown(cmd.Context())
+
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
 				return err

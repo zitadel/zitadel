@@ -20,10 +20,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (

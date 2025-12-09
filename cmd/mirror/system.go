@@ -21,9 +21,14 @@ func systemCmd() *cobra.Command {
 		Long: `mirrors the system tables of ZITADEL from one database to another
 ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer shutdown(cmd.Context())
 			copySystem(cmd.Context(), config)
+			return nil
 		},
 	}
 

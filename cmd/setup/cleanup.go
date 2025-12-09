@@ -19,9 +19,14 @@ func NewCleanup() *cobra.Command {
 		Use:   "cleanup",
 		Short: "cleans up migration if they got stuck",
 		Long:  `cleans up migration if they got stuck`,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer shutdown(cmd.Context())
 			Cleanup(cmd.Context(), config)
+			return nil
 		},
 	}
 }
