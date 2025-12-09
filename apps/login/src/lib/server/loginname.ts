@@ -81,7 +81,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     console.log("No users found, will proceed with org discovery");
   }
 
-  const handleUserNotFound = (currentLoginSettings: LoginSettings | undefined, currentOrg: string | undefined) => {
+  const handleUserNotFound = (currentLoginSettings: LoginSettings | undefined, organization: string | undefined) => {
     if (currentLoginSettings?.ignoreUnknownUsernames) {
       console.log("ignoreUnknownUsernames is true, redirecting to password");
       const paramsPasswordDefault = new URLSearchParams({
@@ -92,8 +92,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         paramsPasswordDefault.append("requestId", command.requestId);
       }
 
-      if (currentOrg) {
-        paramsPasswordDefault.append("organization", currentOrg);
+      if (organization) {
+        paramsPasswordDefault.append("organization", organization);
       }
 
       return { redirect: "/password?" + paramsPasswordDefault };
