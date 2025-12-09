@@ -1,8 +1,8 @@
 import { getAllSessions } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { validateAuthRequest, isRSCRequest } from "@/lib/auth-utils";
 import { handleOIDCFlowInitiation, handleSAMLFlowInitiation, FlowInitiationParams } from "@/lib/server/flow-initiation";
-import { listSessions } from "@/lib/zitadel";
+import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,18 +13,15 @@ export const fetchCache = "default-no-store";
 // Add this to prevent RSC requests
 export const runtime = "nodejs";
 
-async function loadSessions({ serviceUrl, ids }: { serviceUrl: string; ids: string[] }): Promise<Session[]> {
-  const response = await listSessions({
-    serviceUrl,
-    ids: ids.filter((id: string | undefined) => !!id),
-  });
+async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
+  const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
 
   return response?.sessions ?? [];
 }
 
 export async function GET(request: NextRequest) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const searchParams = request.nextUrl.searchParams;
 
@@ -43,17 +40,11 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, ids });
+    sessions = await loadSessions({ serviceConfig, ids });
   }
 
   // Flow initiation - delegate to appropriate handler
-  const flowParams: FlowInitiationParams = {
-    serviceUrl,
-    requestId,
-    sessions,
-    sessionCookies,
-    request,
-  };
+  const flowParams: FlowInitiationParams = { serviceConfig, requestId, sessions, sessionCookies, request };
 
   if (requestId.startsWith("oidc_")) {
     return handleOIDCFlowInitiation(flowParams);

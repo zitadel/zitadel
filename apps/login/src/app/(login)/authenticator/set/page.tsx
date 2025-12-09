@@ -6,7 +6,7 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { checkUserVerification } from "@/lib/verify-helper";
 import {
@@ -35,7 +35,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -52,11 +52,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
+    return listAuthenticationMethodTypes({ serviceConfig, userId,
     }).then((methods) => {
-      return getUserByID({ serviceUrl, userId }).then((user) => {
+      return getUserByID({ serviceConfig, userId }).then((user) => {
         const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
@@ -71,25 +69,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
+    return loadMostRecentSession({ serviceConfig, sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(serviceUrl, session);
+      return getAuthMethodsAndUser(serviceConfig.baseUrl, session);
     });
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
+    return getSession({ serviceConfig, sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
+      return getAuthMethodsAndUser(serviceConfig.baseUrl, sessionResponse.session);
     });
   }
 
@@ -101,14 +95,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     );
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: sessionWithData.factors.user?.organizationId,
+  const branding = await getBrandingSettings({ serviceConfig, organization: sessionWithData.factors.user?.organizationId,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: sessionWithData.factors.user?.organizationId,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: sessionWithData.factors.user?.organizationId,
   });
 
   // check if user was verified recently
@@ -132,9 +122,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     redirect(`/verify?` + params);
   }
 
-  const identityProviders = await getActiveIdentityProviders({
-    serviceUrl,
-    orgId: sessionWithData.factors?.user?.organizationId,
+  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {
     return resp.identityProviders;

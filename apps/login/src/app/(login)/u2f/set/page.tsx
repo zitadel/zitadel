@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { Metadata } from "next";
@@ -21,19 +21,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { loginName, organization, requestId, checkAfter } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionFactors = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: {
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
   return (
