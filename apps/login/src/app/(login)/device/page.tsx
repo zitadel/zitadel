@@ -1,7 +1,7 @@
 import { DeviceCodeForm } from "@/components/device-code-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -20,21 +20,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
   });
 
   return (

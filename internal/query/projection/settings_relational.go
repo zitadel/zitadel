@@ -8,7 +8,6 @@ import (
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -766,10 +765,7 @@ func (s *settingsRelationalProjection) reduceLabelActivated(event eventstore.Eve
 
 		settingsRepo := repository.BrandingSettingsRepository()
 		_, err := settingsRepo.ActivateAt(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				settingsRepo.InstanceIDCondition(event.Aggregate().InstanceID),
-				settingsRepo.OrganizationIDCondition(orgId),
-			),
+			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
 			policyEvent.Creation,
 		)
 		return err
