@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -131,7 +132,12 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	api.connectOTELInterceptor, err = otelconnect.NewInterceptor()
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otel.GetTracerProvider()),
+		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
+		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
+		otelconnect.WithoutServerPeerAttributes(),
+	)
 	if err != nil {
 		return nil, err
 	}
