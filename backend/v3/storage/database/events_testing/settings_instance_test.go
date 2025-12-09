@@ -1390,6 +1390,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 }
 
 func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
+	t.Parallel()
 	settingsRepo := repository.SecretGeneratorSettingsRepository()
 	newInstance := integration.NewInstance(t.Context())
 
