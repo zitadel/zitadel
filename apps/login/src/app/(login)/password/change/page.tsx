@@ -3,7 +3,7 @@ import { ChangePasswordForm } from "@/components/change-password-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
 import { Metadata } from "next";
@@ -17,34 +17,26 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const searchParams = await props.searchParams;
 
   const { loginName, organization, requestId } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: {
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
-  const passwordComplexity = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization: sessionFactors?.factors?.user?.organizationId,
+  const passwordComplexity = await getPasswordComplexitySettings({ serviceConfig, organization: sessionFactors?.factors?.user?.organizationId,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: sessionFactors?.factors?.user?.organizationId,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: sessionFactors?.factors?.user?.organizationId,
   });
 
   return (
