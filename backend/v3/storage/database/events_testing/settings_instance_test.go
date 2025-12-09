@@ -1514,7 +1514,7 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 				),
 			)
 			require.NoError(collect, err)
-			require.NotNil(t, setting)
+			require.NotNil(collect, setting)
 		}, retryDuration, tick)
 
 		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
