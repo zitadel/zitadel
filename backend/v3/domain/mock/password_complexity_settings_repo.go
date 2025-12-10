@@ -23,21 +23,26 @@ func NewPasswordComplexitySettingsRepo(ctrl *gomock.Controller) *PasswordComplex
 }
 
 func (pcsr *PasswordComplexitySettingsRepo) EXPECT() *MockPasswordComplexitySettingsRepositoryMockRecorder {
+	pcsr.mock.ctrl.T.Helper()
 	return pcsr.mock.EXPECT()
 }
 
 func (pcsr *PasswordComplexitySettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.PasswordComplexitySettings, error) {
+	pcsr.mock.ctrl.T.Helper()
 	return pcsr.mock.Get(ctx, client, opts...)
 }
 
 func (pcsr *PasswordComplexitySettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.PasswordComplexitySettings, error) {
+	pcsr.mock.ctrl.T.Helper()
 	return pcsr.mock.List(ctx, client, opts...)
 }
 
 func (pcsr *PasswordComplexitySettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordComplexitySettings) error {
+	pcsr.mock.ctrl.T.Helper()
 	return pcsr.mock.Set(ctx, client, settings)
 }
 
 func (pcsr *PasswordComplexitySettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	pcsr.mock.ctrl.T.Helper()
 	return pcsr.mock.Delete(ctx, client, condition)
 }

@@ -23,25 +23,31 @@ func NewLoginSettingsRepo(ctrl *gomock.Controller) *LoginSettingsRepo {
 }
 
 func (lsr *LoginSettingsRepo) EXPECT() *MockLoginSettingsRepositoryMockRecorder {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.EXPECT()
 }
 
 func (lsr *LoginSettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LoginSettings, error) {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.Get(ctx, client, opts...)
 }
 
 func (lsr *LoginSettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LoginSettings, error) {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.List(ctx, client, opts...)
 }
 
 func (lsr *LoginSettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LoginSettings) error {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.Set(ctx, client, settings)
 }
 
 func (lsr *LoginSettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.Delete(ctx, client, condition)
 }
 
 func (lsr *LoginSettingsRepo) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	lsr.mock.ctrl.T.Helper()
 	return lsr.mock.SetColumns(ctx, client, settings, changes...)
 }

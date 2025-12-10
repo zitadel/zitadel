@@ -13,16 +13,17 @@ import (
 )
 
 var (
-	pool              database.Pool
-	tracer            tracing.Tracer
-	logger            logging.Logger = *logging.NewLogger(slog.Default())
-	legacyEventstore  eventstore.LegacyEventstore
-	sysConfig         systemdefaults.SystemDefaults
-	passwordHasher    *crypto.Hasher
-	idpEncryptionAlgo crypto.EncryptionAlgorithm
-	mfaEncryptionAlgo crypto.EncryptionAlgorithm
-
-	webauthnConfig *webauthn.Config
+	pool                 database.Pool
+	tracer               tracing.Tracer
+	logger               logging.Logger = *logging.NewLogger(slog.Default())
+	legacyEventstore     eventstore.LegacyEventstore
+	sysConfig            systemdefaults.SystemDefaults
+	passwordHasher       *crypto.Hasher
+	idpEncryptionAlgo    crypto.EncryptionAlgorithm
+	mfaEncryptionAlgo    crypto.EncryptionAlgorithm
+	otpEncryptionAlgo    crypto.EncryptionAlgorithm
+	defaultPhoneVerifier phoneCodeVerifyFn
+	webauthnConfig       *webauthn.Config
 )
 
 func SetPool(p database.Pool) {
@@ -59,4 +60,12 @@ func SetWebAuthNConfig(cfg *webauthn.Config) {
 
 func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
 	mfaEncryptionAlgo = mfaEncryptionAlg
+}
+
+func SetOTPEncryptionAlgorithm(otpEncryptionAlg crypto.EncryptionAlgorithm) {
+	otpEncryptionAlgo = otpEncryptionAlg
+}
+
+func SetPhoneCodeVerifier(fn phoneCodeVerifyFn) {
+	defaultPhoneVerifier = fn
 }

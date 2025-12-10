@@ -16,11 +16,6 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-// tarpitFn represents a tarpit function
-//
-// The input is the number of failed attempts after which the tarpit is started
-type tarpitFn func(failedAttempts uint64)
-
 type PasswordCheckCommand struct {
 	CheckPassword *session_grpc.CheckPassword
 

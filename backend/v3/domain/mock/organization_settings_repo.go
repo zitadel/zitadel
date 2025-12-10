@@ -23,21 +23,26 @@ func NewOrganizationSettingsRepo(ctrl *gomock.Controller) *OrganizationSettingsR
 }
 
 func (osr *OrganizationSettingsRepo) EXPECT() *MockOrganizationSettingsRepositoryMockRecorder {
+	osr.mock.ctrl.T.Helper()
 	return osr.mock.EXPECT()
 }
 
 func (osr *OrganizationSettingsRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationSettings, error) {
+	osr.mock.ctrl.T.Helper()
 	return osr.mock.Get(ctx, client, opts...)
 }
 
 func (osr *OrganizationSettingsRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationSettings, error) {
+	osr.mock.ctrl.T.Helper()
 	return osr.mock.List(ctx, client, opts...)
 }
 
 func (osr *OrganizationSettingsRepo) Set(ctx context.Context, client database.QueryExecutor, settings *domain.OrganizationSettings) error {
+	osr.mock.ctrl.T.Helper()
 	return osr.mock.Set(ctx, client, settings)
 }
 
 func (osr *OrganizationSettingsRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	osr.mock.ctrl.T.Helper()
 	return osr.mock.Delete(ctx, client, condition)
 }
