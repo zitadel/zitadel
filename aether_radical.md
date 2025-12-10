@@ -185,8 +185,6 @@ graph TD
 
 #### B2B Scenario (Multi-Tenant)
 
-#### B2B Scenario (Multi-Tenant)
-
 In a B2B scenario, a "Platform" Collection holds the shared Applications. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Platform Collection's policy.
 
 ```mermaid
@@ -194,9 +192,7 @@ graph TD
     Instance[Instance]
     Platform["Collection: Platform (contains Apps)"]
 
-    subgraph "Platform Resources"
-        App["App: Dashboard"]
-    end
+    App["App: Dashboard"]
 
     TenantA["Collection: Tenant A"]
     UserA["User: Admin A"]
