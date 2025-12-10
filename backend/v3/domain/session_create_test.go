@@ -28,7 +28,6 @@ import (
 )
 
 func TestCreateSessionCommand_Validate(t *testing.T) {
-	t.Parallel()
 	ctx := authz.NewMockContext("instance-ctx", "", "")
 	oldIDConfig := id.GeneratorConfig
 	t.Cleanup(func() {
@@ -36,6 +35,7 @@ func TestCreateSessionCommand_Validate(t *testing.T) {
 	})
 
 	id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
+	t.Parallel()
 
 	tt := []struct {
 		testName        string
@@ -88,13 +88,13 @@ func TestCreateSessionCommand_Validate(t *testing.T) {
 }
 
 func TestCreateSessionCommand_Execute(t *testing.T) {
-	t.Parallel()
 	oldIDConfig := id.GeneratorConfig
 	t.Cleanup(func() {
 		id.GeneratorConfig = oldIDConfig
 	})
 
 	id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
+	t.Parallel()
 
 	idGenErr := errors.New("mock id gen")
 	createErr := errors.New("mock create error")
@@ -233,13 +233,13 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 }
 
 func TestCreateSessionCommand_Events(t *testing.T) {
-	t.Parallel()
 	oldIDConfig := id.GeneratorConfig
 	t.Cleanup(func() {
 		id.GeneratorConfig = oldIDConfig
 	})
 
 	id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
+	t.Parallel()
 
 	sessionAgg := &session.NewAggregate("session-1", "instance-1").Aggregate
 	tt := []struct {
