@@ -67,17 +67,17 @@ Instrumentation:
       # Project ID for Google Cloud Trace exporter
       GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_GOOGLEPROJECTID
   Profile:
-    # The following profiler types are supported:
-    # "none": Disables profiling
-    # "google": Exports profiling data to Google Cloud Profiler
-    Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
-    # Project ID for Google Cloud Profiler
-    GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_GOOGLEPROJECTID
+    Exporter:
+      # The following profiler types are supported:
+      # "none": Disables profiling
+      # "google": Exports profiling data to Google Cloud Profiler
+      Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
+      # Project ID for Google Cloud Profiler
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_GOOGLEPROJECTID
 
 # Legacy logging (Deprecated, see Instrumentation.Slog)
 Log:
-  # Disables the legacy logger by default
-  Level: fatal # ZITADEL_LOG_LEVEL
+  Level: info # ZITADEL_LOG_LEVEL
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 

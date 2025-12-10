@@ -28,11 +28,12 @@ func (c *ProfileConfig) SetLegacyConfig(lc *LegacyProfileConfig) {
 }
 
 func startProfiler(cfg ProfileConfig, sericeName string) error {
-	if cfg.Exporter.Type == ExporterTypeNone {
+	typ := cfg.Exporter.Type
+	if typ == ExporterTypeUnspecified || typ == ExporterTypeNone {
 		return nil
 	}
-	if cfg.Exporter.Type != ExporterTypeGoogle {
-		return errExporterType(cfg.Exporter.Type, "profiler")
+	if typ != ExporterTypeGoogle {
+		return errExporterType(typ, "profiler")
 	}
 	pc := profiler.Config{
 		Service:        sericeName,

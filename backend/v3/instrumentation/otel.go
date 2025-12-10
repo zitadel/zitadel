@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 )
 
-//go:generate enumer -type=ExporterType -trimprefix=OtelExporterType -text -linecomment
+//go:generate enumer -type=ExporterType -trimprefix=ExporterType -text -linecomment
 type ExporterType int
 
 // ExporterType defines the type of exporter to use.
@@ -129,5 +129,5 @@ func resourceWithService(serviceName string) (*resource.Resource, error) {
 }
 
 func errExporterType(typ ExporterType, instrument string) error {
-	return fmt.Errorf("exporter type value %v unsupported for %s", typ, instrument)
+	return fmt.Errorf("exporter type \"%v\" unsupported for %s", typ, instrument)
 }
