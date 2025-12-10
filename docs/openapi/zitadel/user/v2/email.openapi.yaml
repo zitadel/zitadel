@@ -1,0 +1,68 @@
+openapi: 3.1.0
+info:
+  title: zitadel.user.v2
+paths: {}
+components:
+  schemas:
+    zitadel.user.v2.HumanEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          title: email
+        isVerified:
+          type: boolean
+          title: is_verified
+      title: HumanEmail
+      additionalProperties: false
+    zitadel.user.v2.ReturnEmailVerificationCode:
+      type: object
+      title: ReturnEmailVerificationCode
+      additionalProperties: false
+    zitadel.user.v2.SendEmailVerificationCode:
+      type: object
+      properties:
+        urlTemplate:
+          type: string
+          title: url_template
+          description: |-
+            Optionally set a url_template, which will be used in the verification mail sent by ZITADEL to guide the user to your verification page.
+             If no template is set, the default ZITADEL url will be used.
+
+             The following placeholders can be used: UserID, OrgID, Code
+          nullable: true
+      title: SendEmailVerificationCode
+      additionalProperties: false
+    zitadel.user.v2.SetHumanEmail:
+      type: object
+      oneOf:
+        - properties:
+            isVerified:
+              type: boolean
+              title: is_verified
+          title: is_verified
+          required:
+            - isVerified
+        - properties:
+            returnCode:
+              title: return_code
+              $ref: '#/components/schemas/zitadel.user.v2.ReturnEmailVerificationCode'
+          title: return_code
+          required:
+            - returnCode
+        - properties:
+            sendCode:
+              title: send_code
+              $ref: '#/components/schemas/zitadel.user.v2.SendEmailVerificationCode'
+          title: send_code
+          required:
+            - sendCode
+      properties:
+        email:
+          type: string
+          title: email
+      title: SetHumanEmail
+      required:
+        - email
+      additionalProperties: false
+security: []

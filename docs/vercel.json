@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm nx run @zitadel/docs:build",
+  "buildCommand": "pnpm nx run docs:build",
   "github": {
     "enabled": true
   },

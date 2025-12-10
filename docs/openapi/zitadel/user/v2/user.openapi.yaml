@@ -1,0 +1,473 @@
+openapi: 3.1.0
+info:
+  title: zitadel.user.v2
+paths: {}
+components:
+  schemas:
+    zitadel.user.v2.AccessTokenType:
+      type: string
+      title: AccessTokenType
+      enum:
+        - ACCESS_TOKEN_TYPE_BEARER
+        - ACCESS_TOKEN_TYPE_JWT
+    zitadel.user.v2.AuthFactorState:
+      type: string
+      title: AuthFactorState
+      enum:
+        - AUTH_FACTOR_STATE_UNSPECIFIED
+        - AUTH_FACTOR_STATE_NOT_READY
+        - AUTH_FACTOR_STATE_READY
+        - AUTH_FACTOR_STATE_REMOVED
+    zitadel.user.v2.Gender:
+      type: string
+      title: Gender
+      enum:
+        - GENDER_UNSPECIFIED
+        - GENDER_FEMALE
+        - GENDER_MALE
+        - GENDER_DIVERSE
+    zitadel.user.v2.UserState:
+      type: string
+      title: UserState
+      enum:
+        - USER_STATE_UNSPECIFIED
+        - USER_STATE_ACTIVE
+        - USER_STATE_INACTIVE
+        - USER_STATE_DELETED
+        - USER_STATE_LOCKED
+        - USER_STATE_INITIAL
+    google.protobuf.Timestamp:
+      type: string
+      examples:
+        - 1s
+        - 1.000340012s
+      format: date-time
+      description: |-
+        A Timestamp represents a point in time independent of any time zone or local
+         calendar, encoded as a count of seconds and fractions of seconds at
+         nanosecond resolution. The count is relative to an epoch at UTC midnight on
+         January 1, 1970, in the proleptic Gregorian calendar which extends the
+         Gregorian calendar backwards to year one.
+
+         All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap
+         second table is needed for interpretation, using a [24-hour linear
+         smear](https://developers.google.com/time/smear).
+
+         The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By
+         restricting to that range, we ensure that we can convert to and from [RFC
+         3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+
+         # Examples
+
+         Example 1: Compute Timestamp from POSIX `time()`.
+
+             Timestamp timestamp;
+             timestamp.set_seconds(time(NULL));
+             timestamp.set_nanos(0);
+
+         Example 2: Compute Timestamp from POSIX `gettimeofday()`.
+
+             struct timeval tv;
+             gettimeofday(&tv, NULL);
+
+             Timestamp timestamp;
+             timestamp.set_seconds(tv.tv_sec);
+             timestamp.set_nanos(tv.tv_usec * 1000);
+
+         Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
+
+             FILETIME ft;
+             GetSystemTimeAsFileTime(&ft);
+             UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+
+             // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
+             // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
+             Timestamp timestamp;
+             timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
+             timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
+
+         Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
+
+             long millis = System.currentTimeMillis();
+
+             Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
+                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+
+         Example 5: Compute Timestamp from Java `Instant.now()`.
+
+             Instant now = Instant.now();
+
+             Timestamp timestamp =
+                 Timestamp.newBuilder().setSeconds(now.getEpochSecond())
+                     .setNanos(now.getNano()).build();
+
+         Example 6: Compute Timestamp from current time in Python.
+
+             timestamp = Timestamp()
+             timestamp.GetCurrentTime()
+
+         # JSON Mapping
+
+         In JSON format, the Timestamp type is encoded as a string in the
+         [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+         format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+         where {year} is always expressed using four digits while {month}, {day},
+         {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
+         seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
+         are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
+         is required. A proto3 JSON serializer should always use UTC (as indicated by
+         "Z") when printing the Timestamp type and a proto3 JSON parser should be
+         able to accept both UTC and other timezones (as indicated by an offset).
+
+         For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past
+         01:30 UTC on January 15, 2017.
+
+         In JavaScript, one can convert a Date object to this format using the
+         standard
+         [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+         method. In Python, a standard `datetime.datetime` object can be converted
+         to this format using
+         [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+         the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
+         the Joda Time's [`ISODateTimeFormat.dateTime()`](
+         http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+         ) to obtain a formatter capable of generating timestamps in this format.
+    zitadel.object.v2.Details:
+      type: object
+      properties:
+        sequence:
+          type:
+            - integer
+            - string
+          title: sequence
+          format: int64
+          description: |-
+            sequence represents the order of events. It's always counting
+
+             on read: the sequence of the last event reduced by the projection
+
+             on manipulation: the timestamp of the event(s) added by the manipulation
+        changeDate:
+          title: change_date
+          description: |-
+            change_date is the timestamp when the object was changed
+
+             on read: the timestamp of the last event reduced by the projection
+
+             on manipulation: the timestamp of the event(s) added by the manipulation
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        resourceOwner:
+          type: string
+          title: resource_owner
+          description: resource_owner is the organization or instance_id an object belongs to
+        creationDate:
+          title: creation_date
+          description: creation_date is the timestamp where the first operation on the object was made
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: Details
+      additionalProperties: false
+    zitadel.user.v2.AuthFactor:
+      type: object
+      oneOf:
+        - properties:
+            otp:
+              title: otp
+              $ref: '#/components/schemas/zitadel.user.v2.AuthFactorOTP'
+          title: otp
+          required:
+            - otp
+        - properties:
+            otpEmail:
+              title: otp_email
+              $ref: '#/components/schemas/zitadel.user.v2.AuthFactorOTPEmail'
+          title: otp_email
+          required:
+            - otpEmail
+        - properties:
+            otpSms:
+              title: otp_sms
+              $ref: '#/components/schemas/zitadel.user.v2.AuthFactorOTPSMS'
+          title: otp_sms
+          required:
+            - otpSms
+        - properties:
+            u2f:
+              title: u2f
+              $ref: '#/components/schemas/zitadel.user.v2.AuthFactorU2F'
+          title: u2f
+          required:
+            - u2f
+      properties:
+        state:
+          title: state
+          $ref: '#/components/schemas/zitadel.user.v2.AuthFactorState'
+      title: AuthFactor
+      additionalProperties: false
+    zitadel.user.v2.AuthFactorOTP:
+      type: object
+      title: AuthFactorOTP
+      additionalProperties: false
+    zitadel.user.v2.AuthFactorOTPEmail:
+      type: object
+      title: AuthFactorOTPEmail
+      additionalProperties: false
+    zitadel.user.v2.AuthFactorOTPSMS:
+      type: object
+      title: AuthFactorOTPSMS
+      additionalProperties: false
+    zitadel.user.v2.AuthFactorU2F:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+      title: AuthFactorU2F
+      additionalProperties: false
+    zitadel.user.v2.HumanEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          title: email
+        isVerified:
+          type: boolean
+          title: is_verified
+      title: HumanEmail
+      additionalProperties: false
+    zitadel.user.v2.HumanPhone:
+      type: object
+      properties:
+        phone:
+          type: string
+          title: phone
+        isVerified:
+          type: boolean
+          title: is_verified
+      title: HumanPhone
+      additionalProperties: false
+    zitadel.user.v2.HumanProfile:
+      type: object
+      properties:
+        givenName:
+          type: string
+          title: given_name
+        familyName:
+          type: string
+          title: family_name
+        nickName:
+          type: string
+          title: nick_name
+          nullable: true
+        displayName:
+          type: string
+          title: display_name
+          nullable: true
+        preferredLanguage:
+          type: string
+          title: preferred_language
+          nullable: true
+        gender:
+          title: gender
+          nullable: true
+          $ref: '#/components/schemas/zitadel.user.v2.Gender'
+        avatarUrl:
+          type: string
+          title: avatar_url
+      title: HumanProfile
+      additionalProperties: false
+    zitadel.user.v2.HumanUser:
+      type: object
+      properties:
+        userId:
+          type: string
+          title: user_id
+          description: Unique identifier of the user.
+        state:
+          title: state
+          description: State of the user, for example active, inactive, locked, deleted, initial.
+          $ref: '#/components/schemas/zitadel.user.v2.UserState'
+        username:
+          type: string
+          title: username
+          description: Username of the user, which can be globally unique or unique on organization level.
+        loginNames:
+          type: array
+          items:
+            type: string
+          title: login_names
+          description: Possible usable login names for the user.
+        preferredLoginName:
+          type: string
+          title: preferred_login_name
+          description: Preferred login name of the user.
+        profile:
+          title: profile
+          description: Profile information of the user.
+          $ref: '#/components/schemas/zitadel.user.v2.HumanProfile'
+        email:
+          title: email
+          description: Email of the user, if defined.
+          $ref: '#/components/schemas/zitadel.user.v2.HumanEmail'
+        phone:
+          title: phone
+          description: Phone of the user, if defined.
+          $ref: '#/components/schemas/zitadel.user.v2.HumanPhone'
+        passwordChangeRequired:
+          type: boolean
+          title: password_change_required
+          description: User is required to change the used password on the next login.
+        passwordChanged:
+          title: password_changed
+          description: The time the user last changed their password.
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        mfaInitSkipped:
+          title: mfa_init_skipped
+          description: The time the user last skipped MFA initialization.
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: HumanUser
+      additionalProperties: false
+    zitadel.user.v2.MachineUser:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        hasSecret:
+          type: boolean
+          title: has_secret
+        accessTokenType:
+          title: access_token_type
+          $ref: '#/components/schemas/zitadel.user.v2.AccessTokenType'
+      title: MachineUser
+      additionalProperties: false
+    zitadel.user.v2.Passkey:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        state:
+          title: state
+          $ref: '#/components/schemas/zitadel.user.v2.AuthFactorState'
+        name:
+          type: string
+          title: name
+      title: Passkey
+      additionalProperties: false
+    zitadel.user.v2.ReturnInviteCode:
+      type: object
+      title: ReturnInviteCode
+      additionalProperties: false
+    zitadel.user.v2.SendInviteCode:
+      type: object
+      properties:
+        urlTemplate:
+          type: string
+          title: url_template
+          description: |-
+            Optionally set a url_template, which will be used in the invite mail sent by ZITADEL to guide the user to your invitation page.
+             If no template is set and no previous code was created, the default ZITADEL url will be used.
+
+             The following placeholders can be used: UserID, OrgID, Code
+          nullable: true
+        applicationName:
+          type: string
+          title: application_name
+          description: |-
+            Optionally set an application name, which will be used in the invite mail sent by ZITADEL.
+             If no application name is set and no previous code was created, ZITADEL will be used as default.
+          nullable: true
+      title: SendInviteCode
+      additionalProperties: false
+    zitadel.user.v2.SetHumanProfile:
+      type: object
+      properties:
+        givenName:
+          type: string
+          title: given_name
+        familyName:
+          type: string
+          title: family_name
+        nickName:
+          type: string
+          title: nick_name
+          nullable: true
+        displayName:
+          type: string
+          title: display_name
+          nullable: true
+        preferredLanguage:
+          type: string
+          title: preferred_language
+          nullable: true
+        gender:
+          title: gender
+          nullable: true
+          $ref: '#/components/schemas/zitadel.user.v2.Gender'
+      title: SetHumanProfile
+      required:
+        - givenName
+        - familyName
+      additionalProperties: false
+    zitadel.user.v2.SetMetadataEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+          format: byte
+      title: SetMetadataEntry
+      required:
+        - key
+        - value
+      additionalProperties: false
+    zitadel.user.v2.User:
+      type: object
+      oneOf:
+        - properties:
+            human:
+              title: human
+              $ref: '#/components/schemas/zitadel.user.v2.HumanUser'
+          title: human
+          required:
+            - human
+        - properties:
+            machine:
+              title: machine
+              $ref: '#/components/schemas/zitadel.user.v2.MachineUser'
+          title: machine
+          required:
+            - machine
+      properties:
+        userId:
+          type: string
+          title: user_id
+        details:
+          title: details
+          $ref: '#/components/schemas/zitadel.object.v2.Details'
+        state:
+          title: state
+          $ref: '#/components/schemas/zitadel.user.v2.UserState'
+        username:
+          type: string
+          title: username
+        loginNames:
+          type: array
+          items:
+            type: string
+          title: login_names
+        preferredLoginName:
+          type: string
+          title: preferred_login_name
+      title: User
+      additionalProperties: false
+security: []

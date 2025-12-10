@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  title: zitadel.application.v2
+paths: {}
+components:
+  schemas:
+    zitadel.application.v2.LoginV1:
+      type: object
+      title: LoginV1
+      additionalProperties: false
+    zitadel.application.v2.LoginV2:
+      type: object
+      properties:
+        baseUri:
+          type: string
+          title: base_uri
+          description: Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+          nullable: true
+      title: LoginV2
+      additionalProperties: false
+    zitadel.application.v2.LoginVersion:
+      type: object
+      oneOf:
+        - properties:
+            loginV1:
+              title: login_v1
+              description: Allow the user to sign in through the ZITADEL hosted login UI.
+              $ref: '#/components/schemas/zitadel.application.v2.LoginV1'
+          title: login_v1
+          required:
+            - loginV1
+        - properties:
+            loginV2:
+              title: login_v2
+              description: Allow the user to sign in though the new login UI or even your own UI by specifying a base_uri.
+              $ref: '#/components/schemas/zitadel.application.v2.LoginV2'
+          title: login_v2
+          required:
+            - loginV2
+      title: LoginVersion
+      additionalProperties: false
+security: []
