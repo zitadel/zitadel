@@ -240,17 +240,22 @@ func TestCreateSessionCommand_Events(t *testing.T) {
 	})
 
 	id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
+
+	sessionAgg := &session.NewAggregate("session-1", "instance-1").Aggregate
 	tt := []struct {
-		testName       string
+		testName string
+
 		inputUserAgent *session_grpc.UserAgent
+		inputMetas     map[string][]byte
+		inputLifetime  *durationpb.Duration
 
 		expectedEvents []eventstore.Command
 	}{
 		{
-			testName: "when user agent is nil should return session added event with nil user agent",
+			testName: "when all params are nil should return session added event with nil user agent",
 
 			expectedEvents: []eventstore.Command{
-				session.NewAddedEvent(t.Context(), &session.NewAggregate("session-1", "instance-1").Aggregate, nil),
+				session.NewAddedEvent(t.Context(), sessionAgg, nil),
 			},
 		},
 		{
@@ -261,11 +266,47 @@ func TestCreateSessionCommand_Events(t *testing.T) {
 				Description:   gu.Ptr("description"),
 			},
 			expectedEvents: []eventstore.Command{
-				session.NewAddedEvent(t.Context(), &session.NewAggregate("session-1", "instance-1").Aggregate, &old_domain.UserAgent{
+				session.NewAddedEvent(t.Context(), sessionAgg, &old_domain.UserAgent{
 					FingerprintID: gu.Ptr("fingerprint-id"),
 					IP:            net.ParseIP("127.0.0.1"),
 					Description:   gu.Ptr("description"),
 				}),
+			},
+		},
+		{
+			testName: "when metas set should return session added and metadata set events",
+			inputUserAgent: &session_grpc.UserAgent{
+				FingerprintId: gu.Ptr("fingerprint-id"),
+				Ip:            gu.Ptr("127.0.0.1"),
+				Description:   gu.Ptr("description"),
+			},
+			inputMetas: map[string][]byte{"meta1": []byte("value1")},
+			expectedEvents: []eventstore.Command{
+				session.NewAddedEvent(t.Context(), sessionAgg, &old_domain.UserAgent{
+					FingerprintID: gu.Ptr("fingerprint-id"),
+					IP:            net.ParseIP("127.0.0.1"),
+					Description:   gu.Ptr("description"),
+				}),
+				session.NewMetadataSetEvent(t.Context(), sessionAgg, map[string][]byte{"meta1": []byte("value1")}),
+			},
+		},
+		{
+			testName: "when lifetime is set should return session added, metadata set and lifetime set events",
+			inputUserAgent: &session_grpc.UserAgent{
+				FingerprintId: gu.Ptr("fingerprint-id"),
+				Ip:            gu.Ptr("127.0.0.1"),
+				Description:   gu.Ptr("description"),
+			},
+			inputMetas:    map[string][]byte{"meta1": []byte("value1")},
+			inputLifetime: durationpb.New(1 * time.Second),
+			expectedEvents: []eventstore.Command{
+				session.NewAddedEvent(t.Context(), sessionAgg, &old_domain.UserAgent{
+					FingerprintID: gu.Ptr("fingerprint-id"),
+					IP:            net.ParseIP("127.0.0.1"),
+					Description:   gu.Ptr("description"),
+				}),
+				session.NewMetadataSetEvent(t.Context(), sessionAgg, map[string][]byte{"meta1": []byte("value1")}),
+				session.NewLifetimeSetEvent(t.Context(), sessionAgg, 1*time.Second),
 			},
 		},
 	}
@@ -274,22 +315,31 @@ func TestCreateSessionCommand_Events(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, nil, nil, nil)
+			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, tc.inputMetas, tc.inputLifetime, nil)
 			cmd.SessionID = gu.Ptr("session-1")
 
 			// Test
 			events, err := cmd.Events(t.Context(), nil)
 
 			// Verify
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			require.Len(t, events, len(tc.expectedEvents))
 			for i, expectedType := range tc.expectedEvents {
-				require.IsType(t, expectedType, events[i])
-				expectedAssertedType, ok := expectedType.(*session.AddedEvent)
-				require.True(t, ok)
-				actualAssertedType, ok := events[i].(*session.AddedEvent)
-				require.True(t, ok)
-				assert.Equal(t, expectedAssertedType.UserAgent, actualAssertedType.UserAgent)
+				assert.IsType(t, expectedType, events[i])
+				switch expectedAssertedType := expectedType.(type) {
+				case *session.AddedEvent:
+					actualAssertedType, ok := events[i].(*session.AddedEvent)
+					require.True(t, ok)
+					assert.Equal(t, expectedAssertedType.UserAgent, actualAssertedType.UserAgent)
+				case *session.MetadataSetEvent:
+					actualAssertedType, ok := events[i].(*session.MetadataSetEvent)
+					require.True(t, ok)
+					assert.Equal(t, expectedAssertedType.Metadata, actualAssertedType.Metadata)
+				case *session.LifetimeSetEvent:
+					actualAssertedType, ok := events[i].(*session.LifetimeSetEvent)
+					require.True(t, ok)
+					assert.Equal(t, expectedAssertedType.Lifetime, actualAssertedType.Lifetime)
+				}
 			}
 		})
 	}

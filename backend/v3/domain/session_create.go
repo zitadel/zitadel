@@ -60,9 +60,20 @@ func (c *CreateSessionCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eve
 		}
 	}
 
-	return []eventstore.Command{
-		session.NewAddedEvent(ctx, &session.NewAggregate(*c.SessionID, c.InstanceID).Aggregate, oldUA),
-	}, nil
+	sessionAgg := &session.NewAggregate(*c.SessionID, c.InstanceID).Aggregate
+
+	toReturn := make([]eventstore.Command, 1, 3)
+	toReturn[0] = session.NewAddedEvent(ctx, sessionAgg, oldUA)
+
+	if c.Metas != nil {
+		toReturn = append(toReturn, session.NewMetadataSetEvent(ctx, sessionAgg, c.Metas))
+	}
+
+	if c.Lifetime != nil {
+		toReturn = append(toReturn, session.NewLifetimeSetEvent(ctx, sessionAgg, c.Lifetime.AsDuration()))
+	}
+
+	return toReturn, nil
 }
 
 // Execute implements [Commander].
