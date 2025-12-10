@@ -205,6 +205,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.CallDurationHandler(),
 		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+		connect_middleware.LogHandler(grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
 		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName, instance_pb.InstanceService_ServiceDesc.ServiceName),
 		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),

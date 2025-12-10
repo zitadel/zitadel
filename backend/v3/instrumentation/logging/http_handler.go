@@ -19,7 +19,7 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 		}
 		start := time.Now()
 		logger := instrumentation.Logger()
-		ctx := instrumentation.SetRequestDetails(r.Context(), service, r)
+		ctx := instrumentation.SetHttpRequestDetails(r.Context(), service, r)
 		ctx = slogctx.NewCtx(ctx, logger)
 		sw := &statusWriter{ResponseWriter: w}
 

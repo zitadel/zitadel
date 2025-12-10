@@ -5,13 +5,16 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"connectrpc.com/connect"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
+	"google.golang.org/grpc"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
@@ -22,25 +25,6 @@ type LogConfig struct {
 	JSONFormat bool
 	AddSource  bool
 	Exporter   ExporterConfig
-}
-
-type RequestDetails interface {
-	*http.Request
-}
-
-// SetRequestDetails adds static details to each context aware log entry.
-func SetRequestDetails[R RequestDetails](ctx context.Context, service string, details R) context.Context {
-	return context.WithValue(ctx, ctxKey{}, requestDetails[R]{
-		service: service,
-		details: details,
-	})
-}
-
-type ctxKey struct{}
-
-type requestDetails[R RequestDetails] struct {
-	service string
-	details R
 }
 
 // setLogger configures the global slog logger.
@@ -86,6 +70,87 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	slog.SetDefault(slog.New(handler))
 }
 
+// SetHttpRequestDetails adds static details to each context aware log entry.
+func SetHttpRequestDetails(ctx context.Context, service string, request *http.Request) context.Context {
+	return context.WithValue(ctx, ctxKey{}, httpRequest{
+		service: service,
+		request: request,
+	})
+}
+
+// SetConnectRequestDetails adds static details to each context aware log entry.
+func SetConnectRequestDetails(ctx context.Context, request connect.AnyRequest) context.Context {
+	return context.WithValue(ctx, ctxKey{}, connectRequest{request})
+}
+
+func SetGrpcRequestDetails(ctx context.Context, info *grpc.UnaryServerInfo) context.Context {
+	return context.WithValue(ctx, ctxKey{}, grpcRequest{info})
+}
+
+type ctxKey struct{}
+
+type requestDetails interface {
+	attrs() []slog.Attr
+}
+
+type httpRequest struct {
+	service string
+	request *http.Request
+}
+
+var _ requestDetails = httpRequest{}
+
+func (r httpRequest) attrs() []slog.Attr {
+	return []slog.Attr{
+		slog.String("protocol", "http"),
+		slog.String("service", r.service),
+		slog.String("method", r.request.Method),
+		slog.String("path", r.request.URL.Path),
+	}
+}
+
+type connectRequest struct {
+	connect.AnyRequest
+}
+
+var _ requestDetails = connectRequest{}
+
+func (r connectRequest) attrs() []slog.Attr {
+	spec := r.Spec()
+	proc := strings.Split(spec.Procedure, "/")
+	var service string
+	if len(proc) > 0 {
+		service = proc[0]
+	}
+
+	return []slog.Attr{
+		slog.String("protocol", "connect"),
+		slog.String("service", service),
+		slog.String("method", r.HTTPMethod()),
+		slog.String("procedure", spec.Procedure),
+	}
+}
+
+type grpcRequest struct {
+	info *grpc.UnaryServerInfo
+}
+
+var _ requestDetails = grpcRequest{}
+
+func (r grpcRequest) attrs() []slog.Attr {
+	proc := strings.Split(r.info.FullMethod, "/")
+	var service string
+	if len(proc) > 0 {
+		service = proc[0]
+	}
+
+	return []slog.Attr{
+		slog.String("protocol", "grpc"),
+		slog.String("service", service),
+		slog.String("procedure", r.info.FullMethod),
+	}
+}
+
 // domainExtractor sets the sanitized request hosts from [http_util.DomainCtx] to a log entry.
 func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
 	return []slog.Attr{
@@ -94,17 +159,8 @@ func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) [
 }
 
 func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	switch details := ctx.Value(ctxKey{}).(type) {
-	case *http.Request:
-		return httpRequestToAttr(details)
-	default:
-		return nil
+	if r, ok := ctx.Value(ctxKey{}).(requestDetails); ok {
+		return r.attrs()
 	}
-}
-
-func httpRequestToAttr(r *http.Request) []slog.Attr {
-	return []slog.Attr{
-		slog.String("method", r.Method),
-		slog.String("path", r.URL.Path),
-	}
+	return nil
 }

@@ -71,6 +71,7 @@ func CreateServer(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+				middleware.LogHandler(grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.InstanceInterceptor(queries, externalDomain, translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
