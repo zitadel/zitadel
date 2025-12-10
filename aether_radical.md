@@ -190,16 +190,16 @@ In a B2B scenario, a "Platform" Collection holds the shared Applications. Sub-Co
 ```mermaid
 graph TD
     Instance[Instance]
-    Platform["Collection: Platform (contains Apps)"]
+    Platform["Collection: Platform (contains Apps, Authorizations for Platform Admins)"]
 
     App["App: Dashboard"]
 
     UserC["User: Platform Admin"]
 
-    TenantA["Collection: Tenant A"]
+    TenantA["Collection: Tenant A (contains Apps, Authorizations for Tenant Admins)"]
     UserA["User: Tenant A Admin"]
 
-    TenantB["Collection: Tenant B"]
+    TenantB["Collection: Tenant B (contains Apps, Authorizations for Tenant Admins)"]
     UserB["User: Tenant B Employee"]
 
     Instance --> Platform
