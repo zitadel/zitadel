@@ -37,25 +37,20 @@ graph TD
     CollectionA["Collection A (Tenant 1)"]
     CollectionB["Collection B (Tenant 2)"]
     User1[User 1]
-
-    subgraph "Project API"
-        Project1[Project 1]
-        App1[App 1]
-    end
+    App1[App 1]
 
     Instance --> CollectionA
     Instance --> CollectionB
     CollectionA --> User1
-    CollectionA --> Project1
-    Project1 --> App1
+    CollectionA --> App1
 ```
 
 ### Collections and Hierarchy
 
 - Collections can consist of multiple layers that are between the root node and the leaf nodes (resources)
 - Introducing an additional layer requires customers to restructure the relationship of resources
-- The hierarchy within a project is kept (project contains multiple applications, …)
-  > **Note:** We retain the **Project** concept as a container for applications. This supports the common pattern where users start with one app but later add more (e.g., a mobile app, a service-to-service client) that share the same authorization context.
+- The hierarchy within a collection is flexible (collection contains multiple applications, users, etc.)
+  > **Note:** We have **removed the Project resource**. Collections now serve as the container for Applications. If you need to group applications (e.g., "My Project"), simply create a sub-collection for them.
 - Collection API allows to do tree transformations (moving subelements of collection like `setParent`).
 - Specific APIs like `UserService` allow to do single resource changes.
 - No resource of a specific type can be a child of a same type node (e.g., no user is a descendant of another user, no setting a descendant of another setting).
@@ -98,11 +93,11 @@ graph TD
 
 ### Tree Transformation & Portability
 
-One of the key advantages of this architecture is the ability to move resources (like Projects) between Collections without breaking their internal configuration or access controls.
+One of the key advantages of this architecture is the ability to move resources (like Applications) between Collections without breaking their internal configuration or access controls.
 
-- **Encapsulation**: When a Project is moved to a new parent Collection, all its child resources—including **Authorizations**, Applications, and **Project Roles**—move with it.
-- **Global Identity References**: Since Authorizations link to Users via stable IDs, the link between a User and the Project remains valid even if the Project's location changes.
-- **Policy Adaptation**: While the internal setup (who has access) is preserved, the Project will automatically adopt the **inherited settings** (e.g., branding, security policies) of its new parent Collection. This ensures that the Project complies with the policies of its new "tenant" or context immediately upon moving.
+- **Encapsulation**: When an Application is moved to a new parent Collection, all its child resources—including **Authorizations** and **Application Roles**—move with it.
+- **Global Identity References**: Since Authorizations link to Users via stable IDs, the link between a User and the Application remains valid even if the Application's location changes.
+- **Policy Adaptation**: While the internal setup (who has access) is preserved, the Application will automatically adopt the **inherited settings** (e.g., branding, security policies) of its new parent Collection. This ensures that the Application complies with the policies of its new "tenant" or context immediately upon moving.
 
 These changes aim to make ZITADEL a lighter, more flexible, and inherently suitable solution for modeling the complex interactions required by modern B2B scenarios, placing the authorization system at the center of the access strategy.
 
@@ -110,34 +105,44 @@ These changes aim to make ZITADEL a lighter, more flexible, and inherently suita
 
 To better align API services with practical use cases and reduce fragmentation, we are reconsidering the scoping of services.
 
-- **Service Consolidation**: Services will be consolidated to handle related resources together. For example, the `App` service will be eliminated, and the `Project` service will handle all operations for a project, including its sub-resources like applications, **Project Roles**, and **Authorizations**.
+- **Service Consolidation**: Services will be consolidated. The `Project` service is removed. Applications are managed directly under Collections.
 - **Sub-resource Fetching (`extend: true`)**: When fetching a resource, an optional parameter `extend: true` can be used to return all its sub-resources in the response. This reduces the need for multiple API calls.
 - **Rule Integration**: If `get()` is used within the rule language to load a resource, it will automatically load the resource with `extend: true` (or equivalent behavior), ensuring that all necessary sub-data is available for evaluation without additional queries.
 
-#### Authorization (Project Authorization)
+#### Unified Access Policy (Permissions & Authorizations)
 
-To manage access rights effectively, we rely on **Project Authorizations** rather than separate resource lists.
+To simplify management, we combine **Management API Permissions** and **App Authorizations** into a single **Access Policy** attached to a **Collection**.
 
-- **Computed Access**: Access is not stored as a static record but is **computed dynamically** by evaluating a CEL script against the User's context.
-- **Project Level**: The authorization script is defined at the Project level and applies to all Apps within that Project.
-- **OIDC Integration**: The evaluation results in a set of **Roles** or **Claims** that are injected into the OIDC token.
+- **Single Source of Truth**: One policy file defines both _who can manage the collection_ and _what roles users have in apps_ within that collection.
+- **Collection-Based**: The policy applies to the Collection and all its resources (including Apps).
+- **Structure**: The policy file has two distinct sections:
+  1.  `permissions`: CEL rules for Management API access (`allow read`, `allow write`).
+  2.  `authorizations`: CEL logic for mapping attributes to OIDC roles/claims.
 
-##### Project Authorization Script (App Roles)
+##### 1. Permissions (Management API)
 
-The mapping from **User/Project Attributes** to **Roles/Claims** is defined in an **Authorization Script** (e.g., `authorization.cel`) attached to the **Project**.
-
-- **Concept**: The script evaluates to a map of roles: `Map<string, bool>`.
-- **Evaluation**: When a user accesses _any_ App in the Project, this script is evaluated using the `User`, `Project`, and `App` attributes.
-- **Output**: The resulting roles are injected into the OIDC token.
+Controls access to the ZITADEL API (e.g., creating users, updating settings).
 
 ```cel
-// authorization.cel (Project Level)
-{
+permissions {
+  // Allow read/write if the session's user belongs to this collection
+  allow read, write: if session.user.collection_id == resource.collection_id;
+}
+```
+
+##### 2. Authorizations (App Roles)
+
+Maps user attributes to OIDC roles for Applications contained in this Collection.
+
+```cel
+authorizations {
+  // Map attributes to roles
   "admin": user.username == "max@zitadel.com",
-  "editor": user.collection_id == project.collection_id,
   "viewer": user.metadata.level == "employee"
 }
 ```
+
+> **API Design Note:** This unified policy will be managed via a single endpoint, e.g., `/collections/{id}/policy`.
 
 #### Schema Enforcement via Permissions
 
@@ -160,7 +165,7 @@ To illustrate the flexibility of this architecture, here are examples for B2C an
 
 #### B2C Scenario (Simple)
 
-In a B2C scenario, the structure is flat. A single Collection holds the Users (customers) and the Project (application).
+In a B2C scenario, the structure is flat. A single Collection holds the Users (customers) and the Application.
 
 ```mermaid
 graph TD
@@ -168,33 +173,28 @@ graph TD
     Collection["Collection: Customer Data"]
     User1["User: Alice"]
     User2["User: Bob"]
-
-    subgraph "Project API"
-        Project["Project: My App"]
-        App["App: Web App"]
-    end
+    App["App: Web App"]
 
     Instance --> Collection
     Collection --> User1
     Collection --> User2
-    Collection --> Project
-    Project --> App
+    Collection --> App
 
     style Collection fill:#f9f,stroke:#333,stroke-width:2px,color:#000
-    style Project fill:#ccf,stroke:#333,stroke-width:2px,color:#000
 ```
 
 #### B2B Scenario (Multi-Tenant)
 
-In a B2B scenario, a "Platform" Collection holds the shared Project. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Project's CEL authorization script evaluating User attributes (e.g., membership in a Tenant Collection).
+#### B2B Scenario (Multi-Tenant)
+
+In a B2B scenario, a "Platform" Collection holds the shared Applications. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Platform Collection's policy.
 
 ```mermaid
 graph TD
     Instance[Instance]
-    Platform["Collection: Platform"]
+    Platform["Collection: Platform (contains Apps)"]
 
-    subgraph "Project API"
-        Project["Project: B2B Service"]
+    subgraph "Platform Resources"
         App["App: Dashboard"]
     end
 
@@ -205,32 +205,19 @@ graph TD
     UserB["User: Employee B"]
 
     Instance --> Platform
-    Platform --> Project
     Platform --> TenantA
     Platform --> TenantB
 
-    Project --> App
+    Platform --> App
 
     TenantA --> UserA
     TenantB --> UserB
 
     style Platform fill:#f9f,stroke:#333,stroke-width:2px,color:#000
-    style Project fill:#ccf,stroke:#333,stroke-width:2px,color:#000
     style TenantA fill:#eef,stroke:#333,stroke-width:1px,color:#000
     style TenantB fill:#eef,stroke:#333,stroke-width:1px,color:#000
 ```
 
-### Permission System (Management API)
-
-Distinct from the "Authorization" system (which controls access to Customer Apps), the **Permission System** controls access to the **ZITADEL API** itself (e.g., creating users, updating projects, configuring collections).
-
-We propose implementing an **Attribute-Based Access Control (ABAC)** system to replace Instance-, Organization- and Project-level roles. This system leverages the **Common Expression Language (CEL)** for flexible and secure permission definitions.
-
-#### Core Concepts
-
-- **Definition of Rules**: Permissions are tied to a new **Rule** concept associated with collections.
-- **Rules as part of Collections**: Rules are defined under a collection. They apply to the same collection and all its sub-elements.
-- **Session-Based Access**: The rule system is fundamentally designed to access sessions that are bound to a single user.
 - **Granular Control**: Access is defined by **Rules** (`read`, `write`), replacing traditional static roles for API management.
 
 #### Syntax (CEL)
@@ -365,25 +352,19 @@ The ZITADEL Console will be reimagined as a Next.js application to support this 
 - **Schema Editor**: An interface for defining and managing User Schemas within collections.
 - **Inheritance Visualization**: Visual cues to show which settings are inherited from parent collections versus defined locally.
 
-### API Design for Authorization Management
+### API Design for Policy Management
 
-We recommend managing CEL authorizations as **sub-resources** rather than embedding them directly in the Project or Collection objects.
+We recommend managing the Unified Access Policy as a **sub-resource** of the Collection.
 
 #### Rationale
 
-1.  **Payload Size**: Authorization scripts can be large. Including them in standard `List` or `Get` responses for Projects/Collections would unnecessarily bloat the payload.
-2.  **Concurrency & Safety**: Separating the authorization allows for independent updates. A user renaming a Project shouldn't accidentally overwrite an authorization change made by a security admin.
-3.  **Content Negotiation**: Authorizations are fundamentally text/code. A dedicated endpoint allows for supporting different formats (e.g., uploading a raw `.cel` file) or future versioning.
+1.  **Unified Management**: A single endpoint to manage both API permissions and App authorizations.
+2.  **Payload Size**: Keeps the Collection resource light.
 
 #### Proposed Endpoints
 
-**Project Authorization (App Roles)**
+**Collection Access Policy**
 
-- `GET /projects/{id}/authorization`: Retrieve the current CEL script.
-- `PUT /projects/{id}/authorization`: Update the CEL script.
-  - Body: `{"script": "..."}` or raw `text/plain`.
-
-**Collection Permission (Management API)**
-
-- `GET /collections/{id}/permission`: Retrieve the current permission rules.
-- `PUT /collections/{id}/permission`: Update the permission rules.
+- `GET /collections/{id}/policy`: Retrieve the current policy (permissions + authorizations).
+- `PUT /collections/{id}/policy`: Update the policy.
+  - Body: `{"permissions": "...", "authorizations": "..."}` or a combined CEL file.
