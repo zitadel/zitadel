@@ -6,11 +6,13 @@ import (
 	"net"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
@@ -28,13 +30,21 @@ import (
 func TestCreateSessionCommand_Validate(t *testing.T) {
 	t.Parallel()
 	ctx := authz.NewMockContext("instance-ctx", "", "")
+	oldIDConfig := id.GeneratorConfig
+	t.Cleanup(func() {
+		id.GeneratorConfig = oldIDConfig
+	})
+
+	id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
 
 	tt := []struct {
 		testName        string
 		inputCtx        context.Context
 		inputInstanceID string
+		inputLifetime   *durationpb.Duration
 
 		expectedInstanceID string
+		expectedError      error
 	}{
 		{
 			testName:           "when input instance id is not set should set from context",
@@ -46,19 +56,32 @@ func TestCreateSessionCommand_Validate(t *testing.T) {
 			inputInstanceID:    "instance-1",
 			expectedInstanceID: "instance-1",
 		},
+		{
+			testName:           "when input lifetime is set as negative value should return invalid argument error",
+			inputInstanceID:    "instance-1",
+			inputLifetime:      durationpb.New(-1 * time.Second),
+			expectedInstanceID: "instance-1",
+			expectedError:      zerrors.ThrowInvalidArgument(nil, "DOM-XA5OMq", "Errors.Session.PositiveLifetime"),
+		},
+		{
+			testName:           "when input lifetime is set as positive value should return nil",
+			inputInstanceID:    "instance-1",
+			inputLifetime:      durationpb.New(1 * time.Second),
+			expectedInstanceID: "instance-1",
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			sessionCreator := domain.NewCreateSessionCommand(tc.inputInstanceID, nil, nil)
+			sessionCreator := domain.NewCreateSessionCommand(tc.inputInstanceID, nil, nil, tc.inputLifetime, nil)
 
 			// Test
 			err := sessionCreator.Validate(tc.inputCtx, nil)
 
 			// Verify
-			require.NoError(t, err)
+			assert.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedInstanceID, sessionCreator.InstanceID)
 		})
 	}
@@ -170,7 +193,7 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 			if tc.idGenMock != nil {
 				idGenMock = tc.idGenMock(ctrl)
 			}
-			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, idGenMock)
+			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, nil, nil, idGenMock)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -233,7 +256,7 @@ func TestCreateSessionCommand_Events(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, nil)
+			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, nil, nil, nil)
 			cmd.SessionID = gu.Ptr("session-1")
 
 			// Test
