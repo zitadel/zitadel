@@ -194,11 +194,13 @@ graph TD
 
     App["App: Dashboard"]
 
+    UserC["User: Platform Admin"]
+
     TenantA["Collection: Tenant A"]
-    UserA["User: Admin A"]
+    UserA["User: Tenant A Admin"]
 
     TenantB["Collection: Tenant B"]
-    UserB["User: Employee B"]
+    UserB["User: Tenant B Employee"]
 
     Instance --> Platform
     Platform --> TenantA
