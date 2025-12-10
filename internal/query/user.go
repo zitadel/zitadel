@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"slices"
 	"strings"
 	"time"
 
@@ -122,14 +121,6 @@ type NotifyUser struct {
 	LastPhone          string
 	VerifiedPhone      string
 	PasswordSet        bool
-}
-
-func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
-	users.Users = slices.DeleteFunc(users.Users,
-		func(user *User) bool {
-			return userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck) != nil
-		},
-	)
 }
 
 type UserSearchQueries struct {
@@ -601,13 +592,11 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
-		usersCheckPermission(ctx, users, permissionCheck)
-	}
+
 	return users, nil
 }
 
