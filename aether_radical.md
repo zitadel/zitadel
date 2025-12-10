@@ -185,7 +185,7 @@ graph TD
 
 #### B2B Scenario (Multi-Tenant)
 
-In a B2B scenario, a "Platform" Collection holds the shared Applications. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Platform Collection's policy.
+In a B2B scenario, a "Platform" Collection holds the shared Applications. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Platform Collection's CEL definitions.
 
 ```mermaid
 graph TD
@@ -196,10 +196,10 @@ graph TD
 
     UserC["User: Platform Admin"]
 
-    TenantA["Collection: Tenant A (contains Apps, Authorizations for Tenant Admins)"]
+    TenantA["Collection: Tenant A (Authorizations for Tenant Admins)"]
     UserA["User: Tenant A Admin"]
 
-    TenantB["Collection: Tenant B (contains Apps, Authorizations for Tenant Admins)"]
+    TenantB["Collection: Tenant B (Authorizations for Tenant Admins)"]
     UserB["User: Tenant B Employee"]
 
     Instance --> Platform
@@ -217,7 +217,9 @@ graph TD
     style TenantB fill:#eef,stroke:#333,stroke-width:1px,color:#000
 ```
 
-- **Granular Control**: Access is defined by **Rules** (`read`, `write`), replacing traditional static roles for API management.
+Users of Tenants can access the Platform Collection's Apps and Collections. If that is not desired, the Platform Collection's CEL definitions can be used to restrict access.
+
+> **Note:** We could optionally define a "authenticate" rule to define who can authenticate to the Platform Collection (previously a setting of the project)
 
 #### Syntax (CEL)
 
