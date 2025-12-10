@@ -12,6 +12,7 @@ import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 import { useTranslations } from "next-intl";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   loginName: string;
@@ -27,15 +28,7 @@ type Props = {
   allowRegister: boolean;
 };
 
-export function UsernameForm({
-  loginName,
-  requestId,
-  organization,
-  suffix,
-  loginSettings,
-  submit,
-  allowRegister,
-}: Props) {
+export function UsernameForm({ loginName, requestId, organization, suffix, loginSettings, submit, allowRegister }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -49,6 +42,7 @@ export function UsernameForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
@@ -71,6 +65,11 @@ export function UsernameForm({
       return router.push(res.redirect);
     }
 
+    if (res && "samlData" in res && res.samlData) {
+      setSamlData(res.samlData);
+      return;
+    }
+
     if (res && "error" in res && res.error) {
       setError(res.error);
       return;
@@ -87,10 +86,7 @@ export function UsernameForm({
   }, []);
 
   let inputLabel = t("labels.loginname");
-  if (
-    loginSettings?.disableLoginWithEmail &&
-    loginSettings?.disableLoginWithPhone
-  ) {
+  if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {
     inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
     inputLabel = t("labels.usernameOrPhoneNumber");
@@ -100,6 +96,7 @@ export function UsernameForm({
 
   return (
     <form className="w-full">
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <div className="">
         <TextInput
           type="text"
