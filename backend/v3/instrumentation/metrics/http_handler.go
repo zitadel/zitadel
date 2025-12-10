@@ -5,7 +5,10 @@ import (
 	"net/http"
 	"strings"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 )
 
 const (
@@ -23,7 +26,7 @@ const (
 type Handler struct {
 	handler http.Handler
 	methods []MetricType
-	filters []Filter
+	filter  otelhttp.Filter
 }
 
 type MetricType int32
@@ -47,13 +50,11 @@ func (r *StatusRecorder) WriteHeader(status int) {
 
 type Filter func(*http.Request) bool
 
-func NewMetricsHandler(handler http.Handler, metricMethods []MetricType, ignoredEndpoints ...string) http.Handler {
+func NewHandler(handler http.Handler, metricMethods []MetricType, ignoredEndpoints ...string) http.Handler {
 	h := Handler{
 		handler: handler,
 		methods: metricMethods,
-	}
-	if len(ignoredEndpoints) > 0 {
-		h.filters = append(h.filters, shouldNotIgnore(ignoredEndpoints...))
+		filter:  instrumentation.RequestFilter(ignoredEndpoints...),
 	}
 	return &h
 }
@@ -76,12 +77,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handler.ServeHTTP(w, r)
 		return
 	}
-	for _, f := range h.filters {
-		if !f(r) {
-			// Simply pass through to the handler if a filter rejects the request
-			h.handler.ServeHTTP(w, r)
-			return
-		}
+	if !h.filter(r) {
+		// Simply pass through to the handler if a filter rejects the request
+		h.handler.ServeHTTP(w, r)
+		return
 	}
 	uri := strings.Split(r.RequestURI, "?")[0]
 	recorder := &StatusRecorder{

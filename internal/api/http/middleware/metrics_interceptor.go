@@ -8,6 +8,6 @@ import (
 
 func MetricsHandler(metricTypes []metrics.MetricType, ignoredMethods ...string) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
-		return metrics.NewMetricsHandler(handler, metricTypes, ignoredMethods...)
+		return metrics.NewHandler(handler, metricTypes, ignoredMethods...)
 	}
 }

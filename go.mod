@@ -95,6 +95,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.28.6
 	github.com/veqryn/slog-context v0.8.0
+	github.com/veqryn/slog-context/otel v0.8.0
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.6.2
 	github.com/zitadel/oidc/v3 v3.45.0

@@ -218,6 +218,8 @@ func addInterceptors(
 		metrics.MetricTypeTotalCount,
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
+	handler = http_mw.TraceHandler(http_utils.Probes...)(handler)
+	handler = http_mw.LogHandler("grpc_gateway", http_utils.Probes...)(handler)
 	return handler
 }
 

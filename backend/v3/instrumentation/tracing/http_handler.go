@@ -1,4 +1,4 @@
-package telemetry
+package tracing
 
 import (
 	"net/http"
@@ -6,23 +6,14 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 )
 
-func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
-	return func(r *http.Request) bool {
-		for _, endpoint := range endpoints {
-			if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
-				return false
-			}
-		}
-		return true
-	}
-}
-
-func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Handler {
+func NewHandler(handler http.Handler, ignoredPrefix ...string) http.Handler {
 	return otelhttp.NewHandler(handler,
 		"zitadel",
-		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
+		otelhttp.WithFilter(instrumentation.RequestFilter(ignoredPrefix...)),
 		otelhttp.WithPublicEndpoint(),
 		otelhttp.WithSpanNameFormatter(spanNameFormatter),
 		otelhttp.WithMeterProvider(otel.GetMeterProvider()))

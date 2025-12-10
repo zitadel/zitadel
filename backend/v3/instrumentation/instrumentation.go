@@ -5,8 +5,12 @@ package instrumentation
 import (
 	"context"
 	"log/slog"
+	"net/http"
+	"slices"
+	"strings"
 	"sync"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/log"
@@ -66,4 +70,15 @@ func NewMeter(name string, options ...metric.MeterOption) *Meter {
 // Logger returns the globally configured logger.
 func Logger() *slog.Logger {
 	return slog.Default()
+}
+
+func RequestFilter(ignoredPrefix ...string) otelhttp.Filter {
+	return func(r *http.Request) bool {
+		return !slices.ContainsFunc(
+			ignoredPrefix,
+			func(endpoint string) bool {
+				return strings.HasPrefix(r.URL.RequestURI(), endpoint)
+			},
+		)
+	}
 }

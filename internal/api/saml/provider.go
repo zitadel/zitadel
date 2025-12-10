@@ -71,7 +71,8 @@ func NewProvider(
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("saml"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
