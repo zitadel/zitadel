@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 import { isSessionValid } from "./session";
 import { sendLoginname } from "@/lib/server/loginname";
-import { createResponse, getLoginSettings } from "@/lib/zitadel";
+import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 
 describe("saml", () => {
   let mockCookies: any;
@@ -271,7 +271,7 @@ describe("saml", () => {
     };
 
     const baseParams = {
-      serviceConfig: { baseUrl: "https://example.com" },
+      serviceConfig: { baseUrl: "https://example.com" } as ServiceConfig,
       samlRequest: "saml-request-id",
       sessionId: "session-123",
       sessions: [mockSession],
