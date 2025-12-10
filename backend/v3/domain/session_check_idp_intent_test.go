@@ -57,6 +57,8 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 			// Test
 			events, err := tc.command.Events(context.Background(), &InvokeOpts{})
 
+			endTime := time.Now()
+
 			// Verify
 			assert.NoError(t, err)
 
@@ -68,7 +70,7 @@ func TestIDPIntentCheckCommand_Events(t *testing.T) {
 				case *session.IntentCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.IntentCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 10)
+					assert.WithinRange(t, actualAssertedType.CheckedAt, expectedAssertedType.CheckedAt, endTime)
 				case *idpintent.ConsumedEvent:
 					_, ok := events[i].(*idpintent.ConsumedEvent)
 					require.True(t, ok)
