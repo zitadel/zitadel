@@ -1942,14 +1942,6 @@ func setSecretGeneratorSettingsAttrs(generatorType legacy_domain.SecretGenerator
 		secretGeneratorSettingsAttrs.OTPEmail = &domain.OTPEmailAttributes{
 			SecretGeneratorAttrsWithExpiry: attrsWithExpiry,
 		}
-	case legacy_domain.SecretGeneratorTypeInviteCode:
-		secretGeneratorSettingsAttrs.InviteCode = &domain.InviteCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: attrsWithExpiry,
-		}
-	case legacy_domain.SecretGeneratorTypeSigningKey:
-		secretGeneratorSettingsAttrs.SigningKey = &domain.SigningKeyAttributes{
-			SecretGeneratorAttrs: attrs,
-		}
 	case legacy_domain.SecretGeneratorTypeUnspecified:
 		return domain.SecretGeneratorSettingsAttributes{}, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n3fK", "unspecified secret generator type")
 	default:
