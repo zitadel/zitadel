@@ -114,24 +114,24 @@ To better align API services with practical use cases and reduce fragmentation, 
 - **Sub-resource Fetching (`extend: true`)**: When fetching a resource, an optional parameter `extend: true` can be used to return all its sub-resources in the response. This reduces the need for multiple API calls.
 - **Rule Integration**: If `get()` is used within the rule language to load a resource, it will automatically load the resource with `extend: true` (or equivalent behavior), ensuring that all necessary sub-data is available for evaluation without additional queries.
 
-#### Authorization (Project Policy)
+#### Authorization (Project Authorization)
 
-To manage access rights effectively, we rely on **Project Policies** rather than separate Authorization resources.
+To manage access rights effectively, we rely on **Project Authorizations** rather than separate resource lists.
 
-- **Computed Access**: Access is not stored as a static record but is **computed dynamically** by evaluating a CEL policy against the User's context.
-- **Project Level**: The policy is defined at the Project level and applies to all Apps within that Project.
-- **OIDC Integration**: The policy evaluation results in a set of **Roles** or **Claims** that are injected into the OIDC token.
+- **Computed Access**: Access is not stored as a static record but is **computed dynamically** by evaluating a CEL script against the User's context.
+- **Project Level**: The authorization script is defined at the Project level and applies to all Apps within that Project.
+- **OIDC Integration**: The evaluation results in a set of **Roles** or **Claims** that are injected into the OIDC token.
 
-##### Project Policy Script (App Roles)
+##### Project Authorization Script (App Roles)
 
-The mapping from **User/Project Attributes** to **Roles/Claims** is defined in a **Policy Script** (e.g., `policy.cel`) attached to the **Project**.
+The mapping from **User/Project Attributes** to **Roles/Claims** is defined in an **Authorization Script** (e.g., `authorization.cel`) attached to the **Project**.
 
 - **Concept**: The script evaluates to a map of roles: `Map<string, bool>`.
 - **Evaluation**: When a user accesses _any_ App in the Project, this script is evaluated using the `User`, `Project`, and `App` attributes.
 - **Output**: The resulting roles are injected into the OIDC token.
 
 ```cel
-// policy.cel (Project Level)
+// authorization.cel (Project Level)
 {
   "admin": user.username == "max@zitadel.com",
   "editor": user.collection_id == project.collection_id,
@@ -186,7 +186,7 @@ graph TD
 
 #### B2B Scenario (Multi-Tenant)
 
-In a B2B scenario, a "Platform" Collection holds the shared Project. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Project's CEL policy evaluating User attributes (e.g., membership in a Tenant Collection).
+In a B2B scenario, a "Platform" Collection holds the shared Project. Sub-Collections represent Tenants, containing their specific Users. Access is determined by the Project's CEL authorization script evaluating User attributes (e.g., membership in a Tenant Collection).
 
 ```mermaid
 graph TD
@@ -364,3 +364,26 @@ The ZITADEL Console will be reimagined as a Next.js application to support this 
 - **Rule Editor**: A dedicated UI for defining and testing CEL security rules, potentially with syntax highlighting and validation.
 - **Schema Editor**: An interface for defining and managing User Schemas within collections.
 - **Inheritance Visualization**: Visual cues to show which settings are inherited from parent collections versus defined locally.
+
+### API Design for Authorization Management
+
+We recommend managing CEL authorizations as **sub-resources** rather than embedding them directly in the Project or Collection objects.
+
+#### Rationale
+
+1.  **Payload Size**: Authorization scripts can be large. Including them in standard `List` or `Get` responses for Projects/Collections would unnecessarily bloat the payload.
+2.  **Concurrency & Safety**: Separating the authorization allows for independent updates. A user renaming a Project shouldn't accidentally overwrite an authorization change made by a security admin.
+3.  **Content Negotiation**: Authorizations are fundamentally text/code. A dedicated endpoint allows for supporting different formats (e.g., uploading a raw `.cel` file) or future versioning.
+
+#### Proposed Endpoints
+
+**Project Authorization (App Roles)**
+
+- `GET /projects/{id}/authorization`: Retrieve the current CEL script.
+- `PUT /projects/{id}/authorization`: Update the CEL script.
+  - Body: `{"script": "..."}` or raw `text/plain`.
+
+**Collection Permission (Management API)**
+
+- `GET /collections/{id}/permission`: Retrieve the current permission rules.
+- `PUT /collections/{id}/permission`: Update the permission rules.
