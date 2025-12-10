@@ -105,6 +105,8 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 		sessionRepoMock func(ctr *gomock.Controller) domain.SessionRepository
 
 		inputUserAgent *session_grpc.UserAgent
+		inputMetas     map[string][]byte
+		inputLifetime  *durationpb.Duration
 
 		expectedError     error
 		expectedSessionID *string
@@ -165,6 +167,17 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 							"h2": []string{"v2.1", "v2.2"},
 						},
 					},
+					Metadata: []domain.SessionMetadata{
+						{
+							Metadata:  domain.Metadata{InstanceID: "instance-1", Key: "meta-1", Value: []byte("value1")},
+							SessionID: "session-1",
+						},
+						{
+							Metadata:  domain.Metadata{InstanceID: "instance-1", Key: "meta-2", Value: []byte("value2")},
+							SessionID: "session-1",
+						},
+					},
+					Lifetime: 1 * time.Second,
 				}
 				mock.EXPECT().Create(gomock.Any(), gomock.Any(), session).Times(1).Return(nil)
 
@@ -179,6 +192,11 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 					"h2": {Values: []string{"v2.1", "v2.2"}},
 				},
 			},
+			inputMetas: map[string][]byte{
+				"meta-1": []byte("value1"),
+				"meta-2": []byte("value2"),
+			},
+			inputLifetime:     durationpb.New(1 * time.Second),
 			expectedSessionID: gu.Ptr("session-1"),
 		},
 	}
@@ -193,7 +211,7 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 			if tc.idGenMock != nil {
 				idGenMock = tc.idGenMock(ctrl)
 			}
-			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, nil, nil, idGenMock)
+			cmd := domain.NewCreateSessionCommand("instance-1", tc.inputUserAgent, tc.inputMetas, tc.inputLifetime, idGenMock)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),

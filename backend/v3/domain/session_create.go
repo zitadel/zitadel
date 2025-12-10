@@ -78,6 +78,8 @@ func (c *CreateSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 		ID:         sessionID,
 		InstanceID: c.InstanceID,
 		UserAgent:  c.getUserAgent(),
+		Metadata:   c.getMetas(sessionID),
+		Lifetime:   c.Lifetime.AsDuration(),
 	}
 
 	err = sessionRepo.Create(ctx, opts.DB(), session)
@@ -88,6 +90,29 @@ func (c *CreateSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	c.SessionID = &sessionID
 
 	return nil
+}
+
+func (c *CreateSessionCommand) getMetas(sessionID string) []SessionMetadata {
+	if c.Metas == nil {
+		return nil
+	}
+	toReturn := make([]SessionMetadata, len(c.Metas))
+	i := 0
+
+	for metaK, metaV := range c.Metas {
+		sm := SessionMetadata{
+			Metadata: Metadata{
+				InstanceID: c.InstanceID,
+				Key:        metaK,
+				Value:      metaV,
+			},
+			SessionID: sessionID,
+		}
+		toReturn[i] = sm
+		i += 1
+	}
+
+	return toReturn
 }
 
 func (c *CreateSessionCommand) getUserAgent() *SessionUserAgent {
