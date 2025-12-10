@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	old_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -18,13 +20,15 @@ import (
 type CreateSessionCommand struct {
 	InstanceID string `json:"instance_id"`
 	UserAgent  *session_grpc.UserAgent
+	Metas      map[string][]byte
+	Lifetime   *durationpb.Duration
 
 	idGenerator id.Generator
 
 	SessionID *string
 }
 
-func NewCreateSessionCommand(instanceID string, userAgent *session_grpc.UserAgent, idGenerator id.Generator) *CreateSessionCommand {
+func NewCreateSessionCommand(instanceID string, userAgent *session_grpc.UserAgent, metas map[string][]byte, lifetime *durationpb.Duration, idGenerator id.Generator) *CreateSessionCommand {
 	idGen := id.SonyFlakeGenerator()
 	if idGenerator != nil {
 		idGen = idGenerator
@@ -34,6 +38,8 @@ func NewCreateSessionCommand(instanceID string, userAgent *session_grpc.UserAgen
 		InstanceID:  strings.TrimSpace(instanceID),
 		UserAgent:   userAgent,
 		idGenerator: idGen,
+		Metas:       metas,
+		Lifetime:    lifetime,
 	}
 }
 
@@ -115,6 +121,14 @@ func (c *CreateSessionCommand) String() string {
 func (c *CreateSessionCommand) Validate(ctx context.Context, _ *InvokeOpts) (err error) {
 	if c.InstanceID == "" {
 		c.InstanceID = authz.GetInstance(ctx).InstanceID()
+	}
+
+	if c.Lifetime == nil {
+		return nil
+	}
+	asDuration := c.Lifetime.AsDuration()
+	if asDuration < 0 {
+		return zerrors.ThrowInvalidArgument(nil, "DOM-XA5OMq", "Errors.Session.PositiveLifetime")
 	}
 
 	return nil
