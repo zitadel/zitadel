@@ -435,7 +435,7 @@ func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model 
 	return c.checkPermission(ctx, domain.PermissionSessionDelete, userResourceOwner, model.UserID)
 }
 
-// sessionUserResourceOwner will return the resourceOwner of the session form the [SessionWriteModel] or by additionally calling the eventstore,
+// sessionUserResourceOwner will return the resourceOwner of the session from the [SessionWriteModel] or by additionally calling the eventstore,
 // because before 2.42.0, the resourceOwner of a session used to be the organisation of the creator.
 // Further the (checked) users organisation id was not stored.
 // To be able to check the permission, we need to get the user's resourceOwner in this case.
