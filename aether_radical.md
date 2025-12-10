@@ -207,6 +207,7 @@ graph TD
     Platform --> TenantB
 
     Platform --> App
+    Platform --> UserC
 
     TenantA --> UserA
     TenantB --> UserB
