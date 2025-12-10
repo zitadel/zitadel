@@ -336,8 +336,13 @@ The ZITADEL Console will be reimagined as a Next.js application to support this 
 
 #### Resource View
 
-- **Side Navigation**: The side navigation will list all available **Resource Types** (e.g., Users, Projects, Applications, Actions). This provides a flat, type-based entry point to data.
+- **Side Navigation**: The side navigation will list all available **Resource Types** (e.g., Collections, Users, Applications, Actions). This provides a flat, type-based entry point to data.
 - **Resource List**: Clicking a resource type displays a list of all resources of that type that the current user has access to.
+
+#### Access
+
+- **Global Access**: Customer portal users have access to all resources of the platform collection. The UI is deployed at the path of the respective instance ex: `https://zitadel.com/admin/instances/xyz123455`;
+- **User Access**: Users have access to all resources of the collection they have a permission rule for. Those users access the UI at the domain of the instance. ex: `https://xyz123455.zitadel.cloud`;
 
 #### Collection Context and Filtering
 
@@ -350,22 +355,5 @@ The ZITADEL Console will be reimagined as a Next.js application to support this 
 #### Additional UI Considerations
 
 - **Rule Editor**: A dedicated UI for defining and testing CEL security rules, potentially with syntax highlighting and validation.
-- **Schema Editor**: An interface for defining and managing User Schemas within collections.
+- **UI Preview**: A preview of the collection's resources in the context of the collection.
 - **Inheritance Visualization**: Visual cues to show which settings are inherited from parent collections versus defined locally.
-
-### API Design for Policy Management
-
-We recommend managing the Unified Access Policy as a **sub-resource** of the Collection.
-
-#### Rationale
-
-1.  **Unified Management**: A single endpoint to manage both API permissions and App authorizations.
-2.  **Payload Size**: Keeps the Collection resource light.
-
-#### Proposed Endpoints
-
-**Collection Access Policy**
-
-- `GET /collections/{id}/policy`: Retrieve the current policy (permissions + authorizations).
-- `PUT /collections/{id}/policy`: Update the policy.
-  - Body: `{"permissions": "...", "authorizations": "..."}` or a combined CEL file.
