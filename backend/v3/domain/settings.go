@@ -452,8 +452,6 @@ type secretGeneratorSettingsJSONChanges interface {
 	SetDomainVerification(value DomainVerificationAttributes) db_json.JsonUpdate
 	SetOTPSMS(value OTPSMSAttributes) db_json.JsonUpdate
 	SetOTPEmail(value OTPEmailAttributes) db_json.JsonUpdate
-	SetInviteCode(value InviteCodeAttributes) db_json.JsonUpdate
-	SetSigningKey(value SigningKeyAttributes) db_json.JsonUpdate
 }
 
 type SecretGeneratorSettingsAttributes struct {
@@ -466,8 +464,6 @@ type SecretGeneratorSettingsAttributes struct {
 	DomainVerification       *DomainVerificationAttributes       `json:"domainVerification,omitempty"`
 	OTPSMS                   *OTPSMSAttributes                   `json:"otpSms,omitempty"`
 	OTPEmail                 *OTPEmailAttributes                 `json:"otpEmail,omitempty"`
-	InviteCode               *InviteCodeAttributes               `json:"inviteCode,omitempty"`
-	SigningKey               *SigningKeyAttributes               `json:"signingKey,omitempty"`
 }
 
 type ClientSecretAttributes struct {
@@ -504,14 +500,6 @@ type OTPSMSAttributes struct {
 
 type OTPEmailAttributes struct {
 	SecretGeneratorAttrsWithExpiry
-}
-
-type InviteCodeAttributes struct {
-	SecretGeneratorAttrsWithExpiry
-}
-
-type SigningKeyAttributes struct {
-	SecretGeneratorAttrs
 }
 
 type SecretGeneratorAttrs struct {

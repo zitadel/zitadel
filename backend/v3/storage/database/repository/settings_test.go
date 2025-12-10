@@ -498,6 +498,11 @@ func TestSetLoginSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1166,6 +1171,11 @@ func TestSetBrandingSettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -1912,6 +1922,11 @@ func TestSetPasswordComplexitySettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2299,6 +2314,11 @@ func TestSetPasswordExpirySettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -2694,6 +2714,11 @@ func TestSetLockoutSettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -3092,6 +3117,11 @@ func TestSetSecuritySettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3489,6 +3519,11 @@ func TestSetDomainSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3860,6 +3895,11 @@ func TestSetOrganizationSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -4226,6 +4266,11 @@ func TestSetNotificationSettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -4672,6 +4717,11 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -4947,6 +4997,11 @@ func TestSetSecretGeneratorSettings(t *testing.T) {
 			settings: createSecretGeneratorSettings(instanceID, gu.Ptr("foo")),
 			wantErr:  new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -5047,39 +5102,37 @@ func createDefaultSecretGeneratorAttrsWithExpiry(expiry time.Duration) domain.Se
 
 func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSettingsAttributes {
 	attrs := createDefaultSecretGeneratorAttrs()
+	oneDay := 24 * time.Hour
+	thirtyMinutes := 30 * time.Minute
+	tenMinutes := 10 * time.Minute
+
 	return domain.SecretGeneratorSettingsAttributes{
 		ClientSecret: &domain.ClientSecretAttributes{
 			SecretGeneratorAttrs: attrs,
 		},
 		InitializeUserCode: &domain.InitializeUserCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(24 * time.Hour),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(oneDay),
 		},
 		EmailVerificationCode: &domain.EmailVerificationCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
 		PhoneVerificationCode: &domain.PhoneVerificationCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
 		PasswordVerificationCode: &domain.PasswordVerificationCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
 		PasswordlessInitCode: &domain.PasswordlessInitCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(10 * time.Minute),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(tenMinutes),
 		},
 		DomainVerification: &domain.DomainVerificationAttributes{
 			SecretGeneratorAttrs: attrs,
 		},
 		OTPSMS: &domain.OTPSMSAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
 		OTPEmail: &domain.OTPEmailAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
-		},
-		InviteCode: &domain.InviteCodeAttributes{
-			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(30 * time.Minute),
-		},
-		SigningKey: &domain.SigningKeyAttributes{
-			SecretGeneratorAttrs: attrs,
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
 	}
 }
