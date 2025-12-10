@@ -1,6 +1,8 @@
 package database
 
-import "go.uber.org/mock/gomock"
+import (
+	"go.uber.org/mock/gomock"
+)
 
 // Condition represents a SQL condition.
 // Its written after the WHERE keyword in a SQL statement.
@@ -158,7 +160,7 @@ func IsNull(column Column) *isNull {
 
 // IsRestrictingColumn implements [Condition].
 func (i isNull) IsRestrictingColumn(col Column) bool {
-	return true
+	return false
 }
 
 var _ Condition = (*isNull)(nil)
@@ -194,7 +196,7 @@ func IsNotNull(column Column) *isNotNull {
 
 // IsRestrictingColumn implements [Condition].
 func (i isNotNull) IsRestrictingColumn(col Column) bool {
-	return true
+	return false
 }
 
 var _ Condition = (*isNotNull)(nil)
@@ -344,3 +346,21 @@ func (e existsCondition) IsRestrictingColumn(col Column) bool {
 }
 
 var _ Condition = (*existsCondition)(nil)
+
+type forcedRestrictingColumnCondition struct {
+	Condition
+	isRestricting bool
+}
+
+func (c forcedRestrictingColumnCondition) IsRestrictingColumn(col Column) bool {
+	return c.isRestricting
+}
+
+func ForceRestrictingColumn(cond Condition, isRestriction bool) Condition {
+	return forcedRestrictingColumnCondition{
+		Condition:     cond,
+		isRestricting: isRestriction,
+	}
+}
+
+var _ Condition = (*forcedRestrictingColumnCondition)(nil)
