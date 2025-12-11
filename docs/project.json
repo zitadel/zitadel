@@ -1,11 +1,15 @@
 {
-  "name": "docs",
+  "name": "@zitadel/docs",
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next build",
+        "commands": [
+          "pnpm generate",
+          "next build"
+        ],
+        "parallel": false,
         "cwd": "docs"
       },
       "outputs": [
