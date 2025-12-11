@@ -19,7 +19,11 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next dev",
+        "commands": [
+          "pnpm generate",
+          "next dev"
+        ],
+        "parallel": false,
         "cwd": "docs"
       }
     },
