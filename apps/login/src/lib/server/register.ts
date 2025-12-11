@@ -27,12 +27,16 @@ export type RegisterUserResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-export async function registerUser(command: RegisterUserCommand) {
+export async function registerUser(
+  command: RegisterUserCommand,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const addResponse = await addHumanUser({ serviceConfig, email: command.email,
+  const addResponse = await addHumanUser({
+    serviceConfig,
+    email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     password: command.password ? command.password : undefined,
@@ -43,8 +47,7 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   let checkPayload: any = {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -96,8 +99,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: "/passkey/set?" + params };
   } else {
-    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
 
     if (!userResponse.user) {
       return { error: t("errors.userNotFound") };
@@ -152,13 +154,17 @@ export type registerUserAndLinkToIDPResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDPommand) {
+export async function registerUserAndLinkToIDP(
+  command: RegisterUserAndLinkToIDPommand,
+): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const addUserResponse = await addHumanUser({ serviceConfig, email: command.email,
+  const addUserResponse = await addHumanUser({
+    serviceConfig,
+    email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     organization: command.organization,
@@ -168,10 +174,11 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
-  const idpLink = await addIDPLink({ serviceConfig, idp: {
+  const idpLink = await addIDPLink({
+    serviceConfig,
+    idp: {
       id: command.idpId,
       userId: command.idpUserId,
       userName: command.idpUserName,
@@ -215,8 +222,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   // check if user has MFA methods
   let authMethods;
   if (session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id,
-    });
+    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }

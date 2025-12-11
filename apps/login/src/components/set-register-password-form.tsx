@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/server/register";
+import { handleServerActionResponse } from "@/lib/client";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +15,7 @@ import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs =
   | {
@@ -57,34 +54,27 @@ export function SetRegisterPasswordForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const response = await registerUser({
-      email: email,
-      firstName: firstname,
-      lastName: lastname,
-      organization: organization,
-      requestId: requestId,
-      password: values.password,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotRegisterUser"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await registerUser({
+        email: email,
+        firstName: firstname,
+        lastName: lastname,
+        organization: organization,
+        requestId: requestId,
+        password: values.password,
       });
 
-    if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
-    }
-
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
+      handleServerActionResponse(response, router, setSamlData, setError);
+    } catch (error) {
+      setError(t("errors.couldNotRegisterUser"));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -93,9 +83,7 @@ export function SetRegisterPasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -110,64 +98,61 @@ export function SetRegisterPasswordForm({
     hasMinLength;
 
   return (
-    <form className="w-full">
-      <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
-        <div className="">
-          <TextInput
-            type="password"
-            autoComplete="new-password"
-            required
-            {...register("password", {
-              required: t("password.required.password"),
-            })}
-            label={t("password.labels.password")}
-            error={errors.password?.message as string}
-            data-testid="password-text-input"
-          />
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
+        <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
+          <div className="">
+            <TextInput
+              type="password"
+              autoComplete="new-password"
+              required
+              {...register("password", {
+                required: t("password.required.password"),
+              })}
+              label={t("password.labels.password")}
+              error={errors.password?.message as string}
+              data-testid="password-text-input"
+            />
+          </div>
+          <div className="">
+            <TextInput
+              type="password"
+              required
+              autoComplete="new-password"
+              {...register("confirmPassword", {
+                required: t("password.required.confirmPassword"),
+              })}
+              label={t("password.labels.confirmPassword")}
+              error={errors.confirmPassword?.message as string}
+              data-testid="password-confirm-text-input"
+            />
+          </div>
         </div>
-        <div className="">
-          <TextInput
-            type="password"
-            required
-            autoComplete="new-password"
-            {...register("confirmPassword", {
-              required: t("password.required.confirmPassword"),
-            })}
-            label={t("password.labels.confirmPassword")}
-            error={errors.confirmPassword?.message as string}
-            data-testid="password-confirm-text-input"
+
+        {passwordComplexitySettings && (
+          <PasswordComplexity
+            passwordComplexitySettings={passwordComplexitySettings}
+            password={watchPassword}
+            equals={!!watchPassword && watchPassword === watchConfirmPassword}
           />
+        )}
+
+        {error && <Alert>{error}</Alert>}
+
+        <div className="mt-8 flex w-full flex-row items-center justify-between">
+          <BackButton data-testid="back-button" />
+          <Button
+            type="submit"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
+            onClick={handleSubmit(submitRegister)}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="password.submit" namespace="register" />
+          </Button>
         </div>
-      </div>
-
-      {passwordComplexitySettings && (
-        <PasswordComplexity
-          passwordComplexitySettings={passwordComplexitySettings}
-          password={watchPassword}
-          equals={!!watchPassword && watchPassword === watchConfirmPassword}
-        />
-      )}
-
-      {error && <Alert>{error}</Alert>}
-
-      <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton data-testid="back-button" />
-        <Button
-          type="submit"
-          variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
-          onClick={handleSubmit(submitRegister)}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="password.submit" namespace="register" />
-        </Button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

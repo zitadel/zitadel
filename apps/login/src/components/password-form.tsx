@@ -14,6 +14,8 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { handleServerActionResponse } from "@/lib/client";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   password: string;
@@ -35,6 +37,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -44,29 +47,21 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
     setError("");
     setLoading(true);
 
-    const response = await sendPassword({
-      loginName,
-      organization,
-      checks: create(ChecksSchema, {
-        password: { password: values.password },
-      }),
-      requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await sendPassword({
+        loginName,
+        organization,
+        checks: create(ChecksSchema, {
+          password: { password: values.password },
+        }),
+        requestId,
       });
 
-    if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
-    }
-
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
+      handleServerActionResponse(response, router, setSamlData, setError);
+    } catch (e) {
+      setError(t("verify.errors.couldNotVerifyPassword"));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -111,56 +106,59 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
   }
 
   return (
-    <form className="w-full">
-      <div className={`${error && "transform-gpu animate-shake"}`}>
-        <TextInput
-          type="password"
-          autoComplete="password"
-          {...register("password", { required: t("verify.required.password") })}
-          label={t("verify.labels.password")}
-          data-testid="password-text-input"
-        />
-        {!loginSettings?.hidePasswordReset && (
-          <button
-            className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-            onClick={() => resetPasswordAndContinue()}
-            type="button"
-            disabled={loading}
-            data-testid="reset-button"
-          >
-            <Translated i18nKey="verify.resetPassword" namespace="password" />
-          </button>
+    <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      <form className="w-full">
+        <div className={`${error && "transform-gpu animate-shake"}`}>
+          <TextInput
+            type="password"
+            autoComplete="password"
+            {...register("password", { required: t("verify.required.password") })}
+            label={t("verify.labels.password")}
+            data-testid="password-text-input"
+          />
+          {!loginSettings?.hidePasswordReset && (
+            <button
+              className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+              onClick={() => resetPasswordAndContinue()}
+              type="button"
+              disabled={loading}
+              data-testid="reset-button"
+            >
+              <Translated i18nKey="verify.resetPassword" namespace="password" />
+            </button>
+          )}
+
+          {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
+        </div>
+
+        {info && (
+          <div className="py-4">
+            <Alert type={AlertType.INFO}>{info}</Alert>
+          </div>
         )}
 
-        {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
-      </div>
+        {error && (
+          <div className="py-4" data-testid="error">
+            <Alert>{error}</Alert>
+          </div>
+        )}
 
-      {info && (
-        <div className="py-4">
-          <Alert type={AlertType.INFO}>{info}</Alert>
+        <div className="mt-8 flex w-full flex-row items-center">
+          <BackButton data-testid="back-button" />
+          <span className="flex-grow"></span>
+          <Button
+            type="submit"
+            className="self-end"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !formState.isValid}
+            onClick={handleSubmit(submitPassword)}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
+          </Button>
         </div>
-      )}
-
-      {error && (
-        <div className="py-4" data-testid="error">
-          <Alert>{error}</Alert>
-        </div>
-      )}
-
-      <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton data-testid="back-button" />
-        <span className="flex-grow"></span>
-        <Button
-          type="submit"
-          className="self-end"
-          variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitPassword)}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
-        </Button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

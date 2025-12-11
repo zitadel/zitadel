@@ -43,7 +43,7 @@ function goToSignedInPage(
 export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
-): Promise<{ redirect: string } | { error: string }> {
+): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
   // Complete OIDC/SAML flows directly with server action
@@ -108,4 +108,39 @@ export async function getNextUrl(
   const result = goToSignedInPage(command);
   console.log("getNextUrl: Using goToSignedInPage result:", result);
   return result;
+}
+
+export type ServerActionResponse =
+  | { redirect: string }
+  | { error: string }
+  | { samlData: { url: string; fields: Record<string, string> } }
+  | undefined
+  | null;
+
+export function handleServerActionResponse(
+  response: ServerActionResponse,
+  router: { push: (url: string) => void },
+  setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
+  setError: (error: string) => void,
+): boolean {
+  if (!response) {
+    return false;
+  }
+
+  if ("redirect" in response && response.redirect) {
+    router.push(response.redirect);
+    return true;
+  }
+
+  if ("samlData" in response && response.samlData) {
+    setSamlData(response.samlData);
+    return true;
+  }
+
+  if ("error" in response && response.error) {
+    setError(response.error);
+    return true;
+  }
+
+  return false;
 }
