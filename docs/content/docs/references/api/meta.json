@@ -1,0 +1,21 @@
+{
+  "title": "API",
+  "pages": [
+    "action",
+    "application",
+    "authorization",
+    "feature",
+    "group",
+    "idp",
+    "instance",
+    "internal_permission",
+    "oidc",
+    "org",
+    "project",
+    "saml",
+    "session",
+    "settings",
+    "user",
+    "webkey"
+  ]
+}

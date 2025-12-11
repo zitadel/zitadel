@@ -24,3 +24,7 @@ yarn-error.log*
 .env*.local
 .vercel
 next-env.d.ts
+
+# generated api docs
+/content/docs/references/api
+/openapi/zitadel/
