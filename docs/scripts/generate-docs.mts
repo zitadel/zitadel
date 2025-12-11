@@ -38,7 +38,7 @@ const generateServiceDocs = (service: string, filename?: string) => {
 services.forEach(service => generateServiceDocs(service));
 
 const meta = {
-  title: "API Reference",
+  title: "APIs",
   pages: services
 };
 
