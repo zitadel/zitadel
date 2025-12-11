@@ -211,6 +211,9 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
+            "inputs": [
+                "{workspaceRoot}/console/dist/console/**/*"
+            ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
