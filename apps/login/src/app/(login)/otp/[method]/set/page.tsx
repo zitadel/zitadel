@@ -5,7 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -24,20 +24,14 @@ export default async function Page(props: {
   const { method } = params;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization,
   });
 
-  const session = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: {
+  const session = await loadMostRecentSession({ serviceConfig, sessionParams: {
       loginName,
       organization,
     },
@@ -46,9 +40,7 @@ export default async function Page(props: {
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await registerTOTP({ serviceConfig, userId: session.factors.user.id,
       })
         .then((resp) => {
           if (resp) {
@@ -59,17 +51,13 @@ export default async function Page(props: {
           error = err;
         });
     } else if (method === "sms") {
-      await addOTPSMS({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await addOTPSMS({ serviceConfig, userId: session.factors.user.id,
       }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
-      await addOTPEmail({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await addOTPEmail({ serviceConfig, userId: session.factors.user.id,
       }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via Email");
