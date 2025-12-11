@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -21,7 +20,7 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 		request.Msg.GetUserAgent(),
 		request.Msg.GetMetadata(),
 		request.Msg.GetLifetime(),
-		id.SonyFlakeGenerator(),
+		nil,
 	)
 	sessionID := *creator.SessionID
 	executors[0] = creator
