@@ -33,9 +33,9 @@ type beginLoginFn func(ctx context.Context, user webauthn.User, rpID string, use
 type PasskeyChallengeCommand struct {
 	RequestChallengePasskey *session_grpc.RequestChallenges_WebAuthN
 
-	SessionID  string
-	InstanceID string
-	BeginLogin beginLoginFn
+	sessionID  string
+	instanceID string
+	beginLogin beginLoginFn
 
 	User    *User
 	Session *Session
@@ -51,16 +51,16 @@ func NewPasskeyChallengeCommand(
 	requestChallengePasskey *session_grpc.RequestChallenges_WebAuthN,
 	beginLoginFn beginLoginFn,
 ) *PasskeyChallengeCommand {
-	passkeyChallengeCmd := &PasskeyChallengeCommand{
-		RequestChallengePasskey: requestChallengePasskey,
-		SessionID:               sessionID,
-		InstanceID:              instanceID,
-		BeginLogin:              beginLoginFn,
-	}
+
 	if beginLoginFn == nil {
-		passkeyChallengeCmd.BeginLogin = webauthnConfig.BeginWebAuthNLogin
+		beginLoginFn = webauthnConfig.BeginWebAuthNLogin
 	}
-	return passkeyChallengeCmd
+	return &PasskeyChallengeCommand{
+		RequestChallengePasskey: requestChallengePasskey,
+		sessionID:               sessionID,
+		instanceID:              instanceID,
+		beginLogin:              beginLoginFn,
+	}
 }
 
 // RequiresTransaction implements [Transactional].
@@ -73,9 +73,17 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 	if p.RequestChallengePasskey == nil {
 		return nil
 	}
+
+	if p.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "missing session id")
+	}
+	if p.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "missing instance id")
+	}
+
 	// get session
 	sessionRepo := opts.sessionRepo
-	p.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.SessionID)))
+	p.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
 	if err := handleGetError(err, "DOM-zy4hYC", objectTypeSession); err != nil {
 		return err
 	}
@@ -158,7 +166,7 @@ func (p *PasskeyChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) 
 	return []eventstore.Command{
 		session.NewWebAuthNChallengedEvent(
 			ctx,
-			&session.NewAggregate(p.SessionID, p.InstanceID).Aggregate,
+			&session.NewAggregate(p.sessionID, p.instanceID).Aggregate,
 			p.ChallengePasskey.Challenge,
 			p.ChallengePasskey.AllowedCredentialIDs,
 			p.ChallengePasskey.UserVerification,
@@ -182,7 +190,7 @@ func (p *PasskeyChallengeCommand) beginWebAuthNLogin(ctx context.Context, userVe
 		displayName: p.User.Human.DisplayName,
 		creds:       PasskeysToCredentials(ctx, p.User.Human.Passkeys, p.RequestChallengePasskey.GetDomain()),
 	}
-	sessionData, credentialAssertionData, rpID, err := p.BeginLogin(
+	sessionData, credentialAssertionData, rpID, err := p.beginLogin(
 		ctx,
 		webUser,
 		p.RequestChallengePasskey.GetDomain(),

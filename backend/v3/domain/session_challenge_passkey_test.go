@@ -28,6 +28,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name                    string
+		sessionID               string
+		instanceID              string
 		RequestChallengePasskey *session_grpc.RequestChallenges_WebAuthN
 		userRepo                func(ctrl *gomock.Controller) domain.UserRepository
 		sessionRepo             func(ctrl *gomock.Controller) domain.SessionRepository
@@ -40,8 +42,23 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			wantErr:                 nil,
 		},
 		{
+			name:                    "no session id",
+			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "",
+			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "missing session id"),
+		},
+		{
+			name:                    "no session id",
+			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "",
+			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "missing instance id"),
+		},
+		{
 			name:                    "failed to fetch session",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -59,6 +76,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "session not found",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -76,6 +95,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "session without user id",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -95,6 +116,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "failed to fetch user",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -141,6 +164,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "user not found",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -186,6 +211,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "user not active",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -233,6 +260,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 		{
 			name:                    "valid request passkey challenge",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				repo.EXPECT().
@@ -320,8 +349,8 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewPasskeyChallengeCommand(
-				"session-id",
-				"instance-id",
+				tt.sessionID,
+				tt.instanceID,
 				tt.RequestChallengePasskey,
 				nil,
 			)

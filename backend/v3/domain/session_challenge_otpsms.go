@@ -1,0 +1,210 @@
+package domain
+
+import (
+	"context"
+	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
+)
+
+var _ Commander = (*OTPSMSChallengeCommand)(nil)
+var _ Transactional = (*OTPSMSChallengeCommand)(nil)
+
+type newPhoneCodeFunc func(g crypto.Generator) (*crypto.CryptoValue, string, error)
+
+// todo: to be implemented
+// getActiveSMSProviderFn helps determine whether to generate an internal OTP code or use an external SMS provider.
+// maybe temporary until we figure out how to integrate SMS providers from v1 API
+type getActiveSMSProviderFn func(ctx context.Context, instanceID string) (string, error)
+
+// OTPSMSChallengeCommand creates an OTP SMS challenge for a session.
+type OTPSMSChallengeCommand struct {
+	RequestChallengeOTPSMS *session_grpc.RequestChallenges_OTPSMS
+
+	sessionID                    string
+	instanceID                   string
+	defaultSecretGeneratorConfig *crypto.GeneratorConfig
+	otpAlg                       crypto.EncryptionAlgorithm
+	smsProvider                  getActiveSMSProviderFn
+	newPhoneCode                 newPhoneCodeFunc
+
+	Session *Session
+	User    *User
+
+	ChallengeOTPSMS *SessionChallengeOTPSMS // the generated OTP SMS challenge that is stored in the session.
+	OTPSMSChallenge *string                 // challenge to be set in the CreateSessionResponse
+}
+
+// NewOTPSMSChallengeCommand creates a command to generate an OTP SMS challenge for a session.
+func NewOTPSMSChallengeCommand(
+	requestChallengeOTPSMS *session_grpc.RequestChallenges_OTPSMS,
+	sessionID string,
+	instanceID string,
+	secretGeneratorConfig *crypto.GeneratorConfig,
+	otpAlgorithm crypto.EncryptionAlgorithm,
+	smsProvider getActiveSMSProviderFn,
+	newPhoneCodeFn newPhoneCodeFunc) *OTPSMSChallengeCommand {
+
+	if secretGeneratorConfig == nil {
+		secretGeneratorConfig = otpSMSSecretGeneratorConfig
+	}
+	if otpAlgorithm == nil {
+		otpAlgorithm = mfaEncryptionAlgo
+	}
+	if newPhoneCodeFn == nil {
+		newPhoneCodeFn = crypto.NewCode
+	}
+
+	return &OTPSMSChallengeCommand{
+		RequestChallengeOTPSMS:       requestChallengeOTPSMS,
+		sessionID:                    sessionID,
+		instanceID:                   instanceID,
+		defaultSecretGeneratorConfig: secretGeneratorConfig,
+		otpAlg:                       otpAlgorithm,
+		smsProvider:                  smsProvider,
+		newPhoneCode:                 newPhoneCodeFn,
+	}
+}
+
+// Validate implements [Commander].
+// It checks if the command has all required fields and fetches necessary data.
+func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
+	if o.RequestChallengeOTPSMS == nil {
+		return nil
+	}
+
+	// validate required fields
+	if o.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "session id missing")
+	}
+	if o.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "instance id missing")
+	}
+
+	// validate that sms provider is set
+	if o.smsProvider == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "sms provider not configured")
+	}
+
+	// get session
+	sessionRepo := opts.sessionRepo
+	o.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
+	if err := handleGetError(err, "DOM-2aGWWE", objectTypeSession); err != nil {
+		return err
+	}
+	if o.Session.UserID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "missing user id in session")
+	}
+
+	// get user
+	userRepo := opts.userRepo
+	o.User, err = userRepo.Get(
+		ctx,
+		opts.DB(),
+		database.WithCondition(userRepo.IDCondition(o.Session.UserID)),
+	)
+	if err := handleGetError(err, "DOM-3aGHDs", objectTypeUser); err != nil {
+		return err
+	}
+
+	// validate human user and user phone
+	if o.User.Human == nil || o.User.Human.Phone == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "user phone not configured")
+	}
+	// validate phone OTP is enabled
+	if o.User.Human.Phone.OTP.EnabledAt.IsZero() {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "phone OTP not enabled")
+	}
+	return nil
+}
+
+// Execute implements [Commander].
+// It generates the OTP SMS challenge and updates the session.
+func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) error {
+	if o.RequestChallengeOTPSMS == nil {
+		return nil
+	}
+
+	// generate phone code
+	code, plain, generatorID, expiry, err := o.createPhoneCode(ctx)
+	if err != nil {
+		return err
+	}
+	if o.RequestChallengeOTPSMS.ReturnCode {
+		o.OTPSMSChallenge = &plain
+	}
+
+	// update the session with the otp sms challenge
+	o.ChallengeOTPSMS = &SessionChallengeOTPSMS{
+		LastChallengedAt:  time.Now(),
+		Code:              code,
+		Expiry:            expiry,
+		CodeReturned:      o.RequestChallengeOTPSMS.ReturnCode,
+		GeneratorID:       generatorID,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+	}
+	sessionRepo := opts.sessionRepo
+	updated, err := sessionRepo.Update(
+		ctx,
+		opts.DB(),
+		sessionRepo.IDCondition(o.Session.ID),
+		sessionRepo.SetChallenge(o.ChallengeOTPSMS),
+	)
+	if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Events implements [eventstore.Command].
+// It returns an OTPSMSChallengedEvent.
+func (o *OTPSMSChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+	if o.RequestChallengeOTPSMS == nil {
+		return nil, nil
+	}
+	return []eventstore.Command{
+		session.NewOTPSMSChallengedEvent(
+			ctx,
+			&session.NewAggregate(o.sessionID, o.instanceID).Aggregate,
+			o.ChallengeOTPSMS.Code,
+			o.ChallengeOTPSMS.Expiry,
+			o.RequestChallengeOTPSMS.ReturnCode,
+			o.ChallengeOTPSMS.GeneratorID,
+		),
+	}, nil
+}
+
+// String implements [Commander].
+func (o *OTPSMSChallengeCommand) String() string {
+	return "OTPSMSChallengeCommand"
+}
+
+// RequiresTransaction implements [Transactional].
+func (o *OTPSMSChallengeCommand) RequiresTransaction() {}
+
+// createPhoneCode generates an OTP code or retrieves the external provider ID if an external SMS provider is active.
+// In the case of an external provider, the code generation is skipped (e.g., when using Twilio verification API).
+func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context) (code *crypto.CryptoValue, plain string, externalID string, expiry time.Duration, err error) {
+	externalID, err = o.smsProvider(ctx, o.instanceID)
+	if err != nil {
+		return nil, "", "", expiry, err
+	}
+	if externalID != "" {
+		return nil, "", externalID, expiry, nil
+	}
+	// todo: retrieval of config from DB - use the DB config if available, otherwise use default config
+	// lookup internal/command/crypto.go:encryptedCodeGenerator
+	codeGenerator := crypto.NewEncryptionGenerator(*o.defaultSecretGeneratorConfig, o.otpAlg)
+	crypted, plain, err := o.newPhoneCode(codeGenerator)
+	if err != nil {
+		return nil, "", "", expiry, err
+	}
+	return crypted, plain, "", o.defaultSecretGeneratorConfig.Expiry, nil
+}
