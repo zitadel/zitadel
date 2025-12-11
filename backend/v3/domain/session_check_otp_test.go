@@ -662,6 +662,8 @@ func TestOTPCheckCommand_Events(t *testing.T) {
 			// Test
 			events, err := cmd.Events(t.Context(), opts)
 
+			endTime := time.Now()
+
 			// Verify
 			assert.NoError(t, err)
 			require.Len(t, events, len(tc.expectedEventTypes))
@@ -689,11 +691,11 @@ func TestOTPCheckCommand_Events(t *testing.T) {
 				case *session.OTPSMSCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.OTPSMSCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 1.5)
+					assert.WithinRange(t, actualAssertedType.CheckedAt, expectedAssertedType.CheckedAt, endTime)
 				case *session.OTPEmailCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.OTPEmailCheckedEvent)
 					require.True(t, ok)
-					assert.InDelta(t, expectedAssertedType.CheckedAt.UnixMilli(), actualAssertedType.CheckedAt.UnixMilli(), 1.5)
+					assert.WithinRange(t, actualAssertedType.CheckedAt, expectedAssertedType.CheckedAt, endTime)
 				}
 			}
 		})

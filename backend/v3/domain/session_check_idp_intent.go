@@ -27,7 +27,7 @@ type IDPIntentCheckCommand struct {
 // NewIDPIntentCheckCommand returns an IDPIntentCheckCommand initialized with the input values.
 //
 // If encryptionAlgo is nil, the default [crypto.EncryptionAlgorithm] will be used
-func NewIDPIntentCheckCommand(request *session_grpc.CheckIDPIntent, sessionID, instanceID string, encryptionAlgo crypto.EncryptionAlgorithm) *IDPIntentCheckCommand {
+func NewIDPIntentCheckCommand(sessionID, instanceID string, request *session_grpc.CheckIDPIntent, encryptionAlgo crypto.EncryptionAlgorithm) *IDPIntentCheckCommand {
 	idpCheckCommand := &IDPIntentCheckCommand{
 		CheckIntent: request,
 		sessionID:   sessionID,
