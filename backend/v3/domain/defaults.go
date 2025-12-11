@@ -25,19 +25,8 @@ var (
 	otpEncryptionAlgo           crypto.EncryptionAlgorithm
 	defaultPhoneVerifier        phoneCodeVerifyFn
 	webauthnConfig              *webauthn.Config
+	defaultIDGenerator          id.Generator
 	otpSMSSecretGeneratorConfig *crypto.GeneratorConfig
-	pool                 database.Pool
-	tracer               tracing.Tracer
-	logger               logging.Logger = *logging.NewLogger(slog.Default())
-	legacyEventstore     eventstore.LegacyEventstore
-	sysConfig            systemdefaults.SystemDefaults
-	passwordHasher       *crypto.Hasher
-	idpEncryptionAlgo    crypto.EncryptionAlgorithm
-	mfaEncryptionAlgo    crypto.EncryptionAlgorithm
-	otpEncryptionAlgo    crypto.EncryptionAlgorithm
-	defaultPhoneVerifier phoneCodeVerifyFn
-	webauthnConfig       *webauthn.Config
-	defaultIDGenerator   id.Generator
 )
 
 func SetPool(p database.Pool) {
