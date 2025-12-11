@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "generate:buf": "buf generate ../proto --template buf.gen.yaml --path ../proto/zitadel/user/v2 --path ../proto/zitadel/instance/v2 --path ../proto/zitadel/application/v2",
+    "generate:buf": "buf generate ../proto --template buf.gen.yaml --path ../proto/zitadel/user/v2 --path ../proto/zitadel/instance/v2 --path ../proto/zitadel/application/v2 --path ../proto/zitadel/action/v2 --path ../proto/zitadel/authorization/v2 --path ../proto/zitadel/feature/v2 --path ../proto/zitadel/group/v2 --path ../proto/zitadel/idp/v2 --path ../proto/zitadel/oidc/v2 --path ../proto/zitadel/org/v2 --path ../proto/zitadel/project/v2 --path ../proto/zitadel/saml/v2 --path ../proto/zitadel/session/v2 --path ../proto/zitadel/settings/v2 --path ../proto/zitadel/webkey/v2 --path ../proto/zitadel/internal_permission/v2",
     "generate:openapi": "npx tsx scripts/generate-docs.mts",
     "generate": "pnpm generate:buf && pnpm generate:openapi",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",

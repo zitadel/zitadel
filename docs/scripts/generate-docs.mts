@@ -1,32 +1,32 @@
 import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 
-const userOpenapi = createOpenAPI({
-  input: ['./openapi/zitadel/user/v2/user_service.openapi.yaml'],
-});
+const generateServiceDocs = (service: string, filename?: string) => {
+  const name = filename || `${service}_service`;
+  const api = createOpenAPI({
+    input: [`./openapi/zitadel/${service}/v2/${name}.openapi.yaml`],
+  });
 
-void generateFiles({
-  input: userOpenapi,
-  output: './content/docs/api/user',
-  includeDescription: true,
-});
+  void generateFiles({
+    input: api,
+    output: `./content/docs/api/${service}`,
+    includeDescription: true,
+  });
+};
 
-const instanceOpenapi = createOpenAPI({
-  input: ['./openapi/zitadel/instance/v2/instance_service.openapi.yaml'],
-});
-
-void generateFiles({
-  input: instanceOpenapi,
-  output: './content/docs/api/instance',
-  includeDescription: true,
-});
-
-const applicationOpenapi = createOpenAPI({
-  input: ['./openapi/zitadel/application/v2/application_service.openapi.yaml'],
-});
-
-void generateFiles({
-  input: applicationOpenapi,
-  output: './content/docs/api/application',
-  includeDescription: true,
-});
+generateServiceDocs('user');
+generateServiceDocs('instance');
+generateServiceDocs('application');
+generateServiceDocs('action');
+generateServiceDocs('authorization');
+generateServiceDocs('feature');
+generateServiceDocs('group');
+generateServiceDocs('idp');
+generateServiceDocs('oidc');
+generateServiceDocs('org');
+generateServiceDocs('project');
+generateServiceDocs('saml');
+generateServiceDocs('session');
+generateServiceDocs('settings');
+generateServiceDocs('webkey');
+generateServiceDocs('internal_permission');
