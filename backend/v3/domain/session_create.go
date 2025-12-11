@@ -28,10 +28,10 @@ type CreateSessionCommand struct {
 	SessionID *string
 }
 
-func NewCreateSessionCommand(instanceID string, userAgent *session_grpc.UserAgent, metas map[string][]byte, lifetime *durationpb.Duration, idGenerator id.Generator) *CreateSessionCommand {
-	idGen := id.SonyFlakeGenerator()
-	if idGenerator != nil {
-		idGen = idGenerator
+func NewCreateSessionCommand(instanceID string, userAgent *session_grpc.UserAgent, metas map[string][]byte, lifetime *durationpb.Duration, customIDGenerator id.Generator) *CreateSessionCommand {
+	idGen := defaultIDGenerator
+	if customIDGenerator != nil {
+		idGen = customIDGenerator
 	}
 
 	return &CreateSessionCommand{

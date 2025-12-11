@@ -11,11 +11,14 @@ import (
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		domain.SetPasswordHasher(&crypto.Hasher{Swapper: &passwap.Swapper{}})
+		id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
+		domain.SetDefaultIDGenerator(id.SonyFlakeGenerator())
 		return m.Run()
 	}())
 }

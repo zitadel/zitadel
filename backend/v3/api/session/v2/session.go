@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -21,7 +20,7 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 		request.Msg.GetUserAgent(),
 		request.Msg.GetMetadata(),
 		request.Msg.GetLifetime(),
-		id.SonyFlakeGenerator(),
+		nil,
 	)
 	sessionID := *creator.SessionID
 	executors[0] = creator
@@ -33,8 +32,7 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 	executors[5] = domain.NewTOTPCheckCommand(sessionID, instanceID, nil, nil, nil, request.Msg.GetChecks().GetTotp())
 	executors[6] = domain.NewOTPCheckCommand(sessionID, instanceID, nil, nil, nil, nil, request.Msg.GetChecks().GetOtpSms(), domain.OTPSMSRequestType)
 	executors[7] = domain.NewOTPCheckCommand(sessionID, instanceID, nil, nil, nil, nil, request.Msg.GetChecks().GetOtpEmail(), domain.OTPEmailRequestType)
-	// TODO(IAM-Marco): Fix when recovery codes repository is available
-	// executors[8] = domain.NewRecoveryCodeCheckCommand(sessionID, instanceID, request.Msg.GetChecks().GetRecoveryCode())
+	executors[8] = domain.NewRecoveryCodeCheckCommand(sessionID, instanceID, request.Msg.GetChecks().GetRecoveryCode())
 
 	// TODO(IAM-Marco): Add challenges
 	// executors[9] = domain.NewPasskeyChallengeCommand()
