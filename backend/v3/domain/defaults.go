@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
@@ -24,6 +25,7 @@ var (
 	otpEncryptionAlgo    crypto.EncryptionAlgorithm
 	defaultPhoneVerifier phoneCodeVerifyFn
 	webauthnConfig       *webauthn.Config
+	defaultIDGenerator   id.Generator
 )
 
 func SetPool(p database.Pool) {
@@ -68,4 +70,8 @@ func SetOTPEncryptionAlgorithm(otpEncryptionAlg crypto.EncryptionAlgorithm) {
 
 func SetPhoneCodeVerifier(fn phoneCodeVerifyFn) {
 	defaultPhoneVerifier = fn
+}
+
+func SetDefaultIDGenerator(gen id.Generator) {
+	defaultIDGenerator = gen
 }
