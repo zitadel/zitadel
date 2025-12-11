@@ -435,7 +435,7 @@ type SecretGeneratorSettings struct {
 	SecretGeneratorSettingsAttributes
 }
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/secretgeneratorsettings.mock.go . SecretGeneratorSettingsRepository
+//go:generate mockgen -typed -package domainmock -destination ./mock/secret_generator_settings.mock.go . SecretGeneratorSettingsRepository
 type SecretGeneratorSettingsRepository interface {
 	settingsRepository[SecretGeneratorSettings]
 	secretGeneratorSettingsJSONChanges

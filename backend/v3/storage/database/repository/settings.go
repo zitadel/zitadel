@@ -1504,7 +1504,6 @@ func SecretGeneratorSettingsRepository() domain.SecretGeneratorSettingsRepositor
 var _ domain.SecretGeneratorSettingsRepository = (*secretGeneratorSettings)(nil)
 
 func (s secretGeneratorSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecretGeneratorSettings) (err error) {
-	// todo: validate settings fields are not empty
 	if settings == nil {
 		return database.ErrInvalidChangeTarget
 	}
