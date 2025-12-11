@@ -58,7 +58,7 @@ export function UsernameForm({ loginName, requestId, organization, suffix, login
 
       handleServerActionResponse(res, router, setSamlData, setError);
       return res;
-    } catch (error) {
+    } catch {
       setError(t("errors.internalError"));
     } finally {
       setLoading(false);

@@ -80,7 +80,7 @@ export function RegisterFormIDPIncomplete({
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch (error) {
+    } catch {
       setError("Could not register user");
     } finally {
       setLoading(false);

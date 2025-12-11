@@ -71,7 +71,7 @@ export function SetRegisterPasswordForm({
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch (error) {
+    } catch {
       setError(t("errors.couldNotRegisterUser"));
     } finally {
       setLoading(false);

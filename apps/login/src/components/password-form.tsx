@@ -58,7 +58,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch (e) {
+    } catch {
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
       setLoading(false);

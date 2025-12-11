@@ -128,7 +128,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           setError(t("verify.errors.noRedirectProvided"));
         }
       }
-    } catch (error) {
+    } catch {
       setError(t("verify.errors.couldNotVerifyPasskey"));
     } finally {
       setLoading(false);
