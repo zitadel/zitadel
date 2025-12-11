@@ -27,4 +27,4 @@ npm-debug.log*
 pnpm-debug.log*
 .vercel
 /protoc-gen-connect-openapi*
-docs_old/*
+docs_old
