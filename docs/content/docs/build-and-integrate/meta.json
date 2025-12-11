@@ -1,0 +1,20 @@
+{
+  "title": "Build & Integrate",
+  "description": "The App Developer Hub",
+  "pages": [
+    "application",
+    "sdks",
+    "login",
+    "login-ui",
+    "identity-providers",
+    "actions",
+    "service-users",
+    "services",
+    "token-introspection",
+    "zitadel-apis",
+    "migrate",
+    "onboarding",
+    "solution-scenarios",
+    "tools"
+  ]
+}
