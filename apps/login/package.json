@@ -15,11 +15,6 @@
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress"
   },
-  "pnpm": {
-    "overrides": {
-      "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
-    }
-  },
   "git": {
     "pre-commit": "lint-staged"
   },

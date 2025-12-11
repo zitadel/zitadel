@@ -1,43 +1,45 @@
-# ZITADEL-Docs
+# docs
 
-This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
+This is a Next.js application generated with
+[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
 
-The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** for development and build processes.
-
-## Quick Start
-
-Run the following commands from the repositorys root directory to install all dependencies needed.
-Using Corepack makes sure you have the pnpm version intalled that is declared in [](../package.json).
+Run development server:
 
 ```bash
-corepack enable
-pnpm install
+npm run dev
+# or
+pnpm dev
+# or
+yarn dev
 ```
 
-Start a docs server
+Open http://localhost:3000 with your browser to see the result.
 
-```bash
-# Start development server with live-reloading
-pnpm nx run @zitadel/docs:dev
+## Explore
 
-# Or serve a production build
-pnpm nx run @zitadel/docs:prod
-```
+In the project, you can see:
 
-The site will be available at http://localhost:3100
+- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
+- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
 
-## Add new Sites to existing Topics
+| Route                     | Description                                            |
+| ------------------------- | ------------------------------------------------------ |
+| `app/(home)`              | The route group for your landing page and other pages. |
+| `app/docs`                | The documentation layout and pages.                    |
+| `app/api/search/route.ts` | The Route Handler for search.                          |
 
-To add a new site to the already existing structure simply save the `md` file into the corresponding folder and append the sites id int the file `sidebars.js`.
+### Fumadocs MDX
 
-If you are introducing new APIs (gRPC), you need to add a new entry to `docusaurus.config.js` under the `plugins` section.
+A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
 
-## Build Process
+Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
 
-The documentation build process automatically:
+## Learn More
 
-1. **Downloads required protoc plugins** - Ensures `protoc-gen-connect-openapi` is available
-2. **Generates gRPC documentation** - Creates API docs from proto files
-3. **Generates API documentation** - Creates OpenAPI specification docs
-4. **Copies configuration files** - Includes configuration examples
-5. **Builds the Docusaurus site** - Generates the final static site
+To learn more about Next.js and Fumadocs, take a look at the following
+resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
+  features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs

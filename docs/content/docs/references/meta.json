@@ -1,0 +1,14 @@
+{
+  "title": "References",
+  "description": "The Dictionary",
+  "pages": [
+    "api",
+    "actions",
+    "assets",
+    "benchmarks",
+    "observability",
+    "openidoauth",
+    "proto",
+    "saml"
+  ]
+}

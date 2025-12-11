@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "index",
+    "quickstarts",
+    "build-and-integrate",
+    "operate-and-self-host",
+    "manage-and-govern",
+    "references",
+    "concepts"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Manage & Govern",
+  "description": "The Administrator Hub",
+  "pages": [
+    "console",
+    "customize",
+    "user",
+    "cloud"
+  ]
+}

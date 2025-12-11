@@ -1,0 +1,11 @@
+{
+  "title": "Concepts",
+  "description": "The Encyclopedia",
+  "pages": [
+    "architecture",
+    "features",
+    "eventstore",
+    "knowledge",
+    "structure"
+  ]
+}
