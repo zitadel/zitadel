@@ -263,6 +263,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -307,6 +308,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -380,6 +382,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Arabic: العربية
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

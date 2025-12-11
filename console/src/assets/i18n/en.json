@@ -1550,7 +1550,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1800,7 +1801,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -2782,7 +2784,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

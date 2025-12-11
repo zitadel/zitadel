@@ -1549,7 +1549,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1799,7 +1800,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-posta doğrulama tamamlandı",
@@ -2781,7 +2783,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Yönetici Ekle",

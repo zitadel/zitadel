@@ -13,6 +13,7 @@ import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
+import localeAr from '@angular/common/locales/ar';
 import localeRu from '@angular/common/locales/ru';
 import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
@@ -119,6 +120,8 @@ registerLocaleData(localeRo);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ro.json'));
 registerLocaleData(localeTr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/tr.json'));
+registerLocaleData(localeAr);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ar.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {

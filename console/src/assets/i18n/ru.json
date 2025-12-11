@@ -1591,7 +1591,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1853,7 +1854,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "ar": "العربية"
       },
       "LOCALE": "Код языка",
       "LOCALES": {
@@ -2861,7 +2863,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Добавить менеджера",

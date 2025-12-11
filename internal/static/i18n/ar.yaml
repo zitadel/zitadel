@@ -1,0 +1,1423 @@
+Errors:
+  Internal: حدث خطأ داخلي
+  NoChangesFound: لا توجد تغييرات
+  OriginNotAllowed: هذا "الأصل" (Origin) غير مسموح به
+  IDMissing: المعرف مفقود
+  ResourceOwnerMissing: منظمة مالك المورد مفقودة
+  RemoveFailed: تعذر الحذف
+  ProjectionName:
+    Invalid: اسم الإسقاط (Projection) غير صالح
+  Assets:
+    EmptyKey: مفتاح الأصل فارغ
+    Store:
+      NotInitialized: تخزين الأصول لم تتم تهيئته
+      NotConfigured: تخزين الأصول لم يتم تكوينه
+    Bucket:
+      Internal: خطأ داخلي عند إنشاء الدلو (Bucket)
+      AlreadyExists: الدلو موجود بالفعل
+      CreateFailed: لم يتم إنشاء الدلو
+      ListFailed: تعذر قراءة الدلاء
+      RemoveFailed: لم يتم حذف الدلو
+      SetPublicFailed: تعذر تعيين الدلو ليكون عاماً
+    Object:
+      PutFailed: لم يتم إنشاء الكائن
+      GetFailed: تعذر قراءة الكائن
+      NotFound: تعذر العثور على الكائن
+      PresignedTokenFailed: تعذر إنشاء الرمز الموقع
+      ListFailed: تعذر قراءة قائمة الكائنات
+      RemoveFailed: تعذر إزالة الكائن
+  Limit:
+    ExceedsDefault: الحد يتجاوز الحد الافتراضي
+  Limits:
+    NotFound: الحدود غير موجودة
+    NoneSpecified: لم يتم تحديد حدود
+    Instance:
+      Blocked: المثيل محظور
+  Restrictions:
+    NoneSpecified: لم يتم تحديد قيود
+    DefaultLanguageMustBeAllowed: يجب السماح باللغة الافتراضية
+  Language:
+    NotParsed: تعذر تحليل اللغة
+    NotSupported: اللغة غير مدعومة
+    NotAllowed: اللغة غير مسموح بها
+    Undefined: اللغة غير محددة
+    Duplicate: اللغات تحتوي على تكرارات
+  OIDCSettings:
+    NotFound: تكوين OIDC غير موجود
+    AlreadyExists: تكوين OIDC موجود بالفعل
+  SecretGenerator:
+    AlreadyExists: مولد الأسرار موجود بالفعل
+    TypeMissing: نوع مولد الأسرار مفقود
+    NotFound: مولد الأسرار غير موجود
+  SMSConfig:
+    NotFound: تكوين SMS غير موجود
+    AlreadyActive: تكوين SMS نشط بالفعل
+    AlreadyDeactivated: تكوين SMS معطل بالفعل
+    NotExternalVerification: تكوين SMS لا يدعم التحقق من الرمز
+  SMTP:
+    NotEmailMessage: الرسالة ليست EmailMessage
+    RequiredAttributes: الموضوع، المستلمين والمحتوى يجب تعيينهم ولكن بعضهم أو كلهم فارغون
+    CouldNotSplit: تعذر تقسيم المضيف والمنفذ للاتصال بـ smtp
+    CouldNotDial: تعذر الاتصال بخادم SMTP، تحقق من المنفذ، مشاكل جدار الحماية...
+    CouldNotDialTLS: تعذر الاتصال بخادم SMTP باستخدام TLS، تحقق من المنفذ، مشاكل جدار الحماية...
+    CouldNotCreateClient: تعذر إنشاء عميل smtp
+    CouldNotStartTLS: تعذر بدء tls
+    CouldNotAuth: تعذر إضافة مصادقة smtp، تحقق مما إذا كان المستخدم وكلمة المرور صحيحين، إذا كانا صحيحين فربما يتطلب مزودك طريقة مصادقة غير مدعومة من ZITADEL
+    CouldNotSetSender: تعذر تعيين المرسل
+    CouldNotSetRecipient: تعذر تعيين المستلم
+  SMTPConfig:
+    TestPassword: كلمة المرور للاختبار غير موجودة
+    NotFound: تكوين SMTP غير موجود
+    AlreadyExists: تكوين SMTP موجود بالفعل
+    AlreadyDeactivated: تكوين SMTP معطل بالفعل
+    SenderAdressNotCustomDomain: عنوان المرسل يجب تكوينه كنطاق مخصص على المثيل.
+    TestEmailNotFound: عنوان البريد الإلكتروني للاختبار غير موجود
+  Notification:
+    NoDomain: لم يتم العثور على نطاق للرسالة
+  User:
+    NotFound: تعذر العثور على المستخدم
+    AlreadyExists: المستخدم موجود بالفعل
+    NotFoundOnOrg: تعذر العثور على المستخدم في المنظمة المختارة
+    NotAllowedOrg: المستخدم ليس عضواً في المنظمة المطلوبة
+    UserIDMissing: معرف المستخدم مفقود
+    UserIDWrong: "المستخدم الطالب لا يساوي المستخدم الموثق"
+    DomainPolicyNil: سياسة المنظمة فارغة
+    EmailAsUsernameNotAllowed: البريد الإلكتروني غير مسموح به كاسم مستخدم
+    Invalid: بيانات المستخدم غير صالحة
+    DomainNotAllowedAsUsername: النطاق محجوز بالفعل ولا يمكن استخدامه
+    AlreadyInactive: المستخدم غير نشط بالفعل
+    NotInactive: المستخدم ليس غير نشط
+    CantDeactivateInitial: المستخدم بالحالة الأولية يمكن حذفه فقط وليس تعطيله
+    ShouldBeActiveOrInitial: يجب أن يكون المستخدم نشطاً أو أولياً
+    AlreadyInitialised: المستخدم مهيأ بالفعل
+    NotInitialised: المستخدم لم تتم تهيئته بعد
+    NotLocked: المستخدم ليس مقفلاً
+    NoChanges: لم يتم العثور على تغييرات
+    InitCodeNotFound: رمز التهيئة غير موجود
+    UsernameNotChanged: اسم المستخدم لم يتغير
+    InvalidURLTemplate: قالب URL غير صالح
+    Locked: المستخدم مقفل
+    Profile:
+      NotFound: الملف الشخصي غير موجود
+      NotChanged: الملف الشخصي لم يتغير
+      Empty: الملف الشخصي فارغ
+      FirstNameEmpty: الاسم الأول في الملف الشخصي فارغ
+      LastNameEmpty: اسم العائلة في الملف الشخصي فارغ
+      IDMissing: معرف الملف الشخصي مفقود
+    Email:
+      NotFound: البريد الإلكتروني غير موجود
+      Invalid: البريد الإلكتروني غير صالح
+      AlreadyVerified: تم التحقق من البريد الإلكتروني بالفعل
+      NotChanged: البريد الإلكتروني لم يتغير
+      Empty: البريد الإلكتروني فارغ
+      IDMissing: معرف البريد الإلكتروني مفقود
+    Phone:
+      NotFound: الهاتف غير موجود
+      Invalid: الهاتف غير صالح
+      AlreadyVerified: تم التحقق من الهاتف بالفعل
+      Empty: الهاتف فارغ
+      NotChanged: الهاتف لم يتغير
+      VerifyingRemovalIsNotSupported: التحقق من إزالة الهاتف غير مدعوم
+    Address:
+      NotFound: العنوان غير موجود
+      NotChanged: العنوان لم يتغير
+    Machine:
+      Key:
+        NotFound: مفتاح الآلة غير موجود
+        AlreadyExisting: مفتاح الآلة موجود بالفعل
+        Invalid: المفتاح العام ليس مفتاح RSA عام صالح بتنسيق PKIX مع تشفير PEM
+      Secret:
+        NotExisting: السر غير موجود
+        Invalid: السر غير صالح
+        CouldNotGenerate: تعذر توليد السر
+    PAT:
+      NotFound: رمز الوصول الشخصي غير موجود
+    NotHuman: يجب أن يكون المستخدم شخصياً
+    NotMachine: يجب أن يكون المستخدم تقنياً
+    WrongType: غير مسموح لنوع المستخدم هذا
+    NotAllowedToLink: غير مسموح للمستخدم بالربط مع مزود تسجيل دخول خارجي
+    Username:
+      AlreadyExists: اسم المستخدم مأخوذ بالفعل
+      Reserved: اسم المستخدم محجوز بالفعل
+      Empty: اسم المستخدم فارغ
+    Code:
+      Empty: الرمز فارغ
+      NotFound: الرمز غير موجود
+      Expired: الرمز منتهي الصلاحية
+      GeneratorAlgNotSupported: خوارزمية التوليد غير مدعومة
+      Invalid: الرمز غير صالح
+    Password:
+      NotFound: كلمة المرور غير موجودة
+      Empty: كلمة المرور فارغة
+      Invalid: كلمة المرور غير صالحة
+      NotSet: لم يقم المستخدم بتعيين كلمة مرور
+      NotChanged: لا يمكن أن تكون كلمة المرور الجديدة هي نفس كلمة المرور الحالية
+      NotSupported: تشفير تجزئة كلمة المرور غير مدعوم. تحقق من https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+    PasswordComplexityPolicy:
+      NotFound: سياسة كلمة المرور غير موجودة
+      MinLength: كلمة المرور قصيرة جداً
+      MinLengthNotAllowed: الحد الأدنى للطول المعطى غير مسموح به
+      HasLower: يجب أن تحتوي كلمة المرور على أحرف صغيرة
+      HasUpper: يجب أن تحتوي كلمة المرور على أحرف كبيرة
+      HasNumber: يجب أن تحتوي كلمة المرور على رقم
+      HasSymbol: يجب أن تحتوي كلمة المرور على رمز
+    ExternalIDP:
+      Invalid: IDP الخارجي غير صالح
+      IDPConfigNotExisting: مزود IDP غير صالح لهذه المنظمة
+      NotAllowed: IDP الخارجي غير مسموح به
+      MinimumExternalIDPNeeded: يجب إضافة IDP واحد على الأقل
+      AlreadyExists: IDP الخارجي مأخوذ بالفعل
+      NotFound: IDP الخارجي غير موجود
+      LoginFailed: فشل تسجيل الدخول في IDP الخارجي
+    MFA:
+      OTP:
+        AlreadyReady: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) معدة بالفعل
+        NotExisting: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) غير موجودة
+        NotReady: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) ليست جاهزة
+        InvalidCode: رمز غير صالح
+      U2F:
+        NotExisting: U2F غير موجود
+      Passwordless:
+        NotExisting: بدون كلمة مرور غير موجود
+      RecoveryCodes:
+        InvalidCode: رمز الاسترداد المقدم غير صالح
+        MaxCountExceeded: تم تجاوز الحد الأقصى لرموز الاسترداد
+        NotReady: رموز الاسترداد ليست جاهزة للاستخدام
+        ConfigInvalid: تكوين رموز الاسترداد غير صالح
+    WebAuthN:
+      NotFound: رمز WebAuthN تعذر العثور عليه
+      BeginRegisterFailed: فشل بدء تسجيل WebAuthN
+      MarshalError: خطأ في ترتيب البيانات (marshal)
+      ErrorOnParseCredential: خطأ في تحليل بيانات الاعتماد
+      CreateCredentialFailed: خطأ في إنشاء بيانات الاعتماد
+      BeginLoginFailed: فشل بدء تسجيل الدخول WebAuthN
+      ValidateLoginFailed: خطأ في التحقق من صحة بيانات اعتماد تسجيل الدخول
+      CloneWarning: قد تكون بيانات الاعتماد مستنسخة
+    RefreshToken:
+      Invalid: رمز التحديث غير صالح
+      NotFound: رمز التحديث غير موجود
+  Instance:
+    NotFound: المثيل غير موجود
+    AlreadyExists: المثيل موجود بالفعل
+    NotChanged: المثيل لم يتغير
+  Org:
+    AlreadyExists: اسم المنظمة أو معرفها مأخوذ بالفعل
+    Invalid: المنظمة غير صالحة
+    AlreadyDeactivated: المنظمة معطلة بالفعل
+    AlreadyActive: المنظمة نشطة بالفعل
+    Empty: المنظمة فارغة
+    NotFound: المنظمة غير موجودة
+    NotChanged: المنظمة لم تتغير
+    DefaultOrgNotDeletable: لا يجب حذف المنظمة الافتراضية
+    ZitadelOrgNotDeletable: المنظمة التي تحتوي على مشروع ZITADEL لا يجب حذفها
+    InvalidDomain: نطاق غير صالح
+    DomainMissing: النطاق مفقود
+    DomainNotOnOrg: النطاق غير موجود في المنظمة
+    DomainNotVerified: لم يتم التحقق من النطاق
+    DomainAlreadyVerified: تم التحقق من النطاق بالفعل
+    DomainVerificationTypeInvalid: نوع التحقق من النطاق غير صالح
+    DomainVerificationMissing: التحقق من النطاق لم يبدأ بعد
+    DomainVerificationFailed: فشل التحقق من النطاق
+    DomainVerificationTXTNotFound: لم يتم العثور على سجل TXT _zitadel-challenge لنطاقك. تحقق من أنك أضفته إلى خادم DNS الخاص بك أو انتظر حتى ينتشر السجل الجديد
+    DomainVerificationTXTNoMatch: تم العثور على سجل TXT _zitadel-challenge لنطاقك ولكنه لا يحتوي على نص الرمز المميز الصحيح. تحقق من أنك أضفت الرمز الصحيح إلى خادم DNS الخاص بك أو انتظر حتى ينتشر السجل الجديد
+    DomainVerificationHTTPNotFound: لم يتم العثور على الملف الذي يحتوي على التحدي في الرابط المتوقع. تحقق من أنك قمت بتحميل الملف في المكان الصحيح مع أذونات القراءة
+    DomainVerificationHTTPNoMatch: تم العثور على الملف الذي يحتوي على التحدي في الرابط المتوقع ولكنه لا يحتوي على نص الرمز المميز الصحيح. تحقق من محتواه
+    DomainVerificationTimeout: انتهت مهلة الاستعلام من خادم DNS
+    PrimaryDomainNotDeletable: لا يجب حذف النطاق الأساسي
+    DomainNotFound: النطاق غير موجود
+    MemberIDMissing: معرف العضو مفقود
+    MemberNotFound: عضو المنظمة غير موجود
+    InvalidMember: عضو المنظمة غير صالح
+    UserIDMissing: معرف المستخدم مفقود
+    PolicyAlreadyExists: السياسة موجودة بالفعل
+    PolicyNotExisting: السياسة غير موجودة
+    IdpInvalid: تكوين IDP غير صالح
+    IdpNotExisting: تكوين IDP غير موجود
+    OIDCConfigInvalid: تكوين OIDC IDP غير صالح
+    IdpIsNotOIDC: تكوين IDP ليس من نوع oidc
+    Domain:
+      AlreadyExists: النطاق موجود بالفعل
+      InvalidCharacter: يسمح فقط بالأحرف الأبجدية الرقمية و . و - للنطاق
+      EmptyString: تم استبدال الأحرف غير الرقمية والأبجدية غير الصالحة بمساحات فارغة والنطاق الناتج هو سلسلة فارغة
+    IDP:
+      InvalidSearchQuery: استعلام بحث غير صالح
+      ClientIDMissing: معرف العميل مفقود
+      TeamIDMissing: معرف الفريق مفقود
+      KeyIDMissing: معرف المفتاح مفقود
+      PrivateKeyMissing: المفتاح الخاص مفقود
+    LoginPolicy:
+      NotFound: سياسة تسجيل الدخول غير موجودة
+      Invalid: سياسة تسجيل الدخول غير صالحة
+      RedirectURIInvalid: عنوان URI لإعادة التوجيه الافتراضي غير صالح
+      NotExisting: سياسة تسجيل الدخول غير موجودة
+      AlreadyExists: سياسة تسجيل الدخول موجودة بالفعل
+      IdpProviderAlreadyExisting: مزود الهوية موجود بالفعل
+      IdpProviderNotExisting: مزود الهوية غير موجود
+      RegistrationNotAllowed: التسجيل غير مسموح به
+      UsernamePasswordNotAllowed: تسجيل الدخول باسم المستخدم / كلمة المرور غير مسموح به
+      MFA:
+        AlreadyExists: المصادقة متعددة العوامل موجودة بالفعل
+        NotExisting: المصادقة متعددة العوامل غير موجودة
+        Unspecified: المصادقة متعددة العوامل غير صالحة
+    MailTemplate:
+      NotFound: قالب البريد الافتراضي غير موجود
+      NotChanged: قالب البريد الافتراضي لم يتغير
+      AlreadyExists: قالب البريد الافتراضي موجود بالفعل
+      Invalid: قالب البريد الافتراضي غير صالح
+    CustomMessageText:
+      NotFound: نص الرسالة الافتراضي غير موجود
+      NotChanged: نص الرسالة الافتراضي لم يتغير
+      AlreadyExists: نص الرسالة الافتراضي موجود بالفعل
+      Invalid: نص الرسالة الافتراضي غير صالح
+    PasswordComplexityPolicy:
+      NotFound: سياسة تعقيد كلمة المرور غير موجودة
+      Empty: سياسة تعقيد كلمة المرور فارغة
+      NotExisting: سياسة تعقيد كلمة المرور غير موجودة
+      AlreadyExists: سياسة تعقيد كلمة المرور موجودة بالفعل
+    PasswordLockoutPolicy:
+      NotFound: سياسة قفل كلمة المرور غير موجودة
+      Empty: سياسة قفل كلمة المرور فارغة
+      NotExisting: سياسة قفل كلمة المرور غير موجودة
+      AlreadyExists: سياسة قفل كلمة المرور موجودة بالفعل
+    PasswordAgePolicy:
+      NotFound: سياسة عمر كلمة المرور غير موجودة
+      Empty: سياسة عمر كلمة المرور فارغة
+      NotExisting: سياسة عمر كلمة المرور غير موجودة
+      AlreadyExists: سياسة عمر كلمة المرور موجودة بالفعل
+    OrgIAMPolicy:
+      Empty: سياسة IAM للمنظمة فارغة
+      NotExisting: سياسة IAM للمنظمة غير موجودة
+      AlreadyExists: سياسة IAM للمنظمة موجودة بالفعل
+    NotificationPolicy:
+      NotFound: سياسة الإشعارات غير موجودة
+      NotChanged: سياسة الإشعارات لم تتغير
+      AlreadyExists: سياسة الإشعارات موجودة بالفعل
+    LabelPolicy:
+      NotFound: سياسة العلامة الخاصة غير موجودة
+      NotChanged: سياسة العلامة الخاصة لم تتغير
+  Project:
+    ProjectIDMissing: معرف المشروع مفقود
+    AlreadyExists: المشروع موجود بالفعل في المنظمة
+    OrgNotExisting: المنظمة غير موجودة
+    UserNotExisting: المستخدم غير موجود
+    CouldNotGenerateClientSecret: تعذر توليد سر العميل
+    Invalid: المشروع غير صالح
+    NotActive: المشروع ليس نشطاً
+    NotInactive: المشروع ليس معطلاً
+    NotFound: المشروع غير موجود
+    UserIDMissing: معرف المستخدم مفقود
+    Member:
+      NotFound: عضو المشروع غير موجود
+      Invalid: عضو المشروع غير صالح
+      AlreadyExists: عضو المشروع موجود بالفعل
+      NotExisting: عضو المشروع غير موجود
+    MinimumOneRoleNeeded: يجب إضافة دور واحد على الأقل
+    Role:
+      AlreadyExists: الدور موجود بالفعل
+      Invalid: الدور غير صالح
+      NotExisting: الدور غير موجود
+    IDMissing: المعرف مفقود
+    App:
+      AlreadyExists: التطبيق موجود بالفعل
+      NotFound: التطبيق غير موجود
+      Invalid: التطبيق غير صالح
+      NotExisting: التطبيق غير موجود
+      NotActive: التطبيق ليس نشطاً
+      NotInactive: التطبيق ليس معطلاً
+      OIDCConfigInvalid: تكوين OIDC غير صالح
+      APIConfigInvalid: تكوين API غير صالح
+      SAMLConfigInvalid: تكوين SAML غير صالح
+      IsNotOIDC: التطبيق ليس من نوع OIDC
+      IsNotAPI: التطبيق ليس من نوع API
+      IsNotSAML: التطبيق ليس من نوع SAML
+      SAMLMetadataMissing: بيانات تعريف SAML مفقودة
+      SAMLMetadataFormat: خطأ في تنسيق بيانات تعريف SAML
+      SAMLEntityIDAlreadyExisting: معرف كيان SAML موجود بالفعل
+      OIDCAuthMethodNoSecret: طريقة مصادقة OIDC المختارة لا تتطلب سراً
+      APIAuthMethodNoSecret: طريقة مصادقة API المختارة لا تتطلب سراً
+      AuthMethodNoPrivateKeyJWT: طريقة المصادقة المختارة لا تتطلب مفتاحاً
+      ClientSecretInvalid: سر العميل غير صالح
+      Key:
+        AlreadyExisting: مفتاح التطبيق موجود بالفعل
+        NotFound: مفتاح التطبيق غير موجود
+    RequiredFieldsMissing: بعض الحقول المطلوبة مفقودة
+    Grant:
+      AlreadyExists: منح المشروع موجود بالفعل
+      NotFound: المنح غير موجود
+      Invalid: منح المشروع غير صالح
+      NotExisting: منح المشروع غير موجود
+      HasNotExistingRole: دور واحد غير موجود في المشروع
+      NotActive: منح المشروع ليس نشطاً
+      NotInactive: منح المشروع ليس معطلاً
+  IAM:
+    NotFound: المثيل غير موجود. تأكد من أن النطاق صحيح. تحقق من https://zitadel.com/docs/apis/introduction#domains
+    Member:
+      RolesNotChanged: الأدوار لم تتغير
+    MemberInvalid: العضو غير صالح
+    MemberAlreadyExisting: العضو موجود بالفعل
+    MemberNotExisting: العضو غير موجود
+    IDMissing: المعرف مفقود
+    IAMProjectIDMissing: معرف مشروع IAM مفقود
+    IamProjectAlreadySet: تم تعيين معرف مشروع IAM بالفعل
+    IdpInvalid: تكوين IDP غير صالح
+    IdpNotExisting: تكوين IDP غير موجود
+    OIDCConfigInvalid: تكوين OIDC IDP غير صالح
+    IdpIsNotOIDC: تكوين IDP ليس من نوع oidc
+    LoginPolicyInvalid: سياسة تسجيل الدخول غير صالحة
+    LoginPolicyNotExisting: سياسة تسجيل الدخول غير موجودة
+    IdpProviderInvalid: مزود الهوية غير صالح
+    LoginPolicy:
+      NotFound: سياسة تسجيل الدخول الافتراضية غير موجودة
+      NotChanged: سياسة تسجيل الدخول الافتراضية لم تتغير
+      NotExisting: سياسة تسجيل الدخول الافتراضية غير موجودة
+      AlreadyExists: سياسة تسجيل الدخول الافتراضية موجودة بالفعل
+      RedirectURIInvalid: عنوان URI لإعادة التوجيه الافتراضي غير صالح
+      MFA:
+        AlreadyExists: المصادقة متعددة العوامل موجودة بالفعل
+        NotExisting: المصادقة متعددة العوامل غير موجودة
+        Unspecified: المصادقة متعددة العوامل غير صالحة
+      IDP:
+        AlreadyExists: مزود الهوية موجود بالفعل
+        NotExisting: مزود الهوية غير موجود
+        Invalid: مزود الهوية غير صالح
+      IDPConfig:
+        AlreadyExists: تكوين مزود الهوية موجود بالفعل
+        NotInactive: تكوين مزود الهوية ليس معطلاً
+        NotActive: تكوين مزود الهوية ليس نشطاً
+    LabelPolicy:
+      NotFound: سياسة العلامة الخاصة الافتراضية غير موجودة
+      NotChanged: سياسة العلامة الخاصة الافتراضية لم تتغير
+    MailTemplate:
+      NotFound: قالب البريد الافتراضي غير موجود
+      NotChanged: قالب البريد الافتراضي لم يتغير
+      AlreadyExists: قالب البريد الافتراضي موجود بالفعل
+      Invalid: قالب البريد الافتراضي غير صالح
+    CustomMessageText:
+      NotFound: نص الرسالة الافتراضي غير موجود
+      NotChanged: نص الرسالة الافتراضي لم يتغير
+      AlreadyExists: نص الرسالة الافتراضي موجود بالفعل
+      Invalid: نص الرسالة الافتراضي غير صالح
+    PasswordComplexityPolicy:
+      NotFound: سياسة تعقيد كلمة المرور الافتراضية غير موجودة
+      NotExisting: سياسة تعقيد كلمة المرور الافتراضية غير موجودة
+      AlreadyExists: سياسة تعقيد كلمة المرور الافتراضية موجودة بالفعل
+      Empty: سياسة تعقيد كلمة المرور الافتراضية فارغة
+      NotChanged: سياسة تعقيد كلمة المرور الافتراضية لم تتغير
+    PasswordAgePolicy:
+      NotFound: سياسة عمر كلمة المرور الافتراضية غير موجودة
+      NotExisting: سياسة عمر كلمة المرور الافتراضية غير موجودة
+      AlreadyExists: سياسة عمر كلمة المرور الافتراضية موجودة بالفعل
+      Empty: سياسة عمر كلمة المرور الافتراضية فارغة
+      NotChanged: سياسة عمر كلمة المرور الافتراضية لم تتغير
+    PasswordLockoutPolicy:
+      NotFound: سياسة قفل كلمة المرور الافتراضية غير موجودة
+      NotExisting: سياسة قفل كلمة المرور الافتراضية غير موجودة
+      AlreadyExists: سياسة قفل كلمة المرور الافتراضية موجودة بالفعل
+      Empty: سياسة قفل كلمة المرور الافتراضية فارغة
+      NotChanged: سياسة قفل كلمة المرور الافتراضية لم تتغير
+    DomainPolicy:
+      NotFound: سياسة IAM للمنظمة غير موجودة
+      Empty: سياسة IAM للمنظمة فارغة
+      NotExisting: سياسة IAM للمنظمة غير موجودة
+      AlreadyExists: سياسة IAM للمنظمة موجودة بالفعل
+      NotChanged: سياسة IAM للمنظمة لم تتغير
+    NotificationPolicy:
+      NotFound: سياسة الإشعارات الافتراضية غير موجودة
+      NotChanged: سياسة الإشعارات الافتراضية لم تتغير
+      AlreadyExists: سياسة الإشعارات الافتراضية موجودة بالفعل
+  Policy:
+    AlreadyExists: السياسة موجودة بالفعل
+    Label:
+      Invalid:
+        PrimaryColor: اللون الأساسي ليس قيمة لون Hex صالحة
+        BackgroundColor: لون الخلفية ليس قيمة لون Hex صالحة
+        WarnColor: لون التحذير ليس قيمة لون Hex صالحة
+        FontColor: لون الخط ليس قيمة لون Hex صالحة
+        PrimaryColorDark: اللون الأساسي (الوضع الداكن) ليس قيمة لون Hex صالحة
+        BackgroundColorDark: لون الخلفية (الوضع الداكن) ليس قيمة لون Hex صالحة
+        WarnColorDark: لون التحذير (الوضع الداكن) ليس قيمة لون Hex صالحة
+        FontColorDark: لون الخط (الوضع الداكن) ليس قيمة لون Hex صالحة
+  UserGrant:
+    AlreadyExists: منح المستخدم موجود بالفعل
+    NotFound: منح المستخدم غير موجود
+    Invalid: منح المستخدم غير صالح
+    NotChanged: منح المستخدم لم يتغير
+    IDMissing: المعرف مفقود
+    NoPermissionForProject: المستخدم ليس لديه أذونات على هذا المشروع
+    RoleKeyNotFound: الدور غير موجود
+  Member:
+    AlreadyExists: العضو موجود بالفعل
+  IDPConfig:
+    AlreadyExists: تكوين IDP بهذا الاسم موجود بالفعل
+    NotExisting: تكوين مزود الهوية غير موجود
+  Changes:
+    NotFound: لم يتم العثور على سجل
+    AuditRetention: السجل خارج فترة الاحتفاظ بسجل التدقيق
+  Token:
+    NotFound: الرمز غير موجود
+    Invalid: الرمز غير صالح
+  UserSession:
+    NotFound: جلسة المستخدم غير موجودة
+  Key:
+    NotFound: المفتاح غير موجود
+    ExpireBeforeNow: تاريخ انتهاء الصلاحية في الماضي
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: تم تكوين المصادقة متعددة العوامل كمطلوبة، ولكن لم يتم تكوين أي مزودين محتملين. يرجى الاتصال بمسؤول النظام الخاص بك.
+  Step:
+    Started:
+      AlreadyExists: الخطوة التي بدأت موجودة بالفعل
+    Done:
+      AlreadyExists: الخطوة التي تم الانتهاء منها موجودة بالفعل
+  CustomText:
+    AlreadyExists: النص المخصص موجود بالفعل
+    Invalid: النص المخصص غير صالح
+    NotFound: النص المخصص غير موجود
+  TranslationFile:
+    ReadError: خطأ في قراءة ملف الترجمة
+    MergeError: تعذر دمج ملف الترجمة مع الترجمات المخصصة
+    NotFound: ملف الترجمة غير موجود
+  Metadata:
+    NotFound: البيانات الوصفية غير موجودة
+    NoData: قائمة البيانات الوصفية فارغة
+    Invalid: البيانات الوصفية غير صالحة
+    KeyNotExisting: مفتاح واحد أو أكثر غير موجود
+  Action:
+    Invalid: الإجراء غير صالح
+    NotFound: الإجراء غير موجود
+    NotActive: الإجراء ليس نشطاً
+    NotInactive: الإجراء ليس معطلاً
+    MaxAllowed: لا يسمح بمزيد من الإجراءات النشطة الإضافية
+    NotEnabled: ميزة "الإجراء" غير مفعلة
+  Flow:
+    FlowTypeMissing: نوع التدفق مفقود
+    Empty: التدفق فارغ بالفعل
+    WrongTriggerType: نوع المشغل غير صالح
+    NoChanges: لا توجد تغييرات
+    ActionIDsNotExist: معرفات الإجراءات غير موجودة
+  Query:
+    CloseRows: تعذر إنهاء بيان SQL
+    SQLStatement: تعذر إنشاء بيان SQL
+    InvalidRequest: الطلب غير صالح
+    TooManyNestingLevels: مستويات تداخل الاستعلام كثيرة جداً (الحد الأقصى 20)
+    LimitExceeded: تم تجاوز الحد
+  Quota:
+    AlreadyExists: الحصة موجودة بالفعل لهذه الوحدة
+    NotFound: الحصة غير موجودة لهذه الوحدة
+    Invalid:
+      CallURL: عنوان URL لاستدعاء الحصة غير صالح
+      Percent: نسبة الحصة أقل من 1
+      Unimplemented: الحصص غير منفذة لهذه الوحدة
+      Amount: مبلغ الحصة أقل من 1
+      ResetInterval: فاصل إعادة تعيين الحصة أقصر من دقيقة
+      Noop: الحصة غير المحدودة بدون إشعارات ليس لها تأثير
+    Access:
+      Exhausted: استنفدت الحصة للطلبات الموثقة
+    Execution:
+      Exhausted: استنفدت الحصة لثواني التنفيذ
+  LogStore:
+    Access:
+      StorageFailed: فشل تخزين سجل الوصول في قاعدة البيانات
+      ScanFailed: فشل الاستعلام عن الاستخدام للطلبات الموثقة
+    Execution:
+      StorageFailed: فشل تخزين سجل تنفيذ الإجراء في قاعدة البيانات
+      ScanFailed: فشل الاستعلام عن الاستخدام لثواني تنفيذ الإجراء
+  Session:
+    NotExisting: الجلسة غير موجودة
+    Terminated: الجلسة منتهية بالفعل
+    Expired: انتهت صلاحية الجلسة
+    PositiveLifetime: عمر الجلسة يجب ألا يكون أقل من 0
+    Token:
+      Invalid: رمز الجلسة غير صالح
+    WebAuthN:
+      NoChallenge: جلسة بدون تحدي WebAuthN
+  Intent:
+    IDPMissing: معرف IDP مفقود في الطلب
+    IDPInvalid: IDP غير صالح للطلب
+    ResponseInvalid: استجابة IDP غير صالحة
+    MissingSingleMappingAttribute: استجابة IDP لا تحتوي على سمة التعيين أو تحتوي على أكثر من قيمة واحدة
+    SuccessURLMissing: عنوان URL للنجاح مفقود في الطلب
+    FailureURLMissing: عنوان URL للفشل مفقود في الطلب
+    StateMissing: معلمة الحالة مفقودة في الطلب
+    NotStarted: النية (Intent) لم تبدأ أو تم إنهاؤها بالفعل
+    NotSucceeded: النية لم تنجح
+    Expired: النية انتهت صلاحيتها
+    TokenCreationFailed: فشل إنشاء الرمز
+    InvalidToken: رمز النية غير صالح
+    OtherUser: النية مخصصة لمستخدم آخر
+  AuthRequest:
+    AlreadyExists: طلب المصادقة موجود بالفعل
+    NotExisting: طلب المصادقة غير موجود
+    WrongLoginClient: تم إنشاء طلب المصادقة بواسطة عميل تسجيل دخول آخر
+    AlreadyHandled: تم التعامل مع طلب المصادقة بالفعل
+  OIDCSession:
+    RefreshTokenInvalid: رمز التحديث غير صالح
+    Token:
+      Invalid: الرمز غير صالح
+      Expired: الرمز منتهي الصلاحية
+    InvalidClient: لم يتم إصدار الرمز لهذا العميل
+  SAMLRequest:
+    AlreadyExists: طلب SAML موجود بالفعل
+    NotExisting: طلب SAML غير موجود
+    WrongLoginClient: تم إنشاء طلب SAML بواسطة عميل تسجيل دخول آخر
+    AlreadyHandled: تم التعامل مع طلب SAML بالفعل
+  SAMLSession:
+    InvalidClient: استجابة SAML لم يتم إصدارها لهذا العميل
+  DeviceAuth:
+    NotFound: طلب تفويض الجهاز غير موجود
+    AlreadyHandled: تم التعامل مع طلب تفويض الجهاز بالفعل
+  Feature:
+    NotExisting: الميزة غير موجودة
+    TypeNotSupported: نوع الميزة غير مدعوم
+    InvalidValue: قيمة غير صالحة لهذه الميزة
+  Target:
+    Invalid: الهدف غير صالح
+    NoTimeout: الهدف ليس له مهلة
+    InvalidURL: الهدف لديه عنوان URL غير صالح
+    NotFound: الهدف غير موجود
+  Execution:
+    ConditionInvalid: شرط التنفيذ غير صالح
+    Invalid: التنفيذ غير صالح
+    NotFound: التنفيذ غير موجود
+    IncludeNotFound: التضمين غير موجود
+    NoTargets: لا توجد أهداف محددة
+    Failed: فشل التنفيذ
+    ResponseIsNotValidJSON: الاستجابة ليست JSON صالحاً
+  UserSchema:
+    NotEnabled: ميزة "مخطط المستخدم" غير مفعلة
+    Type:
+      Missing: نوع مخطط المستخدم مفقود
+      AlreadyExists: نوع مخطط المستخدم موجود بالفعل
+    Authenticator:
+      Invalid: نوع المصادق غير صالح
+    NotActive: مخطط المستخدم غير نشط
+    NotInactive: مخطط المستخدم غير معطل
+    NotExists: مخطط المستخدم غير موجود
+    ID:
+      Missing: معرف مخطط المستخدم مفقود
+    Invalid: مخطط المستخدم غير صالح
+    Data:
+      Invalid: البيانات غير صالحة لمخطط المستخدم
+  TokenExchange:
+    FeatureDisabled: ميزة تبادل الرموز معطلة للمثيل الخاص بك. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: الرمز مفقود
+      Invalid: الرمز غير صالح
+      TypeMissing: نوع الرمز مفقود
+      TypeNotAllowed: نوع الرمز غير مسموح به
+      TypeNotSupported: نوع الرمز غير مدعوم
+      NotForAPI: الرموز المنتحلة غير مسموح بها لـ API
+    Impersonation:
+      PolicyDisabled: الانتحال معطل في سياسة أمان المثيل
+  WebKey:
+    ActiveDelete: لا يمكن حذف مفتاح ويب نشط
+    Config: تكوين مفتاح الويب غير صالح
+    Duplicate: معرف مفتاح الويب ليس فريداً
+    FeatureDisabled: ميزة مفتاح الويب معطلة
+    NoActive: لم يتم العثور على مفتاح ويب نشط
+    NotFound: مفتاح الويب غير موجود
+
+AggregateTypes:
+  action: إجراء
+  instance: مثيل
+  key_pair: زوج مفاتيح
+  org: منظمة
+  project: مشروع
+  user: مستخدم
+  usergrant: منح مستخدم
+  quota: حصة
+  feature: ميزة
+  target: هدف
+  execution: تنفيذ
+  user_schema: مخطط مستخدم
+  auth_request: طلب مصادقة
+  device_auth: تفويض جهاز
+  idpintent: نية IDP
+  limits: حدود
+  milestone: معلم
+  oidc_session: جلسة OIDC
+  restrictions: قيود
+  system: نظام
+  session: جلسة
+  web_key: مفتاح ويب
+  saml_request: طلب SAML
+  saml_session: جلسة SAML
+
+EventTypes:
+  execution:
+    set: تم تعيين التنفيذ
+    removed: تم حذف التنفيذ
+  target:
+    added: تم إنشاء الهدف
+    changed: تم تغيير الهدف
+    removed: تم حذف الهدف
+  user:
+    added: تمت إضافة المستخدم
+    selfregistered: قام المستخدم بالتسجيل بنفسه
+    initialization:
+      code:
+        added: تم إنشاء رمز التهيئة
+        sent: تم إرسال رمز التهيئة
+      check:
+        succeeded: نجح فحص التهيئة
+        failed: فشل فحص التهيئة
+    token:
+      added: تم إنشاء رمز الوصول
+      v2.added: تم إنشاء رمز الوصول
+      removed: تم حذف رمز الوصول
+    impersonated: تم انتحال شخصية المستخدم
+    username:
+      reserved: تم حجز اسم المستخدم
+      released: تم تحرير اسم المستخدم
+      changed: تم تغيير اسم المستخدم
+    email:
+      reserved: تم حجز عنوان البريد الإلكتروني
+      released: تم تحرير عنوان البريد الإلكتروني
+      changed: تم تغيير عنوان البريد الإلكتروني
+      verified: تم التحقق من عنوان البريد الإلكتروني
+      verification:
+        failed: فشل التحقق من عنوان البريد الإلكتروني
+      code:
+        added: تم إنشاء رمز التحقق من البريد الإلكتروني
+        sent: تم إرسال رمز التحقق من البريد الإلكتروني
+    machine:
+      added: تمت إضافة مستخدم تقني
+      changed: تم تغيير المستخدم التقني
+      key:
+        added: تمت إضافة المفتاح
+        removed: تم حذف المفتاح
+      secret:
+        set: تم تعيين السر
+        updated: تم تحديث تجزئة السر
+        removed: تم حذف السر
+        check:
+          succeeded: نجح فحص السر
+          failed: فشل فحص السر
+    human:
+      added: تمت إضافة شخص
+      selfregistered: قام الشخص بالتسجيل بنفسه
+      avatar:
+        added: تمت إضافة الصورة الرمزية
+        removed: تمت إزالة الصورة الرمزية
+      initialization:
+        code:
+          added: تم إنشاء رمز التهيئة
+          sent: تم إرسال رمز التهيئة
+        check:
+          succeeded: نجح فحص التهيئة
+          failed: فشل فحص التهيئة
+      invite:
+        code:
+          added: تم إنشاء رمز الدعوة
+          sent: تم إرسال رمز الدعوة
+        check:
+          succeeded: نجح فحص الدعوة
+          failed: فشل فحص الدعوة
+      username:
+        reserved: تم حجز اسم المستخدم
+        released: تم تحرير اسم المستخدم
+      email:
+        changed: تم تغيير عنوان البريد الإلكتروني
+        verified: تم التحقق من عنوان البريد الإلكتروني
+        verification:
+          failed: فشل التحقق من عنوان البريد الإلكتروني
+        code:
+          added: تم إنشاء رمز التحقق من البريد الإلكتروني
+          sent: تم إرسال رمز التحقق من البريد الإلكتروني
+      password:
+        changed: تم تغيير كلمة المرور
+        code:
+          added: تم إنشاء رمز كلمة المرور
+          sent: تم إرسال رمز كلمة المرور
+        check:
+          succeeded: نجح فحص كلمة المرور
+          failed: فشل فحص كلمة المرور
+        change:
+          sent: تم إرسال تغيير كلمة المرور
+        hash:
+          updated: تم تحديث تجزئة كلمة المرور
+      externallogin:
+        check:
+          succeeded: نجح تسجيل الدخول الخارجي
+      externalidp:
+        added: تمت إضافة IDP خارجي
+        removed: تمت إزالة IDP خارجي
+        cascade:
+          removed: تمت إزالة تتابع IDP الخارجي
+        id:
+          migrated: تم ترحيل معرف المستخدم الخارجي لـ IDP
+      phone:
+        changed: تم تغيير رقم الهاتف
+        verified: تم التحقق من رقم الهاتف
+        verification:
+          failed: فشل التحقق من رقم الهاتف
+        code:
+          added: تم إنشاء رمز رقم الهاتف
+          sent: تم إرسال رمز رقم الهاتف
+        removed: تمت إزالة رقم الهاتف
+      profile:
+        changed: تم تغيير ملف تعريف المستخدم
+      address:
+        changed: تم تغيير عنوان المستخدم
+      mfa:
+        otp:
+          added: تمت إضافة OTP للمصادقة متعددة العوامل
+          verified: تم التحقق من OTP للمصادقة متعددة العوامل
+          removed: تمت إزالة OTP للمصادقة متعددة العوامل
+          check:
+            succeeded: نجح فحص OTP للمصادقة متعددة العوامل
+            failed: فشل فحص OTP للمصادقة متعددة العوامل
+          sms:
+            added: تمت إضافة OTP SMS للمصادقة متعددة العوامل
+            removed: تمت إزالة OTP SMS للمصادقة متعددة العوامل
+            code:
+              added: تمت إضافة رمز OTP SMS للمصادقة متعددة العوامل
+              sent: تم إرسال رمز OTP SMS للمصادقة متعددة العوامل
+            check:
+              succeeded: نجح فحص OTP SMS للمصادقة متعددة العوامل
+              failed: فشل فحص OTP SMS للمصادقة متعددة العوامل
+          email:
+            added: تمت إضافة OTP Email للمصادقة متعددة العوامل
+            removed: تمت إزالة OTP Email للمصادقة متعددة العوامل
+            code:
+              added: تمت إضافة رمز OTP Email للمصادقة متعددة العوامل
+              sent: تم إرسال رمز OTP Email للمصادقة متعددة العوامل
+            check:
+              succeeded: نجح فحص OTP Email للمصادقة متعددة العوامل
+              failed: فشل فحص OTP Email للمصادقة متعددة العوامل
+        u2f:
+          token:
+            added: تمت إضافة رمز U2F للمصادقة متعددة العوامل
+            verified: تم التحقق من رمز U2F للمصادقة متعددة العوامل
+            removed: تمت إزالة رمز U2F للمصادقة متعددة العوامل
+            begin:
+              login: بدأ فحص U2F للمصادقة متعددة العوامل
+            check:
+              succeeded: نجح فحص U2F للمصادقة متعددة العوامل
+              failed: فشل فحص U2F للمصادقة متعددة العوامل
+            signcount:
+              changed: تم تغيير المجموع الاختباري (Checksum) لرمز U2F للمصادقة متعددة العوامل
+        init:
+          skipped: تم تخطي تهيئة المصادقة متعددة العوامل
+      passwordless:
+        token:
+          added: تمت إضافة رمز لتسجيل الدخول بدون كلمة مرور
+          verified: تم التحقق من رمز لتسجيل الدخول بدون كلمة مرور
+          removed: تمت إزالة رمز لتسجيل الدخول بدون كلمة مرور
+          begin:
+            login: بدأ فحص تسجيل الدخول بدون كلمة مرور
+          check:
+            succeeded: نجح فحص تسجيل الدخول بدون كلمة مرور
+            failed: فشل فحص تسجيل الدخول بدون كلمة مرور
+          signcount:
+            changed: تم تغيير المجموع الاختباري (Checksum) لرمز تسجيل الدخول بدون كلمة مرور
+        initialization:
+          code:
+            added: تمت إضافة رمز تهيئة بدون كلمة مرور
+            sent: تم إرسال رمز تهيئة بدون كلمة مرور
+            requested: تم طلب رمز تهيئة بدون كلمة مرور
+            check:
+              succeeded: تم فحص رمز تهيئة بدون كلمة مرور بنجاح
+              failed: فشل فحص رمز تهيئة بدون كلمة مرور
+      signed:
+        out: قام المستخدم بتسجيل الخروج
+      refresh:
+        token:
+          added: تم إنشاء رمز التحديث
+          renewed: تم تجديد رمز التحديث
+          removed: تمت إزالة رمز التحديث
+    locked: المستخدم مقفل
+    unlocked: المستخدم مفتوح
+    deactivated: المستخدم معطل
+    reactivated: المستخدم معاد تفعيله
+    removed: المستخدم محذوف
+    password:
+      changed: تم تغيير كلمة المرور
+      code:
+        added: تم إنشاء رمز كلمة المرور
+        sent: تم إرسال رمز كلمة المرور
+      check:
+        succeeded: نجح فحص كلمة المرور
+        failed: فشل فحص كلمة المرور
+    phone:
+      changed: تم تغيير رقم الهاتف
+      verified: تم التحقق من رقم الهاتف
+      verification:
+        failed: فشل التحقق من رقم الهاتف
+      code:
+        added: تم إنشاء رمز رقم الهاتف
+        sent: تم إرسال رمز رقم الهاتف
+
+    profile:
+      changed: تم تغيير ملف تعريف المستخدم
+    address:
+      changed: تم تغيير عنوان المستخدم
+    mfa:
+      otp:
+        added: تمت إضافة OTP للمصادقة متعددة العوامل
+        verified: تم التحقق من OTP للمصادقة متعددة العوامل
+        removed: تمت إزالة OTP للمصادقة متعددة العوامل
+        check:
+          succeeded: نجح فحص OTP للمصادقة متعددة العوامل
+          failed: فشل فحص OTP للمصادقة متعددة العوامل
+        init:
+          skipped: تم تخطي تهيئة OTP للمصادقة متعددة العوامل
+      init:
+        skipped: تم تخطي تهيئة المصادقة متعددة العوامل
+    signed:
+      out: قام المستخدم بتسجيل الخروج
+    grant:
+      added: تمت إضافة المنح
+      changed: تم تغيير المنح
+      removed: تمت إزالة المنح
+      deactivated: تم تعطيل المنح
+      reactivated: تمت إعادة تفعيل المنح
+      reserved: تم حجز المنح
+      released: تم تحرير المنح
+      cascade:
+        removed: تمت إزالة المنح (تتابعي)
+        changed: تم تغيير المنح (تتابعي)
+    metadata:
+      set: تم تعيين البيانات الوصفية للمستخدم
+      removed: تمت إزالة البيانات الوصفية للمستخدم
+      removed.all: تمت إزالة جميع البيانات الوصفية للمستخدم
+    domain:
+      claimed: تمت المطالبة بالنطاق
+      claimed.sent: تم إرسال إشعار المطالبة بالنطاق
+    pat:
+      added: تمت إضافة رمز الوصول الشخصي
+      removed: تمت إزالة رمز الوصول الشخصي
+  org:
+    added: تمت إضافة المنظمة
+    changed: تم تغيير المنظمة
+    deactivated: تم تعطيل المنظمة
+    reactivated: تمت إعادة تفعيل المنظمة
+    removed: تمت إزالة المنظمة
+    domain:
+      added: تمت إضافة النطاق
+      verification:
+        added: تمت إضافة التحقق من النطاق
+        failed: فشل التحقق من النطاق
+      verified: تم التحقق من النطاق
+      removed: تمت إزالة النطاق
+      primary:
+        set: تم تعيين النطاق الأساسي
+      reserved: تم حجز النطاق
+      released: تم تحرير النطاق
+    name:
+      reserved: تم حجز اسم المنظمة
+      released: تم تحرير اسم المنظمة
+    member:
+      added: تمت إضافة عضو المنظمة
+      changed: تم تغيير عضو المنظمة
+      removed: تمت إزالة عضو المنظمة
+      cascade:
+        removed: تمت إزالة تتابع عضو المنظمة
+    iam:
+      policy:
+        added: تمت إضافة سياسة النظام
+        changed: تم تغيير سياسة النظام
+        removed: تمت إزالة سياسة النظام
+    idp:
+      config:
+        added: تمت إضافة تكوين IDP
+        changed: تم تغيير تكوين IDP
+        removed: تمت إزالة تكوين IDP
+        deactivated: تم تعطيل تكوين IDP
+        reactivated: تمت إعادة تفعيل تكوين IDP
+      oidc:
+        config:
+          added: تمت إضافة تكوين OIDC IDP
+          changed: تم تغيير تكوين OIDC IDP
+      saml:
+        config:
+          added: تمت إضافة تكوين SAML IDP
+          changed: تم تغيير تكوين SAML IDP
+      jwt:
+        config:
+          added: تمت إضافة تكوين JWT IDP
+          changed: تم تغيير تكوين JWT IDP
+    customtext:
+      set: تم تعيين نص مخصص
+      removed: تمت إزالة نص مخصص
+      template:
+        removed: تمت إزالة قالب نص مخصص
+    policy:
+      login:
+        added: تمت إضافة سياسة تسجيل الدخول
+        changed: تم تغيير سياسة تسجيل الدخول
+        removed: تمت إزالة سياسة تسجيل الدخول
+        idpprovider:
+          added: تمت إضافة مزود الهوية إلى سياسة تسجيل الدخول
+          removed: تمت إزالة مزود الهوية من سياسة تسجيل الدخول
+          cascade:
+            removed: تمت إزالة تتابع مزود الهوية من سياسة تسجيل الدخول
+        secondfactor:
+          added: تمت إضافة عامل ثانٍ إلى سياسة تسجيل الدخول
+          removed: تمت إزالة عامل ثانٍ من سياسة تسجيل الدخول
+        multifactor:
+          added: تمت إضافة متعدد العوامل إلى سياسة تسجيل الدخول
+          removed: تمت إزالة متعدد العوامل من سياسة تسجيل الدخول
+      password:
+        complexity:
+          added: تمت إضافة سياسة تعقيد كلمة المرور
+          changed: تم تغيير سياسة تعقيد كلمة المرور
+          removed: تمت إزالة سياسة تعقيد كلمة المرور
+        age:
+          added: تمت إضافة سياسة عمر كلمة المرور
+          changed: تم تغيير سياسة عمر كلمة المرور
+          removed: تمت إزالة سياسة عمر كلمة المرور
+        lockout:
+          added: تمت إضافة سياسة قفل كلمة المرور
+          changed: تم تغيير سياسة قفل كلمة المرور
+          removed: تمت إزالة سياسة قفل كلمة المرور
+      label:
+        added: تمت إضافة سياسة العلامة
+        changed: تم تغيير سياسة العلامة
+        activated: تم تفعيل سياسة العلامة
+        removed: تمت إزالة سياسة العلامة
+        logo:
+          added: تمت إضافة الشعار إلى سياسة العلامة
+          removed: تمت إزالة الشعار من سياسة العلامة
+          dark:
+            added: تمت إضافة الشعار (الوضع الداكن) إلى سياسة العلامة
+            removed: تمت إزالة الشعار (الوضع الداكن) من سياسة العلامة
+        icon:
+          added: تمت إضافة الأيقونة إلى سياسة العلامة
+          removed: تمت إزالة الأيقونة من سياسة العلامة
+          dark:
+            added: تمت إضافة الأيقونة (الوضع الداكن) إلى سياسة العلامة
+            removed: تمت إزالة الأيقونة (الوضع الداكن) من سياسة العلامة
+        font:
+          added: تمت إضافة الخط إلى سياسة العلامة
+          removed: تمت إزالة الخط من سياسة العلامة
+        assets:
+          removed: تمت إزالة الأصول من سياسة العلامة
+      privacy:
+        added: تمت إضافة سياسة الخصوصية وشروط الخدمة
+        changed: تم تغيير سياسة الخصوصية وشروط الخدمة
+        removed: تمت إزالة سياسة الخصوصية وشروط الخدمة
+      domain:
+        added: تمت إضافة سياسة النطاق
+        changed: تم تغيير سياسة النطاق
+        removed: تمت إزالة سياسة النطاق
+      lockout:
+        added: تمت إضافة سياسة القفل
+        changed: تم تغيير سياسة القفل
+        removed: تمت إزالة سياسة القفل
+      notification:
+        added: تمت إضافة سياسة الإشعارات
+        changed: تم تغيير سياسة الإشعارات
+        removed: تمت إزالة سياسة الإشعارات
+    flow:
+      trigger_actions:
+        set: تم تعيين الإجراء
+        cascade:
+          removed: تمت إزالة تتابع الإجراءات
+        removed: تمت إزالة الإجراءات
+      cleared: تم مسح التدفق
+    mail:
+      template:
+        added: تمت إضافة قالب البريد الإلكتروني
+        changed: تم تغيير قالب البريد الإلكتروني
+        removed: تمت إزالة قالب البريد الإلكتروني
+      text:
+        added: تمت إضافة نص البريد الإلكتروني
+        changed: تم تغيير نص البريد الإلكتروني
+        removed: تمت إزالة نص البريد الإلكتروني
+    metadata:
+      removed: تمت إزالة البيانات الوصفية
+      removed.all: تمت إزالة جميع البيانات الوصفية
+      set: تم تعيين البيانات الوصفية
+  project:
+    added: تمت إضافة المشروع
+    changed: تم تغيير المشروع
+    deactivated: تم تعطيل المشروع
+    reactivated: تمت إعادة تفعيل المشروع
+    removed: تمت إزالة المشروع
+    member:
+      added: تمت إضافة عضو المشروع
+      changed: تم تغيير عضو المشروع
+      removed: تمت إزالة عضو المشروع
+      cascade:
+        removed: تمت إزالة تتابع عضو المشروع
+    role:
+      added: تمت إضافة دور المشروع
+      changed: تم تغيير دور المشروع
+      removed: تمت إزالة دور المشروع
+    grant:
+      added: تمت إضافة الوصول الإداري
+      changed: تم تغيير الوصول الإداري
+      removed: تمت إزالة الوصول الإداري
+      deactivated: تم تعطيل الوصول الإداري
+      reactivated: تمت إعادة تفعيل الوصول الإداري
+      cascade:
+        changed: تم تغيير الوصول الإداري (تتابعي)
+      member:
+        added: تمت إضافة عضو الوصول الإداري
+        changed: تم تغيير عضو الوصول الإداري
+        removed: تمت إزالة عضو الوصول الإداري
+        cascade:
+          removed: تمت إزالة تتابع الوصول الإداري
+    application:
+      added: تمت إضافة التطبيق
+      changed: تم تغيير التطبيق
+      removed: تمت إزالة التطبيق
+      deactivated: تم تعطيل التطبيق
+      reactivated: تمت إعادة تفعيل التطبيق
+      oidc:
+        secret:
+          check:
+            succeeded: نجح فحص سر عميل OIDC
+            failed: فشل فحص سر عميل OIDC
+        key:
+          added: تمت إضافة مفتاح تطبيق OIDC
+          removed: تمت إزالة مفتاح تطبيق OIDC
+      api:
+        secret:
+          check:
+            succeeded: نجح فحص سر API
+            failed: فشل فحص سر API
+        key:
+          added: تمت إضافة مفتاح التطبيق
+          removed: تمت إزالة مفتاح التطبيق
+      config:
+        saml:
+          added: تمت إضافة تكوين SAML
+          changed: تم تغيير تكوين SAML
+        oidc:
+          added: تمت إضافة تكوين OIDC
+          changed: تم تغيير تكوين OIDC
+          secret:
+            changed: تم تغيير سر OIDC
+            updated: تم تحديث تجزئة سر OIDC
+        api:
+          added: تمت إضافة تكوين API
+          changed: تم تغيير تكوين API
+          secret:
+            changed: تم تغيير سر API
+            updated: تم تحديث تجزئة سر API
+  policy:
+    password:
+      complexity:
+        added: تمت إضافة سياسة تعقيد كلمة المرور
+        changed: تم تغيير سياسة تعقيد كلمة المرور
+      age:
+        added: تمت إضافة سياسة عمر كلمة المرور
+        changed: تم تغيير سياسة عمر كلمة المرور
+      lockout:
+        added: تمت إضافة سياسة قفل كلمة المرور
+        changed: تم تغيير سياسة قفل كلمة المرور
+  iam:
+    setup:
+      started: بدأ إعداد ZITADEL
+      done: تم إعداد ZITADEL
+    global:
+      org:
+        set: تم تعيين المنظمة العالمية
+    project:
+      iam:
+        set: تم تعيين مشروع ZITADEL
+    member:
+      added: تمت إضافة عضو ZITADEL
+      changed: تم تغيير عضو ZITADEL
+      removed: تمت إزالة عضو ZITADEL
+      cascade:
+        removed: تمت إزالة تتابع عضو ZITADEL
+    idp:
+      config:
+        added: تمت إضافة تكوين IDP
+        changed: تم تغيير تكوين IDP
+        removed: تمت إزالة تكوين IDP
+        deactivated: تم تعطيل تكوين IDP
+        reactivated: تمت إعادة تفعيل تكوين IDP
+      oidc:
+        config:
+          added: تمت إضافة تكوين OIDC IDP
+          changed: تم تغيير تكوين OIDC IDP
+      saml:
+        config:
+          added: تمت إضافة تكوين SAML IDP
+          changed: تم تغيير تكوين SAML IDP
+      jwt:
+        config:
+          added: تمت إضافة تكوين JWT لمزود الهوية
+          changed: تمت إزالة تكوين JWT من مزود الهوية
+    customtext:
+      set: تم تعيين النص
+      removed: تمت إزالة النص
+    policy:
+      login:
+        added: تمت إضافة سياسة تسجيل الدخول الافتراضية
+        changed: تم تغيير سياسة تسجيل الدخول الافتراضية
+        idpprovider:
+          added: تمت إضافة مزود الهوية إلى سياسة تسجيل الدخول الافتراضية
+          removed: تمت إزالة مزود الهوية من سياسة تسجيل الدخول الافتراضية
+      label:
+        added: تمت إضافة سياسة العلامة
+        changed: تم تغيير سياسة العلامة
+        activated: تم تفعيل سياسة العلامة
+        logo:
+          added: تمت إضافة الشعار إلى سياسة العلامة
+          removed: تمت إزالة الشعار من سياسة العلامة
+          dark:
+            added: تمت إضافة الشعار (الوضع الداكن) إلى سياسة العلامة
+            removed: تمت إزالة الشعار (الوضع الداكن) من سياسة العلامة
+        icon:
+          added: تمت إضافة الأيقونة إلى سياسة العلامة
+          removed: تمت إزالة الأيقونة من سياسة العلامة
+          dark:
+            added: تمت إضافة الأيقونة (الوضع الداكن) إلى سياسة العلامة
+            removed: تمت إزالة الأيقونة (الوضع الداكن) من سياسة العلامة
+        font:
+          added: تمت إضافة الخط إلى سياسة العلامة
+          removed: تمت إزالة الخط من سياسة العلامة
+        assets:
+          removed: تمت إزالة الأصول من سياسة العلامة
+    default:
+      language:
+        set: تم تعيين اللغة الافتراضية
+    oidc:
+      settings:
+        added: تمت إضافة تكوين OIDC
+        changed: تم تغيير تكوين OIDC
+        removed: تمت إزالة تكوين OIDC
+    secret:
+      generator:
+        added: تمت إضافة مولد الأسرار
+        changed: تم تغيير مولد الأسرار
+        removed: تمت إزالة مولد الأسرار
+    smtp:
+      config:
+        added: تمت إضافة تكوين SMTP
+        changed: تم تغيير تكوين SMTP
+        activated: تم تفعيل تكوين SMTP
+        deactivated: تم تعطيل تكوين SMTP
+        removed: تمت إزالة تكوين SMTP
+        password:
+          changed: تم تغيير سر تكوين SMTP
+    sms:
+      config:
+        twilio:
+          added: تمت إضافة مزود Twilio SMS
+          changed: تم تغيير مزود Twilio SMS
+          token:
+            changed: تم تغيير رمز مزود Twilio SMS
+          removed: تمت إزالة مزود Twilio SMS
+          activated: تم تفعيل مزود Twilio SMS
+          deactivated: تم تعطيل مزود Twilio SMS
+  key_pair:
+    added: تمت إضافة زوج المفاتيح
+    certificate:
+      added: تمت إضافة الشهادة
+  action:
+    added: تمت إضافة الإجراء
+    changed: تم تغيير الإجراء
+    deactivated: تم تعطيل الإجراء
+    reactivated: تمت إعادة تفعيل الإجراء
+    removed: تمت إزالة الإجراء
+  instance:
+    added: تمت إضافة المثيل
+    changed: تم تغيير المثيل
+    customtext:
+      removed: تمت إزالة نص مخصص
+      set: تم تعيين نص مخصص
+      template:
+        removed: تمت إزالة قالب النص المخصص
+    default:
+      language:
+        set: تم تعيين اللغة الافتراضية
+      org:
+        set: تم تعيين المنظمة الافتراضية
+    domain:
+      added: تمت إضافة النطاق
+      primary:
+        set: تم تعيين النطاق الأساسي
+      removed: تمت إزالة النطاق
+    iam:
+      console:
+        set: تم تعيين تطبيق ZITADEL Console
+      project:
+        set: تم تعيين مشروع ZITADEL
+    mail:
+      template:
+        added: تمت إضافة قالب البريد الإلكتروني
+        changed: تم تغيير قالب البريد الإلكتروني
+      text:
+        added: تمت إضافة نص البريد الإلكتروني
+        changed: تم تغيير نص البريد الإلكتروني
+    member:
+      added: تمت إضافة عضو المثيل
+      changed: تم تغيير عضو المثيل
+      removed: تمت إزالة عضو المثيل
+      cascade:
+        removed: تمت إزالة تتابع عضو المثيل
+    notification:
+      provider:
+        debug:
+          fileadded: تمت إضافة مزود إشعار تصحيح الملفات
+          filechanged: تم تغيير مزود إشعار تصحيح الملفات
+          fileremoved: تمت إزالة مزود إشعار تصحيح الملفات
+          logadded: تمت إضافة مزود إشعار تصحيح السجلات
+          logchanged: تم تغيير مزود إشعار تصحيح السجلات
+          logremoved: تمت إزالة مزود إشعار تصحيح السجلات
+    oidc:
+      settings:
+        added: تمت إضافة إعدادات OIDC
+        changed: تم تغيير إعدادات OIDC
+    policy:
+      domain:
+        added: تمت إضافة سياسة النطاق
+        changed: تم تغيير سياسة النطاق
+      label:
+        activated: تم تفعيل سياسة العلامة
+        added: تمت إضافة سياسة العلامة
+        assets:
+          removed: تمت إزالة الأصل من سياسة العلامة
+        changed: تم تغيير سياسة العلامة
+        font:
+          added: تمت إضافة الخط إلى سياسة العلامة
+          removed: تمت إزالة الخط من سياسة العلامة
+        icon:
+          added: تمت إضافة الأيقونة إلى سياسة العلامة
+          removed: تمت إزالة الأيقونة من سياسة العلامة
+          dark:
+            added: تمت إضافة الأيقونة إلى سياسة العلامة الداكنة
+            removed: تمت إزالة الأيقونة من سياسة العلامة الداكنة
+        logo:
+          added: تمت إضافة الشعار إلى سياسة العلامة
+          removed: تمت إزالة الشعار من سياسة العلامة
+          dark:
+            added: تمت إضافة الشعار إلى سياسة العلامة الداكنة
+            removed: تمت إزالة الشعار من سياسة العلامة الداكنة
+      lockout:
+        added: تمت إضافة سياسة القفل
+        changed: تم تغيير سياسة القفل
+      login:
+        added: تمت إضافة سياسة تسجيل الدخول
+        changed: تم تغيير سياسة تسجيل الدخول
+        idpprovider:
+          added: تمت إضافة مزود الهوية إلى سياسة تسجيل الدخول
+          cascade:
+            removed: تمت إزالة تتابع مزود الهوية من سياسة تسجيل الدخول
+          removed: تمت إزالة مزود الهوية من سياسة تسجيل الدخول
+        multifactor:
+          added: تمت إضافة متعدد العوامل إلى سياسة تسجيل الدخول
+          removed: تمت إزالة متعدد العوامل من سياسة تسجيل الدخول
+        secondfactor:
+          added: تمت إضافة العامل الثاني إلى سياسة تسجيل الدخول
+          removed: تمت إزالة العامل الثاني من سياسة تسجيل الدخول
+      password:
+        age:
+          added: تمت إضافة سياسة عمر كلمة المرور
+          changed: تم تغيير سياسة عمر كلمة المرور
+        complexity:
+          added: تمت إضافة سياسة تعقيد كلمة المرور
+          changed: تمت إزالة سياسة تعقيد كلمة المرور
+      privacy:
+        added: تمت إضافة سياسة الخصوصية
+        changed: تم تغيير سياسة الخصوصية
+      security:
+        set: تم تعيين سياسة الأمان
+
+    removed: تمت إزالة المثيل
+    secret:
+      generator:
+        added: تمت إضافة مولد الأسرار
+        changed: تم تغيير مولد الأسرار
+        removed: تمت إزالة مولد الأسرار
+    sms:
+      configtwilio:
+        activated: تم تفعيل تكوين Twilio SMS
+        added: تمت إضافة تكوين Twilio SMS
+        changed: تم تغيير تكوين Twilio SMS
+        deactivated: تم تعطيل تكوين Twilio SMS
+        removed: تمت إزالة تكوين Twilio SMS
+        token:
+          changed: تم تغيير رمز تكوين Twilio SMS
+    smtp:
+      config:
+        added: تمت إضافة تكوين SMTP
+        changed: تم تغيير تكوين SMTP
+        activated: تم تفعيل تكوين SMTP
+        deactivated: تم تعطيل تكوين SMTP
+        password:
+          changed: تم تغيير كلمة مرور تكوين SMTP
+        removed: تمت إزالة تكوين SMTP
+  user_schema:
+    created: تم إنشاء مخطط المستخدم
+    updated: تم تحديث مخطط المستخدم
+    deactivated: تم تعطيل مخطط المستخدم
+    reactivated: تمت إعادة تفعيل مخطط المستخدم
+    deleted: تم حذف مخطط المستخدم
+    user:
+      created: تم إنشاء المستخدم
+      updated: تم تحديث المستخدم
+      deleted: تم حذف المستخدم
+      email:
+        updated: تم تغيير عنوان البريد الإلكتروني
+        verified: تم التحقق من عنوان البريد الإلكتروني
+        verification:
+          failed: فشل التحقق من عنوان البريد الإلكتروني
+        code:
+          added: تم إنشاء رمز التحقق من البريد الإلكتروني
+          sent: تم إرسال رمز التحقق من البريد الإلكتروني
+      phone:
+        updated: تم تغيير رقم الهاتف
+        verified: تم التحقق من رقم الهاتف
+        verification:
+          failed: فشل التحقق من رقم الهاتف
+        code:
+          added: تم إنشاء رمز التحقق من رقم الهاتف
+          sent: تم إرسال رمز التحقق من رقم الهاتف
+  web_key:
+    added: تمت إضافة مفتاح الويب
+    activated: تم تفعيل مفتاح الويب
+    deactivated: تم تعطيل مفتاح الويب
+    removed: تمت إزالة مفتاح الويب
+
+Application:
+  OIDC:
+    UnsupportedVersion: إصدار OIDC الخاص بك غير مدعوم
+    V1:
+      NotCompliant: التكوين الخاص بك غير متوافق ويختلف عن معيار OIDC 1.0.
+      NoRedirectUris: يجب تسجيل عنوان uri واحد على الأقل لإعادة التوجيه.
+      NotAllCombinationsAreAllowed: التكوين متوافق، ولكن ليست كل التوليفات الممكنة مسموحاً بها.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: نوع المنح "code" يسمح فقط بعناوين uri لإعادة التوجيه http لنوع التطبيق "web".
+          CustomOnlyForNative: نوع المنح "code" يسمح فقط بعناوين uri لإعادة التوجيه المخصصة لنوع التطبيق "native" (مثل appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: نوع المنح الضمني (implicit) لا يسمح بعناوين uri لإعادة التوجيه المخصصة
+          HttpNotAllowed: نوع المنح الضمني (implicit) لا يسمح بعناوين uri لإعادة التوجيه http
+          HttpLocalhostOnlyForNative: عنوان uri لإعادة التوجيه Http://localhost مسموح به فقط للتطبيقات الأصلية (native).
+      Native:
+        AuthMethodType:
+          NotNone: التطبيقات الأصلية يجب أن يكون لديها authmethodtype none.
+        RedirectUris:
+          MustBeHttpLocalhost: عناوين URI لإعادة التوجيه يجب أن تبدأ بالبروتوكول الخاص بك، http://127.0.0.1، http://[::1] أو http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: تطبيق وكيل المستخدم يجب أن يكون لديه authmethodtype none.
+      GrantType:
+        Refresh:
+          NoAuthCode: رمز التحديث مسموح به فقط بالاشتراك مع رمز التفويض.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: غير محدد
+      ExternalAuthentication: مصادقة خارجية
+      CustomiseToken: استكمال الرمز
+      InternalAuthentication: مصادقة داخلية
+      CustomizeSAMLResponse: استكمال استجابة SAML
+  TriggerType:
+    Unspecified: غير محدد
+    PostAuthentication: بعد المصادقة
+    PreCreation: قبل الإنشاء
+    PostCreation: بعد الإنشاء
+    PreUserinfoCreation: قبل إنشاء Userinfo
+    PreAccessTokenCreation: قبل إنشاء رمز الوصول
+    PreSAMLResponseCreation: قبل إنشاء استجابة SAML
