@@ -1,5 +1,33 @@
 [
   {
+    "version": "v4.7",
+    "label": "v4.7",
+    "type": "external",
+    "url": "/docs/v4.7",
+    "target": "https://docs-git-v47x-zitadel.vercel.app/docs"
+  },
+  {
+    "version": "v4.6",
+    "label": "v4.6",
+    "type": "external",
+    "url": "/docs/v4.6",
+    "target": "https://docs-git-v46x-zitadel.vercel.app/docs"
+  },
+  {
+    "version": "v4.5",
+    "label": "v4.5",
+    "type": "external",
+    "url": "/docs/v4.5",
+    "target": "https://docs-git-v45x-zitadel.vercel.app/docs"
+  },
+  {
+    "version": "v4.4",
+    "label": "v4.4",
+    "type": "external",
+    "url": "/docs/v4.4",
+    "target": "https://docs-git-v44x-zitadel.vercel.app/docs"
+  },
+  {
     "version": "v4",
     "label": "v4 (Legacy)",
     "type": "external",
