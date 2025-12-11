@@ -561,6 +561,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 				Code:             code,
 				Expiry:           expiry,
 				GeneratorID:      "generator-id",
+				CodeReturned:     true,
 			},
 			wantEvent: session.NewOTPSMSChallengedEvent(ctx,
 				&session.NewAggregate("session-id", "instance-id").Aggregate,
@@ -895,15 +896,14 @@ func assertOTPSMSChallengeChange(t *testing.T, expectedChallengeOTPSMS *domain.S
 		assert.Equal(t, expectedChallengeOTPSMS.CodeReturned, challenge.CodeReturned)
 		assert.Equal(t, expectedChallengeOTPSMS.GeneratorID, challenge.GeneratorID)
 		return database.NewChanges(
-			// todo
-			//database.NewChange(
-			//	database.NewColumn("zitadel.sessions", "otpsms_challenge_code"), challenge.Code,
-			//),
 			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otpsms_challenge_expiry"), challenge.Expiry,
+				database.NewColumn("zitadel.sessions", "otp_sms_challenge_code"), challenge.Code.Crypted,
 			),
 			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otpsms_challenge_code_returned"), challenge.CodeReturned,
+				database.NewColumn("zitadel.sessions", "otp_sms_challenge_expiry"), challenge.Expiry,
+			),
+			database.NewChange(
+				database.NewColumn("zitadel.sessions", "otp_sms_challenge_code_returned"), challenge.CodeReturned,
 			),
 		)
 	}

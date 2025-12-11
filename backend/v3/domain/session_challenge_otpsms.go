@@ -16,7 +16,7 @@ import (
 var _ Commander = (*OTPSMSChallengeCommand)(nil)
 var _ Transactional = (*OTPSMSChallengeCommand)(nil)
 
-type newPhoneCodeFunc func(g crypto.Generator) (*crypto.CryptoValue, string, error)
+type newOTPCodeFunc func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 
 // todo: to be implemented
 // getActiveSMSProviderFn helps determine whether to generate an internal OTP code or use an external SMS provider.
@@ -32,7 +32,7 @@ type OTPSMSChallengeCommand struct {
 	defaultSecretGeneratorConfig *crypto.GeneratorConfig
 	otpAlg                       crypto.EncryptionAlgorithm
 	smsProvider                  getActiveSMSProviderFn
-	newPhoneCode                 newPhoneCodeFunc
+	newPhoneCode                 newOTPCodeFunc
 
 	Session *Session
 	User    *User
@@ -49,7 +49,7 @@ func NewOTPSMSChallengeCommand(
 	secretGeneratorConfig *crypto.GeneratorConfig,
 	otpAlgorithm crypto.EncryptionAlgorithm,
 	smsProvider getActiveSMSProviderFn,
-	newPhoneCodeFn newPhoneCodeFunc) *OTPSMSChallengeCommand {
+	newPhoneCodeFn newOTPCodeFunc) *OTPSMSChallengeCommand {
 
 	if secretGeneratorConfig == nil {
 		secretGeneratorConfig = otpSMSSecretGeneratorConfig
@@ -132,12 +132,14 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 	}
 
 	// generate phone code
-	code, plain, generatorID, expiry, err := o.createPhoneCode(ctx)
+	code, plain, generatorID, expiry, err := o.createPhoneCode(ctx, opts)
 	if err != nil {
 		return err
 	}
+
+	o.OTPSMSChallenge = new(string)
 	if o.RequestChallengeOTPSMS.ReturnCode {
-		o.OTPSMSChallenge = &plain
+		*o.OTPSMSChallenge = plain
 	}
 
 	// update the session with the otp sms challenge
@@ -175,7 +177,7 @@ func (o *OTPSMSChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) (
 			&session.NewAggregate(o.sessionID, o.instanceID).Aggregate,
 			o.ChallengeOTPSMS.Code,
 			o.ChallengeOTPSMS.Expiry,
-			o.RequestChallengeOTPSMS.ReturnCode,
+			o.ChallengeOTPSMS.CodeReturned,
 			o.ChallengeOTPSMS.GeneratorID,
 		),
 	}, nil
@@ -191,7 +193,7 @@ func (o *OTPSMSChallengeCommand) RequiresTransaction() {}
 
 // createPhoneCode generates an OTP code or retrieves the external provider ID if an external SMS provider is active.
 // In the case of an external provider, the code generation is skipped (e.g., when using Twilio verification API).
-func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context) (code *crypto.CryptoValue, plain string, externalID string, expiry time.Duration, err error) {
+func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context, opts *InvokeOpts) (code *crypto.CryptoValue, plain string, externalID string, expiry time.Duration, err error) {
 	externalID, err = o.smsProvider(ctx, o.instanceID)
 	if err != nil {
 		return nil, "", "", expiry, err
@@ -199,12 +201,49 @@ func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context) (code *cry
 	if externalID != "" {
 		return nil, "", externalID, expiry, nil
 	}
-	// todo: retrieval of config from DB - use the DB config if available, otherwise use default config
-	// lookup internal/command/crypto.go:encryptedCodeGenerator
-	codeGenerator := crypto.NewEncryptionGenerator(*o.defaultSecretGeneratorConfig, o.otpAlg)
+
+	config, err := getOTPSMSCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig)
+	if err != nil {
+		return nil, "", "", expiry, err
+	}
+	codeGenerator := crypto.NewEncryptionGenerator(*config, o.otpAlg)
 	crypted, plain, err := o.newPhoneCode(codeGenerator)
 	if err != nil {
 		return nil, "", "", expiry, err
 	}
-	return crypted, plain, "", o.defaultSecretGeneratorConfig.Expiry, nil
+	return crypted, plain, "", config.Expiry, nil
+}
+
+func getOTPSMSCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
+	settingsRepo := opts.secretGeneratorSettingsRepo
+	cfg, err := settingsRepo.Get(
+		ctx,
+		opts.DB(),
+		database.WithCondition(
+			database.And(
+				settingsRepo.InstanceIDCondition(instanceID),
+				database.NewTextCondition( // todo: check TypeCondition
+					settingsRepo.TypeColumn(),
+					database.TextOperationEqual,
+					SettingTypeSecretGenerator.String(),
+				),
+			),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Settings.State != SettingStateActive || cfg.OTPSMS == nil {
+		return defaultConfig, nil
+	}
+
+	return &crypto.GeneratorConfig{
+		Length:              *cfg.OTPSMS.Length,
+		Expiry:              *cfg.OTPSMS.Expiry,
+		IncludeLowerLetters: *cfg.OTPSMS.IncludeLowerLetters,
+		IncludeUpperLetters: *cfg.OTPSMS.IncludeUpperLetters,
+		IncludeDigits:       *cfg.OTPSMS.IncludeDigits,
+		IncludeSymbols:      *cfg.OTPSMS.IncludeSymbols,
+	}, nil
 }
