@@ -462,7 +462,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 		return nil, nil, 0, err
 	}
 
-	_, token := domain.GetTokenByKeyID(tokens, credential.ID)
+	token := domain.GetTokenByKeyID(tokens, credential.ID)
 	if token == nil {
 		return nil, nil, 0, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
 	}

@@ -13,6 +13,8 @@ const (
 	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
+//go:generate mockgen -typed -package cryptomock -destination ./mock/crypto.mock.go . EncryptionAlgorithm
+
 type EncryptionAlgorithm interface {
 	Algorithm() string
 	EncryptionKeyID() string

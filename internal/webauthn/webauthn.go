@@ -181,6 +181,30 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	return credential, nil
 }
 
+func (w *Config) FinishLoginWithNewDomainModel(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
+	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credentials))
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion could not be parsed")
+		return nil, zerrors.ThrowInternal(err, "WEBAU-ytJJmg", "Errors.User.WebAuthN.ValidateLoginFailed")
+	}
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, assertionData.Response.CollectedClientData.Origin)
+	if err != nil {
+		return nil, err
+	}
+
+	credential, err := webAuthNServer.ValidateLogin(user, sessionData, assertionData)
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion failed")
+		return nil, zerrors.ThrowInternal(err, "WEBAU-zHfUKX", "Errors.User.WebAuthN.ValidateLoginFailed")
+	}
+
+	if credential.Authenticator.CloneWarning {
+		return credential, zerrors.ThrowInternal(nil, "WEBAU-eDG7kQ", "Errors.User.WebAuthN.CloneWarning")
+	}
+
+	return credential, nil
+}
+
 func (w *Config) serverFromContext(ctx context.Context, id, origin string) (*webauthn.WebAuthn, error) {
 	config := w.config(id, origin)
 	if id == "" {
