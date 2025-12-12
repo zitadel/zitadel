@@ -142,10 +142,11 @@ export async function registerPasskeyLink(
       },
     });
 
-    createdSession = await createSessionAndUpdateCookie({
+    const result = await createSessionAndUpdateCookie({
       checks,
       requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
     });
+    createdSession = result.session;
 
     if (!createdSession) {
       return { error: "Could not create session" };

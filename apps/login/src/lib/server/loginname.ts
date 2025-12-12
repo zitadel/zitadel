@@ -7,7 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceConfig } from "../service-url";
 import {
@@ -80,6 +80,26 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   if (users.length === 0) {
     console.log("No users found, will proceed with org discovery");
   }
+
+  const handleUserNotFound = (currentLoginSettings: LoginSettings | undefined, organization: string | undefined) => {
+    if (currentLoginSettings?.ignoreUnknownUsernames) {
+      console.log("ignoreUnknownUsernames is true, redirecting to password");
+      const paramsPasswordDefault = new URLSearchParams({
+        loginName: command.loginName,
+      });
+
+      if (command.requestId) {
+        paramsPasswordDefault.append("requestId", command.requestId);
+      }
+
+      if (organization) {
+        paramsPasswordDefault.append("organization", organization);
+      }
+
+      return { redirect: "/password?" + paramsPasswordDefault };
+    }
+    return { error: t("errors.userNotFound") };
+  };
 
   const redirectUserToIDP = async (userId?: string, organization?: string) => {
     // If userId is provided, check for user-specific IDP links first
@@ -214,39 +234,42 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname) {
-        return { error: t("errors.userNotFound") };
+        return handleUserNotFound(userLoginSettings, command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
-        return { error: t("errors.userNotFound") };
+        return handleUserNotFound(userLoginSettings, command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
-        return { error: t("errors.userNotFound") };
+        return handleUserNotFound(userLoginSettings, command.organization);
       }
     }
 
-    const checks = create(ChecksSchema, {
-      user: { search: { case: "userId", value: userId } },
-    });
+    let session;
+    if (!userLoginSettings?.ignoreUnknownUsernames) {
+      const checks = create(ChecksSchema, {
+        user: { search: { case: "userId", value: userId } },
+      });
 
-    const sessionOrError = await createSessionAndUpdateCookie({
-      checks,
-      requestId: command.requestId,
-    }).catch((error) => {
-      if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
-        return { error: t("errors.userNotActive") };
+      const sessionOrError = await createSessionAndUpdateCookie({
+        checks,
+        requestId: command.requestId,
+      }).catch((error) => {
+        if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+          return { error: t("errors.userNotActive") };
+        }
+        throw error;
+      });
+
+      if ("error" in sessionOrError) {
+        return sessionOrError;
       }
-      throw error;
-    });
 
-    if ("error" in sessionOrError) {
-      return sessionOrError;
+      session = sessionOrError.session;
     }
 
-    const session = sessionOrError;
-
-    if (!session.factors?.user?.id) {
+    if (session && !session.factors?.user?.id) {
       return { error: t("errors.couldNotCreateSession") };
     }
 
@@ -256,14 +279,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // Resolve organization from command or session
-    const organization = command.organization ?? session.factors?.user?.organizationId;
+    const organization = command.organization ?? session?.factors?.user?.organizationId ?? user.details?.resourceOwner;
 
-    const methods = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors?.user?.id });
+    const methods = await listAuthenticationMethodTypes({
+      serviceConfig,
+      userId: session?.factors?.user?.id ?? userId,
+    });
 
     // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       const params = new URLSearchParams({
-        loginName: session.factors?.user?.loginName as string,
+        loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
         invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
       });
@@ -296,7 +322,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPassword = new URLSearchParams({
-            loginName: session.factors?.user?.loginName,
+            loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           });
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
@@ -321,7 +347,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPasskey = new URLSearchParams({
-            loginName: session.factors?.user?.loginName,
+            loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           });
           if (command.requestId) {
             paramsPasskey.append("requestId", command.requestId);
@@ -346,7 +372,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // prefer passkey in favor of other methods
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
         const passkeyParams = new URLSearchParams({
-          loginName: session.factors?.user?.loginName,
+          loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowUsernamePassword}`, // show alternative password option only if allowed
         });
 
@@ -371,7 +397,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
-          loginName: session.factors?.user?.loginName,
+          loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
         });
 
         if (command.requestId) {
@@ -428,7 +454,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return resp;
     }
     console.log("IDP redirect failed, returning user not found");
-    return { error: t("errors.userNotFound") };
+
+    return handleUserNotFound(effectiveLoginSettings, discoveredOrganization);
   } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowUsernamePassword) {
     console.log("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
@@ -453,23 +480,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  if (effectiveLoginSettings?.ignoreUnknownUsernames) {
-    console.log("ignoreUnknownUsernames is true, redirecting to password");
-    const paramsPasswordDefault = new URLSearchParams({
-      loginName: command.loginName,
-    });
-
-    if (command.requestId) {
-      paramsPasswordDefault.append("requestId", command.requestId);
-    }
-
-    if (discoveredOrganization) {
-      paramsPasswordDefault.append("organization", discoveredOrganization);
-    }
-
-    return { redirect: "/password?" + paramsPasswordDefault };
-  }
-
-  console.log("no valid registration option found, returning user not found");
-  return { error: t("errors.userNotFound") };
+  return handleUserNotFound(effectiveLoginSettings, discoveredOrganization);
 }

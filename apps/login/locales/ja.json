@@ -80,6 +80,10 @@
         "newPassword": "新しいパスワードを入力してください！",
         "confirmPassword": "必須項目です"
       }
+    },
+    "errors": {
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

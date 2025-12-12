@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Could not load session",
       "couldNotLoadAuthMethods": "Could not load auth methods",
       "failedPrecondition": "Failed precondition",
-      "sessionNotValid": "Session is not valid"
+      "sessionNotValid": "Session is not valid",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

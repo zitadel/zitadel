@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Oturum yüklenemedi",
       "couldNotLoadAuthMethods": "Kimlik doğrulama yöntemleri yüklenemedi",
       "failedPrecondition": "Ön koşul başarısız",
-      "sessionNotValid": "Oturum geçerli değil"
+      "sessionNotValid": "Oturum geçerli değil",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

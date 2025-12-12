@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Не удалось загрузить сессию",
       "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
       "failedPrecondition": "Нарушено предварительное условие",
-      "sessionNotValid": "Сессия недействительна"
+      "sessionNotValid": "Сессия недействительна",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

@@ -195,7 +195,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
     test("should redirect to verify when user has no authentication methods", async () => {
@@ -338,6 +338,27 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+      });
+
+      test("should NOT create session when ignoreUnknownUsernames is true", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: true,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
       });
     });
 
@@ -646,6 +667,48 @@ describe("sendLoginname", () => {
       // Verify org discovery was NOT called since org was provided
       expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
+
+    test("should redirect to password when ignoreUnknownUsernames is true, allowRegister is true, but allowUsernamePassword is false (User not found)", async () => {
+      mockSearchUsers.mockResolvedValue({ result: [] });
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: false,
+        ignoreUnknownUsernames: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true, user found but rejected due to disableLoginWithEmail", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" }, phone: { phone: "123456" } } },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithEmail: true,
+        ignoreUnknownUsernames: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
   });
 
   describe("Edge cases", () => {
@@ -661,7 +724,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({ factors: {} }); // No user in session
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: { factors: {} }, sessionCookie: {} }); // No user in session
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -692,7 +755,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -723,7 +786,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });

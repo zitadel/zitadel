@@ -14,12 +14,12 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { ConnectError, create, Duration } from "@zitadel/client";
+import { ConnectError, create, Duration, timestampDate } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -104,11 +104,13 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
       try {
-        session = await createSessionAndUpdateCookie({
+        const result = await createSessionAndUpdateCookie({
           checks,
           requestId: command.requestId,
           lifetime: loginSettings?.passwordCheckLifetime,
         });
+        session = result.session;
+        sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
@@ -130,11 +132,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
-      return { error: "Could not verify password" };
+      return { error: t("errors.couldNotVerifyPassword") };
     }
-
-    // this is a fake error message to hide that the user does not even exist
-    return { error: t("errors.couldNotVerifyPassword") };
   } else {
     loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
 
@@ -408,8 +407,38 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
 
+  const mfaFactors = authmethods.authMethodTypes.filter(
+    (m) =>
+      m === AuthenticationMethodType.TOTP ||
+      m === AuthenticationMethodType.OTP_SMS ||
+      m === AuthenticationMethodType.OTP_EMAIL ||
+      m === AuthenticationMethodType.U2F,
+  );
+
+  const hasMfa = mfaFactors.length > 0;
+  const mfaVerified =
+    !!session.factors?.totp?.verifiedAt ||
+    !!session.factors?.otpSms?.verifiedAt ||
+    !!session.factors?.otpEmail?.verifiedAt ||
+    !!session.factors?.webAuthN?.verifiedAt;
+
+  // check if the password factor is set and not older than 5 minutes
+  const passwordVerifiedAt = session.factors?.password?.verifiedAt;
+  if (!passwordVerifiedAt) {
+    return { error: t("errors.passwordVerificationMissing") };
+  }
+
+  const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
+  const now = new Date();
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+  if (passwordVerifiedDate < fiveMinutesAgo) {
+    return { error: t("errors.passwordVerificationTooOld") };
+  }
+
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa) {
+  // also if the user has MFA but it is not verified, we use the service account
+  if (forceMfa || (hasMfa && !mfaVerified)) {
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceConfig, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
