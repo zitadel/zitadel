@@ -54,7 +54,6 @@ async function cleanOpenApi() {
             }
           ];
           await fs.writeFile(file, yaml.dump(doc, { noRefs: true }));
-          console.log(`Added servers block to ${file}`);
           // Re-read content for the next step
         }
       } catch (e) {
@@ -72,7 +71,6 @@ async function cleanOpenApi() {
     
     if (lines.length !== newLines.length) {
         await fs.writeFile(file, newLines.join('\n'));
-        console.log(`Cleaned ${file}`);
     }
   }
 }
