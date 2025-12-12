@@ -231,7 +231,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       noSessionResponse.headers.set("Content-Security-Policy", cspImages);
 
       if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
         noSessionResponse.headers.set(
           "Content-Security-Policy",
           `${cspImages} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
@@ -270,7 +269,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       callbackResponse.headers.set("Content-Security-Policy", cspImages);
 
       if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
         callbackResponse.headers.set(
           "Content-Security-Policy",
           `${cspImages} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
