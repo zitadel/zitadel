@@ -17,6 +17,12 @@ type Change interface {
 	IsOnColumn(col Column) bool
 }
 
+// NoChange can be implemented by Changes that might not result in any actual change,
+// resp. when the change has no set statement, e.g. [CTEChange] with no change function.
+type NoChange interface {
+	NoChange() bool
+}
+
 type change[V Value] struct {
 	column Column
 	value  V
@@ -88,14 +94,22 @@ func (c Changes) IsOnColumn(col Column) bool {
 }
 
 // Write implements [Change].
-func (m Changes) Write(builder *StatementBuilder) error {
-	for i, change := range m {
-		if i > 0 {
+func (c Changes) Write(builder *StatementBuilder) error {
+	var hadChanges bool
+	for _, change := range c {
+		ch, ok := change.(NoChange)
+		hasChanges := !ok || !ch.NoChange()
+		// if the previous change actually wrote a change to the builder
+		// and this change has changes, add a comma
+		if hadChanges && hasChanges {
 			builder.WriteString(", ")
 		}
-		err := change.Write(builder)
-		if err != nil {
+		if err := change.Write(builder); err != nil {
 			return err
+		}
+		// if the change had changes, mark that we had changes for the next iteration
+		if hasChanges {
+			hadChanges = hasChanges
 		}
 	}
 	return nil
@@ -121,6 +135,21 @@ func (c Changes) Matches(x any) bool {
 // String implements [gomock.Matcher].
 func (c Changes) String() string {
 	return "database.Changes"
+}
+
+// NoChange implements [NoChange].
+// It returns false if any of the changes writes to the builder.
+func (c Changes) NoChange() bool {
+	for _, change := range c {
+		no, ok := change.(NoChange)
+		if !ok {
+			return false
+		}
+		if no.NoChange() {
+			return true
+		}
+	}
+	return true
 }
 
 var _ Change = Changes(nil)
@@ -319,7 +348,7 @@ func (c *cteChange) Matches(x any) bool {
 	return slices.Equal(expectedCTEBuilder.Args(), actualCTEBuilder.Args())
 }
 
-// Name implements [CTEChange].
+// SetName implements [CTEChange].
 func (c *cteChange) SetName(name string) {
 	c.name = name
 }
@@ -341,4 +370,10 @@ func (c *cteChange) Write(builder *StatementBuilder) error {
 // WriteCTE implements [CTEChange].
 func (c *cteChange) WriteCTE(builder *StatementBuilder) {
 	c.cte(builder)
+}
+
+// NoChange implements [NoChange].
+// It returns true if there is no change function defined.
+func (c *cteChange) NoChange() bool {
+	return c.change == nil
 }
