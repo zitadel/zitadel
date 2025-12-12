@@ -257,13 +257,19 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
-		columns, err := u.sessionColumnsActivate(event,
-			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
-		)
+		userAgent, err := agentIDFromSession(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+			},
+			[]handler.Condition{
+				handler.NewCond(view_model.UserSessionKeyUserAgentID, userAgent),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+			}), nil
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
 		columns, err := u.sessionColumnsActivate(event,
