@@ -36,15 +36,63 @@
         "build"
       ]
     },
-    "generate": {
+    "generate-buf": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate",
+        "command": "pnpm generate:buf",
         "cwd": "docs"
       },
       "outputs": [
-        "{projectRoot}/openapi",
+        "{projectRoot}/openapi"
+      ]
+    },
+    "clean-openapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm clean:openapi",
+        "cwd": "docs"
+      },
+      "dependsOn": [
+        "generate-buf"
+      ],
+      "outputs": [
+        "{projectRoot}/openapi"
+      ]
+    },
+    "generate-openapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:openapi",
+        "cwd": "docs"
+      },
+      "outputs": [
         "{projectRoot}/content/docs/references/api"
+      ],
+      "dependsOn": [
+        "clean-openapi"
+      ]
+    },
+    "generate-source": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec fumadocs-mdx",
+        "cwd": "docs"
+      },
+      "outputs": [
+        "{projectRoot}/.source"
+      ],
+      "dependsOn": [
+        "generate-openapi"
+      ]
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Generation complete'",
+        "cwd": "docs"
+      },
+      "dependsOn": [
+        "generate-source"
       ]
     },
     "check-links": {
