@@ -108,7 +108,8 @@ func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Eve
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
 		}
-		_, err := repository.InstanceRepository().Delete(ctx, v3_sql.SQLTx(tx), e.Aggregate().ID)
+		instanceRepo := repository.InstanceRepository()
+		_, err := instanceRepo.Delete(ctx, v3_sql.SQLTx(tx), instanceRepo.PrimaryKeyCondition(e.Aggregate().ID))
 		return err
 	}), nil
 }
@@ -178,7 +179,7 @@ func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore
 }
 
 func (p *instanceRelationalProjection) updateInstance(ctx context.Context, tx database.Transaction, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
-	_, err := repo.Update(ctx, tx, event.Aggregate().ID, changes...)
+	_, err := repo.Update(ctx, tx, repo.PrimaryKeyCondition(event.Aggregate().ID), changes...)
 	if err != nil {
 		return err
 	}
@@ -193,7 +194,7 @@ func (p *instanceRelationalProjection) updateInstance(ctx context.Context, tx da
 	// we need to split the update into two statements because multiple events can have the same creation date
 	// therefore we first do not set the updated_at timestamp
 	_, err = repo.Update(ctx, tx,
-		event.Aggregate().ID,
+		repo.PrimaryKeyCondition(event.Aggregate().ID),
 		repo.SetUpdatedAt(event.CreatedAt()),
 	)
 	return err

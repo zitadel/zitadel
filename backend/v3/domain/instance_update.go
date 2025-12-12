@@ -44,7 +44,7 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 	updateCount, err := instanceRepo.Update(
 		ctx,
 		opts.DB(),
-		u.ID,
+		instanceRepo.PrimaryKeyCondition(u.ID),
 		database.NewChange(instanceRepo.NameColumn(), u.Name),
 	)
 	if err != nil {

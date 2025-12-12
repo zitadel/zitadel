@@ -56,7 +56,7 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	d.InstanceName = instanceToDelete.Name
 
-	deletedRows, err := instanceRepo.Delete(ctx, opts.DB(), instanceToDelete.ID)
+	deletedRows, err := instanceRepo.Delete(ctx, opts.DB(), instanceRepo.PrimaryKeyCondition(instanceToDelete.ID))
 	if err != nil {
 		return err
 	}
