@@ -2,6 +2,7 @@
   "name": "@zitadel/docs",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "pnpm sync-versions && next build",
     "sync-versions": "node scripts/sync-versions.mjs",
@@ -12,6 +13,7 @@
     "clean:openapi": "tsx scripts/clean-openapi.mts",
     "generate": "pnpm generate:buf && pnpm clean:openapi && pnpm generate:openapi",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "check-links": "tsx scripts/lint.mts",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint"
   },
@@ -46,6 +48,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.0.8",
+    "next-validate-link": "^1.6.3",
     "postcss": "^8.5.6",
     "raw-loader": "^4.0.2",
     "remark-heading-id": "^1.0.1",

@@ -6,7 +6,7 @@ import { Transition } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Buffer } from "buffer";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import CopyToClipboard from "react-copy-to-clipboard";
 import BrowserOnly from "./docusaurus/browser-only";
 
 const LinkButton = ({
