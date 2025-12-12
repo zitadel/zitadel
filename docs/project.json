@@ -5,41 +5,57 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "pnpm generate",
-          "next build"
-        ],
-        "parallel": false,
+        "command": "pnpm build",
         "cwd": "docs"
       },
       "outputs": [
         "{projectRoot}/.next"
+      ],
+      "dependsOn": [
+        "^build",
+        "check-links"
       ]
     },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "pnpm generate",
-          "next dev"
-        ],
-        "parallel": false,
+        "command": "next dev",
         "cwd": "docs"
-      }
+      },
+      "dependsOn": [
+        "generate"
+      ]
     },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next start",
         "cwd": "docs"
-      }
+      },
+      "dependsOn": [
+        "build"
+      ]
     },
     "generate": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm generate",
         "cwd": "docs"
-      }
+      },
+      "outputs": [
+        "{projectRoot}/openapi",
+        "{projectRoot}/content/docs/references/api"
+      ]
+    },
+    "check-links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm check-links",
+        "cwd": "docs"
+      },
+      "dependsOn": [
+        "generate"
+      ]
     },
     "lint": {
       "executor": "nx:run-commands",

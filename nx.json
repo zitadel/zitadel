@@ -32,6 +32,12 @@
       ],
       "cache": true
     },
+    "check-links": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
     "test": {
       "inputs": [
         "default"
