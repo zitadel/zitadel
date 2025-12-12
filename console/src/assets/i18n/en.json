@@ -634,6 +634,11 @@
         "AWAIT_RESPONSE": "Await Response",
         "AWAIT_RESPONSE_DESCRIPTION": "We'll Wait for a response before we do anything else. Useful if you intend to use multiple targets for a single action"
       },
+      "SIGNING_KEY": {
+        "TITLE": "Signing Key Generated",
+        "DESCRIPTION": "Your target has been created successfully. Here is your signing key that you'll need to authenticate requests from Zitadel:",
+        "WARNING": "Important: This signing key will only be displayed once. Please copy it now and store it securely. You will not be able to retrieve it again."
+      },
       "TABLE": {
         "NAME": "Name",
         "ENDPOINT": "Endpoint",
