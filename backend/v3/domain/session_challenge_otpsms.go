@@ -234,7 +234,7 @@ func getOTPSMSCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID s
 		return nil, zerrors.ThrowInternal(err, "DOM-kAcM0U", "failed to get OTP SMS secret generator config")
 	}
 
-	if cfg.Settings.State != SettingStateActive || cfg.OTPSMS == nil {
+	if cfg.State != SettingStateActive || cfg.OTPSMS == nil {
 		return defaultConfig, nil
 	}
 

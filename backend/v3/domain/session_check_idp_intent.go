@@ -20,7 +20,7 @@ type IDPIntentCheckCommand struct {
 	instanceID string
 	encAlgo    crypto.EncryptionAlgorithm
 
-	fetchedUser     User
+	//fetchedUser     User // todo: commenting it out to please the linter
 	isCheckComplete bool
 }
 

@@ -250,7 +250,7 @@ func getOTPEmailCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "DOM-x7Yd3E", "failed to get OTP email secret generator config")
 	}
-	if cfg.Settings.State != SettingStateActive || cfg.OTPEmail == nil {
+	if cfg.State != SettingStateActive || cfg.OTPEmail == nil {
 		return defaultConfig, nil
 	}
 	return &crypto.GeneratorConfig{
