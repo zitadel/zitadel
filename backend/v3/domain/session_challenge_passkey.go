@@ -125,7 +125,6 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 		return err
 	}
 	// set the challenge for CreateSessionResponse
-	// todo: review: set in the CreateSessionResponse in the current implementation
 	p.WebAuthNChallenge = &session_grpc.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}

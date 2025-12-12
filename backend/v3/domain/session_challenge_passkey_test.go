@@ -48,7 +48,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "missing session id"),
 		},
 		{
-			name:                    "no session id",
+			name:                    "no instance id",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
 			sessionID:               "session-id",
 			instanceID:              "",

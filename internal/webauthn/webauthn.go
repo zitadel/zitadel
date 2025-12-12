@@ -169,8 +169,6 @@ func (w *Config) BeginWebAuthNLogin(ctx context.Context, user webauthn.User, rpI
 	if err != nil {
 		return nil, nil, "", zerrors.ThrowInternal(err, "WEBAU-2M0s9", "Errors.User.WebAuthN.MarshalError")
 	}
-	// todo: do we need to explicitly return webAuthNServer.Config.RPID?
-	// I see when the rpID is empty, it's obtained from the context. Is that why?
 	return sessionData, cred, webAuthNServer.Config.RPID, nil
 }
 

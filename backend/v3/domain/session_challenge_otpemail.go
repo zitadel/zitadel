@@ -32,7 +32,7 @@ type OTPEmailChallengeCommand struct {
 	Session *Session
 	User    *User
 
-	ChallengeOTPEmail *SessionChallengeOTPEmail // the generated OTP SMS challenge that is stored in the session.
+	ChallengeOTPEmail *SessionChallengeOTPEmail // the generated OTP Email challenge that is stored in the session.
 	OTPEmailChallenge *string                   // challenge to be set in the CreateSessionResponse
 }
 
@@ -45,7 +45,7 @@ func NewOTPEmailChallengeCommand(
 	newEmailCodeFn newOTPCodeFunc) *OTPEmailChallengeCommand {
 
 	if secretGeneratorConfig == nil {
-		secretGeneratorConfig = otpSMSSecretGeneratorConfig
+		secretGeneratorConfig = otpEmailSecretGeneratorConfig
 	}
 	if otpAlgorithm == nil {
 		otpAlgorithm = mfaEncryptionAlgo
@@ -160,7 +160,6 @@ func (o *OTPEmailChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts
 // prepareOTPEmailChallenge generates the OTP email challenge based on the delivery type in the request.
 func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context, opts *InvokeOpts) error {
 	// generate email code
-	// todo: when do we set the default config?
 	config, err := getOTPEmailCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig)
 	if err != nil {
 		return err

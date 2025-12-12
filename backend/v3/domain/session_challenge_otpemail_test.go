@@ -39,7 +39,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 		wantSession         *domain.Session
 	}{
 		{
-			name:                "no request otpsms challenge",
+			name:                "no request otp email challenge",
 			requestChallengeOTP: nil,
 			wantErr:             nil,
 		},

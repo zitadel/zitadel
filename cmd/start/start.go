@@ -201,6 +201,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	new_domain.SetMFAEncryptionAlgorithm(keys.OTP)
 	new_domain.SetOTPEncryptionAlgorithm(keys.User)
 	new_domain.SetOTPSMSSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPSMS)
+	new_domain.SetOTPEmailSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPEmail)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
