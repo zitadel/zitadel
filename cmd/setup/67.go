@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -18,7 +19,17 @@ type SyncMemberRoleFields struct {
 }
 
 func (mig *SyncMemberRoleFields) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, syncMemberRoleFields)
+	var exists bool
+	err := mig.dbClient.QueryRowContext(
+		ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&exists)
+		},
+		"SELECT EXISTS(SELECT FROM pg_catalog.pg_tables WHERE schemaname = 'projections' and tablename = 'instance_members4')")
+	if err != nil || !exists {
+		return err
+	}
+	_, err = mig.dbClient.ExecContext(ctx, syncMemberRoleFields)
 	return err
 }
 
