@@ -301,10 +301,11 @@ func (db *CRDB) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) st
 	}
 
 	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC`
+		return ` ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id`
 	}
-	return ` ORDER BY "position", in_tx_order`
+	return ` ORDER BY "position", in_tx_order, instance_id, aggregate_type, aggregate_id`
 }
+
 
 func (db *CRDB) eventQuery(useV1 bool) string {
 	if useV1 {
