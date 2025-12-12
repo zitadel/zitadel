@@ -1133,6 +1133,18 @@ func secretGeneratorSettingsRepo(state domain.SettingState) func(ctrl *gomock.Co
 							},
 						},
 					},
+					OTPSMS: &domain.OTPSMSAttributes{
+						SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
+							Expiry: gu.Ptr(30 * time.Minute),
+							SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
+								Length:              gu.Ptr(uint(6)),
+								IncludeLowerLetters: gu.Ptr(true),
+								IncludeUpperLetters: gu.Ptr(false),
+								IncludeDigits:       gu.Ptr(true),
+								IncludeSymbols:      gu.Ptr(false),
+							},
+						},
+					},
 				},
 			}, nil)
 		return repo
