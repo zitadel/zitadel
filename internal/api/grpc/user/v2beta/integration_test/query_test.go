@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"errors"
 	"slices"
 	"testing"
 	"time"
@@ -15,7 +14,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -28,55 +26,6 @@ func detailsV2ToV2beta(obj *object.Details) *object_v2beta.Details {
 		ChangeDate:    obj.GetChangeDate(),
 		ResourceOwner: obj.GetResourceOwner(),
 	}
-}
-
-var (
-	permissionCheckV2SetFlagInital bool
-	permissionCheckV2SetFlag       bool
-)
-
-type permissionCheckV2SettingsStruct struct {
-	TestNamePrependString string
-	SetFlag               bool
-}
-
-var permissionCheckV2Settings []permissionCheckV2SettingsStruct = []permissionCheckV2SettingsStruct{
-	{
-		SetFlag:               false,
-		TestNamePrependString: "permission_check_v2 IS NOT SET" + " ",
-	},
-	{
-		SetFlag:               true,
-		TestNamePrependString: "permission_check_v2 IS SET" + " ",
-	},
-}
-
-func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
-	if permissionCheckV2SetFlagInital && permissionCheckV2SetFlag == setFlag {
-		return
-	}
-
-	_, err := Instance.Client.FeatureV2.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{
-		PermissionCheckV2: &setFlag,
-	})
-	require.NoError(t, err)
-
-	var flagSet bool
-	for i := 0; !flagSet || i < 6; i++ {
-		res, err := Instance.Client.FeatureV2.GetInstanceFeatures(IamCTX, &feature.GetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-		if res.PermissionCheckV2.Enabled == setFlag {
-			flagSet = true
-			continue
-		}
-		time.Sleep(10 * time.Second)
-	}
-
-	if !flagSet {
-		require.NoError(t, errors.New("unable to set permission_check_v2 flag"))
-	}
-	permissionCheckV2SetFlagInital = true
-	permissionCheckV2SetFlag = setFlag
 }
 
 func TestServer_GetUserByID(t *testing.T) {
@@ -431,11 +380,6 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-
 	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
@@ -1111,7 +1055,6 @@ func TestServer_ListUsers(t *testing.T) {
 				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
-					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1120,7 +1063,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
-					TotalResult: 0,
+					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
@@ -1131,58 +1074,51 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 	}
-	for _, f := range permissionCheckV2Settings {
-		for _, tc := range tt {
-			t.Run(f.TestNamePrependString+tc.name, func(t1 *testing.T) {
-				setPermissionCheckV2Flag(t1, f.SetFlag)
-				infos := tc.args.dep(IamCTX, tc.args.req)
+	for _, tc := range tt {
+		t.Run(tc.name, func(t1 *testing.T) {
+			infos := tc.args.dep(IamCTX, tc.args.req)
 
-				// retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, time.Minute)
-				require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
-					got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
-					if tc.wantErr {
-						require.Error(ttt, err)
-						return
-					}
-					require.NoError(ttt, err)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, time.Minute)
+			require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
+				got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
+				if tc.wantErr {
+					require.Error(ttt, err)
+					return
+				}
+				require.NoError(ttt, err)
 
-					// always only give back dependency infos which are required for the response
-					require.Len(ttt, tc.want.Result, len(infos))
-					// always first check length, otherwise its failed anyway
-					if assert.Len(ttt, got.Result, len(tc.want.Result)) {
-						// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
-						tc.want.Details.TotalResult = got.Details.TotalResult
-
-						// fill in userid and username as it is generated
-						for i := range infos {
-							if tc.want.Result[i] == nil {
-								continue
-							}
-							tc.want.Result[i].UserId = infos[i].UserID
-							tc.want.Result[i].Username = infos[i].Username
-							tc.want.Result[i].PreferredLoginName = infos[i].Username
-							tc.want.Result[i].LoginNames = []string{infos[i].Username}
-							if human := tc.want.Result[i].GetHuman(); human != nil {
-								human.Email.Email = infos[i].Username
-								human.Phone.Phone = infos[i].Phone
-								if tc.want.Result[i].GetHuman().GetPasswordChanged() != nil {
-									human.PasswordChanged = infos[i].Changed
-								}
-							}
-							tc.want.Result[i].Details = detailsV2ToV2beta(infos[i].Details)
+				// always only give back dependency infos which are required for the response
+				require.Len(ttt, tc.want.Result, len(infos))
+				// always first check length, otherwise its failed anyway
+				if assert.Len(ttt, got.Result, len(tc.want.Result)) {
+					// fill in userid and username as it is generated
+					for i := range infos {
+						if tc.want.Result[i] == nil {
+							continue
 						}
-						for i := range tc.want.Result {
-							if tc.want.Result[i] == nil {
-								continue
+						tc.want.Result[i].UserId = infos[i].UserID
+						tc.want.Result[i].Username = infos[i].Username
+						tc.want.Result[i].PreferredLoginName = infos[i].Username
+						tc.want.Result[i].LoginNames = []string{infos[i].Username}
+						if human := tc.want.Result[i].GetHuman(); human != nil {
+							human.Email.Email = infos[i].Username
+							human.Phone.Phone = infos[i].Phone
+							if tc.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+								human.PasswordChanged = infos[i].Changed
 							}
-							assert.EqualExportedValues(ttt, got.Result[i], tc.want.Result[i])
 						}
+						tc.want.Result[i].Details = detailsV2ToV2beta(infos[i].Details)
 					}
-					integration.AssertListDetails(ttt, tc.want, got)
-				}, retryDuration, tick, "timeout waiting for expected user result")
-			})
-		}
+					for i := range tc.want.Result {
+						if tc.want.Result[i] == nil {
+							continue
+						}
+						assert.EqualExportedValues(ttt, got.Result[i], tc.want.Result[i])
+					}
+				}
+				integration.AssertListDetails(ttt, tc.want, got)
+			}, retryDuration, tick, "timeout waiting for expected user result")
+		})
 	}
 }
 
