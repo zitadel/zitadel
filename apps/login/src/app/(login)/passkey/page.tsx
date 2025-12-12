@@ -4,7 +4,7 @@ import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { Metadata } from "next";
@@ -22,20 +22,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { loginName, altPassword, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
+    ? await loadSessionById(serviceConfig.baseUrl, sessionId, organization)
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
       });
 
   async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
+    return getSession({ serviceConfig, sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session) {
@@ -44,9 +40,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
   return (
