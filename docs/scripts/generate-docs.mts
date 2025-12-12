@@ -3,6 +3,15 @@ import { createOpenAPI } from 'fumadocs-openapi/server';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
+// Suppress "Generated: ..." logs to avoid Vercel log limits
+const originalLog = console.log;
+console.log = (...args) => {
+  if (args.length > 0 && typeof args[0] === 'string' && args[0].startsWith('Generated: ')) {
+    return;
+  }
+  originalLog(...args);
+};
+
 const services = [
   'action',
   'application',
