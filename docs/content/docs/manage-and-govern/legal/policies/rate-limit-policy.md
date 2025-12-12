@@ -8,7 +8,7 @@ custom_edit_url: null
 
 Last updated on February 24, 2025
 
-This policy is an annex to the [Terms of Service](../terms-of-service) and clarifies your obligations while using our Services, specifically how we will use rate limiting to enforce certain aspects of our [Acceptable Use Policy](acceptable-use-policy).
+This policy is an annex to the [Terms of Service](../terms-of-service) and clarifies your obligations while using our Services, specifically how we will use rate limiting to enforce certain aspects of our [Acceptable Use Policy](./acceptable-use-policy).
 
 ## Why do we rate limit
 

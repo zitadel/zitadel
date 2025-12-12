@@ -11,9 +11,9 @@ For these tasks we either provide an user interface, or the tasks can be initiat
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
 - `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Managers` are users with a [special manager role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
+- `Managers` are users with a [special manager role](../../manage-and-govern/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
 
-All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization).
+All self-service interfaces are available in different [languages](/docs/manage-and-govern/customize/texts#internationalization).
 
 <Callout type="info" title="ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).">
 
@@ -70,12 +70,12 @@ Given an external identity provider is configured on the instance or on the orga
 ### Machines
 
 Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
-Read more about [Service Users](/guides/integrate/service-users/authenticate-service-users) and recommended [OpenID Connect Flows](/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
+Read more about [Service Users](/docs/build-and-integrate/service-users/authenticate-service-users) and recommended [OpenID Connect Flows](/docs/build-and-integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
 
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client can also implement this, by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
+A client can also implement this, by calling the [specific endpoint](/docs/references/openidoauth/endpoints#end-session-endpoint).
 
 ## Profile
 
@@ -137,7 +137,7 @@ Thus we will explain service for two very common scenarios in ZITADEL:
 - `Managers in isolation`: Granting administrative permissions within a single organization context.
 - `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
 
-A list of [Manager Roles](../../guides/manage/console/managers#roles) is available with a description of permissions.
+A list of [Manager Roles](../../manage-and-govern/console/managers#roles) is available with a description of permissions.
 Managers can be assigned to both human users and service users eg, for managing certain tasks programmatically.
 
 ### Managers in isolation
@@ -147,7 +147,7 @@ This could be permission to assign authorizations within this isolated organizat
 
 ### Managers in delegation
 
-In a setup like described in the [B2B Scenario](/guides/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
+In a setup like described in the [B2B Scenario](/docs/build-and-integrate/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
 The project is granted to the customer organization, such that the customer can access the project and assign authorization to their users.
 
 Given such as setup the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.

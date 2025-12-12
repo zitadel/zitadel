@@ -13,7 +13,7 @@ This is useful for triggering workflows based on API responses in ZITADEL. You c
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
+- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/manage-and-govern/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
 <Callout type="info" title="Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.">
@@ -32,7 +32,7 @@ To test the actions feature, you need to create a target that will be called whe
 You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
 For this example, we will use a simple Go HTTP server that will return the request with added metadata.
 
-<Callout type="info" title="The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).">
+<Callout type="info" title="The signature of the received request can be checked, [please refer to the example for more information on how to](/docs/build-and-integrate/actions/testing-request-signature).">
 
 </Callout>
 
@@ -298,4 +298,4 @@ the [Sent information Response](./usage#sent-information-response) payload descr
 
 You have successfully set up a target and execution to manipulate API responses in your ZITADEL instance.
 This feature can now be used to add necessary information for clients including the new login UI.
-Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).
+Find more information about the actions feature in the [API documentation](/docs/concepts/features/actions_v2).

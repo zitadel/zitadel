@@ -86,7 +86,7 @@ Developers can customize elements such as logos, colors, and messaging to ensure
 <Callout type="info" title="Customization and Branding">
 The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
 
-By default, the displayed branding is defined [based on the user's domain](/docs/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+By default, the displayed branding is defined [based on the user's domain](/docs/build-and-integrate/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 
 </Callout>
 
@@ -97,7 +97,7 @@ In case a user has used multiple accounts, for example, a private account and a 
 Users can still login with a different user that is not on the list.
 This allows users to quickly switch between users and provide a better user experience.
 
-<Callout type="info" title="This behavior can be changed with the authorization request. Please refer to our [guide](/guides/integrate/login/oidc/login-users).">
+<Callout type="info" title="This behavior can be changed with the authorization request. Please refer to our [guide](/docs/build-and-integrate/login/oidc/login-users).">
 
 </Callout>
 
@@ -119,7 +119,7 @@ Unauthenticated users can request a password reset after providing the loginname
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](/concepts/structure/policies#login-policy) is set
+- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy) is set
 - Requested by the client
 - A multi-factor is set up for the user
 

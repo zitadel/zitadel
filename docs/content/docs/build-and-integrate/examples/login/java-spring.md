@@ -23,7 +23,7 @@ Select the **Web** application type and continue.
 
 ![Create app in console](/img/java-spring/app-create.png)
 
-We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all applications.
+We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/references/openidoauth/grant-types#proof-key-for-code-exchange) for all applications.
 
 ![Create app in console - set auth method](/img/java-spring/app-create-auth.png)
 

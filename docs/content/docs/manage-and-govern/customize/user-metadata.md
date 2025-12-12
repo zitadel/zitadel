@@ -27,11 +27,11 @@ You can do so by using [Console](../console/users) or [setting user metadata](/d
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/build-and-integrate/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout type="info" title="Getting a token">
 In case you want to test out different settings configure an application with code flow (PKCE).
-Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/references/openidoauth/endpoints#token_endpoint).
+Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/references/openidoauth/endpoints#token-endpoint).
 You will find more information in our guides on how to [authenticate users](/docs/build-and-integrate/login/oidc/login-users).
 
 </Callout>
@@ -44,13 +44,13 @@ In case you want to manage metadata for other users than the currently logged in
 
 ### Request metadata from userinfo endpoint
 
-With the access token we can make a request to the [userinfo endpoint](/docs/references/openidoauth/endpoints#introspection_endpoint) to get the user's metadata.
+With the access token we can make a request to the [userinfo endpoint](/docs/references/openidoauth/endpoints#introspection-endpoint) to get the user's metadata.
 This method is the preferred method to retrieve a user's information in combination with opaque tokens, to insure that the token is valid.
 
 You must pass the [reserved scope](/docs/references/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:user:metadata` in your authentication request.
 If you don't include this scope the response will contain user data, but not the metadata object.
 
-Request the user information by calling the [userinfo endpoint](/docs/references/openidoauth/endpoints#introspection_endpoint):
+Request the user information by calling the [userinfo endpoint](/docs/references/openidoauth/endpoints#introspection-endpoint):
 
 ```bash
 curl --request GET \
@@ -157,7 +157,7 @@ You can use the authentication service to request and search for the user's meta
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/references/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/build-and-integrate/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout type="info" title="Invalid audience">
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.

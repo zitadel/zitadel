@@ -15,4 +15,4 @@ Currently, the following restrictions are available:
   - Custom Texts can be created for disallowed languages as long as ZITADEL supports that language. Therefore, all texts can be customized before allowing a language.
 
 Feature restrictions for an instance are intended to be configured by a user that is managed within that instance.
-However, if you are self-hosting and need to control your virtual instances usage, [read about the APIs for limits and quotas](/self-hosting/manage/usage_control) that are intended to be used by system users.
+However, if you are self-hosting and need to control your virtual instances usage, [read about the APIs for limits and quotas](/docs/operate-and-self-host/manage/usage_control) that are intended to be used by system users.

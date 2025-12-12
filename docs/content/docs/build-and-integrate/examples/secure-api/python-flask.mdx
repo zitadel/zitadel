@@ -11,7 +11,7 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
-The API will validate the access token on the [introspect endpoint](/docs/references/openidoauth/endpoints#introspection_endpoint) and will receive the user's roles from ZITADEL.
+The API will validate the access token on the [introspect endpoint](/docs/references/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from ZITADEL.
 
 The API application uses [Client Secret Basic](/docs/references/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.

@@ -13,7 +13,7 @@ This is useful for integrating with other systems or for triggering workflows ba
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
+- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/manage-and-govern/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
 <Callout type="info" title="Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.">
@@ -27,7 +27,7 @@ To test the actions feature, you need to create a target that will be called whe
 You will need to implement a listener that can receive HTTP requests and process the events.
 For this example, we will use a simple Go HTTP server that will print the received events to standard output.
 
-<Callout type="info" title="The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).">
+<Callout type="info" title="The signature of the received request can be checked, [please refer to the example for more information on how to](/docs/build-and-integrate/actions/testing-request-signature).">
 
 </Callout>
 
@@ -195,4 +195,4 @@ The event_payload is base64 encoded and has the following content:
 
 You have successfully set up a target and execution to react to events in your ZITADEL instance.
 This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on events in ZITADEL.
-Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).
+Find more information about the actions feature in the [API documentation](/docs/concepts/features/actions_v2).

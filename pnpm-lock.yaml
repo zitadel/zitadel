@@ -551,6 +551,9 @@ importers:
       eslint-config-next:
         specifier: 16.0.8
         version: 16.0.8(@typescript-eslint/parser@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      glob:
+        specifier: ^11.0.3
+        version: 11.0.3
       next-validate-link:
         specifier: ^1.6.3
         version: 1.6.3

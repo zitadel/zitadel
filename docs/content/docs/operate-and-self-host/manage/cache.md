@@ -164,7 +164,7 @@ All HTTP and gRPC requests sent to ZITADEL receive an instance context. The inst
 - Instance [features](/docs/manage-and-govern/console/default-settings#features)
 - Custom domains: generated and [custom](/docs/manage-and-govern/cloud/instances#add-custom-domain)
 - [Trusted domains](/docs/references/resources/admin/admin-service-add-instance-trusted-domain)
-- Security settings ([IFrame policy](/docs/guides/solution-scenarios/configurations#embedding-zitadel-in-an-iframe))
+- Security settings ([IFrame policy](/docs/build-and-integrate/solution-scenarios/configurations#embedding-zitadel-in-an-iframe))
 - Limits[^2]
 - [Allowed languages](/docs/manage-and-govern/console/default-settings#languages)
 

@@ -6,7 +6,7 @@ The ZITADEL console is a web-based interface designed to facilitate the manageme
 It serves as a central hub where administrators can perform various tasks related to identity and access management within their organization's infrastructure.
 
 The console is available by navigating to the [custom domain](/docs/concepts/features/custom-domain) of your instance and appending the path `/ui/console`.
-Administrators can [restrict end-users from accessing the console](/docs/guides/solution-scenarios/restrict-console).
+Administrators can [restrict end-users from accessing the console](/docs/build-and-integrate/solution-scenarios/restrict-console).
 
 Here's an overview of what the console enables users to do:
 
@@ -29,4 +29,4 @@ Overall, the ZITADEL console serves as a comprehensive tool for administrators t
 Notes:
 
 - Detailed guide on [using the console](/docs/manage-and-govern/console/overview)
-- [Restrict access](/docs/guides/solution-scenarios/restrict-console) to the console
+- [Restrict access](/docs/build-and-integrate/solution-scenarios/restrict-console) to the console

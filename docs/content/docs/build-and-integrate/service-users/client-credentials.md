@@ -5,9 +5,9 @@ title: Configure client credential authentication for service users
 
 
 
-This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/concepts/structure/users) and client applications within ZITADEL.
+This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/docs/concepts/structure/users) and client applications within ZITADEL.
 
-In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](../service-users/authenticate-service-users).
+In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](./authenticate-service-users) as alternative to the [JWT profile authentication](../service-users/authenticate-service-users).
 
 ## Steps to authenticate a Service User with client credentials
 
@@ -44,7 +44,7 @@ curl --request POST \
 
 * `CUSTOM_DOMAIN` should be set to your [custom domain](/docs/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
+* `scope` should contain any [Scopes](/docs/references/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
 * `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/docs/references/openidoauth/authn-methods)
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.

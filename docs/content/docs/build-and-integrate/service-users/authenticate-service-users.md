@@ -8,7 +8,7 @@ This guide explains ZITADEL service users and their role in facilitating secure 
 
 Service users in ZITADEL represent **non-human entities** within your system.
 They are ideal for scenarios involving secure communication between applications, particularly when interacting with backend services or APIs.
-Service users in combination with [Manager](/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
+Service users in combination with [Manager](/docs/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
 Unlike regular human users, service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
 
 ## Benefits of using Service Users
@@ -97,7 +97,7 @@ However, PATs also come with limitations:
 
 ## Using Service Users
 
-1. **Creation:** Access the ZITADEL management console and create a new service user. Assign a descriptive name that reflects its purpose. Follow our detailed guide on [how to create service users](../../manage/console/users).
+1. **Creation:** Access the ZITADEL management console and create a new service user. Assign a descriptive name that reflects its purpose. Follow our detailed guide on [how to create service users](/docs/manage-and-govern/console/users).
 2. **Credentials:** Choose your preferred authentication method (JWT or Client Credentials) and securely store the generated credentials (private key, client secret).
 3. **Making API Calls:** When your service needs to make an API call:
     * **For JWT:** Generate and sign a JWT. Include it in the "Authorization" header of your API request.
@@ -107,9 +107,9 @@ However, PATs also come with limitations:
 
 We have guides for the different authentication methods:
 
-- [Private key JWT authentication](private-key-jwt)
-- [Client credential authentication](client-credentials)
-- [Personal access token authentication](personal-access-token)
+- [Private key JWT authentication](./private-key-jwt)
+- [Client credential authentication](./client-credentials)
+- [Personal access token authentication](./personal-access-token)
 
 ## Important considerations
 

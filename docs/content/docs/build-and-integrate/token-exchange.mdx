@@ -318,7 +318,7 @@ This gives the following response:
 }
 ```
 
-As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/docs/references/openidoauth/endpoints#introspection_endpoint) call with the access token. Note we use the credentials of the API here:
+As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/docs/references/openidoauth/endpoints#introspection-endpoint) call with the access token. Note we use the credentials of the API here:
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/introspect' \

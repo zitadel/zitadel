@@ -376,7 +376,7 @@ To ensure the integrity of request content, each call includes a 'ZITADEL-Signat
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/action-service-create-target),
 and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-update-target).
 
-For an example on how to check the signature, [refer to the example](/guides/integrate/actions/testing-request-signature).
+For an example on how to check the signature, [refer to the example](/docs/build-and-integrate/actions/testing-request-signature).
 
 ## Execution
 
@@ -472,7 +472,7 @@ For event there are 3 levels the condition can be defined:
 - Group, handling a specific group of events
 - All, handling any event in ZITADEL
 
-The concept of events can be found under [Events](/concepts/architecture/software#events)
+The concept of events can be found under [Events](/docs/concepts/architecture/software#events)
 
 ### Error forwarding
 

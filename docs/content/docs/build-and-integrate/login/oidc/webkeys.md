@@ -15,7 +15,7 @@ Private keys are used to sign tokens.
 Public keys are used to verify tokens.
 OIDC clients need the public key to verify ID tokens.
 OAuth2 API apps might need the public key if they want to client-side verification of a
-JWT access tokens, instead of [introspection](/docs/references/openidoauth/endpoints#introspection_endpoint).
+JWT access tokens, instead of [introspection](/docs/references/openidoauth/endpoints#introspection-endpoint).
 ZITADEL uses public key verification when API calls are made or when the userInfo or introspection
 endpoints are called with a JWT access token.
 

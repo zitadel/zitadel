@@ -40,9 +40,9 @@ The http server is responsible for the following functions:
 
 The API layer consist of the multiple APIs provided by Zitadel. Each serves a dedicated purpose.
 All APIs of Zitadel are always available as gRCP, gRPC-web and REST service. 
-The only exception is the [OpenID Connect & OAuth](/apis/openidoauth/endpoints) and [Asset API](/apis/introduction#assets) due their unique nature.
+The only exception is the [OpenID Connect & OAuth](/docs/references/openidoauth/endpoints) and [Asset API](/apis/introduction#assets) due their unique nature.
 
-- [OpenID Connect & OAuth](/apis/openidoauth/endpoints) - allows to request authentication and authorization of Zitadel
+- [OpenID Connect & OAuth](/docs/references/openidoauth/endpoints) - allows to request authentication and authorization of Zitadel
 - [SAML](/apis/saml/endpoints) - allows to request authentication and authorization of Zitadel through the SAML standard
 - [Authentication API](/apis/introduction#authentication) - allow a user to do operation in its own context
 - [Management API](/apis/introduction#management) - allows an admin or machine to manage the Zitadel resources on an organization level

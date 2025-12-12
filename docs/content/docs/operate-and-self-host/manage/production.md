@@ -145,7 +145,7 @@ Database:
 ```
 
 
-You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
+You also might want to configure how [projections](/docs/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
@@ -203,7 +203,7 @@ please refer to the corresponding docs [for PostgreSQL](https://www.postgresql.o
 ## Data initialization
 
 - You can configure instance defaults in the DefaultInstance section.
-  If you plan to eventually create [multiple virtual instances](/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
+  If you plan to eventually create [multiple virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
   Also, these configurations apply to the first instance, that ZITADEL automatically creates for you.
   Especially the following properties are of special interest for your production setup.
 
@@ -229,15 +229,15 @@ DefaultInstance:
     ReplyToAddress:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
-- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
-- Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
-- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform-provider).
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/operate-and-self-host/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
+- Learn how to configure ZITADEL via the [Console user interface](/docs/manage-and-govern/console/overview).
+- Probably, you also want to [apply your custom branding](/docs/manage-and-govern/customize/branding), [hook into certain events](/docs/manage-and-govern/customize/behavior), [customize texts](/docs/manage-and-govern/customize/texts) or [add metadata to your users](/docs/manage-and-govern/customize/user-metadata).
+- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/manage-and-govern/terraform-provider).
 
 ## Limits and Quotas
 
 If you host ZITADEL as a service,
-you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/usage_control).
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/docs/operate-and-self-host/manage/usage_control).
 
 ## Minimum system requirements
 

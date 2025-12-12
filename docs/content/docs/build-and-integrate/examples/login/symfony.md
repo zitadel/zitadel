@@ -50,7 +50,7 @@ Next you will need to provide some information about your app.
 
 In your Project, add a new application at the top of the page.
 Select Web application type and continue.
-We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Symfony application.
+We use [Authorization Code](/docs/references/openidoauth/grant-types#authorization-code)for our Symfony application.
 
 ![Create app in console](/img/symfony/app-create.png)
 

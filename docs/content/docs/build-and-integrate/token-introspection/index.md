@@ -28,7 +28,7 @@ Read the introduction on how to [authenticate service users](../service-users/au
 
 ## Further references
 
-- [Introspection API reference](/docs/references/openidoauth/endpoints#token_endpoint)
+- [Introspection API reference](/docs/references/openidoauth/endpoints#token-endpoint)
 - [JWT vs. opaque tokens](/docs/concepts/knowledge/opaque-tokens.md)
 - [Python examples for securing an API and invoking it as a service user](https://github.com/zitadel/examples-api-access-and-token-introspection)
 

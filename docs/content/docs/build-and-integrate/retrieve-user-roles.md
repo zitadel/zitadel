@@ -67,7 +67,7 @@ And you can also use the same to access the ZITADEL APIs.
 If you need user roles returned from the userinfo endpoint, you must select the **’Assert Roles on Authentication’** checkbox in your project under general settings. 
 
 <img
-    src="/docs/img/guides/integrate/retrieve-user-roles-1.png"
+    src="/docs/img/guides/retrieve-user-roles-1.png"
     width="75%"
     alt="Assert Roles on Authentication"
 />
@@ -75,7 +75,7 @@ If you need user roles returned from the userinfo endpoint, you must select the 
 If you need them included in your ID Token, select **’User Roles Inside ID Token’** in application settings. This has to be set in your applications as this is dependent on your application type. Navigate to your application and select this setting.
 
 <img
-    src="/docs/img/guides/integrate/retrieve-user-roles-2.png"
+    src="/docs/img/guides/retrieve-user-roles-2.png"
     width="75%"
     alt="Assert Roles on Authentication"
 />

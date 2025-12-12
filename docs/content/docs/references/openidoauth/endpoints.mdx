@@ -24,7 +24,7 @@ This would give us `${CUSTOM_DOMAIN}/.well-known/openid-configuration`.
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-## authorization_endpoint
+## Authorization Endpoint
 
 `${CUSTOM_DOMAIN}/oauth/v2/authorize`
 
@@ -63,7 +63,7 @@ authenticate the user in exchange for an authorization_code (authorization code 
 <Callout type="info" title="Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued,">
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`.
 
-Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or [introspection_endpoint](#introspection_endpoint) the retrieve these claims
+Send the access_token to the [userinfo_endpoint](#userinfo-endpoint) or [introspection_endpoint](#introspection-endpoint) the retrieve these claims
 or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
 
 </Callout>
@@ -178,7 +178,7 @@ the error will be display directly to the user on the auth server
 | interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction. |
 | login_required            | The authorization server requires end-user authentication. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user authentication.                   |
 
-## token_endpoint
+## Token Endpoint
 
 `${CUSTOM_DOMAIN}/oauth/v2/token`
 
@@ -478,7 +478,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | invalid_grant          | The provided authorization grant (e.g., authorization code, resource owner credentials) or refresh token is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.                |
 | invalid_client         | Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method).                                                                                                                                |
 
-## introspection_endpoint
+## Introspection Endpoint
 
 `${CUSTOM_DOMAIN}/oauth/v2/introspect`
 
@@ -561,7 +561,7 @@ Check the [Claims](claims) page if a specific claims might be returned and for d
 
 If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
-## userinfo_endpoint
+## Userinfo Endpoint
 
 `${CUSTOM_DOMAIN}/oidc/v1/userinfo`
 
@@ -584,7 +584,7 @@ Check the [Claims](claims) page if a specific claims might be returned and for d
 
 If the token is invalid or expired, an HTTP 401 will be returned.
 
-## revocation_endpoint
+## Revocation Endpoint
 
 `${CUSTOM_DOMAIN}/oauth/v2/revoke`
 
@@ -656,7 +656,7 @@ curl --request POST \
 </Tab>
 </Tabs>
 
-## end_session_endpoint
+## End Session Endpoint
 
 `${CUSTOM_DOMAIN}/oidc/v1/end_session`
 
@@ -683,7 +683,7 @@ If neither an `id_token_hint` nor a `client_id` parameter is provided, the `post
 `${CUSTOM_DOMAIN}/oauth/v2/keys`
 
 The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
-The alternative would be to validate tokens with the [introspection endpoint](#introspection_endpoint).
+The alternative would be to validate tokens with the [introspection endpoint](#introspection-endpoint).
 
 ### Key rotation
 

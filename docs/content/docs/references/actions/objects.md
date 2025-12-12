@@ -111,7 +111,7 @@ title: Objects
 
 ## Auth Request
 
-This object contains context information about the request to the [authorization endpoint](/docs/references/openidoauth/endpoints#authorization_endpoint).
+This object contains context information about the request to the [authorization endpoint](/docs/references/openidoauth/endpoints#authorization-endpoint).
 
 - `id` *string*
 - `agentId` *string*
@@ -182,7 +182,7 @@ This object represents [the claims](../openidoauth/claims) which will be written
 - `email_verified` *bool*
 - `updated_at` *Number*
 
-Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects#role-settings) and your [application](../../guides/manage/console/applications#token-settings)
+Additionally there could additional fields depending on the configuration of your [project](../../manage-and-govern/console/projects#role-settings) and your [application](../../manage-and-govern/console/applications#token-settings)
 
 ## user grant list
 
@@ -194,7 +194,7 @@ This object represents a list of user grant stored in ZITADEL.
 - `grants` Array of
   - `id` *string*
   - `projectGrantId` *string*  
-    The id of the [project grant](/docs/guides/solution-scenarios/saas#project-grant)
+    The id of the [project grant](/docs/build-and-integrate/solution-scenarios/saas#project-grant)
   - `state` *Number*  
     <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: removed</li></ul>
   - `creationDate` *Date*

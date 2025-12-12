@@ -10,17 +10,17 @@ status: stable
 
 ## Overview
 
-[Fastify](https://fastify.dev) is a fast and low overhead web framework for Node.js, designed for building efficient server-side applications. This example demonstrates how to integrate **[ZITADEL](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
+[Fastify](https://fastify.dev) is a fast and low overhead web framework for Node.js, designed for building efficient server-side applications. This example demonstrates how to integrate **[ZITADEL](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](/docs/build-and-integrate/login/oidc/oauth-recommended-flows)** to authenticate users securely and maintain sessions across your application.
 
 #### Auth library
 
-This example uses **[@mridang/fastify-auth](https://www.npmjs.com/package/@mridang/fastify-auth)**, a [Fastify](https://fastify.dev) plugin that wraps **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js). The underlying [@auth/core](https://authjs.dev) library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/references/openidoauth/endpoints) flow, manages [PKCE](/docs/concepts/pkce), performs secure token exchange, and provides session management helpers. This integration leverages the **[@auth/core/providers/zitadel](https://authjs.dev/reference/core/providers/zitadel)** provider specifically designed for ZITADEL authentication.
+This example uses **[@mridang/fastify-auth](https://www.npmjs.com/package/@mridang/fastify-auth)**, a [Fastify](https://fastify.dev) plugin that wraps **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js). The underlying [@auth/core](https://authjs.dev) library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/references/openidoauth/endpoints) flow, manages [PKCE](/docs/build-and-integrate/login/oidc/oauth-recommended-flows), performs secure token exchange, and provides session management helpers. This integration leverages the **[@auth/core/providers/zitadel](https://authjs.dev/reference/core/providers/zitadel)** provider specifically designed for ZITADEL authentication.
 
 ---
 
 ## What this example demonstrates
 
-This example shows a complete authentication implementation using [Fastify](https://fastify.dev) with [server-side rendering](https://fastify.dev) via [@fastify/view](https://www.npmjs.com/package/@fastify/view) and [Handlebars](https://handlebarsjs.com) templates. The application implements secure user authentication through [ZITADEL](https://zitadel.com/docs) using the industry-standard [PKCE flow](/docs/concepts/pkce), which prevents authorization code interception attacks without requiring client secrets.
+This example shows a complete authentication implementation using [Fastify](https://fastify.dev) with [server-side rendering](https://fastify.dev) via [@fastify/view](https://www.npmjs.com/package/@fastify/view) and [Handlebars](https://handlebarsjs.com) templates. The application implements secure user authentication through [ZITADEL](https://zitadel.com/docs) using the industry-standard [PKCE flow](/docs/build-and-integrate/login/oidc/oauth-recommended-flows), which prevents authorization code interception attacks without requiring client secrets.
 
 The example includes a custom sign-in page that initiates the [OAuth 2.0](https://zitadel.com/docs/build-and-integrate/login/oidc/oauth-recommended-flows) authentication flow, automatic [callback handling](https://zitadel.com/docs/build-and-integrate/login/oidc/) with secure [token exchange](https://zitadel.com/docs/references/openidoauth/endpoints), and [JWT-based session management](https://zitadel.com/docs/concepts/tokens) with [@fastify/cookie](https://www.npmjs.com/package/@fastify/cookie). Protected routes use the `requireAuth` middleware to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/references/openidoauth/claims) and [session metadata](https://zitadel.com/docs/concepts/tokens).
 
@@ -32,10 +32,10 @@ The application also demonstrates proper **[federated logout](https://zitadel.co
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/manage-and-govern/console/overview). Follow the **[PKCE Application Setup guide](/docs/build-and-integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/manage-and-govern/console/overview). Follow the **[PKCE Application Setup guide](/docs/manage-and-govern/console/applications)** to:
 
 1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/manage-and-govern/console/projects)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the [PKCE authentication method](/docs/build-and-integrate/login/oidc/oauth-recommended-flows)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000`)
 5. Copy your **Client ID** for use in the next steps
@@ -74,12 +74,12 @@ Once you have your [ZITADEL application](https://zitadel.com/docs/build-and-inte
 ## Learn more and resources
 
 * **ZITADEL documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
-* **PKCE concept:** /docs/concepts/pkce
-* **PKCE application setup:** /docs/build-and-integrate/login/oidc/pkce-setup
+* **PKCE concept:** /docs/build-and-integrate/login/oidc/oauth-recommended-flows
+* **PKCE application setup:** /docs/manage-and-govern/console/applications
 * **Federated logout:** [https://zitadel.com/docs/build-and-integrate/login/oidc/logout](https://zitadel.com/docs/build-and-integrate/login/oidc/logout)
 * **OIDC integration guide:** [https://zitadel.com/docs/build-and-integrate/login/oidc/](https://zitadel.com/docs/build-and-integrate/login/oidc/)
 * **Fastify documentation:** https://fastify.dev
 * **Auth.js (Auth/Core):** https://www.npmjs.com/package/@auth/core
 * **Fastify Auth plugin:** https://www.npmjs.com/package/@mridang/fastify-auth
 * **Example repository:** https://github.com/zitadel/example-auth-fastify
-* **All framework examples:** /docs/examples
+* **All framework examples:** /docs/build-and-integrate/sdk-examples/introduction

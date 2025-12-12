@@ -17,10 +17,10 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
-* [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Descriptions**](./service-description/) - How we provide services to yo
-* [**Policies**](./policies/) - Policies that apply for use of our services
-* [**Enterprise Agreement**](./annex-support-services/) - Annex for Enterprise Agreement and Support Services
+* [**Data Processing Agreement**](./data-processing-agreement) - How we process personal data on behalf of you
+* [**Service Descriptions**](./service-description/cloud-service-description) - How we provide services to yo
+* [**Policies**](./policies/acceptable-use-policy) - Policies that apply for use of our services
+* [**Enterprise Agreement**](./annex-support-services) - Annex for Enterprise Agreement and Support Services
 
 The outlined policies complement these terms of service.
 When accepting the TOS, you accept these policies.
@@ -90,7 +90,7 @@ Portions of our services, i.e. software components, may also be beyond our influ
 
 ### Inclusion of third parties
 
-We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](subprocessors), and our [Data Processing Agreement](data-processing-agreement) for more information.
+We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](./subprocessors), and our [Data Processing Agreement](data-processing-agreement) for more information.
 
 ## Your obligations
 
@@ -185,7 +185,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](./subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 

@@ -31,7 +31,7 @@ The base URL for the SCIM endpoint in Zitadel is: `https://${CUSTOM_DOMAIN}/scim
 ## Authentication
 
 The SCIM interface adheres to Zitadel's standard API authentication methods.
-For detailed instructions on authenticating with the SCIM interface, refer to the [Authenticate Service Users Guide](/guides/integrate/service-users/authenticate-service-users).
+For detailed instructions on authenticating with the SCIM interface, refer to the [Authenticate Service Users Guide](/docs/build-and-integrate/service-users/authenticate-service-users).
 
 ## Query
 
@@ -849,7 +849,7 @@ which aids pinpointing the source of the error in the system.
 
 ## Resources
 
-- **[Zitadel SCIM Documentation](/guides/manage/user/scim2)**: Documentation of Zitadel's SCIM implementation, including configuration details and known limitations.
+- **[Zitadel SCIM Documentation](/docs/manage-and-govern/user/scim2)**: Documentation of Zitadel's SCIM implementation, including configuration details and known limitations.
 - **[SCIM](https://scim.cloud/)**: The Webpage of SCIM.
 - **[RFC7643](https://tools.ietf.org/html/rfc7643) Core Schema**:
   The Core Schema provides a platform-neutral schema and extension model for representing users and groups.

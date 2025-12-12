@@ -9,7 +9,7 @@ This guide demonstrates how developers can leverage private key JWT authenticati
 
 In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 
-Read more about the [different authentication methods for service users](authenticate-service-users) and their benefits, drawbacks, and security considerations.
+Read more about the [different authentication methods for service users](./authenticate-service-users) and their benefits, drawbacks, and security considerations.
 
 #### How private key JWT authentication works
 
@@ -102,11 +102,11 @@ Payload
 
 * `iss` represents the requesting party, i.e. the owner of the private key. In this case the value of `userId` from the downloaded JSON.
 * `sub` represents the application. Set the value also to the value of `userId`
-* `aud` must be your [Custom Domain](../../../concepts/features/custom-domain)
+* `aud` must be your [Custom Domain](/docs/concepts/features/custom-domain)
 * `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
 * `exp` is the unix timestamp of expiry of this assertion
 
-Please refer to [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference for further information.
+Please refer to [JWT with private key](/docs/references/openidoauth/authn-methods#jwt-with-private-key) API reference for further information.
 
 If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded JSON.
 There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
@@ -159,7 +159,7 @@ curl --request POST \
 ```
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`.
+* `scope` should contain any [Scopes](/docs/references/openidoauth/scopes) you want to include, but must include `openid`.
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
@@ -219,6 +219,6 @@ By following these steps and adhering to security best practices, you can effect
 
 ## Notes
 
-* [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference
+* [JWT with private key](/docs/references/openidoauth/authn-methods#jwt-with-private-key) API reference
 * [Accessing ZITADEL API](../zitadel-apis/access-zitadel-apis)
 * [Token introspection with private key JWT](../token-introspection/private-key-jwt)

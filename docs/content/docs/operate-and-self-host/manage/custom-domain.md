@@ -4,7 +4,7 @@ title: External ZITADEL Access
 
 ## Why do I get an "Instance not found" error?
 
-Also, ZITADEL has the [concept of virtual instances](/concepts/structure/instance#multiple-virtual-instances).
+Also, ZITADEL has the [concept of virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances).
 It uses a requests Host header to determine which virtual instance to use.
 This is useful for multi-tenancy and resource sharing, for example in SaaS scenarios.
 For most cases however, ZITADEL should run on exactly one domain.
@@ -33,7 +33,7 @@ ExternalSecure: true
 ## Changing ExternalDomain, ExternalPort or ExternalSecure
 
 You can change the ExternalDomain, ExternalPort and ExternalSecure configuration options at any time.
-However, for ZITADEL to be able to pick up the changes, [you need to rerun ZITADELs setup phase](/self-hosting/manage/updating_scaling#the-setup-phase).
+However, for ZITADEL to be able to pick up the changes, [you need to rerun ZITADELs setup phase](/docs/operate-and-self-host/manage/updating_scaling#the-setup-phase).
 
 ## Running ZITADEL behind a Reverse Proxy
 
@@ -42,23 +42,23 @@ The proxy must either ensure that
 - the original *Host* header value is assigned to the *Forwarded* headers host directive.
 - the original requests *Host* header value is unchanged by the proxy.
 
-Check out the [reverse proxy configuration examples](/self-hosting/manage/reverseproxy/reverse_proxy) for more information.
+Check out the [reverse proxy configuration examples](/docs/operate-and-self-host/manage/reverseproxy/reverse_proxy) for more information.
 
 ## Organization Domains
 
 Note that by default, you cannot access ZITADEL at an organizations domain.
-Organization level domains [are intended for routing users by their login methods to their correct organization](/guides/solution-scenarios/domain-discovery).
+Organization level domains [are intended for routing users by their login methods to their correct organization](/docs/build-and-integrate/solution-scenarios/domain-discovery).
 
 However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/apis/resources/system/system-service-add-domain#adds-a-domain-to-an-instance).
 Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
 
 ## Generated Subdomains
 
-ZITADEL creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
+ZITADEL creates random subdomains for [each new virtual instance](/docs/concepts/structure/instance#multiple-virtual-instances).
 You can immediately access the ZITADEL Console and APIs using these subdomains without further actions.
 
 ## More Information
 
-- [Check out the production-near loadbalancing example with Traefik](/self-hosting/deploy/loadbalancing-example)
-- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy/reverse_proxy)
+- [Check out the production-near loadbalancing example with Traefik](/docs/operate-and-self-host/deploy/loadbalancing-example)
+- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/docs/operate-and-self-host/manage/reverseproxy/reverse_proxy)
 

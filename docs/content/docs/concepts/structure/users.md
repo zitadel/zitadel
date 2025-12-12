@@ -26,7 +26,7 @@ Learn how to [use service users](/docs/build-and-integrate/service-users/authent
 
 ### Managers
 
-Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
+Any user, human or service user, can be given a [Manager](/docs/concepts/structure/managers) role.
 Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
@@ -45,7 +45,7 @@ These invited users are called external users.
 
 ### Uniqueness of users
 
-Users can only exist within one [organization](/concepts/structure/organizations).
+Users can only exist within one [organization](/docs/concepts/structure/organizations).
 It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
@@ -60,7 +60,7 @@ Consider this general recommendation as a starting point:
 - Structure users in organizations based on common domains that are self-managed (eg, company)
 - Grant your projects to the organizations, allow Managers to give granted roles to their users
 
-You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios/introduction). 
+You might want to adjust this general setup based on your [scenario](/docs/build-and-integrate/solution-scenarios/introduction). 
 
 One important consideration in the setup is that you can only have a domain once for an organization. If you have multiple teams working with the same email address, you might need to add them to one single organization that has the domain verified for the teams' domain.
 
@@ -75,6 +75,6 @@ You can use organization metadata or your own business logic to describe a hiera
 
 ## References
 
-- [Manage users in the Console](../../guides/manage/console/users)
+- [Manage users in the Console](../../manage-and-govern/console/users)
 - [ZITADEL APIs: Users](/docs/references/resources/mgmt/users)
 - [User onboarding and registration](/docs/build-and-integrate/onboarding)

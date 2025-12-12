@@ -5,7 +5,7 @@ title: Configure personal access token authentication for service users
 A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
 At the moment ZITADEL only allows PATs for machine accounts (service users).
 
-It is an alternative to the [private key JWT profile authentication](private-key-jwt) and [client credentials authentication](client-credentials). Read more about that the different [authentication methods for service users](authenticate-service-users).
+It is an alternative to the [private key JWT profile authentication](./private-key-jwt) and [client credentials authentication](./client-credentials). Read more about that the different [authentication methods for service users](./authenticate-service-users).
 
 ## Create a Service User with a PAT
 

@@ -38,25 +38,25 @@ so that everybody can implement their custom behaviour for as many processes as 
 Possible conditions for the Execution:
 - Request, to react to or manipulate requests to ZITADEL, for example add information to newly created users
 - Response, to react to or manipulate responses to ZITADEL, for example to provision newly created users to other systems
-- Function, to react to different functionality in ZITADEL, replaces [Actions](/concepts/features/actions).
+- Function, to react to different functionality in ZITADEL, replaces [Actions](/docs/concepts/features/actions).
 - Event, to create to different events which get created in ZITADEL, for example to inform somebody if a user gets locked
 
-<Callout type="info" title="Currently, the defined Actions v2 will be executed additionally to the defined [Actions](/concepts/features/actions).">
+<Callout type="info" title="Currently, the defined Actions v2 will be executed additionally to the defined [Actions](/docs/concepts/features/actions).">
 
 </Callout>
 
 ## Migration
 
-- [Migrate Actions v1 to Actions v2](/guides/integrate/actions/migrate-from-v1)
+- [Migrate Actions v1 to Actions v2](/docs/build-and-integrate/actions/migrate-from-v1)
 
 ## Further reading
 
-- [Actions v2 reference](/guides/integrate/actions/usage)
-- [Actions v2 example execution for request](/guides/integrate/actions/testing-request)
-- [Actions v2 example execution for request manipulation](/guides/integrate/actions/testing-request-manipulation)
-- [Actions v2 example execution for request signature check](/guides/integrate/actions/testing-request-signature)
-- [Actions v2 example execution for response](/guides/integrate/actions/testing-response)
-- [Actions v2 example execution for response manipulation](/guides/integrate/actions/testing-response-manipulation)
-- [Actions v2 example execution for function](/guides/integrate/actions/testing-function)
-- [Actions v2 example execution for function manipulation](/guides/integrate/actions/testing-function-manipulation)
-- [Actions v2 example execution for event](/guides/integrate/actions/testing-event)
+- [Actions v2 reference](/docs/build-and-integrate/actions/usage)
+- [Actions v2 example execution for request](/docs/build-and-integrate/actions/testing-request)
+- [Actions v2 example execution for request manipulation](/docs/build-and-integrate/actions/testing-request-manipulation)
+- [Actions v2 example execution for request signature check](/docs/build-and-integrate/actions/testing-request-signature)
+- [Actions v2 example execution for response](/docs/build-and-integrate/actions/testing-response)
+- [Actions v2 example execution for response manipulation](/docs/build-and-integrate/actions/testing-response-manipulation)
+- [Actions v2 example execution for function](/docs/build-and-integrate/actions/testing-function)
+- [Actions v2 example execution for function manipulation](/docs/build-and-integrate/actions/testing-function-manipulation)
+- [Actions v2 example execution for event](/docs/build-and-integrate/actions/testing-event)

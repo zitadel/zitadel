@@ -4,7 +4,7 @@ title: ZITADEL with Next.js - A B2B Scenario
 
 This is our ZITADEL [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.
 
-If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](/guides/solution-scenarios/b2b.mdx).
+If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](/docs/build-and-integrate/solution-scenarios/b2b.mdx).
 
 > You can follow along with the template code in our [zitadel-nextjs-b2b](https://github.com/zitadel/zitadel-nextjs-b2b) repo.
 
@@ -134,13 +134,13 @@ Let's call this new organization `Demo-Customer`.
 
 ### Users
 
-Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users#create-user) in this organization.
+Now switch back to the organization `Demo-Customer` and [create a new user](/docs/manage-and-govern/console/users#create-user) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
 ### Manager Role
 
 We want to enable Alice to assign roles to users in her organization in a self-service manner.
-To make this happen, we need give Alice an [Manager Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
+To make this happen, we need give Alice an [Manager Role](/docs/concepts/structure/managers) within the Organization `Demo-Customer`.
 
 Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Manager Role `Org Owner`.
 
@@ -151,7 +151,7 @@ Login with your user on the customer organization to validate the setup.
 ### Organization Grant
 
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
-[Grant all roles of the Project](/guides/manage/console/projects#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
+[Grant all roles of the Project](/docs/manage-and-govern/console/projects#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
 
 ### Authorization
 

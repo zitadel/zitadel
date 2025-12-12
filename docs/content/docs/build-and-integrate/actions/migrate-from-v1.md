@@ -2,7 +2,7 @@
 title: Migrate from Actions v1 to v2
 ---
 
-In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/apis/actions/introduction#available-flow-types).
+In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/docs/references/actions/introduction#available-flow-types).
 
 ## Internal Authentication
 

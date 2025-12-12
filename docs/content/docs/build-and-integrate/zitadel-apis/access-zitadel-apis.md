@@ -11,7 +11,7 @@ This guide explains what ZITADEL APIs are and how to access ZITADEL APIs using a
 
 ZITADEL exposes a variety of APIs that allow you to interact with its functionalities programmatically.
 These APIs are offered through different protocols including gRPC and REST.
-Additionally, ZITADEL provides [SDKs for popular languages](/docs/sdk-examples/introduction) and frameworks to simplify integration.
+Additionally, ZITADEL provides [SDKs for popular languages](/docs/build-and-integrate/sdk-examples/introduction) and frameworks to simplify integration.
 
 Here's a breakdown of some key points about ZITADEL APIs:
 
@@ -76,14 +76,14 @@ There are some different levels for managers.
 - **Project Managers**: At this level, the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
-On each level, we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
+On each level, we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/docs/manage-and-govern/console/managers#roles)
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
 1. Go to the detail page of your organization
 2. Click in the top right corner the "+" button
 3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
+4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/docs/manage-and-govern/console/managers))
 
 ![Add Org Manager](/img/console_org_manager_add.gif)
 
@@ -106,7 +106,7 @@ Follow the steps in this guide to [generate an key file](../service-users/privat
 With the encoded JWT (assertion) from the prior step, you will need to craft a POST request to ZITADEL's token endpoint.
 
 **To access the ZITADEL APIs you need the ZITADEL Project ID in the audience of your token.**
-This is possible by sending a [reserved scope](/apis/openidoauth/scopes) for the audience.
+This is possible by sending a [reserved scope](/docs/references/openidoauth/scopes) for the audience.
 Use the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to include the ZITADEL project id in your audience
 
 A sample request will look like this
@@ -123,7 +123,7 @@ curl --request POST \
 where 
 
 - `grant_type` must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to acces the ZITADEL APIs. For this example include `profile`.
+- `scope` should contain any [Scopes](/docs/references/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to acces the ZITADEL APIs. For this example include `profile`.
 - `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`, `token_type` and time to expiry in seconds as `expires_in`.
@@ -163,7 +163,7 @@ With the ClientId and ClientSecret from the prior step, you will need to craft a
 #### Audience scope
 
 **To access the ZITADEL APIs you need the ZITADEL Project ID in the audience of your token.**
-This is possible by sending a [reserved scope](/apis/openidoauth/scopes) for the audience.
+This is possible by sending a [reserved scope](/docs/references/openidoauth/scopes) for the audience.
 Use the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to include the ZITADEL project id in your audience
 
 In this step we will authenticate a service user and receive an access_token to use against the ZITADEL API.
@@ -195,7 +195,7 @@ curl --request POST \
 where
 
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
+* `scope` should contain any [Scopes](/docs/references/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
   and `urn:zitadel:iam:org:project:id:zitadel:aud`. The latter provides access to the ZITADEL API.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

@@ -45,7 +45,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
         <div>
             <CodeBlock language="bash">
                 {'# Download the configuration files.'}{'\n'}
-                {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/operate-and-self-host/manage/reverseproxy\n'}
+                {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/operate-and-self-host/manage/reverseproxy\n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml --quiet \n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml --quiet \n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfilename}{' -O '}{configfilename}{' --quiet \n'}

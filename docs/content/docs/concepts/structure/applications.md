@@ -1,7 +1,7 @@
 ---
 title: Configure applications for your frontend and backend services and clients
 ---
-import AppType from "../../guides/manage/console/_application-types.mdx";
+import AppType from "../../manage-and-govern/console/_application-types.mdx";
 
 Applications are the entry point to your project.
 [Users](users.md) either login into one of your clients and interact with them directly or use one of your APIs.
@@ -22,5 +22,5 @@ Ensure the configuration of application settings is limited to authorized users 
 
 ## References
 
-- [Configure Applications in the Console](../../guides/manage/console/applications)
+- [Configure Applications in the Console](../../manage-and-govern/console/applications)
 - [ZITADEL API: Applications](/docs/references/resources/mgmt/applications)

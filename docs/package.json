@@ -48,6 +48,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.0.8",
+    "glob": "^11.0.3",
     "next-validate-link": "^1.6.3",
     "postcss": "^8.5.6",
     "raw-loader": "^4.0.2",

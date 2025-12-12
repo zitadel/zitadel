@@ -88,7 +88,7 @@ This allows to increase cost along with growing computing power.
 ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
 
 Note however that by default, only `bcrypt` is enabled. 
-Further `Verifiers` must be enabled in the [configuration](/self-hosting/manage/configure) by the system administrator. 
+Further `Verifiers` must be enabled in the [configuration](/docs/operate-and-self-host/manage/configure) by the system administrator. 
 
 </Callout>
 
