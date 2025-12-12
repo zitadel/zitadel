@@ -15,7 +15,7 @@ You can migrate from a generic OIDC provider to the following supported template
 - Entra ID (former Azure Active Directory)
 - Google
 
-To migrate, you either use the [Migrate Generic OIDC Identity Provider (Instance)](/docs/references/api-v1/admin/zitadel.admin.v1.AdminService.MigrateGenericOIDCProvider#migrate-generic-oidc-identity-provider) or [Migrate Generic OIDC Identity Provider (Organization)](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.MigrateGenericOIDCProvider#migrate-generic-oidc-identity-provider) API request.
+To migrate, you either use the [Migrate Generic OIDC Identity Provider (Instance)](/docs/references/api-v1/admin/zitadel.admin.v1.AdminService.MigrateGenericOIDCProvider) or [Migrate Generic OIDC Identity Provider (Organization)](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.MigrateGenericOIDCProvider) API request.
 These calls change the type of the provider and don't delete any linked users. 
 
 <Callout type="info" title="Linked users will not notice the change and be able to login as usual.">
