@@ -1,0 +1,436 @@
+{
+  "common": {
+    "back": "Retour",
+    "title": "Connexion avec Zitadel"
+  },
+  "accounts": {
+    "title": "Comptes",
+    "description": "Sélectionnez le compte que vous souhaitez utiliser.",
+    "addAnother": "Ajouter un autre compte",
+    "noResults": "Aucun compte trouvé",
+    "verified": "vérifié",
+    "expired": "expiré"
+  },
+  "logout": {
+    "title": "Déconnexion",
+    "description": "Cliquez sur un compte pour terminer la session",
+    "noResults": "Aucun compte trouvé",
+    "clear": "Terminer la session",
+    "verifiedAt": "Dernière activité : {time}",
+    "success": {
+      "title": "Déconnexion réussie",
+      "description": "Vous vous êtes déconnecté avec succès."
+    }
+  },
+  "loginname": {
+    "title": "Connectez-vous à votre compte",
+    "description": "Entrez vos données de connexion.",
+    "register": "Enregistrer un nouvel utilisateur",
+    "submit": "Continuer",
+    "labels": {
+      "loginname": "Nom d'utilisateur",
+      "username": "Nom d'utilisateur",
+      "usernameOrPhoneNumber": "Nom d'utilisateur ou numéro de téléphone",
+      "usernameOrEmail": "Nom d'utilisateur ou email",
+      "email": "E-mail"
+    },
+    "required": {
+      "loginName": "Ce champ est requis"
+    },
+    "errors": {
+      "internalError": "Une erreur interne est survenue",
+      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+      "couldNotSearchUsers": "Impossible de rechercher les utilisateurs",
+      "couldNotGetDomain": "Impossible d'obtenir le domaine",
+      "couldNotGetHost": "Impossible d'obtenir l'hôte",
+      "couldNotStartIDPFlow": "Impossible de démarrer le flux IDP",
+      "moreThanOneUserFound": "Plus d'un utilisateur trouvé. Fournissez un identifiant unique.",
+      "userNotFound": "Utilisateur non trouvé dans le système",
+      "couldNotCreateSession": "Impossible de créer une session pour l'utilisateur",
+      "initialUserNotSupported": "Utilisateur initial non pris en charge",
+      "usernamePasswordNotAllowed": "Nom d'utilisateur/mot de passe non autorisé ! Contactez votre administrateur pour plus d'informations.",
+      "passkeysNotAllowed": "Les clés d'accès ne sont pas autorisées ! Contactez votre administrateur pour plus d'informations.",
+      "couldNotFindIdentityProvider": "Impossible de trouver le fournisseur d'identité.",
+      "userNotActive": "L'utilisateur n'est pas actif. Contactez votre administrateur pour plus d'informations."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Une erreur est survenue",
+      "multipleUsersFound": "Plusieurs utilisateurs trouvés",
+      "userNotFound": "Utilisateur non trouvé dans le système"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Connectez-vous à votre compte",
+      "description": "Entrez votre mot de passe.",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "submit": "Continuer",
+      "labels": {
+        "password": "Mot de passe"
+      },
+      "required": {
+        "password": "Ce champ est requis"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+        "couldNotResetPassword": "Impossible de réinitialiser le mot de passe"
+      },
+      "info": {
+        "passwordResetSent": "Le mot de passe a été réinitialisé. Veuillez vérifier votre email"
+      }
+    },
+    "set": {
+      "title": "Définir le mot de passe",
+      "description": "Définissez le mot de passe pour votre compte",
+      "codeSent": "Un code a été envoyé à votre adresse email.",
+      "noCodeReceived": "Vous n'avez pas reçu de code ?",
+      "resend": "Renvoyer le code",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
+      },
+      "required": {
+        "code": "Ce champ est requis",
+        "newPassword": "Vous devez fournir un mot de passe !",
+        "confirmPassword": "Ce champ est requis"
+      },
+      "errors": {
+        "couldNotSetPassword": "Impossible de définir le mot de passe",
+        "couldNotResetPassword": "Impossible de réinitialiser le mot de passe",
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe"
+      }
+    },
+    "change": {
+      "title": "Changer le mot de passe",
+      "description": "Définissez le mot de passe pour votre compte",
+      "submit": "Continuer",
+      "labels": {
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
+      },
+      "required": {
+        "newPassword": "Vous devez fournir un nouveau mot de passe !",
+        "confirmPassword": "Ce champ est requis"
+      },
+      "errors": {
+        "couldNotChangePassword": "Impossible de changer le mot de passe",
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+        "unknownError": "Erreur inconnue"
+      }
+    },
+    "complexity": {
+      "length": "Doit comporter au moins {minLength} caractères.",
+      "hasSymbol": "Doit inclure un symbole.",
+      "hasNumber": "Doit inclure un chiffre.",
+      "hasUppercase": "Doit inclure une lettre majuscule.",
+      "hasLowercase": "Doit inclure une lettre minuscule.",
+      "equals": "La confirmation du mot de passe correspond.",
+      "matches": "Correspond",
+      "doesNotMatch": "Ne correspond pas"
+    },
+    "errors": {
+      "noHostFound": "Aucun hôte trouvé",
+      "couldNotSendResetLink": "Impossible d'envoyer le lien de réinitialisation du mot de passe",
+      "couldNotCreateSessionForUser": "Impossible de créer une session pour l'utilisateur",
+      "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+      "failedToAuthenticate": "Échec de l'authentification. Vous avez eu {failedAttempts} sur {maxPasswordAttempts} tentatives.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Échec de l'authentification.",
+      "accountLockedContactAdmin": " Contactez votre administrateur pour déverrouiller votre compte",
+      "userNotFound": "Utilisateur non trouvé dans le système",
+      "initialUserNotSupported": "Utilisateur initial non pris en charge",
+      "userInitialStateNotSupported": "État initial de l'utilisateur non pris en charge",
+      "codeOrVerificationRequired": "Vous devez fournir un code ou avoir une vérification d'utilisateur valide",
+      "verificationRequired": "La vérification de l'utilisateur doit être effectuée",
+      "couldNotLoadSession": "Impossible de charger la session",
+      "couldNotLoadAuthMethods": "Impossible de charger les méthodes d'authentification",
+      "failedPrecondition": "Précondition échouée",
+      "sessionNotValid": "La session n'est pas valide"
+    }
+  },
+  "idp": {
+    "title": "Se connecter avec SSO",
+    "description": "Sélectionnez l'un des fournisseurs suivants pour vous connecter",
+    "orSignInWith": "ou connectez-vous avec",
+    "signInWithApple": "Se connecter avec Apple",
+    "signInWithGoogle": "Se connecter avec Google",
+    "signInWithAzureAD": "Se connecter avec AzureAD",
+    "signInWithGithub": "Se connecter avec GitHub",
+    "signInWithGitlab": "Se connecter avec GitLab",
+    "loginSuccess": {
+      "title": "Connexion réussie",
+      "description": "Vous vous êtes connecté avec succès !"
+    },
+    "linkingSuccess": {
+      "title": "Compte lié",
+      "description": "Vous avez lié votre compte avec succès !"
+    },
+    "registerSuccess": {
+      "title": "Inscription réussie",
+      "description": "Vous vous êtes inscrit avec succès !"
+    },
+    "loginError": {
+      "title": "Échec de la connexion",
+      "description": "Une erreur est survenue lors de la tentative de connexion."
+    },
+    "linkingError": {
+      "title": "Échec de la liaison du compte",
+      "description": "Une erreur est survenue lors de la tentative de liaison du compte."
+    },
+    "completeRegister": {
+      "title": "Complétez vos données",
+      "description": "Vous devez compléter votre inscription en fournissant votre adresse email et votre nom."
+    },
+    "accountNotFound": {
+      "title": "Compte non trouvé",
+      "description": "Nous n'avons pas trouvé de compte associé à vos identifiants du fournisseur d'identité.",
+      "info": "Aucun compte existant n'a été trouvé. Veuillez vous connecter avec un compte existant ou contacter votre administrateur pour obtenir de l'aide.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "registrationFailed": {
+      "title": "Inscription non disponible",
+      "description": "Nous n'avons pas pu terminer le processus d'inscription.",
+      "info": "Impossible de déterminer l'organisation pour l'inscription. Veuillez contacter votre administrateur pour obtenir de l'aide.",
+      "backToLogin": "Retour à la connexion"
+    }
+  },
+  "ldap": {
+    "title": "Connexion LDAP",
+    "description": "Entrez vos identifiants LDAP.",
+    "submit": "Continuer",
+    "labels": {
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe"
+    },
+    "required": {
+      "username": "Ce champ est requis",
+      "password": "Ce champ est requis"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Vérifiez votre identité",
+      "description": "Choisissez l'un des facteurs suivants.",
+      "noResults": "Aucun second facteur disponible à configurer."
+    },
+    "set": {
+      "title": "Configurer la double authentification",
+      "description": "Choisissez l'un des facteurs suivants.",
+      "skip": "Passer"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Vérifier la double authentification",
+      "totpDescription": "Entrez le code de votre application d'authentification.",
+      "smsDescription": "Entrez le code reçu par SMS.",
+      "emailDescription": "Entrez le code reçu par email.",
+      "noCodeReceived": "Vous n'avez pas reçu de code ?",
+      "resendCode": "Renvoyer le code",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Ce champ est requis"
+      }
+    },
+    "set": {
+      "title": "Configurer la double authentification",
+      "totpDescription": "Scannez le QR code avec votre application d'authentification.",
+      "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par SMS.",
+      "emailDescription": "Entrez votre adresse email pour recevoir un code par email.",
+      "totpRegisterDescription": "Scannez le QR Code ou saisissez l'URL manuellement.",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Ce champ est requis"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Authentifiez-vous avec une clé d'accès",
+      "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou le verrouillage de l'écran",
+      "usePassword": "Utiliser le mot de passe",
+      "submit": "Continuer"
+    },
+    "set": {
+      "title": "Configurer une clé d'accès",
+      "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou le verrouillage de l'écran",
+      "info": {
+        "description": "Une clé d'accès est une méthode d'authentification sur un appareil comme votre empreinte digitale, Apple FaceID ou similaire.",
+        "link": "Authentification sans mot de passe"
+      },
+      "skip": "Passer",
+      "submit": "Continuer"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Vérifier la double authentification",
+      "description": "Vérifiez votre compte avec votre appareil."
+    },
+    "set": {
+      "title": "Configurer la double authentification",
+      "description": "Configurez un appareil comme second facteur.",
+      "submit": "Continuer"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Clé d'accès",
+      "password": "Mot de passe"
+    },
+    "disabled": {
+      "title": "Inscription désactivée",
+      "description": "L'inscription est désactivée. Veuillez contacter votre administrateur."
+    },
+    "missingdata": {
+      "title": "Données manquantes",
+      "description": "Fournissez l'email, le prénom et le nom pour vous inscrire."
+    },
+    "title": "Inscription",
+    "description": "Créez votre compte ZITADEL.",
+    "noMethodAvailableWarning": "Aucune méthode d'authentification disponible. Veuillez contacter votre administrateur.",
+    "selectMethod": "Sélectionnez la méthode d'authentification souhaitée",
+    "agreeTo": "Pour vous inscrire, vous devez accepter les conditions générales",
+    "termsOfService": "Conditions générales",
+    "privacyPolicy": "Politique de confidentialité",
+    "submit": "Continuer",
+    "password": {
+      "title": "Définir le mot de passe",
+      "description": "Définissez le mot de passe pour votre compte",
+      "submit": "Continuer",
+      "labels": {
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
+      },
+      "required": {
+        "password": "Vous devez fournir un mot de passe !",
+        "confirmPassword": "Ce champ est requis"
+      }
+    },
+    "labels": {
+      "firstname": "Prénom",
+      "lastname": "Nom",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "Ce champ est requis",
+      "lastname": "Ce champ est requis",
+      "email": "Ce champ est requis"
+    },
+    "errors": {
+      "couldNotCreateUser": "Impossible de créer l'utilisateur",
+      "couldNotCreateSession": "Impossible de créer la session",
+      "userNotFound": "Utilisateur non trouvé dans le système",
+      "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
+      "couldNotRegisterUser": "Impossible d'enregistrer l'utilisateur"
+    }
+  },
+  "invite": {
+    "title": "Inviter un utilisateur",
+    "description": "Fournissez l'adresse email et le nom de l'utilisateur que vous souhaitez inviter.",
+    "info": "L'utilisateur recevra un email avec des instructions supplémentaires.",
+    "notAllowed": "Vos paramètres ne vous permettent pas d'inviter des utilisateurs.",
+    "submit": "Continuer",
+    "success": {
+      "title": "Utilisateur invité",
+      "description": "L'email a été envoyé avec succès.",
+      "verified": "L'utilisateur a été invité et a déjà vérifié son email.",
+      "notVerifiedYet": "L'utilisateur a été invité. Il recevra un email avec des instructions supplémentaires.",
+      "submit": "Inviter un autre utilisateur"
+    }
+  },
+  "signedin": {
+    "title": "Bienvenue {user} !",
+    "description": "Vous êtes connecté.",
+    "continue": "Continuer",
+    "error": {
+      "title": "Erreur",
+      "description": "Une erreur est survenue lors de la connexion."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Aucun identifiant utilisateur fourni !",
+    "successTitle": "Utilisateur vérifié",
+    "successDescription": "L'utilisateur a été vérifié avec succès.",
+    "setupAuthenticator": "Configurer l'authentificateur",
+    "verify": {
+      "title": "Vérifier l'utilisateur",
+      "description": "Entrez le code fourni dans l'email de vérification.",
+      "noCodeReceived": "Vous n'avez pas reçu de code ?",
+      "resendCode": "Renvoyer le code",
+      "codeSent": "Un code vient d'être envoyé à votre adresse email.",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Ce champ est requis"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Impossible de renvoyer l'email",
+      "couldNotVerifyUser": "Impossible de vérifier l'utilisateur",
+      "couldNotVerifyInvite": "Impossible de vérifier l'invitation",
+      "couldNotVerifyEmail": "Impossible de vérifier l'email",
+      "couldNotVerify": "Impossible de vérifier",
+      "couldNotLoadUser": "Impossible de charger l'utilisateur",
+      "couldNotLoadAuthenticators": "Impossible de charger les authentificateurs possibles",
+      "couldNotCreateSession": "Impossible de créer la session",
+      "noHostFound": "Aucun hôte trouvé",
+      "userAlreadyVerified": "L'utilisateur est déjà vérifié !",
+      "couldNotResendInvite": "Impossible de renvoyer l'invitation",
+      "inviteSendFailed": "Échec de l'envoi de l'email d'invitation",
+      "emailSendFailed": "Échec de l'envoi de l'email de vérification"
+    }
+  },
+  "authenticator": {
+    "title": "Choisissez la méthode d'authentification",
+    "description": "Sélectionnez la méthode d'authentification souhaitée",
+    "noMethodsAvailable": "Aucune méthode d'authentification disponible",
+    "allSetup": "Vous avez déjà configuré un authentificateur !",
+    "linkWithIDP": "ou lier avec un fournisseur d'identité"
+  },
+  "device": {
+    "usercode": {
+      "title": "Code de l'appareil",
+      "description": "Entrez le code affiché sur votre application ou appareil.",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Ce champ est requis"
+      }
+    },
+    "request": {
+      "title": "{appName} souhaite se connecter",
+      "description": "{appName} aura accès à :",
+      "disclaimer": "En cliquant sur Autoriser, vous permettez à {appName} et Zitadel d'utiliser vos informations conformément à leurs conditions générales et politiques de confidentialité respectives. Vous pouvez révoquer cet accès à tout moment.",
+      "submit": "Autoriser",
+      "deny": "Refuser"
+    },
+    "scope": {
+      "openid": "Vérifiez votre identité.",
+      "email": "Voir votre adresse email.",
+      "profile": "Voir toutes les informations de votre profil.",
+      "offline_access": "Autoriser l'accès hors ligne à votre compte."
+    }
+  },
+  "error": {
+    "noUserCode": "Aucun code utilisateur fourni !",
+    "noDeviceRequest": "Aucune demande de périphérique trouvée.",
+    "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous de saisir d'abord le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
+    "tryagain": "Réessayer"
+  }
+}
