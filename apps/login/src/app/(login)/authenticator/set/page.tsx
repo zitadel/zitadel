@@ -17,6 +17,7 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 // import { getLocale } from "next-intl/server";
 import { Metadata } from "next";
@@ -142,6 +143,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   if (requestId) {
     params.set("requestId", requestId);
+  }
+
+  // Check if password is the only available authentication method
+  const hasNoAuthMethodsSetup = sessionWithData.authMethods.length === 0;
+  const onlyPasswordAllowed = loginSettings?.allowUsernamePassword && 
+    loginSettings?.passkeysType !== PasskeysType.ALLOWED;
+  const noExternalIdp = !loginSettings?.allowExternalIdp || identityProviders.length === 0;
+
+  // If password is the only option and no auth methods are setup yet, redirect to password setup
+  if (hasNoAuthMethodsSetup && onlyPasswordAllowed && noExternalIdp) {
+    redirect(`/password/set?` + params);
   }
 
   return (

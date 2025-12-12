@@ -2,15 +2,13 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { VerifyForm } from "@/components/verify-form";
-import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { VerifyEmailForm } from "@/components/verify-email-form";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
+import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -23,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send, phone } = searchParams;
+  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -34,12 +32,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let user: User | undefined;
   let human: HumanUser | undefined;
   let id: string | undefined;
-  let loginSettings: LoginSettings | undefined;
 
   let error: string | undefined;
 
   const doSend = send === "true";
-  const isPhoneVerification = phone === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -50,7 +46,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendInviteEmailCode({
         userId,
         urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify/email?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send invitation email", apiError);
@@ -60,21 +56,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendEmailCode({
         userId,
         urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify/email?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send verification email", apiError);
         error = "emailSendFailed";
       });
     }
-  }
-
-  async function sendPhone(userId: string) {
-    const { resendPhoneCode } = await import("@/lib/zitadel");
-    await resendPhoneCode({ serviceConfig, userId }).catch((apiError) => {
-      console.error("Could not send phone verification SMS", apiError);
-      error = "phoneSendFailed";
-    });
   }
 
   if ("loginName" in searchParams) {
@@ -84,29 +72,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         loginName,
         organization,
       },
-    }).catch(async (error) => {
-      loginSettings = await getLoginSettings({ serviceConfig, organization });
-      if (!loginSettings?.ignoreUnknownUsernames) {
-        console.error("loadMostRecentSession failed", error);
-      }
-      // ignore error, as we might not have a session yet
-      return undefined;
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      if (isPhoneVerification) {
-        await sendPhone(sessionFactors.factors.user.id);
-      } else {
-        await sendEmail(sessionFactors.factors.user.id);
-      }
+      await sendEmail(sessionFactors.factors.user.id);
     }
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
-      if (isPhoneVerification) {
-        await sendPhone(userId);
-      } else {
-        await sendEmail(userId);
-      }
+      await sendEmail(userId);
     }
 
     const userResponse = await getUserByID({ serviceConfig, userId });
@@ -120,44 +93,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
-  if (!id && loginName) {
-    if (!loginSettings) {
-      loginSettings = await getLoginSettings({ serviceConfig, organization });
-    }
-
-    if (!loginSettings) {
-      console.error("loginSettings not found");
-      return;
-    }
-
-    const users = await searchUsers({
-      serviceConfig,
-      searchValue: loginName,
-      loginSettings: loginSettings,
-      organizationId: organization,
-    });
-
-    if (users.result && users.result.length === 1) {
-      const foundUser = users.result[0];
-      id = foundUser.userId;
-      user = foundUser;
-      if (user.type.case === "human") {
-        human = user.type.value as HumanUser;
-      }
-
-      // If we found the user and need to send email, do it now
-      if (doSend && id) {
-        await sendEmail(id);
-      }
-    } else if (loginSettings?.ignoreUnknownUsernames) {
-      // Prevent enumeration by pretending we found a user
-      id = UNKNOWN_USER_ID;
-    }
+  if (!id) {
+    throw Error("Failed to get user id");
   }
 
   const params = new URLSearchParams({
     userId: userId,
-    initial: "true", // defines that a code is not required and is therefore not shown in the UI
+    initial: "true",
   });
 
   if (loginName) {
@@ -174,7 +116,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 w-full">
         <h1>
           <Translated i18nKey="verify.title" namespace="verify" />
         </h1>
@@ -190,16 +132,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
-          (user || loginName) && (
-            <UserAvatar
-              loginName={loginName ?? user?.preferredLoginName}
-              displayName={
-                !loginSettings?.ignoreUnknownUsernames
-                  ? human?.profile?.displayName
-                  : (loginName ?? user?.preferredLoginName)
-              }
-              showDropdown={false}
-            />
+          user && (
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
           )
         )}
       </div>
@@ -222,24 +156,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         )}
 
         {id && send && (
-          <div className="w-full py-4">
+          <div className="w-full">
             <Alert type={AlertType.INFO}>
               <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>
           </div>
         )}
 
-        {id && (
-        <VerifyForm
+        <VerifyEmailForm
           loginName={loginName}
           organization={organization}
           userId={id}
           code={code}
           isInvite={invite === "true"}
           requestId={requestId}
-          isPhoneVerification={isPhoneVerification}
         />
-        )}
       </div>
     </DynamicTheme>
   );

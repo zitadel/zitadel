@@ -1,10 +1,9 @@
 "use client";
 
-import { Alert, AlertType } from "@/components/alert";
-import { resendVerification, sendVerification } from "@/lib/server/verify";
-import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { Alert } from "@/components/alert";
+import { resendPhoneVerification, sendPhoneVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -22,24 +21,20 @@ type Props = {
   loginName?: string;
   organization?: string;
   code?: string;
-  isInvite: boolean;
   requestId?: string;
-  isPhoneVerification?: boolean;
 };
 
-export function VerifyForm({
+export function VerifyPhoneForm({
   userId,
   loginName,
   organization,
   requestId,
   code,
-  isInvite,
-  isPhoneVerification = false,
 }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       code: code ?? "",
     },
@@ -55,24 +50,11 @@ export function VerifyForm({
     setError("");
     setLoading(true);
 
-    // do not send code for dummy userid that is set to prevent user enumeration
-    if (userId === UNKNOWN_USER_ID) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setLoading(false);
-      return;
-    }
-
-    const response = await resendVerification({
+    const response = await resendPhoneVerification({
       userId,
-      isInvite: isInvite,
-      isPhoneVerification: isPhoneVerification,
     })
       .catch(() => {
-        setError(
-          isPhoneVerification
-            ? t("errors.couldNotResendPhone")
-            : t("errors.couldNotResendEmail")
-        );
+        setError(t("errors.couldNotResendPhone"));
         return;
       })
       .finally(() => {
@@ -87,21 +69,18 @@ export function VerifyForm({
     return response;
   }
 
-  const processedCode = useRef<string | undefined>(undefined);
-
   const fcn = useCallback(
-    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
-      setError("");
+    async function submitCodeAndContinue(
+      value: Inputs,
+    ): Promise<boolean | void> {
       setLoading(true);
 
-      const response = await sendVerification({
+      const response = await sendPhoneVerification({
         code: value.code,
         userId,
-        isInvite: isInvite,
         loginName: loginName,
         organization: organization,
         requestId: requestId,
-        isPhoneVerification: isPhoneVerification,
       })
         .catch(() => {
           setError(t("errors.couldNotVerifyUser"));
@@ -120,12 +99,11 @@ export function VerifyForm({
         return router.push(response?.redirect);
       }
     },
-    [isInvite, userId, isPhoneVerification],
+    [userId, loginName, organization, requestId, t, router],
   );
 
   useEffect(() => {
-    if (code && code !== processedCode.current) {
-      processedCode.current = code;
+    if (code) {
       fcn({ code });
     }
   }, [code, fcn]);
@@ -133,11 +111,17 @@ export function VerifyForm({
   return (
     <>
       <form className="w-full">
-        <Alert type={AlertType.INFO}>
-          <div className="flex flex-row">
-            <span className="mr-auto flex-1 text-left">
-              <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
-            </span>
+        <div className="mt-4">
+          <TextInput
+            type="text"
+            autoComplete="one-time-code"
+            {...register("code", { required: t("verify.required.code") })}
+            label={t("verify.labels.code")}
+            data-testid="code-text-input"
+          />
+        </div>
+        <div className="w-full">  
+          <div className="flex flex-row justify-end pt-1">
             <button
               aria-label="Resend Code"
               disabled={loading}
@@ -151,15 +135,6 @@ export function VerifyForm({
               <Translated i18nKey="verify.resendCode" namespace="verify" />
             </button>
           </div>
-        </Alert>
-        <div className="mt-4">
-          <TextInput
-            type="text"
-            autoComplete="one-time-code"
-            {...register("code", { required: t("verify.required.code") })}
-            label={t("verify.labels.code")}
-            data-testid="code-text-input"
-          />
         </div>
 
         {error && (
@@ -168,20 +143,18 @@ export function VerifyForm({
           </div>
         )}
 
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
+        <div className="mt-8 flex w-full flex-col items-center gap-2">
           <Button
             type="submit"
-            className="self-end"
+            className="self-end w-full"
             variant={ButtonVariants.Primary}
             disabled={loading || !formState.isValid}
             onClick={handleSubmit(fcn)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />}
-            <Translated i18nKey="verify.submit" namespace="verify" />
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="otp" />
           </Button>
+          <BackButton data-testid="back-button" />
         </div>
       </form>
     </>
