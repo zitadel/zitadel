@@ -266,7 +266,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return sessionOrError;
       }
 
-      session = sessionOrError;
+      session = sessionOrError.session;
     }
 
     if (session && !session.factors?.user?.id) {

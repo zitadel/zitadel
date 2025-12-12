@@ -104,11 +104,13 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
       try {
-        session = await createSessionAndUpdateCookie({
+        const result = await createSessionAndUpdateCookie({
           checks,
           requestId: command.requestId,
           lifetime: loginSettings?.passwordCheckLifetime,
         });
+        session = result.session;
+        sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
@@ -130,11 +132,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
-      return { error: "Could not verify password" };
+      return { error: t("errors.couldNotVerifyPassword") };
     }
-
-    // this is a fake error message to hide that the user does not even exist
-    return { error: t("errors.couldNotVerifyPassword") };
   } else {
     loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
 

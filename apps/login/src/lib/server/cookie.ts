@@ -44,7 +44,7 @@ export async function createSessionAndUpdateCookie(command: {
   checks: Checks;
   requestId: string | undefined;
   lifetime?: Duration;
-}): Promise<Session> {
+}): Promise<{ session: Session; sessionCookie: CustomCookieData }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -59,12 +59,12 @@ export async function createSessionAndUpdateCookie(command: {
     } as Duration; // for usecases where the lifetime is not specified (user discovery)
   }
 
-  const createdSession = await createSessionFromChecks({ serviceConfig, checks: command.checks,
-    lifetime: sessionLifetime,
-  });
+  const createdSession = await createSessionFromChecks({ serviceConfig, checks: command.checks, lifetime: sessionLifetime });
 
   if (createdSession) {
-    return getSession({ serviceConfig, sessionId: createdSession.sessionId,
+    return getSession({
+      serviceConfig,
+      sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then(async (response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
@@ -90,7 +90,7 @@ export async function createSessionAndUpdateCookie(command: {
 
         await addSessionToCookie({ session: sessionCookie, iFrameEnabled });
 
-        return response.session as Session;
+        return { session: response.session as Session, sessionCookie };
       } else {
         throw "could not get session or session does not have loginName";
       }
@@ -128,7 +128,9 @@ export async function createSessionForIdpAndUpdateCookie({
     } as Duration;
   }
 
-  const createdSession = await createSessionForUserIdAndIdpIntent({ serviceConfig, userId,
+  const createdSession = await createSessionForUserIdAndIdpIntent({
+    serviceConfig,
+    userId,
     idpIntent,
     lifetime: sessionLifetime,
   }).catch((error: ErrorDetail | CredentialsCheckError) => {
@@ -146,7 +148,9 @@ export async function createSessionForIdpAndUpdateCookie({
     throw "Could not create session";
   }
 
-  const { session } = await getSession({ serviceConfig, sessionId: createdSession.sessionId,
+  const { session } = await getSession({
+    serviceConfig,
+    sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
 
@@ -194,7 +198,9 @@ export async function setSessionAndUpdateCookie(command: {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  return setSession({ serviceConfig, sessionId: command.recentCookie.id,
+  return setSession({
+    serviceConfig,
+    sessionId: command.recentCookie.id,
     sessionToken: command.recentCookie.token,
     challenges: command.challenges,
     checks: command.checks,
@@ -217,40 +223,40 @@ export async function setSessionAndUpdateCookie(command: {
           sessionCookie.requestId = command.requestId;
         }
 
-        return getSession({ serviceConfig, sessionId: sessionCookie.id,
-          sessionToken: sessionCookie.token,
-        }).then(async (response) => {
-          if (!response?.session || !response.session.factors?.user?.loginName) {
-            throw "could not get session or session does not have loginName";
-          }
+        return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token }).then(
+          async (response) => {
+            if (!response?.session || !response.session.factors?.user?.loginName) {
+              throw "could not get session or session does not have loginName";
+            }
 
-          const { session } = response;
-          const newCookie: CustomCookieData = {
-            id: sessionCookie.id,
-            token: updatedSession.sessionToken,
-            creationTs: sessionCookie.creationTs,
-            expirationTs: sessionCookie.expirationTs,
-            // just overwrite the changeDate with the new one
-            changeTs: updatedSession.details?.changeDate ? `${timestampMs(updatedSession.details.changeDate)}` : "",
-            loginName: session.factors?.user?.loginName ?? "",
-            organization: session.factors?.user?.organizationId ?? "",
-          };
+            const { session } = response;
+            const newCookie: CustomCookieData = {
+              id: sessionCookie.id,
+              token: updatedSession.sessionToken,
+              creationTs: sessionCookie.creationTs,
+              expirationTs: sessionCookie.expirationTs,
+              // just overwrite the changeDate with the new one
+              changeTs: updatedSession.details?.changeDate ? `${timestampMs(updatedSession.details.changeDate)}` : "",
+              loginName: session.factors?.user?.loginName ?? "",
+              organization: session.factors?.user?.organizationId ?? "",
+            };
 
-          if (sessionCookie.requestId) {
-            newCookie.requestId = sessionCookie.requestId;
-          }
+            if (sessionCookie.requestId) {
+              newCookie.requestId = sessionCookie.requestId;
+            }
 
-          const securitySettings = await getSecuritySettings({ serviceConfig });
-          const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
+            const securitySettings = await getSecuritySettings({ serviceConfig });
+            const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
-          return updateSessionCookie({
-            id: sessionCookie.id,
-            session: newCookie,
-            iFrameEnabled,
-          }).then(() => {
-            return { challenges: updatedSession.challenges, ...session };
-          });
-        });
+            return updateSessionCookie({
+              id: sessionCookie.id,
+              session: newCookie,
+              iFrameEnabled,
+            }).then(() => {
+              return { challenges: updatedSession.challenges, ...session };
+            });
+          },
+        );
       } else {
         throw "Session not be set";
       }

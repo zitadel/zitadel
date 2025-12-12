@@ -195,7 +195,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
     test("should redirect to verify when user has no authentication methods", async () => {
@@ -724,7 +724,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({ factors: {} }); // No user in session
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: { factors: {} }, sessionCookie: {} }); // No user in session
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -755,7 +755,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -786,7 +786,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue(mockSession);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
