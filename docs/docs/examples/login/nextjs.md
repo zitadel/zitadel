@@ -62,7 +62,7 @@ To setup your configuration, create a file called [...nextauth].tsx in `pages/ap
 You can directly import the ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts reference
-https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/auth/%5B...nextauth%5D.tsx
+https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/api/auth/%5B...nextauth%5D.tsx
 ```
 
 You can overwrite the profile callback, just append it to the ZITADEL provider.
@@ -182,14 +182,14 @@ https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/userinfo.ts
 ### Session state
 
 To allow session state to be shared between pages - which improves performance, reduces network traffic and avoids component state changes while rendering - you can use the NextAuth.js Provider in `/pages/_app.tsx`.
-Take a loot at the template `_app.tsx`.
+Take a look at the template `_app.tsx`.
 
 ```ts reference
-https://github.com/zitadel/zitadel-nextjs/blob/main/pages/_app.tsx
+https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/_app.tsx
 ```
 
 Last thing: create a `profile.tsx` in /pages which renders the callback page.
 
 ```ts reference
-https://github.com/zitadel/zitadel-nextjs/blob/main/pages/profile.tsx
+https://github.com/zitadel/zitadel-nextjs-b2b/blob/main/pages/profile.tsx
 ```
