@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
 import { Translated } from "./translated";
 import { useState } from "react";
+import { handleServerActionResponse } from "@/lib/client";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { Alert } from "./alert";
 
 type Props = {
@@ -40,6 +42,7 @@ export function ChooseSecondFactorToSetup({
   const params = new URLSearchParams({});
 
   const [error, setError] = useState<string>("");
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   if (loginName) {
     params.append("loginName", loginName);
@@ -59,6 +62,7 @@ export function ChooseSecondFactorToSetup({
 
   return (
     <>
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {loginSettings.secondFactors.map((factor) => {
           switch (factor) {
@@ -89,15 +93,7 @@ export function ChooseSecondFactorToSetup({
               requestId,
             });
 
-            if (skipResponse && "error" in skipResponse && skipResponse.error) {
-              setError(skipResponse.error);
-              return;
-            }
-
-            // For regular flows (non-OIDC/SAML), return URL for client-side navigation
-            if ("redirect" in skipResponse && skipResponse.redirect) {
-              router.push(skipResponse.redirect);
-            }
+            handleServerActionResponse(skipResponse, router, setSamlData, setError);
           }}
           type="button"
           data-testid="reset-button"
