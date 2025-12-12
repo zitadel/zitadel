@@ -420,26 +420,25 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     !!session.factors?.totp?.verifiedAt ||
     !!session.factors?.otpSms?.verifiedAt ||
     !!session.factors?.otpEmail?.verifiedAt ||
-    // @ts-ignore
-    !!session.factors?.u2f?.verifiedAt;
+    !!session.factors?.webAuthN?.verifiedAt;
+
+  // check if the password factor is set and not older than 5 minutes
+  const passwordVerifiedAt = session.factors?.password?.verifiedAt;
+  if (!passwordVerifiedAt) {
+    return { error: t("errors.passwordVerificationMissing") };
+  }
+
+  const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
+  const now = new Date();
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+  if (passwordVerifiedDate < fiveMinutesAgo) {
+    return { error: t("errors.passwordVerificationTooOld") };
+  }
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   // also if the user has MFA but it is not verified, we use the service account
   if (forceMfa || (hasMfa && !mfaVerified)) {
-    // check if the password factor is set and not older than 5 minutes
-    const passwordVerifiedAt = session.factors?.password?.verifiedAt;
-    if (!passwordVerifiedAt) {
-      return { error: t("errors.passwordVerificationMissing") };
-    }
-
-    const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
-    const now = new Date();
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-
-    if (passwordVerifiedDate < fiveMinutesAgo) {
-      return { error: t("errors.passwordVerificationTooOld") };
-    }
-
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceConfig, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
