@@ -8,9 +8,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/session"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
@@ -18,9 +16,11 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
-	"go.uber.org/mock/gomock"
 )
 
 func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
@@ -650,6 +650,7 @@ func TestOTPEmailChallengeCommand_Events(t *testing.T) {
 func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 	t.Parallel()
 	codeErr := errors.New("failed to create code")
+	defaultExpiry := 10 * time.Minute
 	expiry := 30 * time.Minute
 
 	tests := []struct {
@@ -701,7 +702,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			requestChallengeOTPEmail:    &session_grpc.RequestChallenges_OTPEmail{},
 			secretGeneratorConfig:       &crypto.GeneratorConfig{},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return nil, "", codeErr
 			},
@@ -716,9 +717,9 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 					},
 				},
 			},
-			secretGeneratorConfig: &crypto.GeneratorConfig{},
-			otpAlgorithm:          crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			secretGeneratorConfig:       &crypto.GeneratorConfig{},
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -740,8 +741,8 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			secretGeneratorConfig: &crypto.GeneratorConfig{
 				Expiry: expiry,
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -788,11 +789,11 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				},
 			},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
-				Expiry: expiry,
+				Expiry: defaultExpiry,
 				Length: uint(6),
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -835,10 +836,10 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				DeliveryType: &session_grpc.RequestChallenges_OTPEmail_ReturnCode_{},
 			},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
-				Expiry: expiry,
+				Expiry: defaultExpiry,
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -882,10 +883,10 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				DeliveryType: &session_grpc.RequestChallenges_OTPEmail_ReturnCode_{},
 			},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
-				Expiry: expiry,
+				Expiry: defaultExpiry,
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -932,10 +933,10 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				},
 			},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
-				Expiry: expiry,
+				Expiry: defaultExpiry,
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -976,10 +977,10 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			name:                     "update session succeeded - delivery type default",
 			requestChallengeOTPEmail: &session_grpc.RequestChallenges_OTPEmail{},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
-				Expiry: expiry,
+				Expiry: defaultExpiry,
 			},
-			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(),
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -1001,6 +1002,55 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 						Crypted:    []byte("code"),
 					},
 					Expiry:       expiry,
+					CodeReturned: false,
+					URLTmpl:      "",
+				}
+				repo.EXPECT().
+					SetChallenge(gomock.Any()).
+					AnyTimes().
+					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+				idCondition := getSessionIDCondition(repo, "session-id")
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					AnyTimes().
+					Return(int64(1), nil)
+				return repo
+			},
+		},
+		{
+			name:                     "update session succeeded - with default config when setting state is not active",
+			requestChallengeOTPEmail: &session_grpc.RequestChallenges_OTPEmail{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry:              defaultExpiry,
+				Length:              uint(8),
+				IncludeLowerLetters: false,
+				IncludeUpperLetters: true,
+				IncludeDigits:       true,
+				IncludeSymbols:      false,
+			},
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview),
+			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
+				return &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				}, "", nil
+			},
+			session: &domain.Session{
+				ID: "session-id",
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewMockSessionRepository(ctrl)
+				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "enc",
+						KeyID:      "id",
+						Crypted:    []byte("code"),
+					},
+					Expiry:       defaultExpiry,
 					CodeReturned: false,
 					URLTmpl:      "",
 				}
@@ -1048,7 +1098,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 	}
 }
 
-func secretGeneratorSettingsRepo() func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
+func secretGeneratorSettingsRepo(state domain.SettingState) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
 	return func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
 		repo := domainmock.NewMockSecretGeneratorSettingsRepository(ctrl)
 		repo.EXPECT().
@@ -1067,7 +1117,9 @@ func secretGeneratorSettingsRepo() func(ctrl *gomock.Controller) domain.SecretGe
 				),
 			).AnyTimes().
 			Return(&domain.SecretGeneratorSettings{
-				Settings: domain.Settings{},
+				Settings: domain.Settings{
+					State: state,
+				},
 				SecretGeneratorSettingsAttributes: domain.SecretGeneratorSettingsAttributes{
 					OTPEmail: &domain.OTPEmailAttributes{
 						SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{

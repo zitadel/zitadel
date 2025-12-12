@@ -190,7 +190,7 @@ func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context,
 		o.ChallengeOTPEmail.CodeReturned = true
 		*o.OTPEmailChallenge = plain
 	case nil:
-		//
+		// no additional action needed
 	default:
 		return zerrors.ThrowUnimplementedf(nil, "DOM-cc1bRa", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
 	}
