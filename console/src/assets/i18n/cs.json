@@ -435,7 +435,8 @@
     "TOS": "Podmínky služby",
     "OPENSHORTCUTSTOOLTIP": "Pro zobrazení klávesových zkratek stiskněte ?",
     "SETTINGS": "Nastavení",
-    "CUSTOMERPORTAL": "Zákaznický portál"
+    "CUSTOMERPORTAL": "Zákaznický portál",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integrovat ZITADEL do vaší aplikace",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
     "METHODS": {
+      "1": "rovná se",
       "5": "obsahuje",
-      "7": "končí s",
-      "1": "rovná se"
+      "7": "končí s"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1502,7 +1503,9 @@
       "SECURITY": "Bezpečnostní nastavení",
       "EVENTS": "Události",
       "FAILEDEVENTS": "Selhané události",
-      "VIEWS": "Pohledy"
+      "VIEWS": "Pohledy",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Obecné informace",
@@ -1512,7 +1515,8 @@
       "TEXTS": "Texty a jazyky",
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
-      "STORAGE": "Data"
+      "STORAGE": "Data",
+      "ACTIONS": "Actions"
     },
     "BETA": "BETA"
   },
@@ -1972,7 +1976,6 @@
         "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Nastavení brandingu",
         "0": {
           "TITLE": "Nespecifikováno",
           "DESC": "Jakmile je uživatel identifikován, zobrazí se branding organizace identifikovaného uživatele, předtím než se zobrazí výchozí systém."
@@ -1985,6 +1988,7 @@
           "TITLE": "Použít nastavení organizace uživatele",
           "DESC": "Bude zobrazen branding organizace projektu, ale jakmile je uživatel identifikován, zobrazí se nastavení organizace identifikovaného uživatele."
         },
+        "TITLE": "Nastavení brandingu",
         "DIALOG": {
           "TITLE": "Nastavení brandingu",
           "DESCRIPTION": "Vyberte chování přihlašování při používání projektu."
@@ -2016,16 +2020,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Stav",
       "0": "Nedefinován",
       "1": "Aktivní",
-      "2": "Neaktivní"
+      "2": "Neaktivní",
+      "TITLE": "Stav"
     },
     "TYPE": {
-      "TITLE": "Typ",
       "0": "Neznámý typ",
       "1": "Vlastní",
-      "2": "Přidělený"
+      "2": "Přidělený",
+      "TITLE": "Typ"
     },
     "NAME": "Název",
     "NAMEDIALOG": {
@@ -2175,7 +2179,8 @@
       "UPDATED": "Projekt změněn.",
       "GRANTUPDATED": "Povolení změněno.",
       "DELETED": "Projekt smazán."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2237,6 +2242,10 @@
       "APPLE": {
         "TITLE": "Přihlásit se pomocí Apple",
         "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Apple"
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2271,10 +2280,10 @@
       "2": "neaktivní"
     },
     "AZUREADTENANTTYPES": {
-      "3": "ID tenantu",
       "0": "Společný",
       "1": "Organizace",
-      "2": "Spotřebitelé"
+      "2": "Spotřebitelé",
+      "3": "ID tenantu"
     },
     "AZUREADTENANTTYPE": "Typ tenantu",
     "AZUREADTENANTID": "ID tenantu",
@@ -2380,7 +2389,17 @@
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
     "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
     "USEPKCE": "Použijte PKCE",
-    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method",
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2453,7 +2472,11 @@
         "DELETE_TITLE": "Smazat konfiguraci SMTP",
         "DELETE_DESCRIPTION": "Chystáte se smazat konfiguraci. Potvrďte tuto akci zadáním jména odesílatele",
         "DELETED": "Konfigurace SMTP byla smazána",
-        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}."
+        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2529,7 +2552,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Další kroky",
         "0": {
           "TITLE": "Přidat role",
           "DESC": "Zadejte role vašeho projektu"
@@ -2541,8 +2563,24 @@
         "2": {
           "TITLE": "Pomoc & Podpora",
           "DESC": "Přečtěte si naši dokumentaci o vytváření aplikací nebo kontaktujte naši podporu"
-        }
-      }
+        },
+        "TITLE": "Další kroky"
+      },
+      "CREATE_PROJECT_AUTO": "Automaticky vytvořit projekt",
+      "CREATE_PROJECT_AUTO_DESC": "Doporučeno, pokud jste noví v ZITADEL. Nastavení projektu zvládneme za vás.",
+      "QUICK_CREATE_DESC": "Vytvořte aplikaci ve třech jednoduchých krocích.",
+      "QUICK_CREATE_FRAMEWORK": "Vyberte svůj framework",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Poskytujeme vám doporučenou konfiguraci pro vaši aplikaci. Vyberte framework, který používáte, nebo framework, který plánujete použít.",
+      "QUICK_CREATE_NAME": "Pojmenujte svou aplikaci",
+      "QUICK_CREATE_TITLE": "Vytvořit aplikaci",
+      "CUSTOM_APP_TITLE": "Vlastní aplikace",
+      "CUSTOM_APP_DESC": "Vytvoříme váš projekt a aplikaci s konfigurací, kterou si zvolíte níže.",
+      "CUSTOM_APP_NAME": "Název aplikace",
+      "CUSTOM_APP_NAME_LABEL": "Název",
+      "CUSTOM_APP_TYPE": "Typ aplikace",
+      "CUSTOM_APP_AUTH_METHOD": "Metoda ověření",
+      "CUSTOM_APP_CANCEL": "Zrušit",
+      "CUSTOM_APP_CREATE": "Vytvořit aplikaci"
     },
     "NAMEDIALOG": {
       "TITLE": "Přejmenovat aplikaci",
@@ -2735,6 +2773,90 @@
     "LOGINV2": {
       "USEV2": "Použít nové uživatelské rozhraní pro přihlášení",
       "BASEURL": "Vlastní základní adresa URL pro nové uživatelské rozhraní pro přihlášení"
+    },
+    "QUICKSTART": "Rychlý start",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Rychlý start",
+      "DESCRIPTION": "Spusťte svou aplikaci s autentizací ZITADEL.",
+      "GETSTARTED": "Začněte se svou aplikací",
+      "GETSTARTED_DESC": "Tento průvodce vám pomůže rychle a snadno integrovat autentizaci ZITADEL do vaší aplikace.",
+      "FRAMEWORK": "Framework",
+      "VIEWDOCS": "Zobrazit dokumentaci",
+      "VIEWEXAMPLE": "Zobrazit příklad",
+      "ENVVARS": "Proměnné prostředí",
+      "ENVVARS_DESC": "Přidejte tyto proměnné prostředí do své aplikace:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Jaký je váš výchozí bod?",
+      "QUICKSTART_SUBTITLE": "Vyberte možnost, která nejlépe popisuje vaši situaci:",
+      "OPTION1": "Možnost 1: Klonovat ukázkovou aplikaci",
+      "OPTION1_DESC": "Rychle začněte s funkční ukázkovou aplikací:",
+      "OPTION1_NOTE": "Po klonování aktualizujte proměnné prostředí s údaji vaší aplikace.",
+      "OPTION2": "Možnost 2: Integrovat existující aplikaci",
+      "OPTION2_DESC": "Integrujte autentizaci ZITADEL do své stávající aplikace:",
+      "STEP1": "Nainstalujte ZITADEL SDK pro svůj framework",
+      "STEP2": "Nakonfigurujte své proměnné prostředí",
+      "STEP3": "Přidejte autentizaci do své aplikace",
+      "STEP4": "Otestujte integraci",
+      "GENERIC": "Obecná integrace",
+      "GENERIC_DESC": "Vyberte si z našich komplexních příkladů a průvodců:",
+      "ALLEXAMPLES": "Všechny příklady",
+      "INTEGRATION_GUIDE": "Průvodce integrací",
+      "NEXTSTEPS": "Další kroky",
+      "CONFIGURE": "Konfigurovat nastavení",
+      "CONFIGURE_DESC": "Přizpůsobte konfiguraci OIDC své aplikace",
+      "REDIRECTS": "Nastavit přesměrování",
+      "REDIRECTS_DESC": "Nakonfigurujte URL pro přesměrování a odhlášení",
+      "URLS_DESC": "Zobrazit důležité URL pro integraci",
+      "TERMINAL": "Terminál",
+      "SCENARIO_NEW_TITLE": "Chci vytvořit zcela novou aplikaci",
+      "SCENARIO_NEW_DESC": "Perfektní! Pomůžeme vám rychle začít s funkčním příkladem, který má zabudovanou autentizaci ZITADEL.",
+      "SCENARIO_NEW_TOGGLE": "Ještě nemám aplikaci",
+      "SCENARIO_EXISTING_TITLE": "Chci integrovat do existující aplikace",
+      "SCENARIO_EXISTING_DESC": "Skvělé! Provedeme vás krok za krokem, jak přidat autentizaci ZITADEL do vaší stávající aplikace.",
+      "SCENARIO_EXISTING_TOGGLE": "Mám existující aplikaci",
+      "CLONE_EXAMPLE": "Klonovat příklad",
+      "CLONE_NOTE": "Po klonování jednoduše aktualizujte soubor .env s údaji své aplikace a jste připraveni!",
+      "BROWSE_EXAMPLES": "Prohlížet všechny příklady",
+      "GENERIC_NEW_NOTE": "Vyberte příklad, který odpovídá vaší technologické stacku, a klonujte jej pro rychlý start.",
+      "EXISTING_STEP1_TITLE": "Nainstalovat SDK",
+      "EXISTING_STEP1_DESC": "Přidejte SDK do svého projektu",
+      "EXISTING_STEP2_TITLE": "Přidat konfiguraci",
+      "EXISTING_STEP2_DESC": "Zkopírujte a vložte tyto proměnné prostředí do konfiguračního souboru vaší aplikace",
+      "EXISTING_STEP3_TITLE": "Nastavit autentizaci",
+      "EXISTING_STEP3_DESC": "Postupujte podle našeho krok za krokem průvodce integrací a přidejte autentizaci do své aplikace",
+      "VIEW_SDKS": "Zobrazit dokumentaci SDK",
+      "AUTH_STATUS_CHECKING": "Kontrola stavu autentizace...",
+      "AUTH_STATUS_SUCCESS": "Vaše aplikace byla autentizována pomocí ZITADEL.",
+      "AUTH_STATUS_PENDING": "Čeká se na první autentizaci uživatele.",
+      "AUTH_STATUS_PENDING_DESC": "Postupujte podle níže uvedeného průvodce integrací pro nastavení autentizace.",
+      "SUCCESS_TITLE": "🎉 Skvělé! Vaše aplikace byla úspěšně připojena",
+      "SUCCESS_DESC": "Vaše aplikace byla úspěšně autentizována pomocí ZITADEL. Nyní můžete použít níže uvedené proměnné prostředí pro integraci.",
+      "ENVVARS_AUTHENTICATED_DESC": "Použijte tyto proměnné prostředí ve své aplikaci:",
+      "INTEGRATION_ENVVARS_TITLE": "Konfigurace vaší aplikace",
+      "INTEGRATION_ENVVARS_DESC": "Přidejte tyto proměnné prostředí do své aplikace pro připojení k ZITADEL:",
+      "NEW_STEP1_TITLE": "Klonovat ukázkovou aplikaci",
+      "NEW_STEP1_DESC": "Rychle začněte s funkčním příkladem, který má zabudovanou autentizaci ZITADEL.",
+      "NEW_STEP2_TITLE": "Nakonfigurujte své proměnné prostředí",
+      "NEW_STEP2_DESC": "Přidejte tyto proměnné prostředí do své aplikace. Vložte je do souboru .env v kořenovém adresáři projektu nebo stáhněte soubor .env a uložte jej.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Aktualizujte soubor .env.example příkladu těmito hodnotami a poté jej přejmenujte na .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Nahraďte 'your-client-secret' svým skutečným klientským tajemstvím. Pokud jste jej při vytváření aplikace neuložili, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "vygenerujte nové zde",
+      "NEW_STEP3_TITLE": "Spusťte a otestujte svou aplikaci",
+      "NEW_STEP3_DESC": "Nainstalujte závislosti.",
+      "NEW_STEP3_DESC2": "Spusťte svou aplikaci a otestujte autentizační proces.",
+      "NEW_STEP4_TITLE": "Zobrazit dokumentaci",
+      "NEW_STEP4_DESC": "Postupujte podle našeho průvodce, jak přizpůsobit a rozšířit svou aplikaci s ZITADEL.",
+      "STEP4_ACTION": "Zobrazit dokumentaci",
+      "GENERIC_NEW_TITLE": "Vyberte svůj výchozí bod",
+      "GENERIC_EXISTING_TITLE": "Vyberte svůj integrační přístup",
+      "GENERIC_EXISTING_NOTE": "Protože pro váš framework není k dispozici žádné specifické SDK, můžete použít naše obecné průvodce integrací nebo pracovat přímo s OIDC/OAuth2 koncovými body.",
+      "API_DOCS": "Dokumentace API",
+      "NEW_STEP_DOCS_TITLE": "Zobrazit komplexní dokumentaci",
+      "NEW_STEP_DOCS_DESC": "Zjistěte více o pokročilých možnostech konfigurace a osvědčených postupech pro váš framework.",
+      "EXISTING_STEP_DOCS_TITLE": "Zjistěte více o integraci",
+      "EXISTING_STEP_DOCS_DESC": "Prozkoumejte naši podrobnou dokumentaci pro pokročilou konfiguraci a řešení problémů.",
+      "SELECT_FRAMEWORK": "Vyberte svůj framework",
+      "SELECT_FRAMEWORK_DESC": "Vyberte framework, který používáte, a získejte přizpůsobené pokyny a příklady integrace."
     }
   },
   "GENDERS": {
@@ -2770,10 +2892,10 @@
     "ADD": "Přidat manažera",
     "CREATIONTYPE": "Typ vytvoření",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organizace",
       "0": "Vlastní projekt",
       "1": "Přidělený projekt",
+      "2": "Organizace",
+      "3": "IAM",
       "4": "Projekt"
     },
     "EDITROLE": "Upravit role",
