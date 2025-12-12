@@ -76,7 +76,6 @@ describe("sendPassword", () => {
   let mockCompleteFlowOrGetUrl: any;
   let mockListAuthenticationMethodTypes: any;
   let mockCheckMFAFactors: any;
-  let mockGetUserByID: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -84,7 +83,7 @@ describe("sendPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieByLoginName } = await import("../cookies");
-    const { listUsers, getLoginSettings, listAuthenticationMethodTypes, getUserByID } = await import("../zitadel");
+    const { listUsers, getLoginSettings, listAuthenticationMethodTypes } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("@/lib/server/cookie");
     const { completeFlowOrGetUrl } = await import("../client");
     const { checkMFAFactors } = await import("../verify-helper");
@@ -98,7 +97,6 @@ describe("sendPassword", () => {
     mockCompleteFlowOrGetUrl = vi.mocked(completeFlowOrGetUrl);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockCheckMFAFactors = vi.mocked(checkMFAFactors);
-    mockGetUserByID = vi.mocked(getUserByID);
 
     mockHeaders.mockResolvedValue({});
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });

@@ -123,10 +123,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         },
       });
 
-      session = await createSessionAndUpdateCookie({
+      const result = await createSessionAndUpdateCookie({
         checks,
         requestId: command.requestId,
       });
+      session = result.session;
     }
 
     if (!session) {

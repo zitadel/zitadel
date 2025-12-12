@@ -1,7 +1,6 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, test, vi, beforeEach } from "vitest";
 import { checkSessionAndSetPassword } from "./password";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 
 // Mock dependencies
 vi.mock("next/headers", () => ({
