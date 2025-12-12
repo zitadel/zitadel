@@ -30,7 +30,7 @@ You will see the default texts in the input field and you can overwrite them by 
 If you don't like your customization anymore click the "reset policy" button.
 All your settings will be removed and the default settings of the system will trigger.
 
-## Internationalization / i18n
+## Internationalization / i18n {#internationalization-i18n}
 
 ZITADEL is available in the following languages
 

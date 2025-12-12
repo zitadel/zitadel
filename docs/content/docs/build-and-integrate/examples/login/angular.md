@@ -166,6 +166,6 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add authorization to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+Now that you have enabled authentication, it's time for you to add authorization to your application using ZITADEL APIs. To do this, you can refer to the [docs](/docs/references/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create an Angular application, you can refer to [Angular](https://angular.io/start). If you want to learn more about the OAuth/OIDC library used above, consider reading the docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

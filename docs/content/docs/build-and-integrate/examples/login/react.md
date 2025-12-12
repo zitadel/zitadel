@@ -116,7 +116,7 @@ If you face issues, contact us or [raise an issue on GitHub](https://github.com/
 ### What's next?
 
 Now that you have enabled authentication, you are ready to add authorization to your application by using ZITADEL APIs.
-To do this, [refer to the API docs](/apis/introduction) or check out [the ZITADEL Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+To do this, [refer to the API docs](/docs/references/introduction) or check out [the ZITADEL Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create a React application, you can refer to [Create React App](https://github.com/facebook/create-react-app).
 If you want to learn more about the libraries wrapped by [@zitadel/react](https://www.npmjs.com/package/@zitadel/react), read the docs for [oidc-client-ts](https://github.com/authts/oidc-client-ts).

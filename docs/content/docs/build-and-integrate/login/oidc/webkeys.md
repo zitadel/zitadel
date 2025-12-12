@@ -77,7 +77,7 @@ The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](/docs/references/resources/webkey_service_v2).
+ZITADEL provides a resource based [web keys API](/docs/references/api/webkey/zitadel.webkey.v2.WebKeyService.ListWebKeys).
 The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
 Applications need public keys for token verification and not all applications are capable of on-demand
@@ -89,12 +89,12 @@ This allows the keys to be distributed to the instance's apps and caches.
 Once a key is deactivated, its public key will remain available for token verification until the web key is deleted.
 Delayed deletion makes sure tokens that were signed before the key got deactivated remain valid.
 
-When the `web_key` [feature](/docs/references/resources/feature_service_v2/feature-service-set-instance-features) is enabled the first time,
+When the `web_key` [feature](/docs/references/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) is enabled the first time,
 two web key pairs are created with one activated.
 
 ### Creation
 
-The web key [create](/docs/references/resources/webkey_service_v3/zitadel-web-keys-create-web-key) endpoint generates a new web key pair,
+The web key [create](/docs/references/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey) endpoint generates a new web key pair,
 using the passed generator configuration from the request. This config is a one-of field of:
 
 - RSA
@@ -191,7 +191,7 @@ curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 
 ### Activation
 
-When a generated web key is [activated](/docs/references/resources/webkey_service_v3/zitadel-web-keys-activate-web-key),
+When a generated web key is [activated](/docs/references/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey),
 its private key will be used to sign new tokens.
 There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
@@ -202,7 +202,7 @@ at least for the duration of the max-age setting plus any time it might take for
 
 ### Deletion
 
-Non-active keys may be [deleted](/docs/references/resources/webkey_service_v3/zitadel-web-keys-delete-web-key).
+Non-active keys may be [deleted](/docs/references/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey).
 Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,

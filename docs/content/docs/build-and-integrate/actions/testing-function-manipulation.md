@@ -23,7 +23,7 @@ In case you are using a different setup, you need to adjust the target URL accor
 
 ## Available functions
 
-The available conditions can be found under [all available Functions](/apis/resources/action_service_v2/action-service-list-execution-functions).
+The available conditions can be found under [all available Functions](/docs/references/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions).
 
 ## Start example target
 
@@ -100,7 +100,7 @@ You can do this by using **Webhook.site** (see [Creating a Listener with Webhook
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
-See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
+See [Create a target](/docs/references/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
@@ -124,7 +124,7 @@ Save the returned ID to set in the execution.
 To configure ZITADEL to call the target when a function is executed, you need to set an execution and define the function
 condition.
 
-See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
+See [Set an execution](/docs/references/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \

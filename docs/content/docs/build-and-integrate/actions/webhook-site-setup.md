@@ -76,7 +76,7 @@ You should see output in your console whenever the listener is called.
 
 As shown in the example above, the target is created with HTTP and port '8090'. If you want to use it as a webhook, the target can be created as follows:
 
-See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information. Notice that the `endpoint` is your Webhook.site URL.
+See [Create a target](/docs/references/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information. Notice that the `endpoint` is your Webhook.site URL.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
@@ -111,7 +111,7 @@ Save the returned ID to use in the execution step. A sample response looks like 
 
 To configure ZITADEL to call the target when an API endpoint is called, set an execution and define the request condition.
 
-See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
+See [Set an execution](/docs/references/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 Here, `<TargetID returned>` is the `id` from the previous step.
 

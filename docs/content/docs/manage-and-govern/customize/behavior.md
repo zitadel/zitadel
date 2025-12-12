@@ -2,7 +2,7 @@
 title: Behavior Customization
 ---
 
-In this guide, you will create a [ZITADEL action](../../../concepts/features/actions).
+In this guide, you will create a [ZITADEL action](../../concepts/features/actions).
 After users register using an external identity provider, the action assigns them a role.
 
 ## Prerequisites
@@ -11,7 +11,7 @@ Before you start, make sure you have everything set up correctly.
 
 - You need to be at least a ZITADEL _ORG_OWNER_
 - Your ZITADEL organization needs to have the actions feature enabled. {/* TODO: How to enable it for SaaS ZITADEL? */}
-- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-providers/introduction)
+- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../build-and-integrate/identity-providers/introduction)
 - [You need to have at least one role configured for a project](../console/projects)
 
 ## Copy some information for the action

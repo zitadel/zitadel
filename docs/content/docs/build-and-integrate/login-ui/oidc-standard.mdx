@@ -56,7 +56,7 @@ The endpoint will redirect you to the domain of your UI on the path /login and a
 ### Get Auth Request by ID
 
 With the ID from the redirect before you will now be able to get the information of the auth request.
-[Get Auth Request By ID Documentation](/docs/references/resources/oidc_service_v2/oidc-service-get-auth-request)
+[Get Auth Request By ID Documentation](/docs/references/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest)
 
 ```bash
 curl --request GET \
@@ -85,7 +85,7 @@ Response Example:
 ### Perform Login
 
 After you have initialized the OIDC flow you can implement the login.
-Implement all the steps you like the user the go trough by [creating](/docs/references/resources/session_service_v2/session-service-create-session) and [updating](/docs/references/resources/session_service_v2/session-service-set-session) the user-session.
+Implement all the steps you like the user the go trough by [creating](/docs/references/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/docs/references/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -100,7 +100,7 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Finalize Auth Request Documentation](/docs/references/resources/oidc_service_v2/oidc-service-create-callback)
+Read more about the [Finalize Auth Request Documentation](/docs/references/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback)
 
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
@@ -150,4 +150,4 @@ In case the ZITADEL backend is not able to determine which session to terminate 
 
 ```/logout?post_logout_redirect=```
 
-Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/references/resources/session_service_v2/session-service-delete-session) and send the user to the `post_logout_redirect` URL.
+Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/references/api/session/zitadel.session.v2.SessionService.DeleteSession) and send the user to the `post_logout_redirect` URL.

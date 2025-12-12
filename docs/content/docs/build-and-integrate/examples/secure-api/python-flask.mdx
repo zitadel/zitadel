@@ -30,7 +30,7 @@ In order to run the example you need to have `python3` and `pip3` installed.
 
 You need to setup a couple of things in ZITADEL. 
 
-1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/docs/quickstarts/quickstart#2-create-your-first-instance). Also, create a new project by following the steps [here](/docs/quickstarts/quickstart#2-create-your-first-instance).
+1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/docs/quickstarts/quickstart). Also, create a new project by following the steps [here](/docs/quickstarts/quickstart).
 
 2. You must create an API application in your project. Follow [this guide](/docs/manage-and-govern/console/applications) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application. 
 
@@ -179,7 +179,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         return res
 ```
 
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/quickstarts/quickstart#referred1).
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/quickstarts/quickstart).
 
 ```python
 ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"

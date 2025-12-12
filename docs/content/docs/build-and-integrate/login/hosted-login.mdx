@@ -28,7 +28,7 @@ After successful authentication, the user will be redirected back to the origina
 ## Security and compliance
 
 ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
-It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/build-and-integrate/login/oidc), and [SAML](/docs/build-and-integrate/login/).
+It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/build-and-integrate/login/oidc/login-users), and [SAML](/docs/build-and-integrate/login/saml).
 
 We make sure to harden the login UI and minimize the attack surface.
 One of the measures we apply is setting the necessary security heads thus minimizing the risk of common vulnerabilities in login pages, such as XSS vulnerabilities.
@@ -51,7 +51,7 @@ By default, all of these login methods are allowed and can be adjusted by [Manag
 
 ### Support for multiple authentication methods
 
-The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
+The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys).
 The second factor (2FA) and multi-factor authentication methods (MFA) available in ZITADEL include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
@@ -119,7 +119,7 @@ Unauthenticated users can request a password reset after providing the loginname
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy) is set
+- Instance or organization [login policy](/docs/manage-and-govern/console/default-settings#login-behavior-and-access) is set
 - Requested by the client
 - A multi-factor is set up for the user
 
@@ -134,14 +134,14 @@ You can disable the prompt, in case multifactor authentication is not enforced b
 
 Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
 
-The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
+The passwordless with [passkeys](/docs/concepts/features/passkeys) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the operating system and browser.
 
 ## Hosted Login Version 2
 
-We have worked on a new, self-hostable implementation of our hosted MIT licensed login built with Next.js and leveraging our [Session API](/docs/build-and-integrate/login/login-users#zitadels-session-api).
+We have worked on a new, self-hostable implementation of our hosted MIT licensed login built with Next.js and leveraging our [Session API](/docs/build-and-integrate/login/login-users#session-api).
 This solution empowers you to easily customize the login experience to perfectly match your brand and needs.
 
 ### Limitations

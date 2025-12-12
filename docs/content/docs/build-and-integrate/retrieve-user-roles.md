@@ -20,7 +20,7 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/docs/manage-and-govern/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/manage-and-govern/console/managers)
-- [Add application roles via the ZITADEL Management API](/docs/references/resources/mgmt/project-roles)
+- [Add application roles via the ZITADEL Management API](/docs/references/api/project/zitadel.project.v2.ProjectService.AddProjectRole)
 - [Add manager roles to users via the ZITADEL Management API](/docs/references/resources/mgmt/members)
 
 ## Retrieve roles
@@ -196,7 +196,7 @@ This request can be tested out in the following way:
 
 #### Customize roles using actions
 
-If your application requires a custom role structure, [ZITADEL actions](/docs/references/actions/complement-token#pre-userinfo-creation-id_token--userinfo--introspection-endpoint) allow you to customize your claims.
+If your application requires a custom role structure, [ZITADEL actions](/docs/references/actions/complement-token) allow you to customize your claims.
 
 <details open="open">
 <summary>Example on github</summary>

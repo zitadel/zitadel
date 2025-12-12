@@ -58,7 +58,7 @@ authenticate the user in exchange for an authorization_code (authorization code 
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
-| scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
+| scope         | `openid` is required, see [Scopes](./scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
 
 <Callout type="info" title="Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued,">
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`.
@@ -212,7 +212,7 @@ Depending on your authorization method you will have to provide additional param
 >
 <Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
 </Tab>
 <Tab value="client_secret_post">
@@ -241,7 +241,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
 </Tab>
@@ -265,8 +265,8 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | Parameter  | Description                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
-| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants) |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
+| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](./grant-types#using-jwts-as-authorization-grants) |
+| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
 
 ```bash
 curl --request POST \
@@ -289,7 +289,7 @@ curl --request POST \
 ### Refresh token grant
 
 To request a new `access_token` without user interaction, you can use the `refresh_token` grant.
-See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
+See [offline_access Scope](./scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
 #### Required request parameters
 
@@ -297,7 +297,7 @@ See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | grant_type    | Must be `refresh_token`                                                                                                                                                                                                                                                                                         |
 | refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request.                                                                                                                                                                                                                    |
-| scope         | [Scopes](scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
+| scope         | [Scopes](./scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -313,7 +313,7 @@ Depending on your authorization method you will have to provide additional param
 >
 <Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
 </Tab>
 <Tab value="client_secret_post">
@@ -337,7 +337,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
 </Tab>
@@ -361,10 +361,10 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | Parameter  | Description                                                                                                |
 | ---------- | ---------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `client_credentials`                                                                               |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
+| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
 
 Additionally, you need to authenticate your client by either sending `client_id` and `client_secret` as Basic Auth Header.
-Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
 ```bash
 curl --request POST \
@@ -428,7 +428,7 @@ Depending on your authorization method you will have to provide additional param
 
 <Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
 </Tab>
 <Tab value="client_secret_post">
@@ -452,7 +452,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
 </Tab>
@@ -501,7 +501,7 @@ values={[
 >
 <Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
 ```bash
 curl --request POST \
@@ -519,7 +519,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
 
 ```bash
@@ -555,7 +555,7 @@ If `active` is **true**, further information will be provided:
 | username   | ZITADEL's login name of the user. Consist of `username@primarydomain` |
 
 Additionally and depending on the granted scopes, information about the authorized user is provided.
-Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
 ### Error response <a id="introspect-error-response"></a>
 
@@ -578,7 +578,7 @@ curl --request GET \
 ### Successful userinfo response <a id="userinfo-response"></a>
 
 If the `access_token` is valid, the information about the user depending on the granted scopes is returned.
-Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
 ### Error response <a id="userinfo-error-response"></a>
 
@@ -613,7 +613,7 @@ values={[
 >
 <Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to construct a request correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to construct a request correctly.
 
 </Tab>
 <Tab value="client_secret_post">
@@ -641,7 +641,7 @@ Send a `client_assertion` as JWT for ZITADEL to verify the signature against the
 
 | Parameter             | Description                                                                                                   |
 | --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                              |
 
 ```bash

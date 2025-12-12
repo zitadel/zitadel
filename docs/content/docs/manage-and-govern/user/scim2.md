@@ -10,7 +10,7 @@ deprovisioning.
 
 ## API
 
-To learn more about Zitadel's SCIM API, see the API documentation [here](/apis/scim2).
+To learn more about Zitadel's SCIM API, see the API documentation [here](/docs/references/scim2).
 
 ## Provisioning domain
 
@@ -108,7 +108,7 @@ Only the value of `displayName` is stored and returned in subsequent queries.
 
 ## Resources
 
-- **[Zitadel SCIM API Documentation](/apis/scim2)**: Documentation of Zitadel's SCIM API implementation.
+- **[Zitadel SCIM API Documentation](/docs/references/scim2)**: Documentation of Zitadel's SCIM API implementation.
 - **[SCIM](https://scim.cloud/)**: The Webpage of SCIM.
 - **[RFC7643](https://tools.ietf.org/html/rfc7643) Core Schema**:
   The Core Schema provides a platform-neutral schema and extension model for representing users and groups.

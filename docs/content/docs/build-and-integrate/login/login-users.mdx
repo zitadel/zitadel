@@ -26,11 +26,11 @@ OpenID Connect (OIDC) offers a modern and lightweight authentication protocol bu
 ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
 Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](https://zitadel.com/playgrounds/oidc) to the identity provider that contains information such as the requesting application, [scopes](/docs/references/openidoauth/scopes), and redirect url.
-The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain.md)
+The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain)
 The user will authenticate using their credentials.
 After successful authentication, the user will be redirected back to the original application.
 
-If you want to read more about authenticating with OIDC, head over to our comprehensive [OpenID Connect Guide](/docs/build-and-integrate/login/oidc).
+If you want to read more about authenticating with OIDC, head over to our comprehensive [OpenID Connect Guide](/docs/build-and-integrate/login/oidc/login-users).
 
 ### Authenticate users with SAML
 
@@ -61,10 +61,10 @@ In case you want to integrate a mobile application, use OpenID Connect or our Se
 There are more [differences between SAML and OIDC](https://zitadel.com/blog/saml-vs-oidc) that you might want to consider.
 If you want to read more about authenticating with SAML, head over to our comprehensive [SAML Guide](/docs/build-and-integrate/login/saml).
 
-## ZITADEL's Session API
+## Session API
 
-ZITADEL's [Session API](/docs/references/resources/session_service_v2) provides developers with a straightforward method to manage user sessions within their applications.
-The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/docs/build-and-integrate/login-ui).
+ZITADEL's [Session API](/docs/references/api/session/zitadel.session.v2.SessionService.CreateSession) provides developers with a straightforward method to manage user sessions within their applications.
+The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/docs/build-and-integrate/login-ui/login-app).
 
 ### Tokens in the Session API
 
@@ -109,7 +109,7 @@ The hosted login is particularly well-suited for scenarios where:
 ## Build a custom Login UI to authenticate users
 
 In certain cases, you want to build your own login UI to optimize your user experience.
-We have dedicated guides on [how to build your custom login UI](/docs/build-and-integrate/login-ui) with ZITADEL.
+We have dedicated guides on [how to build your custom login UI](/docs/build-and-integrate/login-ui/login-app) with ZITADEL.
 
 When building your own login UI, you will leverage the [Session API](#zitadels-session-api) to authenticate users and manage user sessions.
 
@@ -129,6 +129,6 @@ Main reasons why developers might want to build their own login UI include:
 
 ## Further reference
 
-- Learn how to [register and onboard users](/docs/build-and-integrate/onboarding)
-- Learn how to [build your own login UI](/docs/build-and-integrate/login-ui) based on ZITADEL
+- Learn how to [register and onboard users](/docs/build-and-integrate/onboarding/end-users)
+- Learn how to [build your own login UI](/docs/build-and-integrate/login-ui/login-app) based on ZITADEL
 - Learn how to [configure ZITADEL](/docs/manage-and-govern/console/overview) through the Console

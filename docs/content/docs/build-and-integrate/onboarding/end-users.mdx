@@ -139,11 +139,11 @@ We do have a guide series on how to build your own login ui, which also includes
 - Passkeys
 - External Login Providers
 
-You can find all the guides here: [Build your own login UI](/docs/build-and-integrate/login-ui)
+You can find all the guides here: [Build your own login UI](/docs/build-and-integrate/login-ui/login-app)
 
 #### Custom fields
 
-The [create user request](/docs/references/resources/user_service_v2/user-service-add-human-user) also allows you to add [metadata](/docs/manage-and-govern/customize/user-metadata) (key, value) to the user.
+The [create user request](/docs/references/api/user/zitadel.user.v2.UserService.AddHumanUser) also allows you to add [metadata](/docs/manage-and-govern/customize/user-metadata) (key, value) to the user.
 This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in ZITADEL.
 Those metadata can also directly be included in the [token](/docs/manage-and-govern/customize/user-metadata#use-tokens-to-get-user-metadata) of the user.
 We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in ZITADEL to follow the separation of concern pattern.

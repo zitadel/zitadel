@@ -43,7 +43,7 @@ If you like to trigger your settings for your applications you have different po
 
 ### 1. Primary Domain Scope
 
-Send a [reserved scope](/docs/references/openidoauth/scopes) with your [authorization request](../../integrate/login/oidc/login-users#auth-request) to trigger your organization.
+Send a [reserved scope](/docs/references/openidoauth/scopes) with your [authorization request](/docs/references/openidoauth/endpoints#authorization-endpoint) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
 You can use our [OpenID Authentication Request Playground](https://zitadel.com/playgrounds/oidc) to learn more about how to trigger an [organization's policies and branding](https://zitadel.com/playgrounds/oidc#organization-policies-and-branding).

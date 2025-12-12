@@ -20,7 +20,7 @@ If a user of this organization wants to login, you don't want them to enter thei
 ### Settings
 
 1. Go to the "Identity Providers" Settings of the organization
-2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers/introduction) if you don't know how
+2. Configure the needed identity provider: Read this [guide](../identity-providers/introduction) if you don't know how
 3. Go to the "Login Behavior and Security" settings of the organization
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
@@ -39,7 +39,7 @@ ZITADEL Login: `login.app.com`
 In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
 To handle this scenario it is possible to register multiple URIs on each application in ZITADEL, the only criteria is that the requested URI has to match one of the registered URIs.
 
-Read more about [applications](../manage/console/applications) and the [redirect urls](../manage/console/applications#redirect-uris)
+Read more about [applications](/docs/manage-and-govern/console/applications) and the [redirect urls](/docs/manage-and-govern/console/applications)
 
 ### Trigger organization in ZITADEL login
 
@@ -107,7 +107,7 @@ Go to the "Advanced" section, per default login with phone number should be allo
 
 ![Login Policy Advanced Setting: Disable phone for login](/img/guides/scenarios/login_policy_advanced_phone.png)
 
-## Embedding ZITADEL in an iFrame
+## Embedding ZITADEL in an iframe
 
 To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
 Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:

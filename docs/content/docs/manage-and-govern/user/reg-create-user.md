@@ -6,7 +6,7 @@ The ZITADEL API has different possibilities to create users.
 This can be used, if you are building your own registration page.
 
 Use the following API call to create your users:
-[Create User (Human)](apis/resources/user_service_v2/user-service-add-human-user.api.mdx)
+[Create User (Human)](/docs/references/api/user/zitadel.user.v2.UserService.AddHumanUser)
 
 ## With Username and Password
 

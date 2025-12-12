@@ -17,8 +17,8 @@ This flexibility is one of ZITADEL's standout features.
 
 If you have an API that behaves as an OAuth resource server that can be accessed by user-facing applications and need to validate an access token by calling the ZITADEL introspection API, you can use the following methods to register these APIs in ZITADEL:
 
-- [JSON Web Token (JWT) Profile (Recommended)](private-key-jwt.mdx)
-- [Basic Authentication](./basic-auth.mdx)
+- [JSON Web Token (JWT) Profile (Recommended)](/docs/build-and-integrate/token-introspection/private-key-jwt)
+- [Basic Authentication](/docs/build-and-integrate/token-introspection/basic-auth)
 
 ## Service users
 
@@ -29,7 +29,7 @@ Read the introduction on how to [authenticate service users](../service-users/au
 ## Further references
 
 - [Introspection API reference](/docs/references/openidoauth/endpoints#token-endpoint)
-- [JWT vs. opaque tokens](/docs/concepts/knowledge/opaque-tokens.md)
+- [JWT vs. opaque tokens](/docs/concepts/knowledge/opaque-tokens)
 - [Python examples for securing an API and invoking it as a service user](https://github.com/zitadel/examples-api-access-and-token-introspection)
 
 import DocCardList from '@/components/docusaurus/doc-card-list';

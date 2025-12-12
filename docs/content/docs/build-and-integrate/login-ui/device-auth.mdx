@@ -77,7 +77,7 @@ Your login will have to provide a page on the `verification_uri` where the user 
 ### Get the Device Authorization Request by User Code
 
 With the user_code entered by the user you will now be able to get the information of the device authorization request.
-[Get Device Authorization Request Documentation](/docs/references/resources/oidc_service_v2/oidc-service-get-device-authorization-request)
+[Get Device Authorization Request Documentation](/docs/references/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest)
 
 ```bash
 curl --request GET \
@@ -107,7 +107,7 @@ Present the user with the information of the device authorization request and al
 ### Perform Login
 
 After you have initialized the OIDC flow you can implement the login.
-Implement all the steps you like the user the go trough by [creating](/docs/references/resources/session_service_v2/session-service-create-session) and [updating](/docs/references/resources/session_service_v2/session-service-set-session) the user-session.
+Implement all the steps you like the user the go trough by [creating](/docs/references/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/docs/references/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -122,7 +122,7 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Authorize or Deny Device Authorization Request Documentation](/docs/references/resources/oidc_service_v2/oidc-service-authorize-or-deny-device-authorization)
+Read more about the [Authorize or Deny Device Authorization Request Documentation](/docs/references/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization)
 
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
@@ -167,4 +167,4 @@ These endpoints are:
 - Device Authorization Endpoint
 - Token
 
-Additionally, we recommend you to proxy all the other [OIDC relevant endpoints](./oidc-standard#endpoints).
+Additionally, we recommend you to proxy all the other [OIDC relevant endpoints](/docs/references/openidoauth/endpoints).

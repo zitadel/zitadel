@@ -17,7 +17,7 @@ You will benefit from the same software as the open-source project, but we take 
 When creating a new instance, you are able to choose a [data location](#data-location).
 We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](https://help.zitadel.com/pricing-and-billing-of-zitadel-services) is based on effective usage of our services.
 
-### Enterprise license / self-hosted
+### Enterprise license and self-hosted
 
 The ZITADEL Enterprise license allows you to use the [ZITADEL software](https://github.com/zitadel) on your own data center or private cloud.
 

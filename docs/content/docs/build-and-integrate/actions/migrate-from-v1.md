@@ -50,8 +50,8 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 Some use-cases:
 
 - Handle the information mapping from the external authentication to internal structure through the response on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`, [Action Response Example](./testing-response)
-  - information about the link to the external IDP available in the response under [`idpInformation`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent)
-  - information if a new user has to be created available in the response under [`addHumanUser`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent), including metadata and link to external IDP
+  - information about the link to the external IDP available in the response under [`idpInformation`](/docs/references/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent)
+  - information if a new user has to be created available in the response under [`addHumanUser`](/docs/references/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent), including metadata and link to external IDP
 
 ### Pre Creation
 

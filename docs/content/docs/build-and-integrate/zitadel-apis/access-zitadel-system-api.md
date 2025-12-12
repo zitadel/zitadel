@@ -12,7 +12,7 @@ The ZITADEL System API is currently only available for ZITADEL Self-Hosted deplo
 ## System API User
 
 The System API works superordinate over all instances. Therefore, you need to define a separate users to get access to this API.
-You can do so by customizing the [runtime configuration](/docs/operate-and-self-host/manage/configure#runtime-configuration).
+You can do so by customizing the [runtime configuration](/docs/operate-and-self-host/manage/configure/configure#runtime-configuration-file).
 
 To authenticate the user a self-signed JWT will be created and utilized.
 
@@ -185,4 +185,4 @@ You should get a successful response with a `totalResult` number of 1 and the de
 
 Where to go from here:
 
-* [ZITADEL API Documentation](/apis/introduction)
+* [ZITADEL API Documentation](/docs/references/introduction)

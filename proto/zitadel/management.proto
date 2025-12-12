@@ -3542,7 +3542,7 @@ service ManagementService {
 
     // Get Application By ID
     //
-    // Deprecated: Use [GetApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-get-application.api.mdx) instead to fetch an app
+    // Deprecated: Use [GetApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead to fetch an app
     //
     // Get an application of any type (OIDC, API, SAML).
     rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
@@ -3571,7 +3571,7 @@ service ManagementService {
 
     // Search Applications
     //
-    // Deprecated: Use [ListApplications](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-list-applications.api.mdx) instead to list applications
+    // Deprecated: Use [ListApplications](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead to list applications
     //
     // Returns all applications within a project, that match the query.
     rpc ListApps(ListAppsRequest) returns (ListAppsResponse) {
@@ -3626,7 +3626,7 @@ service ManagementService {
 
     // Create Application (OIDC)
     //
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application.api.mdx) instead to create an OIDC application.
+    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an OIDC application.
     //
     // Create a new OIDC client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be returned.
     rpc AddOIDCApp(AddOIDCAppRequest) returns (AddOIDCAppResponse) {
@@ -3656,7 +3656,7 @@ service ManagementService {
 
     // Create Application (SAML)
     //
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application.api.mdx) instead to create a SAML application.
+    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create a SAML application.
     //
     // Create a new SAML client. Returns an entity ID.
     rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
@@ -3686,7 +3686,7 @@ service ManagementService {
 
     // Create Application (API)
     //
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application.api.mdx) instead to create an API application
+    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an API application
     //
     // Create a new API client. The client id will be generated and returned in the response.
     // Depending on the chosen configuration also a secret will be generated and returned.
@@ -3717,7 +3717,7 @@ service ManagementService {
 
     // Update Application
     //
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-update-application.api.mdx) instead to update the generic params of an app.
+    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the generic params of an app.
     //
     // Update the basic information of an application. This doesn't include information that are dependent on the application type (OIDC, API, SAML)
     rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {
@@ -3747,7 +3747,7 @@ service ManagementService {
 
     // Update OIDC Application Config
     //
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-update-application.api.mdx) instead to update the config of an OIDC app.
+    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an OIDC app.
     //
     // Update the OIDC specific configuration of an application.
     rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
@@ -3777,7 +3777,7 @@ service ManagementService {
 
     // Update SAML Application Config
     //
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-update-application.api.mdx) instead to update the config of a SAML app.
+    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of a SAML app.
     //
     // Update the SAML specific configuration of an application.
     rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
@@ -3807,7 +3807,7 @@ service ManagementService {
 
     // Update API Application Config
     //
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-update-application.api.mdx) instead to update the config of an API app.
+    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an API app.
     //
     // Update the OIDC-specific configuration of an application.
     rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
@@ -3837,7 +3837,7 @@ service ManagementService {
 
     // Deactivate Application
     //
-    // Deprecated: Use [DeactivateApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-deactivate-application.api.mdx) instead to deactivate an app.
+    // Deprecated: Use [DeactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead to deactivate an app.
     //
     // Set the state of an application to deactivated. It is not possible to request tokens for deactivated apps. Request returns an error if the application is already deactivated.
     rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
@@ -3867,7 +3867,7 @@ service ManagementService {
 
     // Reactivate Application
     //
-    // Deprecated: Use [ReactivateApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-reactivate-application.api.mdx) instead to reactivate an app.
+    // Deprecated: Use [ReactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead to reactivate an app.
     //
     // Set the state of an application to active. Request returns an error if the application is not deactivated.
     rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
@@ -3897,7 +3897,7 @@ service ManagementService {
 
     // Remove Application
     //
-    // Deprecated: Use [DeleteApplication](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-delete-application.api.mdx) instead to delete an app.
+    // Deprecated: Use [DeleteApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead to delete an app.
     //
     // Remove an application. It is not possible to request tokens for removed apps. Request returns an error if the application is already deactivated.
     rpc RemoveApp(RemoveAppRequest) returns (RemoveAppResponse) {
@@ -3926,7 +3926,7 @@ service ManagementService {
 
     // Generate New OIDC Client Secret
     //
-    // Deprecated: Use [GenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-generate-client-secret.api.mdx) instead to (re-)generate an OIDC app client secret.
+    // Deprecated: Use [GenerateClientSecret](/docs/references/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an OIDC app client secret.
     //
     // Generates a new client secret for the OIDC application, make sure to save the response.
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
@@ -3956,7 +3956,7 @@ service ManagementService {
 
     // Generate New API Client Secret
     //
-    // Deprecated: Use [GenerateClientSecret](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-generate-client-secret.api.mdx) instead to (re-)generate an API app client secret
+    // Deprecated: Use [GenerateClientSecret](/docs/references/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an API app client secret
     //
     // Generates a new client secret for the API application, make sure to save the response.
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
@@ -3986,7 +3986,7 @@ service ManagementService {
 
     // Get Application Key By ID
     //
-    // Deprecated: Use [GetApplicationKey](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-get-application-key.api.mdx) instead to get an application key.
+    // Deprecated: Use [GetApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead to get an application key.
     //
     // Returns an application key. Keys are used for authorizing API Applications.
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
@@ -4015,7 +4015,7 @@ service ManagementService {
 
     // List Application Keys
     //
-    // Deprecated: Use [ListApplicationKeys](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-list-application-keys.api.mdx) instead to list application keys.
+    // Deprecated: Use [ListApplicationKeys](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead to list application keys.
     //
     // Search application keys. Keys are used for authorizing API Applications.
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
@@ -4045,7 +4045,7 @@ service ManagementService {
 
     // Create Application Key
     //
-    // Deprecated: Use [CreateApplicationKey](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-create-application-key.api.mdx) instead to create an application key.
+    // Deprecated: Use [CreateApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead to create an application key.
     //
     // Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it.
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
@@ -4075,7 +4075,7 @@ service ManagementService {
 
     // Delete Application Key
     //
-    // Deprecated: Use [DeleteApplicationKey](/apis/resources/application_service_v2/zitadel-application-v-2-application-service-delete-application-key.api.mdx) instead to delete an application key.
+    // Deprecated: Use [DeleteApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead to delete an application key.
     //
     // Remove an application key. The API application will not be able to authorize with the key anymore.
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
@@ -4509,7 +4509,7 @@ service ManagementService {
 
     // Get User Grant By ID
     //
-    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-list-authorizations.api.mdx) and filter by its ID.
+    // Deprecated: [List authorizations](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and filter by its ID.
     //
     // Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
@@ -4537,7 +4537,7 @@ service ManagementService {
 
     // Search User Grants
     //
-    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-list-authorizations.api.mdx) and pass the user ID filter to search for a users grants on owned or granted projects.
+    // Deprecated: [List authorizations](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and pass the user ID filter to search for a users grants on owned or granted projects.
     //
     // Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization.
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
@@ -4567,7 +4567,7 @@ service ManagementService {
 
     // Add User Grant
     //
-    // Deprecated: [Add an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-create-authorization.api.mdx) to grant a user access to an owned or granted project.
+    // Deprecated: [Add an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization) to grant a user access to an owned or granted project.
     //
     // Add a user grant for a specific user. User grants are the roles users have for a specific project and organization.
     rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
@@ -4596,7 +4596,7 @@ service ManagementService {
 
     // Update User Grant
     //
-    // Deprecated: [Update an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-update-authorization.api.mdx) to update a user's roles on an owned or granted project.
+    // Deprecated: [Update an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization) to update a user's roles on an owned or granted project.
     //
     // Update the roles of a user grant. User grants are the roles users have for a specific project and organization.
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
@@ -4625,7 +4625,7 @@ service ManagementService {
 
     // Deactivate User Grant
     //
-    // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-deactivate-authorization.api.mdx) to disable a user's access to an owned or granted project.
+    // Deprecated: [Deactivate an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization) to disable a user's access to an owned or granted project.
     //
     // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
@@ -4654,7 +4654,7 @@ service ManagementService {
 
     // Reactivate User Grant
     //
-    // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-activate-authorization.api.mdx) to enable a user's access to an owned or granted project.
+    // Deprecated: [Activate an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization) to enable a user's access to an owned or granted project.
     //
     // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
@@ -4683,7 +4683,7 @@ service ManagementService {
 
     // Remove User Grant
     //
-    // Deprecated: [Delete an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove a users access to an owned or granted project.
+    // Deprecated: [Delete an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove a users access to an owned or granted project.
     //
     // Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
@@ -4711,7 +4711,7 @@ service ManagementService {
 
     // Bulk Remove User Grants
     //
-    // Deprecated: [Delete authorizations one after the other](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove access for multiple users on multiple owned or granted projects.
+    // Deprecated: [Delete authorizations one after the other](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove access for multiple users on multiple owned or granted projects.
     //
     // Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {

@@ -101,7 +101,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes).
+ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](./scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                                  | Description                                                                                                                                                                                                                              |
 |:--------------------------------------------------|:---------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

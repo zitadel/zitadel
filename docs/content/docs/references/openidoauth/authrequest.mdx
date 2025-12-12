@@ -56,7 +56,7 @@ Depending on the authentication and authorization flow of your application you m
 for most application types. The playground appends automatically a code challenge
 for PKCE flows.
 
-You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/build-and-integrate/login/oidc/login-users#token-request) for more details.
+You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/build-and-integrate/login/oidc/login-users) for more details.
 
 More in the [documentation](/docs/references/openidoauth/authn-methods) about authentication methods.
 
@@ -115,7 +115,7 @@ Please refer to the full [guide on user-metadata](/docs/manage-and-govern/custom
 
 ### Access core apis
 
-Calling the [core API](/apis/introduction) with the authenticated user, requires that the projectID of ZITADEL is included in the audience claim.
+Calling the [core API](/docs/references/introduction) with the authenticated user, requires that the projectID of ZITADEL is included in the audience claim.
 
 This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your applications authorization request.
 

@@ -161,7 +161,7 @@ Essentially, a verifier ensures ZITADEL can work with passwords hashed using var
 Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
 This ensures consistency and allows for automatic updates even when hasher configurations are changed, such as increasing salt cost for bcrypt.
 
-To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/docs/operate-and-self-host/manage/configure#runtime-configuration-file)
+To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/docs/operate-and-self-host/manage/configure/configure#runtime-configuration-file)
 or by the environment variable `ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM`, for example:
 
 ```

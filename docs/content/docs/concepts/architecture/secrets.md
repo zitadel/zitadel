@@ -88,7 +88,7 @@ This allows to increase cost along with growing computing power.
 ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
 
 Note however that by default, only `bcrypt` is enabled. 
-Further `Verifiers` must be enabled in the [configuration](/docs/operate-and-self-host/manage/configure) by the system administrator. 
+Further `Verifiers` must be enabled in the [configuration](/docs/operate-and-self-host/manage/configure/configure) by the system administrator. 
 
 </Callout>
 
@@ -123,7 +123,7 @@ Some secrets cannot be hashed because they need to be used in their raw form. Th
 ### Masterkey
 
 Since the Masterkey is used as means of protecting the Secrets Storage it cannot be stored in the storage.
-You find [here the many ways how ZITADEL can consume the Masterkey](/docs/operate-and-self-host/manage/configure).
+You find [here the many ways how ZITADEL can consume the Masterkey](/docs/operate-and-self-host/manage/configure/configure).
 
 ### TLS Material
 
@@ -132,7 +132,7 @@ Please check our [TLS Modes documentation](/docs/operate-and-self-host/manage/tl
 
 ### Admin User
 
-The initial Admin User of ZITADEL can be configured through [ZITADELs config options](/docs/operate-and-self-host/manage/configure).
+The initial Admin User of ZITADEL can be configured through [ZITADELs config options](/docs/operate-and-self-host/manage/configure/configure).
 
 <Callout type="info" title="To prevent elevated breaches ZITADEL forces the Admin Users password to be changed during the first login.">
 

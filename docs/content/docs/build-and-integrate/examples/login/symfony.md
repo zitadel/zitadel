@@ -104,7 +104,7 @@ composer require drenso/symfony-oidc-bundle
 
 First, we need to create a User class for the database, so we can persist user info between requests. In this case you don't need password authentication.
 Email addresses are not unique for ZITADEL users. There can be multiple user accounts with the same email address.
-See [User Constraints](/docs/concepts/structure/users#constraints) for more details.
+See [User Uniqueness](/docs/concepts/structure/users#uniqueness-of-users) for more details.
 We will use the User Info `sub` claim as unique "display" name for the user. `sub` equals the unique User ID from ZITADEL.
 This creates a User Repository and Entity that implements the `UserInterface`:
 
@@ -407,4 +407,4 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.
+Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/docs/references/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.

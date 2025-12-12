@@ -2159,9 +2159,9 @@ message CreateUserRequest{
     // Read more about your options for controlling this behaviour in the email and phone field documentations.
     Human human = 4;
     // Users of type machine are users that are meant to be used by a machine.
-    // In order to authenticate, [add a secret](apis/resources/user_service_v2/user-service-add-secret.api.mdx), [a key](apis/resources/user_service_v2/user-service-add-key.api.mdx) or [a personal access token](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) to the user.
+    // In order to authenticate, [add a secret](/docs/references/api/user/zitadel.user.v2.UserService.AddSecret), [a key](/docs/references/api/user/zitadel.user.v2.UserService.AddKey) or [a personal access token](/docs/references/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken) to the user.
     // Tokens generated for new users of type machine will be of an opaque Bearer type.
-    // You can change the users token type to JWT by using the [management v1 service method UpdateMachine](apis/resources/mgmt/management-service-update-machine.api.mdx).
+    // You can change the users token type to JWT by using the management v1 service method UpdateMachine.
     Machine machine = 5;
   }
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

@@ -11,7 +11,7 @@ Zitadel can be run as high available system with ease.
 Since the storage layer takes the heavy lifting of making sure that data in synched across, server, data centers or regions.
 
 Depending on your projects needs our general recommendation is to run Zitadel across multiple availability zones in the same region or across multiple regions.
-Make sure to read our [Production Guide](/docs/operate-and-self-host/manage/production#prefer-postgresql) before you decide to use it.
+Make sure to read our [Production Guide](/docs/operate-and-self-host/manage/database/database) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/) for more details.
 
 ## Scalability
@@ -46,7 +46,7 @@ Hence our reference design for Kubernetes is to have three application nodes and
 To scale Zitadel across regions it is recommend to create at least three clusters.
 Each cluster is a fully independent ZITADEL setup.
 To keep the data in sync across all clusters, we recommend using Postgres with read-only replicas as a storage layer.
-Make sure to read our [Production Guide](/docs/operate-and-self-host/manage/production#prefer-postgresql) before you decide to use it.
+Make sure to read our [Production Guide](/docs/operate-and-self-host/manage/database/database) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/current/high-availability.html) for more details.
 
 

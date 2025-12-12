@@ -24,7 +24,7 @@ Read more about separating the init and setup phases on the [Updating and Scalin
 
 ## Configuration
 
-Read [on the configure page](/docs/operate-and-self-host/manage/configure) about the available options you have to configure ZITADEL.
+Read [on the configure page](/docs/operate-and-self-host/manage/configure/configure) about the available options you have to configure ZITADEL.
 Prefer passing .yaml files to the ZITADEL binary instead of environment variables.
 Restricting access to these files to avoid leaking sensitive information is easier than restricting access to environment variables.
 Also, not all configuration options are available as environment variables.
@@ -40,7 +40,7 @@ Also, not all configuration options are available as environment variables.
 
 ## Monitoring
 
-By default, [**metrics**](/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
+By default, [**metrics**](/docs/references/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
 
 Also, you can enable **tracing** in the ZITADEL configuration.
 
@@ -127,7 +127,7 @@ please create an issue in our [github repository](https://github.com/zitadel/zit
 
 ### Configure ZITADEL
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/operate-and-self-host/manage/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/operate-and-self-host/manage/database/database).
 
 ```yaml
 Database:
@@ -229,7 +229,7 @@ DefaultInstance:
     ReplyToAddress:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/operate-and-self-host/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/operate-and-self-host/manage/configure/configure#database-initialization-file), you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the [Console user interface](/docs/manage-and-govern/console/overview).
 - Probably, you also want to [apply your custom branding](/docs/manage-and-govern/customize/branding), [hook into certain events](/docs/manage-and-govern/customize/behavior), [customize texts](/docs/manage-and-govern/customize/texts) or [add metadata to your users](/docs/manage-and-govern/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/manage-and-govern/terraform-provider).

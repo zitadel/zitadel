@@ -6,7 +6,7 @@ This flow is executed before the return of the SAML Response.
 
 The flow is represented by the following Ids in the API: `4`
 
-## Pre SAMLResponse creation
+## Pre SAML Response creation
 
 This trigger is called before attributes are set in the SAMLResponse.
 

@@ -7,7 +7,7 @@ The individual guides in this section should give you an overview of things to c
 
 When moving from a previous auth solution to ZITADEL, it is important to note that some decisions and features are unique to ZITADEL.
 Without duplicating too much content here are some important features and patterns to consider in terms of solution architecture.
-You can read more about the basic structure and important concepts of ZITADEL in our [concepts section](/docs/concepts/).
+You can read more about the basic structure and important concepts of ZITADEL in our [concepts section](/docs/concepts).
 
 ## Multi-tenancy architecture
 
@@ -15,7 +15,7 @@ Multi-tenancy in ZITADEL can be achieved through either [Instances](/docs/concep
 Where instances represent isolated ZITADEL instances, Organizations provide a more permeable approach to multi-tenancy.
 
 In most cases, when you want to achieve multi-tenancy, you use Organizations. Each organization can have their own set of Settings (eg, Security Policies, IDPs, Branding), Managers, and Users.
-Please also consult our guide on [Solution Scenarios](/docs/build-and-integrate/solution-scenarios/introduction) for B2C and B2B for more details.
+Please also consult our guide on [Solution Scenarios](/docs/build-and-integrate/solution-scenarios/configurations) for B2C and B2B for more details.
 
 ## Delegated access management
 

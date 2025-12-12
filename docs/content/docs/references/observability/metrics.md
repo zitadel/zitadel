@@ -10,5 +10,5 @@ The metrics endpoint can be scrubbed by any tool of choice that supports the `ot
 
 For our [Kubernetes/Helm](/docs/operate-and-self-host/deploy/kubernetes) users, we provide an out of the box support for the [ServiceMonitor](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/templates/servicemonitor.yaml) custom resource.
 
-By default, metrics are enabled but can be turned off through ZITADEL's [configuration](/docs/operate-and-self-host/manage/configure).
+By default, metrics are enabled but can be turned off through ZITADEL's [configuration](/docs/operate-and-self-host/manage/configure/configure).
 The (default) configuration is located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).

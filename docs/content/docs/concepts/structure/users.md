@@ -37,7 +37,7 @@ Federated user [accounts are linked](../features/account-linking) to internal us
 
 ### External users
 
-In a multi-tenancy architecture, you might use [organizations](organizations) to separate user groups.
+In a multi-tenancy architecture, you might use [organizations](/docs/concepts/structure/organizations) to separate user groups.
 By using [external user grants](../features/external-user-grant) an organization is able to invite users from another organization.
 These invited users are called external users.
 
@@ -60,7 +60,7 @@ Consider this general recommendation as a starting point:
 - Structure users in organizations based on common domains that are self-managed (eg, company)
 - Grant your projects to the organizations, allow Managers to give granted roles to their users
 
-You might want to adjust this general setup based on your [scenario](/docs/build-and-integrate/solution-scenarios/introduction). 
+You might want to adjust this general setup based on your scenario. 
 
 One important consideration in the setup is that you can only have a domain once for an organization. If you have multiple teams working with the same email address, you might need to add them to one single organization that has the domain verified for the teams' domain.
 
@@ -77,4 +77,4 @@ You can use organization metadata or your own business logic to describe a hiera
 
 - [Manage users in the Console](../../manage-and-govern/console/users)
 - [ZITADEL APIs: Users](/docs/references/resources/mgmt/users)
-- [User onboarding and registration](/docs/build-and-integrate/onboarding)
+- [User onboarding and registration](/docs/build-and-integrate/onboarding/end-users)

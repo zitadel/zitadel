@@ -42,13 +42,13 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Add [Custom Branding](/docs/manage-and-govern/customize/branding) if required
 - [ ] Configure a valid [SMS Service](/docs/manage-and-govern/console/default-settings#sms) such as Twilio if needed
 - [ ] Configure your privacy policy, terms of service and a help Link if needed
-- [ ] Keep your [masterkey](/docs/operate-and-self-host/manage/configure) in a secure storage
+- [ ] Keep your [masterkey](/docs/operate-and-self-host/manage/configure/configure) in a secure storage
 - [ ] Declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
 
 ### Security
 
-- [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/docs/operate-and-self-host/manage/database#zitadel-credentials)
-- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/operate-and-self-host/manage/tls_modes#http2) connections
+- [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/docs/operate-and-self-host/manage/database/database#zitadel-credentials)
+- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/operate-and-self-host/manage/http2) connections
 - [ ] Create service accounts for applications that interact with ZITADEL's APIs
 - [ ] Make use of a CDN service to decrease the load for static assets served by ZITADEL
 - [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and deployment environment

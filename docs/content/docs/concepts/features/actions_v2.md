@@ -12,7 +12,7 @@ This is useful when you have special business requirements that ZITADEL doesn't 
 
 </Callout>
 
-<Callout type="warn" title="To use Actions v2 activate the feature flag "Actions" [feature flag](/docs/references/resources/feature_service_v2/feature-service-set-instance-features), to be able to manage the related resources.">
+<Callout type="warn" title="To use Actions v2 activate the feature flag "Actions" [feature flag](/docs/references/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures), to be able to manage the related resources.">
 The Actions v2 will always be executed if available, even if the feature flag is switched off, to remove any Actions v2 the related Execution has to be removed.
 
 </Callout>

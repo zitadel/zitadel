@@ -9,7 +9,7 @@ It uses a requests Host header to determine which virtual instance to use.
 This is useful for multi-tenancy and resource sharing, for example in SaaS scenarios.
 For most cases however, ZITADEL should run on exactly one domain.
 
-This guide assumes you are already familiar with [configuring ZITADEL](./configure).
+This guide assumes you are already familiar with [configuring ZITADEL](./configure/configure).
 
 ## Standard Config
 
@@ -59,6 +59,5 @@ You can immediately access the ZITADEL Console and APIs using these subdomains w
 
 ## More Information
 
-- [Check out the production-near loadbalancing example with Traefik](/docs/operate-and-self-host/deploy/loadbalancing-example)
 - [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/docs/operate-and-self-host/manage/reverseproxy/reverse_proxy)
 

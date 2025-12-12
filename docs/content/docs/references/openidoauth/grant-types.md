@@ -41,7 +41,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 
 **Link to spec.** [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
 
-### Using JWTs as Authorization Grants
+### Using JWTs as Authorization Grants {#using-jwts-as-authorization-grants}
 
 Our service user work with the JWT profile to authenticate them against ZITADEL.
 
@@ -104,13 +104,13 @@ JWT
 
 ---
 
-See [JWT Profile Grant on Token Endpoint](endpoints#token-endpoint) for usage.
+See [JWT Profile Grant on Token Endpoint](./endpoints#token-endpoint) for usage.
 
 ### Using JWTs for Client Authentication
 
-See how to build a [JWT for client authentication](authn-methods#jwt-with-private-key) from the downloaded key.
+See how to build a [JWT for client authentication](./authn-methods#jwt-with-private-key) from the downloaded key.
 
-Find out how to use it on the [token endpoint](endpoints#token-endpoint) or the [introspection endpoint](endpoints#introspection-endpoint).
+Find out how to use it on the [token endpoint](./endpoints#token-endpoint) or the [introspection endpoint](./endpoints#introspection-endpoint).
 
 ## Token Exchange
 

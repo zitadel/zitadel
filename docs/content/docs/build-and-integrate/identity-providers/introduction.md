@@ -119,7 +119,7 @@ In the guides below, some of which utilize the Generic OIDC or SAML templates fo
 - [LDAP](./ldap) 
 - [Local OpenLDAP](./openldap.mdx)
 - [OKTA generic OIDC](./okta-oidc)
-- [OKTA SAML](./okta-saml)
+- [OKTA SAML](./okta_saml)
 - [Keycloak generic OIDC](./keycloak)
 - [MockSAML](./mocksaml)
 - [JWT IdP](./jwt_idp)

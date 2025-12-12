@@ -82,5 +82,5 @@ api.SessionService().CreateSession(ctx, &session.CreateSessionRequest{})
 ```
 Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/next/example),
 like how you can integrate the [client in your own API](https://github.com/zitadel/zitadel-go/blob/next/example/api/client/main.go)
-or refer to our [API Docs](/apis/introduction).
+or refer to our [API Docs](/docs/references/introduction).
 

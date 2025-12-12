@@ -59,7 +59,7 @@ Changing services booked by you requires a new purchase order, stating the new c
 
 We take all appropriate physical and electronic precautions to ensure the security and availability of our infrastructure and the service offered thereupon, in particular to protect against unauthorized access to data, data loss, failures and misuse.
 
-The [Annex of the data processing agreement](data-processing-agreement#annex-regarding-security-measures) outlines the measures we take in more detail.
+The [Annex of the data processing agreement](./data-processing-agreement#annex-2-technical-and-organizational-measures) outlines the measures we take in more detail.
 
 ### Support
 
@@ -90,7 +90,7 @@ Portions of our services, i.e. software components, may also be beyond our influ
 
 ### Inclusion of third parties
 
-We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](./subprocessors), and our [Data Processing Agreement](data-processing-agreement) for more information.
+We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](./subprocessors), and our [Data Processing Agreement](./data-processing-agreement) for more information.
 
 ## Your obligations
 
@@ -185,7 +185,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](./subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](./data-processing-agreement), [Third Party Sub-Processors](./subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 

@@ -33,7 +33,7 @@ Caches:
       Level: error
 ```
 
-For a full configuration reference, please see the [runtime configuration file](/docs/operate-and-self-host/manage/configure#runtime-configuration-file) section's `defaults.yaml`.
+For a full configuration reference, please see the [runtime configuration file](/docs/operate-and-self-host/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
 
 ## Connectors
 
