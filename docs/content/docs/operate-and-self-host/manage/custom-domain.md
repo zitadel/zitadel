@@ -49,7 +49,7 @@ Check out the [reverse proxy configuration examples](/docs/operate-and-self-host
 Note that by default, you cannot access ZITADEL at an organizations domain.
 Organization level domains [are intended for routing users by their login methods to their correct organization](/docs/build-and-integrate/solution-scenarios/domain-discovery).
 
-However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/apis/resources/system/system-service-add-domain#adds-a-domain-to-an-instance).
+However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/docs/references/api-v1/system/system-service-add-domain#adds-a-domain-to-an-instance).
 Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
 
 ## Generated Subdomains

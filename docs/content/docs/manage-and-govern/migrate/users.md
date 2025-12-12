@@ -9,7 +9,7 @@ Migrating users from an existing system, while minimizing impact on said users, 
 
 ## Individual Users
 
-Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/references/resources/mgmt/management-service-import-human-user).
+Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser).
 Please also consult our [guide](/docs/manage-and-govern/user/reg-create-user) on how to create users.
 
 ```json
@@ -44,7 +44,7 @@ Please also consult our [guide](/docs/manage-and-govern/user/reg-create-user) on
 
 ## Bulk import
 
-For bulk import use the [import endpoint](/docs/references/resources/admin/admin-service-import-data) on the admin API:
+For bulk import use the [import endpoint](/docs/references/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) on the admin API:
 
 ```json
 {
@@ -252,6 +252,6 @@ With the [complement token flow](/docs/references/actions/complement-token), you
 You can assign roles from owned or granted projects to a user.
 
 <Callout type="info" title="Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.">
-[API reference: User Authorization / Grants](/docs/references/resources/auth/user-authorizations-grants)
+[API reference: User Authorization / Grants](/docs/references/api-v1/auth)
 
 </Callout>

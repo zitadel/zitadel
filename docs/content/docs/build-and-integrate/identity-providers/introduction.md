@@ -177,5 +177,5 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 ## References
 
 - [Identity brokering in ZITADEL](/docs/concepts/features/identity-brokering)
-- [The ZITADEL API reference for managing external IdPs](/docs/references/resources/admin/identity-providers)
+- [The ZITADEL API reference for managing external IdPs](/docs/references/api-v1/admin)
 - [Handle external logins in a custom login UI](/docs/build-and-integrate/login-ui/external-login)

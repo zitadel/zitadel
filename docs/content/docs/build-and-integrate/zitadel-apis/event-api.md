@@ -11,7 +11,7 @@ You need to give a user the [manager role](/docs/manage-and-govern/console/manag
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
 
-Call the [ListEvents](/apis/resources/admin) endpoint in the Administration API to get all the events you need.
+Call the [ListEvents](/docs/references/api-v1/admin) endpoint in the Administration API to get all the events you need.
 To further restrict your result you can add the following filters:
 - sequence
 - editor user id
@@ -29,7 +29,7 @@ curl --request POST \
 
 ## Get event types
 
-To be able to filter for the different event types ZITADEL knows, you can request the [EventTypesList](/apis/resources/admin)
+To be able to filter for the different event types ZITADEL knows, you can request the [EventTypesList](/docs/references/api-v1/admin)
 
 ```bash
 curl --request POST \
@@ -65,7 +65,7 @@ The following example shows you the event types for a password check (failed/suc
 
 ## Get aggregate types
 
-To be able to filter for the different aggregate types (resources) ZITADEL knows, you can request the [AggregateTypesList](/apis/resources/admin)
+To be able to filter for the different aggregate types (resources) ZITADEL knows, you can request the [AggregateTypesList](/docs/references/api-v1/admin)
 
 ```bash
 curl --request POST \

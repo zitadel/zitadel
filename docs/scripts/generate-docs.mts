@@ -1,6 +1,6 @@
 import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
-import { writeFileSync } from 'fs';
+import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 const services = [
@@ -22,10 +22,10 @@ const services = [
   'webkey'
 ];
 
-const generateServiceDocs = (service: string, filename?: string) => {
+const generateServiceDocs = (service: string, filename?: string, version: string = 'v2') => {
   const name = filename || `${service}_service`;
   const api = createOpenAPI({
-    input: [`./openapi/zitadel/${service}/v2/${name}.openapi.yaml`],
+    input: [`./openapi/zitadel/${service}/${version}/${name}.openapi.yaml`],
   });
 
   void generateFiles({
@@ -36,13 +36,61 @@ const generateServiceDocs = (service: string, filename?: string) => {
 };
 
 services.forEach(service => generateServiceDocs(service));
+generateServiceDocs('org', undefined, 'v2beta');
+
+const generateUserSchemaDocs = () => {
+  const api = createOpenAPI({
+    input: ['./openapi/zitadel/resources/userschema/v3alpha/user_schema_service.openapi.yaml'],
+  });
+
+  void generateFiles({
+    input: api,
+    output: './content/docs/references/api/user_schema',
+    includeDescription: true,
+  });
+};
+generateUserSchemaDocs();
 
 const meta = {
   title: "APIs",
-  pages: services
+  pages: [...services, 'user_schema']
 };
 
 writeFileSync(
   join(process.cwd(), 'content/docs/references/api/meta.json'),
   JSON.stringify(meta, null, 2)
 );
+
+const v1Services = [
+  'admin',
+  'auth',
+  'management',
+  'system'
+];
+
+const generateV1ServiceDocs = (service: string) => {
+  const api = createOpenAPI({
+    input: [`./openapi/zitadel/${service}.openapi.yaml`],
+  });
+
+  void generateFiles({
+    input: api,
+    output: `./content/docs/references/api-v1/${service}`,
+    includeDescription: true,
+  });
+};
+
+v1Services.forEach(service => generateV1ServiceDocs(service));
+
+const v1Meta = {
+  title: "API v1",
+  pages: v1Services
+};
+
+mkdirSync(join(process.cwd(), 'content/docs/references/api-v1'), { recursive: true });
+
+writeFileSync(
+  join(process.cwd(), 'content/docs/references/api-v1/meta.json'),
+  JSON.stringify(v1Meta, null, 2)
+);
+

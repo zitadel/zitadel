@@ -3,6 +3,7 @@
   "description": "The Dictionary",
   "pages": [
     "api",
+    "api-v1",
     "actions",
     "assets",
     "benchmarks",

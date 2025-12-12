@@ -18,5 +18,9 @@ export const openapi = createOpenAPI({
     './openapi/zitadel/settings/v2/settings_service.openapi.yaml',
     './openapi/zitadel/webkey/v2/webkey_service.openapi.yaml',
     './openapi/zitadel/internal_permission/v2/internal_permission_service.openapi.yaml',
+    './openapi/zitadel/admin.openapi.yaml',
+    './openapi/zitadel/auth.openapi.yaml',
+    './openapi/zitadel/management.openapi.yaml',
+    './openapi/zitadel/system.openapi.yaml',
   ],
 });

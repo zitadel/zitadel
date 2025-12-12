@@ -29,7 +29,7 @@ Do not use it for production yet. To test it out, you need to enable the `UserSc
 Let's create the first very simple schema `user`, which defines a `givenName` and `familyName` for a user and allows them to
 authenticate with username and password.
 
-We can do so by calling the [create user schema endpoint](/docs/references/resources/user_schema_service_v3/user-schema-service-create-user-schema)
+We can do so by calling the [create user schema endpoint](/docs/references/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.CreateUserSchema)
 with the following data. Make sure to provide an access_token with an IAM_OWNER role.
 
 ```bash
@@ -91,7 +91,7 @@ to see the `profileUri` value, but cannot update it.
 Maybe we also have some `customerId`, which the user should not even know about. We therefore can simply omit the `self` permission
 and only set `owner` to `rw`, so admins are able to read and change the id if needed.
 
-Finally, we call the [update user schema endpoint](/docs/references/resources/user_schema_service_v3/user-schema-service-update-user-schema)
+Finally, we call the [update user schema endpoint](/docs/references/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.PatchUserSchema)
 with the following data. Be sure to provide the id of the previously created schema.
 
 ```bash
@@ -139,9 +139,9 @@ curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
 
 ## Retrieve the Existing Schemas
 
-To check the state of existing schemas you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
+To check the state of existing schemas you can simply [list them](/docs/references/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.SearchUserSchemas).
 In this case we will query for the one with state `active`. Check out the api documentation for detailed information on possible filters.
-The API also allows to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
+The API also allows to retrieve a single [schema by ID](/docs/references/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.GetUserSchema).
 
 ```bash
 curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \

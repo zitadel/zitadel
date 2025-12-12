@@ -27,4 +27,5 @@ next-env.d.ts
 
 # generated api docs
 /content/docs/references/api
+/content/docs/references/api-v1
 /openapi/zitadel/

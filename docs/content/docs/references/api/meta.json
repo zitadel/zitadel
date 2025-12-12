@@ -16,6 +16,7 @@
     "session",
     "settings",
     "user",
-    "webkey"
+    "webkey",
+    "user_schema"
   ]
 }

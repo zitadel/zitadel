@@ -155,7 +155,7 @@ You can read more about the managers, roles and their meanings [here](/docs/mana
 #### Disable built-in register organization form
 
 If you do not want to allow users to register organizations with this form, you can disable it with the following request:
-[Restrict the instance features](/docs/references/resources/admin/admin-service-set-restrictions)
+[Restrict the instance features](/docs/references/api-v1/admin/zitadel.admin.v1.AdminService.SetRestrictions)
 
 Disabling the form makes sense, if your administrators manage new customers themselves or if you build your own form.
 
@@ -210,15 +210,15 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/admin/v1/orgs/_setup' \
 }'
 ```
 
-Detailed description of [Setup Organization](/docs/references/resources/admin/admin-service-set-up-org#setup-organization)
+Detailed description of [Setup Organization](/docs/references/api-v1/admin/zitadel.admin.v1.AdminService.SetUpOrg#setup-organization)
 
 If you need to add custom data to either the organization or the user you can use the metadata.
 Metadata is a key value construct that allows you to store any additional information to the resources.
 The set organization metadata request allows you to add one key value pair to an organization:
-[Set Organization Metadata](/docs/references/resources/mgmt/management-service-set-org-metadata)
+[Set Organization Metadata](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.SetOrgMetadata)
 If you have more than one field, you can use the bulk add request:
-[Bulk Set Organization Metadata](/docs/references/resources/mgmt/management-service-bulk-set-org-metadata)
+[Bulk Set Organization Metadata](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.BulkSetOrgMetadata)
 
 The same requests also exist on the user resource:
-[Set User Metadata](/docs/references/resources/mgmt/management-service-set-user-metadata)
-[Bulk Set User Metadata](/docs/references/resources/mgmt/management-service-bulk-set-user-metadata)
+[Set User Metadata](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata)
+[Bulk Set User Metadata](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.BulkSetUserMetadata)

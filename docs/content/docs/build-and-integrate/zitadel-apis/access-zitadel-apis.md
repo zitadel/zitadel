@@ -64,7 +64,7 @@ Via Console:
 
 Via APIs:
 
-* [Create User (Machine)](/docs/references/resources/mgmt/management-service-add-machine-user)
+* [Create User (Machine)](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
 
 ## 2. Grant a Manager role to the service user
 

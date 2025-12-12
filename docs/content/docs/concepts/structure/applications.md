@@ -23,4 +23,4 @@ Ensure the configuration of application settings is limited to authorized users 
 ## References
 
 - [Configure Applications in the Console](../../manage-and-govern/console/applications)
-- [ZITADEL API: Applications](/docs/references/resources/mgmt/applications)
+- [ZITADEL API: Applications](/docs/references/api-v1/management)

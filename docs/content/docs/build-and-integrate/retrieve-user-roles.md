@@ -21,7 +21,7 @@ Follow the links below to assign roles to your users.
 - [Add application roles via the ZITADEL Console](/docs/manage-and-govern/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/manage-and-govern/console/managers)
 - [Add application roles via the ZITADEL Management API](/docs/references/api/project/zitadel.project.v2.ProjectService.AddProjectRole)
-- [Add manager roles to users via the ZITADEL Management API](/docs/references/resources/mgmt/members)
+- [Add manager roles to users via the ZITADEL Management API](/docs/references/api-v1/management)
 
 ## Retrieve roles
 
@@ -212,12 +212,12 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/references/resources/auth/user-authorizations-grants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/references/api-v1/auth). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
 
-#### **1. [List my project roles](/docs/references/resources/auth/auth-service-list-my-project-permissions)**
+#### **1. [List my project roles](/docs/references/api-v1/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions)**
 
 Returns a list of roles for the authenticated user and for the requesting project (based on the token).
 
@@ -240,7 +240,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
 }
 ```
 
-#### **2.[List my ZITADEL permissions](/docs/references/resources/auth/auth-service-list-my-zitadel-permissions)​**
+#### **2.[List my ZITADEL permissions](/docs/references/api-v1/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions)​**
 
 Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
 
@@ -288,7 +288,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/zitadel/me/_search
 }
 ```
 
-#### **[3. List my authorizations/grants​](/docs/references/resources/auth/auth-service-list-my-user-grants)**
+#### **[3. List my authorizations/grants​](/docs/references/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)**
 
 Returns a list of user grants the authenticated user has. User grants consist of an organization, a project and roles.
 
@@ -396,11 +396,11 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
 
-In [APIs listed under user grants in the management API](/docs/references/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/docs/references/api-v1/management), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
-#### **1. [Search user grants](/docs/references/resources/mgmt/management-service-list-user-grants)​**
+#### **1. [Search user grants](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.ListUserGrants)​**
 
 Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
 
@@ -469,7 +469,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/management/v1/users/grants/_search' \
 }
 ```
 
-#### **2. [User grant by ID](/docs/references/resources/mgmt/management-service-get-user-grant-by-id)​** 
+#### **2. [User grant by ID](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.GetUserGrantByID)​** 
 
 Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
 

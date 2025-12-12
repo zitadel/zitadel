@@ -8,7 +8,7 @@ The usage control features are currently limited to the instance level only.
 
 ## Block Instances
 
-You can block an instance using the [system API](/apis/resources/system/limits).
+You can block an instance using the [system API](/docs/references/api-v1/system/limits).
 
 Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
 However, requests to the [system API](/docs/references/introduction#system) are still allowed.
@@ -30,13 +30,13 @@ DefaultInstance:
 
 You can restrict the maximum age of events returned by the following APIs:
 
-- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](/docs/build-and-integrate/zitadel-apis/event-api)
-- [My User History](/apis/resources/auth/auth-service-list-my-user-changes)
-- [A Users History](/apis/resources/mgmt/management-service-list-user-changes)
-- [An Applications History](/apis/resources/mgmt/management-service-list-app-changes)
-- [An Organizations History](/apis/resources/mgmt/management-service-list-org-changes)
-- [A Projects History](/apis/resources/mgmt/management-service-list-project-changes)
-- [A Project Grants History](/apis/resources/mgmt/management-service-list-project-grant-changes)
+- [Events Search](/docs/references/api-v1/admin/admin-service-list-events), See also the [Event API guide](/docs/build-and-integrate/zitadel-apis/event-api)
+- [My User History](/docs/references/api-v1/auth/auth-service-list-my-user-changes)
+- [A Users History](/docs/references/api-v1/management/management-service-list-user-changes)
+- [An Applications History](/docs/references/api-v1/management/management-service-list-app-changes)
+- [An Organizations History](/docs/references/api-v1/management/management-service-list-org-changes)
+- [A Projects History](/docs/references/api-v1/management/management-service-list-project-changes)
+- [A Project Grants History](/docs/references/api-v1/management/management-service-list-project-grant-changes)
 
 You can set a global default limit as well as a default limit [for new virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
 The following snippets shows the defaults:
@@ -54,7 +54,7 @@ DefaultInstance:
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
 ```
 
-You can also set a limit for [a specific virtual instance](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/limits).
+You can also set a limit for [a specific virtual instance](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/references/api-v1/system/limits).
 
 ## Quotas
 
@@ -84,7 +84,7 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 ```
 
-Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/quotas) or the *DefaultInstances.Quotas* section.
+Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/references/api-v1/system/quotas) or the *DefaultInstances.Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
