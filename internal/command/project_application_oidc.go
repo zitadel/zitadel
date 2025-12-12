@@ -158,9 +158,12 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
+	appID := oidcApp.AppID
+	if appID == "" {
+		appID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
