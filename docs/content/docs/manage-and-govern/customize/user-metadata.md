@@ -234,4 +234,4 @@ The user that calls the management service must have [manager permissions](/docs
 A user can be either a human user or a service user.
 
 You can get [metadata of a user filtered by your query](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.GetUserMetadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/docs/references/api-v1/management).
+The management service allows you to set and delete metadata, see the [API documentation for users](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata).

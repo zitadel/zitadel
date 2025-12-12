@@ -125,7 +125,7 @@ However, [client credentials authentication](./client-credentials.md) might be c
 ## Further resources
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/references/api-v1/management)
+* [Service User API reference](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
 * [OIDC JWT with private key](/docs/references/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)

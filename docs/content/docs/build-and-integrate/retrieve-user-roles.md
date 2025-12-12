@@ -21,7 +21,7 @@ Follow the links below to assign roles to your users.
 - [Add application roles via the ZITADEL Console](/docs/manage-and-govern/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/manage-and-govern/console/managers)
 - [Add application roles via the ZITADEL Management API](/docs/references/api/project/zitadel.project.v2.ProjectService.AddProjectRole)
-- [Add manager roles to users via the ZITADEL Management API](/docs/references/api-v1/management)
+- [Add manager roles to users via the ZITADEL Management API](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.AddOrgMember)
 
 ## Retrieve roles
 
@@ -212,7 +212,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/references/api-v1/auth). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/references/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
@@ -396,7 +396,7 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
 
-In [APIs listed under user grants in the management API](/docs/references/api-v1/management), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.ListUserGrants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 

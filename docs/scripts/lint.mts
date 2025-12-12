@@ -17,6 +17,14 @@ const { source, versionSource } = await import('../lib/source');
 async function checkLinks() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
   
+  const managementPage = pages.find(p => p.url === '/docs/references/api-v1/management');
+  if (managementPage) {
+    console.log('Lint: Management page found in source:', managementPage.url);
+    console.log('Lint: Management page slugs:', managementPage.slugs);
+  } else {
+    console.log('Lint: Management page NOT found in source');
+  }
+
   const scanned = await scanURLs({
     preset: 'next',
     populate: {

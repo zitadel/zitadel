@@ -31,7 +31,7 @@ If nothing is requested, the type will not be restricted and all possibilities o
 
 If you already have a user in ZITADEL, it is possible to add passwordless later.
 
-[Add Passwordless Registration ](/docs/references/api-v1/management)
+[Add Passwordless Registration ](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.AddPasswordlessRegistration)
 
 Send the user_id in the request and you will get a link and an expiration as response.
 You can then customize the link the same as described above in the creation process.
@@ -39,7 +39,7 @@ You can then customize the link the same as described above in the creation proc
 The second possibility is to send the link directly to the user per email.
 Use the following request in that case:
 
-[Send Passwordless Registration ](/docs/references/api-v1/management)
+[Send Passwordless Registration ](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.SendPasswordlessRegistration)
 
 ## Verified Email Address
 

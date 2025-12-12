@@ -56,6 +56,8 @@ const meta = {
   pages: [...services, 'user_schema']
 };
 
+mkdirSync(join(process.cwd(), 'content/docs/references/api'), { recursive: true });
+
 writeFileSync(
   join(process.cwd(), 'content/docs/references/api/meta.json'),
   JSON.stringify(meta, null, 2)

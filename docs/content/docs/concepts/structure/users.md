@@ -76,5 +76,5 @@ You can use organization metadata or your own business logic to describe a hiera
 ## References
 
 - [Manage users in the Console](../../manage-and-govern/console/users)
-- [ZITADEL APIs: Users](/docs/references/api-v1/management)
+- [ZITADEL APIs: Users](/docs/references/api-v1/management/zitadel.management.v1.ManagementService.ListUsers)
 - [User onboarding and registration](/docs/build-and-integrate/onboarding/end-users)
