@@ -81,7 +81,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       requestId,
     })
       .catch(() => {
-        setError(t("verify.errors.couldNotResetPassword"));
+        setError(t("errors.couldNotSendResetLink"));
         return;
       })
       .finally(() => {

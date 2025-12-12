@@ -246,27 +246,30 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     }
 
-    const checks = create(ChecksSchema, {
-      user: { search: { case: "userId", value: userId } },
-    });
+    let session;
+    if (!userLoginSettings?.ignoreUnknownUsernames) {
+      const checks = create(ChecksSchema, {
+        user: { search: { case: "userId", value: userId } },
+      });
 
-    const sessionOrError = await createSessionAndUpdateCookie({
-      checks,
-      requestId: command.requestId,
-    }).catch((error) => {
-      if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
-        return { error: t("errors.userNotActive") };
+      const sessionOrError = await createSessionAndUpdateCookie({
+        checks,
+        requestId: command.requestId,
+      }).catch((error) => {
+        if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+          return { error: t("errors.userNotActive") };
+        }
+        throw error;
+      });
+
+      if ("error" in sessionOrError) {
+        return sessionOrError;
       }
-      throw error;
-    });
 
-    if ("error" in sessionOrError) {
-      return sessionOrError;
+      session = sessionOrError;
     }
 
-    const session = sessionOrError;
-
-    if (!session.factors?.user?.id) {
+    if (session && !session.factors?.user?.id) {
       return { error: t("errors.couldNotCreateSession") };
     }
 
@@ -276,14 +279,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // Resolve organization from command or session
-    const organization = command.organization ?? session.factors?.user?.organizationId;
+    const organization = command.organization ?? session?.factors?.user?.organizationId ?? user.details?.resourceOwner;
 
-    const methods = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors?.user?.id });
+    const methods = await listAuthenticationMethodTypes({
+      serviceConfig,
+      userId: session?.factors?.user?.id ?? userId,
+    });
 
     // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       const params = new URLSearchParams({
-        loginName: session.factors?.user?.loginName as string,
+        loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
         invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
       });
@@ -316,7 +322,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPassword = new URLSearchParams({
-            loginName: session.factors?.user?.loginName,
+            loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           });
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
@@ -341,7 +347,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPasskey = new URLSearchParams({
-            loginName: session.factors?.user?.loginName,
+            loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           });
           if (command.requestId) {
             paramsPasskey.append("requestId", command.requestId);
@@ -366,7 +372,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // prefer passkey in favor of other methods
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
         const passkeyParams = new URLSearchParams({
-          loginName: session.factors?.user?.loginName,
+          loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
           altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowUsernamePassword}`, // show alternative password option only if allowed
         });
 
@@ -391,7 +397,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
-          loginName: session.factors?.user?.loginName,
+          loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
         });
 
         if (command.requestId) {

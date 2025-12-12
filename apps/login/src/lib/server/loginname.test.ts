@@ -339,6 +339,27 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       });
+
+      test("should NOT create session when ignoreUnknownUsernames is true", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: true,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+      });
     });
 
     describe("Multiple authentication methods", () => {
