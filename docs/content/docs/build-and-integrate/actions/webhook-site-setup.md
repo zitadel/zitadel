@@ -54,7 +54,7 @@ if req.Method == http.MethodOptions {
 5. Leave other fields empty unless you need custom headers.
 6. Keep the Webhook.site browser tab open while testing.
 
-<img src="/docs/img/actions-v2/webhook-xhr.png" alt="Screenshot: Webhook.site XHR Redirect configuration interface"/> 
+<img src="/img/actions-v2/webhook-xhr.png" alt="Screenshot: Webhook.site XHR Redirect configuration interface"/> 
 
 ---
 
@@ -68,7 +68,7 @@ go run actionsRequest.go
 
 You should see output in your console whenever the listener is called.
 
-<img src="/docs/img/actions-v2/console.png" alt="Screenshot: Console output showing listener receiving webhook requests"/>
+<img src="/img/actions-v2/console.png" alt="Screenshot: Console output showing listener receiving webhook requests"/>
 
 ---
 
@@ -93,7 +93,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
 }'
 ```
 
-<img src="/docs/img/actions-v2/webhook-url.png" alt="Screenshot: Webhook.site target creation interface"/>
+<img src="/img/actions-v2/webhook-url.png" alt="Screenshot: Webhook.site target creation interface"/>
 
 ---
 
@@ -159,10 +159,10 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 Both your Webhook.site and your local listener should now print out something like the following. See the [Sent information Request](./usage#sent-information-request) payload description for details.
 
 Your local listener should look like this:
-<img src="/docs/img/actions-v2/local-listener.png" alt="Screenshot: Local listener output"/>
+<img src="/img/actions-v2/local-listener.png" alt="Screenshot: Local listener output"/>
 
 Your Webhook.site should look like this:
-<img src="/docs/img/actions-v2/webhook-listener.png" alt="Screenshot: Webhook.site request log"/>
+<img src="/img/actions-v2/webhook-listener.png" alt="Screenshot: Webhook.site request log"/>
 
 ---
 

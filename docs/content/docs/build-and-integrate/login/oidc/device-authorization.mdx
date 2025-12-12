@@ -21,24 +21,24 @@ To begin integrating your application with Zitadel using RFC 8628, follow the st
 1. Go to “Organization”/”Projects”.
 2. Under “Applications” click the “New” button.
 
-    <img src="/docs/img/device-auth/device-auth-01.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-01.png" alt="Device Authorization Flow in ZITADEL"/>
 
 3. Select “Native” and enter a name for the application, and click “Continue”.
 
-    <img src="/docs/img/device-auth/device-auth-02.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-02.png" alt="Device Authorization Flow in ZITADEL"/>
 
 4. Select “Device Code”. Click “Continue”.
 
-    <img src="/docs/img/device-auth/device-auth-03.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-03.png" alt="Device Authorization Flow in ZITADEL"/>
 
 
 5. Check the details and click “Create”.
 
-    <img src="/docs/img/device-auth/device-auth-04.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-04.png" alt="Device Authorization Flow in ZITADEL"/>
 
 6. Copy the “Client ID” and store it for later use.
 
-    <img src="/docs/img/device-auth/device-auth-05.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-05.png" alt="Device Authorization Flow in ZITADEL"/>
 
 ## Device Client Example
 
@@ -50,7 +50,7 @@ The example requires two environment variables to be set:
 
 - `ISSUER`: server address of your instance or domain. You can find the issuer URL in the “URLs” section. In this example, it will be set to [https://test-0o6zvq.zitadel.cloud](https://test-0o6zvq.zitadel.cloud). **Do not use a trailing slash!**
 
-    <img src="/docs/img/device-auth/device-auth-06.png" alt="Device Authorization Flow in ZITADEL"/>
+    <img src="/img/device-auth/device-auth-06.png" alt="Device Authorization Flow in ZITADEL"/>
 
 - `CLIENT_ID`: the Client ID we obtained earlier.
 
@@ -78,15 +78,15 @@ At this point, the device app starts polling the token endpoint at 5-second inte
 
 When you browse to the given URL and the device code is entered, the authentication flow for a user is started. If you are already logged in, it skips right ahead to the final screen where you can choose to allow or deny the request. If you are not logged in, you will have to enter your credentials for login.
 
-<img src="/docs/img/device-auth/device-auth-07.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/img/device-auth/device-auth-07.png" alt="Device Authorization Flow in ZITADEL"/>
 
-<img src="/docs/img/device-auth/device-auth-08.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/img/device-auth/device-auth-08.png" alt="Device Authorization Flow in ZITADEL"/>
 
-<img src="/docs/img/device-auth/device-auth-09.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/img/device-auth/device-auth-09.png" alt="Device Authorization Flow in ZITADEL"/>
 
-<img src="/docs/img/device-auth/device-auth-10.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/img/device-auth/device-auth-10.png" alt="Device Authorization Flow in ZITADEL"/>
 
-<img src="/docs/img/device-auth/device-auth-11.png" alt="Device Authorization Flow in ZITADEL"/>
+<img src="/img/device-auth/device-auth-11.png" alt="Device Authorization Flow in ZITADEL"/>
 
 When “allow”  is clicked, the device (the CLI in this case) will receive a token on the next poll. A log line will be shown as given below:
 
