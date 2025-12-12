@@ -54,14 +54,14 @@ importers:
         specifier: ^2.29.4
         version: 2.30.1
       next:
-        specifier: 15.5.7
-        version: 15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
+        specifier: 15.5.9
+        version: 15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
       next-intl:
         specifier: ^3.25.1
-        version: 3.26.5(next@15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react@19.1.2)
+        version: 3.26.5(next@15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react@19.1.2)
       next-themes:
         specifier: ^0.2.1
-        version: 0.2.1(next@15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react-dom@19.1.2(react@19.1.2))(react@19.1.2)
+        version: 0.2.1(next@15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react-dom@19.1.2(react@19.1.2))(react@19.1.2)
       nice-grpc:
         specifier: 2.0.1
         version: 2.0.1
@@ -166,8 +166,8 @@ importers:
         specifier: ^8.57.0
         version: 8.57.1
       eslint-config-next:
-        specifier: 15.5.7
-        version: 15.5.7(eslint@8.57.1)(typescript@5.9.2)
+        specifier: 15.5.9
+        version: 15.5.9(eslint@8.57.1)(typescript@5.9.2)
       eslint-config-prettier:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
@@ -3525,11 +3525,11 @@ packages:
     engines: {node: '>=18.14.0'}
     hasBin: true
 
-  '@next/env@15.5.7':
-    resolution: {integrity: sha512-4h6Y2NyEkIEN7Z8YxkA27pq6zTkS09bUSYC0xjd0NpwFxjnIKeZEeH591o5WECSmjpUhLn3H2QLJcDye3Uzcvg==}
+  '@next/env@15.5.9':
+    resolution: {integrity: sha512-4GlTZ+EJM7WaW2HEZcyU317tIQDjkQIyENDLxYJfSWlfqguN+dHkZgyQTV/7ykvobU7yEH5gKvreNrH4B6QgIg==}
 
-  '@next/eslint-plugin-next@15.5.7':
-    resolution: {integrity: sha512-DtRU2N7BkGr8r+pExfuWHwMEPX5SD57FeA6pxdgCHODo+b/UgIgjE+rgWKtJAbEbGhVZ2jtHn4g3wNhWFoNBQQ==}
+  '@next/eslint-plugin-next@15.5.9':
+    resolution: {integrity: sha512-kUzXx0iFiXw27cQAViE1yKWnz/nF8JzRmwgMRTMh8qMY90crNsdXJRh2e+R0vBpFR3kk1yvAR7wev7+fCCb79Q==}
 
   '@next/swc-darwin-arm64@15.5.7':
     resolution: {integrity: sha512-IZwtxCEpI91HVU/rAUOOobWSZv4P2DeTtNaCdHqLcTJU4wdNXgAySvKa/qJCgR5m6KI8UsKDXtO2B31jcaw1Yw==}
@@ -8080,8 +8080,8 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  eslint-config-next@15.5.7:
-    resolution: {integrity: sha512-nU/TRGHHeG81NeLW5DeQT5t6BDUqbpsNQTvef1ld/tqHT+/zTx60/TIhKnmPISTTe++DVo+DLxDmk4rnwHaZVw==}
+  eslint-config-next@15.5.9:
+    resolution: {integrity: sha512-852JYI3NkFNzW8CqsMhI0K2CDRxTObdZ2jQJj5CtpEaOkYHn13107tHpNuD/h0WRpU4FAbCdUaxQsrfBtNK9Kw==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0 || ^9.0.0
       typescript: '>=3.3.1'
@@ -10786,8 +10786,8 @@ packages:
       react: '*'
       react-dom: '*'
 
-  next@15.5.7:
-    resolution: {integrity: sha512-+t2/0jIJ48kUpGKkdlhgkv+zPTEOoXyr60qXe68eB/pl3CMJaLeIGjzp5D6Oqt25hCBiBTt8wEeeAzfJvUKnPQ==}
+  next@15.5.9:
+    resolution: {integrity: sha512-agNLK89seZEtC5zUHwtut0+tNrc0Xw4FT/Dg+B/VLEo9pAcS9rtTKpek3V6kVcVwsB2YlqMaHdfZL4eLEVYuCg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -18453,9 +18453,9 @@ snapshots:
       yaml: 2.8.1
       yargs: 17.7.2
 
-  '@next/env@15.5.7': {}
+  '@next/env@15.5.9': {}
 
-  '@next/eslint-plugin-next@15.5.7':
+  '@next/eslint-plugin-next@15.5.9':
     dependencies:
       fast-glob: 3.3.1
 
@@ -23504,9 +23504,9 @@ snapshots:
       source-map: 0.6.1
     optional: true
 
-  eslint-config-next@15.5.7(eslint@8.57.1)(typescript@5.9.2):
+  eslint-config-next@15.5.9(eslint@8.57.1)(typescript@5.9.2):
     dependencies:
-      '@next/eslint-plugin-next': 15.5.7
+      '@next/eslint-plugin-next': 15.5.9
       '@rushstack/eslint-patch': 1.15.0
       '@typescript-eslint/eslint-plugin': 8.48.1(@typescript-eslint/parser@8.43.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1)(typescript@5.9.2)
       '@typescript-eslint/parser': 8.43.0(eslint@8.57.1)(typescript@5.9.2)
@@ -27278,23 +27278,23 @@ snapshots:
   netmask@2.0.2:
     optional: true
 
-  next-intl@3.26.5(next@15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react@19.1.2):
+  next-intl@3.26.5(next@15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react@19.1.2):
     dependencies:
       '@formatjs/intl-localematcher': 0.5.10
       negotiator: 1.0.0
-      next: 15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
+      next: 15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
       react: 19.1.2
       use-intl: 3.26.5(react@19.1.2)
 
-  next-themes@0.2.1(next@15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react-dom@19.1.2(react@19.1.2))(react@19.1.2):
+  next-themes@0.2.1(next@15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1))(react-dom@19.1.2(react@19.1.2))(react@19.1.2):
     dependencies:
-      next: 15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
+      next: 15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1)
       react: 19.1.2
       react-dom: 19.1.2(react@19.1.2)
 
-  next@15.5.7(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1):
+  next@15.5.9(@babel/core@7.28.4)(@playwright/test@1.55.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.92.1):
     dependencies:
-      '@next/env': 15.5.7
+      '@next/env': 15.5.9
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001741
       postcss: 8.4.31
