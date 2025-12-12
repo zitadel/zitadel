@@ -2,9 +2,8 @@ import { source, versionSource } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import { VersionSelector } from '@/components/version-selector';
-import { ReactNode } from 'react';
 
-export default async function Layout(props: { children: ReactNode; params: Promise<{ slug?: string[] }> }) {
+export default async function Layout(props: { children: React.ReactNode; params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
   const slug = params.slug || [];
   

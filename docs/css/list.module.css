@@ -1,0 +1,66 @@
+.listelement {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem 0;
+  text-decoration: none;
+  transition: all 0.2 ease-in-out;
+  margin: 0.5rem 0;
+}
+
+.listelement:hover {
+  text-decoration: none;
+}
+
+.listelement h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.listelement p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ifm-font-color-base);
+}
+
+.fillspace {
+  flex: 1;
+}
+
+.icon {
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+}
+
+.listlabel {
+  color: white;
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  background: var(--list-background);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+}
+
+.listWrapperTitle {
+  color: var(--ifm-heading-color);
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.homerow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.homecontent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1rem 0;
+}

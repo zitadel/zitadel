@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "_accessing_zitadel_api",
+    "access-zitadel-apis",
+    "access-zitadel-system-api",
+    "event-api",
+    "example-zitadel-api-with-dot-net",
+    "example-zitadel-api-with-go"
+  ]
+}

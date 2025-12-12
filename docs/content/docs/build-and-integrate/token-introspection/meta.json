@@ -1,0 +1,7 @@
+{
+  "pages": [
+    "_introspection-response",
+    "basic-auth",
+    "private-key-jwt"
+  ]
+}

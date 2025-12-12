@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "go",
+    "java-spring",
+    "nodejs-nestjs",
+    "pylon",
+    "python-django",
+    "python-flask"
+  ]
+}

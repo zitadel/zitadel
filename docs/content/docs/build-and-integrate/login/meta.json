@@ -1,0 +1,9 @@
+{
+  "pages": [
+    "oidc",
+    "_prevent-lockout",
+    "hosted-login",
+    "login-users",
+    "saml"
+  ]
+}

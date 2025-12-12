@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "client-libraries",
+    "angular",
+    "astro",
+    "expressjs",
+    "fastify",
+    "flutter",
+    "go",
+    "hono",
+    "introduction",
+    "java",
+    "nestjs",
+    "nextjs",
+    "nuxtjs",
+    "python-django",
+    "python-flask",
+    "qwik",
+    "react",
+    "solidstart",
+    "sveltekit",
+    "symfony",
+    "vue"
+  ]
+}

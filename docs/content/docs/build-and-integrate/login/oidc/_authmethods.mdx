@@ -1,0 +1,68 @@
+---
+title: Authmethods
+---
+
+import { Tab } from 'fumadocs-ui/components/tabs';
+
+
+
+
+import { TabItem } from '@/components/docusaurus/tabs';
+import Tabs from '@/components/docusaurus/tabs';
+import PKCE from "./authmethods/_pkce.mdx";
+import Basic from "./authmethods/_basic.mdx";
+import Implicit from "./authmethods/_implicit.mdx";
+import PKCENative from "./authmethods/_pkcenative.mdx";
+import JWTPrivateKey from "./authmethods/_jwtpk.mdx";
+
+export default function AuthMethods(props) {
+  return props.selected == "web" ? (
+    <div>
+      <Tabs
+        groupId="auth-type"
+        default="pkce"
+        values={[
+          { label: "PKCE", value: "pkce" },
+          { label: "Basic Auth", value: "basic" },
+          { label: "JWT with Private Key", value: "jwtpk" },
+        ]}
+      >
+        <Tab value="pkce">
+          <PKCE />
+        </Tab>
+        <Tab value="basic">
+          <Basic />
+        </Tab>
+        <Tab value="jwtpk">
+          <JWTPrivateKey />
+        </Tab>
+      </Tabs>
+    </div>
+  ) : props.selected == "native" ? (
+    <Tabs
+      groupId="auth-type"
+      default="pkce"
+      values={[{ label: "PKCE", value: "pkce" }]}
+    >
+      <Tab value="pkce">
+        <PKCENative />
+      </Tab>
+    </Tabs>
+  ) : props.selected == "spa" ? (
+    <Tabs
+      groupId="auth-type"
+      default="pkce"
+      values={[
+        { label: "PKCE", value: "pkce" },
+        { label: "Implicit", value: "implicit" },
+      ]}
+    >
+      <Tab value="pkce">
+        <PKCE />
+      </Tab>
+      <Tab value="implicit">
+        <Implicit />
+      </Tab>
+    </Tabs>
+  ) : null;
+}

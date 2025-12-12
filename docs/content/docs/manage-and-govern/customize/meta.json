@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "behavior",
+    "branding",
+    "notification-providers",
+    "restrictions",
+    "texts",
+    "user-metadata",
+    "user-schema"
+  ]
+}

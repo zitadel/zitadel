@@ -22,6 +22,47 @@ const config = {
         destination: `${v.target}/:path*`,
       }));
   },
+  turbopack: {
+    rules: {
+      '**/*.yaml': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      '**/*.Caddyfile': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+      '**/*.conf': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
+  webpack: (config, { webpack }) => {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^fumadocs-mdx:collections\/server$/,
+        (resource) => {
+          resource.request = path.join(process.cwd(), '.source/server.ts');
+        }
+      )
+    );
+
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: 'asset/source',
+    });
+    config.module.rules.push({
+      test: /\.ya?ml$/,
+      use: 'yaml-loader',
+      resourceQuery: { not: [/raw/] },
+    });
+    config.module.rules.push({
+      test: /\.(Caddyfile|conf)$/,
+      type: 'asset/source',
+    });
+    return config;
+  },
 };
 
 export default withMDX(config);

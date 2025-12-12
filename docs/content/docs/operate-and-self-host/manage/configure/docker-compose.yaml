@@ -1,0 +1,40 @@
+services:
+  zitadel:
+    restart: "always"
+    networks:
+      - "zitadel"
+    image: "ghcr.io/zitadel/zitadel:latest"
+    command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled'
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./example-zitadel-config.yaml:/example-zitadel-config.yaml:ro"
+      - "./example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro"
+      - "./example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro"
+    depends_on:
+      db:
+        condition: "service_healthy"
+
+  db:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - 'zitadel'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - 'data:/var/lib/postgresql/data:rw'
+
+networks:
+  zitadel:
+
+volumes:
+  data:
+

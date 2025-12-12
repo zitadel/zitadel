@@ -1,0 +1,41 @@
+---
+title: Database
+---
+
+import { Tab } from 'fumadocs-ui/components/tabs';
+
+
+
+
+
+import Tabs from '@/components/docusaurus/tabs';
+import { TabItem } from '@/components/docusaurus/tabs';
+import Cockroach from './_cockroachdb.mdx'
+import Postgres from './_postgres.mdx'
+
+# Database Configuration
+
+<Tabs
+    groupId="database-vendor"
+    default="postgres"
+    values={[
+        {'label': 'Postgres', 'value': 'pg'},
+        {'label': 'Cockroach (Zitadel v2)', 'value': 'crdb'},
+    ]}
+>
+    <Tab value="pg">
+        <Postgres/>
+    </Tab>
+    <Tab value="crdb">
+        <Cockroach/>
+    </Tab>
+</Tabs>
+
+## Zitadel credentials
+The [init phase](/docs/operate-and-self-host/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of Zitadel creates a the zitadel user (`Database.*.User.Username` & `Database.*.User.Password`) with their password if it does not exist (and Admin credentials are passed). It is though to note that it does **neither** update **nor** deprecate them. In case you provisioned a Zitadel setup with insecure or _easy-to-guess_ values you should first of all rotate them but also manually ensure, that the old role/user gets deprecated.
+
+If you rotate the credentials you either must opt for a new username or deprecate the old user first (might lead to interruptions) since the init phase will fail if the user already exists but only the password changes. To deprecate the old user you need admin access to your database server and remove the user with commands matching your database provider.
+
+:::caution
+Recreating a database will not necessarily remove the user, make sure to check for the user and remove it if necessary.
+:::

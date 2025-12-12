@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "cli",
+    "configure",
+    "database",
+    "reverseproxy",
+    "cache",
+    "custom-domain",
+    "http2",
+    "login-client",
+    "production",
+    "productionchecklist",
+    "service_ping",
+    "tls_modes",
+    "updating_scaling",
+    "usage_control"
+  ]
+}

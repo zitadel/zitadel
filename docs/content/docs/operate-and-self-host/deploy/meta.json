@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "troubleshooting",
+    "_defaultuser",
+    "_disclaimer",
+    "_next",
+    "compose",
+    "devcontainer",
+    "kubernetes",
+    "linux",
+    "macos",
+    "overview"
+  ]
+}

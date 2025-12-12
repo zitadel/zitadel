@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "account-linking",
+    "actions",
+    "actions_v2",
+    "audit-trail",
+    "console",
+    "custom-domain",
+    "external-user-grant",
+    "identity-brokering",
+    "passkeys",
+    "selfservice"
+  ]
+}

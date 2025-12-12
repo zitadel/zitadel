@@ -1,0 +1,136 @@
+services:
+  zitadel:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel:latest
+    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
+    environment:
+      # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
+      ZITADEL_EXTERNALDOMAIN: localhost
+
+      # See "What's next" to learn about how to enable TLS.
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_TLS_ENABLED: false
+
+      # Database connection settings.
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      # The database is created by the init job if it does not exist.
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      # The admin user must already exist in the database.
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      # The zitadel user is created by the init job if it does not exist.
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      
+      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
+      # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM_LOGIN_CLIENT
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
+      # Activate the login v2 on an installation from scratch.
+      # To activate the login v2 on an existing installation, read the "What's next" section.
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true # To use the login v1, set this to false.
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login
+      # Configure the redirection paths to the login v2.
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
+
+      # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
+      # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
+      # The PAT can be used to provision resources with [Terraform](/docs/guides/manage/terraform-provider), for example.
+      # ZITADEL_FIRSTINSTANCE_PATPATH: /current-dir/admin.pat
+      # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
+      # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER
+      # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
+      
+      # To change the initial human admin users username and password, uncomment the following lines.
+      # The first login name is formatted like this: <username>@<org_name>.<external_domain>
+      # With the following incommented configuration, this would be root@my-organization.localhost
+      # Visit http://localhost:8080/ui/console to check if the login name works.
+      # If you can't log in, check the available login names:
+      # echo "select * from projections.login_names3;" | psql -h localhost -U postgres -d zitadel
+      # The postgres users password is postgres.
+      # ZITADEL_FIRSTINSTANCE_ORG_NAME: My Organization
+      # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: root
+      # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: RootPassword1!
+
+      # Enable debug logs
+      # ZITADEL_LOG_LEVEL: debug     
+      # Write Access Logs to stdout.
+      # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
+
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+    user: "0"
+    volumes:
+      - .:/current-dir:delegated
+    ports:
+      - 8080:8080
+      - 3000:3000
+    networks:
+      - zitadel
+    depends_on:
+      db:
+        condition: service_healthy
+
+  login:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel-login:latest
+    # If you can't use the network_mode service:zitadel, you can pass the environment variables ZITADEL_API_URL=http://zitadel:8080 and CUSTOM_REQUEST_HEADERS=Host:localhost instead.
+    environment:
+      - ZITADEL_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+    network_mode: service:zitadel
+    user: "0"
+    volumes:
+      - .:/current-dir:ro
+    depends_on:
+      zitadel:
+        condition: service_healthy
+        restart: false
+
+  db:
+    restart: unless-stopped
+    image: postgres:17
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: 
+      - CMD-SHELL
+      - pg_isready
+      - -d
+      - zitadel
+      - -U
+      - postgres
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+    networks:
+      - zitadel
+    ports:
+      - 5432:5432
+    volumes:
+      - 'data:/var/lib/postgresql/data:rw'
+
+networks:
+  zitadel:
+
+volumes:
+  data:

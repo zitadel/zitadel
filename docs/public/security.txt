@@ -1,0 +1,4 @@
+Contact: mailto:security@zitadel.com
+Expires: Fri, 31 Dec 2023 23:00 +0200
+Preferred-Languages: en, de
+Canonical: https://zitadel.com/docs/security.txt

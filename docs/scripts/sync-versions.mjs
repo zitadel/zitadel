@@ -14,13 +14,7 @@ if (!fs.existsSync(versionsPath)) {
 
 // --- Dynamic Version Discovery ---
 try {
-  console.log('Fetching git tags...');
-  // Ensure we have tags
-  try {
-    execSync('git fetch --tags', { stdio: 'ignore' });
-  } catch (e) {
-    console.warn('Failed to fetch tags, using local tags only.');
-  }
+  console.log('Reading git tags...');
 
   const tagsOutput = execSync('git tag -l "v*"', { encoding: 'utf8' });
   const tags = tagsOutput.split('\n').filter(Boolean);

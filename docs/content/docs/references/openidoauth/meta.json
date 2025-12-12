@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "_token_exchange_request",
+    "_token_exchange_response",
+    "_token_exchange_types",
+    "authn-methods",
+    "authrequest",
+    "claims",
+    "endpoints",
+    "grant-types",
+    "scopes"
+  ]
+}

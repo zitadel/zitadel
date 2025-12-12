@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "add_session",
+    "human_password_login",
+    "introspect",
+    "machine_client_credentials_login",
+    "machine_jwt_profile_grant",
+    "machine_pat_login",
+    "manipulate_user",
+    "oidc_session",
+    "otp_session",
+    "password_session",
+    "user_info"
+  ]
+}

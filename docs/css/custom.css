@@ -1,0 +1,647 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "../../static/icons/line-awesome/css/line-awesome.min.css";
+
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../static/fonts/lato/Lato-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 900;
+  src: url(../../static/fonts/lato/Lato-Black.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 900;
+  src: url(../../static/fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 700;
+  src: url(../../static/fonts/lato/Lato-Bold.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 700;
+  src: url(../../static/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 400;
+  src: url(../../static/fonts/lato/Lato-Italic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 300;
+  src: url(../../static/fonts/lato/Lato-Light.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 300;
+  src: url(../../static/fonts/lato/Lato-LightItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 100;
+  src: url(../../static/fonts/lato/Lato-Thin.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 100;
+  src: url(../../static/fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+}
+
+/* You can override the default Infima variables here. */
+
+:root {
+  --ifm-background-color: #fafafa;
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-footer-background-color: #f4f4f4;
+  --ifm-menu-color-background-active: #00000010;
+  --ifm-menu-color-active: #000000;
+  --ifm-menu-color-background-hover: #f7fafc;
+  --ifm-font-color-base: #6b7280;
+  --ifm-link-color: #5469d4;
+  --ifm-menu-color: #697386;
+  --ifm-footer-link-color: #000000;
+  --ifm-color-primary: #5469d4;
+  --ifm-color-primary-dark: #4d61cf;
+  --ifm-color-primary-darker: #4356c9;
+  --ifm-color-primary-darkest: #3a4cc3; /* 293bb9 */
+  --ifm-color-primary-light: #6e80da;
+  --ifm-color-primary-lighter: #8796e1;
+  --ifm-color-primary-lightest: #aab4ea;
+  --ifm-code-font-size: 95%;
+  --ifm-font-family-base: "Lato", sans-serif;
+  --ifm-hero-background-color: #7e21ce;
+  --ifm-hero-text-color: var(--ifm-font-color-base-inverse);
+  --get-started: #ff2069;
+  --get-started-bg-hover: var(--ifm-hero-background-color);
+  --ifm-color-info: #4cb3d4;
+  --ifm-navbar-height: 56px;
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-footer-color: #00000080;
+  --ifm-footer-padding-vertical: 50px;
+  --ifm-heading-font-weight: 500;
+  --ifm-heading-color: #000000;
+  --ifm-font-color-base: #000000dd; /*#6b7280;*/
+  --font-color-strong: #000000;
+  --ifm-navbar-link-hover-color: #000000;
+  --ifm-heading-color: #000000;
+  --ifm-h4-font-size: 1.2rem;
+  --ifm-color-success-contrast-foreground: #0e6245;
+  --ifm-color-success-contrast-background: #cbf4c9;
+  --ifm-color-success-dark: #0e6245;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #f0f3fa;
+  --ifm-color-secondary-contrast-background: #f0f3fa;
+  --ifm-alert-background-color-highlight: #620e0e;
+  --ifm-color-warning-dark: #ffc1c1;
+  --ifm-color-warning-contrast-background: #ffc1c1;
+  --ifm-color-warning-contrast-foreground: #620e0e;
+  --card-background: #fafafa;
+  --list-background: #ffffff;
+  --ifm-spacing-horizontal: 1.5rem;
+  --apiauthbackground: linear-gradient(40deg, #a9d9ca 30%, #b4d5cb);
+  --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
+  --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
+  --apisystembackground: linear-gradient(40deg, #c7a6928e, #c7a6928e);
+  --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  --overlaycolor: #6c90b420;
+  --ifm-hero-text-color: #ffffff;
+  --gigibannerbackground: white;
+  --gigibannerforeground: black;
+  --footer-border: rgba(0, 0, 0, 0.12);
+  --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #6c8eef;
+  --ifm-pagination-nav-color-hover: #000000;
+  --input-border: #1a191954;
+  --input-hover-border: #000000;
+  --input-background: #00000004;
+}
+
+.tile-wrapper {
+  margin: 0 -8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+pre code {
+  font-size: 14px !important;
+}
+
+.get-started {
+  border-radius: 50vw;
+}
+
+.apicard-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.padding-top--md {
+  padding-top: 3rem !important;
+}
+
+.menu {
+  padding: 3rem 0.5rem !important;
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+.react-toggle-track {
+  background-color: #ebedf0 !important;
+}
+
+.footer__title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.navbar:not(.navbar-sidebar--show) {
+  background-color: hsla(0, 0%, 100%, 0.8);
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
+:root[data-theme="dark"] .navbar:not(.navbar-sidebar--show) {
+  background-color: rgba(var(--ifm-background-color, 0.2));
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
+.navbar .navbar__logo {
+  height: 100%;
+}
+
+.navbar .navbar__items .navbar__item {
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 550;
+}
+
+.menu__link {
+  font-size: 14px;
+}
+
+.menu__link--sublist:after {
+  opacity: 0.3;
+}
+
+:root[data-theme="dark"] .react-toggle-track {
+  background-color: #454a66 !important;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #737c8850;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar {
+  background-color: transparent;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: #737c8850;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.navbar__brand {
+  height: 40px;
+}
+
+:root[data-theme="dark"] {
+  --ifm-navbar-background-color: #1b2036; /*#141c2d;*/
+  --ifm-footer-background-color: #00000020; /* #121430; */
+  --ifm-menu-color-background-active: #ffffff10;
+  --ifm-menu-color-active: #ffffff;
+  --ifm-menu-color-background-hover: #3c405850;
+  --ifm-font-color-base: #dddddd;
+  --ifm-menu-color: #c1c9d2;
+  --ifm-link-color: #ff2069;
+  --docsearch-searchbox-background: #454a66;
+  --docsearch-searchbox-focus-background: #454a66;
+  --docsearch-searchbox-shadow: inset 0 0 0 1px var(--docsearch-primary-color);
+  --docsearch-hit-background: #454a66;
+  --docsearch-highlight-color: #5469d4;
+  --ifm-navbar-shadow: inset 0 -1px rgba(255, 255, 255, 0.12);
+  --ifm-footer-link-color: #ffffff;
+  --ifm-color-emphasis-300: #ffffff20;
+  --ifm-color-primary: #ff2069;
+  --ifm-color-primary-dark: #ff1c61;
+  --ifm-color-primary-darker: #ff1856;
+  --ifm-color-primary-darkest: #ff134c;
+  --ifm-color-primary-light: #ff4180;
+  --ifm-color-primary-lighter: #ff6396;
+  --ifm-color-primary-lightest: #ff90b4;
+  --ifm-background-color: #141735; /* #141c2d; */
+  --ifm-hero-background-color: #0f1022;
+  --ifm-hero-text-color: #ffffff;
+  --get-started-bg: var(--ifm-font-color-base);
+  --get-started: #ff1f69;
+  --ifm-footer-color: #ffffff50;
+  --ifm-heading-color: #ffffff;
+  --ifm-font-color-base: #ffffffdd; /* #c1c9d2; */
+  --font-color-strong: #ffffff;
+  --ifm-navbar-link-hover-color: #ffffff;
+  --ifm-color-success-contrast-foreground: #cbf4c9;
+  --ifm-color-success-contrast-background: #4f566b;
+  --ifm-color-success-dark: #cbf4c9;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #3c4257;
+  --ifm-table-stripe-background: #1a253c; /* #1a1d46; */
+  --ifm-color-secondary-contrast-background: #3c4257;
+  --ifm-code-background: #3c4257;
+  --ifm-alert-background-color: #92400e50;
+  --ifm-alert-background-color-highlight: #fbbf24;
+  --ifm-color-warning-contrast-background: #92400e50;
+  --ifm-color-warning-contrast-foreground: #fbbf24;
+  --ifm-color-warning-dark: #4f566b;
+  --ifm-toc-border-color: rgba(135, 149, 161, 0.2);
+  --ifm-table-border-color: rgba(135, 149, 161, 0.2);
+  --ifm-card-background-color: #1a253c;
+  --card-background: #1a253c; /* #1a1d46; */
+  --list-background: #1a253c; /* #1a1d46; */
+  --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
+  --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
+  --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
+  --apisystembackground: linear-gradient(40deg, #6e695090, #6e695090);
+  --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
+  --overlaycolor: #ffffff15;
+  --gigibannerbackground: #7e21ce;
+  --gigibannerforeground: white;
+  --footer-border: rgba(255, 255, 255, 0.12);
+  --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #ffffff;
+  --ifm-pagination-nav-color-hover: #ffffff;
+  --input-border: #f9f7f775;
+  --input-hover-border: #ffffff;
+  --input-background: #00000040;
+}
+
+.get-started:hover {
+  color: #ffffff !important;
+}
+
+.menu li li a {
+  font-size: 14px;
+  /* padding: 2px 14px; */
+}
+
+i {
+  font-size: 1.5rem;
+  color: var(--ifm-heading-color);
+}
+
+main .container img {
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+}
+
+.custom-rounded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-right: 1rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.custom-rounded svg {
+  fill: white;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.custom-rounded i {
+  color: white;
+}
+
+.custom-rounded-start {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.custom-rounded-password {
+  background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+}
+
+.custom-rounded-login,
+.custom-rounded-register {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.custom-rounded-privatelabel,
+.custom-rounded-phone,
+.custom-rounded-email,
+.custom-rounded-storage,
+.custom-rounded-service {
+  background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+}
+
+.custom-rounded-split {
+  background: linear-gradient(40deg, #3b82f6, #4f46e5);
+}
+
+.custom-rounded-texts,
+.custom-rounded-help,
+.custom-rounded-architecture {
+  background: linear-gradient(40deg, #dc2626 30%, #db2777);
+}
+
+.custom-rounded-system,
+.custom-rounded-apis,
+.custom-rounded-policy,
+.custom-rounded-instance {
+  background: linear-gradient(40deg, #1f2937, #111827);
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(72, 77, 91);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+.hero__title {
+  color: white;
+}
+
+.get-started {
+  border: 2px solid var(--get-started);
+  background-color: var(--get-started);
+  color: var(--ifm-hero-text-color);
+}
+
+.get-started:hover {
+  background-color: var(--get-started-bg-hover);
+  color: var(--ifm-hero-text-color);
+}
+
+.docs-link {
+  margin-bottom: 2rem;
+}
+
+.docs-link a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.docs-link a:hover {
+  color: var(--ifm-color-primary);
+}
+
+.docs-link img {
+  margin: 40px;
+}
+
+.b2borg,
+.b2bproject,
+.b2bapp,
+.b2buser {
+  border-radius: 1rem;
+  background: var(--overlaycolor);
+  padding: 1rem;
+}
+
+.b2buser {
+  margin-top: 1rem;
+}
+
+.b2borg span,
+.b2bproject span,
+.b2bapp span,
+.b2buser span {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.flexrowbetween {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+
+.arrowright {
+  height: 2rem;
+  width: auto;
+  align-self: center;
+  min-width: 2rem;
+}
+
+.b2bprojectrole {
+  margin: 1rem 0 0 1rem !important;
+}
+
+.footer__link-item {
+  font-size: 14px;
+}
+
+.footer__link-item svg {
+  margin-left: 0.5rem;
+}
+
+.footer {
+  border-top: 1px solid var(--footer-border);
+}
+
+table th {
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+a {
+  transition: all 0.2s ease;
+}
+
+.alert {
+  font-size: 14px;
+  border: none;
+  font-weight: 600;
+}
+
+p strong {
+  color: var(--font-color-strong);
+}
+
+/* Sidebar Method labels */
+.api-method > .menu__link {
+  align-items: center;
+  justify-content: start;
+}
+
+.api-method > .menu__link::before {
+  width: 50px;
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  border: 1px solid;
+  border-inline-start-width: 5px;
+  margin-right: var(--ifm-spacing-horizontal);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.get > .menu__link::before {
+  content: "get";
+  background-color: var(--ifm-color-info-contrast-background);
+  color: var(--ifm-color-info-contrast-foreground);
+  border-color: var(--ifm-color-info-dark);
+}
+
+.post > .menu__link::before {
+  content: "post";
+  background-color: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  border-color: var(--ifm-color-success-dark);
+}
+
+.delete > .menu__link::before {
+  content: "del";
+  background-color: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+  border-color: var(--ifm-color-danger-dark);
+}
+
+.put > .menu__link::before {
+  content: "put";
+  background-color: var(--ifm-color-warning-contrast-background);
+  color: var(--ifm-color-warning-contrast-foreground);
+  border-color: var(--ifm-color-warning-dark);
+}
+
+.patch > .menu__link::before {
+  content: "patch";
+  background-color: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  border-color: var(--ifm-color-success-dark);
+}
+
+.head > .menu__link::before {
+  content: "head";
+  background-color: var(--ifm-color-secondary-contrast-background);
+  color: var(--ifm-color-secondary-contrast-foreground);
+  border-color: var(--ifm-color-secondary-dark);
+}
+
+.hideondark {
+  display: block !important;
+}
+
+:root[data-theme="dark"] .hideondark {
+  display: none !important;
+}
+
+.hideonlight {
+  display: none !important;
+}
+
+:root[data-theme="dark"] .hideonlight {
+  display: block !important;
+}
+
+
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  margin-bottom: 2rem;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/*
+  The overview list components are enriched by swizzled DocCardList and DocSidebarItems wrappers.
+  Deprecated list item titles have the class zitadel-lifecycle-deprecated.
+  We strike them through, because this is well-known practice and reduces mental overhead for finding the right method to solve a task.
+ */
+.card:has(.zitadel-lifecycle-deprecated) {
+  position: relative;
+}
+
+.card:has(.zitadel-lifecycle-deprecated)::after {
+  content: "DEPRECATED";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zitadel-lifecycle-deprecated {
+  text-decoration: line-through;
+}
+
+table#zitadel-versions td {
+  vertical-align: top;
+}

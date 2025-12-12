@@ -1,0 +1,7 @@
+{
+  "pages": [
+    "auth0",
+    "keycloak",
+    "zitadel"
+  ]
+}

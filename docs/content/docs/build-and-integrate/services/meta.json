@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "atlassian-saml",
+    "auth0-oidc",
+    "auth0-saml",
+    "aws-saml",
+    "cloudflare-oidc",
+    "gitlab-saml",
+    "gitlab-self-hosted",
+    "google-cloud",
+    "google-workspace",
+    "pingidentity-saml"
+  ]
+}

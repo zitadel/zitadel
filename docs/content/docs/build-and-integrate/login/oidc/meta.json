@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "authmethods",
+    "_authmethods",
+    "device-authorization",
+    "login-users",
+    "logout",
+    "oauth-recommended-flows",
+    "webkeys"
+  ]
+}

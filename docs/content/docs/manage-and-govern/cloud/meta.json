@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "billing",
+    "instances",
+    "settings",
+    "start",
+    "support",
+    "users"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "pages": [
+    "machine_jwt_profile_grant",
+    "oidc_session"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "migrate-from-v1",
+    "testing-event",
+    "testing-function-manipulation",
+    "testing-function",
+    "testing-request-manipulation",
+    "testing-request-signature",
+    "testing-request",
+    "testing-response-manipulation",
+    "testing-response",
+    "usage",
+    "webhook-site-setup"
+  ]
+}
