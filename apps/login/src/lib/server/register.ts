@@ -8,7 +8,7 @@ import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/sess
 import { cookies, headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { getServiceConfig } from "../service-url";
-import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { checkEmailVerification, checkPhoneVerification, checkMFAFactors } from "../verify-helper";
 import { getOrSetFingerprintId } from "../fingerprint";
 import crypto from "crypto";
 import { completeFlowOrGetUrl } from "../client";
@@ -114,6 +114,18 @@ export async function registerUser(command: RegisterUserCommand) {
 
     if (emailVerificationCheck?.redirect) {
       return emailVerificationCheck;
+    }
+
+    // check to see if user phone was verified (if user has a phone)
+    const phoneVerificationCheck = checkPhoneVerification(
+      session,
+      humanUser,
+      session.factors.user.organizationId,
+      command.requestId,
+    );
+
+    if (phoneVerificationCheck?.redirect) {
+      return phoneVerificationCheck;
     }
 
     return completeFlowOrGetUrl(

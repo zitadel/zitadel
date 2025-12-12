@@ -7,7 +7,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
+import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, getUserByID, registerTOTP } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -36,6 +36,18 @@ export default async function Page(props: {
       organization,
     },
   });
+
+  // Get user information to check verification status
+  let phoneVerified = false;
+  let emailVerified = false;
+  if (session?.factors?.user?.id) {
+    const userResponse = await getUserByID({ serviceConfig, userId: session.factors.user.id });
+    if (userResponse?.user?.type.case === "human") {
+      const humanUser = userResponse.user.type.value;
+      phoneVerified = humanUser.phone?.isVerified ?? false;
+      emailVerified = humanUser.email?.isVerified ?? false;
+    }
+  }
 
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
@@ -86,11 +98,36 @@ export default async function Page(props: {
     if (requestId) {
       paramsToContinue.append("requestId", requestId);
     }
-    urlToContinue = `/otp/${method}?` + paramsToContinue;
 
-    // immediately check the OTP on the next page if sms or email was set up
-    if (["email", "sms"].includes(method)) {
+    // Check if contact method needs verification
+    const needsVerification = 
+      (method === "sms" && !phoneVerified) || 
+      (method === "email" && !emailVerified);
+
+    if (needsVerification) {
+      // Contact method is not verified, redirect to OTP verification
+      urlToContinue = `/otp/${method}?` + paramsToContinue;
       return redirect(urlToContinue);
+    } else {
+      // Contact is already verified, skip OTP verification and go to login flow
+      if (requestId && sessionId) {
+        const loginParams = new URLSearchParams();
+        if (sessionId) {
+          loginParams.append("sessionId", sessionId);
+        }
+        if (loginName) {
+          loginParams.append("loginName", loginName);
+        }
+        if (organization) {
+          loginParams.append("organization", organization);
+        }
+        if (requestId) {
+          loginParams.append("authRequest", requestId);
+        }
+        urlToContinue = `/login?` + loginParams;
+      } else if (loginName) {
+        urlToContinue = `/signedin?` + paramsToContinue;
+      }
     }
   } else if (requestId && sessionId) {
     if (requestId) {
@@ -117,11 +154,13 @@ export default async function Page(props: {
           </p>
         ) : (
           <p className="ztdl-p">
-            {method === "email"
-              ? "Code via email was successfully added."
-              : method === "sms"
-                ? "Code via SMS was successfully added."
-                : ""}
+            {method === "email" ? (
+              <Translated i18nKey="set.emailOtpAdded" namespace="otp" />
+            ) : method === "sms" ? (
+              <Translated i18nKey="set.smsOtpAdded" namespace="otp" />
+            ) : (
+              ""
+            )}
           </p>
         )}
 
@@ -164,15 +203,13 @@ export default async function Page(props: {
             ></TotpRegister>
           </div>
         ) : (
-          <div className="mt-8 flex w-full flex-row items-center">
-            <BackButton />
-            <span className="flex-grow"></span>
-
-            <Link href={urlToContinue}>
-              <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+          <div className="mt-8 flex w-full flex-col items-center gap-2">
+            <Link href={urlToContinue} className="self-end w-full">
+              <Button type="submit" className="self-end w-full" variant={ButtonVariants.Primary}>
                 <Translated i18nKey="set.submit" namespace="otp" />
               </Button>
             </Link>
+            <BackButton data-testid="back-button" />
           </div>
         )}
       </div>

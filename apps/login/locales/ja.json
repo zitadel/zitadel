@@ -180,6 +180,8 @@
       "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
       "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
       "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+      "emailOtpAdded": "メールによるコードが正常に追加されました。",
+      "smsOtpAdded": "SMSによるコードが正常に追加されました。",
       "submit": "続行",
       "labels": {
         "code": "コード"

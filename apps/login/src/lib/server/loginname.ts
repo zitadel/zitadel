@@ -260,12 +260,50 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const methods = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors?.user?.id });
 
-    // always resend invite if user has no auth method set
+    // if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
+      // If email is already verified, redirect directly to authenticator setup
+      if (humanUser?.email?.isVerified) {
+        const params = new URLSearchParams({
+          sessionId: session.id,
+          initial: "true",
+        });
+
+        if (session.factors?.user?.loginName) {
+          params.set("loginName", session.factors?.user?.loginName);
+        }
+
+        if (command.requestId) {
+          params.append("requestId", command.requestId);
+        }
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        // Load login settings to determine redirect
+        const loginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
+        
+        // Check if password is the only available authentication method
+        const onlyPasswordAllowed = loginSettings?.allowUsernamePassword && 
+          loginSettings?.passkeysType !== 1; // PasskeysType.ALLOWED = 1
+        
+        // Check if external IDPs are available
+        const noExternalIdp = !loginSettings?.allowExternalIdp;
+
+        // If password is the only option, redirect directly to password setup
+        if (onlyPasswordAllowed && noExternalIdp) {
+          return { redirect: `/password/set?${params}` };
+        }
+
+        return { redirect: `/authenticator/set?${params}` };
+      }
+
+      // If email is not verified, send invite/verification email
       const params = new URLSearchParams({
         loginName: session.factors?.user?.loginName as string,
         send: "true", // set this to true to request a new code immediately
-        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        invite: "true",
       });
 
       if (command.requestId) {
@@ -276,7 +314,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.append("organization", organization);
       }
 
-      return { redirect: `/verify?` + params };
+      return { redirect: `/verify/email?` + params };
     }
 
     if (methods.authMethodTypes.length == 1) {

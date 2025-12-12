@@ -248,6 +248,8 @@
       "smsDescription": "输入您的电话号码以接收短信验证码。",
       "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+      "emailOtpAdded": "电子邮件验证码已成功添加。",
+      "smsOtpAdded": "短信验证码已成功添加。",
       "submit": "继续",
       "labels": {
         "code": "验证码"

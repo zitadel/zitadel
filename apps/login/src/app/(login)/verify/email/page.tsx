@@ -2,7 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { VerifyForm } from "@/components/verify-form";
+import { VerifyEmailForm } from "@/components/verify-email-form";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send, phone } = searchParams;
+  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -36,7 +36,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let error: string | undefined;
 
   const doSend = send === "true";
-  const isPhoneVerification = phone === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -47,7 +46,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendInviteEmailCode({
         userId,
         urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify/email?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send invitation email", apiError);
@@ -57,21 +56,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendEmailCode({
         userId,
         urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify/email?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((apiError) => {
         console.error("Could not send verification email", apiError);
         error = "emailSendFailed";
       });
     }
-  }
-
-  async function sendPhone(userId: string) {
-    const { resendPhoneCode } = await import("@/lib/zitadel");
-    await resendPhoneCode({ serviceConfig, userId }).catch((apiError) => {
-      console.error("Could not send phone verification SMS", apiError);
-      error = "phoneSendFailed";
-    });
   }
 
   if ("loginName" in searchParams) {
@@ -84,19 +75,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      if (isPhoneVerification) {
-        await sendPhone(sessionFactors.factors.user.id);
-      } else {
-        await sendEmail(sessionFactors.factors.user.id);
-      }
+      await sendEmail(sessionFactors.factors.user.id);
     }
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
-      if (isPhoneVerification) {
-        await sendPhone(userId);
-      } else {
-        await sendEmail(userId);
-      }
+      await sendEmail(userId);
     }
 
     const userResponse = await getUserByID({ serviceConfig, userId });
@@ -116,7 +99,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const params = new URLSearchParams({
     userId: userId,
-    initial: "true", // defines that a code is not required and is therefore not shown in the UI
+    initial: "true",
   });
 
   if (loginName) {
@@ -133,7 +116,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 w-full">
         <h1>
           <Translated i18nKey="verify.title" namespace="verify" />
         </h1>
@@ -173,21 +156,20 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         )}
 
         {id && send && (
-          <div className="w-full py-4">
+          <div className="w-full">
             <Alert type={AlertType.INFO}>
               <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>
           </div>
         )}
 
-        <VerifyForm
+        <VerifyEmailForm
           loginName={loginName}
           organization={organization}
           userId={id}
           code={code}
           isInvite={invite === "true"}
           requestId={requestId}
-          isPhoneVerification={isPhoneVerification}
         />
       </div>
     </DynamicTheme>
