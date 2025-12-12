@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Не вдалося завантажити сеанс",
       "couldNotLoadAuthMethods": "Не вдалося завантажити методи автентифікації",
       "failedPrecondition": "Не виконано передумову",
-      "sessionNotValid": "Сеанс недійсний"
+      "sessionNotValid": "Сеанс недійсний",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

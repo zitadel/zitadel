@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Impossibile caricare la sessione",
       "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
       "failedPrecondition": "Precondizione non soddisfatta",
-      "sessionNotValid": "La sessione non è valida"
+      "sessionNotValid": "La sessione non è valida",
+      "passwordVerificationMissing": "Password verification is missing.",
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
     }
   },
   "idp": {

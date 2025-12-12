@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
       "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
       "failedPrecondition": "Vorbedingung fehlgeschlagen",
-      "sessionNotValid": "Sitzung ist nicht gültig"
+      "sessionNotValid": "Sitzung ist nicht gültig",
+      "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
+      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
     }
   },
   "idp": {
