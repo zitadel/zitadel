@@ -75,7 +75,7 @@
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "15.5.7",
+    "eslint-config-next": "15.5.9",
     "eslint-config-prettier": "^9.1.0",
     "gaxios": "^7.1.0",
     "grpc-tools": "1.13.0",
