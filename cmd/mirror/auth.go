@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"io"
 	"strconv"
 	"time"
@@ -22,12 +23,14 @@ func authCmd() *cobra.Command {
 		Long: `mirrors the auth requests table from one database to another
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Only auth requests are mirrored`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			copyAuth(cmd.Context(), config)
 			return nil
 		},

@@ -3,6 +3,7 @@ package mirror
 import (
 	"bytes"
 	_ "embed"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -45,12 +46,14 @@ Order of execution:
 				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
 			}
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return fmt.Errorf("unable to create migration config: %w", err)
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
 			projectionConfig := mustNewProjectionsConfig(viper.GetViper())
 

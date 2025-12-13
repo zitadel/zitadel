@@ -61,8 +61,8 @@ func New() *cobra.Command {
 		Long: `sets up data to start ZITADEL.
 Requirements:
 - postgreSQL`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tls.ModeFromFlag(cmd)
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			err = tls.ModeFromFlag(cmd)
 			if err != nil {
 				return fmt.Errorf("invalid tlsMode: %w", err)
 			}
@@ -81,7 +81,9 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
 			steps := MustNewSteps(viper.New())
 

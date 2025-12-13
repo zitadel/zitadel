@@ -107,6 +107,16 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 		c, lvl = codes.Unimplemented, slog.LevelInfo
 	case zerrors.KindResourceExhausted:
 		c, lvl = codes.ResourceExhausted, slog.LevelError
+	case zerrors.KindDataLoss:
+		c, lvl = codes.DataLoss, slog.LevelError
+	case zerrors.KindCanceled:
+		c, lvl = codes.Canceled, slog.LevelWarn
+	case zerrors.KindAborted:
+		c, lvl = codes.Aborted, slog.LevelError
+	case zerrors.KindOutOfRange:
+		c, lvl = codes.OutOfRange, slog.LevelWarn
+	case zerrors.KindUnknown:
+		c, lvl = codes.Unknown, slog.LevelError
 	default:
 		c, lvl = codes.Unknown, slog.LevelError
 	}

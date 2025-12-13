@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -111,7 +112,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 	// Legacy logger
 	err = config.Log.SetLogger()
 	if err != nil {
-		shutdown(ctx)
+		err = errors.Join(err, shutdown(ctx))
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 
@@ -122,7 +123,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	err = config.SystemDefaults.Validate()
 	if err != nil {
-		shutdown(ctx)
+		err = errors.Join(err, shutdown(ctx))
 		return nil, nil, fmt.Errorf("system defaults config invalid: %w", err)
 	}
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.

@@ -58,6 +58,16 @@ func extractError(err error) (statusCode int, msg, id string, lvl slog.Level) {
 		statusCode, lvl = http.StatusNotImplemented, slog.LevelInfo
 	case zerrors.KindResourceExhausted:
 		statusCode, lvl = http.StatusTooManyRequests, slog.LevelError
+	case zerrors.KindCanceled:
+		statusCode, lvl = 499, slog.LevelWarn
+	case zerrors.KindDataLoss:
+		statusCode, lvl = http.StatusInternalServerError, slog.LevelError
+	case zerrors.KindOutOfRange:
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindAborted:
+		statusCode, lvl = http.StatusConflict, slog.LevelWarn
+	case zerrors.KindUnknown:
+		fallthrough
 	default:
 		statusCode, lvl = statusUnknown, slog.LevelError
 	}

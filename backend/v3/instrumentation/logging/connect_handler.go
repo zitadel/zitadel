@@ -62,6 +62,7 @@ func assertConnectLevel(code connect.Code) slog.Level {
 	// server errors
 	case connect.CodeUnknown,
 		connect.CodeAborted,
+		connect.CodeDeadlineExceeded,
 		connect.CodeInternal,
 		connect.CodeUnavailable,
 		connect.CodeDataLoss:

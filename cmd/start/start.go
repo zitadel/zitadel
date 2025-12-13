@@ -127,8 +127,8 @@ func New(server chan<- *Server) *cobra.Command {
 		Long: `starts ZITADEL.
 Requirements:
 - postgreSQL`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := cmd_tls.ModeFromFlag(cmd)
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			err = cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err
 			}
@@ -136,7 +136,9 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = shutdown(cmd.Context())
+			}()
 
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {

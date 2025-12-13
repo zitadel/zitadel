@@ -3,6 +3,7 @@ package setup
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -100,7 +101,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	err = config.Log.SetLogger()
 	if err != nil {
-		shutdown(ctx)
+		err = errors.Join(err, shutdown(ctx))
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 

@@ -30,25 +30,25 @@ type ShutdownFunc func(context.Context) error
 var (
 	startOnce sync.Once
 	shutdown  ShutdownFunc
-	startErr  error
+	errStart  error
 )
 
 // Start initializes global instrumentation once, based on the provided configuration.
 // It is safe to call multiple times; subsequent calls will return the same shutdown function and error as the first call.
 func Start(ctx context.Context, cfg Config) (ShutdownFunc, error) {
 	startOnce.Do(func() {
-		startErr = startProfiler(cfg.Profile, cfg.ServiceName)
-		if startErr != nil {
+		errStart = startProfiler(cfg.Profile, cfg.ServiceName)
+		if errStart != nil {
 			return
 		}
 		var logProvider *log.LoggerProvider
-		logProvider, shutdown, startErr = setupOTelSDK(ctx, cfg)
-		if startErr != nil {
+		logProvider, shutdown, errStart = setupOTelSDK(ctx, cfg)
+		if errStart != nil {
 			return
 		}
 		setLogger(logProvider, cfg.Log)
 	})
-	return shutdown, startErr
+	return shutdown, errStart
 }
 
 // NewTracer creates a new tracer from the global provider.

@@ -61,11 +61,13 @@ func assertGrpcLevel(code codes.Code) slog.Level {
 	// server errors
 	case codes.Unknown,
 		codes.Aborted,
+		codes.DeadlineExceeded,
 		codes.Internal,
 		codes.Unavailable,
 		codes.DataLoss:
 		return slog.LevelError
-
+	case codes.OK:
+		fallthrough
 	default: // includes 0 code when no error
 		return slog.LevelInfo
 	}

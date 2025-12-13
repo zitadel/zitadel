@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"errors"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,8 +24,8 @@ Requirements:
 - database
 - database is initialized
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := tls.ModeFromFlag(cmd)
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			err = tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err
 			}
@@ -43,7 +44,9 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
 			setupSteps := setup.MustNewSteps(viper.New())
 
@@ -51,11 +54,10 @@ Requirements:
 			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
 			cancel()
 
-			startConfig, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
 
 			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},

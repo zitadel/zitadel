@@ -33,12 +33,14 @@ func eventstoreCmd() *cobra.Command {
 		Long: `mirrors the eventstore of an instance from one database to another
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Migrate only copies events2 and unique constraints`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			copyEventstore(cmd.Context(), config)
 			return nil
 		},
