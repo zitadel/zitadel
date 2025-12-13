@@ -9,11 +9,11 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	es "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"

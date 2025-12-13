@@ -10,13 +10,13 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Server struct {
@@ -117,7 +117,7 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)

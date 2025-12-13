@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 

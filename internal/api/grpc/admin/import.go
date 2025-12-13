@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
@@ -28,7 +29,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"

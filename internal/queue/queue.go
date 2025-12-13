@@ -11,9 +11,9 @@ import (
 	"github.com/riverqueue/rivercontrib/otelriver"
 	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 // Queue abstracts the underlying queuing library
@@ -32,7 +32,7 @@ type Config struct {
 
 func NewQueue(config *Config) (_ *Queue, err error) {
 	middleware := []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
-		MeterProvider: metrics.GetMetricsProvider(),
+		MeterProvider: otel.GetMeterProvider(),
 		DurationUnit:  "ms",
 	})}
 	return &Queue{

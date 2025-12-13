@@ -3,6 +3,7 @@ package gerrors
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,7 +42,7 @@ func TestCaosToGRPCError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ZITADELToGRPCError(tt.args.err); (err != nil) != tt.wantErr {
+			if err := ZITADELToGRPCError(t.Context(), tt.args.err); (err != nil) != tt.wantErr {
 				t.Errorf("ZITADELToGRPCError() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -96,7 +97,7 @@ func Test_getErrorInfo(t *testing.T) {
 	}
 }
 
-func Test_Extract(t *testing.T) {
+func Test_extractError(t *testing.T) {
 	type args struct {
 		err error
 	}
@@ -106,7 +107,7 @@ func Test_Extract(t *testing.T) {
 		wantC   codes.Code
 		wantMsg string
 		wantID  string
-		wantOk  bool
+		wantLvl slog.Level
 	}{
 		{
 			"already exists",
@@ -114,7 +115,7 @@ func Test_Extract(t *testing.T) {
 			codes.AlreadyExists,
 			"already exists",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"deadline exceeded",
@@ -122,7 +123,7 @@ func Test_Extract(t *testing.T) {
 			codes.DeadlineExceeded,
 			"deadline exceeded",
 			"id",
-			true,
+			slog.LevelError,
 		},
 		{
 			"internal error",
@@ -130,7 +131,7 @@ func Test_Extract(t *testing.T) {
 			codes.Internal,
 			"internal error",
 			"id",
-			true,
+			slog.LevelError,
 		},
 		{
 			"invalid argument",
@@ -138,7 +139,7 @@ func Test_Extract(t *testing.T) {
 			codes.InvalidArgument,
 			"invalid argument",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"not found",
@@ -146,7 +147,7 @@ func Test_Extract(t *testing.T) {
 			codes.NotFound,
 			"not found",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"permission denied",
@@ -154,7 +155,7 @@ func Test_Extract(t *testing.T) {
 			codes.PermissionDenied,
 			"permission denied",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"precondition failed",
@@ -162,7 +163,7 @@ func Test_Extract(t *testing.T) {
 			codes.FailedPrecondition,
 			"precondition failed",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"unauthenticated",
@@ -170,7 +171,7 @@ func Test_Extract(t *testing.T) {
 			codes.Unauthenticated,
 			"unauthenticated",
 			"id",
-			true,
+			slog.LevelWarn,
 		},
 		{
 			"unavailable",
@@ -178,7 +179,7 @@ func Test_Extract(t *testing.T) {
 			codes.Unavailable,
 			"unavailable",
 			"id",
-			true,
+			slog.LevelError,
 		},
 		{
 			"unimplemented",
@@ -186,7 +187,7 @@ func Test_Extract(t *testing.T) {
 			codes.Unimplemented,
 			"unimplemented",
 			"id",
-			true,
+			slog.LevelInfo,
 		},
 		{
 			"exhausted",
@@ -194,7 +195,7 @@ func Test_Extract(t *testing.T) {
 			codes.ResourceExhausted,
 			"exhausted",
 			"id",
-			true,
+			slog.LevelError,
 		},
 		{
 			"unknown",
@@ -202,12 +203,12 @@ func Test_Extract(t *testing.T) {
 			codes.Unknown,
 			"unknown",
 			"",
-			false,
+			slog.LevelError,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotC, gotMsg, gotID, gotOk := ExtractZITADELError(tt.args.err)
+			gotC, gotMsg, gotID := ExtractZITADELError(tt.args.err)
 			if gotC != tt.wantC {
 				t.Errorf("extract() gotC = %v, want %v", gotC, tt.wantC)
 			}
@@ -216,9 +217,6 @@ func Test_Extract(t *testing.T) {
 			}
 			if gotID != tt.wantID {
 				t.Errorf("extract() gotID = %v, want %v", gotID, tt.wantID)
-			}
-			if gotOk != tt.wantOk {
-				t.Errorf("extract() gotOk = %v, want %v", gotOk, tt.wantOk)
 			}
 		})
 	}

@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -16,7 +16,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 	}()
 	client, ok := r.Client.(*clientCredentialsClient)
 	if !ok {

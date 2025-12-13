@@ -11,11 +11,11 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -36,8 +36,6 @@ const (
 	ClaimUserGroups                 = ScopeUserGroups
 	ScopeCustomUserGroups           = "urn:zitadel:iam:user:groups"
 	ClaimCustomUserGroups           = ScopeCustomUserGroups
-
-	oidcCtx = "oidc"
 )
 
 // GetClientByClientID implements the op.Storage interface to retrieve an OIDC client by its ID.
@@ -46,7 +44,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	client, err := o.query.ActiveOIDCClientByID(ctx, id, false)
@@ -188,7 +186,7 @@ func userinfoClaims(userInfo *oidc.UserInfo) func(c *actions.FieldConfig) interf
 func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 

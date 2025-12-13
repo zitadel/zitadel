@@ -3,6 +3,7 @@ package zerrors
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"reflect"
 )
 
@@ -83,4 +84,12 @@ func (err *ZitadelError) As(target interface{}) bool {
 func IsZitadelError(err error) bool {
 	zitadelErr := new(ZitadelError)
 	return errors.As(err, &zitadelErr)
+}
+
+func (err *ZitadelError) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("parent", err.Parent.Error()),
+		slog.String("message", err.Message),
+		slog.String("id", err.ID),
+	)
 }

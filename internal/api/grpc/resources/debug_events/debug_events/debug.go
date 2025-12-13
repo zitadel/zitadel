@@ -3,9 +3,9 @@ package debug_events
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	debug_events "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha"
 )

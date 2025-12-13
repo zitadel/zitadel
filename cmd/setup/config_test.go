@@ -241,7 +241,9 @@ Actions:
 			v := viper.New()
 			v.SetConfigType("yaml")
 			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
-			got := MustNewConfig(v)
+			got, shutdown, err := NewConfig(t.Context(), v)
+			require.NoError(t, err)
+			defer shutdown(t.Context())
 			tt.want(t, got)
 		})
 	}

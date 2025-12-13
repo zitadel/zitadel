@@ -18,6 +18,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -29,7 +30,6 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )

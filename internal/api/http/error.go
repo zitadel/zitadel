@@ -1,48 +1,61 @@
 package http
 
 import (
+	"context"
 	"errors"
+	"log/slog"
 	"net/http"
+
+	slogctx "github.com/veqryn/slog-context"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
+func ZitadelErrorToHTTPStatusCode(ctx context.Context, err error) (statusCode int, ok bool) {
 	if err == nil {
 		return http.StatusOK, true
 	}
-	//nolint:errorlint
-	switch err.(type) {
-	case *zerrors.AlreadyExistsError:
-		return http.StatusConflict, true
-	case *zerrors.DeadlineExceededError:
-		return http.StatusGatewayTimeout, true
-	case *zerrors.InternalError:
-		return http.StatusInternalServerError, true
-	case *zerrors.InvalidArgumentError:
-		return http.StatusBadRequest, true
-	case *zerrors.NotFoundError:
-		return http.StatusNotFound, true
-	case *zerrors.PermissionDeniedError:
-		return http.StatusForbidden, true
-	case *zerrors.PreconditionFailedError:
+	statusCode, key, id, lvl := extractError(err)
+	msg := key
+	msg += " (" + id + ")"
+	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
+	return statusCode, statusCode != statusUnknown
+}
+
+const statusUnknown = 0
+
+func extractError(err error) (statusCode int, msg, id string, lvl slog.Level) {
+	zitadelErr := new(zerrors.ZitadelError)
+	if ok := errors.As(err, &zitadelErr); !ok {
+		return statusUnknown, err.Error(), "", slog.LevelError
+	}
+	switch {
+	case zerrors.IsErrorAlreadyExists(err):
+		return http.StatusConflict, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+	case zerrors.IsDeadlineExceeded(err):
+		return http.StatusGatewayTimeout, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+	case zerrors.IsInternal(err):
+		return http.StatusInternalServerError, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+	case zerrors.IsErrorInvalidArgument(err):
+		return http.StatusBadRequest, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
+	case zerrors.IsNotFound(err):
+		return http.StatusNotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
+	case zerrors.IsPermissionDenied(err):
+		return http.StatusForbidden, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
+	case zerrors.IsPreconditionFailed(err):
 		// use the same code as grpc-gateway:
 		// https://github.com/grpc-ecosystem/grpc-gateway/blob/9e33e38f15cb7d2f11096366e62ea391a3459ba9/runtime/errors.go#L59
-		return http.StatusBadRequest, true
-	case *zerrors.UnauthenticatedError:
-		return http.StatusUnauthorized, true
-	case *zerrors.UnavailableError:
-		return http.StatusServiceUnavailable, true
-	case *zerrors.UnimplementedError:
-		return http.StatusNotImplemented, true
-	case *zerrors.ResourceExhaustedError:
-		return http.StatusTooManyRequests, true
+		return http.StatusBadRequest, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
+	case zerrors.IsUnauthenticated(err):
+		return http.StatusUnauthorized, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
+	case zerrors.IsUnavailable(err):
+		return http.StatusServiceUnavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+	case zerrors.IsUnimplemented(err):
+		return http.StatusNotImplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
+	case zerrors.IsResourceExhausted(err):
+		return http.StatusTooManyRequests, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	default:
-		c := new(zerrors.ZitadelError)
-		if errors.As(err, &c) {
-			return ZitadelErrorToHTTPStatusCode(errors.Unwrap(err))
-		}
-		return http.StatusInternalServerError, false
+		return statusUnknown, err.Error(), "", slog.LevelError
 	}
 }
 

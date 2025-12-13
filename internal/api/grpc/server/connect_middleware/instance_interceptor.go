@@ -9,10 +9,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )

@@ -8,12 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 )
 
 func TestNewProjectionMetrics(t *testing.T) {
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
+	metrics.M = func() metrics.Metrics {
+		return mockMetrics
+	}
 
 	metrics := NewProjectionMetrics()
 	require.NotNil(t, metrics)
@@ -21,9 +23,10 @@ func TestNewProjectionMetrics(t *testing.T) {
 }
 
 func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
+	metrics.M = func() metrics.Metrics {
+		return mockMetrics
+	}
 	projectionMetrics := NewProjectionMetrics()
 
 	ctx := context.Background()
@@ -42,9 +45,10 @@ func TestProjectionMetrics_ProjectionUpdateTiming(t *testing.T) {
 }
 
 func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
+	metrics.M = func() metrics.Metrics {
+		return mockMetrics
+	}
 	projectionMetrics := NewProjectionMetrics()
 
 	ctx := context.Background()
@@ -64,9 +68,10 @@ func TestProjectionMetrics_ProjectionEventsProcessed(t *testing.T) {
 }
 
 func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
+	metrics.M = func() metrics.Metrics {
+		return mockMetrics
+	}
 	projectionMetrics := NewProjectionMetrics()
 
 	ctx := context.Background()
@@ -85,9 +90,10 @@ func TestProjectionMetrics_ProjectionStateLatency(t *testing.T) {
 }
 
 func TestProjectionMetrics_Integration(t *testing.T) {
-
 	mockMetrics := metrics.NewMockMetrics()
-	metrics.M = mockMetrics
+	metrics.M = func() metrics.Metrics {
+		return mockMetrics
+	}
 	projectionMetrics := NewProjectionMetrics()
 
 	ctx := context.Background()
