@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"errors"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -76,8 +75,7 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Reques
 
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
 	if err != nil {
-		var notFoundError *zerrors.NotFoundError
-		if errors.As(err, &notFoundError) {
+		if zerrors.IsNotFound(err) {
 			return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{}), nil
 		}
 		return nil, err

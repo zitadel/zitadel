@@ -118,7 +118,7 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
+            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/go*"

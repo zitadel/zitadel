@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net/http"
 
@@ -19,44 +18,50 @@ func ZitadelErrorToHTTPStatusCode(ctx context.Context, err error) (statusCode in
 	msg := key
 	msg += " (" + id + ")"
 	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
-	return statusCode, statusCode != statusUnknown
+	if statusCode == statusUnknown {
+		return http.StatusInternalServerError, false
+	}
+	return statusCode, true
 }
 
 const statusUnknown = 0
 
 func extractError(err error) (statusCode int, msg, id string, lvl slog.Level) {
-	zitadelErr := new(zerrors.ZitadelError)
-	if ok := errors.As(err, &zitadelErr); !ok {
+	zitadelErr, ok := zerrors.AsZitadelError(err)
+	if !ok {
 		return statusUnknown, err.Error(), "", slog.LevelError
 	}
-	switch {
-	case zerrors.IsErrorAlreadyExists(err):
-		return http.StatusConflict, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsDeadlineExceeded(err):
-		return http.StatusGatewayTimeout, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsInternal(err):
-		return http.StatusInternalServerError, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsErrorInvalidArgument(err):
-		return http.StatusBadRequest, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsNotFound(err):
-		return http.StatusNotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsPermissionDenied(err):
-		return http.StatusForbidden, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsPreconditionFailed(err):
+	msg, id = zitadelErr.GetMessage(), zitadelErr.GetID()
+
+	switch zitadelErr.Kind {
+	case zerrors.KindAlreadyExists:
+		statusCode, lvl = http.StatusConflict, slog.LevelError
+	case zerrors.KindDeadlineExceeded:
+		statusCode, lvl = http.StatusGatewayTimeout, slog.LevelError
+	case zerrors.KindInternal:
+		statusCode, lvl = http.StatusInternalServerError, slog.LevelError
+	case zerrors.KindInvalidArgument:
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindNotFound:
+		statusCode, lvl = http.StatusNotFound, slog.LevelWarn
+	case zerrors.KindPermissionDenied:
+		statusCode, lvl = http.StatusForbidden, slog.LevelWarn
+	case zerrors.KindPreconditionFailed:
 		// use the same code as grpc-gateway:
 		// https://github.com/grpc-ecosystem/grpc-gateway/blob/9e33e38f15cb7d2f11096366e62ea391a3459ba9/runtime/errors.go#L59
-		return http.StatusBadRequest, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsUnauthenticated(err):
-		return http.StatusUnauthorized, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsUnavailable(err):
-		return http.StatusServiceUnavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsUnimplemented(err):
-		return http.StatusNotImplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
-	case zerrors.IsResourceExhausted(err):
-		return http.StatusTooManyRequests, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindUnauthenticated:
+		statusCode, lvl = http.StatusUnauthorized, slog.LevelWarn
+	case zerrors.KindUnavailable:
+		statusCode, lvl = http.StatusServiceUnavailable, slog.LevelError
+	case zerrors.KindUnimplemented:
+		statusCode, lvl = http.StatusNotImplemented, slog.LevelInfo
+	case zerrors.KindResourceExhausted:
+		statusCode, lvl = http.StatusTooManyRequests, slog.LevelError
 	default:
-		return statusUnknown, err.Error(), "", slog.LevelError
+		statusCode, lvl = statusUnknown, slog.LevelError
 	}
+	return statusCode, msg, id, lvl
 }
 
 func HTTPStatusCodeToZitadelError(parent error, statusCode int, id string, message string) error {

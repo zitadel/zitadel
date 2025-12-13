@@ -78,36 +78,39 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	if ok := errors.As(err, &connErr); ok {
 		return codes.Internal, "db connection error", "", slog.LevelError
 	}
-	zitadelErr := new(zerrors.ZitadelError)
-	if ok := errors.As(err, &zitadelErr); !ok {
+	zitadelErr, ok := zerrors.AsZitadelError(err)
+	if !ok {
 		return codes.Unknown, err.Error(), "", slog.LevelError
 	}
-	switch {
-	case zerrors.IsErrorAlreadyExists(err):
-		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsDeadlineExceeded(err):
-		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsInternal(err):
-		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsErrorInvalidArgument(err):
-		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsNotFound(err):
-		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsPermissionDenied(err):
-		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsPreconditionFailed(err):
-		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsUnauthenticated(err):
-		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelWarn
-	case zerrors.IsUnavailable(err):
-		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
-	case zerrors.IsUnimplemented(err):
-		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
-	case zerrors.IsResourceExhausted(err):
-		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
+	msg, id = zitadelErr.GetMessage(), zitadelErr.GetID()
+
+	switch zitadelErr.Kind {
+	case zerrors.KindAlreadyExists:
+		c, lvl = codes.AlreadyExists, slog.LevelError
+	case zerrors.KindDeadlineExceeded:
+		c, lvl = codes.DeadlineExceeded, slog.LevelError
+	case zerrors.KindInternal:
+		c, lvl = codes.Internal, slog.LevelError
+	case zerrors.KindInvalidArgument:
+		c, lvl = codes.InvalidArgument, slog.LevelWarn
+	case zerrors.KindNotFound:
+		c, lvl = codes.NotFound, slog.LevelWarn
+	case zerrors.KindPermissionDenied:
+		c, lvl = codes.PermissionDenied, slog.LevelWarn
+	case zerrors.KindPreconditionFailed:
+		c, lvl = codes.FailedPrecondition, slog.LevelWarn
+	case zerrors.KindUnauthenticated:
+		c, lvl = codes.Unauthenticated, slog.LevelWarn
+	case zerrors.KindUnavailable:
+		c, lvl = codes.Unavailable, slog.LevelError
+	case zerrors.KindUnimplemented:
+		c, lvl = codes.Unimplemented, slog.LevelInfo
+	case zerrors.KindResourceExhausted:
+		c, lvl = codes.ResourceExhausted, slog.LevelError
 	default:
-		return codes.Unknown, err.Error(), "", slog.LevelError
+		c, lvl = codes.Unknown, slog.LevelError
 	}
+	return c, msg, id, lvl
 }
 
 func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {

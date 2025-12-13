@@ -127,7 +127,8 @@ func ThrowPayloadTooLarge(parent error) error {
 }
 
 func IsScimOrZitadelError(err error) bool {
-	return IsScimError(err) || zerrors.IsZitadelError(err)
+	_, zok := zerrors.AsZitadelError(err)
+	return IsScimError(err) || zok
 }
 
 func IsScimError(err error) bool {

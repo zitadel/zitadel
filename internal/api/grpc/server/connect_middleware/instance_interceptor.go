@@ -77,8 +77,8 @@ func addInstanceByID(ctx context.Context, req connect.AnyRequest, handler connec
 func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (connect.AnyResponse, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
-		notFoundErr := new(zerrors.NotFoundError)
-		if errors.As(err, &notFoundErr) {
+		notFoundErr := new(zerrors.ZitadelError)
+		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr))
