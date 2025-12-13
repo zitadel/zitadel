@@ -13,6 +13,7 @@ import (
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
+	slogdedup "github.com/veqryn/slog-dedup"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
 	"google.golang.org/grpc"
@@ -20,12 +21,24 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
+type LogFormat int
+
+//go:generate enumer -type=LogFormat -trimprefix=LogFormat -text -linecomment
+const (
+	// Empty line comment sets empty string of unspecified value
+	LogFormatUndefined LogFormat = iota //
+	LogFormatDisabled
+	LogFormatText
+	LogFormatJSON
+	// JSON formatted logs compatible with Google Cloud Platform
+	LogFormatGCP
+)
+
 type LogConfig struct {
-	Level      slog.Level
-	StdErr     bool
-	JSONFormat bool
-	AddSource  bool
-	Exporter   ExporterConfig
+	Level     slog.Level
+	StdErr    LogFormat
+	AddSource bool
+	Exporter  ExporterConfig
 }
 
 // setLogger configures the global slog logger.
@@ -41,21 +54,36 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	handlers := []slog.Handler{
 		otelslog.NewHandler("zitadel", otelslog.WithLoggerProvider(provider)),
 	}
+	options := &slog.HandlerOptions{
+		AddSource: cfg.AddSource,
+		Level:     cfg.Level,
+	}
+	switch cfg.StdErr {
+	case LogFormatUndefined, LogFormatDisabled:
+		// do nothing
+	case LogFormatText:
+		handlers = append(handlers,
+			slog.NewTextHandler(os.Stderr, options),
+		)
+	case LogFormatJSON:
+		handlers = append(handlers,
+			slogdedup.NewIncrementHandler(
+				slog.NewJSONHandler(os.Stderr, options),
+				nil,
+			),
+		)
+	case LogFormatGCP:
+		handlers = append(handlers,
+			slogdedup.NewIncrementHandler(
+				slog.NewJSONHandler(os.Stderr, options),
+				&slogdedup.IncrementHandlerOptions{
+					ResolveKey: slogdedup.ResolveKeyStackdriver(&slogdedup.ResolveReplaceOptions{
+						OverwriteSummary: true,
+					}),
+				},
+			),
+		)
 
-	if cfg.StdErr {
-		options := &slog.HandlerOptions{
-			AddSource: cfg.AddSource,
-			Level:     cfg.Level,
-		}
-		if cfg.JSONFormat {
-			handlers = append(handlers, slog.NewJSONHandler(os.Stderr,
-				options,
-			))
-		} else {
-			handlers = append(handlers, slog.NewTextHandler(os.Stderr,
-				options,
-			))
-		}
 	}
 	handler := slogctx.NewHandler(
 		slogmulti.Fanout(handlers...),

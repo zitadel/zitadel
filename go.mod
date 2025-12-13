@@ -97,6 +97,7 @@ require (
 	github.com/twilio/twilio-go v1.28.6
 	github.com/veqryn/slog-context v0.8.0
 	github.com/veqryn/slog-context/otel v0.8.0
+	github.com/veqryn/slog-dedup v0.6.0
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.6.2
 	github.com/zitadel/oidc/v3 v3.45.0
@@ -262,5 +263,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	modernc.org/b/v2 v2.1.2 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect
 )
