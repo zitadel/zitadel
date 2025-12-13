@@ -1,9 +1,0 @@
-{
-  "pages": [
-    "_compose",
-    "_helm",
-    "_linuxunix",
-    "_login",
-    "configure"
-  ]
-}

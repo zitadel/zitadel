@@ -1,0 +1,227 @@
+---
+title: Test Actions Request Signature Check
+---
+
+
+
+
+This guide shows you how to leverage the ZITADEL actions feature to react to API requests in your ZITADEL instance.
+You can use the actions feature to create a target that will be called when a specific API request occurs.
+This is useful for information provisioning in between systems or for triggering workflows based on API requests in ZITADEL.
+
+## Prerequisites
+
+Before you start, make sure you have everything set up correctly.
+
+- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/manage/org-management/managers)
+- Your ZITADEL instance needs to have the actions feature enabled.
+
+<Callout type="info" title="Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.">
+In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
+
+</Callout>
+
+<Callout type="warn" title="To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),">
+as the request is a protocol buffer message, to avoid potential problems with the attribute names.
+
+</Callout>
+
+## Start example target
+
+To test the actions feature, you need to create a target that will be called when an API endpoint is called.
+You will need to implement a listener that can receive HTTP requests, check the signature and process the request.
+For this example, we will use a simple Go HTTP server that will print the received request to standard output.
+The 'signingKey' is the key received in the next step 'Create target'.
+
+```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+
+	"github.com/zitadel/zitadel-go/v3/pkg/actions"
+)
+
+const signingKey = "somekey" // signing key received after creating the target
+
+// webhook HandleFunc to read the request body and then print out the contents
+func webhook(w http.ResponseWriter, req *http.Request) {
+	// read the body content
+	sentBody, err := io.ReadAll(req.Body)
+	if err != nil {
+		// if there was an error while reading the body return an error
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+	defer req.Body.Close()
+	// validate signature
+	if err := actions.ValidateRequestPayload(sentBody, &req.Header, signingKey); err != nil {
+		// if the signed content is not equal the sent content return an error
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+	// print out the read content
+	fmt.Println(string(sentBody))
+}
+
+func main() {
+	// handle the HTTP call under "/webhook"
+	http.HandleFunc("/webhook", webhook)
+
+	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
+	http.ListenAndServe(":8090", nil)
+}
+```
+
+<Callout type="info" title="The example above runs only on your local machine (`localhost`).">
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+
+</Callout>
+
+## Create target
+
+As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
+
+See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
+
+```shell
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <TOKEN>' \
+--data-raw '{
+  "name": "local webhook",
+  "restWebhook": {
+    "interruptOnError": true    
+  },
+  "endpoint": "http://localhost:8090/webhook",
+  "timeout": "10s"
+}'
+```
+
+Example response after creating the target:
+```json
+{
+    "id": "344649040681500814",
+    "creationDate": "2025-10-31T15:00:36.432595dZ",
+    "signingKey": "somekey"
+}
+```
+Save the returned ID to set in the execution. Use the `signingKey` to validate the request signature.
+
+## Set execution
+
+To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the request
+condition.
+
+See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
+
+```shell
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <TOKEN>' \
+--data-raw '{
+    "condition": {
+        "request": {
+            "method": "/zitadel.user.v2.UserService/CreateUser"
+        }
+    },
+    "targets": [
+        "<TargetID returned>"
+    ]
+}'
+```
+
+## Example call
+
+Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+by calling the ZITADEL API to create a human user.
+
+```shell
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <TOKEN>' \
+--data-raw '{
+    "organizationId": "344648897353810062",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini+test@mouse.com"
+        }
+    }
+}'
+```
+
+Your server should now print out something like the following. Check out
+the [Sent information Request](./usage#sent-information-request) payload description.
+
+```json
+{
+  "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
+  "instanceID": "344648897353744526",
+  "orgID": "344648897353810062",
+  "projectID": "344648897353875598",
+  "userID": "344648897354465422",
+  "request":
+  {
+    "organizationId": "344648897353810062",
+    "human":
+    {
+      "profile":
+      {
+        "givenName": "Minnie",
+        "familyName": "Mouse",
+        "nickName": "Mini",
+        "displayName": "Minnie Mouse",
+        "preferredLanguage": "en",
+        "gender": "GENDER_FEMALE"
+      },
+      "email":
+      {
+        "email": "mini+test@mouse.com"
+      }
+    }
+  },
+  "headers":
+  {
+    "Content-Type":
+    [
+      "application/grpc"
+    ],
+    "Host":
+    [
+      "localhost:8080"
+    ],
+    "X-Forwarded-For":
+    [
+      "::1"
+    ],
+    "X-Forwarded-Host":
+    [
+      "localhost:8080"
+    ]
+  }
+}
+```
+
+## Conclusion
+
+You have successfully set up a target and execution to react to API requests in your ZITADEL instance.
+This feature can now be used to provision information in between systems or for triggering workflows based on API requests in ZITADEL.
+Additionally, you are sure that the request was not tempered with, as the signature was created with the combination of signing key and payload.
+Find more information about the actions feature in the [API documentation](/docs/learn/features/actions_v2).

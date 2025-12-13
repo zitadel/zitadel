@@ -2,19 +2,14 @@
   "title": "Build & Integrate",
   "description": "The App Developer Hub",
   "pages": [
-    "application",
+    "quickstarts",
     "sdks",
     "login",
-    "login-ui",
-    "identity-providers",
-    "actions",
-    "service-users",
-    "services",
-    "token-introspection",
-    "zitadel-apis",
-    "migrate",
-    "onboarding",
-    "solution-scenarios",
-    "tools"
+    "social-login",
+    "m2m",
+    "token-inspection",
+    "customization",
+    "patterns",
+    "examples"
   ]
 }

@@ -1,0 +1,137 @@
+---
+title: Configuration Options in ZITADEL
+---
+
+import { Tab } from 'fumadocs-ui/components/tabs';
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+
+
+
+
+
+import Tabs from '@/components/docusaurus/tabs';
+import { TabItem } from '@/components/docusaurus/tabs';
+import LinuxUnix from "./_linuxunix.mdx";
+import Compose from "./_compose.mdx";
+import Helm from "./_helm.mdx";
+import Login from "./_login.md";
+import CodeBlock from '@/components/docusaurus/code-block';
+import DefaultsYamlSource from '../../../../../cmd/defaults.yaml?raw';
+import StepsYamlSource from '../../../../../cmd/setup/steps.yaml?raw';
+import SkipSuperUserDatabaseQueries from './example-skip-superuser-queries.yaml?raw';
+
+This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/operate/deploy/overview).
+
+## Configuration files
+
+### Runtime configuration file
+
+You can configure the runtime using the `--config` flag of the `zitadel` binary.
+Also, you can use the environment variables listed in the defaults.yaml.
+
+<Callout type="tip" title="For overwriting the default configuration for the first instance created by zitadel setup, use the FirstInstance section in the [database initialization file](#database-initialization-file).">
+
+</Callout>
+
+
+<details>
+  <summary>defaults.yaml</summary>
+  <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
+</details>
+
+### Database initialization file
+
+ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
+Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
+Also, you can use the environment variables listed in the steps.yaml.
+
+<Callout type="tip" title="By using the FirstInstance section, you can overwrite the [DefaultInstance configuration](#runtime-configuration-file) for the first instance created by zitadel setup.">
+
+</Callout>
+
+<details>
+  <summary>steps.yaml</summary>
+  <CodeBlock language="yaml">{StepsYamlSource}</CodeBlock>
+</details>
+
+### Pre-existing Database and User
+
+By default, when you run `zitadel init` or `zitadel start-from-init`, ZITADEL checks if the specified database and user exist. If they don't, ZITADEL creates them and grants the necessary permissions.
+
+If you manage the database and user manually, you can instruct ZITADEL to skip these checks. This is useful if the ZITADEL user has limited database permissions, for example, if it is not a `SUPERUSER`. This scenario is most common on cloud providers.
+To skip the checks, you must ensure the database objects (database, user, grant) exist before running the commands and then set the `Database.postgres.Admin.ExistingDatabase` field in your configuration as shown below. This tells ZITADEL to connect to the existing database as an admin user, bypassing the creation and permission steps.
+
+<details>
+  <summary>skip-superuser-queries-config.yaml</summary>
+  <CodeBlock language="yaml">{SkipSuperUserDatabaseQueries}</CodeBlock>
+</details>
+
+### Multiple configuration files
+
+ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
+You can use these flags to handle standard configuration files differently from secret configuration files.
+For example, standard configuration files stored in git may contain public information such as a database hostname.
+To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
+
+## Environment variables
+
+All configuration properties are configurable using environment variables.
+ZITADEL environment variable keys are prefixed with `ZITADEL_`.
+For example, to configure the default ZITADEL IAM admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+All supported environment variables are listed in the [runtime configuration file](#runtime-configuration-file) and the [database initialization file](#database-initialization-file).
+
+### Proxy configuration
+
+A proxy for outgoing connections can be configured using the environment variables: Use `HTTP_PROXY` for outgoing HTTP requests, and `HTTPS_PROXY` for outgoing HTTPS requests.
+These environment variables are used as a proxy URL.
+To exclude specific hosts from proxying, set the `NO_PROXY` environment variable: The value is interpreted as a comma-separated string.
+For more information on the `NO_PROXY` environment variable, read the [`httpproxy` Go doc](https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config).
+
+## Masterkey
+
+The masterkey is used to AES256-encrypt other generated encryption keys.
+It must be 32 bytes.
+There are three ways to pass the masterkey to the `zitadel` binary:
+
+- By value: Use the flag `--masterkey My_Master_Key_Which_Has_32_Bytes`
+- By environment variable `ZITADEL_MASTERKEY`: Use the flag `--masterkeyFromEnv`
+- By file: Use the flag `--masterkeyFile /path/to/file`
+
+## Passing the configuration
+
+<Tabs
+  groupId="installation-target"
+  default="linuxunix"
+  values={[
+    { label: "Linux and Unix", value: "linuxunix" },
+    { label: "Docker Compose", value: "compose" },
+    { label: "Kubernetes (Helm)", value: "k8s" },
+  ]}
+>
+  <Tab value="linuxunix">
+    <LinuxUnix />
+    <Login/>
+  </Tab>
+  <Tab value="compose">
+    <Compose />
+    <Login/>
+  </Tab>
+  <Tab value="k8s">
+    <Helm />
+  </Tab>
+</Tabs>
+
+## What's next
+
+- Read more about [the login process](/docs/build-and-integrate/login/login-users).
+- If you are running ZITADEL in production, you need to [customize your own domain](./custom-domain).
+- Check out all possible [runtime configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
+- Check out all possible [setup step configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml)
+
+:::caution
+
+{/* TODO: Better mark the link in the UI */}
+
+The ZITADEL management console [requires end-to-end HTTP/2 support](/docs/operate/configure/http2)

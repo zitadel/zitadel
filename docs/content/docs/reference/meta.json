@@ -1,0 +1,9 @@
+{
+  "title": "Reference",
+  "pages": [
+    "api",
+    "cli",
+    "terraform",
+    "tools"
+  ]
+}

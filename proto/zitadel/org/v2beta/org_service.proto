@@ -116,7 +116,7 @@ service OrganizationService {
   // Required permission:
   //  - `org.create`
   //
-  // Deprecated: Use [AddOrganization](/docs/references/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead to create an organization.
+  // Deprecated: Use [AddOrganization](/docs/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead to create an organization.
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2beta/organizations"
@@ -194,7 +194,7 @@ service OrganizationService {
   // Required permission:
   //  - `iam.read`
   //
-  // Deprecated: Use [ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead to list organizations.
+  // Deprecated: Use [ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead to list organizations.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
         post: "/v2beta/organizations/search";

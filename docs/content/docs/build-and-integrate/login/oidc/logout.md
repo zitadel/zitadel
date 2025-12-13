@@ -34,7 +34,7 @@ When a user logs out of the provider, the user's session is terminated and the c
 
 #### RP initiated Logout
 
-With the RP initiated flow all logout processes are triggered by a request from the client (e.g your application) through a well defined standard API by redirecting the user-agent to the [end_session_endpoint](/docs/references/openidoauth/endpoints#end-session-endpoint).
+With the RP initiated flow all logout processes are triggered by a request from the client (e.g your application) through a well defined standard API by redirecting the user-agent to the [end_session_endpoint](/docs/reference/openidoauth/endpoints#end-session-endpoint).
 If you have specified some post_logout_redirect_uris on your client you have to send either the id_token_hint or the client_id as param in your request.
 So ZITADEL is able to read the configured redirect uris.
 

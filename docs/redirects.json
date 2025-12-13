@@ -1142,5 +1142,305 @@
   {
     "source": "/docs/support/troubleshooting",
     "destination": "/docs/manage-and-govern/support/troubleshooting"
+  },
+  {
+    "source": "/docs/build-and-integrate/sdks-tools",
+    "destination": "/docs/build-and-integrate/sdks",
+    "permanent": true
+  },
+  {
+    "source": "/docs/quickstarts",
+    "destination": "/docs/build-and-integrate/quickstarts",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/authentication",
+    "destination": "/docs/build-and-integrate/login/authentication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers/google",
+    "destination": "/docs/build-and-integrate/social-login/google",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers/github",
+    "destination": "/docs/build-and-integrate/social-login/github",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers/gitlab",
+    "destination": "/docs/build-and-integrate/social-login/gitlab",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers/apple",
+    "destination": "/docs/build-and-integrate/social-login/apple",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers/linkedin_oauth",
+    "destination": "/docs/build-and-integrate/social-login/linkedin_oauth",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/service-users",
+    "destination": "/docs/build-and-integrate/m2m",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/token-introspection",
+    "destination": "/docs/build-and-integrate/token-inspection",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/actions",
+    "destination": "/docs/build-and-integrate/customization/actions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/login-ui",
+    "destination": "/docs/build-and-integrate/customization/branding",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/customize",
+    "destination": "/docs/build-and-integrate/customization/general",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/deploy",
+    "destination": "/docs/operate/deploy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/configure",
+    "destination": "/docs/operate/configure",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/database",
+    "destination": "/docs/operate/configure/database",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/reverseproxy",
+    "destination": "/docs/operate/configure/proxy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/custom-domain",
+    "destination": "/docs/operate/configure/custom-domain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/tls_modes",
+    "destination": "/docs/operate/configure/tls_modes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/updating_scaling",
+    "destination": "/docs/operate/operations/updating_scaling",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/production",
+    "destination": "/docs/operate/operations/production",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/observability",
+    "destination": "/docs/operate/operations/observability",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/console/organizations",
+    "destination": "/docs/manage/org-management/organizations",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/console/users",
+    "destination": "/docs/manage/org-management/users",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/user",
+    "destination": "/docs/manage/org-management/user-management",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/console/projects",
+    "destination": "/docs/manage/projects-apps/projects",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/console/applications",
+    "destination": "/docs/manage/projects-apps/applications",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/console/default-settings",
+    "destination": "/docs/manage/policies/default-settings",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/identity-providers",
+    "destination": "/docs/manage/federation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/architecture",
+    "destination": "/docs/learn/architecture",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/eventstore",
+    "destination": "/docs/learn/event-sourcing",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/knowledge",
+    "destination": "/docs/learn/standards",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features",
+    "destination": "/docs/learn/features",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/apis",
+    "destination": "/docs/reference/api",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/zitadel-apis",
+    "destination": "/docs/reference/api/guides",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/manage/cli",
+    "destination": "/docs/reference/cli",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/terraform-provider",
+    "destination": "/docs/reference/terraform/terraform-provider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/build-and-integrate/tools",
+    "destination": "/docs/reference/tools",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/index",
+    "destination": "/docs/learn/index",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/principles",
+    "destination": "/docs/learn/principles",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/structure",
+    "destination": "/docs/learn/structure",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/cloud",
+    "destination": "/docs/manage/cloud",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/index",
+    "destination": "/docs/manage/index",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/legal",
+    "destination": "/docs/manage/legal",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/migrate",
+    "destination": "/docs/manage/migrate",
+    "permanent": true
+  },
+  {
+    "source": "/docs/manage-and-govern/support",
+    "destination": "/docs/manage/support",
+    "permanent": true
+  },
+  {
+    "source": "/docs/operate-and-self-host/index",
+    "destination": "/docs/operate/index",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/actions",
+    "destination": "/docs/reference/actions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/api-v1",
+    "destination": "/docs/reference/api-v1",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/assets",
+    "destination": "/docs/reference/assets",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/benchmarks",
+    "destination": "/docs/reference/benchmarks",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/index",
+    "destination": "/docs/reference/index",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/introduction",
+    "destination": "/docs/reference/introduction",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/migration_v1_to_v2",
+    "destination": "/docs/reference/migration_v1_to_v2",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/openidoauth",
+    "destination": "/docs/reference/openidoauth",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/proto",
+    "destination": "/docs/reference/proto",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/saml",
+    "destination": "/docs/reference/saml",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/scim2",
+    "destination": "/docs/reference/scim2",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/statuscodes",
+    "destination": "/docs/reference/statuscodes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/references/v2",
+    "destination": "/docs/reference/v2",
+    "permanent": true
   }
 ]

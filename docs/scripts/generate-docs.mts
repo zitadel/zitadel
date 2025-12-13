@@ -39,7 +39,7 @@ const generateServiceDocs = (service: string, filename?: string, version: string
 
   void generateFiles({
     input: api,
-    output: `./content/docs/references/api/${service}`,
+    output: `./content/docs/reference/api/${service}`,
     includeDescription: true,
   });
 };
@@ -54,7 +54,7 @@ const generateUserSchemaDocs = () => {
 
   void generateFiles({
     input: api,
-    output: './content/docs/references/api/user_schema',
+    output: './content/docs/reference/api/user_schema',
     includeDescription: true,
   });
 };
@@ -65,10 +65,10 @@ const meta = {
   pages: [...services, 'user_schema']
 };
 
-mkdirSync(join(process.cwd(), 'content/docs/references/api'), { recursive: true });
+mkdirSync(join(process.cwd(), 'content/docs/reference/api'), { recursive: true });
 
 writeFileSync(
-  join(process.cwd(), 'content/docs/references/api/meta.json'),
+  join(process.cwd(), 'content/docs/reference/api/meta.json'),
   JSON.stringify(meta, null, 2)
 );
 
@@ -86,7 +86,7 @@ const generateV1ServiceDocs = (service: string) => {
 
   void generateFiles({
     input: api,
-    output: `./content/docs/references/api-v1/${service}`,
+    output: `./content/docs/reference/api-v1/${service}`,
     includeDescription: true,
   });
 };

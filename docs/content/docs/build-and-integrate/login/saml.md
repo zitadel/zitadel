@@ -226,7 +226,7 @@ In this SAML response:
 - **Response to SP1**: ZITADEL (IdP1) sends this newly created SAML assertion to SP1, completing the authentication process.
 - **Access Granted to SP1**:IdP1 then sends a final SAML assertion to SP1, which grants the user access to the requested service.
 
-See [Let Users Login with Preferred Identity Provider](https://zitadel.com/docs/build-and-integrate/identity-providers/introduction) for more information.
+See [Let Users Login with Preferred Identity Provider](https://zitadel.com/docs/manage/federation/introduction) for more information.
 
 
 ## Best practices for SAML implementation
@@ -266,9 +266,9 @@ To test SAML scenarios with ZITADEL, follow these steps:
 
     - Configure an identity provider that supports SAML.
     - Set up the necessary metadata and endpoints. Here are some guides to help with this setup:
-        - [Configure Entra ID as a SAML IdP](https://zitadel.com/docs/build-and-integrate/identity-providers/azure-ad-saml)
-        - [Configure Okta as a SAML IdP](https://zitadel.com/docs/build-and-integrate/identity-providers/okta-saml)
-        - [Configure MockSAML as a SAML IdP](https://zitadel.com/docs/build-and-integrate/identity-providers/mocksaml)
+        - [Configure Entra ID as a SAML IdP](https://zitadel.com/docs/manage/federation/azure-ad-saml)
+        - [Configure Okta as a SAML IdP](https://zitadel.com/docs/manage/federation/okta-saml)
+        - [Configure MockSAML as a SAML IdP](https://zitadel.com/docs/manage/federation/mocksaml)
 
 3. Create test users and simulate authentication requests:
     - Create test users in ZITADEL.
@@ -281,4 +281,4 @@ To test SAML scenarios with ZITADEL, follow these steps:
     - Attribute Mapping: Check that user attributes (e.g., roles, permissions) are correctly mapped and utilized by the service provider.
     - Logout Requests: Test single logout (SLO) to ensure that logging out from one service logs the user out of all connected services.
 
-For more information, refer to [SAML Endpoints in ZITADEL](https://zitadel.com/docs/references/saml/endpoints). 
+For more information, refer to [SAML Endpoints in ZITADEL](https://zitadel.com/docs/reference/saml/endpoints). 

@@ -1,0 +1,10 @@
+{
+  "title": "Operations",
+  "pages": [
+    "updating_scaling",
+    "production",
+    "productionchecklist",
+    "observability",
+    "login-client"
+  ]
+}

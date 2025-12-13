@@ -1,0 +1,12 @@
+{
+  "title": "Configure",
+  "pages": [
+    "database",
+    "proxy",
+    "custom-domain",
+    "tls_modes",
+    "cache",
+    "http2",
+    "usage_control"
+  ]
+}

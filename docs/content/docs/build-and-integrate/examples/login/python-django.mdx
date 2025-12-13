@@ -27,7 +27,7 @@ Before we can start building our application, we have to do a few configuration 
 
 ### Project roles
 
-The Example expects [user roles](/docs/build-and-integrate/retrieve-user-roles) to be returned after login.
+The Example expects [user roles](/docs/build-and-integrate/login/authentication/retrieve-user-roles) to be returned after login.
 This example expects 3 different roles:
 - `admin`: superuser with permissions to use the admin console
 - `staff`: user with permissions to see results of the polls
@@ -57,7 +57,7 @@ Next you will need to provide some information about your app.
 
 In your Project, add a new application at the top of the page.
 Select Web application type and continue.
-We use [Authorization Code](/docs/references/openidoauth/grant-types#authorization-code) for our Django application.
+We use [Authorization Code](/docs/reference/openidoauth/grant-types#authorization-code) for our Django application.
 
 ![Create app in console](/img/django/app-create.png)
 
@@ -243,4 +243,4 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/docs/references/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.
+Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/docs/reference/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.

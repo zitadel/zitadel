@@ -1,0 +1,10 @@
+{
+  "title": "Manage",
+  "pages": [
+    "console-overview",
+    "org-management",
+    "projects-apps",
+    "policies",
+    "federation"
+  ]
+}

@@ -1,8 +1,0 @@
-{
-  "pages": [
-    "authenticate-service-users",
-    "client-credentials",
-    "personal-access-token",
-    "private-key-jwt"
-  ]
-}

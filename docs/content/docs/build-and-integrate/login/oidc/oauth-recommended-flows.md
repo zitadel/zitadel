@@ -32,7 +32,7 @@ So what do we want to achieve with delegated authentication?
 
 - Instead of sending around the user’s credentials
   - Clients may access protected resources with an **access token** that is only valid for specific scope and limited lifetime (OAuth 2.x)
-  - Users have to **authorize** applications to access certain [**scopes**](/docs/references/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](/docs/references/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
+  - Users have to **authorize** applications to access certain [**scopes**](/docs/reference/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](/docs/reference/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
   - Access tokens are bearer tokens, meaning that possession of the token provides access to a resource. But the tokens expire frequently and the application must request a new access token via **refresh token** or the user must reauthenticate
 
 ![Overview federated identities](/img/guides/consulting_federated_identities_basics.png)
@@ -93,7 +93,7 @@ _So what about APIs?_
 
 We recommend using **“JWT bearer token with private key”** ([RFC7523](https://tools.ietf.org/html/rfc7523)) for Machine-to-Machine clients.
 
-What this means is that you have to send an JWT token, containing the [standard claims for access tokens](/docs/references/openidoauth/claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
+What this means is that you have to send an JWT token, containing the [standard claims for access tokens](/docs/reference/openidoauth/claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
 
 If you don’t have any technical limitations, you should prefer this method over other methods.
 

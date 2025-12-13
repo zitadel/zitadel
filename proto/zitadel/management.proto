@@ -282,7 +282,7 @@ service ManagementService {
 
     // User by ID
     //
-    // Deprecated: use [user service v2 ListUsers with InUserIDQuery](/docs/references/api/user/zitadel.user.v2.UserService.ListUsers) instead.
+    // Deprecated: use [user service v2 ListUsers with InUserIDQuery](/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers) instead.
     //
     // Returns the full user object (human or machine) including the profile, email, etc.
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
@@ -316,7 +316,7 @@ service ManagementService {
 
     // Get User by login name (globally)
     //
-    // Deprecated: use [user service v2 ListUsers with LoginNameQuery](/docs/references/api/user/zitadel.user.v2.UserService.ListUsers) instead.
+    // Deprecated: use [user service v2 ListUsers with LoginNameQuery](/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers) instead.
     //
     // Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly.
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
@@ -343,7 +343,7 @@ service ManagementService {
 
     // Search Users
     //
-    // Deprecated: use [user service v2 ListUsers](/docs/references/api/user/zitadel.user.v2.UserService.ListUsers) instead.
+    // Deprecated: use [user service v2 ListUsers](/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers) instead.
     //
     // Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
@@ -414,7 +414,7 @@ service ManagementService {
 
     // Check for existing user
     //
-    // Deprecated: use [user service v2 ListUsers](/docs/references/api/user/zitadel.user.v2.UserService.ListUsers) instead, is unique if no user returned.
+    // Deprecated: use [user service v2 ListUsers](/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers) instead, is unique if no user returned.
     //
     // Returns if a user with the requested email or username is unique. So you can create the user.
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
@@ -442,7 +442,7 @@ service ManagementService {
 
     // Create User (Human)
     //
-    // Deprecated: use [user service v2 CreateUser](/docs/references/api/user/zitadel.user.v2.UserService.CreateUser) instead.
+    // Deprecated: use [user service v2 CreateUser](/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser) instead.
     //
     // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -471,7 +471,7 @@ service ManagementService {
 
     // Create/Import User (Human)
     //
-    // Deprecated: use [user service v2 UpdateHumanUser](/docs/references/api/user/zitadel.user.v2.UserService.UpdateHumanUser) instead.
+    // Deprecated: use [user service v2 UpdateHumanUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser) instead.
     //
     // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
@@ -501,7 +501,7 @@ service ManagementService {
 
     // Create User (Machine)
     //
-    // Deprecated: use [user service v2 CreateUser](/docs/references/api/user/zitadel.user.v2.UserService.CreateUser) instead.
+    // Deprecated: use [user service v2 CreateUser](/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser) instead.
     //
     // Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
@@ -537,7 +537,7 @@ service ManagementService {
 
     // Deactivate User
     //
-    // Deprecated: use [user service v2 DeactivateUser](/docs/references/api/user/zitadel.user.v2.UserService.DeactivateUser) instead.
+    // Deprecated: use [user service v2 DeactivateUser](/docs/reference/api/user/zitadel.user.v2.UserService.DeactivateUser) instead.
     //
     // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore.
     // The endpoint returns an error if the user is already in the state 'deactivated'.
@@ -574,7 +574,7 @@ service ManagementService {
 
     // Deactivate User
     //
-    // Deprecated: use [user service v2 ReactivateUser](/docs/references/api/user/zitadel.user.v2.UserService.ReactivateUser) instead.
+    // Deprecated: use [user service v2 ReactivateUser](/docs/reference/api/user/zitadel.user.v2.UserService.ReactivateUser) instead.
     //
     // Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward.
     // The endpoint returns an error if the user is not in the state 'deactivated'.
@@ -610,7 +610,7 @@ service ManagementService {
 
     // Lock User
     //
-    // Deprecated: use [user service v2 LockUser](/docs/references/api/user/zitadel.user.v2.UserService.LockUser) instead.
+    // Deprecated: use [user service v2 LockUser](/docs/reference/api/user/zitadel.user.v2.UserService.LockUser) instead.
     //
     // The state of the user will be changed to 'locked'. The user will not be able to log in anymore.
     // The endpoint returns an error if the user is already in the state 'locked'.
@@ -647,7 +647,7 @@ service ManagementService {
 
     // Unlock User
     //
-    // Deprecated: use [user service v2 UnlockUser](/docs/references/api/user/zitadel.user.v2.UserService.UnlockUser) instead.
+    // Deprecated: use [user service v2 UnlockUser](/docs/reference/api/user/zitadel.user.v2.UserService.UnlockUser) instead.
     //
     // Unlock a user with the state 'locked'. The user will be able to log in again afterward.
     // The endpoint returns an error if the user is not in the state 'locked'.
@@ -683,7 +683,7 @@ service ManagementService {
 
     // Unlock User
     //
-    // Deprecated: use [user service v2 DeleteUser](/docs/references/api/user/zitadel.user.v2.UserService.DeleteUser) instead.
+    // Deprecated: use [user service v2 DeleteUser](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUser) instead.
     //
     // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
@@ -717,7 +717,7 @@ service ManagementService {
 
     // Change user name
     //
-    // Deprecated: use [user service v2 UpdateUser](/docs/references/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
+    // Deprecated: use [user service v2 UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
     //
     // Change the username of the user. Be aware that the user has to log in with the newly added username afterward.
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
@@ -752,7 +752,7 @@ service ManagementService {
 
     // Set User Metadata
     //
-    // Deprecated: use [SetUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.SetUserMetadata) instead.
+    // Deprecated: use [SetUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.SetUserMetadata) instead.
     //
     // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
@@ -782,7 +782,7 @@ service ManagementService {
 
     // Bulk Set User Metadata
     //
-    // Deprecated: use [SetUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.SetUserMetadata) instead.
+    // Deprecated: use [SetUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.SetUserMetadata) instead.
     //
     // Add or update multiple metadata values for a user. Make sure the values are base64 encoded.
     rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
@@ -812,7 +812,7 @@ service ManagementService {
 
     // Search User Metadata
     //
-    // Deprecated: use [ListUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.ListUserMetadata) instead.
+    // Deprecated: use [ListUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.ListUserMetadata) instead.
     //
     // Get the metadata of a user filtered by your query.
     rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
@@ -842,7 +842,7 @@ service ManagementService {
 
     // Get User Metadata By Key
     //
-    // Deprecated: use [ListUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.ListUserMetadata) instead.
+    // Deprecated: use [ListUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.ListUserMetadata) instead.
     //
     // Get a metadata object from a user by a specific key.
     rpc GetUserMetadata(GetUserMetadataRequest) returns (GetUserMetadataResponse) {
@@ -871,7 +871,7 @@ service ManagementService {
 
     // Delete User Metadata By Key
     //
-    // Deprecated: use [DeleteUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.DeleteUserMetadata) instead.
+    // Deprecated: use [DeleteUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata) instead.
     //
     // Get a metadata object from a user by a specific key.
     rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
@@ -900,7 +900,7 @@ service ManagementService {
 
     // Delete User Metadata By Key
     //
-    // Deprecated: use [DeleteUserMetadata](/docs/references/api/user/zitadel.user.v2.UserService.DeleteUserMetadata) instead.
+    // Deprecated: use [DeleteUserMetadata](/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata) instead.
     //
     // Remove a list of metadata objects from a user with a list of keys.
     rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
@@ -930,7 +930,7 @@ service ManagementService {
 
     // Get User Profile (Human)
     //
-    // Deprecated: use [user service v2 GetUserByID](/docs/references/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
+    // Deprecated: use [user service v2 GetUserByID](/docs/reference/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
     //
     // Get basic information like first_name and last_name of a user.
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
@@ -965,7 +965,7 @@ service ManagementService {
 
     // Update User Profile (Human)
     //
-    // Deprecated: use [user service v2 UpdateHumanUser](/docs/references/api/user/zitadel.user.v2.UserService.UpdateHumanUser) instead.
+    // Deprecated: use [user service v2 UpdateHumanUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser) instead.
     //
     // Update the profile information from a user. The profile includes basic information like first_name and last_name.
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
@@ -1001,7 +1001,7 @@ service ManagementService {
 
     // Get User Email (Human)
     //
-    // Deprecated: use [user service v2 GetUserByID](/docs/references/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
+    // Deprecated: use [user service v2 GetUserByID](/docs/reference/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
     //
     // Get the email address and the verification state of the address.
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
@@ -1036,7 +1036,7 @@ service ManagementService {
 
     // Update User Email (Human)
     //
-    // Deprecated: use [user service v2 SetEmail](/docs/references/api/user/zitadel.user.v2.UserService.SetEmail) instead.
+    // Deprecated: use [user service v2 SetEmail](/docs/reference/api/user/zitadel.user.v2.UserService.SetEmail) instead.
     //
     // Change the email address of a user. If the state is set to not verified, the user will get a verification email.
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
@@ -1109,7 +1109,7 @@ service ManagementService {
 
     // Resend User Email Verification
     //
-    // Deprecated: use [user service v2 ResendEmailCode](/docs/references/api/user/zitadel.user.v2.UserService.ResendEmailCode) instead.
+    // Deprecated: use [user service v2 ResendEmailCode](/docs/reference/api/user/zitadel.user.v2.UserService.ResendEmailCode) instead.
     //
     // Resend the email verification notification to the given email address of the user.
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
@@ -1145,7 +1145,7 @@ service ManagementService {
 
     // Get User Phone (Human)
     //
-    // Deprecated: use [user service v2 GetUserByID](/docs/references/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
+    // Deprecated: use [user service v2 GetUserByID](/docs/reference/api/user/zitadel.user.v2.UserService.GetUserByID) instead.
     //
     // Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
@@ -1180,7 +1180,7 @@ service ManagementService {
 
     // Update User Phone (Human)
     //
-    // Deprecated: use [user service v2 UpdateUser](/docs/references/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
+    // Deprecated: use [user service v2 UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
     //
     // Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
@@ -1216,7 +1216,7 @@ service ManagementService {
 
     // Remove User Phone (Human)
     //
-    // Deprecated: use user service v2 [user service v2 SetPhone](/docs/references/api/user/zitadel.user.v2.UserService.SetPhone) instead.
+    // Deprecated: use user service v2 [user service v2 SetPhone](/docs/reference/api/user/zitadel.user.v2.UserService.SetPhone) instead.
     //
     // Remove the configured phone number of a user.
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
@@ -1251,7 +1251,7 @@ service ManagementService {
 
     // Resend User Phone Verification
     //
-    // Deprecated: use user service v2 [user service v2 ResendPhoneCode](/docs/references/api/user/zitadel.user.v2.UserService.ResendPhoneCode) instead.
+    // Deprecated: use user service v2 [user service v2 ResendPhoneCode](/docs/reference/api/user/zitadel.user.v2.UserService.ResendPhoneCode) instead.
     //
     // Resend the notification for the verification of the phone number, to the number stored on the user.
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
@@ -1319,7 +1319,7 @@ service ManagementService {
 
     // Set Human Initial Password
     //
-    // Deprecated: use [user service v2 SetPassword](/docs/references/api/user/zitadel.user.v2.UserService.SetPassword) instead.
+    // Deprecated: use [user service v2 SetPassword](/docs/reference/api/user/zitadel.user.v2.UserService.SetPassword) instead.
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
@@ -1347,7 +1347,7 @@ service ManagementService {
 
     // Set User Password
     //
-    // Deprecated: use [user service v2 SetPassword](/docs/references/api/user/zitadel.user.v2.UserService.SetPassword) instead.
+    // Deprecated: use [user service v2 SetPassword](/docs/reference/api/user/zitadel.user.v2.UserService.SetPassword) instead.
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password"
@@ -1381,7 +1381,7 @@ service ManagementService {
 
     // Send Reset Password Notification
     //
-    // Deprecated: use [user service v2 PasswordReset](/docs/references/api/user/zitadel.user.v2.UserService.PasswordReset) instead.
+    // Deprecated: use [user service v2 PasswordReset](/docs/reference/api/user/zitadel.user.v2.UserService.PasswordReset) instead.
     //
     // The user will receive an email with a link to change the password.
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
@@ -1417,7 +1417,7 @@ service ManagementService {
 
     // Get User Authentication Factors (2FA/MFA)
     //
-    // Deprecated: use [user service v2 ListAuthenticationMethodTypes](/docs/references/api/user/zitadel.user.v2.UserService.ListAuthenticationMethodTypes) instead.
+    // Deprecated: use [user service v2 ListAuthenticationMethodTypes](/docs/reference/api/user/zitadel.user.v2.UserService.ListAuthenticationMethodTypes) instead.
     //
     // Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
@@ -1452,7 +1452,7 @@ service ManagementService {
 
     // Remove Multi-Factor OTP
     //
-    // Deprecated: use [user service v2 RemoveTOTP](/docs/references/api/user/zitadel.user.v2.UserService.RemoveTOTP) instead.
+    // Deprecated: use [user service v2 RemoveTOTP](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveTOTP) instead.
     //
     // Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
@@ -1487,7 +1487,7 @@ service ManagementService {
 
     // Remove Multi-Factor U2F
     //
-    // Deprecated: use [user service v2 RemoveU2F](/docs/references/api/user/zitadel.user.v2.UserService.RemoveU2F) instead.
+    // Deprecated: use [user service v2 RemoveU2F](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveU2F) instead.
     //
     // Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
@@ -1522,7 +1522,7 @@ service ManagementService {
 
     // Remove Multi-Factor OTP SMS
     //
-    // Deprecated: use [user service v2 RemoveOTPSMS](/docs/references/api/user/zitadel.user.v2.UserService.RemoveOTPSMS) instead.
+    // Deprecated: use [user service v2 RemoveOTPSMS](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveOTPSMS) instead.
     //
     // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
@@ -1557,7 +1557,7 @@ service ManagementService {
 
     // Remove Multi-Factor OTP Email
     //
-    // Deprecated: use [user service v2 RemoveOTPEmail](/docs/references/api/user/zitadel.user.v2.UserService.RemoveOTPEmail) instead.
+    // Deprecated: use [user service v2 RemoveOTPEmail](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveOTPEmail) instead.
     //
     // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
@@ -1592,7 +1592,7 @@ service ManagementService {
 
     // Search Passwordless/Passkey authentication
     //
-    // Deprecated: use [user service v2 ListPasskeys](/docs/references/api/user/zitadel.user.v2.UserService.ListPasskeys) instead.
+    // Deprecated: use [user service v2 ListPasskeys](/docs/reference/api/user/zitadel.user.v2.UserService.ListPasskeys) instead.
     //
     // Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
@@ -1627,7 +1627,7 @@ service ManagementService {
 
     // Add Passwordless/Passkey Registration Link
     //
-    // Deprecated: use [user service v2 RegisterPasskey](/docs/references/api/user/zitadel.user.v2.UserService.RegisterPasskey) instead.
+    // Deprecated: use [user service v2 RegisterPasskey](/docs/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey) instead.
     //
     // Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
@@ -1661,7 +1661,7 @@ service ManagementService {
 
     // Send Passwordless/Passkey Registration Link
     //
-    // Deprecated: use [user service v2 RegisterPasskey](/docs/references/api/user/zitadel.user.v2.UserService.RegisterPasskey) instead.
+    // Deprecated: use [user service v2 RegisterPasskey](/docs/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey) instead.
     //
     // Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
@@ -1696,7 +1696,7 @@ service ManagementService {
 
     // Delete Passwordless/Passkey
     //
-    // Deprecated: use [user service v2 RemovePasskey](/docs/references/api/user/zitadel.user.v2.UserService.RemovePasskey) instead.
+    // Deprecated: use [user service v2 RemovePasskey](/docs/reference/api/user/zitadel.user.v2.UserService.RemovePasskey) instead.
     //
     // Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
@@ -1731,7 +1731,7 @@ service ManagementService {
 
     // Update Machine User
     //
-    // Deprecated: use [user service v2 UpdateUser](/docs/references/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
+    // Deprecated: use [user service v2 UpdateUser](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
     //
     // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
@@ -1767,7 +1767,7 @@ service ManagementService {
 
     // Create Secret for Machine User
     //
-    // Deprecated: use [user service v2 AddSecret](/docs/references/api/user/zitadel.user.v2.UserService.AddSecret) instead.
+    // Deprecated: use [user service v2 AddSecret](/docs/reference/api/user/zitadel.user.v2.UserService.AddSecret) instead.
     //
     // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
@@ -1803,7 +1803,7 @@ service ManagementService {
 
     // Delete Secret of Machine User
     //
-    // Deprecated: use [user service v2 RemoveSecret](/docs/references/api/user/zitadel.user.v2.UserService.RemoveSecret) instead.
+    // Deprecated: use [user service v2 RemoveSecret](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveSecret) instead.
     //
     // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
@@ -1838,7 +1838,7 @@ service ManagementService {
 
     // Get Machine user Key By ID
     //
-    // Deprecated: use [user service v2 ListUsers](/docs/references/api/user/zitadel.user.v2.UserService.ListUsers) instead.
+    // Deprecated: use [user service v2 ListUsers](/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers) instead.
     //
     // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
@@ -1873,7 +1873,7 @@ service ManagementService {
 
     // List Machine Keys
     //
-    // Deprecated: use [user service v2 ListKeys](/docs/references/api/user/zitadel.user.v2.UserService.ListKeys) instead.
+    // Deprecated: use [user service v2 ListKeys](/docs/reference/api/user/zitadel.user.v2.UserService.ListKeys) instead.
     //
     // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
@@ -1909,7 +1909,7 @@ service ManagementService {
 
     // Create Key for machine user
     //
-    // Deprecated: use [user service v2 AddKey](/docs/references/api/user/zitadel.user.v2.UserService.AddKey) instead.
+    // Deprecated: use [user service v2 AddKey](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey) instead.
     //
     // If a public key is not supplied, a new key is generated and will be returned in the response.
     // Make sure to store the returned key.
@@ -1948,7 +1948,7 @@ service ManagementService {
 
     // Delete Key for machine user
     //
-    // Deprecated: use [user service v2 RemoveKey](/docs/references/api/user/zitadel.user.v2.UserService.RemoveKey) instead.
+    // Deprecated: use [user service v2 RemoveKey](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveKey) instead.
     //
     // Delete a specific key from a user.
     // The user will not be able to authenticate with that key afterward.
@@ -1984,7 +1984,7 @@ service ManagementService {
 
     // Get Personal-Access-Token (PAT) by ID
     //
-    // Deprecated: use [user service v2 ListPersonalAccessTokens](/docs/references/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens) instead.
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](/docs/reference/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens) instead.
     //
     // Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
@@ -2019,7 +2019,7 @@ service ManagementService {
 
     // List Personal-Access-Tokens (PATs)
     //
-    // Deprecated: use [user service v2 ListPersonalAccessTokens](/docs/references/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens) instead.
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](/docs/reference/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens) instead.
     //
     // Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
@@ -2055,7 +2055,7 @@ service ManagementService {
 
     // Create a Personal-Access-Token (PAT)
     //
-    // Deprecated: use [user service v2 AddPersonalAccessToken](/docs/references/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken) instead.
+    // Deprecated: use [user service v2 AddPersonalAccessToken](/docs/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken) instead.
     //
     // Generates a new PAT for the user. Currently only available for machine users.
     // The token will be returned in the response, make sure to store it.
@@ -2093,7 +2093,7 @@ service ManagementService {
 
     // Remove a Personal-Access-Token (PAT) by ID
     //
-    // Deprecated: use [user service v2 RemovePersonalAccessToken](/docs/references/api/user/zitadel.user.v2.UserService.RemovePersonalAccessToken) instead.
+    // Deprecated: use [user service v2 RemovePersonalAccessToken](/docs/reference/api/user/zitadel.user.v2.UserService.RemovePersonalAccessToken) instead.
     //
     // Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.
     rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
@@ -2128,7 +2128,7 @@ service ManagementService {
 
     // List Social Logins
     //
-    // Deprecated: use [user service v2 ListLinkedIDPs](/docs/references/api/user/zitadel.user.v2.UserService.ListIDPLinks) instead.
+    // Deprecated: use [user service v2 ListLinkedIDPs](/docs/reference/api/user/zitadel.user.v2.UserService.ListIDPLinks) instead.
     //
     // Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
@@ -2157,7 +2157,7 @@ service ManagementService {
 
     // Remove Social Login
     //
-    // Deprecated: use [user service v2 RemoveIDPLink](/docs/references/api/user/zitadel.user.v2.UserService.RemoveIDPLink) instead.
+    // Deprecated: use [user service v2 RemoveIDPLink](/docs/reference/api/user/zitadel.user.v2.UserService.RemoveIDPLink) instead.
     //
     // Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
@@ -2185,7 +2185,7 @@ service ManagementService {
 
     // List ZITADEL Permissions
     //
-    // Deprecated: use [ListAdministrators](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
+    // Deprecated: use [ListAdministrators](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
     //
     // Show all the permissions the user has in ZITADEL (ZITADEL Manager).
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
@@ -2238,7 +2238,7 @@ service ManagementService {
 
     // Get Organization By Domain
     //
-    // Deprecated: use [organization v2 service ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
+    // Deprecated: use [organization v2 service ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
     //
     // Search an organization by the domain, overall organizations. The domain must match exactly.
     rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
@@ -2283,7 +2283,7 @@ service ManagementService {
 
     // Create Organization
     //
-    // Deprecated: use [organization service v2 CreateOrganization](/docs/references/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead
+    // Deprecated: use [organization service v2 CreateOrganization](/docs/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead
     //
     // Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization.
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
@@ -2312,7 +2312,7 @@ service ManagementService {
 
     // Update Organization
     //
-    // Deprecated: use [organization service v2 UpdateOrganization](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.UpdateOrganization) instead.
+    // Deprecated: use [organization service v2 UpdateOrganization](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.UpdateOrganization) instead.
     //
     // Change the name of the organization.
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
@@ -2341,7 +2341,7 @@ service ManagementService {
 
     // Deactivate Organization
     //
-    // Deprecated: use [organization service v2 DeactivateOrganization](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeactivateOrganization) instead.
+    // Deprecated: use [organization service v2 DeactivateOrganization](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeactivateOrganization) instead.
     //
     // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
@@ -2370,7 +2370,7 @@ service ManagementService {
 
     // Reactivate Organization
     //
-    // Deprecated: use [organization service v2 ActivateOrganization](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.ActivateOrganization) instead.
+    // Deprecated: use [organization service v2 ActivateOrganization](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ActivateOrganization) instead.
     //
     // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
@@ -2399,7 +2399,7 @@ service ManagementService {
 
     // Delete Organization
     //
-    // Deprecated: use [organization service v2 DeleteOrganization](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization) instead.
+    // Deprecated: use [organization service v2 DeleteOrganization](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization) instead.
     //
     // Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
@@ -2427,7 +2427,7 @@ service ManagementService {
 
     // Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata) instead.
     //
     // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
@@ -2457,7 +2457,7 @@ service ManagementService {
 
     // Bulk Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata) instead.
     //
     // This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded.
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
@@ -2487,7 +2487,7 @@ service ManagementService {
 
     // Search Organization Metadata
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata) instead.
     //
     // Get the metadata of an organization filtered by your query.
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
@@ -2517,7 +2517,7 @@ service ManagementService {
 
     // Get Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata) instead.
     //
     // Get a metadata object from an organization by a specific key.
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
@@ -2546,7 +2546,7 @@ service ManagementService {
 
     // Delete Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata) instead.
     //
     // Remove a metadata object from an organization with a specific key.
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
@@ -2575,7 +2575,7 @@ service ManagementService {
 
     // Bulk Delete Metadata
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata) instead.
     //
     // Remove a list of metadata objects from an organization with a list of keys.
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
@@ -2605,7 +2605,7 @@ service ManagementService {
 
     // Add Domain
     //
-    // Deprecated: use [organization service v2 AddOrganizationDomain](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.AddOrganizationDomain) instead.
+    // Deprecated: use [organization service v2 AddOrganizationDomain](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.AddOrganizationDomain) instead.
     //
     // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
@@ -2634,7 +2634,7 @@ service ManagementService {
 
     // Search Domains
     //
-    // Deprecated: use [organization service v2 ListOrganizationDomains](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationDomains) instead.
+    // Deprecated: use [organization service v2 ListOrganizationDomains](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationDomains) instead.
     //
     // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs.
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -2663,7 +2663,7 @@ service ManagementService {
 
     // Remove Domain
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationDomain](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationDomain) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationDomain](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationDomain) instead.
     //
     // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
@@ -2691,7 +2691,7 @@ service ManagementService {
 
     // Generate Domain Verification
     //
-    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.GenerateOrganizationDomainValidation) instead.
+    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.GenerateOrganizationDomainValidation) instead.
     //
     // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
@@ -2720,7 +2720,7 @@ service ManagementService {
 
     // Verify Domain
     //
-    // Deprecated: use [organization service v2 VerifyOrganizationDomain](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.VerifyOrganizationDomain) instead.
+    // Deprecated: use [organization service v2 VerifyOrganizationDomain](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.VerifyOrganizationDomain) instead.
     //
     // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
@@ -2799,7 +2799,7 @@ service ManagementService {
 
     // List Organization Members
     //
-    // Deprecated: use [ListAdministrators](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
+    // Deprecated: use [ListAdministrators](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked.
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
@@ -2830,7 +2830,7 @@ service ManagementService {
 
     // Add Organization Member
     //
-    // Deprecated: use [CreateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
+    // Deprecated: use [CreateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles.
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
@@ -2861,7 +2861,7 @@ service ManagementService {
 
     // Update Organization Member
     //
-    // Deprecated: use [UpdateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
+    // Deprecated: use [UpdateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
@@ -2892,7 +2892,7 @@ service ManagementService {
 
     // Remove Organization Member
     //
-    // Deprecated: use [DeleteAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
+    // Deprecated: use [DeleteAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project).
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
@@ -2922,7 +2922,7 @@ service ManagementService {
 
     // Get Project By ID
     //
-    // Deprecated: use [project v2 service GetProject](/docs/references/api/project/zitadel.project.v2.ProjectService.GetProject) instead.
+    // Deprecated: use [project v2 service GetProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.GetProject) instead.
     //
     // Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
@@ -2951,7 +2951,7 @@ service ManagementService {
 
     // Get Granted Project By ID
     //
-    // Deprecated: use [project v2 service ListProjectGrants](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
+    // Deprecated: use [project v2 service ListProjectGrants](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
     //
     // Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context.
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
@@ -2980,7 +2980,7 @@ service ManagementService {
 
     // Search Project
     //
-    // Deprecated: use [project v2 service ListProjects](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjects) instead.
+    // Deprecated: use [project v2 service ListProjects](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjects) instead.
     //
     // Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
@@ -3009,7 +3009,7 @@ service ManagementService {
 
     // Search Granted Project
     //
-    // Deprecated: use [project v2 service ListProjects](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjects) instead.
+    // Deprecated: use [project v2 service ListProjects](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjects) instead.
     //
     // Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
@@ -3038,7 +3038,7 @@ service ManagementService {
 
     // Search Granted Project Roles
     //
-    // Deprecated: use [project v2 service ListProjectGrants](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
+    // Deprecated: use [project v2 service ListProjectGrants](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
     //
     // Lists the roles a granted projects has. These are the roles, that have been granted by the owner organization to my organization.
     rpc ListGrantedProjectRoles(ListGrantedProjectRolesRequest) returns (ListGrantedProjectRolesResponse) {
@@ -3092,7 +3092,7 @@ service ManagementService {
 
     // Create Project
     //
-    // Deprecated: use [project v2 service CreateProject](/docs/references/api/project/zitadel.project.v2.ProjectService.CreateProject) instead.
+    // Deprecated: use [project v2 service CreateProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.CreateProject) instead.
     //
     // Create a new project. A Project is a vessel for different applications sharing the same role context.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
@@ -3121,7 +3121,7 @@ service ManagementService {
 
     // Update Project
     //
-    // Deprecated: use [project v2 service UpdateProject](/docs/references/api/project/zitadel.project.v2.ProjectService.UpdateProject) instead.
+    // Deprecated: use [project v2 service UpdateProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProject) instead.
     //
     // Update a project and its settings. A Project is a vessel for different applications sharing the same role context.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
@@ -3151,7 +3151,7 @@ service ManagementService {
 
     // Deactivate Project
     //
-    // Deprecated: use [project v2 service DeactivateProject](/docs/references/api/project/zitadel.project.v2.ProjectService.DeactivateProject) instead.
+    // Deprecated: use [project v2 service DeactivateProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProject) instead.
     //
     // Set the state of a project to deactivated. Request returns an error if the project is already deactivated.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
@@ -3181,7 +3181,7 @@ service ManagementService {
 
     // Reactivate Project
     //
-    // Deprecated: use [project v2 service ActivateProject](/docs/references/api/project/zitadel.project.v2.ProjectService.ActivateProject) instead.
+    // Deprecated: use [project v2 service ActivateProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.ActivateProject) instead.
     //
     // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
@@ -3211,7 +3211,7 @@ service ManagementService {
 
     // Remove Project
     //
-    // Deprecated: use [project v2 service DeleteProject](/docs/references/api/project/zitadel.project.v2.ProjectService.DeleteProject) instead.
+    // Deprecated: use [project v2 service DeleteProject](/docs/reference/api/project/zitadel.project.v2.ProjectService.DeleteProject) instead.
     //
     // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
@@ -3240,7 +3240,7 @@ service ManagementService {
 
     // Search Project Roles
     //
-    // Deprecated: use [project v2 service ListProjectRoles](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectRoles) instead.
+    // Deprecated: use [project v2 service ListProjectRoles](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectRoles) instead.
     //
     // Returns all roles of a project matching the search query.
     rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
@@ -3270,7 +3270,7 @@ service ManagementService {
 
     // Add Project Role
     //
-    // Deprecated: use [project v2 service AddProjectRole](/docs/references/api/project/zitadel.project.v2.ProjectService.AddProjectRole) instead.
+    // Deprecated: use [project v2 service AddProjectRole](/docs/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole) instead.
     //
     // Add a new project role to a project. The key must be unique within the project.
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
@@ -3300,7 +3300,7 @@ service ManagementService {
 
     // Bulk Add Project Role
     //
-    // Deprecated: use [project v2 service AddProjectRole](/docs/references/api/project/zitadel.project.v2.ProjectService.AddProjectRole) instead.
+    // Deprecated: use [project v2 service AddProjectRole](/docs/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole) instead.
     //
     // Add a list of roles to a project. The keys must be unique within the project.
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
@@ -3330,7 +3330,7 @@ service ManagementService {
 
     // Change Project Role
     //
-    // Deprecated: use [project v2 service UpdateProjectRole](/docs/references/api/project/zitadel.project.v2.ProjectService.UpdateProjectRole) instead.
+    // Deprecated: use [project v2 service UpdateProjectRole](/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectRole) instead.
     //
     // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
@@ -3360,7 +3360,7 @@ service ManagementService {
 
     // Remove Project Role
     //
-    // Deprecated: use [project v2 service RemoveProjectRole](/docs/references/api/project/zitadel.project.v2.ProjectService.RemoveProjectRole) instead.
+    // Deprecated: use [project v2 service RemoveProjectRole](/docs/reference/api/project/zitadel.project.v2.ProjectService.RemoveProjectRole) instead.
     //
     // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
@@ -3415,7 +3415,7 @@ service ManagementService {
 
     // List Project Members
     //
-    // Deprecated: use [ListAdministrators](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
+    // Deprecated: use [ListAdministrators](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectMembers(ListProjectMembersRequest) returns (ListProjectMembersResponse) {
@@ -3447,7 +3447,7 @@ service ManagementService {
 
     // Add Project Member
     //
-    // Deprecated: use [CreateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
+    // Deprecated: use [CreateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles.
     rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse) {
@@ -3479,7 +3479,7 @@ service ManagementService {
 
     // Update Project Member
     //
-    // Deprecated: use [UpdateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
+    // Deprecated: use [UpdateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectMember(UpdateProjectMemberRequest) returns (UpdateProjectMemberResponse) {
@@ -3511,7 +3511,7 @@ service ManagementService {
 
     // Remove Project Member
     //
-    // Deprecated: use [DeleteAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
+    // Deprecated: use [DeleteAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization).
     rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) {
@@ -3542,7 +3542,7 @@ service ManagementService {
 
     // Get Application By ID
     //
-    // Deprecated: Use [GetApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead to fetch an app
+    // Deprecated: Use [GetApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead to fetch an app
     //
     // Get an application of any type (OIDC, API, SAML).
     rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
@@ -3571,7 +3571,7 @@ service ManagementService {
 
     // Search Applications
     //
-    // Deprecated: Use [ListApplications](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead to list applications
+    // Deprecated: Use [ListApplications](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead to list applications
     //
     // Returns all applications within a project, that match the query.
     rpc ListApps(ListAppsRequest) returns (ListAppsResponse) {
@@ -3626,7 +3626,7 @@ service ManagementService {
 
     // Create Application (OIDC)
     //
-    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an OIDC application.
+    // Deprecated: Use [CreateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an OIDC application.
     //
     // Create a new OIDC client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be returned.
     rpc AddOIDCApp(AddOIDCAppRequest) returns (AddOIDCAppResponse) {
@@ -3656,7 +3656,7 @@ service ManagementService {
 
     // Create Application (SAML)
     //
-    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create a SAML application.
+    // Deprecated: Use [CreateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create a SAML application.
     //
     // Create a new SAML client. Returns an entity ID.
     rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
@@ -3686,7 +3686,7 @@ service ManagementService {
 
     // Create Application (API)
     //
-    // Deprecated: Use [CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an API application
+    // Deprecated: Use [CreateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead to create an API application
     //
     // Create a new API client. The client id will be generated and returned in the response.
     // Depending on the chosen configuration also a secret will be generated and returned.
@@ -3717,7 +3717,7 @@ service ManagementService {
 
     // Update Application
     //
-    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the generic params of an app.
+    // Deprecated: Use [PatchApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the generic params of an app.
     //
     // Update the basic information of an application. This doesn't include information that are dependent on the application type (OIDC, API, SAML)
     rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {
@@ -3747,7 +3747,7 @@ service ManagementService {
 
     // Update OIDC Application Config
     //
-    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an OIDC app.
+    // Deprecated: Use [PatchApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an OIDC app.
     //
     // Update the OIDC specific configuration of an application.
     rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
@@ -3777,7 +3777,7 @@ service ManagementService {
 
     // Update SAML Application Config
     //
-    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of a SAML app.
+    // Deprecated: Use [PatchApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of a SAML app.
     //
     // Update the SAML specific configuration of an application.
     rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
@@ -3807,7 +3807,7 @@ service ManagementService {
 
     // Update API Application Config
     //
-    // Deprecated: Use [PatchApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an API app.
+    // Deprecated: Use [PatchApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead to update the config of an API app.
     //
     // Update the OIDC-specific configuration of an application.
     rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
@@ -3837,7 +3837,7 @@ service ManagementService {
 
     // Deactivate Application
     //
-    // Deprecated: Use [DeactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead to deactivate an app.
+    // Deprecated: Use [DeactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead to deactivate an app.
     //
     // Set the state of an application to deactivated. It is not possible to request tokens for deactivated apps. Request returns an error if the application is already deactivated.
     rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
@@ -3867,7 +3867,7 @@ service ManagementService {
 
     // Reactivate Application
     //
-    // Deprecated: Use [ReactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead to reactivate an app.
+    // Deprecated: Use [ReactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead to reactivate an app.
     //
     // Set the state of an application to active. Request returns an error if the application is not deactivated.
     rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
@@ -3897,7 +3897,7 @@ service ManagementService {
 
     // Remove Application
     //
-    // Deprecated: Use [DeleteApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead to delete an app.
+    // Deprecated: Use [DeleteApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead to delete an app.
     //
     // Remove an application. It is not possible to request tokens for removed apps. Request returns an error if the application is already deactivated.
     rpc RemoveApp(RemoveAppRequest) returns (RemoveAppResponse) {
@@ -3926,7 +3926,7 @@ service ManagementService {
 
     // Generate New OIDC Client Secret
     //
-    // Deprecated: Use [GenerateClientSecret](/docs/references/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an OIDC app client secret.
+    // Deprecated: Use [GenerateClientSecret](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an OIDC app client secret.
     //
     // Generates a new client secret for the OIDC application, make sure to save the response.
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
@@ -3956,7 +3956,7 @@ service ManagementService {
 
     // Generate New API Client Secret
     //
-    // Deprecated: Use [GenerateClientSecret](/docs/references/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an API app client secret
+    // Deprecated: Use [GenerateClientSecret](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead to (re-)generate an API app client secret
     //
     // Generates a new client secret for the API application, make sure to save the response.
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
@@ -3986,7 +3986,7 @@ service ManagementService {
 
     // Get Application Key By ID
     //
-    // Deprecated: Use [GetApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead to get an application key.
+    // Deprecated: Use [GetApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead to get an application key.
     //
     // Returns an application key. Keys are used for authorizing API Applications.
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
@@ -4015,7 +4015,7 @@ service ManagementService {
 
     // List Application Keys
     //
-    // Deprecated: Use [ListApplicationKeys](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead to list application keys.
+    // Deprecated: Use [ListApplicationKeys](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead to list application keys.
     //
     // Search application keys. Keys are used for authorizing API Applications.
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
@@ -4045,7 +4045,7 @@ service ManagementService {
 
     // Create Application Key
     //
-    // Deprecated: Use [CreateApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead to create an application key.
+    // Deprecated: Use [CreateApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead to create an application key.
     //
     // Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it.
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
@@ -4075,7 +4075,7 @@ service ManagementService {
 
     // Delete Application Key
     //
-    // Deprecated: Use [DeleteApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead to delete an application key.
+    // Deprecated: Use [DeleteApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead to delete an application key.
     //
     // Remove an application key. The API application will not be able to authorize with the key anymore.
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
@@ -4129,7 +4129,7 @@ service ManagementService {
 
     // Project Grant By ID
     //
-    // Deprecated: use [ListProjectGrants](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
+    // Deprecated: use [ListProjectGrants](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
     //
     // Returns a project grant. A project grant is when the organization grants its project to another organization.
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
@@ -4157,7 +4157,7 @@ service ManagementService {
 
     // Search Project Grants from Project
     //
-    // Deprecated: use [ListProjectGrants](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
+    // Deprecated: use [ListProjectGrants](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
     //
     // Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization.
     rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
@@ -4187,7 +4187,7 @@ service ManagementService {
 
     // Search Project Grants
     //
-    // Deprecated: use [ListProjectGrants](/docs/references/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
+    // Deprecated: use [ListProjectGrants](/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants) instead.
     //
     // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
     rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
@@ -4216,7 +4216,7 @@ service ManagementService {
 
     // Add Project Grant
     //
-    // Deprecated: use [CreateProjectGrant](/docs/references/api/project/zitadel.project.v2.ProjectService.CreateProjectGrant) instead.
+    // Deprecated: use [CreateProjectGrant](/docs/reference/api/project/zitadel.project.v2.ProjectService.CreateProjectGrant) instead.
     //
     // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
@@ -4245,7 +4245,7 @@ service ManagementService {
 
     // Change Project Grant
     //
-    // Deprecated: use [UpdateProjectGrant](/docs/references/api/project/zitadel.project.v2.ProjectService.UpdateProjectGrant) instead.
+    // Deprecated: use [UpdateProjectGrant](/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectGrant) instead.
     //
     // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
@@ -4274,7 +4274,7 @@ service ManagementService {
 
     // Deactivate Project Grant
     //
-    // Deprecated: use [DeactivateProjectGrant](/docs/references/api/project/zitadel.project.v2.ProjectService.DeactivateProjectGrant) instead.
+    // Deprecated: use [DeactivateProjectGrant](/docs/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProjectGrant) instead.
     //
     // Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate.
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
@@ -4303,7 +4303,7 @@ service ManagementService {
 
     // Reactivate Project Grant
     //
-    // Deprecated: use [ActivateProjectGrant](/docs/references/api/project/zitadel.project.v2.ProjectService.ActivateProjectGrant) instead.
+    // Deprecated: use [ActivateProjectGrant](/docs/reference/api/project/zitadel.project.v2.ProjectService.ActivateProjectGrant) instead.
     //
     // Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate.
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
@@ -4332,7 +4332,7 @@ service ManagementService {
 
     // Remove Project Grant
     //
-    // Deprecated: use [DeleteProjectGrant](/docs/references/api/project/zitadel.project.v2.ProjectService.DeleteProjectGrant) instead.
+    // Deprecated: use [DeleteProjectGrant](/docs/reference/api/project/zitadel.project.v2.ProjectService.DeleteProjectGrant) instead.
     //
     // Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
     rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
@@ -4386,7 +4386,7 @@ service ManagementService {
 
     // List Project Grant Members
     //
-    // Deprecated: use [ListAdministrators](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
+    // Deprecated: use [ListAdministrators](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
@@ -4417,7 +4417,7 @@ service ManagementService {
 
     // Add Project Grant Member
     //
-    // Deprecated: use [CreateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
+    // Deprecated: use [CreateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
@@ -4448,7 +4448,7 @@ service ManagementService {
 
     // Update Project Grant Member
     //
-    // Deprecated: use [UpdateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
+    // Deprecated: use [UpdateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
@@ -4479,7 +4479,7 @@ service ManagementService {
 
     // Remove Project Grant Member
     //
-    // Deprecated: use [DeleteAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
+    // Deprecated: use [DeleteAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project).
     rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
@@ -4509,7 +4509,7 @@ service ManagementService {
 
     // Get User Grant By ID
     //
-    // Deprecated: [List authorizations](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and filter by its ID.
+    // Deprecated: [List authorizations](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and filter by its ID.
     //
     // Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
@@ -4537,7 +4537,7 @@ service ManagementService {
 
     // Search User Grants
     //
-    // Deprecated: [List authorizations](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and pass the user ID filter to search for a users grants on owned or granted projects.
+    // Deprecated: [List authorizations](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations) and pass the user ID filter to search for a users grants on owned or granted projects.
     //
     // Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization.
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
@@ -4567,7 +4567,7 @@ service ManagementService {
 
     // Add User Grant
     //
-    // Deprecated: [Add an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization) to grant a user access to an owned or granted project.
+    // Deprecated: [Add an authorization](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization) to grant a user access to an owned or granted project.
     //
     // Add a user grant for a specific user. User grants are the roles users have for a specific project and organization.
     rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
@@ -4596,7 +4596,7 @@ service ManagementService {
 
     // Update User Grant
     //
-    // Deprecated: [Update an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization) to update a user's roles on an owned or granted project.
+    // Deprecated: [Update an authorization](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization) to update a user's roles on an owned or granted project.
     //
     // Update the roles of a user grant. User grants are the roles users have for a specific project and organization.
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
@@ -4625,7 +4625,7 @@ service ManagementService {
 
     // Deactivate User Grant
     //
-    // Deprecated: [Deactivate an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization) to disable a user's access to an owned or granted project.
+    // Deprecated: [Deactivate an authorization](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization) to disable a user's access to an owned or granted project.
     //
     // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
@@ -4654,7 +4654,7 @@ service ManagementService {
 
     // Reactivate User Grant
     //
-    // Deprecated: [Activate an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization) to enable a user's access to an owned or granted project.
+    // Deprecated: [Activate an authorization](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization) to enable a user's access to an owned or granted project.
     //
     // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
@@ -4683,7 +4683,7 @@ service ManagementService {
 
     // Remove User Grant
     //
-    // Deprecated: [Delete an authorization](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove a users access to an owned or granted project.
+    // Deprecated: [Delete an authorization](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove a users access to an owned or granted project.
     //
     // Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
@@ -4711,7 +4711,7 @@ service ManagementService {
 
     // Bulk Remove User Grants
     //
-    // Deprecated: [Delete authorizations one after the other](/docs/references/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove access for multiple users on multiple owned or granted projects.
+    // Deprecated: [Delete authorizations one after the other](/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization) to remove access for multiple users on multiple owned or granted projects.
     //
     // Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
@@ -8700,7 +8700,7 @@ message ImportHumanUserRequest {
         string value = 1 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm\"";
-                description: "Encoded hash of a password in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+                description: "Encoded hash of a password in Modular Crypt Format: https://zitadel.com/docs/learn/architecture/secrets#hashed-secrets"
             }
         ];
         reserved 2; // was algortithm, which is actually obtained from the encoded hash
@@ -8741,7 +8741,7 @@ message ImportHumanUserRequest {
                 (google.api.field_behavior) = REQUIRED,
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                     example: "\"a435b-34kns\"";
-                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/learn/architecture/secrets#hashed-secrets\"";
                     min_length: 1,
                     max_length: 200;
                 }
@@ -8751,7 +8751,7 @@ message ImportHumanUserRequest {
                 (google.api.field_behavior) = REQUIRED,
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                     example: "\"$2a$12$lJ08fqVr8bFJilRVnDT9QeULI7YW.nT3iwUv6dyg0aCrfm3UY8XR2\"";
-                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets\"";
+                    description: "\"Encoded hash of a recovery code in Modular Crypt Format: https://zitadel.com/docs/learn/architecture/secrets#hashed-secrets\"";
                     min_length: 1,
                     max_length: 200;
                 }
@@ -8799,7 +8799,7 @@ message ImportHumanUserRequest {
     ];
     repeated RecoveryCode recovery_codes = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Import your existing recovery codes. You can import the raw code or the hashed code. The raw code will be hashed on import, the hashed code will be stored as is and need to be in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets";
+            description: "Import your existing recovery codes. You can import the raw code or the hashed code. The raw code will be hashed on import, the hashed code will be stored as is and need to be in Modular Crypt Format: https://zitadel.com/docs/learn/architecture/secrets#hashed-secrets";
         }
     ];
 }
@@ -11411,19 +11411,19 @@ message AddCustomPrivacyPolicyRequest {
     string tos_link = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "If registration is enabled, the user has to accept the TOS. Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+            example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
         }
     ];
     string privacy_link = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "If registration is enabled, the user has to accept the privacy terms. Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+            example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
         }
     ];
     string help_link = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+            example: "\"https://zitadel.com/docs/manage/console-overview\"";
         }
     ];
     string support_email = 4 [
@@ -11461,19 +11461,19 @@ message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "If registration is enabled, the user has to accept the TOS. Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+            example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
         }
     ];
     string privacy_link = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "If registration is enabled, the user has to accept the privacy terms. Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+            example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
         }
     ];
     string help_link = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Variable {{.Lang}} can be set to have different links based on the language.";
-            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+            example: "\"https://zitadel.com/docs/manage/console-overview\"";
         }
     ];
     string support_email = 4 [

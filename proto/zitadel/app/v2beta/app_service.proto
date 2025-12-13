@@ -112,7 +112,7 @@ service AppService {
 
     // Create Application
     //
-    // Deprecated: use [application service v2 CreateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead.
+    // Deprecated: use [application service v2 CreateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication) instead.
     //
     // Create an application. The application can be OIDC, API or SAML type, based on the input.
     //
@@ -143,7 +143,7 @@ service AppService {
 
     // Update Application
     //
-    // Deprecated: use [application service v2 UpdateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead.
+    // Deprecated: use [application service v2 UpdateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication) instead.
     //
     // Changes the configuration of an OIDC, API or SAML type application, as well as
     // the application name, based on the input provided.
@@ -175,7 +175,7 @@ service AppService {
 
     // Get Application
     //
-    // Deprecated: use [application service v2 GetApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead.
+    // Deprecated: use [application service v2 GetApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication) instead.
     //
     // Retrieves the application matching the provided ID.
     //
@@ -205,7 +205,7 @@ service AppService {
 
     // Delete Application
     //
-    // Deprecated: use [application service v2 DeleteApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead.
+    // Deprecated: use [application service v2 DeleteApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication) instead.
     //
     // Deletes the application belonging to the input project and matching the provided
     // application ID.
@@ -236,7 +236,7 @@ service AppService {
 
     // Deactivate Application
     //
-    // Deprecated: use [application service v2 DeactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead.
+    // Deprecated: use [application service v2 DeactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication) instead.
     //
     // Deactivates the application belonging to the input project and matching the provided
     // application ID.
@@ -268,7 +268,7 @@ service AppService {
 
     // Reactivate Application
     //
-    // Deprecated: use [application service v2 ReactivateApplication](/docs/references/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead.
+    // Deprecated: use [application service v2 ReactivateApplication](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication) instead.
     //
     // Reactivates the application belonging to the input project and matching the provided
     // application ID.
@@ -301,7 +301,7 @@ service AppService {
 
     // Regenerate Client Secret
     //
-    // Deprecated: use [application service v2 GenerateClientSecret](/docs/references/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead.
+    // Deprecated: use [application service v2 GenerateClientSecret](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret) instead.
     //
     // Regenerates the client secret of an API or OIDC application that belongs to the input project.
     // 
@@ -332,7 +332,7 @@ service AppService {
 
     // List Applications
     //
-    // Deprecated: use [application service v2 ListApplications](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead.
+    // Deprecated: use [application service v2 ListApplications](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications) instead.
     //
     // Returns a list of applications matching the input parameters that belong to the provided
     // project.
@@ -368,7 +368,7 @@ service AppService {
 
     // Create Application Key 
     //
-    // Deprecated: use [application service v2 CreateApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead.
+    // Deprecated: use [application service v2 CreateApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey) instead.
     //
     // Create a new application key, which is used to authorize an API application.
     //
@@ -402,7 +402,7 @@ service AppService {
 
     // Delete Application Key 
     //
-    // Deprecated: use [application service v2 DeleteApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead.
+    // Deprecated: use [application service v2 DeleteApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey) instead.
     //
     // Deletes an application key matching the provided ID.
     //
@@ -436,7 +436,7 @@ service AppService {
 
     // Get Application Key
     //
-    // Deprecated: use [application service v2 GetApplicationKey](/docs/references/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead.
+    // Deprecated: use [application service v2 GetApplicationKey](/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey) instead.
     //
     // Retrieves the application key matching the provided ID.
     //
@@ -468,7 +468,7 @@ service AppService {
 
     // List Application Keys
     //
-    // Deprecated: use [application service v2 ListApplicationKeys](/docs/references/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead.
+    // Deprecated: use [application service v2 ListApplicationKeys](/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys) instead.
     //
     // Returns a list of application keys matching the input parameters.
     //

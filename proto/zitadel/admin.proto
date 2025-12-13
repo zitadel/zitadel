@@ -293,7 +293,7 @@ service AdminService {
 
     // Get My Instance
     //
-    // Deprecated: use [instance service v2 GetInstance](/docs/references/api/instance/zitadel.instance.v2.InstanceService.GetInstance) instead.
+    // Deprecated: use [instance service v2 GetInstance](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance) instead.
     //
     // Returns the details about the current instance such as the name, version, domains, etc.
     rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
@@ -313,7 +313,7 @@ service AdminService {
 
     // List Instance Domains
     //
-    // Deprecated: use [instance service v2 GetInstance](/docs/references/api/instance/zitadel.instance.v2.InstanceService.GetInstance) instead.
+    // Deprecated: use [instance service v2 GetInstance](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance) instead.
     //
     // Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
@@ -333,7 +333,7 @@ service AdminService {
 
     // List Instance Trusted Domains
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/references/api/instance/zitadel.instance.v2.InstanceService.ListTrustedDomains) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListTrustedDomains) instead.
     //
     // Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
@@ -353,7 +353,7 @@ service AdminService {
 
     // Add an Instance Trusted Domain
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/references/api/instance/zitadel.instance.v2.InstanceService.AddTrustedDomain) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.AddTrustedDomain) instead.
     //
     // Add a domain to the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
@@ -374,7 +374,7 @@ service AdminService {
 
     // Remove an Instance Trusted Domain
     //
-    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/references/api/instance/zitadel.instance.v2.InstanceService.RemoveTrustedDomain) instead.
+    // Deprecated: use [instance service v2 ListTrustedDomains](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveTrustedDomain) instead.
     //
     // Removes a domain from the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
@@ -1175,7 +1175,7 @@ service AdminService {
 
     // Get Organization By ID
     //
-    // Deprecated: use [organization service v2 ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
+    // Deprecated: use [organization service v2 ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
     //
     // Returns an organization by its ID. Make sure the user has the permissions to access the organization.
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
@@ -1201,7 +1201,7 @@ service AdminService {
 
     // Is Organization Unique
     //
-    // Deprecated: use [organization service v2 ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
+    // Deprecated: use [organization service v2 ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
     //
     // Checks if an organization with the searched parameters already exists or not.
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
@@ -1250,7 +1250,7 @@ service AdminService {
 
     // Get Default Organization
     //
-    // Deprecated: use [organization service v2 ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
+    // Deprecated: use [organization service v2 ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
     //
     // Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization.
     rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
@@ -1271,7 +1271,7 @@ service AdminService {
 
     // Search Organizations
     //
-    // Deprecated: use [organization service v2 ListOrganizations](/docs/references/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
+    // Deprecated: use [organization service v2 ListOrganizations](/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations) instead.
     //
     // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
      rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
@@ -1309,7 +1309,7 @@ service AdminService {
 
     // Setup Organization
     //
-    // Deprecated: use [organization service v2 CreateOrganization](/docs/references/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead.
+    // Deprecated: use [organization service v2 CreateOrganization](/docs/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization) instead.
     //
     // Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER.
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
@@ -1347,7 +1347,7 @@ service AdminService {
 
     // Remove Organization
     //
-    // Deprecated: use [organization service v2 DeleteOrganization](/docs/references/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization) instead.
+    // Deprecated: use [organization service v2 DeleteOrganization](/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization) instead.
     //
     // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
@@ -4053,7 +4053,7 @@ service AdminService {
 
     // List IAM Members
     //
-    // Deprecated: use [ListAdministrators](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
+    // Deprecated: use [ListAdministrators](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked.
     rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
@@ -4081,7 +4081,7 @@ service AdminService {
 
     // Add IAM Member
     //
-    // Deprecated: use [CreateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
+    // Deprecated: use [CreateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles.
     rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
@@ -4120,7 +4120,7 @@ service AdminService {
 
     // Update IAM Member
     //
-    // Deprecated: use [UpdateAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
+    // Deprecated: use [UpdateAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
@@ -4159,7 +4159,7 @@ service AdminService {
 
     // Remove IAM Member
     //
-    // Deprecated: use [DeleteAdministrator](/docs/references/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
+    // Deprecated: use [DeleteAdministrator](/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project).
     rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
@@ -7885,17 +7885,17 @@ message GetPrivacyPolicyResponse {
 message UpdatePrivacyPolicyRequest {
     string tos_link = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+            example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
         }
     ];
     string privacy_link = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+            example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
         }
     ];
     string help_link = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+            example: "\"https://zitadel.com/docs/manage/console-overview\"";
         }
     ];
     string support_email = 4 [
