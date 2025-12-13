@@ -3,7 +3,6 @@ package logging
 import (
 	"log/slog"
 	"net/http"
-	"time"
 
 	slogctx "github.com/veqryn/slog-context"
 
@@ -17,7 +16,6 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 			next.ServeHTTP(w, r)
 			return
 		}
-		start := time.Now()
 		logger := instrumentation.Logger()
 		ctx := instrumentation.SetHttpRequestDetails(r.Context(), service, r)
 		ctx = slogctx.NewCtx(ctx, logger)
@@ -26,14 +24,27 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 		next.ServeHTTP(sw, r.WithContext(ctx))
 
 		logger.Log(ctx,
-			sw.logLevel(),
+			LogLevelFromStatus(sw.status),
 			"http request served",
 			"status", sw.status,
-			"duration", time.Since(start),
 		)
 	})
 }
 
+func LogLevelFromStatus(status int) slog.Level {
+	if status < 200 {
+		return slog.LevelDebug
+	}
+	if status < 400 {
+		return slog.LevelInfo
+	}
+	if status < 500 {
+		return slog.LevelWarn
+	}
+	return slog.LevelError
+}
+
+// statusWriter is a [http.ResponseWriter] that captures the status code for logging.
 type statusWriter struct {
 	http.ResponseWriter
 	status int
@@ -49,17 +60,4 @@ func (w *statusWriter) Write(p []byte) (int, error) {
 func (w *statusWriter) WriteHeader(statusCode int) {
 	w.status = statusCode
 	w.ResponseWriter.WriteHeader(statusCode)
-}
-
-func (w statusWriter) logLevel() slog.Level {
-	if w.status < 200 {
-		return slog.LevelDebug
-	}
-	if w.status < 400 {
-		return slog.LevelInfo
-	}
-	if w.status < 500 {
-		return slog.LevelWarn
-	}
-	return slog.LevelError
 }

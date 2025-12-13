@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"google.golang.org/grpc"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 
 func LogHandler(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {

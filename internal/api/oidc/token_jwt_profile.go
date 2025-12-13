@@ -18,7 +18,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 	}()
 
 	user, err := s.verifyJWTProfile(ctx, r.Data)

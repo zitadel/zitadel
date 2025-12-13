@@ -174,7 +174,7 @@ func MapToScimError(ctx context.Context, translator *i18n.Translator, err error)
 		}
 	}
 
-	statusCode, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
+	statusCode, ok := http_util.ZitadelErrorToHTTPStatusCode(ctx, err)
 	if !ok {
 		statusCode = http.StatusInternalServerError
 	}

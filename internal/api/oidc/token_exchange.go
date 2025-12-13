@@ -31,7 +31,7 @@ func init() {
 func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
 	resp, err := s.tokenExchange(ctx, r)
 	if err != nil {
-		return nil, oidcError(err)
+		return nil, oidcError(ctx, err)
 	}
 	return resp, nil
 }

@@ -5,12 +5,11 @@ import (
 	"log/slog"
 	"slices"
 	"strings"
-	"time"
 
-	"connectrpc.com/connect"
 	slogctx "github.com/veqryn/slog-context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 )
@@ -23,21 +22,19 @@ func NewGrpcInterceptor(ignoredMethodSuffixes ...string) grpc.UnaryServerInterce
 			return next(ctx, req)
 		}
 
-		start := time.Now()
 		logger := instrumentation.Logger()
 		ctx = instrumentation.SetGrpcRequestDetails(ctx, info)
 		ctx = slogctx.NewCtx(ctx, logger)
 
 		resp, err := next(ctx, req)
-		var code connect.Code
+		var code codes.Code
 		if err != nil {
-			code = connect.CodeOf(err)
+			code = status.Code(err)
 		}
 		logger.Log(ctx,
-			assertConnectLevel(code),
-			"connect RPC served",
+			assertGrpcLevel(code),
+			"gRPC served",
 			"code", code,
-			"duration", time.Since(start),
 		)
 
 		return resp, err

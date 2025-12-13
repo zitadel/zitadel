@@ -128,7 +128,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotStatusCode, gotOk := ZitadelErrorToHTTPStatusCode(tt.args.err)
+			gotStatusCode, gotOk := ZitadelErrorToHTTPStatusCode(t.Context(), tt.args.err)
 			if gotStatusCode != tt.wantStatusCode {
 				t.Errorf("ZitadelErrorToHTTPStatusCode() gotStatusCode = %v, want %v", gotStatusCode, tt.wantStatusCode)
 			}

@@ -54,7 +54,7 @@ func ZITADELToConnectError(ctx context.Context, err error) error {
 	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err, "code", code)
+	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
 
 	errorInfo := getErrorInfo(id, key, err)
 
@@ -84,7 +84,7 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	}
 	switch {
 	case zerrors.IsErrorAlreadyExists(err):
-		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelInfo
+		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	case zerrors.IsDeadlineExceeded(err):
 		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), slog.LevelError
 	case zerrors.IsInternal(err):

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
@@ -70,85 +71,91 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	slog.SetDefault(slog.New(handler))
 }
 
+const (
+	ProtocolHttp    = "http"
+	ProtocolConnect = "connect"
+	ProtocolGrpc    = "grpc"
+)
+
 // SetHttpRequestDetails adds static details to each context aware log entry.
 func SetHttpRequestDetails(ctx context.Context, service string, request *http.Request) context.Context {
-	return context.WithValue(ctx, ctxKey{}, httpRequest{
-		service: service,
-		request: request,
+	now := time.Now()
+	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+		protocol:    ProtocolHttp,
+		service:     service,
+		http_method: request.Method,
+		path:        request.URL.Path,
+		requestID:   xid.NewWithTime(now),
+		start:       now,
 	})
 }
 
 // SetConnectRequestDetails adds static details to each context aware log entry.
 func SetConnectRequestDetails(ctx context.Context, request connect.AnyRequest) context.Context {
-	return context.WithValue(ctx, ctxKey{}, connectRequest{request})
+	now := time.Now()
+	spec := request.Spec()
+	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+		protocol:    ProtocolConnect,
+		service:     serviceFromRPCMethod(spec.Procedure),
+		http_method: request.HTTPMethod(),
+		path:        spec.Procedure,
+		requestID:   xid.NewWithTime(now),
+		start:       now,
+	})
 }
 
 func SetGrpcRequestDetails(ctx context.Context, info *grpc.UnaryServerInfo) context.Context {
-	return context.WithValue(ctx, ctxKey{}, grpcRequest{info})
+	now := time.Now()
+	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+		protocol:    ProtocolGrpc,
+		service:     serviceFromRPCMethod(info.FullMethod),
+		http_method: http.MethodPost, // gRPC always uses POST
+		path:        info.FullMethod,
+		requestID:   xid.NewWithTime(now),
+		start:       now,
+	})
 }
 
 type ctxKey struct{}
 
-type requestDetails interface {
-	attrs() []slog.Attr
+type requestDetails struct {
+	protocol    string
+	service     string
+	http_method string
+	path        string
+	requestID   xid.ID
+	start       time.Time
 }
 
-type httpRequest struct {
-	service string
-	request *http.Request
-}
-
-var _ requestDetails = httpRequest{}
-
-func (r httpRequest) attrs() []slog.Attr {
-	return []slog.Attr{
-		slog.String("protocol", "http"),
-		slog.String("service", r.service),
-		slog.String("method", r.request.Method),
-		slog.String("path", r.request.URL.Path),
+func (r *requestDetails) attrs() []slog.Attr {
+	attrs := make([]slog.Attr, 0, 6)
+	if r.protocol != "" {
+		attrs = append(attrs, slog.String("protocol", r.protocol))
 	}
+	if r.service != "" {
+		attrs = append(attrs, slog.String("service", r.service))
+	}
+	if r.http_method != "" {
+		attrs = append(attrs, slog.String("http_method", r.http_method))
+	}
+	if r.path != "" {
+		attrs = append(attrs, slog.String("path", r.path))
+	}
+	if !r.requestID.IsZero() {
+		attrs = append(attrs, slog.String("request_id", r.requestID.String()))
+	}
+	if !r.start.IsZero() {
+		attrs = append(attrs, slog.Duration("duration", time.Since(r.start)))
+	}
+	return attrs
 }
 
-type connectRequest struct {
-	connect.AnyRequest
-}
-
-var _ requestDetails = connectRequest{}
-
-func (r connectRequest) attrs() []slog.Attr {
-	spec := r.Spec()
-	proc := strings.Split(spec.Procedure, "/")
-	var service string
-	if len(proc) > 0 {
-		service = proc[0]
+func serviceFromRPCMethod(fullMethod string) string {
+	parts := strings.Split(fullMethod, "/")
+	if len(parts) >= 2 {
+		return parts[1]
 	}
-
-	return []slog.Attr{
-		slog.String("protocol", "connect"),
-		slog.String("service", service),
-		slog.String("method", r.HTTPMethod()),
-		slog.String("procedure", spec.Procedure),
-	}
-}
-
-type grpcRequest struct {
-	info *grpc.UnaryServerInfo
-}
-
-var _ requestDetails = grpcRequest{}
-
-func (r grpcRequest) attrs() []slog.Attr {
-	proc := strings.Split(r.info.FullMethod, "/")
-	var service string
-	if len(proc) > 0 {
-		service = proc[0]
-	}
-
-	return []slog.Attr{
-		slog.String("protocol", "grpc"),
-		slog.String("service", service),
-		slog.String("procedure", r.info.FullMethod),
-	}
+	return "unknown"
 }
 
 // domainExtractor sets the sanitized request hosts from [http_util.DomainCtx] to a log entry.
@@ -158,8 +165,9 @@ func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) [
 	}
 }
 
+// requestExtractor sets the request details from [requestDetails] to a log entry.
 func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := ctx.Value(ctxKey{}).(requestDetails); ok {
+	if r, ok := ctx.Value(ctxKey{}).(*requestDetails); ok {
 		return r.attrs()
 	}
 	return nil
