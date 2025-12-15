@@ -98,9 +98,9 @@ func CreateZitadelError(kind Kind, parent error, id, message string) *ZitadelErr
 
 func (err *ZitadelError) Error() string {
 	if err.Parent != nil {
-		return fmt.Sprintf("Kind=%s ID=%s Message=%s Parent=(%v)", err.Kind, err.ID, err.Message, err.Parent)
+		return fmt.Sprintf("ID=%s Message=%s Parent=(%v)", err.ID, err.Message, err.Parent)
 	}
-	return fmt.Sprintf("Kind=%s ID=%s Message=%s", err.Kind, err.ID, err.Message)
+	return fmt.Sprintf("ID=%s Message=%s", err.ID, err.Message)
 }
 
 func (err *ZitadelError) Unwrap() error {
