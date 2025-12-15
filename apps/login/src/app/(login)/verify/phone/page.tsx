@@ -35,7 +35,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const doSend = send === "true";
 
-  async function sendPhone(userId: string) {
+  async function sendPhone(userId: string, isPhoneVerified: boolean) {
+    // Don't send code if phone is already verified
+    if (isPhoneVerified) {
+      return;
+    }
+    
     await resendPhoneCode({ serviceConfig, userId }).catch((apiError) => {
       console.error("Could not send phone verification SMS", apiError);
       error = "phoneSendFailed";
@@ -52,18 +57,25 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendPhone(sessionFactors.factors.user.id);
+      // Get user to check phone verification status
+      const userResponse = await getUserByID({ serviceConfig, userId: sessionFactors.factors.user.id });
+      if (userResponse?.user?.type.case === "human") {
+        const humanUser = userResponse.user.type.value;
+        const isPhoneVerified = humanUser.phone?.isVerified ?? false;
+        await sendPhone(sessionFactors.factors.user.id, isPhoneVerified);
+      }
     }
   } else if ("userId" in searchParams && userId) {
-    if (doSend) {
-      await sendPhone(userId);
-    }
-
     const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
         human = user.type.value as HumanUser;
+        const isPhoneVerified = human.phone?.isVerified ?? false;
+        
+        if (doSend) {
+          await sendPhone(userId, isPhoneVerified);
+        }
       }
     }
   }

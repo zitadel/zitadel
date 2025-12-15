@@ -39,7 +39,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  async function sendEmail(userId: string) {
+  async function sendEmail(userId: string, isEmailVerified: boolean) {
+    // Don't send code if email is already verified (unless it's an invite)
+    if (isEmailVerified && invite !== "true") {
+      return;
+    }
+    
     const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
     if (invite === "true") {
@@ -75,18 +80,25 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmail(sessionFactors.factors.user.id);
+      // Get user to check email verification status
+      const userResponse = await getUserByID({ serviceConfig, userId: sessionFactors.factors.user.id });
+      if (userResponse?.user?.type.case === "human") {
+        const humanUser = userResponse.user.type.value;
+        const isEmailVerified = humanUser.email?.isVerified ?? false;
+        await sendEmail(sessionFactors.factors.user.id, isEmailVerified);
+      }
     }
   } else if ("userId" in searchParams && userId) {
-    if (doSend) {
-      await sendEmail(userId);
-    }
-
     const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
         human = user.type.value as HumanUser;
+        const isEmailVerified = human.email?.isVerified ?? false;
+        
+        if (doSend) {
+          await sendEmail(userId, isEmailVerified);
+        }
       }
     }
   }

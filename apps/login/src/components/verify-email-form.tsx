@@ -36,7 +36,7 @@ export function VerifyEmailForm({
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },
@@ -55,20 +55,19 @@ export function VerifyEmailForm({
     const response = await resendEmailVerification({
       userId,
       isInvite: isInvite,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotResendEmail"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("errors.couldNotResendEmail"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response?.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
+    setLoading(false);
     return response;
   }
 
@@ -85,23 +84,24 @@ export function VerifyEmailForm({
         loginName: loginName,
         organization: organization,
         requestId: requestId,
-      })
-        .catch(() => {
-          setError(t("errors.couldNotVerifyUser"));
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      }).catch(() => {
+        setError(t("errors.couldNotVerifyUser"));
+        setLoading(false);
+        return;
+      });
 
       if (response && "error" in response && response?.error) {
         setError(response.error);
+        setLoading(false);
         return;
       }
 
       if (response && "redirect" in response && response?.redirect) {
+        // Keep loading state true during redirect
         return router.push(response?.redirect);
       }
+
+      setLoading(false);
     },
     [isInvite, userId, loginName, organization, requestId, t, router],
   );

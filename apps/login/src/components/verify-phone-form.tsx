@@ -34,7 +34,7 @@ export function VerifyPhoneForm({
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },
@@ -52,20 +52,19 @@ export function VerifyPhoneForm({
 
     const response = await resendPhoneVerification({
       userId,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotResendPhone"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("errors.couldNotResendPhone"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response?.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
+    setLoading(false);
     return response;
   }
 
@@ -81,23 +80,24 @@ export function VerifyPhoneForm({
         loginName: loginName,
         organization: organization,
         requestId: requestId,
-      })
-        .catch(() => {
-          setError(t("errors.couldNotVerifyUser"));
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      }).catch(() => {
+        setError(t("errors.couldNotVerifyUser"));
+        setLoading(false);
+        return;
+      });
 
       if (response && "error" in response && response?.error) {
         setError(response.error);
+        setLoading(false);
         return;
       }
 
       if (response && "redirect" in response && response?.redirect) {
+        // Keep loading state true during redirect
         return router.push(response?.redirect);
       }
+
+      setLoading(false);
     },
     [userId, loginName, organization, requestId, t, router],
   );
