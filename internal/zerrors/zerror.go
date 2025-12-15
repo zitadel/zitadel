@@ -159,8 +159,9 @@ var _ slog.LogValuer = (*ZitadelError)(nil)
 
 func (err *ZitadelError) LogValue() slog.Value {
 	return slog.GroupValue(
-		slog.String("parent", err.Parent.Error()),
+		slog.String("kind", err.Kind.String()),
 		slog.String("message", err.Message),
 		slog.String("id", err.ID),
+		slog.Any("parent", err.Parent),
 	)
 }
