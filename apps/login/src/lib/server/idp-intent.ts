@@ -44,13 +44,11 @@ async function resolveOrganizationForUser({
     const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
     const suffix = matched?.[1] ?? "";
 
-    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix,
-    });
+    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
-      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery,
-      });
+      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
       if (orgLoginSettings?.allowDomainDiscovery) {
         return orgToCheckForDiscovery;
       }
@@ -69,7 +67,9 @@ async function resolveOrganizationForUser({
  * 2. The specific IDP is activated for the organization
  *
  */
-export async function validateIDPLinkingPermissions({ serviceConfig, userOrganizationId,
+export async function validateIDPLinkingPermissions({
+  serviceConfig,
+  userOrganizationId,
   idpId,
 }: {
   serviceConfig: ServiceConfig;
@@ -77,17 +77,14 @@ export async function validateIDPLinkingPermissions({ serviceConfig, userOrganiz
   idpId: string;
 }): Promise<boolean> {
   // Check organization login settings
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: userOrganizationId,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: userOrganizationId });
 
   if (!loginSettings?.allowExternalIdp) {
     return false;
   }
 
   // Check if the IDP is activated for the organization and allows linking
-  const activeIDPs = await getActiveIdentityProviders({ serviceConfig, orgId: userOrganizationId,
-    linking_allowed: true,
-  });
+  const activeIDPs = await getActiveIdentityProviders({ serviceConfig, orgId: userOrganizationId, linking_allowed: true });
 
   const isIDPActive = activeIDPs.identityProviders?.some((idp) => idp.id === idpId);
 
@@ -139,16 +136,8 @@ export async function processIDPCallback({
   }
 
   try {
-    console.log("[IDP Process] Retrieving IDP intent (single call):", {
-      id,
-      tokenPreview: token.substring(0, 10) + "...",
-      timestamp: new Date().toISOString(),
-    });
-
     // Consume the single-use token ONCE
-    const intent = await retrieveIDPIntent({ serviceConfig, id,
-      token,
-    });
+    const intent = await retrieveIDPIntent({ serviceConfig, id, token });
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
@@ -160,8 +149,7 @@ export async function processIDPCallback({
     }
 
     // Get IDP configuration
-    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId,
-    });
+    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId });
 
     if (!idp) {
       return { error: t("errors.idpNotFound") };
@@ -194,7 +182,9 @@ export async function processIDPCallback({
       // Auto-update user if enabled
       if (options?.isAutoUpdate && updateHumanUser) {
         try {
-          await updateHuman({ serviceConfig, request: create(UpdateHumanUserRequestSchema, {
+          await updateHuman({
+            serviceConfig,
+            request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
               profile: updateHumanUser.profile,
               email: updateHumanUser.email,
@@ -253,7 +243,9 @@ export async function processIDPCallback({
         }
 
         // Validate IDP linking permissions
-        const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: targetUser.details.resourceOwner,
+        const isAllowed = await validateIDPLinkingPermissions({
+          serviceConfig,
+          userOrganizationId: targetUser.details.resourceOwner,
           idpId: idpInformation.idpId,
         });
 
@@ -263,7 +255,9 @@ export async function processIDPCallback({
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
         }
 
-        await addIDPLink({ serviceConfig, idp: {
+        await addIDPLink({
+          serviceConfig,
+          idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
             userName: idpInformation.userName,
@@ -313,13 +307,15 @@ export async function processIDPCallback({
           return response.result ? response.result[0] : null;
         });
       } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
-        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
-          organizationId: organization,
-        }).then((response) => {
-          return response.result ? response.result[0] : null;
-        });
+        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName, organizationId: organization }).then(
+          (response) => {
+            return response.result ? response.result[0] : null;
+          },
+        );
       } else {
-        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
+        foundUser = await listUsers({
+          serviceConfig,
+          userName: idpInformation.userName,
           email,
           organizationId: organization,
         }).then((response) => {
@@ -336,7 +332,9 @@ export async function processIDPCallback({
           }
 
           // Validate IDP linking permissions
-          const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: foundUser.details.resourceOwner,
+          const isAllowed = await validateIDPLinkingPermissions({
+            serviceConfig,
+            userOrganizationId: foundUser.details.resourceOwner,
             idpId: idpInformation.idpId,
           });
 
@@ -346,7 +344,9 @@ export async function processIDPCallback({
             return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
           }
 
-          await addIDPLink({ serviceConfig, idp: {
+          await addIDPLink({
+            serviceConfig,
+            idp: {
               id: idpInformation.idpId,
               userId: idpInformation.userId,
               userName: idpInformation.userName,
@@ -411,8 +411,7 @@ export async function processIDPCallback({
       });
 
       try {
-        const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization,
-        });
+        const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization });
         console.log("[IDP Process] User auto-created successfully, creating session");
 
         // Create session for newly created user
