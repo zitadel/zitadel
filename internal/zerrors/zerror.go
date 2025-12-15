@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"runtime"
 )
 
 //go:generate enumer -type=Kind -trimprefix=Kind -json
@@ -82,7 +81,6 @@ type ZitadelError struct {
 	Parent  error
 	Message string
 	ID      string
-	Caller  caller
 }
 
 func ThrowError(parent error, id, message string) error {
@@ -95,7 +93,6 @@ func CreateZitadelError(kind Kind, parent error, id, message string) *ZitadelErr
 		Parent:  parent,
 		ID:      id,
 		Message: message,
-		Caller:  newCaller(2),
 	}
 }
 
@@ -166,36 +163,5 @@ func (err *ZitadelError) LogValue() slog.Value {
 		slog.String("message", err.Message),
 		slog.String("id", err.ID),
 		slog.Any("parent", err.Parent),
-		slog.Any("caller", err.Caller),
-	)
-}
-
-type caller struct {
-	Func string
-	File string
-	Line int
-}
-
-func newCaller(skip int) caller {
-	pc, file, line, ok := runtime.Caller(skip + 1)
-	funcName := "unknown"
-	if ok {
-		fn := runtime.FuncForPC(pc)
-		if fn != nil {
-			funcName = fn.Name()
-		}
-	}
-	return caller{
-		Func: funcName,
-		File: file,
-		Line: line,
-	}
-}
-
-func (c caller) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("func", c.Func),
-		slog.String("file", c.File),
-		slog.Int("line", c.Line),
 	)
 }
