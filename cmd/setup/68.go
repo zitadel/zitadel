@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 67.sql
+	//go:embed 68.sql
 	targetAddPayloadTypeAndKeyFingerprintColumn string
 )
 
@@ -23,5 +23,5 @@ func (mig *TargetAddPayloadTypeColumn) Execute(ctx context.Context, _ eventstore
 }
 
 func (mig *TargetAddPayloadTypeColumn) String() string {
-	return "67_target2_add_payload_type_authn_key2_fingerprint"
+	return "68_target2_add_payload_type_authn_key2_fingerprint_expiration"
 }

@@ -4,5 +4,3 @@ ALTER TABLE projections.authn_keys2
 ADD COLUMN IF NOT EXISTS fingerprint text;
 ALTER TABLE projections.authn_keys2
 ALTER COLUMN expiration DROP NOT NULL;
-ALTER TABLE projections.authn_keys2
-ALTER COLUMN expiration DROP NOT NULL;

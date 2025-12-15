@@ -19,9 +19,7 @@ func (mig *TransactionalTables) Execute(ctx context.Context, _ eventstore.Event)
 	if err != nil {
 		return err
 	}
-	_ = pool
-	return nil
-	//return pool.Migrate(ctx)
+	return pool.Migrate(ctx)
 }
 
 func (mig *TransactionalTables) String() string {
