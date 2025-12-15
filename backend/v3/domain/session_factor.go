@@ -22,6 +22,7 @@ const (
 	SessionFactorTypeTOTP
 	SessionFactorTypeOTPSMS // otp_sms
 	SessionFactorTypeOTPEmail
+	SessionFactorTypeRecoveryCode
 )
 
 type SessionFactor interface {
@@ -97,6 +98,16 @@ func (s *SessionFactorOTPEmail) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
+type SessionFactorRecoveryCode struct {
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
+}
+
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorRecoveryCode) SessionFactorType() SessionFactorType {
+	return SessionFactorTypeRecoveryCode
+}
+
 type SessionFactors []SessionFactor
 
 func (s *SessionFactors) AppendTo(factor SessionFactor) {
@@ -142,6 +153,12 @@ func (s SessionFactors) GetOTPSMSFactor() *SessionFactorOTPSMS {
 // GetOTPEmailFactor returns the OTP Email factor from the factors.
 func (s SessionFactors) GetOTPEmailFactor() *SessionFactorOTPEmail {
 	factor, _ := GetFactor[*SessionFactorOTPEmail](s)
+	return factor
+}
+
+// GetRecoveryCodeFactor returns the recovery code factor from the factors.
+func (s SessionFactors) GetRecoveryCodeFactor() *SessionFactorRecoveryCode {
+	factor, _ := GetFactor[*SessionFactorRecoveryCode](s)
 	return factor
 }
 

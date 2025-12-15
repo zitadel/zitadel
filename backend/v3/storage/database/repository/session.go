@@ -348,6 +348,14 @@ func (s session) SetFactor(factor domain.SessionFactor) database.Change {
 				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
 			}, nil,
 		)
+	case *domain.SessionFactorRecoveryCode:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.session_factors (instance_id, session_id, type, last_verified_at) SELECT instance_id, id, ")
+				builder.WriteArgs(domain.SessionFactorTypeRecoveryCode, f.LastVerifiedAt)
+				builder.WriteString(" FROM existing_session ON CONFLICT (instance_id, session_id, type) DO UPDATE SET last_verified_at = EXCLUDED.last_verified_at")
+			}, nil,
+		)
 	default:
 		return nil
 	}

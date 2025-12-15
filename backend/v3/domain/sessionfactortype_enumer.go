@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _SessionFactorTypeName = "unknownuserpasswordpasskeyidentity_provider_intenttotpotp_smsotp_email"
+const _SessionFactorTypeName = "unknownuserpasswordpasskeyidentity_provider_intenttotpotp_smsotp_emailrecovery_code"
 
-var _SessionFactorTypeIndex = [...]uint8{0, 7, 11, 19, 26, 50, 54, 61, 70}
+var _SessionFactorTypeIndex = [...]uint8{0, 7, 11, 19, 26, 50, 54, 61, 70, 83}
 
-const _SessionFactorTypeLowerName = "unknownuserpasswordpasskeyidentity_provider_intenttotpotp_smsotp_email"
+const _SessionFactorTypeLowerName = "unknownuserpasswordpasskeyidentity_provider_intenttotpotp_smsotp_emailrecovery_code"
 
 func (i SessionFactorType) String() string {
 	if i >= SessionFactorType(len(_SessionFactorTypeIndex)-1) {
@@ -33,9 +33,10 @@ func _SessionFactorTypeNoOp() {
 	_ = x[SessionFactorTypeTOTP-(5)]
 	_ = x[SessionFactorTypeOTPSMS-(6)]
 	_ = x[SessionFactorTypeOTPEmail-(7)]
+	_ = x[SessionFactorTypeRecoveryCode-(8)]
 }
 
-var _SessionFactorTypeValues = []SessionFactorType{SessionFactorTypeUnknown, SessionFactorTypeUser, SessionFactorTypePassword, SessionFactorTypePasskey, SessionFactorTypeIdentityProviderIntent, SessionFactorTypeTOTP, SessionFactorTypeOTPSMS, SessionFactorTypeOTPEmail}
+var _SessionFactorTypeValues = []SessionFactorType{SessionFactorTypeUnknown, SessionFactorTypeUser, SessionFactorTypePassword, SessionFactorTypePasskey, SessionFactorTypeIdentityProviderIntent, SessionFactorTypeTOTP, SessionFactorTypeOTPSMS, SessionFactorTypeOTPEmail, SessionFactorTypeRecoveryCode}
 
 var _SessionFactorTypeNameToValueMap = map[string]SessionFactorType{
 	_SessionFactorTypeName[0:7]:        SessionFactorTypeUnknown,
@@ -54,6 +55,8 @@ var _SessionFactorTypeNameToValueMap = map[string]SessionFactorType{
 	_SessionFactorTypeLowerName[54:61]: SessionFactorTypeOTPSMS,
 	_SessionFactorTypeName[61:70]:      SessionFactorTypeOTPEmail,
 	_SessionFactorTypeLowerName[61:70]: SessionFactorTypeOTPEmail,
+	_SessionFactorTypeName[70:83]:      SessionFactorTypeRecoveryCode,
+	_SessionFactorTypeLowerName[70:83]: SessionFactorTypeRecoveryCode,
 }
 
 var _SessionFactorTypeNames = []string{
@@ -65,6 +68,7 @@ var _SessionFactorTypeNames = []string{
 	_SessionFactorTypeName[50:54],
 	_SessionFactorTypeName[54:61],
 	_SessionFactorTypeName[61:70],
+	_SessionFactorTypeName[70:83],
 }
 
 // SessionFactorTypeString retrieves an enum value from the enum constants string name.

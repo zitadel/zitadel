@@ -653,6 +653,33 @@ func TestSession_Update(t *testing.T) {
 			rowsAffected: 1,
 		},
 		{
+			name: "update session recovery code factor",
+			testFunc: func(t *testing.T) *domain.Session {
+				session := &domain.Session{
+					InstanceID: instanceId,
+					ID:         gofakeit.Name(),
+					Lifetime:   time.Hour * 24,
+					CreatorID:  gofakeit.Name(),
+				}
+				err := sessionRepo.Create(t.Context(), tx, session)
+				require.NoError(t, err)
+
+				// update with updated values
+				session.Factors = []domain.SessionFactor{
+					&domain.SessionFactorRecoveryCode{
+						LastVerifiedAt: testNow,
+					},
+				}
+				return session
+			},
+			update: []database.Change{
+				sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastVerifiedAt: testNow,
+				}),
+			},
+			rowsAffected: 1,
+		},
+		{
 			name: "update session metadata",
 			testFunc: func(t *testing.T) *domain.Session {
 				session := &domain.Session{

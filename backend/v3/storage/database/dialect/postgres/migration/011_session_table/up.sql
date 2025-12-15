@@ -46,7 +46,8 @@ CREATE TYPE zitadel.session_factor_type AS ENUM (
     'identity_provider_intent',
     'totp',
     'otp_sms', -- is also a challenge
-    'otp_email' -- is also a challenge
+    'otp_email', -- is also a challenge
+    'recovery_code'
 );
 
 CREATE TABLE zitadel.session_factors (

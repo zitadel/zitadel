@@ -87,6 +87,8 @@ func (f *rawFactor) ToDomain() (domain.SessionFactor, domain.SessionChallenge, e
 		return f.otpSMSFactorToDomain()
 	case domain.SessionFactorTypeOTPEmail:
 		return f.otpEmailFactorToDomain()
+	case domain.SessionFactorTypeRecoveryCode:
+		return f.recoveryCodeFactorToDomain()
 	case domain.SessionFactorTypeUnknown:
 		return nil, nil, nil
 	default:
@@ -176,4 +178,13 @@ func (f *rawFactor) otpEmailFactorToDomain() (factor domain.SessionFactor, chall
 		}
 	}
 	return factor, challenge, nil
+}
+
+func (f *rawFactor) recoveryCodeFactorToDomain() (domain.SessionFactor, domain.SessionChallenge, error) {
+	if f.LastVerifiedAt.IsZero() {
+		return nil, nil, nil
+	}
+	return &domain.SessionFactorRecoveryCode{
+		LastVerifiedAt: f.LastVerifiedAt,
+	}, nil, nil
 }

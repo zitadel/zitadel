@@ -48,7 +48,7 @@ func TestServer_SessionReduces(t *testing.T) {
 	})
 	require.NoError(t, err)
 	totpSecret := registerTOTP(CTX, t, testUser.GetId())
-	passkey := Instance.RegisterUserPasskey(CTX, testUser.GetId())
+	Instance.RegisterUserPasskey(CTX, testUser.GetId())
 	registerOTPEmail(CTX, t, testUser.GetId())
 	_, err = UserClient.SetPhone(CTX, &user.SetPhoneRequest{
 		UserId: testUser.GetId(),
@@ -71,6 +71,8 @@ func TestServer_SessionReduces(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
+
+	recoveryCodes := createRecoveryCodes(CTX, t, testUser.GetId())
 
 	lifetime := time.Hour
 	creatorID := "tester"
@@ -230,6 +232,9 @@ func TestServer_SessionReduces(t *testing.T) {
 						return code
 					}(),
 				},
+				RecoveryCode: &session.CheckRecoveryCode{
+					Code: recoveryCodes[0],
+				},
 			},
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
@@ -278,12 +283,15 @@ func TestServer_SessionReduces(t *testing.T) {
 					&domain.SessionFactorTOTP{
 						LastVerifiedAt: firstFactorCheckTime,
 					},
+					&domain.SessionFactorRecoveryCode{
+						LastVerifiedAt: firstFactorCheckTime,
+					},
 				},
 				Challenges: domain.SessionChallenges{
 					&domain.SessionChallengePasskey{
 						LastChallengedAt:     updatedSession.GetDetails().GetChangeDate().AsTime(),
-						Challenge:            "challenge",
-						AllowedCredentialIDs: [][]byte{[]byte(passkey)},
+						Challenge:            "challenge", // placeholder
+						AllowedCredentialIDs: [][]byte{Instance.WebAuthN.KeyID()},
 						UserVerification:     zdomain.UserVerificationRequirementRequired,
 						RPID:                 Instance.Domain,
 					},
@@ -379,6 +387,9 @@ func TestServer_SessionReduces(t *testing.T) {
 					&domain.SessionFactorOTPSMS{
 						LastVerifiedAt: updatedSession.GetDetails().GetChangeDate().AsTime(),
 					},
+					&domain.SessionFactorRecoveryCode{
+						LastVerifiedAt: firstFactorCheckTime,
+					},
 				},
 				Challenges: domain.SessionChallenges{},
 				Metadata:   metadata,
@@ -435,6 +446,9 @@ func TestServer_SessionReduces(t *testing.T) {
 					},
 					&domain.SessionFactorOTPSMS{
 						LastVerifiedAt: updatedSession.GetDetails().GetChangeDate().AsTime(),
+					},
+					&domain.SessionFactorRecoveryCode{
+						LastVerifiedAt: firstFactorCheckTime,
 					},
 				},
 				Challenges: domain.SessionChallenges{},
@@ -511,8 +525,24 @@ func assertSessionFactorsEqual(t *assert.CollectT, expected, actual domain.Sessi
 				case *domain.SessionFactorPassword:
 					actTyped := act.(*domain.SessionFactorPassword)
 					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+				case *domain.SessionFactorIdentityProviderIntent:
+					actTyped := act.(*domain.SessionFactorIdentityProviderIntent)
+					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+				case *domain.SessionFactorPasskey:
+					actTyped := act.(*domain.SessionFactorPasskey)
+					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+					assert.Equal(t, expTyped.UserVerified, actTyped.UserVerified)
 				case *domain.SessionFactorTOTP:
 					actTyped := act.(*domain.SessionFactorTOTP)
+					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+				case *domain.SessionFactorOTPEmail:
+					actTyped := act.(*domain.SessionFactorOTPEmail)
+					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+				case *domain.SessionFactorOTPSMS:
+					actTyped := act.(*domain.SessionFactorOTPSMS)
+					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
+				case *domain.SessionFactorRecoveryCode:
+					actTyped := act.(*domain.SessionFactorRecoveryCode)
 					assert.Equal(t, expTyped.LastVerifiedAt.UTC(), actTyped.LastVerifiedAt.UTC())
 				}
 				found = true
@@ -531,12 +561,13 @@ func assertSessionChallengesEqual(t *assert.CollectT, expected, actual domain.Se
 		for _, act := range actual {
 			if exp.SessionChallengeType() == act.SessionChallengeType() {
 				switch expTyped := exp.(type) {
-				//case *domain.SessionChallengePasskey:
-				//	actTyped := act.(*domain.SessionChallengePasskey)
-				//	assert.Equal(t, expTyped.LastChallengedAt.UTC(), actTyped.LastChallengedAt.UTC())
-				//	assert.Equal(t, expTyped.Challenge, actTyped.Challenge)
-				//	assert.Equal(t, expTyped.AllowedCredentialIDs, actTyped.AllowedCredentialIDs)
-				//	assert.Equal(t, expTyped.RPID, actTyped.RPID)
+				case *domain.SessionChallengePasskey:
+					actTyped := act.(*domain.SessionChallengePasskey)
+					assert.Equal(t, expTyped.LastChallengedAt.UTC(), actTyped.LastChallengedAt.UTC())
+					assert.NotEmpty(t, actTyped.Challenge)
+					assert.Equal(t, expTyped.AllowedCredentialIDs, actTyped.AllowedCredentialIDs)
+					assert.Equal(t, expTyped.RPID, actTyped.RPID)
+					assert.Equal(t, expTyped.UserVerification, actTyped.UserVerification)
 				case *domain.SessionChallengeOTPEmail:
 					actTyped := act.(*domain.SessionChallengeOTPEmail)
 					assert.Equal(t, expTyped.LastChallengedAt.UTC(), actTyped.LastChallengedAt.UTC())
@@ -583,4 +614,13 @@ func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
 		UserId: userID,
 	})
 	require.NoError(t, err)
+}
+
+func createRecoveryCodes(ctx context.Context, t *testing.T, userID string) (secret []string) {
+	resp, err := UserClient.GenerateRecoveryCodes(ctx, &user.GenerateRecoveryCodesRequest{
+		UserId: userID,
+		Count:  5,
+	})
+	require.NoError(t, err)
+	return resp.GetRecoveryCodes()
 }

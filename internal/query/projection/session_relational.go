@@ -80,6 +80,10 @@ func (p *sessionRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOTPEmailChecked,
 				},
 				{
+					Event:  session.RecoveryCodeCheckedType,
+					Reduce: p.reduceRecoveryCodeChecked,
+				},
+				{
 					Event:  session.TokenSetType,
 					Reduce: p.reduceTokenSet,
 				},
@@ -407,6 +411,31 @@ func (p *sessionRelationalProjection) reduceOTPEmailChecked(event eventstore.Eve
 		_, err = sessionRepo.Update(ctx, v3Tx, condition,
 			sessionRepo.SetUpdatedAt(e.CreatedAt()),
 			sessionRepo.SetFactor(&domain.SessionFactorOTPEmail{
+				LastVerifiedAt: e.CreatedAt(),
+			}),
+		)
+		return err
+	}), nil
+}
+
+func (p *sessionRelationalProjection) reduceRecoveryCodeChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.RecoveryCodeCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+		}
+		v3Tx := v3_sql.SQLTx(tx)
+
+		sessionRepo := repository.SessionRepository()
+		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
+		_, err = sessionRepo.Update(ctx, v3Tx, condition,
+			sessionRepo.SetUpdatedAt(e.CreatedAt()),
+			sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
 				LastVerifiedAt: e.CreatedAt(),
 			}),
 		)
