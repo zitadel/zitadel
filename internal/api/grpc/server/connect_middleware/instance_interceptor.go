@@ -9,10 +9,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
@@ -77,8 +77,8 @@ func addInstanceByID(ctx context.Context, req connect.AnyRequest, handler connec
 func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (connect.AnyResponse, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
-		notFoundErr := new(zerrors.NotFoundError)
-		if errors.As(err, &notFoundErr) {
+		notFoundErr := new(zerrors.ZitadelError)
+		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr))

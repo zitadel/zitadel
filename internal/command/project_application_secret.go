@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 

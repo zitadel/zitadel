@@ -2,10 +2,10 @@ package start
 
 import (
 	"context"
+	"errors"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
@@ -24,27 +24,42 @@ Requirements:
 - database
 - database is initialized
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return err
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return err
+			}
 
 			err = setup.BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return err
+			}
 
-			setupConfig := setup.MustNewConfig(viper.GetViper())
+			setupConfig, shutdown, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			setupSteps := setup.MustNewSteps(viper.New())
 
 			setupCtx, cancel := context.WithCancel(cmd.Context())
 			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
 			cancel()
 
-			startConfig := MustNewConfig(viper.GetViper())
+			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
-			logging.OnError(err).Fatal("unable to start zitadel")
+			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},
 	}
 

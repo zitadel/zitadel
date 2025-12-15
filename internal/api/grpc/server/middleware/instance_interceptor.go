@@ -11,10 +11,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
@@ -77,8 +77,8 @@ func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHan
 func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
-		notFoundErr := new(zerrors.NotFoundError)
-		if errors.As(err, &notFoundErr) {
+		notFoundErr := new(zerrors.ZitadelError)
+		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())

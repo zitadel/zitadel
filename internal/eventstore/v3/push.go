@@ -8,13 +8,13 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/queue"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (es *Eventstore) Push(ctx context.Context, client database.QueryExecutor, commands ...eventstore.Command) (events []eventstore.Event, err error) {

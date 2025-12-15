@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/saml/pkg/provider/serviceprovider"
 	"github.com/zitadel/saml/pkg/provider/xml/samlp"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/activity"
@@ -30,7 +31,6 @@ import (
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
