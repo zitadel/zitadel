@@ -169,40 +169,42 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 	if err != nil {
 		return nil, err
 	}
+	provider, err := s.command.GetProvider(ctx, idpIntent.IdpInformation.IdpId, "", "")
+	if err != nil && !errors.Is(err, oidc_pkg.ErrDiscoveryFailed) {
+		return nil, err
+	}
+	var idpUser idp.User
+	switch p := provider.(type) {
+	case *apple.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
+	case *oauth.Provider:
+		idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+	case *oidc.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *jwt.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
+	case *azuread.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
+	case *github.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
+	case *gitlab.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *google.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
+	case *saml.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
+	case *ldap.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &ldap.User{})
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-7rPBbls4Zn", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	if err != nil {
+		return nil, err
+	}
 	if idpIntent.UserId == "" {
-		provider, err := s.command.GetProvider(ctx, idpIntent.IdpInformation.IdpId, "", "")
-		if err != nil && !errors.Is(err, oidc_pkg.ErrDiscoveryFailed) {
-			return nil, err
-		}
-		var idpUser idp.User
-		switch p := provider.(type) {
-		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
-		case *oauth.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
-		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
-		case *jwt.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
-		case *azuread.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
-		case *github.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
-		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
-		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
-		case *saml.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
-		case *ldap.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &ldap.User{})
-		default:
-			return nil, zerrors.ThrowInvalidArgument(nil, "IDP-7rPBbls4Zn", "Errors.ExternalIDP.IDPTypeNotImplemented")
-		}
-		if err != nil {
-			return nil, err
-		}
 		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
+	} else {
+		idpIntent.UpdateHumanUser = idpUserToUpdateHumanUser(intent.UserID, idpUser)
 	}
 	return connect.NewResponse(idpIntent), nil
 }
@@ -376,4 +378,45 @@ func idpUserToAddHumanUser(idpUser idp.User, idpID string) *user.AddHumanUserReq
 		}
 	}
 	return addHumanUser
+}
+
+func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHumanUserRequest {
+	updateHumanUser := &user.UpdateHumanUserRequest{
+		UserId: userID,
+		Profile: &user.SetHumanProfile{
+			GivenName:  idpUser.GetFirstName(),
+			FamilyName: idpUser.GetLastName(),
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		updateHumanUser.Username = &username
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		updateHumanUser.Profile.NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		updateHumanUser.Profile.DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		updateHumanUser.Profile.PreferredLanguage = &lang
+	}
+	if email := string(idpUser.GetEmail()); email != "" {
+		updateHumanUser.Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_SendCode{},
+		}
+		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+			updateHumanUser.Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		}
+	}
+	if phone := string(idpUser.GetPhone()); phone != "" {
+		updateHumanUser.Phone = &user.SetHumanPhone{
+			Phone:        phone,
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			updateHumanUser.Phone.Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+	return updateHumanUser
 }

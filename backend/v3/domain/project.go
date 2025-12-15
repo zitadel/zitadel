@@ -27,15 +27,20 @@ type Project struct {
 	IsAuthorizationRequired  bool         `json:"isAuthorizationRequired,omitempty" db:"is_authorization_required"`
 	IsProjectAccessRequired  bool         `json:"isProjectAccessRequired,omitempty" db:"is_project_access_required"`
 	UsedLabelingSettingOwner int16        `json:"usedLabelingSettingOwner,omitempty" db:"used_labeling_setting_owner"`
+
+	// Granted Project only filled in List
+	GrantID               *string            `json:"grantId,omitempty" db:"grant_id"`
+	GrantedOrganizationID *string            `json:"grantedOrganizationId,omitempty" db:"granted_organization_id"`
+	GrantState            *ProjectGrantState `json:"grantState,omitempty" db:"grant_state"`
 }
 
 type projectColumns interface {
-	// PrimaryKeyColumns returns the columns for the primary key fields
-	PrimaryKeyColumns() []database.Column
 	// InstanceIDColumn returns the column for the instance id field
 	InstanceIDColumn() database.Column
 	// OrganizationIDColumn returns the column for the organization id field
 	OrganizationIDColumn() database.Column
+	// GrantedOrganizationIDColumn returns the column for the granted organization id field
+	GrantedOrganizationIDColumn() database.Column
 	// IDColumn returns the column for the id field.
 	IDColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
@@ -63,6 +68,8 @@ type projectConditions interface {
 	InstanceIDCondition(instanceID string) database.Condition
 	// OrganizationIDCondition returns a filter on the organization id field.
 	OrganizationIDCondition(organizationID string) database.Condition
+	// GrantedOrganizationIDCondition returns a filter on the granted organization id field.
+	GrantedOrganizationIDCondition(organizationID string) database.Condition
 	// IDCondition returns an equal filter on the id field.
 	IDCondition(projectID string) database.Condition
 	// NameCondition returns a filter on the name field.
@@ -91,7 +98,11 @@ type projectChanges interface {
 }
 
 // ProjectRepository manages projects and project roles.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/project.mock.go . ProjectRepository
 type ProjectRepository interface {
+	Repository
+
 	projectColumns
 	projectConditions
 	projectChanges

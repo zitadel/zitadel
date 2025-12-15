@@ -70,6 +70,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -203,6 +204,12 @@ func StartCommands(
 				CryptoMFA: otpEncryption,
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
+			RecoveryCodes: domain.RecoveryCodesConfig{
+				MaxCount:   defaults.Multifactors.RecoveryCodes.MaxCount,
+				Format:     domain.RecoveryCodeFormat(defaults.Multifactors.RecoveryCodes.Format),
+				Length:     defaults.Multifactors.RecoveryCodes.Length,
+				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
+			},
 		},
 		GenerateDomain:                domain.NewGeneratedInstanceDomain,
 		caches:                        caches,
@@ -214,6 +221,7 @@ func StartCommands(
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
 

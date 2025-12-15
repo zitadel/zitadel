@@ -100,6 +100,14 @@ func TestWrite(t *testing.T) {
 			},
 		},
 		{
+			name: "text condition with ignore case",
+			cond: NewTextCondition(NewColumn("table", "column1"), TextOperationEqualIgnoreCase, "some text"),
+			want: want{
+				stmt: "LOWER(table.column1) = LOWER($1)",
+				args: []any{"some text"},
+			},
+		},
+		{
 			name: "text ignore case condition",
 			cond: NewTextIgnoreCaseCondition(NewColumn("table", "column1"), TextOperationNotEqual, "some TEXT"),
 			want: want{
@@ -166,13 +174,13 @@ func TestWrite(t *testing.T) {
 func TestIsRestrictingColumn(t *testing.T) {
 	for _, test := range []struct {
 		name string
-		col  Column
+		arg  Column
 		cond Condition
 		want bool
 	}{
 		{
 			name: "and with restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: And(
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column2")),
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column3")),
@@ -181,7 +189,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 		{
 			name: "and without restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: And(
 				NewColumnCondition(NewColumn("table", "column2"), NewColumn("other_table", "column3")),
 				IsNull(NewColumn("table", "column4")),
@@ -191,7 +199,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 		{
 			name: "or with restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: Or(
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column2")),
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column3")),
@@ -200,7 +208,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 		{
 			name: "or without restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: Or(
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column3")),
 				IsNotNull(NewColumn("table", "column4")),
@@ -210,19 +218,19 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 		{
 			name: "is null never restricts",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: IsNull(NewColumn("table", "column1")),
 			want: false,
 		},
 		{
 			name: "is not null never restricts",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: IsNotNull(NewColumn("table", "column1")),
 			want: false,
 		},
 		{
 			name: "exists with restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: Exists("table", And(
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column2")),
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column3")),
@@ -231,7 +239,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 		{
 			name: "exists without restricting column",
-			col:  NewColumn("table", "column1"),
+			arg:  NewColumn("table", "column1"),
 			cond: Exists("table", Or(
 				NewColumnCondition(NewColumn("table", "column1"), NewColumn("other_table", "column3")),
 				IsNotNull(NewColumn("table", "column4")),
@@ -241,7 +249,7 @@ func TestIsRestrictingColumn(t *testing.T) {
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			isRestricting := test.cond.IsRestrictingColumn(test.col)
+			isRestricting := test.cond.IsRestrictingColumn(test.arg)
 			assert.Equal(t, test.want, isRestricting)
 		})
 	}

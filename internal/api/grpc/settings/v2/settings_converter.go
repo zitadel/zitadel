@@ -25,6 +25,7 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 
 	return &settings.LoginSettings{
 		AllowUsernamePassword:      current.AllowUsernamePassword,
+		AllowLocalAuthentication:   current.AllowUsernamePassword,
 		AllowRegister:              current.AllowRegister,
 		AllowExternalIdp:           current.AllowExternalIDPs,
 		ForceMfa:                   current.ForceMFA,
@@ -68,13 +69,15 @@ func passkeysTypeToPb(passwordlessType domain.PasswordlessType) settings.Passkey
 func secondFactorTypeToPb(secondFactorType domain.SecondFactorType) settings.SecondFactorType {
 	switch secondFactorType {
 	case domain.SecondFactorTypeTOTP:
-		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP
 	case domain.SecondFactorTypeU2F:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F
 	case domain.SecondFactorTypeOTPEmail:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL
 	case domain.SecondFactorTypeOTPSMS:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS
+	case domain.SecondFactorTypeRecoveryCodes:
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES
 	case domain.SecondFactorTypeUnspecified:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	default:
@@ -249,5 +252,12 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
 		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
 		EnableImpersonation:   req.GetEnableImpersonation(),
+	}
+}
+
+func organizationSettingsToCommand(req *settings.SetOrganizationSettingsRequest) *command.SetOrganizationSettings {
+	return &command.SetOrganizationSettings{
+		OrganizationID:              req.OrganizationId,
+		OrganizationScopedUsernames: req.OrganizationScopedUsernames,
 	}
 }

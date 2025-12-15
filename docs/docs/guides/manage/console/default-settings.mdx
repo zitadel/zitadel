@@ -95,6 +95,13 @@ You can configure many SMTP providers using templates for popular providers. The
 You have to activate your SMTP provider so Zitadel can use it to send your emails. Only one provider can be active.
 :::
 
+:::warning
+The built-in SMTP provider is intended **only for testing and evaluation purposes**.  
+Email delivery through this service may be **delayed or temporarily unstable**.  
+
+For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
+:::
+
 Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
 
 To configure your custom SMTP please fill the following fields:
@@ -158,7 +165,7 @@ Reasons why ZITADEL doesn't have a redirect URI:
 
 We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
 
-Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/settings?id=login`
+Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
 <img
   src="/docs//img/guides/solution-scenarios/console-default-redirect.png"

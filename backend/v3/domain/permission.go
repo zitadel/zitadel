@@ -2,6 +2,13 @@ package domain
 
 import "context"
 
+const (
+	InstanceReadPermission      = "instance.read"
+	InstanceWritePermission     = "instance.write"
+	OrganizationReadPermission  = "organization.read"
+	OrganizationWritePermission = "organization.write"
+)
+
 // PermissionRepository is the interface that manages and checks Zitadel permissions.
 //
 // TODO(muhlemmer): This just defines the checker methods, rest to be done later.
@@ -10,6 +17,8 @@ type PermissionRepository interface {
 }
 
 // PermissionChecker defines the methods needed to check permissions.
+//
+//go:generate mockgen -typed -package domainmock -destination ./mock/permission.mock.go . PermissionChecker
 type PermissionChecker interface {
 	// Check if the authenticated user has the given permission on instance level.
 	CheckInstancePermission(ctx context.Context, permission string) error

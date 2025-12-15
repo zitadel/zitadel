@@ -3,8 +3,8 @@
 import { getAllSessions } from "@/lib/cookies";
 import { loginWithOIDCAndSession } from "@/lib/oidc";
 import { loginWithSAMLAndSession } from "@/lib/saml";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import { listSessions } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/service-url";
+import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 
@@ -14,10 +14,8 @@ export interface AuthFlowParams {
   organization?: string;
 }
 
-async function loadSessions({ serviceUrl, ids }: { serviceUrl: string; ids: string[] }): Promise<Session[]> {
-  const response = await listSessions({
-    serviceUrl,
-    ids: ids.filter((id: string | undefined) => !!id),
+async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
+  const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id),
   });
 
   return response?.sessions ?? [];
@@ -33,21 +31,19 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
   const { sessionId, requestId } = command;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
 
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, ids });
+    sessions = await loadSessions({ serviceConfig, ids });
   }
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    const result = await loginWithOIDCAndSession({
-      serviceUrl,
-      authRequest: requestId.replace("oidc_", ""),
+    const result = await loginWithOIDCAndSession({ serviceConfig, authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
@@ -62,9 +58,7 @@ export async function completeAuthFlow(command: AuthFlowParams): Promise<{ error
     return result;
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    const result = await loginWithSAMLAndSession({
-      serviceUrl,
-      samlRequest: requestId.replace("saml_", ""),
+    const result = await loginWithSAMLAndSession({ serviceConfig, samlRequest: requestId.replace("saml_", ""),
       sessionId,
       sessions,
       sessionCookies,

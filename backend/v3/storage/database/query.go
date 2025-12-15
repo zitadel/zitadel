@@ -1,5 +1,13 @@
 package database
 
+import (
+	"fmt"
+	"reflect"
+	"slices"
+
+	"go.uber.org/mock/gomock"
+)
+
 type QueryOption func(opts *QueryOpts)
 
 // WithCondition sets the condition for the query.
@@ -65,6 +73,13 @@ func WithPermissionCheck(permission string) QueryOption {
 	}
 }
 
+// WithResultLock locks the results of the query during the transaction.
+func WithResultLock() QueryOption {
+	return func(opts *QueryOpts) {
+		opts.ShouldLock = true
+	}
+}
+
 type joinType string
 
 const (
@@ -111,7 +126,65 @@ type QueryOpts struct {
 	// Permission required to read or write the resource.
 	// When unset, no permission check is made.
 	Permission string
+	// ShouldLock the results during the transaction.
+	ShouldLock bool
 }
+
+// Matches implements [gomock.Matcher].
+func (q *QueryOpts) Matches(x any) bool {
+	// first check if the x is a [QueryOpt]
+	inputOpts, ok := x.(*QueryOpts)
+	if !ok {
+		// second possibility is a [QueryOption]
+		optFunc, ok := x.(QueryOption)
+		if !ok {
+			return false
+		}
+
+		// QueryOption is a function that takes a *QueryOpts in input and fills it with its data.
+		// QueryOption data is not accessible because it's a function, so we exploit this "hack"
+		// to read the data.
+		inputOpts = new(QueryOpts)
+		optFunc(inputOpts)
+	}
+
+	// inputOpts now contains the actual data but made of other interfaces and functions/decorator.
+	// Doing a reflect.DeepEqual() will fail because you will end up into comparing functions
+	// which is not possible (comparison is successful only if both functions are nil).
+	// So we exploit the Write() method of QueryOpts to fill up the StatementBuilders:
+	// these objects are basically string builders, so we can leverage their String()
+	// method (implementing Stringer interface) to make an easy and safe comparison.
+	inputBuilder, expectedBuilder := &StatementBuilder{}, &StatementBuilder{}
+	inputOpts.Write(inputBuilder)
+	q.Write(expectedBuilder)
+
+	deepEq := func(input, expected any) int {
+		if reflect.DeepEqual(input, expected) {
+			return 0
+		}
+		return -1
+	}
+
+	if slices.CompareFunc(inputBuilder.Args(), expectedBuilder.Args(), deepEq) != 0 {
+		return false
+	}
+	return inputBuilder.String() == expectedBuilder.String()
+}
+
+// String implements [gomock.Matcher].
+func (q *QueryOpts) String() string {
+	return fmt.Sprintf("QueryOpts: {%v,%v,%v,%v,%v,%v,%v}\n",
+		q.Condition,
+		q.OrderBy,
+		q.Ordering,
+		q.Limit,
+		q.Offset,
+		q.GroupBy,
+		q.Joins,
+	)
+}
+
+var _ (gomock.Matcher) = (*QueryOpts)(nil)
 
 func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteLeftJoins(builder)
@@ -120,6 +193,7 @@ func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteOrderBy(builder)
 	opts.WriteLimit(builder)
 	opts.WriteOffset(builder)
+	opts.WriteLock(builder)
 }
 
 func (opts *QueryOpts) WriteCondition(builder *StatementBuilder) {
@@ -182,4 +256,11 @@ func (opts *QueryOpts) WriteLeftJoins(builder *StatementBuilder) {
 		builder.WriteString(" ON ")
 		join.columns.Write(builder)
 	}
+}
+
+func (opts *QueryOpts) WriteLock(builder *StatementBuilder) {
+	if !opts.ShouldLock {
+		return
+	}
+	builder.WriteString(" FOR UPDATE")
 }
