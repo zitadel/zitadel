@@ -21,11 +21,9 @@ type Tracer interface {
 	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *instrumentation.Span)
 }
 
-const TracerName = "zitadel/backend/v3/instrumentation/tracing"
-
 var globalTracer = sync.OnceValue(func() Tracer {
 	return instrumentation.NewTracer(
-		TracerName,
+		instrumentation.Name,
 		api_trace.WithInstrumentationVersion(build.Version()),
 	)
 })

@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/muhlemmer/sloggcp"
 	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
-	slogdedup "github.com/veqryn/slog-dedup"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
 	"google.golang.org/grpc"
@@ -35,10 +35,12 @@ const (
 )
 
 type LogConfig struct {
-	Level     slog.Level
-	StdErr    LogFormat
-	AddSource bool
-	Exporter  ExporterConfig
+	Level           slog.Level
+	Format          LogFormat
+	AddSource       bool
+	GoogleProjectID string
+	GoogleLogName   string
+	Exporter        ExporterConfig
 }
 
 // setLogger configures the global slog logger.
@@ -51,42 +53,27 @@ type LogConfig struct {
 //   - Sanitized request hosts from [http_util.DomainCtx]
 //   - Request details, such as method and path.
 func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
-	handlers := []slog.Handler{
-		otelslog.NewHandler("zitadel", otelslog.WithLoggerProvider(provider)),
-	}
 	options := &slog.HandlerOptions{
 		AddSource: cfg.AddSource,
 		Level:     cfg.Level,
 	}
-	switch cfg.StdErr {
-	case LogFormatUndefined, LogFormatDisabled:
-		// do nothing
+	var stdErrHandler slog.Handler
+	switch cfg.Format {
+	case LogFormatUndefined:
+		return // uses default slog logger
+	case LogFormatDisabled:
+		stdErrHandler = slog.DiscardHandler
 	case LogFormatText:
-		handlers = append(handlers,
-			slog.NewTextHandler(os.Stderr, options),
-		)
+		stdErrHandler = slog.NewTextHandler(os.Stderr, options)
 	case LogFormatJSON:
-		handlers = append(handlers,
-			slogdedup.NewIncrementHandler(
-				slog.NewJSONHandler(os.Stderr, options),
-				nil,
-			),
-		)
+		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
 	case LogFormatGCP:
-		handlers = append(handlers,
-			slogdedup.NewIncrementHandler(
-				slog.NewJSONHandler(os.Stderr, options),
-				&slogdedup.IncrementHandlerOptions{
-					ResolveKey: slogdedup.ResolveKeyStackdriver(&slogdedup.ResolveReplaceOptions{
-						OverwriteSummary: true,
-					}),
-				},
-			),
-		)
-
+		options.ReplaceAttr = sloggcp.ReplaceAttr
+		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
 	}
-	handler := slogctx.NewHandler(
-		slogmulti.Fanout(handlers...),
+
+	stdErrHandler = slogctx.NewHandler(
+		stdErrHandler,
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
 				domainExtractor,
@@ -96,7 +83,15 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 			},
 		},
 	)
-	slog.SetDefault(slog.New(handler))
+
+	otelHandler := otelslog.NewHandler(
+		Name,
+		otelslog.WithLoggerProvider(provider),
+	)
+
+	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
+	logger.Info("structered logger configured", "config_level", cfg.Level, "format", cfg.Format)
+	slog.SetDefault(logger)
 }
 
 const (
