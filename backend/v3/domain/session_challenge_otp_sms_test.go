@@ -448,10 +448,8 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			}
 			err := cmd.Validate(ctx, opts)
 			assert.Equal(t, tt.wantErr, err)
-			if tt.wantErr == nil {
-				assert.Equal(t, tt.wantUser, cmd.User)
-				assert.Equal(t, tt.wantSession, cmd.Session)
-			}
+			assert.Equal(t, tt.wantUser, cmd.User)
+			assert.Equal(t, tt.wantSession, cmd.Session)
 		})
 	}
 }
