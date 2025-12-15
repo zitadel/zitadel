@@ -117,11 +117,7 @@ func (s *Span) SetStatusByError(err error) {
 		return
 	}
 	if err != nil {
-		// trace.WithErrorStatus(codes.Error)
 		s.span.RecordError(err)
-		s.span.SetAttributes(
-			attribute.KeyValue{},
-		)
 	}
 
 	code, msg, id := gerrors.ExtractZITADELError(err)

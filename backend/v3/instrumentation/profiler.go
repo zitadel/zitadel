@@ -27,7 +27,7 @@ func (c *ProfileConfig) SetLegacyConfig(lc *LegacyProfileConfig) {
 	}
 }
 
-func startProfiler(cfg ProfileConfig, sericeName string) error {
+func startProfiler(cfg ProfileConfig, serviceName string) error {
 	typ := cfg.Exporter.Type
 	if typ == ExporterTypeUnspecified || typ == ExporterTypeNone {
 		return nil
@@ -36,7 +36,7 @@ func startProfiler(cfg ProfileConfig, sericeName string) error {
 		return errExporterType(typ, "profiler")
 	}
 	pc := profiler.Config{
-		Service:        sericeName,
+		Service:        serviceName,
 		ServiceVersion: build.Version(),
 		ProjectID:      cfg.Exporter.GoogleProjectID,
 	}

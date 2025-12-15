@@ -86,7 +86,7 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 
 	switch zitadelErr.Kind {
 	case zerrors.KindAlreadyExists:
-		c, lvl = codes.AlreadyExists, slog.LevelError
+		c, lvl = codes.AlreadyExists, slog.LevelWarn
 	case zerrors.KindDeadlineExceeded:
 		c, lvl = codes.DeadlineExceeded, slog.LevelError
 	case zerrors.KindInternal:

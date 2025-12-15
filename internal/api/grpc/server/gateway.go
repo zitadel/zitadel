@@ -209,7 +209,7 @@ func addInterceptors(
 	handler = http_mw.CallDurationHandler(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
-	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.DefaultTraceHandler(handler)
 	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler

@@ -7,7 +7,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func DefaultTelemetryHandler(handler http.Handler) http.Handler {
+func DefaultTraceHandler(handler http.Handler) http.Handler {
 	return TraceHandler(http_utils.Probes...)(handler)
 }
 
