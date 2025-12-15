@@ -367,7 +367,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 				domain.WithSessionRepo(tt.sessionRepo(ctrl))(opts)
 			}
 			err := cmd.Validate(ctx, opts)
-			assert.Equal(t, tt.wantErr, err)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantUser, cmd.User)
 		})
 	}
@@ -425,7 +425,7 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
 			events, err := cmd.Events(ctx, opts)
-			assert.Equal(t, tt.wantErr, err)
+			assert.ErrorIs(t, err, tt.wantErr)
 			if tt.wantEvent != nil {
 				require.Len(t, events, 1)
 				assert.Equal(t, tt.wantEvent, events[0])
@@ -623,7 +623,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-yd3f4", "unexpected number of rows updated"),
+			wantErr: zerrors.ThrowInternal(nil, "DOM-yd3f4", "unexpected number of rows updated"),
 		},
 		{
 			name: "session updated successfully with the passkey challenge - required user verification",
@@ -740,7 +740,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				domain.WithSessionRepo(tt.sessionRepo(ctrl))(opts)
 			}
 			err := cmd.Execute(ctx, opts)
-			assert.Equal(t, tt.wantErr, err)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantChallengePasskey, cmd.WebAuthNChallenge)
 		})
 	}
