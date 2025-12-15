@@ -49,13 +49,11 @@ with domain as (
 		join projections.targets2 t
 			on et.instance_id = t.instance_id
 			and et.target_id = t.id
-		left join lateral (
-            select * from projections.authn_keys2 k
-            where k.instance_id = et.instance_id
+        left join projections.authn_keys2 k
+            on k.instance_id = et.instance_id
             and k.object_id = t.id
             and k.enabled = true
-            and k.expiration IS NULL or k.expiration > now()
-		    limit 1) k on true
+            and (k.expiration IS NULL or k.expiration > now())
 		order by et.position asc
 	) as x
 	group by instance_id

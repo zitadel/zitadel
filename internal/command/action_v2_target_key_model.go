@@ -37,6 +37,11 @@ func (wm *TargetKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.WriteModel.AppendEvents(e)
 		case *target.KeyActivatedEvent:
 			wm.WriteModel.AppendEvents(e)
+		case *target.KeyDeactivatedEvent:
+			if wm.KeyID != e.KeyID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *target.KeyRemovedEvent:
 			if wm.KeyID != e.KeyID {
 				continue

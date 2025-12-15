@@ -99,7 +99,7 @@ func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[act
 
 func (s *Server) DeactivatePublicKey(ctx context.Context, req *connect.Request[action.DeactivatePublicKeyRequest]) (*connect.Response[action.DeactivatePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	changeDate, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	changeDate, err := s.command.DeactivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
 	if err != nil {
 		return nil, err
 	}

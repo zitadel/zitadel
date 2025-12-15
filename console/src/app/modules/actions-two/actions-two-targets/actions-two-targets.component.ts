@@ -74,8 +74,6 @@ export class ActionsTwoTargetsComponent {
       return;
     }
 
-    console.log(request);
-
     try {
       if ('id' in request) {
         await this.actionService.updateTarget(request);
