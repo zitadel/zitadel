@@ -83,21 +83,21 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 
 	// get session
 	sessionRepo := opts.sessionRepo
-	p.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(p.sessionID)))
 	if err := handleGetError(err, "DOM-zy4hYC", objectTypeSession); err != nil {
 		return err
 	}
-	if p.Session.UserID == "" {
+	if session.UserID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "missing user id in session")
 	}
 
 	// retrieve user and their passkeys based on user verification requirement
 	passkeyType := determinePasskeyType(p.RequestChallengePasskey.GetUserVerificationRequirement())
 	userRepo := opts.userRepo.LoadPasskeys()
-	p.User, err = userRepo.Get(
+	user, err := userRepo.Get(
 		ctx,
 		opts.DB(),
-		database.WithCondition(userRepo.IDCondition(p.Session.UserID)),
+		database.WithCondition(userRepo.IDCondition(session.UserID)),
 		database.WithCondition(userRepo.Human().PasskeyTypeCondition(database.NumberOperationEqual, passkeyType)),
 	)
 	if err := handleGetError(err, "DOM-8cGMtd", objectTypeUser); err != nil {
@@ -105,9 +105,12 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 	}
 
 	// ensure user is active
-	if p.User.State != UserStateActive {
+	if user.State != UserStateActive {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "user not active")
 	}
+
+	p.Session = session
+	p.User = user
 
 	return nil
 }
@@ -125,15 +128,15 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 		return err
 	}
 	// set the challenge for CreateSessionResponse
-	p.WebAuthNChallenge = &session_grpc.Challenges_WebAuthN{
+	webAuthNChallenge := &session_grpc.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	if err = json.Unmarshal(credentialAssertionData, p.WebAuthNChallenge.PublicKeyCredentialRequestOptions); err != nil {
+	if err = json.Unmarshal(credentialAssertionData, webAuthNChallenge.PublicKeyCredentialRequestOptions); err != nil {
 		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "failed to unmarshal credential assertion data")
 	}
 
 	// update the session with the passkey challenge
-	p.ChallengePasskey = &SessionChallengePasskey{
+	challengePasskey := &SessionChallengePasskey{
 		Challenge:            sessionData.Challenge,
 		AllowedCredentialIDs: sessionData.AllowedCredentialIDs,
 		UserVerification:     userVerificationDomain,
@@ -145,11 +148,13 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 		ctx,
 		opts.DB(),
 		sessionRepo.IDCondition(p.Session.ID),
-		sessionRepo.SetChallenge(p.ChallengePasskey),
+		sessionRepo.SetChallenge(challengePasskey),
 	)
 	if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-yd3f4", objectTypeSession); err != nil {
 		return err
 	}
+	p.WebAuthNChallenge = webAuthNChallenge
+	p.ChallengePasskey = challengePasskey
 	return nil
 }
 

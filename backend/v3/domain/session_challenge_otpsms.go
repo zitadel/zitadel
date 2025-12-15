@@ -18,7 +18,7 @@ var _ Transactional = (*OTPSMSChallengeCommand)(nil)
 
 type newOTPCodeFunc func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 
-// todo: to be implemented
+// (@grvijayan) todo: to be implemented
 // getActiveSMSProviderFn helps determine whether to generate an internal OTP code or use an external SMS provider.
 // maybe temporary until we figure out how to integrate SMS providers from v1 API
 type getActiveSMSProviderFn func(ctx context.Context, instanceID string) (string, error)
@@ -94,33 +94,35 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 
 	// get session
 	sessionRepo := opts.sessionRepo
-	o.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
 	if err := handleGetError(err, "DOM-2aGWWE", objectTypeSession); err != nil {
 		return err
 	}
-	if o.Session.UserID == "" {
+	if session.UserID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "missing user id in session")
 	}
 
 	// get user
 	userRepo := opts.userRepo
-	o.User, err = userRepo.Get(
+	user, err := userRepo.Get(
 		ctx,
 		opts.DB(),
-		database.WithCondition(userRepo.IDCondition(o.Session.UserID)),
+		database.WithCondition(userRepo.IDCondition(session.UserID)),
 	)
 	if err := handleGetError(err, "DOM-3aGHDs", objectTypeUser); err != nil {
 		return err
 	}
 
 	// validate human user and user phone
-	if o.User.Human == nil || o.User.Human.Phone == nil {
+	if user.Human == nil || user.Human.Phone == nil {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "user phone not configured")
 	}
 	// validate phone OTP is enabled
-	if o.User.Human.Phone.OTP.EnabledAt.IsZero() {
+	if user.Human.Phone.OTP.EnabledAt.IsZero() {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "phone OTP not enabled")
 	}
+	o.Session = session
+	o.User = user
 	return nil
 }
 
@@ -131,23 +133,20 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return nil
 	}
 
+	returnCode := o.RequestChallengeOTPSMS.GetReturnCode()
+
 	// generate phone code
 	code, plain, generatorID, expiry, err := o.createPhoneCode(ctx, opts)
 	if err != nil {
 		return err
 	}
 
-	o.OTPSMSChallenge = new(string)
-	if o.RequestChallengeOTPSMS.ReturnCode {
-		*o.OTPSMSChallenge = plain
-	}
-
 	// update the session with the otp sms challenge
-	o.ChallengeOTPSMS = &SessionChallengeOTPSMS{
+	challengeOTPSMS := &SessionChallengeOTPSMS{
 		LastChallengedAt:  time.Now(),
 		Code:              code,
 		Expiry:            expiry,
-		CodeReturned:      o.RequestChallengeOTPSMS.ReturnCode,
+		CodeReturned:      returnCode,
 		GeneratorID:       generatorID,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
@@ -156,10 +155,14 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		ctx,
 		opts.DB(),
 		sessionRepo.IDCondition(o.Session.ID),
-		sessionRepo.SetChallenge(o.ChallengeOTPSMS),
+		sessionRepo.SetChallenge(challengeOTPSMS),
 	)
 	if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
 		return err
+	}
+	o.ChallengeOTPSMS = challengeOTPSMS
+	if returnCode {
+		o.OTPSMSChallenge = &plain
 	}
 
 	return nil
@@ -202,7 +205,7 @@ func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context, opts *Invo
 		return nil, "", externalID, expiry, nil
 	}
 
-	config, err := getOTPSMSCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig)
+	config, err := getOTPCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig, OTPSMSRequestType)
 	if err != nil {
 		return nil, "", "", expiry, err
 	}
@@ -214,7 +217,7 @@ func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context, opts *Invo
 	return crypted, plain, "", config.Expiry, nil
 }
 
-func getOTPSMSCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
+func getOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig, otpType OTPRequestType) (*crypto.GeneratorConfig, error) {
 	settingsRepo := opts.secretGeneratorSettingsRepo
 	cfg, err := settingsRepo.Get(
 		ctx,
@@ -222,7 +225,7 @@ func getOTPSMSCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID s
 		database.WithCondition(
 			database.And(
 				settingsRepo.InstanceIDCondition(instanceID),
-				database.NewTextCondition( // todo: check TypeCondition
+				database.NewTextCondition( // (@grvijayan) todo: check TypeCondition
 					settingsRepo.TypeColumn(),
 					database.TextOperationEqual,
 					SettingTypeSecretGenerator.String(),
@@ -230,20 +233,35 @@ func getOTPSMSCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID s
 			),
 		),
 	)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "DOM-kAcM0U", "failed to get OTP SMS secret generator config")
+	if err := handleGetError(err, "DOM-x7Yd3E", "secret_generator_settings"); err != nil {
+		return nil, err
 	}
 
-	if cfg.State != SettingStateActive || cfg.OTPSMS == nil {
+	if cfg.State != SettingStateActive {
 		return defaultConfig, nil
 	}
 
+	var attrs SecretGeneratorAttrsWithExpiry
+	switch otpType {
+	case OTPSMSRequestType:
+		if cfg.OTPSMS == nil {
+			return defaultConfig, nil
+		}
+		attrs = cfg.OTPSMS.SecretGeneratorAttrsWithExpiry
+	case OTPEmailRequestType:
+		if cfg.OTPEmail == nil {
+			return defaultConfig, nil
+		}
+		attrs = cfg.OTPEmail.SecretGeneratorAttrsWithExpiry
+	default:
+		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "invalid otp request type")
+	}
 	return &crypto.GeneratorConfig{
-		Length:              *cfg.OTPSMS.Length,
-		Expiry:              *cfg.OTPSMS.Expiry,
-		IncludeLowerLetters: *cfg.OTPSMS.IncludeLowerLetters,
-		IncludeUpperLetters: *cfg.OTPSMS.IncludeUpperLetters,
-		IncludeDigits:       *cfg.OTPSMS.IncludeDigits,
-		IncludeSymbols:      *cfg.OTPSMS.IncludeSymbols,
+		Length:              *attrs.Length,
+		Expiry:              *attrs.Expiry,
+		IncludeLowerLetters: *attrs.IncludeLowerLetters,
+		IncludeUpperLetters: *attrs.IncludeUpperLetters,
+		IncludeDigits:       *attrs.IncludeDigits,
+		IncludeSymbols:      *attrs.IncludeSymbols,
 	}, nil
 }

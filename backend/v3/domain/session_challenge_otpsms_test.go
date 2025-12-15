@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -82,7 +83,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
@@ -104,7 +105,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
@@ -126,7 +127,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "",
 					}, nil)
@@ -150,7 +151,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -158,15 +159,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -174,7 +166,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
@@ -196,7 +188,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -204,15 +196,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -220,7 +203,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
@@ -242,7 +225,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -250,15 +233,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -266,7 +240,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -294,7 +268,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -302,15 +276,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -318,7 +283,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -349,7 +314,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -357,15 +322,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -373,7 +329,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -407,7 +363,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID:     "user-id",
 						InstanceID: "instance-id",
@@ -417,15 +373,6 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -433,7 +380,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -617,6 +564,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 		smsProviderFn               func(ctx context.Context, instanceID string) (string, error)
 		newPhoneCodeFn              func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 		wantErr                     error
+		wantOTPSMSChallenge         string
 	}{
 		{
 			name:                   "no otp sms challenge request",
@@ -661,11 +609,11 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 								),
 							),
 						),
-					).AnyTimes().
+					).Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-kAcM0U", "failed to get OTP SMS secret generator config"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "failed fetching secret_generator_settings"),
 		},
 		{
 			name:                   "failed to generate code",
@@ -676,7 +624,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			secretGeneratorConfig: &crypto.GeneratorConfig{
 				Expiry: defaultExpiry,
 			},
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return nil, "", codeErr
@@ -704,12 +652,12 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
@@ -726,14 +674,14 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -753,15 +701,16 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
+			wantOTPSMSChallenge: "code",
 		},
 		{
 			name: "update successful - internal sms provider - with default config",
@@ -775,14 +724,14 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview, domain.OTPSMSRequestType),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -802,15 +751,66 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
+			wantOTPSMSChallenge: "code",
+		},
+		{
+			name: "update successful - internal sms provider - missing SMS OTP config - with default config",
+			requestChallengeOTPSMS: &session_grpc.RequestChallenges_OTPSMS{
+				ReturnCode: true,
+			},
+			smsProviderFn: func(ctx context.Context, instanceID string) (string, error) {
+				return "", nil
+			},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: defaultExpiry,
+			},
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, 2),
+			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
+				return &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				}, "code", nil
+			},
+			session: &domain.Session{
+				ID: "session-id",
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewMockSessionRepository(ctrl)
+				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "enc",
+						KeyID:      "id",
+						Crypted:    []byte("code"),
+					},
+					Expiry:       defaultExpiry,
+					CodeReturned: true,
+					GeneratorID:  "",
+				}
+				repo.EXPECT().
+					SetChallenge(gomock.Any()).
+					Times(1).
+					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+				idCondition := getSessionIDCondition(repo, "session-id")
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Times(1).
+					Return(int64(1), nil)
+				return repo
+			},
+			wantOTPSMSChallenge: "code",
 		},
 		{
 			name: "failed to update session",
@@ -824,14 +824,14 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -851,12 +851,12 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(0), assert.AnError)
 				return repo
 			},
@@ -874,14 +874,14 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -901,12 +901,12 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(0), nil)
 				return repo
 			},
@@ -924,14 +924,14 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -951,12 +951,12 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(2), nil)
 				return repo
 			},
@@ -989,6 +989,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			}
 			err := cmd.Execute(ctx, opts)
 			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.wantOTPSMSChallenge, gu.Value(cmd.OTPSMSChallenge))
 		})
 	}
 }

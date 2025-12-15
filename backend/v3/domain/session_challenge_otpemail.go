@@ -80,33 +80,36 @@ func (o *OTPEmailChallengeCommand) Validate(ctx context.Context, opts *InvokeOpt
 
 	// get session
 	sessionRepo := opts.sessionRepo
-	o.Session, err = sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(o.sessionID)))
 	if err := handleGetError(err, "DOM-JArUai", objectTypeSession); err != nil {
 		return err
 	}
-	if o.Session.UserID == "" {
+	if session.UserID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-wG2XoJ", "missing user id in session")
 	}
 
 	// get user
 	userRepo := opts.userRepo
-	o.User, err = userRepo.Get(
+	user, err := userRepo.Get(
 		ctx,
 		opts.DB(),
-		database.WithCondition(userRepo.IDCondition(o.Session.UserID)),
+		database.WithCondition(userRepo.IDCondition(session.UserID)),
 	)
 	if err := handleGetError(err, "DOM-56MWkg", objectTypeUser); err != nil {
 		return err
 	}
 
 	// validate human user and user email
-	if o.User.Human == nil || o.User.Human.Email.Address == "" {
+	if user.Human == nil || user.Human.Email.Address == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "user email not configured")
 	}
 	// validate email OTP is enabled
-	if o.User.Human.Email.OTP.EnabledAt.IsZero() {
+	if user.Human.Email.OTP.EnabledAt.IsZero() {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4q", "email OTP not enabled")
 	}
+
+	o.Session = session
+	o.User = user
 
 	return nil
 }
@@ -137,7 +140,7 @@ func (o *OTPEmailChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts
 	}
 
 	// prepare the otp email challenge
-	err := o.prepareOTPEmailChallenge(ctx, opts)
+	challengeOTPEmail, otpEmailChallenge, err := o.prepareOTPEmailChallenge(ctx, opts)
 	if err != nil {
 		return err
 	}
@@ -148,52 +151,56 @@ func (o *OTPEmailChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts
 		ctx,
 		opts.DB(),
 		sessionRepo.IDCondition(o.Session.ID),
-		sessionRepo.SetChallenge(o.ChallengeOTPEmail),
+		sessionRepo.SetChallenge(challengeOTPEmail),
 	)
 	if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-YfQIA3", objectTypeSession); err != nil {
 		return err
+	}
+	o.ChallengeOTPEmail = challengeOTPEmail
+	if otpEmailChallenge != "" { // only set when the delivery type is ReturnCode
+		o.OTPEmailChallenge = &otpEmailChallenge
 	}
 
 	return nil
 }
 
 // prepareOTPEmailChallenge generates the OTP email challenge based on the delivery type in the request.
-func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context, opts *InvokeOpts) error {
+func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context, opts *InvokeOpts) (*SessionChallengeOTPEmail, string, error) {
 	// generate email code
-	config, err := getOTPEmailCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig)
+	config, err := getOTPCryptoGeneratorConfigWithDefault(ctx, o.instanceID, opts, o.defaultSecretGeneratorConfig, OTPEmailRequestType)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 	codeGenerator := crypto.NewEncryptionGenerator(*config, o.otpAlg)
 	crypted, plain, err := o.newEmailCode(codeGenerator)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 
-	o.ChallengeOTPEmail = &SessionChallengeOTPEmail{
+	challengeOTPEmail := &SessionChallengeOTPEmail{
 		LastChallengedAt:  time.Now(),
 		Code:              crypted,
 		Expiry:            config.Expiry,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 
-	o.OTPEmailChallenge = new(string)
+	var otpEmailChallenge string
 	switch t := o.RequestChallengeOTPEmail.GetDeliveryType().(type) {
 	case *session_grpc.RequestChallenges_OTPEmail_SendCode_:
 		urlTmpl := t.SendCode.GetUrlTemplate()
-		if err := renderURLTemplate(io.Discard, urlTmpl); err != nil {
-			return err
+		if err := validateURLTemplate(io.Discard, urlTmpl); err != nil {
+			return nil, "", err
 		}
-		o.ChallengeOTPEmail.URLTmpl = urlTmpl
+		challengeOTPEmail.URLTmpl = urlTmpl
 	case *session_grpc.RequestChallenges_OTPEmail_ReturnCode_:
-		o.ChallengeOTPEmail.CodeReturned = true
-		*o.OTPEmailChallenge = plain
+		challengeOTPEmail.CodeReturned = true
+		otpEmailChallenge = plain
 	case nil:
 		// no additional action needed
 	default:
-		return zerrors.ThrowUnimplementedf(nil, "DOM-cc1bRa", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
+		return nil, "", zerrors.ThrowUnimplementedf(nil, "DOM-cc1bRa", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
 	}
-	return nil
+	return challengeOTPEmail, otpEmailChallenge, nil
 }
 
 // String implements [Commander].
@@ -204,8 +211,8 @@ func (o *OTPEmailChallengeCommand) String() string {
 // RequiresTransaction implements [Transactional].
 func (o *OTPEmailChallengeCommand) RequiresTransaction() {}
 
-// renderURLTemplate renders the given URL template with sample data to validate its correctness.
-func renderURLTemplate(w io.Writer, tmpl string) error {
+// validateURLTemplate renders the given URL template with sample data to validate its correctness.
+func validateURLTemplate(w io.Writer, tmpl string) error {
 	otpEmailURLData := &struct {
 		Code              string
 		UserID            string
@@ -229,36 +236,4 @@ func renderURLTemplate(w io.Writer, tmpl string) error {
 		return zerrors.ThrowInvalidArgument(err, "DOM-F5Yv8l", "invalid URL template")
 	}
 	return nil
-}
-
-func getOTPEmailCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
-	settingsRepo := opts.secretGeneratorSettingsRepo
-	cfg, err := settingsRepo.Get(
-		ctx,
-		opts.DB(),
-		database.WithCondition(
-			database.And(
-				settingsRepo.InstanceIDCondition(instanceID),
-				database.NewTextCondition( // todo: check TypeCondition
-					settingsRepo.TypeColumn(),
-					database.TextOperationEqual,
-					SettingTypeSecretGenerator.String(),
-				),
-			),
-		),
-	)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "DOM-x7Yd3E", "failed to get OTP email secret generator config")
-	}
-	if cfg.State != SettingStateActive || cfg.OTPEmail == nil {
-		return defaultConfig, nil
-	}
-	return &crypto.GeneratorConfig{
-		Length:              *cfg.OTPEmail.Length,
-		Expiry:              *cfg.OTPEmail.Expiry,
-		IncludeLowerLetters: *cfg.OTPEmail.IncludeLowerLetters,
-		IncludeUpperLetters: *cfg.OTPEmail.IncludeUpperLetters,
-		IncludeDigits:       *cfg.OTPEmail.IncludeDigits,
-		IncludeSymbols:      *cfg.OTPEmail.IncludeSymbols,
-	}, nil
 }

@@ -47,7 +47,7 @@ func UserVerificationFromDomain(verification old_domain.UserVerificationRequirem
 	}
 }
 
-// todo: we could use the protocol.UserVerificationRequirement type directly
+// (@grvijayan) todo: we could use the protocol.UserVerificationRequirement type directly
 // in session_factor.SessionChallengePasskey to avoid the intermediate conversion to the type in old domain.
 func UserVerificationRequirementToDomain(req session_grpc.UserVerificationRequirement) old_domain.UserVerificationRequirement {
 	switch req {

@@ -70,7 +70,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
@@ -89,7 +89,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
@@ -108,7 +108,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "",
 					}, nil)
@@ -129,7 +129,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -137,15 +137,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -153,7 +144,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
@@ -172,7 +163,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -180,15 +171,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -196,7 +178,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
@@ -215,7 +197,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -223,15 +205,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -239,7 +212,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -264,7 +237,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -272,15 +245,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -288,7 +252,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -316,7 +280,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -324,15 +288,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -340,7 +295,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -374,7 +329,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID: "user-id",
 					}, nil)
@@ -382,15 +337,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -398,7 +344,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -433,7 +379,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 							getSessionIDCondition(repo, "session-id"),
 						),
 					)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.Session{
 						UserID:     "user-id",
 						InstanceID: "instance-id",
@@ -443,15 +389,6 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				repo := domainmock.NewMockUserRepository(ctrl)
-				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
-				repo.EXPECT().
-					LoadPasskeys().
-					AnyTimes().
-					Return(repo)
-				repo.EXPECT().
-					Human().
-					AnyTimes().
-					Return(humanRepo)
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
@@ -459,7 +396,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 								getUserIDCondition(repo, "user-id"),
 							),
 						)).
-					AnyTimes().
+					Times(1).
 					Return(&domain.User{
 						InstanceID:     "instance-id",
 						OrganizationID: "org-id",
@@ -526,10 +463,8 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			}
 			err := cmd.Validate(ctx, opts)
 			assert.Equal(t, tt.wantErr, err)
-			if tt.wantErr == nil {
-				assert.Equal(t, tt.wantUser, cmd.User)
-				assert.Equal(t, tt.wantSession, cmd.Session)
-			}
+			assert.Equal(t, tt.wantUser, cmd.User)
+			assert.Equal(t, tt.wantSession, cmd.Session)
 		})
 	}
 }
@@ -664,6 +599,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 		otpAlgorithm                crypto.EncryptionAlgorithm
 		newEmailCodeFn              func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 		wantErr                     error
+		wantOTPEmailChallenge       string
 	}{
 		{
 			name:                     "no otp email challenge request",
@@ -691,18 +627,18 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 								),
 							),
 						),
-					).AnyTimes().
+					).Times(1).
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "failed to get OTP email secret generator config"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "failed fetching secret_generator_settings"),
 		},
 		{
 			name:                        "failed to generate code",
 			requestChallengeOTPEmail:    &session_grpc.RequestChallenges_OTPEmail{},
 			secretGeneratorConfig:       &crypto.GeneratorConfig{},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return nil, "", codeErr
 			},
@@ -719,14 +655,14 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			secretGeneratorConfig:       &crypto.GeneratorConfig{},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -742,7 +678,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Expiry: expiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -768,12 +704,12 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(0), assert.AnError)
 				return repo
 			},
@@ -793,7 +729,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Length: uint(6),
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -819,12 +755,12 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(0), nil)
 				return repo
 			},
@@ -839,7 +775,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -866,12 +802,12 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(2), nil)
 				return repo
 			},
@@ -886,14 +822,14 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -913,15 +849,16 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
+			wantOTPEmailChallenge: "code", // OTPEmailChallenge is only set when the delivery type is return code
 		},
 		{
 			name: "update session succeeded - delivery type send code",
@@ -936,14 +873,14 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -963,12 +900,12 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
@@ -980,14 +917,14 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -1007,12 +944,12 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
@@ -1029,14 +966,14 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				IncludeSymbols:      false,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview, domain.OTPEmailRequestType),
 			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
 					Algorithm:  "enc",
 					KeyID:      "id",
 					Crypted:    []byte("code"),
-				}, "", nil
+				}, "code", nil
 			},
 			session: &domain.Session{
 				ID: "session-id",
@@ -1056,12 +993,61 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				}
 				repo.EXPECT().
 					SetChallenge(gomock.Any()).
-					AnyTimes().
+					Times(1).
 					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
-					AnyTimes().
+					Times(1).
+					Return(int64(1), nil)
+				return repo
+			},
+		},
+		{
+			name:                     "update session succeeded - with default config when OTP email settings not found",
+			requestChallengeOTPEmail: &session_grpc.RequestChallenges_OTPEmail{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry:              defaultExpiry,
+				Length:              uint(8),
+				IncludeLowerLetters: false,
+				IncludeUpperLetters: true,
+				IncludeDigits:       true,
+				IncludeSymbols:      false,
+			},
+			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, 2),
+			newEmailCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
+				return &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				}, "code", nil
+			},
+			session: &domain.Session{
+				ID: "session-id",
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewMockSessionRepository(ctrl)
+				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+					Code: &crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "enc",
+						KeyID:      "id",
+						Crypted:    []byte("code"),
+					},
+					Expiry:       defaultExpiry,
+					CodeReturned: false,
+					URLTmpl:      "",
+				}
+				repo.EXPECT().
+					SetChallenge(gomock.Any()).
+					Times(1).
+					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+				idCondition := getSessionIDCondition(repo, "session-id")
+				repo.EXPECT().
+					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
@@ -1094,11 +1080,46 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			}
 			err := cmd.Execute(ctx, opts)
 			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.wantOTPEmailChallenge, gu.Value(cmd.OTPEmailChallenge))
 		})
 	}
 }
 
-func secretGeneratorSettingsRepo(state domain.SettingState) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
+func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPRequestType) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
+	var attrs domain.SecretGeneratorSettingsAttributes
+	switch otpType {
+	case domain.OTPEmailRequestType:
+		attrs = domain.SecretGeneratorSettingsAttributes{
+			OTPEmail: &domain.OTPEmailAttributes{
+				SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
+					Expiry: gu.Ptr(30 * time.Minute),
+					SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
+						Length:              gu.Ptr(uint(8)),
+						IncludeLowerLetters: gu.Ptr(true),
+						IncludeUpperLetters: gu.Ptr(false),
+						IncludeDigits:       gu.Ptr(true),
+						IncludeSymbols:      gu.Ptr(false),
+					},
+				},
+			},
+		}
+	case domain.OTPSMSRequestType:
+		attrs = domain.SecretGeneratorSettingsAttributes{
+			OTPSMS: &domain.OTPSMSAttributes{
+				SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
+					Expiry: gu.Ptr(30 * time.Minute),
+					SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
+						Length:              gu.Ptr(uint(6)),
+						IncludeLowerLetters: gu.Ptr(true),
+						IncludeUpperLetters: gu.Ptr(false),
+						IncludeDigits:       gu.Ptr(true),
+						IncludeSymbols:      gu.Ptr(false),
+					},
+				},
+			},
+		}
+	}
+
 	return func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
 		repo := domainmock.NewMockSecretGeneratorSettingsRepository(ctrl)
 		repo.EXPECT().
@@ -1115,37 +1136,12 @@ func secretGeneratorSettingsRepo(state domain.SettingState) func(ctrl *gomock.Co
 						),
 					),
 				),
-			).AnyTimes().
+			).Times(1).
 			Return(&domain.SecretGeneratorSettings{
 				Settings: domain.Settings{
 					State: state,
 				},
-				SecretGeneratorSettingsAttributes: domain.SecretGeneratorSettingsAttributes{
-					OTPEmail: &domain.OTPEmailAttributes{
-						SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
-							Expiry: gu.Ptr(30 * time.Minute),
-							SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
-								Length:              gu.Ptr(uint(8)),
-								IncludeLowerLetters: gu.Ptr(true),
-								IncludeUpperLetters: gu.Ptr(false),
-								IncludeDigits:       gu.Ptr(true),
-								IncludeSymbols:      gu.Ptr(false),
-							},
-						},
-					},
-					OTPSMS: &domain.OTPSMSAttributes{
-						SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
-							Expiry: gu.Ptr(30 * time.Minute),
-							SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
-								Length:              gu.Ptr(uint(6)),
-								IncludeLowerLetters: gu.Ptr(true),
-								IncludeUpperLetters: gu.Ptr(false),
-								IncludeDigits:       gu.Ptr(true),
-								IncludeSymbols:      gu.Ptr(false),
-							},
-						},
-					},
-				},
+				SecretGeneratorSettingsAttributes: attrs,
 			}, nil)
 		return repo
 	}
@@ -1156,7 +1152,7 @@ func getSettingsInstanceIDCondition(repo *domainmock.MockSecretGeneratorSettings
 
 	repo.EXPECT().
 		InstanceIDCondition(instanceID).
-		AnyTimes().
+		Times(1).
 		Return(instanceIDCondition)
 	return instanceIDCondition
 }
@@ -1164,7 +1160,7 @@ func getSettingsInstanceIDCondition(repo *domainmock.MockSecretGeneratorSettings
 func getSettingsTypeColumn(repo *domainmock.MockSecretGeneratorSettingsRepository) database.Column {
 	repo.EXPECT().
 		TypeColumn().
-		AnyTimes().
+		Times(1).
 		Return(database.NewColumn("zitadel.settings", "type"))
 	return database.NewColumn("zitadel.settings", "type")
 }
