@@ -1071,6 +1071,6 @@ func TestServer_RemovePublicKey(t *testing.T) {
 	}
 }
 
-func assertDateWithinRangeClockSkew(t *testing.T, actual time.Time, start, end time.Time) {
+func assertDateWithinRangeClockSkew(t assert.TestingT, actual time.Time, start, end time.Time) {
 	assert.WithinRange(t, actual, start.Add(-time.Second), end.Add(time.Second))
 }

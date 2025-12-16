@@ -1104,8 +1104,23 @@ func TestServer_ListPublicKeys(t *testing.T) {
 					return
 				}
 				assert.NoError(ttt, err)
+				assertPublicKeys(ttt, tt.want, got)
 				assert.EqualExportedValues(ttt, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected public keys")
 		})
+	}
+}
+
+func assertPublicKeys(ttt *assert.CollectT, want *action.ListPublicKeysResponse, got *action.ListPublicKeysResponse) {
+	assert.EqualExportedValues(ttt, want.Pagination, got.Pagination)
+	assert.Len(ttt, got.PublicKeys, len(want.PublicKeys))
+	for i := range want.PublicKeys {
+		assert.Equal(ttt, want.PublicKeys[i].GetKeyId(), got.PublicKeys[i].GetKeyId())
+		assert.Equal(ttt, want.PublicKeys[i].GetActive(), got.PublicKeys[i].GetActive())
+		assert.Equal(ttt, want.PublicKeys[i].GetFingerprint(), got.PublicKeys[i].GetFingerprint())
+		assert.Equal(ttt, want.PublicKeys[i].GetPublicKey(), got.PublicKeys[i].GetPublicKey())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetExpirationDate().AsTime(), want.PublicKeys[i].GetExpirationDate().AsTime(), want.PublicKeys[i].GetExpirationDate().AsTime())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetCreationDate().AsTime(), want.PublicKeys[i].GetCreationDate().AsTime(), want.PublicKeys[i].GetCreationDate().AsTime())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetChangeDate().AsTime(), want.PublicKeys[i].GetChangeDate().AsTime(), want.PublicKeys[i].GetChangeDate().AsTime())
 	}
 }
