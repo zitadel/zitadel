@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -21,13 +21,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let { loginName, organization, requestId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
 
     if (org) {
       defaultOrganization = org.id;
@@ -37,9 +35,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // also allow no session to be found (ignoreUnkownUsername)
   let sessionFactors;
   try {
-    sessionFactors = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
+    sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: {
         loginName,
         organization,
       },
@@ -49,13 +45,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
   });
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization,
   });
 
   return (
