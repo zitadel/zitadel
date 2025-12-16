@@ -18,7 +18,7 @@ type LegacyProfileConfig struct {
 
 func (c *ProfileConfig) SetLegacyConfig(lc *LegacyProfileConfig) {
 	typ := c.Exporter.Type
-	if lc == nil || typ != ExporterTypeUnspecified && typ != ExporterTypeNone {
+	if lc == nil || typ.isNone() {
 		return
 	}
 	if lc.Type == "google" {
@@ -29,7 +29,7 @@ func (c *ProfileConfig) SetLegacyConfig(lc *LegacyProfileConfig) {
 
 func startProfiler(cfg ProfileConfig, serviceName string) error {
 	typ := cfg.Exporter.Type
-	if typ == ExporterTypeUnspecified || typ == ExporterTypeNone {
+	if typ.isNone() {
 		return nil
 	}
 	if typ != ExporterTypeGoogle {

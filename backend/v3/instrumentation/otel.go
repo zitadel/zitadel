@@ -37,6 +37,11 @@ const (
 	ExporterTypePrometheus
 )
 
+// isNone returns true if the ExporterType is either Unspecified or None.
+func (e ExporterType) isNone() bool {
+	return e == ExporterTypeUnspecified || e == ExporterTypeNone
+}
+
 type ExporterConfig struct {
 	Type            ExporterType
 	Endpoint        string

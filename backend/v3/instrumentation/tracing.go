@@ -36,7 +36,7 @@ type LegacyTraceConfig struct {
 // If the Type field is already set to a value other than [ExporterTypeNone], the legacy config is ignored.
 func (c *TraceConfig) SetLegacyConfig(lc *LegacyTraceConfig) {
 	typ := c.Exporter.Type
-	if lc == nil || typ != ExporterTypeUnspecified && typ != ExporterTypeNone {
+	if lc == nil || typ.isNone() {
 		return
 	}
 	typeMap := map[string]ExporterType{
