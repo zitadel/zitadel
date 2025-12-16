@@ -19,6 +19,7 @@ LEFT JOIN LATERAL (
     WHERE
         projections.user_auth_methods5.user_id = projections.users14.id
         AND projections.user_auth_methods5.instance_id = projections.users14.instance_id
+        AND projections.user_auth_methods5.state = 2
     ) AS user_auth_methods5 ON TRUE
 WHERE
     projections.users14.id = $1
