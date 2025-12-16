@@ -37,18 +37,6 @@ export default async function Page(props: {
     },
   });
 
-  // Get user information to check verification status
-  let phoneVerified = false;
-  let emailVerified = false;
-  if (session?.factors?.user?.id) {
-    const userResponse = await getUserByID({ serviceConfig, userId: session.factors.user.id });
-    if (userResponse?.user?.type.case === "human") {
-      const humanUser = userResponse.user.type.value;
-      phoneVerified = humanUser.phone?.isVerified ?? false;
-      emailVerified = humanUser.email?.isVerified ?? false;
-    }
-  }
-
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
@@ -98,37 +86,13 @@ export default async function Page(props: {
     if (requestId) {
       paramsToContinue.append("requestId", requestId);
     }
-
-    // Check if contact method needs verification
-    const needsVerification = 
-      (method === "sms" && !phoneVerified) || 
-      (method === "email" && !emailVerified);
-
-    if (needsVerification) {
-      // Contact method is not verified, redirect to OTP verification
-      urlToContinue = `/otp/${method}?` + paramsToContinue;
+    // Contact method is not verified, redirect to OTP verification
+    urlToContinue = `/otp/${method}?` + paramsToContinue;
+    // immediately check the OTP on the next page if sms or email was set up
+    if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
-    } else {
-      // Contact is already verified, skip OTP verification and go to login flow
-      if (requestId && sessionId) {
-        const loginParams = new URLSearchParams();
-        if (sessionId) {
-          loginParams.append("sessionId", sessionId);
-        }
-        if (loginName) {
-          loginParams.append("loginName", loginName);
-        }
-        if (organization) {
-          loginParams.append("organization", organization);
-        }
-        if (requestId) {
-          loginParams.append("authRequest", requestId);
-        }
-        urlToContinue = `/login?` + loginParams;
-      } else if (loginName) {
-        urlToContinue = `/signedin?` + paramsToContinue;
-      }
     }
+    
   } else if (requestId && sessionId) {
     if (requestId) {
       paramsToContinue.append("authRequest", requestId);
