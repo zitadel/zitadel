@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekty",
-      "DESCRIPTION": "Projekt gości jedną lub więcej aplikacji, których możesz użyć do uwierzytelniania swoich użytkowników. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do twoich aplikacji, udziel im dostępu do twojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą z odpowiednimi uprawnieniami, aby uzyskać dostęp.",
+      "DESCRIPTION": "Projekt gości jedną lub więcej aplikacji, których możesz użyć do uwierzytelniania swoich użytkowników. Na przykład, możesz mieć jeden projekt z 3 aplikacjami; jedną dla swojego frontendu internetowego, jedną dla swojej aplikacji mobilnej i jedną dla swojego backendu. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do twoich aplikacji, udziel im dostępu do twojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą z odpowiednimi uprawnieniami, aby uzyskać dostęp.",
       "OWNED": {
         "TITLE": "Posiadane projekty",
         "DESCRIPTION": "To są projekty, które posiadasz. Możesz zarządzać ustawieniami tych projektów, uprawnieniami i aplikacjami."
@@ -1550,7 +1550,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1800,7 +1801,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2887,7 +2889,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

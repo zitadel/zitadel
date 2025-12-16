@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Proyek",
-      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
+      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Misalnya, Anda mungkin memiliki satu proyek dengan 3 aplikasi; satu untuk frontend web Anda, satu untuk aplikasi seluler Anda, dan satu untuk backend Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
       "OWNED": {
         "TITLE": "Proyek Milik",
         "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, otorisasi, dan aplikasi proyek ini."
@@ -1550,7 +1550,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1800,7 +1801,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2883,7 +2885,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",
