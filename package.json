@@ -1,5 +1,5 @@
 {
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.26.0",
   "private": true,
   "name": "@zitadel/zitadel",
   "scripts": {
