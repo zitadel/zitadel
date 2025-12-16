@@ -34,13 +34,13 @@ func TestGetInstanceCommand_Validate(t *testing.T) {
 			name:            "empty instance id, error",
 			inputInstanceID: "",
 			ctx:             context.Background(),
-			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "invalid instance ID"),
+			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "Errors.Instance.ID"),
 		},
 		{
 			name:            "whitespace instance id, error",
 			inputInstanceID: "   ",
 			ctx:             context.Background(),
-			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "invalid instance ID"),
+			expectedError:   zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "Errors.Instance.ID"),
 		},
 		{
 			name:            "instance id mismatch, error",
@@ -62,7 +62,7 @@ func TestGetInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance1",
 			ctx:             authz.NewMockContext("instance1", "", ""),
-			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-Uq6b00", "permission denied"),
+			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-Uq6b00", "Errors.PermissionDenied"),
 		},
 		{
 			name: "valid instance id, success",
@@ -142,7 +142,7 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID: "instance-1",
-			expectedError:   zerrors.ThrowInternal(getErr, "DOM-lvsRce", "failed fetching instance"),
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-lvsRce", "Errors.Instance.Get"),
 		},
 		{
 			testName: "when instance is not found should return not found error",

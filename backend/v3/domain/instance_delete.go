@@ -70,11 +70,11 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 		if errors.Is(err, &database.NoRowFoundError{}) {
 			return nil
 		}
-		return zerrors.ThrowInternal(err, "DOM-caF4Vs", "failed deleting instance")
+		return zerrors.ThrowInternal(err, "DOM-caF4Vs", "Errors.Instance.Delete")
 	}
 
 	if deletedRows > 1 {
-		err = zerrors.ThrowInternalf(nil, "DOM-Od04Jx", "expecting 1 row deleted, got %d", deletedRows)
+		err = zerrors.ThrowInternal(nil, "DOM-Od04Jx", "Errors.Instsance.DeleteMismatch")
 		return err
 	}
 
@@ -99,7 +99,7 @@ func (d *DeleteInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Yz8f1X", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Yz8f1X", "Errors.PermissionDenied")
 	}
 
 	return nil

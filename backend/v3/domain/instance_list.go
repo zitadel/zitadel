@@ -41,7 +41,7 @@ func (l *ListInstancesQuery) Execute(ctx context.Context, opts *InvokeOpts) (err
 
 	instances, err := instanceRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-AIRPxN", "failed fetching instances")
+		return zerrors.ThrowInternal(err, "DOM-AIRPxN", "Errors.Instance.List")
 	}
 
 	l.toReturn = instances
@@ -115,7 +115,7 @@ func (l *ListInstancesQuery) Validate(ctx context.Context, opts *InvokeOpts) (er
 	// the instance in context. In here, instead we should probably loop through all retrieved
 	// instances and check their permissions.
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-cuT6Ws", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-cuT6Ws", "Errors.PermissionDenied")
 	}
 
 	return nil

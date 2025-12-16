@@ -161,7 +161,7 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 					}}},
 				},
 			},
-			expectedError: zerrors.ThrowInternal(listErr, "DOM-AIRPxN", "failed fetching instances"),
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-AIRPxN", "Errors.Instance.List"),
 		},
 		{
 			testName: "when listing instances succeeds should save into result and return nil",
@@ -288,7 +288,7 @@ func TestListInstancesCommand_Validate(t *testing.T) {
 
 				return permChecker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-cuT6Ws", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-cuT6Ws", "Errors.PermissionDenied"),
 		},
 		{
 			name: "when valid permission should return no error",

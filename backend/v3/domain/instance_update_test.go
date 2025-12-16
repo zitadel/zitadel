@@ -37,13 +37,13 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			testName:          "when no ID should return invalid argument error",
 			inputInstanceID:   "",
 			inputInstanceName: "test-name",
-			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "invalid instance ID"),
+			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "Errors.Instance.ID"),
 		},
 		{
 			testName:          "when no name shuld return invalid argument error",
 			inputInstanceID:   "test-id",
 			inputInstanceName: "",
-			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "invalid instance name"),
+			expectedError:     zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "Errors.Instance.Name"),
 		},
 		{
 			testName: "when user is missing permission should return permission denied",
@@ -59,7 +59,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID:   "instance-1",
 			inputInstanceName: "test instance update",
-			expectedError:     zerrors.ThrowPermissionDenied(permissionErr, "DOM-M5ObLP", "permission denied"),
+			expectedError:     zerrors.ThrowPermissionDenied(permissionErr, "DOM-M5ObLP", "Errors.PermissionDenied"),
 		},
 		{
 			testName: "when retrieving instance fails should return error",
@@ -87,7 +87,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID:   "instance-1",
 			inputInstanceName: "test instance update",
-			expectedError:     zerrors.ThrowInternal(getErr, "DOM-j05Hdo", "failed fetching instance"),
+			expectedError:     zerrors.ThrowInternal(getErr, "DOM-j05Hdo", "Errors.Instance.Get"),
 		},
 		{
 			testName: "when instance name is not changed should return name not changed error",
@@ -209,7 +209,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: zerrors.ThrowInternal(updateErr, "DOM-PkVMNR", "failed updating instance"),
+			expectedError: zerrors.ThrowInternal(updateErr, "DOM-PkVMNR", "Errors.Instance.Update"),
 		},
 		{
 			testName:  "when instance update returns 0 rows updated should return not found error",
@@ -243,7 +243,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 			},
 			inputID:       "instance-1",
 			inputName:     "test instance update",
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-HlrNmD", "unexpected number of rows updated"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch"),
 		},
 		{
 			testName: "when instance update returns 1 row updated should return no error and set non-primary verified domain",

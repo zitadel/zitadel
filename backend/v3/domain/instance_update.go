@@ -57,7 +57,7 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 		database.NewChange(instanceRepo.NameColumn(), u.Name),
 	)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-PkVMNR", "failed updating instance")
+		return zerrors.ThrowInternal(err, "DOM-PkVMNR", "Errors.Instance.Update")
 	}
 
 	if updateCount == 0 {
@@ -65,7 +65,7 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 		return err
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "unexpected number of rows updated")
+		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch")
 		return err
 	}
 
@@ -80,21 +80,21 @@ func (u *UpdateInstanceCommand) String() string {
 // Validate implements [Commander]
 func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
 	if u.ID = strings.TrimSpace(u.ID); u.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "invalid instance ID")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-wSs6kG", "Errors.Instance.ID")
 	}
 	if u.Name = strings.TrimSpace(u.Name); u.Name == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "invalid instance name")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "Errors.Instance.Name")
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "Errors.PermissionDenied")
 	}
 
 	instanceRepo := opts.instanceRepo
 
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(u.ID)))
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-j05Hdo", "failed fetching instance")
+		return zerrors.ThrowInternal(err, "DOM-j05Hdo", "Errors.Instance.Get")
 	}
 
 	u.ShouldSkipUpdate = instance.Name == u.Name

@@ -52,7 +52,7 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 
 				return permChecker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-Yz8f1X", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-Yz8f1X", "Errors.PermissionDenied"),
 			inputID:       "instance-1",
 		},
 		{
@@ -214,7 +214,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID:         "instance-1",
-			expectedError:           zerrors.ThrowInternal(deleteErr, "DOM-caF4Vs", "failed deleting instance"),
+			expectedError:           zerrors.ThrowInternal(deleteErr, "DOM-caF4Vs", "Errors.Instance.Delete"),
 			expectedInstanceName:    "My instance 1",
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
 		},
@@ -293,7 +293,7 @@ func TestDeleteInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID:         "instance-1",
-			expectedError:           zerrors.ThrowInternalf(nil, "DOM-Od04Jx", "expecting 1 row deleted, got %d", 2),
+			expectedError:           zerrors.ThrowInternal(nil, "DOM-Od04Jx", "Errors.Instsance.DeleteMismatch"),
 			expectedInstanceName:    "My instance 1",
 			expectedInstanceDomains: []string{"d1.example.com", "d2.example.com", "d3.example.com"},
 		},
