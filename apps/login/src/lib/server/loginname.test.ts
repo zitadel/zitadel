@@ -15,7 +15,7 @@ vi.mock("@zitadel/client", () => ({
 }));
 
 vi.mock("../service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(),
+  getServiceConfig: vi.fn(),
 }));
 
 vi.mock("../idp", () => ({
@@ -39,7 +39,8 @@ vi.mock("./cookie", () => ({
 }));
 
 vi.mock("./host", () => ({
-  getOriginalHost: vi.fn(),
+  getInstanceHost: vi.fn(),
+  getPublicHost: vi.fn(),
 }));
 
 // this returns the key itself that can be checked not the translated value
@@ -57,11 +58,13 @@ describe("sendLoginname", () => {
   let mockCreateSessionAndUpdateCookie: any;
   let mockListAuthenticationMethodTypes: any;
   let mockListIDPLinks: any;
-  let mockGetOriginalHost: any;
+  let mockGetInstanceHost: any;
+  let mockGetPublicHost: any;
   let mockStartIdentityProviderFlow: any;
   let mockGetActiveIdentityProviders: any;
   let mockGetIDPByID: any;
   let mockIdpTypeToSlug: any;
+  let mockGetOrgsByDomain: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -69,7 +72,7 @@ describe("sendLoginname", () => {
     // Import mocked modules
     const { headers } = await import("next/headers");
     const { create } = await import("@zitadel/client");
-    const { getServiceUrlFromHeaders } = await import("../service-url");
+    const { getServiceConfig } = await import("../service-url");
     const {
       getLoginSettings,
       searchUsers,
@@ -77,36 +80,42 @@ describe("sendLoginname", () => {
       listIDPLinks,
       startIdentityProviderFlow,
       getActiveIdentityProviders,
+      getOrgsByDomain,
     } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("./cookie");
-    const { getOriginalHost } = await import("./host");
+    const { getInstanceHost, getPublicHost } = await import("./host");
     const { idpTypeToSlug } = await import("../idp");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
     mockCreate = vi.mocked(create);
-    mockGetServiceUrlFromHeaders = vi.mocked(getServiceUrlFromHeaders);
+    mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockSearchUsers = vi.mocked(searchUsers);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockListIDPLinks = vi.mocked(listIDPLinks);
-    mockGetOriginalHost = vi.mocked(getOriginalHost);
+    mockGetInstanceHost = vi.mocked(getInstanceHost);
+    mockGetPublicHost = vi.mocked(getPublicHost);
     mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
     mockGetIDPByID = vi.mocked(getIDPByID);
     mockIdpTypeToSlug = vi.mocked(idpTypeToSlug);
+    mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
-    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceUrl: "https://api.example.com" });
-    mockGetOriginalHost.mockResolvedValue("example.com");
+    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+    mockGetInstanceHost.mockReturnValue("example.com");
+    mockGetPublicHost.mockReturnValue("example.com");
     mockIdpTypeToSlug.mockReturnValue("google");
     mockGetIDPByID.mockResolvedValue({
       id: "idp123",
       name: "Google",
       type: "GOOGLE",
     });
+    // Default: org discovery returns empty result
+    mockGetOrgsByDomain.mockResolvedValue({ result: [] });
   });
 
   afterEach(() => {
@@ -238,7 +247,7 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
         expect(mockListIDPLinks).toHaveBeenCalledWith({
-          serviceUrl: "https://api.example.com",
+          serviceConfig: { baseUrl: "https://api.example.com" },
           userId: "user123",
         });
       });
@@ -278,7 +287,7 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
         expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-          serviceUrl: "https://api.example.com",
+          serviceConfig: { baseUrl: "https://api.example.com" },
           orgId: "org123", // User's organization from resourceOwner
         });
       });
@@ -481,6 +490,161 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should discover organization from domain suffix when user not found without org context", async () => {
+      // Mock login settings for instance level (no org context)
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        })
+        // Mock login settings for discovered org - must include all necessary flags
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        });
+
+      // Mock org discovery to return one org with matching domain
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-123", name: "Example Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+        // No organization parameter - this is the key test scenario
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/register\?/);
+      expect(result?.redirect).toContain("organization=discovered-org-123");
+      expect(result?.redirect).toContain("requestId=req123");
+      expect(result?.redirect).toContain("email=user%40example.com");
+
+      // Verify org discovery was called with correct domain
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        domain: "example.com",
+      });
+    });
+
+    test("should redirect to IDP with discovered org when user not found and only IDP allowed", async () => {
+      // Mock login settings for instance level (no org context)
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: false,
+        })
+        // Mock login settings for discovered org - must include all necessary flags
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowUsernamePassword: false,
+        });
+
+      // Mock org discovery to return one org with matching domain
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-456", name: "Example Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC" }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth?org=discovered-org-456");
+
+      const result = await sendLoginname({
+        loginName: "user@company.com",
+        requestId: "req123",
+        // No organization parameter
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth?org=discovered-org-456" });
+
+      // Verify org discovery was called
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        domain: "company.com",
+      });
+
+      // Verify IDP redirect was called with discovered org
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-456",
+      });
+    });
+
+    test("should not discover org if domain discovery is disabled", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowUsernamePassword: true,
+          ignoreUnknownUsernames: false,
+        })
+        // Mock login settings for org with domain discovery disabled
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: false,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "10987654321", name: "Example Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        // No organization parameter
+      });
+
+      // Should return error since discovery is disabled and no org context
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should not discover org if multiple orgs match the domain", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: true,
+        ignoreUnknownUsernames: false,
+      });
+
+      // Mock org discovery to return multiple orgs
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [
+          { id: "12345678910", name: "Example Org 1" },
+          { id: "10987654321", name: "Example Org 2" },
+        ],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        // No organization parameter
+      });
+
+      // Should return error since multiple orgs match
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should use provided organization instead of discovering when org context exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowUsernamePassword: true,
+        ignoreUnknownUsernames: false,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        organization: "123456",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/register\?/);
+      expect(result?.redirect).toContain("organization=123456");
+
+      // Verify org discovery was NOT called since org was provided
+      expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
   });
 

@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -18,12 +18,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let { firstname, lastname, email, organization, requestId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
     if (org) {
       organization = org.id;
     }
@@ -31,23 +29,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const missingData = !firstname || !lastname || !email || !organization;
 
-  const legal = await getLegalAndSupportSettings({
-    serviceUrl,
-    organization,
+  const legal = await getLegalAndSupportSettings({ serviceConfig, organization,
   });
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization,
+  const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization,
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization,
   });
 
   return missingData ? (
