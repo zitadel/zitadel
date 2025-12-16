@@ -1259,38 +1259,38 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
+  const interceptors = [tracingInterceptor];
+
+  if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
+    interceptors.push((next) => {
+      return (req) => {
+        // Apply headers from serviceConfig
+        if (serviceConfig.instanceHost) {
+          req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+        }
+        if (serviceConfig.publicHost) {
+          req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+        }
+
+        // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+        if (process.env.CUSTOM_REQUEST_HEADERS) {
+          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+            const kv = header.indexOf(":");
+            if (kv > 0) {
+              req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+            } else {
+              console.warn(`Skipping malformed header: ${header}`);
+            }
+          });
+        }
+
+        return next(req);
+      };
+    });
+  }
+
   return libCreateServerTransport(token, {
     baseUrl: serviceConfig.baseUrl,
-    interceptors:
-      !process.env.CUSTOM_REQUEST_HEADERS && !serviceConfig.instanceHost && !serviceConfig.publicHost
-        ? undefined
-        : [
-          (next) => {
-            return (req) => {
-              // Apply headers from serviceConfig
-              if (serviceConfig.instanceHost) {
-                req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
-              }
-              if (serviceConfig.publicHost) {
-                req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
-              }
-
-              // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-              if (process.env.CUSTOM_REQUEST_HEADERS) {
-                process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-                  const kv = header.indexOf(":");
-                  if (kv > 0) {
-                    req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
-                  } else {
-                    console.warn(`Skipping malformed header: ${header}`);
-                  }
-                });
-              }
-
-              return next(req);
-            };
-          },
-          tracingInterceptor,
-        ],
+    interceptors,
   });
 }
