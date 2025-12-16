@@ -313,8 +313,19 @@ func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (Se
 	return NewTimestampQuery(AuthNKeyColumnCreationDate, ts, compare)
 }
 
-func NewAuthNKeyExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
-	return NewTimestampQuery(AuthNKeyColumnExpiration, ts, compare)
+func NewAuthNKeyExpirationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	query, err := NewTimestampQuery(AuthNKeyColumnExpiration, ts, compare)
+	if err != nil {
+		return nil, err
+	}
+	if compare != TimestampGreater && compare != TimestampGreaterOrEquals {
+		return query, nil
+	}
+	noExpiration, err := NewIsNullQuery(AuthNKeyColumnExpiration)
+	if err != nil {
+		return nil, err
+	}
+	return NewOrQuery(query, noExpiration)
 }
 
 //go:embed authn_key_user.sql

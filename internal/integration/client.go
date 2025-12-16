@@ -1110,6 +1110,10 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
+func (i *Instance) CreateTargetWithoutPayloadType(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	return i.CreateTarget(ctx, t, name, endpoint, ty, interrupt, action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED)
+}
+
 func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType) *action.CreateTargetResponse {
 	if name == "" {
 		name = TargetName()

@@ -493,7 +493,7 @@ func publicKeyActiveFilterToQuery(activeFilter bool) (query.SearchQuery, error) 
 }
 
 func publicKeyExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
-	return query.NewAuthNKeyExpirationDateDateQuery(f.GetTimestamp().AsTime(), filter.TimestampMethodPbToQuery(f.Method))
+	return query.NewAuthNKeyExpirationDateQuery(f.GetTimestamp().AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
 func publicKeyFieldNameToSortingColumn(column action.PublicKeyFieldName) query.Column {

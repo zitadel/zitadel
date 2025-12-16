@@ -846,7 +846,11 @@ func TestServer_ListPublicKeys(t *testing.T) {
 					TargetId: "notfound",
 				},
 			},
-			want: &action.ListPublicKeysResponse{},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+				},
+			},
 		},
 		{
 			name: "list all",
@@ -857,6 +861,10 @@ func TestServer_ListPublicKeys(t *testing.T) {
 				},
 			},
 			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  3,
+				},
 				PublicKeys: []*action.PublicKey{
 					{
 						KeyId:          anotherKey.GetKeyId(),
@@ -904,6 +912,10 @@ func TestServer_ListPublicKeys(t *testing.T) {
 				},
 			},
 			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  1,
+				},
 				PublicKeys: []*action.PublicKey{
 					{
 						KeyId:          activeKey.GetKeyId(),
@@ -933,6 +945,10 @@ func TestServer_ListPublicKeys(t *testing.T) {
 				},
 			},
 			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  2,
+				},
 				PublicKeys: []*action.PublicKey{
 					{
 						KeyId:          anotherKey.GetKeyId(),
@@ -956,7 +972,7 @@ func TestServer_ListPublicKeys(t *testing.T) {
 			},
 		},
 		{
-			name: "list with expiration date filter",
+			name: "list with expiration date filter (boefore or equals)",
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.ListPublicKeysRequest{
@@ -966,7 +982,7 @@ func TestServer_ListPublicKeys(t *testing.T) {
 							Filter: &action.PublicKeySearchFilter_ExpirationDateFilter{
 								ExpirationDateFilter: &filter.TimestampFilter{
 									Timestamp: expirationDate,
-									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE,
+									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS,
 								},
 							},
 						},
@@ -974,6 +990,46 @@ func TestServer_ListPublicKeys(t *testing.T) {
 				},
 			},
 			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  1,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list with expiration date filter (after incl. no expiration)",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ExpirationDateFilter{
+								ExpirationDateFilter: &filter.TimestampFilter{
+									Timestamp: expirationDate,
+									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  2,
+				},
 				PublicKeys: []*action.PublicKey{
 					{
 						KeyId:          anotherKey.GetKeyId(),
@@ -983,6 +1039,15 @@ func TestServer_ListPublicKeys(t *testing.T) {
 						ExpirationDate: nil,
 						CreationDate:   anotherKey.GetCreationDate(),
 						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
 					},
 				},
 			},
@@ -1031,7 +1096,7 @@ func TestServer_ListPublicKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 10*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV2.ListPublicKeys(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
