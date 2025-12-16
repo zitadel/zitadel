@@ -18,7 +18,7 @@ type LegacyProfileConfig struct {
 
 func (c *ProfileConfig) SetLegacyConfig(lc *LegacyProfileConfig) {
 	typ := c.Exporter.Type
-	if lc == nil || typ.isNone() {
+	if lc == nil || !typ.isNone() {
 		return
 	}
 	if lc.Type == "google" {

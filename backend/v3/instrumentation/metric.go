@@ -42,7 +42,7 @@ type LegacyMetricConfig struct {
 
 func (c *MetricConfig) SetLegacyConfig(lc *LegacyMetricConfig) {
 	typ := c.Exporter.Type
-	if lc == nil || typ.isNone() {
+	if lc == nil || !typ.isNone() {
 		return
 	}
 	if lc.Type == "otel" {
