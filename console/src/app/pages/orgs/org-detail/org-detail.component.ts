@@ -21,6 +21,7 @@ import { injectMutation } from '@tanstack/angular-query-experimental';
 import { Organization, OrganizationState } from '@zitadel/proto/zitadel/org/v2/org_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -136,7 +137,7 @@ export class OrgDetailComponent implements OnInit {
     }
   }
 
-  public async deleteOrg(org: Organization) {
+  public async deleteOrg(org: Organization | Org) {
     const mgmtUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -264,7 +265,7 @@ export class OrgDetailComponent implements OnInit {
     });
   }
 
-  public async renameOrg(org: Organization): Promise<void> {
+  public async renameOrg(org: Organization | Org): Promise<void> {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
         name: org.name,

@@ -3,18 +3,18 @@
     *ngIf="['org.write:' + org.id, 'org.write$'] | hasRole as hasWrite$"
     [hasBackButton]="false"
     title="{{ org.name }}"
-    [isActive]="org.state === OrganizationState.ACTIVE"
-    [isInactive]="org.state === OrganizationState.INACTIVE"
+    [isActive]="$any(org.state) === OrganizationState.ACTIVE"
+    [isInactive]="$any(org.state) === OrganizationState.INACTIVE"
     [hasContributors]="true"
     stateTooltip="{{ 'ORG.STATE.' + org.state | translate }}"
     [hasActions]="hasWrite$ | async"
   >
     <ng-container topActions *ngIf="hasWrite$ | async">
-      <button mat-menu-item *ngIf="org.state === OrganizationState.ACTIVE" (click)="changeState(OrganizationState.INACTIVE)">
+      <button mat-menu-item *ngIf="$any(org.state) === OrganizationState.ACTIVE" (click)="changeState(OrganizationState.INACTIVE)">
         {{ 'ORG.PAGES.DEACTIVATE' | translate }}
       </button>
 
-      <button mat-menu-item *ngIf="org.state === OrganizationState.INACTIVE" (click)="changeState(OrganizationState.ACTIVE)">
+      <button mat-menu-item *ngIf="$any(org.state) === OrganizationState.INACTIVE" (click)="changeState(OrganizationState.ACTIVE)">
         {{ 'ORG.PAGES.REACTIVATE' | translate }}
       </button>
 

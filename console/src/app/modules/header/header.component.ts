@@ -1,5 +1,5 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, EventEmitter, input, Input, linkedSignal, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -7,6 +7,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ActionKeysType } from '../action-keys/action-keys.component';
 import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-header',
@@ -19,7 +20,7 @@ export class HeaderComponent {
   @Input({ required: true }) public user!: User.AsObject;
   public showOrgContext: boolean = false;
 
-  public org = input<Organization | null>();
+  public org = input<Organization | Org | null>();
 
   @Output() public changedActiveOrg = new EventEmitter<void>();
   public showAccount: boolean = false;

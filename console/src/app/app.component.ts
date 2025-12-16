@@ -45,14 +45,11 @@ export class AppComponent {
   @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
     this.yoffset = this.viewPortScroller.getScrollPosition()[1];
   }
-  public orgs$: Observable<Org.AsObject[]> = of([]);
   public showAccount: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
   public activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
-
-  private listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -244,8 +241,6 @@ export class AppComponent {
       this.document.documentElement.lang = language.lang;
     });
   }
-
-  // TODO implement Console storage
 
   //   private startIntroWorkflow(): void {
   //     setTimeout(() => {

@@ -1,18 +1,23 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import { injectQuery, mutationOptions, QueryClient, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
-import { MessageInitShape } from '@bufbuild/protobuf';
-import { ListOrganizationsRequestSchema, ListOrganizationsResponse } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
+import { create, DescMessage, MessageInitShape, toBinary } from '@bufbuild/protobuf';
+import {
+  ListOrganizationsRequestSchema,
+  ListOrganizationsResponse,
+  OrganizationService,
+} from '@zitadel/proto/zitadel/org/v2/org_service_pb';
 import { NewMgmtService } from './new-mgmt.service';
 import { OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { NewAdminService } from './new-admin.service';
 import { SetUpOrgRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
-import { TranslateService } from '@ngx-translate/core';
 import { UserService } from './user.service';
 import { GrpcAuthService } from './grpc-auth.service';
 import { concatWith, defer, map } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Buffer } from 'buffer';
+import { AuthService, ListMyProjectOrgsRequestSchema } from '@zitadel/proto/zitadel/auth_pb';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +30,6 @@ export class NewOrganizationService {
     private readonly newAdminService: NewAdminService,
     private readonly orgInterceptorProvider: OrgInterceptorProvider,
     private readonly queryClient: QueryClient,
-    private readonly translate: TranslateService,
     private readonly userService: UserService,
   ) {}
 
@@ -46,11 +50,12 @@ export class NewOrganizationService {
       ],
     };
 
+    const { queryFn, ...listOrganizationsQueryOptions } = this.listOrganizationsQueryOptions(req);
+
     return queryOptions({
-      queryKey: [this.userService.userId(), 'organization', 'listOrganizations', req],
-      queryFn: organizationId
-        ? () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null)
-        : skipToken,
+      ...listOrganizationsQueryOptions,
+      queryFn: organizationId ? queryFn : skipToken,
+      select: (data) => data.result.find(Boolean) ?? null,
     });
   }
 
@@ -63,53 +68,64 @@ export class NewOrganizationService {
 
     const activeOrg = toSignal(activeOrg$);
 
-    return injectQuery(() => this.organizationByIdQueryOptions(activeOrg()));
-  }
+    const req = computed(
+      () =>
+        ({
+          query: {
+            limit: 1,
+          },
+          queries: [
+            {
+              query: {
+                case: 'idQuery' as const,
+                value: {
+                  id: activeOrg(),
+                },
+              },
+            },
+          ],
+        }) satisfies MessageInitShape<typeof ListMyProjectOrgsRequestSchema>,
+    );
 
-  public listOrganizationsQueryOptions(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
-    return queryOptions({
-      queryKey: this.listOrganizationsQueryKey(req),
-      queryFn: () => this.listOrganizations(req ?? {}),
+    return injectQuery(() => {
+      const { queryFn, ...listMyProjectOrgsQueryOptions } = this.listMyProjectOrgsQueryOptions(req());
+
+      return queryOptions({
+        ...listMyProjectOrgsQueryOptions,
+        queryFn: activeOrg() ? queryFn : skipToken,
+        select: (data) => data.result.find(Boolean) ?? null,
+      });
     });
   }
 
-  public listOrganizationsQueryKey(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
-    if (!req) {
-      return [this.userService.userId(), 'organization', 'listOrganizations'];
-    }
-
-    // needed because angular query isn't able to serialize a bigint key
-    const query = req.query ? { ...req.query, offset: req.query.offset ? Number(req.query.offset) : undefined } : undefined;
-    const queryKey = {
-      ...req,
-      ...(query ? { query } : {}),
-    };
-
-    return [this.userService.userId(), 'organization', 'listOrganizations', queryKey];
+  public listOrganizationsQueryOptions(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
+    const queryKeyHashFn = tanstackQueryKeyHashFn(ListOrganizationsRequestSchema);
+    return queryOptions({
+      queryKey: [
+        this.userService.userId(),
+        OrganizationService.name,
+        OrganizationService.method.listOrganizations.name,
+        req,
+      ] as const,
+      queryKeyHashFn: (key) => queryKeyHashFn(...key),
+      queryFn: ({ signal }) => this.listOrganizations(req ?? {}, signal),
+    });
   }
 
-  public listOrganizations(
+  private listOrganizations(
     req: MessageInitShape<typeof ListOrganizationsRequestSchema>,
     signal?: AbortSignal,
   ): Promise<ListOrganizationsResponse> {
     return this.grpcService.organizationNew.listOrganizations(req, { signal });
   }
 
-  private async getDefaultOrganization() {
-    let resp = await this.listOrganizations({
-      query: {
-        limit: 1,
-      },
-      queries: [
-        {
-          query: {
-            case: 'defaultQuery',
-            value: {},
-          },
-        },
-      ],
+  private listMyProjectOrgsQueryOptions(req?: MessageInitShape<typeof ListMyProjectOrgsRequestSchema>) {
+    const queryKeyHashFn = tanstackQueryKeyHashFn(ListMyProjectOrgsRequestSchema);
+    return queryOptions({
+      queryKey: [this.userService.userId(), AuthService.name, AuthService.method.listMyProjectOrgs.name, req] as const,
+      queryKeyHashFn: (key) => queryKeyHashFn(...key),
+      queryFn: ({ signal }) => this.grpcService.authNew.listMyProjectOrgs(req ?? {}, { signal }),
     });
-    return resp.result.find(Boolean) ?? null;
   }
 
   private invalidateAllOrganizationQueries() {
@@ -181,3 +197,63 @@ export class NewOrganizationService {
       },
     });
 }
+
+function tanstackQueryKeyHashFn<T extends DescMessage>(schema: T) {
+  return (userId: string | undefined, serviceName: string, methodName: string, req?: MessageInitShape<T>) => {
+    if (!req) {
+      return JSON.stringify([userId, serviceName, methodName]);
+    }
+
+    const serializedReq = toBinary(schema, create(schema, req));
+    const serializedReqAsString = Buffer.from(serializedReq).toString('base64');
+
+    return JSON.stringify([userId, serviceName, methodName, serializedReqAsString]);
+  };
+}
+
+// type UnaryClient<S extends DescService> = {
+//   [P in keyof S['method']]: S['method'][P] extends DescMethodUnary<infer I, infer O>
+//     ? O extends GenMessage<infer M>
+//       ? M
+//       : never
+//     : never;
+// };
+
+// type DescMethodTyped<K extends DescMethod['methodKind'], I extends DescMessage, O extends DescMessage> = Omit<
+//   DescMethod,
+//   'methodKind' | 'input' | 'output'
+// > & {
+//   readonly methodKind: K;
+//   readonly input: I;
+//   readonly output: O;
+// };
+//
+// type UnaryClient<T extends DescService> = {
+//   [P in keyof T['method']]: T['method'][P] extends DescMethodTyped<'unary', infer I, infer O>
+//     ? (req: MessageInitShape<I>, options?: CallOptions) => Promise<O>
+//     : never;
+// };
+//
+// type Hoi = UnaryClient<typeof OrganizationService>;
+// type What = Hoi['listOrganizations'];
+//
+// function tanstackQueryOptions<S extends DescService, M extends keyof S['method'] & string>(
+//   service: S,
+//   client: UnaryClient<S>,
+//   method: M,
+//   req: MessageInitShape<S['method'][typeof method]['input']>,
+// ) {
+//   const userService = inject(UserService);
+//   const methodDesc = service.method[method];
+//   const queryKeyHashFn = tanstackQueryKeyHashFn(methodDesc.input);
+//
+//   const what = client[method](req);
+//
+//   return queryOptions({
+//     queryKey: [userService.userId(), service.name, methodDesc.name, req] as const,
+//     queryKeyHashFn: (key) => queryKeyHashFn(...key),
+//     queryFn: ({ signal }) =>
+//       client[method](req ?? {}, { signal }) satisfies Promise<MessageShape<S['method'][typeof method]['output']>>,
+//   });
+// }
+//
