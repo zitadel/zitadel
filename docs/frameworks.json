@@ -65,7 +65,7 @@
 		"id": "spring",
 		"title": "Spring",
 		"imgSrcDark": "/docs/img/tech/spring.svg",
-		"docsLink": "/docs/sdk-examples/java"
+		"docsLink": "/docs/sdk-examples/spring"
 	},
 	{
 		"title": "NestJS",
