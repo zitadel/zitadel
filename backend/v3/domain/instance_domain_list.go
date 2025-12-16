@@ -87,7 +87,7 @@ func (l *ListInstanceDomainsQuery) Sorting(domainRepo InstanceDomainRepository) 
 
 	switch l.Request.GetSortingColumn() {
 
-	case instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE:
+	case instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE, instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_UNSPECIFIED:
 		sortingCol = domainRepo.CreatedAtColumn()
 	case instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_DOMAIN:
 		sortingCol = domainRepo.DomainColumn()
@@ -95,8 +95,6 @@ func (l *ListInstanceDomainsQuery) Sorting(domainRepo InstanceDomainRepository) 
 		sortingCol = domainRepo.IsGeneratedColumn()
 	case instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_PRIMARY:
 		sortingCol = domainRepo.IsPrimaryColumn()
-	case instance_v2.DomainFieldName_DOMAIN_FIELD_NAME_UNSPECIFIED:
-		fallthrough
 	default:
 		return func(opts *database.QueryOpts) {}
 	}

@@ -334,7 +334,8 @@ func TestListInstanceDomainsQuery_Sorting(t *testing.T) {
 			request: &instance.ListCustomDomainsRequest{
 				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_UNSPECIFIED,
 			},
-			expectedSortingDirection: database.OrderDirectionAsc,
+			expectedSortingDirection: database.OrderDirectionDesc,
+			expectedOrderBy:          database.Columns{database.NewColumn("instance_domains", "created_at")},
 		},
 	}
 

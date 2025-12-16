@@ -51,7 +51,7 @@ type instanceDomainConditions interface {
 	PrimaryKeyCondition(domain string) database.Condition
 	// TypeCondition returns a filter for the type field.
 	TypeCondition(typ DomainType) database.Condition
-	// IsGeneratedCondition returns a filter for the is generated field
+	// IsGeneratedCondition returns a filter for the is_generated field
 	IsGeneratedCondition(isGenerated bool) database.Condition
 }
 

@@ -38,18 +38,18 @@ func NewAddInstanceDomainCommand(instanceID, domainName string, domainType Domai
 
 // Events implements [Commander].
 func (a *AddInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
-	var toReturn eventstore.Command
+	var event eventstore.Command
 	switch a.DType {
 	case DomainTypeCustom:
-		toReturn = instance.NewDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName, false)
+		event = instance.NewDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName, false)
 	case DomainTypeTrusted:
-		toReturn = instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName)
+		event = instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate(a.InstanceID).Aggregate, a.DomainName)
 	default:
 		return nil, nil
 	}
 
 	return []eventstore.Command{
-		toReturn,
+		event,
 	}, nil
 }
 
