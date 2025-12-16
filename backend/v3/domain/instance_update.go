@@ -11,8 +11,9 @@ import (
 )
 
 type UpdateInstanceCommand struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	ShouldSkipUpdate bool   `json:"should_skip_update"`
 }
 
 // RequiresTransaction implements [Transactional].
@@ -20,6 +21,10 @@ func (u *UpdateInstanceCommand) RequiresTransaction() {}
 
 // Events implements Commander.
 func (u *UpdateInstanceCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
+	if u.ShouldSkipUpdate {
+		return nil, nil
+	}
+
 	return []eventstore.Command{
 		instance.NewInstanceChangedEvent(ctx, &instance.NewAggregate(u.ID).Aggregate, u.Name),
 	}, nil
@@ -39,6 +44,10 @@ func NewUpdateInstanceCommand(id, name string) *UpdateInstanceCommand {
 
 // Execute implements [Commander]
 func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+	if u.ShouldSkipUpdate {
+		return
+	}
+
 	instanceRepo := opts.instanceRepo
 
 	updateCount, err := instanceRepo.Update(
@@ -88,9 +97,7 @@ func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInternal(err, "DOM-j05Hdo", "failed fetching instance")
 	}
 
-	if instance.Name == u.Name {
-		err = zerrors.ThrowPreconditionFailed(nil, "DOM-5MrT21", "Errors.Instance.NotChanged")
-		return err
-	}
+	u.ShouldSkipUpdate = instance.Name == u.Name
+
 	return nil
 }
