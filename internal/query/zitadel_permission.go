@@ -3,9 +3,9 @@ package query
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string) (_ *domain.Permissions, err error) {

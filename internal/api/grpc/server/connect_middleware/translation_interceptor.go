@@ -5,10 +5,10 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/i18n"
 	_ "github.com/zitadel/zitadel/internal/statik"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func TranslationHandler() connect.UnaryInterceptorFunc {
