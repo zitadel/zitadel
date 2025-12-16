@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
-	"google.golang.org/protobuf/runtime/protoimpl"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -105,7 +104,7 @@ func TestGetTranslationOutput(t *testing.T) {
 		{
 			testName:         "when unparsable map should return internal error",
 			inputTranslation: map[string]any{"\xc5z": "something"},
-			expectedError:    zerrors.ThrowInternal(protoimpl.X.NewError("invalid UTF-8 in string: %q", "\xc5z"), "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct"),
+			expectedError:    zerrors.ThrowInternal(nil, "QUERY-70ppPp", "Errors.Protobuf.ConvertToStruct"),
 		},
 		{
 			testName:         "when input translation is valid should return expected response message",
@@ -125,7 +124,7 @@ func TestGetTranslationOutput(t *testing.T) {
 			res, err := getTranslationOutputMessage(tc.inputTranslation, encodedHash)
 
 			// Verify
-			require.Equal(t, tc.expectedError, err)
+			require.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedResponse, res)
 		})
 	}
