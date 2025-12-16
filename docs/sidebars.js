@@ -92,28 +92,8 @@ module.exports = {
         },
         {
           type: "link",
-          label: "FastAPI",
-          href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-        },
-        {
-          type: "link",
-          label: "NextAuth",
-          href: "https://next-auth.js.org/providers/zitadel",
-        },
-        {
-          type: "link",
-          label: "Node.js",
-          href: "https://www.npmjs.com/package/@zitadel/node",
-        },
-        {
-          type: "link",
           label: ".Net",
           href: "https://github.com/smartive/zitadel-net",
-        },
-        {
-          type: "link",
-          label: "Passport.js",
-          href: "https://github.com/buehler/node-passport-zitadel",
         },
         {
           type: "link",
