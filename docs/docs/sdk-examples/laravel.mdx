@@ -1,29 +1,29 @@
 ---
-title: Symfony
-sidebar_label: Symfony
-framework_url: https://symfony.com
-auth_library: "Symfony Security"
-auth_library_url: https://symfony.com/doc/current/security.html
-example_repo: https://github.com/zitadel/example-auth-symfony
+title: Laravel
+sidebar_label: Laravel
+framework_url: https://laravel.com
+auth_library: "Laravel Socialite"
+auth_library_url: https://laravel.com/docs/socialite
+example_repo: https://github.com/zitadel/example-auth-laravel
 auth_flow: pkce
 status: stable
 ---
 
 ## Overview
 
-[Symfony](https://symfony.com) is a set of reusable PHP components and a PHP framework for web projects. It provides a robust set of features for web applications, making it one of the most popular choices for building server-side applications. This example demonstrates how to integrate **[Zitadel](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
+[Laravel](https://laravel.com) is a web application framework with expressive, elegant syntax. It provides a robust set of features for web applications, making it one of the most popular choices for building server-side applications. This example demonstrates how to integrate **[Zitadel](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
 
 #### Auth library
 
-This example uses **[Symfony Security](https://symfony.com/doc/current/security.html)**, the standard authentication component for Symfony applications. Symfony Security implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow through a custom authenticator, manages [PKCE](/docs/concepts/pkce), performs secure [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), and provides [session management](https://zitadel.com/docs/concepts/sessions) through Symfony's firewall system.
+This example uses **[Laravel Socialite](https://laravel.com/docs/socialite)**, the standard authentication library for Laravel applications. Laravel Socialite implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow through a custom Zitadel provider, manages [PKCE](/docs/concepts/pkce), performs secure [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), and provides [session management](https://zitadel.com/docs/concepts/sessions) through Laravel's authentication system.
 
 ---
 
 ## What this example demonstrates
 
-This example shows a complete authentication implementation using [Symfony](https://symfony.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](/docs/concepts/pkce), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
+This example shows a complete authentication implementation using [Laravel](https://laravel.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](/docs/concepts/pkce), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
 
-The application implements [server-side session management](https://zitadel.com/docs/concepts/sessions) with Symfony's security system, storing authentication state securely through the framework's user provider pattern. Protected routes use Symfony Security's firewall configuration to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/concepts/tokens).
+The application implements [server-side session management](https://zitadel.com/docs/concepts/sessions) with Laravel's built-in session handling, storing authentication state securely in encrypted cookies. Protected routes use Laravel middleware to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/concepts/tokens).
 
 The application demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with Zitadel's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/concepts/tokens) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [Zitadel-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
 
@@ -48,12 +48,15 @@ Before running this example, you need to create and configure a PKCE application
 
 Once you have your [Zitadel application](https://zitadel.com/docs/guides/integrate/login/oidc/) configured:
 
-1. Clone the [repository](https://github.com/zitadel/example-auth-symfony).
+1. Clone the [repository](https://github.com/zitadel/example-auth-laravel).
 2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). **Use these exact environment variable names:**
    ```
-   APP_SECRET=your-app-secret-key
+   APP_KEY=your-app-key
+   APP_ENV=local
+   APP_DEBUG=true
    SERVER_URL=http://localhost:3000
    SERVER_PORT=3000
+   DB_CONNECTION=sqlite
    Zitadel_DOMAIN=https://your-zitadel-domain
    Zitadel_CLIENT_ID=your-zitadel-application-client-id
    Zitadel_CLIENT_SECRET=your-randomly-generated-client-secret
@@ -63,7 +66,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/integra
 	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/overview) for `Zitadel_DOMAIN` (the issuer)
 	- The **Client ID** you copied when creating the application for `Zitadel_CLIENT_ID`
 	- The **post-logout redirect URI** for `Zitadel_POST_LOGOUT_URL`
-	- A strong random string for `APP_SECRET` (generate using: `php -r "echo bin2hex(random_bytes(32));"`)
+	- A strong random string for `APP_KEY` (generate using: `php artisan key:generate`)
 	- A randomly generated string for `Zitadel_CLIENT_SECRET` (generate using: `php -r "echo bin2hex(random_bytes(32));"`)
 3. Install dependencies using [Composer](https://getcomposer.org) with `composer install` and start the development server with `composer run dev` to verify the authentication flow end-to-end.
 
@@ -76,7 +79,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/integra
 * **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
 * **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
-* **Symfony documentation:** https://symfony.com/doc
-* **Symfony Security documentation:** https://symfony.com/doc/current/security.html
-* **Example repository:** https://github.com/zitadel/example-auth-symfony
+* **Laravel documentation:** https://laravel.com/docs
+* **Laravel Socialite documentation:** https://laravel.com/docs/socialite
+* **Example repository:** https://github.com/zitadel/example-auth-laravel
 * **All framework examples:** /docs/examples
