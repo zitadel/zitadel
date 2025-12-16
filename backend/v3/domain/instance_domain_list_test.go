@@ -40,7 +40,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 					Return(permissionErr)
 				return checker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-RyCEyr", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-RyCEyr", "Errors.PermissionDenied"),
 		},
 		{
 			name:    "when valid permissions should return no error (ctx instance same as input)",
@@ -67,7 +67,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 					Return(permissionErr)
 				return checker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-yN7oCp", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-yN7oCp", "Errors.PermissionDenied"),
 		},
 		{
 			name: "when input instance doesn't match context should check instance and succeed then check domain and fail",
@@ -86,7 +86,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 					Return(permissionErr)
 				return checker
 			},
-			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-RyCEyr", "permission denied"),
+			expectedError: zerrors.ThrowPermissionDenied(permissionErr, "DOM-RyCEyr", "Errors.PermissionDenied"),
 		},
 		{
 			name: "when input instance doesn't match context should check instance and succeed then check domain and succeed",
@@ -191,7 +191,7 @@ func TestListInstanceDomainsQuery_Execute(t *testing.T) {
 					Return(nil, listErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(listErr, "DOM-ubaPNU", "failed fetching instance domains"),
+			expectedError: zerrors.ThrowInternal(listErr, "DOM-ubaPNU", "Errors.Instance.Domain.List"),
 		},
 		{
 			name: "when listing domains succeeds should return domains",

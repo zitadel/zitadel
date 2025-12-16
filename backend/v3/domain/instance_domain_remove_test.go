@@ -70,7 +70,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-eroxID", "permission denied"),
+			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-eroxID", "Errors.PermissionDenied"),
 		},
 		{
 			testName: "when domain not found should return no error",
@@ -129,7 +129,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowInternal(getErr, "DOM-Zvv1fi", "failed fetching instance domain"),
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-Zvv1fi", "Errors.Instance.Domain.Get"),
 		},
 		{
 			testName: "when domain is generated should return precondition failed error",
@@ -261,7 +261,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowInternal(removeErr, "DOM-KH7AuJ", "failde removing instance domain"),
+			expectedError:   zerrors.ThrowInternal(removeErr, "DOM-KH7AuJ", "Errors.Instance.Domain.Remove"),
 		},
 		{
 			testName: "when domain remove returns 0 rows removed should return no error",
@@ -322,7 +322,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "test-domain.com",
-			expectedError:   zerrors.ThrowInternalf(nil, "DOM-XSCnJB", "expecting 1 row deleted, got %d", 2),
+			expectedError:   zerrors.ThrowInternal(nil, "DOM-XSCnJB", "Errors.Instsance.Domain.DeleteMismatch"),
 		},
 		{
 			testName: "when domain remove returns 1 row removed should return no error",

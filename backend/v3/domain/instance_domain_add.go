@@ -17,6 +17,8 @@ import (
 
 var allowedDomainCharacters = regexp.MustCompile(`^[a-zA-Z0-9\\.\\-]+$`)
 
+const maxDomainNameLength = 253
+
 type AddInstanceDomainCommand struct {
 	InstanceID string     `json:"instance_id"`
 	DomainName string     `json:"domain_name"`
@@ -68,7 +70,7 @@ func (a *AddInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts
 		Type:        a.DType,
 	})
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-uSCVn3", "failed adding instance domain")
+		return zerrors.ThrowInternal(err, "DOM-uSCVn3", "Errors.Instance.Domain.Add")
 	}
 
 	return nil
@@ -81,7 +83,7 @@ func (a *AddInstanceDomainCommand) String() string {
 
 // Validate implements [Commander].
 func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if a.DomainName = strings.TrimSpace(a.DomainName); a.DomainName == "" || len(a.DomainName) > 253 {
+	if a.DomainName = strings.TrimSpace(a.DomainName); a.DomainName == "" || len(a.DomainName) > maxDomainNameLength {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-jieuM8", "Errors.Invalid.Argument")
 	}
 
@@ -99,8 +101,7 @@ func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpt
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainWritePermission); authZErr != nil {
-		err = zerrors.ThrowPermissionDenied(authZErr, "DOM-c83vPX", "permission denied")
-		return err
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-c83vPX", "Errors.PermissionDenied")
 	}
 
 	domainRepo := opts.instanceDomainRepo
@@ -110,7 +111,7 @@ func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpt
 	}
 
 	if !errors.Is(err, &database.NoRowFoundError{}) {
-		return zerrors.ThrowInternal(err, "DOM-LrTy2z", "failed fetching instance domain")
+		return zerrors.ThrowInternal(err, "DOM-LrTy2z", "Errors.Instance.Domain.Get")
 	}
 
 	return nil

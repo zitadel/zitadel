@@ -77,7 +77,7 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "valid.domain",
-			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-c83vPX", "permission denied"),
+			expectedError:   zerrors.ThrowPermissionDenied(permissionErr, "DOM-c83vPX", "Errors.PermissionDenied"),
 		},
 		{
 			testName: "when retrieving instance domain fails with generic error should return error",
@@ -105,7 +105,7 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			},
 			inputInstanceID: "instance-1",
 			inputDomainName: "valid.domain",
-			expectedError:   zerrors.ThrowInternal(getErr, "DOM-LrTy2z", "failed fetching instance domain"),
+			expectedError:   zerrors.ThrowInternal(getErr, "DOM-LrTy2z", "Errors.Instance.Domain.Get"),
 		},
 		{
 			testName: "when retrieving instance domain succeeds should return already exists error",
@@ -286,7 +286,7 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 					Return(addErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(addErr, "DOM-uSCVn3", "failed adding instance domain"),
+			expectedError: zerrors.ThrowInternal(addErr, "DOM-uSCVn3", "Errors.Instance.Domain.Add"),
 		},
 	}
 

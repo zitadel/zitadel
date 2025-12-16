@@ -51,16 +51,14 @@ func (r *RemoveInstanceDomainCommand) Events(ctx context.Context, _ *InvokeOpts)
 // Execute implements [Commander].
 func (r *RemoveInstanceDomainCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
 	instanceRepo := opts.instanceDomainRepo
-	// TODO(IAM-Marco): I'm not sure if this is a mistake, but InstanceIDCondition must be passed, otherwise an error is returned.
-	// But instance_id is not a primary key
+
 	deletedRows, err := instanceRepo.Remove(ctx, opts.DB(), database.And(instanceRepo.InstanceIDCondition(r.InstanceID), instanceRepo.PrimaryKeyCondition(r.DomainName)))
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-KH7AuJ", "failde removing instance domain")
+		return zerrors.ThrowInternal(err, "DOM-KH7AuJ", "Errors.Instance.Domain.Remove")
 	}
 
 	if deletedRows > 1 {
-		err = zerrors.ThrowInternalf(nil, "DOM-XSCnJB", "expecting 1 row deleted, got %d", deletedRows)
-		return err
+		return zerrors.ThrowInternal(nil, "DOM-XSCnJB", "Errors.Instsance.Domain.DeleteMismatch")
 	}
 
 	if deletedRows < 1 {
@@ -90,13 +88,12 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 		return zerrors.ThrowInvalidArgument(nil, "DOM-dYD5I7", "Errors.Instance.Domain.InvalidCharacter")
 	}
 
-	// TODO(IAM-Marco): Do we want to restrict to the instance in context?
 	if r.InstanceID != authz.GetInstance(ctx).InstanceID() {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-83FUdY", "Errors.Invalid.Argument")
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainWritePermission); authZErr != nil {
-		err = zerrors.ThrowPermissionDenied(authZErr, "DOM-eroxID", "permission denied")
+		err = zerrors.ThrowPermissionDenied(authZErr, "DOM-eroxID", "Errors.PermissionDenied")
 		return err
 	}
 
@@ -106,7 +103,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 		if errors.Is(err, &database.NoRowFoundError{}) {
 			return nil
 		}
-		return zerrors.ThrowInternal(err, "DOM-Zvv1fi", "failed fetching instance domain")
+		return zerrors.ThrowInternal(err, "DOM-Zvv1fi", "Errors.Instance.Domain.Get")
 	}
 
 	if d.Type == DomainTypeCustom && d.IsGenerated != nil && *d.IsGenerated {

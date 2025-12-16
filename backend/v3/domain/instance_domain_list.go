@@ -43,7 +43,7 @@ func (l *ListInstanceDomainsQuery) Execute(ctx context.Context, opts *InvokeOpts
 
 	instances, err := domainRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-ubaPNU", "failed fetching instance domains")
+		return zerrors.ThrowInternal(err, "DOM-ubaPNU", "Errors.Instance.Domain.List")
 	}
 
 	l.toReturn = instances
@@ -122,7 +122,7 @@ func (l *ListInstanceDomainsQuery) Validate(ctx context.Context, opts *InvokeOpt
 
 	// TODO(IAM-Marco): This is wrong, as it should check the permission for the input instance and not the one in context
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-yN7oCp", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-yN7oCp", "Errors.PermissionDenied")
 	}
 
 	return l.checkDomainPerms(ctx, opts)
@@ -130,7 +130,7 @@ func (l *ListInstanceDomainsQuery) Validate(ctx context.Context, opts *InvokeOpt
 
 func (l *ListInstanceDomainsQuery) checkDomainPerms(ctx context.Context, opts *InvokeOpts) error {
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-RyCEyr", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-RyCEyr", "Errors.PermissionDenied")
 	}
 	return nil
 }

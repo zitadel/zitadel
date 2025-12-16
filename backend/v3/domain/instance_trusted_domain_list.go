@@ -43,7 +43,7 @@ func (l *ListInstanceTrustedDomainsQuery) Execute(ctx context.Context, opts *Inv
 
 	instances, err := domainRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-8eoWqY", "failed fetching trusted domains")
+		return zerrors.ThrowInternal(err, "DOM-8eoWqY", "Errors.Instance.TrustedDomain.List")
 	}
 
 	l.toReturn = instances
@@ -119,7 +119,7 @@ func (l *ListInstanceTrustedDomainsQuery) Validate(ctx context.Context, opts *In
 
 	// TODO(IAM-Marco): This is wrong, as it should check the permission for the input instance and not the one in context
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-yN7oCp", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-nx0QKI", "Errors.PermissionDenied")
 	}
 
 	return l.checkDomainPerms(ctx, opts)
@@ -127,7 +127,7 @@ func (l *ListInstanceTrustedDomainsQuery) Validate(ctx context.Context, opts *In
 
 func (l *ListInstanceTrustedDomainsQuery) checkDomainPerms(ctx context.Context, opts *InvokeOpts) error {
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-RyCEyr", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-RyCEyr", "Errors.PermissionDenied")
 	}
 	return nil
 }
