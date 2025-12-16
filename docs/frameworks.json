@@ -219,5 +219,11 @@
 		"title": "SvelteKit",
 		"imgSrcDark": "/docs/img/tech/sveltekit.svg",
 		"docsLink": "/docs/sdk-examples/sveltekit"
+	},
+	{
+		"id": "laravel",
+		"title": "Laravel",
+		"imgSrcDark": "/docs/img/tech/laravel.svg",
+		"docsLink": "/docs/sdk-examples/laravel"
 	}
 ]
