@@ -56,6 +56,7 @@ func CallTargets(
 		// call the type of target
 		resp, err := CallTarget(ctx, target, info, alg, signerOnce, encrypters)
 		// handle error if interrupt is set
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "target", target.GetTargetID()).OnError(err).Error("error calling target")
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
 		}
