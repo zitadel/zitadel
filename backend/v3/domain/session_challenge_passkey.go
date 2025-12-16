@@ -105,6 +105,7 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 	}
 
 	// ensure user is active
+	// (@grvijayan) todo: clarify this requirement
 	if user.State != UserStateActive {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "user not active")
 	}

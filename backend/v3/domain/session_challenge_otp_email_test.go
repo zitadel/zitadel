@@ -600,6 +600,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 		newEmailCodeFn              func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 		wantErr                     error
 		wantOTPEmailChallenge       string
+		wantChallengeOTPEmail       *domain.SessionChallengeOTPEmail
 	}{
 		{
 			name:                     "no otp email challenge request",
@@ -692,23 +693,20 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(0), assert.AnError)
 				return repo
@@ -743,23 +741,21 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:  expiry,
-					URLTmpl: "http://example.com",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:            expiry,
+					URLTmpl:           "http://example.com",
+					LastChallengedAt:  time.Now(),
+					TriggeredAtOrigin: "://",
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(0), nil)
 				return repo
@@ -789,24 +785,21 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					URLTmpl:      "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					URLTmpl:          "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(2), nil)
 				return repo
@@ -836,29 +829,39 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					URLTmpl:      "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					URLTmpl:          "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
 			wantOTPEmailChallenge: "code", // OTPEmailChallenge is only set when the delivery type is return code
+			wantChallengeOTPEmail: &domain.SessionChallengeOTPEmail{
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      true,
+				URLTmpl:           "",
+				LastChallengedAt:  time.Now(),
+				TriggeredAtOrigin: "://",
+			},
 		},
 		{
 			name: "update session succeeded - delivery type send code",
@@ -887,27 +890,37 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: false,
-					URLTmpl:      "http://example.com",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           expiry,
+					CodeReturned:     false,
+					URLTmpl:          "http://example.com",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
+			},
+			wantChallengeOTPEmail: &domain.SessionChallengeOTPEmail{
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      false,
+				URLTmpl:           "http://example.com",
+				LastChallengedAt:  time.Now(),
+				TriggeredAtOrigin: "://",
 			},
 		},
 		{
@@ -931,27 +944,37 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: false,
-					URLTmpl:      "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           expiry,
+					CodeReturned:     false,
+					URLTmpl:          "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
+			},
+			wantChallengeOTPEmail: &domain.SessionChallengeOTPEmail{
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      false,
+				URLTmpl:           "",
+				LastChallengedAt:  time.Now(),
+				TriggeredAtOrigin: "://",
 			},
 		},
 		{
@@ -980,27 +1003,37 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       defaultExpiry,
-					CodeReturned: false,
-					URLTmpl:      "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           defaultExpiry,
+					CodeReturned:     false,
+					URLTmpl:          "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
+			},
+			wantChallengeOTPEmail: &domain.SessionChallengeOTPEmail{
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      false,
+				URLTmpl:           "",
+				LastChallengedAt:  time.Now(),
+				TriggeredAtOrigin: "://",
 			},
 		},
 		{
@@ -1029,27 +1062,37 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPEmail := &domain.SessionChallengeOTPEmail{
+				challengeOTPEmail := getOTPEmailChallengeChange(repo, &domain.SessionChallengeOTPEmail{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       defaultExpiry,
-					CodeReturned: false,
-					URLTmpl:      "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPEmailChallengeChange(t, expectedChallengeOTPEmail))
+					Expiry:           defaultExpiry,
+					CodeReturned:     false,
+					URLTmpl:          "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPEmail).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
+			},
+			wantChallengeOTPEmail: &domain.SessionChallengeOTPEmail{
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      false,
+				URLTmpl:           "",
+				LastChallengedAt:  time.Now(),
+				TriggeredAtOrigin: "://",
 			},
 		},
 	}
@@ -1079,10 +1122,25 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 				domain.WithSecretGeneratorSettingsRepo(tt.secretGeneratorSettingsRepo(ctrl))(opts)
 			}
 			err := cmd.Execute(ctx, opts)
+			after := time.Now()
 			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantOTPEmailChallenge, gu.Value(cmd.OTPEmailChallenge))
+			assertChallengeOTPEmailEqual(t, tt.wantChallengeOTPEmail, cmd.ChallengeOTPEmail, after)
 		})
 	}
+}
+
+func assertChallengeOTPEmailEqual(t *testing.T, want, got *domain.SessionChallengeOTPEmail, upperThreshold time.Time) {
+	if want == nil {
+		assert.Nil(t, got)
+		return
+	}
+	assert.WithinRange(t, got.LastChallengedAt, want.LastChallengedAt, upperThreshold)
+	assert.Equal(t, want.Code, got.Code)
+	assert.Equal(t, want.Expiry, want.Expiry)
+	assert.Equal(t, want.CodeReturned, got.CodeReturned)
+	assert.Equal(t, want.URLTmpl, got.URLTmpl)
+	assert.Equal(t, want.TriggeredAtOrigin, got.TriggeredAtOrigin)
 }
 
 func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPRequestType) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
@@ -1165,25 +1223,24 @@ func getSettingsTypeColumn(repo *domainmock.MockSecretGeneratorSettingsRepositor
 	return database.NewColumn("zitadel.settings", "type")
 }
 
-func assertOTPEmailChallengeChange(t *testing.T, expectedChallengeOTPEmail *domain.SessionChallengeOTPEmail) func(challenge *domain.SessionChallengeOTPEmail) database.Change {
-	return func(challenge *domain.SessionChallengeOTPEmail) database.Change {
-		assert.Equal(t, expectedChallengeOTPEmail.Code, challenge.Code)
-		assert.Equal(t, expectedChallengeOTPEmail.Expiry, challenge.Expiry)
-		assert.Equal(t, expectedChallengeOTPEmail.CodeReturned, challenge.CodeReturned)
-		assert.Equal(t, expectedChallengeOTPEmail.URLTmpl, challenge.URLTmpl)
-		return database.NewChanges(
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_email_challenge_code_crypted"), challenge.Code.Crypted,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_email_challenge_expiry"), challenge.Expiry,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_email_challenge_code_returned"), challenge.CodeReturned,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_email_challenge_url_template"), challenge.URLTmpl,
-			),
-		)
-	}
+func getOTPEmailChallengeChange(repo *domainmock.MockSessionRepository, challenge *domain.SessionChallengeOTPEmail) database.Change {
+	changes := database.NewChanges(
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_email_challenge_code_crypted"), challenge.Code.Crypted,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_email_challenge_expiry"), challenge.Expiry,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_email_challenge_code_returned"), challenge.CodeReturned,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_email_challenge_url_template"), challenge.URLTmpl,
+		),
+	)
+	repo.EXPECT().
+		SetChallenge(challenge).
+		AnyTimes().
+		Return(changes)
+	return changes
 }

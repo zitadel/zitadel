@@ -447,7 +447,8 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 		session                 *domain.Session
 		webAuthNBeginLogin      func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error)
 		wantErr                 error
-		wantChallengePasskey    *session_grpc.Challenges_WebAuthN
+		wantWebAuthNChallenge   *session_grpc.Challenges_WebAuthN
+		wantChallengePasskey    *domain.SessionChallengePasskey
 	}{
 		{
 			name:                    "no request passkey challenge",
@@ -513,18 +514,15 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
+				expectedPasskeyChallenge := getPasskeyChallengeChange(repo, &domain.SessionChallengePasskey{
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertPasskeyChallengeChange(t, expectedPasskeyChallenge))
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, expectedPasskeyChallenge).
 					Times(1).
 					Return(int64(0), assert.AnError)
 				return repo
@@ -560,18 +558,15 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
+				expectedPasskeyChallenge := getPasskeyChallengeChange(repo, &domain.SessionChallengePasskey{
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertPasskeyChallengeChange(t, expectedPasskeyChallenge))
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, expectedPasskeyChallenge).
 					Times(1).
 					Return(int64(0), nil)
 				return repo
@@ -607,18 +602,15 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
+				expectedPasskeyChallenge := getPasskeyChallengeChange(repo, &domain.SessionChallengePasskey{
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertPasskeyChallengeChange(t, expectedPasskeyChallenge))
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, expectedPasskeyChallenge).
 					Times(1).
 					Return(int64(2), nil)
 				return repo
@@ -654,23 +646,26 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
+				expectedPasskeyChallenge := getPasskeyChallengeChange(repo, &domain.SessionChallengePasskey{
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementRequired,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertPasskeyChallengeChange(t, expectedPasskeyChallenge))
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, expectedPasskeyChallenge).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
-			wantChallengePasskey: getChallengePasskey(t, credentialAssertionDataRequired),
+			wantWebAuthNChallenge: getChallengePasskey(t, credentialAssertionDataRequired),
+			wantChallengePasskey: &domain.SessionChallengePasskey{
+				Challenge:        "Y2hhbGxlbmdl",
+				RPID:             "example.com",
+				UserVerification: legacy_domain.UserVerificationRequirementRequired,
+				LastChallengedAt: time.Now(),
+			},
 		},
 		{
 			name: "session updated successfully with the passkey challenge - preferred user verification",
@@ -701,23 +696,26 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedPasskeyChallenge := &domain.SessionChallengePasskey{
+				expectedPasskeyChallenge := getPasskeyChallengeChange(repo, &domain.SessionChallengePasskey{
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: legacy_domain.UserVerificationRequirementPreferred,
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertPasskeyChallengeChange(t, expectedPasskeyChallenge))
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, expectedPasskeyChallenge).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
-			wantChallengePasskey: getChallengePasskey(t, credentialAssertionDataPreferred),
+			wantWebAuthNChallenge: getChallengePasskey(t, credentialAssertionDataPreferred),
+			wantChallengePasskey: &domain.SessionChallengePasskey{
+				Challenge:        "Y2hhbGxlbmdl",
+				RPID:             "example.com",
+				UserVerification: legacy_domain.UserVerificationRequirementPreferred,
+				LastChallengedAt: time.Now(),
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -740,29 +738,46 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 				domain.WithSessionRepo(tt.sessionRepo(ctrl))(opts)
 			}
 			err := cmd.Execute(ctx, opts)
+			after := time.Now()
 			assert.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantChallengePasskey, cmd.WebAuthNChallenge)
+			assert.Equal(t, tt.wantWebAuthNChallenge, cmd.WebAuthNChallenge)
+			assertChallengePasskeyEqual(t, tt.wantChallengePasskey, cmd.ChallengePasskey, after)
 		})
 	}
 }
 
-func assertPasskeyChallengeChange(t *testing.T, expectedPasskeyChallenge *domain.SessionChallengePasskey) func(challenge *domain.SessionChallengePasskey) database.Change {
-	return func(challenge *domain.SessionChallengePasskey) database.Change {
-		assert.Equal(t, expectedPasskeyChallenge.Challenge, challenge.Challenge)
-		assert.Equal(t, expectedPasskeyChallenge.RPID, challenge.RPID)
-		assert.Equal(t, expectedPasskeyChallenge.UserVerification, challenge.UserVerification)
-		return database.NewChanges(
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "passkey_challenge_challenge"), challenge.Challenge,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "passkey_challenge_rp_id"), challenge.RPID,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "passkey_challenge_user_verification"), challenge.UserVerification,
-			),
-		)
+func assertChallengePasskeyEqual(t *testing.T, want, got *domain.SessionChallengePasskey, upperThreshold time.Time) {
+	if want == nil {
+		assert.Nil(t, got)
+		return
 	}
+	assert.WithinRange(t, got.LastChallengedAt, want.LastChallengedAt, upperThreshold)
+	assert.Equal(t, want.Challenge, got.Challenge)
+	assert.Equal(t, want.RPID, got.RPID)
+	assert.Equal(t, want.UserVerification, got.UserVerification)
+	assert.Equal(t, want.AllowedCredentialIDs, got.AllowedCredentialIDs)
+}
+
+func getPasskeyChallengeChange(repo *domainmock.MockSessionRepository, challenge *domain.SessionChallengePasskey) database.Change {
+	changes := database.NewChanges(
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "passkey_challenge_challenge"), challenge.Challenge,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "passkey_challenge_rp_id"), challenge.RPID,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "passkey_challenge_user_verification"), challenge.UserVerification,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "passkey_challenge_last_challenged_at"), challenge.LastChallengedAt,
+		),
+	)
+	repo.EXPECT().
+		SetChallenge(challenge).
+		AnyTimes().
+		Return(changes)
+	return changes
 }
 
 func getChallengePasskey(t *testing.T, data []byte) *session_grpc.Challenges_WebAuthN {

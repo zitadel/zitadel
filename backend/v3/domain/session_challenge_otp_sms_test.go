@@ -563,6 +563,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 		newPhoneCodeFn              func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 		wantErr                     error
 		wantOTPSMSChallenge         string
+		wantChallengeOTPSMS         *domain.SessionChallengeOTPSMS
 	}{
 		{
 			name:                   "no otp sms challenge request",
@@ -630,10 +631,8 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			wantErr: codeErr,
 		},
 		{
-			name: "update successful - external sms provider",
-			requestChallengeOTPSMS: &session_grpc.RequestChallenges_OTPSMS{
-				ReturnCode: true,
-			},
+			name:                   "update successful - external sms provider",
+			requestChallengeOTPSMS: &session_grpc.RequestChallenges_OTPSMS{},
 			smsProviderFn: func(ctx context.Context, instanceID string) (string, error) {
 				return "external-sms-provider-id", nil // with an external sms provider
 			},
@@ -642,22 +641,25 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
-					Code:         nil,
-					Expiry:       0,
-					CodeReturned: true,
-					GeneratorID:  "external-sms-provider-id",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
+					Code:             nil,
+					Expiry:           0,
+					CodeReturned:     true,
+					GeneratorID:      "external-sms-provider-id",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
+			},
+			wantChallengeOTPSMS: &domain.SessionChallengeOTPSMS{
+				LastChallengedAt:  time.Now(),
+				CodeReturned:      false,
+				GeneratorID:       "external-sms-provider-id",
+				TriggeredAtOrigin: "://",
 			},
 		},
 		{
@@ -686,29 +688,39 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
 			wantOTPSMSChallenge: "code",
+			wantChallengeOTPSMS: &domain.SessionChallengeOTPSMS{
+				LastChallengedAt: time.Now(),
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      true,
+				GeneratorID:       "",
+				TriggeredAtOrigin: "://",
+			},
 		},
 		{
 			name: "update successful - internal sms provider - with default config",
@@ -736,29 +748,39 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       defaultExpiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           defaultExpiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
 			wantOTPSMSChallenge: "code",
+			wantChallengeOTPSMS: &domain.SessionChallengeOTPSMS{
+				LastChallengedAt: time.Now(),
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      true,
+				GeneratorID:       "",
+				TriggeredAtOrigin: "://",
+			},
 		},
 		{
 			name: "update successful - internal sms provider - missing SMS OTP config - with default config",
@@ -786,29 +808,39 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       defaultExpiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           defaultExpiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(1), nil)
 				return repo
 			},
 			wantOTPSMSChallenge: "code",
+			wantChallengeOTPSMS: &domain.SessionChallengeOTPSMS{
+				LastChallengedAt: time.Now(),
+				Code: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				Expiry:            defaultExpiry,
+				CodeReturned:      true,
+				GeneratorID:       "",
+				TriggeredAtOrigin: "://",
+			},
 		},
 		{
 			name: "failed to update session",
@@ -836,24 +868,21 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(0), assert.AnError)
 				return repo
@@ -886,24 +915,21 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(0), nil)
 				return repo
@@ -936,24 +962,21 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
-				expectedChallengeOTPSMS := &domain.SessionChallengeOTPSMS{
+				challengeOTPSMSChange := getOTPSMSChallengeChange(repo, &domain.SessionChallengeOTPSMS{
 					Code: &crypto.CryptoValue{
 						CryptoType: crypto.TypeEncryption,
 						Algorithm:  "enc",
 						KeyID:      "id",
 						Crypted:    []byte("code"),
 					},
-					Expiry:       expiry,
-					CodeReturned: true,
-					GeneratorID:  "",
-				}
-				repo.EXPECT().
-					SetChallenge(gomock.Any()).
-					Times(1).
-					DoAndReturn(assertOTPSMSChallengeChange(t, expectedChallengeOTPSMS))
+					Expiry:           expiry,
+					CodeReturned:     true,
+					GeneratorID:      "",
+					LastChallengedAt: time.Now(),
+				})
 				idCondition := getSessionIDCondition(repo, "session-id")
 				repo.EXPECT().
-					Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).
+					Update(gomock.Any(), gomock.Any(), idCondition, challengeOTPSMSChange).
 					Times(1).
 					Return(int64(2), nil)
 				return repo
@@ -986,35 +1009,57 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				domain.WithSecretGeneratorSettingsRepo(tt.secretGeneratorSettingsRepo(ctrl))(opts)
 			}
 			err := cmd.Execute(ctx, opts)
+			after := time.Now()
 			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantOTPSMSChallenge, gu.Value(cmd.OTPSMSChallenge))
+			assertChallengeOTPSMSEqual(t, tt.wantChallengeOTPSMS, cmd.ChallengeOTPSMS, after)
 		})
 	}
 }
 
-func assertOTPSMSChallengeChange(t *testing.T, expectedChallengeOTPSMS *domain.SessionChallengeOTPSMS) func(challenge *domain.SessionChallengeOTPSMS) database.Change {
-	return func(challenge *domain.SessionChallengeOTPSMS) database.Change {
-		assert.Equal(t, expectedChallengeOTPSMS.Code, challenge.Code)
-		assert.Equal(t, expectedChallengeOTPSMS.Expiry, challenge.Expiry)
-		assert.Equal(t, expectedChallengeOTPSMS.CodeReturned, challenge.CodeReturned)
-		assert.Equal(t, expectedChallengeOTPSMS.GeneratorID, challenge.GeneratorID)
-
-		changes := []database.Change{
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_sms_challenge_expiry"), challenge.Expiry,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_sms_challenge_code_returned"), challenge.CodeReturned,
-			),
-			database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_sms_challenge_generator_id"), challenge.GeneratorID,
-			),
-		}
-		if challenge.Code != nil { // is nil in the case of an external sms provider
-			changes = append(changes, database.NewChange(
-				database.NewColumn("zitadel.sessions", "otp_sms_challenge_code"), challenge.Code.Crypted,
-			))
-		}
-		return database.NewChanges(changes...)
+func assertChallengeOTPSMSEqual(t *testing.T, want, got *domain.SessionChallengeOTPSMS, upperThreshold time.Time) {
+	t.Helper()
+	if want == nil {
+		assert.Nil(t, got)
+		return
 	}
+	assert.WithinRange(t, got.LastChallengedAt, want.LastChallengedAt, upperThreshold)
+	assert.Equal(t, want.Code, got.Code)
+	assert.Equal(t, want.Expiry, want.Expiry)
+	assert.Equal(t, want.CodeReturned, got.CodeReturned)
+	assert.Equal(t, want.GeneratorID, got.GeneratorID)
+	assert.Equal(t, want.TriggeredAtOrigin, got.TriggeredAtOrigin)
+}
+
+func getOTPSMSChallengeChange(repo *domainmock.MockSessionRepository, challenge *domain.SessionChallengeOTPSMS) database.Change {
+	changes := make([]database.Change, 0, 6)
+	changes = append(
+		changes,
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_last_challenged_at"), challenge.LastChallengedAt,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_expiry"), challenge.Expiry,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_code_returned"), challenge.CodeReturned,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_generator_id"), challenge.GeneratorID,
+		),
+		database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_triggered_at_origin"), challenge.TriggeredAtOrigin,
+		),
+	)
+	if challenge.Code != nil { // is nil in the case of an external sms provider
+		changes = append(changes, database.NewChange(
+			database.NewColumn("zitadel.sessions", "otp_sms_challenge_code"), challenge.Code.Crypted,
+		))
+	}
+	result := database.NewChanges(changes...)
+	repo.EXPECT().
+		SetChallenge(challenge).
+		AnyTimes().
+		Return(result)
+	return result
 }

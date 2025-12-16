@@ -248,6 +248,31 @@ type SessionChallengePasskey struct {
 	RPID                 string
 }
 
+// Matches implements [gomock.Matcher].
+func (s *SessionChallengePasskey) Matches(in any) bool {
+	challengePasskey, ok := in.(*SessionChallengePasskey)
+	if !ok {
+		return false
+	}
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastChallengedAt not being easily controllable through the tested code,
+	// we check that it's in a certain range rather than doing an exact match on time.
+	var isLastVerifiedAtInRange bool
+	if !challengePasskey.LastChallengedAt.IsZero() {
+		lowerThreshold := s.LastChallengedAt.Add(-timeDelta)
+		upperThreshold := s.LastChallengedAt.Add(timeDelta)
+		isLastVerifiedAtInRange = !challengePasskey.LastChallengedAt.Before(lowerThreshold) && !challengePasskey.LastChallengedAt.After(upperThreshold)
+	}
+	return isLastVerifiedAtInRange
+}
+
+// String implements [gomock.Matcher].
+func (s *SessionChallengePasskey) String() string {
+	return "SessionChallengePasskey"
+}
+
 // sessionChallengeType implements [SessionChallenge].
 func (s *SessionChallengePasskey) sessionChallengeType() SessionFactorType {
 	return SessionFactorTypePasskey
@@ -262,6 +287,31 @@ type SessionChallengeOTPSMS struct {
 	TriggeredAtOrigin string
 }
 
+// Matches implements [gomock.Matcher].
+func (s *SessionChallengeOTPSMS) Matches(in any) bool {
+	challengeOTPSMS, ok := in.(*SessionChallengeOTPSMS)
+	if !ok {
+		return false
+	}
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastChallengedAt not being easily controllable through the tested code,
+	// we check that it's in a certain range rather than doing an exact match on time.
+	var isLastVerifiedAtInRange bool
+	if !challengeOTPSMS.LastChallengedAt.IsZero() {
+		lowerThreshold := s.LastChallengedAt.Add(-timeDelta)
+		upperThreshold := s.LastChallengedAt.Add(timeDelta)
+		isLastVerifiedAtInRange = !challengeOTPSMS.LastChallengedAt.Before(lowerThreshold) && !challengeOTPSMS.LastChallengedAt.After(upperThreshold)
+	}
+	return isLastVerifiedAtInRange
+}
+
+// String implements [gomock.Matcher].
+func (s *SessionChallengeOTPSMS) String() string {
+	return "SessionChallengeOTPSMS"
+}
+
 // sessionChallengeType implements [SessionChallenge].
 func (s *SessionChallengeOTPSMS) sessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
@@ -274,6 +324,31 @@ type SessionChallengeOTPEmail struct {
 	CodeReturned      bool
 	URLTmpl           string
 	TriggeredAtOrigin string
+}
+
+// Matches implements [gomock.Matcher].
+func (s *SessionChallengeOTPEmail) Matches(in any) bool {
+	challengeOTPEmail, ok := in.(*SessionChallengeOTPEmail)
+	if !ok {
+		return false
+	}
+
+	// Using a fixed delta, can be changed later to make it configurable if needed
+	timeDelta := 800 * time.Millisecond
+	// Due to LastChallengedAt not being easily controllable through the tested code,
+	// we check that it's in a certain range rather than doing an exact match on time.
+	var isLastVerifiedAtInRange bool
+	if !challengeOTPEmail.LastChallengedAt.IsZero() {
+		lowerThreshold := s.LastChallengedAt.Add(-timeDelta)
+		upperThreshold := s.LastChallengedAt.Add(timeDelta)
+		isLastVerifiedAtInRange = !challengeOTPEmail.LastChallengedAt.Before(lowerThreshold) && !challengeOTPEmail.LastChallengedAt.After(upperThreshold)
+	}
+	return isLastVerifiedAtInRange
+}
+
+// String implements [gomock.Matcher].
+func (s *SessionChallengeOTPEmail) String() string {
+	return "SessionChallengeOTPEmail"
 }
 
 // sessionChallengeType implements [SessionChallenge].
