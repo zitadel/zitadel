@@ -149,6 +149,10 @@ func (s settings) list(ctx context.Context, client database.QueryExecutor, opts 
 }
 
 func (s settings) set(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	var (
 		id, createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction, database.DefaultInstruction
 	)
@@ -378,6 +382,10 @@ func LoginSettingsRepository() domain.LoginSettingsRepository {
 var _ domain.LoginSettingsRepository = (*loginSettings)(nil)
 
 func (s loginSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LoginSettings) error {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeLogin
 	settings.State = domain.SettingStateActive
 
@@ -572,6 +580,10 @@ func BrandingSettingsRepository() domain.BrandingSettingsRepository {
 var _ domain.BrandingSettingsRepository = (*brandingSettings)(nil)
 
 func (s brandingSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.BrandingSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeBranding
 	settings.State = domain.SettingStatePreview
 
@@ -719,6 +731,10 @@ func PasswordComplexitySettingsRepository() domain.PasswordComplexitySettingsRep
 var _ domain.PasswordComplexitySettingsRepository = (*passwordComplexitySettings)(nil)
 
 func (s passwordComplexitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordComplexitySettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypePasswordComplexity
 	settings.State = domain.SettingStateActive
 
@@ -801,6 +817,10 @@ func PasswordExpirySettingsRepository() domain.PasswordExpirySettingsRepository 
 }
 
 func (s passwordExpirySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.PasswordExpirySettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypePasswordExpiry
 	settings.State = domain.SettingStateActive
 
@@ -889,6 +909,10 @@ func LockoutSettingsRepository() domain.LockoutSettingsRepository {
 var _ domain.LockoutSettingsRepository = (*lockoutSettings)(nil)
 
 func (s lockoutSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LockoutSettings) error {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeLockout
 	settings.State = domain.SettingStateActive
 
@@ -977,6 +1001,10 @@ func SecuritySettingsRepository() domain.SecuritySettingsRepository {
 var _ domain.SecuritySettingsRepository = (*securitySettings)(nil)
 
 func (s securitySettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeSecurity
 	settings.State = domain.SettingStateActive
 
@@ -1065,6 +1093,10 @@ func DomainSettingsRepository() domain.DomainSettingsRepository {
 var _ domain.DomainSettingsRepository = (*domainSettings)(nil)
 
 func (s domainSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.DomainSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeDomain
 	settings.State = domain.SettingStateActive
 
@@ -1139,6 +1171,10 @@ func OrganizationSettingsRepository() domain.OrganizationSettingsRepository {
 var _ domain.OrganizationSettingsRepository = (*organizationSettings)(nil)
 
 func (s organizationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.OrganizationSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeOrganization
 	settings.State = domain.SettingStateActive
 
@@ -1213,6 +1249,10 @@ func NotificationSettingsRepository() domain.NotificationSettingsRepository {
 var _ domain.NotificationSettingsRepository = (*notificationSettings)(nil)
 
 func (s notificationSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.NotificationSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeNotification
 	settings.State = domain.SettingStateActive
 
@@ -1329,6 +1369,10 @@ func LegalAndSupportSettingsRepository() domain.LegalAndSupportSettingsRepositor
 var _ domain.LegalAndSupportSettingsRepository = (*legalAndSupportSettings)(nil)
 
 func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LegalAndSupportSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
 	settings.Type = domain.SettingTypeLegalAndSupport
 	settings.State = domain.SettingStateActive
 
@@ -1369,6 +1413,141 @@ func (s legalAndSupportSettings) Get(ctx context.Context, client database.QueryE
 
 	item := &domain.LegalAndSupportSettings{Settings: *settings}
 	if err = json.Unmarshal(item.Settings.Settings, &item.LegalAndSupportSettingsAttributes); err != nil {
+		return nil, err
+	}
+	item.Settings.Settings = nil
+	return item, nil
+}
+
+// -------------------------------------------------------------
+// secret generators
+// -------------------------------------------------------------
+
+type secretGeneratorSettings struct {
+	settings
+}
+
+func (s secretGeneratorSettings) SetSettingFields(value domain.SecretGeneratorSettingsAttributes) database.Change {
+	changes := make([]db_json.JsonUpdate, 0, 11)
+	if value.ClientSecret != nil {
+		changes = append(changes, s.SetClientSecret(*value.ClientSecret))
+	}
+	if value.InitializeUserCode != nil {
+		changes = append(changes, s.SetInitializeUserCode(*value.InitializeUserCode))
+	}
+	if value.EmailVerificationCode != nil {
+		changes = append(changes, s.SetEmailVerificationCode(*value.EmailVerificationCode))
+	}
+	if value.PhoneVerificationCode != nil {
+		changes = append(changes, s.SetPhoneVerificationCode(*value.PhoneVerificationCode))
+	}
+	if value.PasswordVerificationCode != nil {
+		changes = append(changes, s.SetPasswordVerificationCode(*value.PasswordVerificationCode))
+	}
+	if value.PasswordlessInitCode != nil {
+		changes = append(changes, s.SetPasswordlessInitCode(*value.PasswordlessInitCode))
+	}
+	if value.DomainVerification != nil {
+		changes = append(changes, s.SetDomainVerification(*value.DomainVerification))
+	}
+	if value.OTPSMS != nil {
+		changes = append(changes, s.SetOTPSMS(*value.OTPSMS))
+	}
+	if value.OTPEmail != nil {
+		changes = append(changes, s.SetOTPEmail(*value.OTPEmail))
+	}
+	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (s secretGeneratorSettings) SetClientSecret(value domain.ClientSecretAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"clientSecret"}, value)
+}
+
+func (s secretGeneratorSettings) SetInitializeUserCode(value domain.InitializeUserCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"initializeUserCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetEmailVerificationCode(value domain.EmailVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"emailVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPhoneVerificationCode(value domain.PhoneVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"phoneVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPasswordVerificationCode(value domain.PasswordVerificationCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"passwordVerificationCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetPasswordlessInitCode(value domain.PasswordlessInitCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"passwordlessInitCode"}, value)
+}
+
+func (s secretGeneratorSettings) SetDomainVerification(value domain.DomainVerificationAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"domainVerification"}, value)
+}
+
+func (s secretGeneratorSettings) SetOTPSMS(value domain.OTPSMSAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"otpSms"}, value)
+}
+
+func (s secretGeneratorSettings) SetOTPEmail(value domain.OTPEmailAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"otpEmail"}, value)
+}
+
+func SecretGeneratorSettingsRepository() domain.SecretGeneratorSettingsRepository {
+	return &secretGeneratorSettings{
+		settings{},
+	}
+}
+
+var _ domain.SecretGeneratorSettingsRepository = (*secretGeneratorSettings)(nil)
+
+func (s secretGeneratorSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecretGeneratorSettings) (err error) {
+	if settings == nil {
+		return database.ErrInvalidChangeTarget
+	}
+
+	settings.Type = domain.SettingTypeSecretGenerator
+	settings.State = domain.SettingStateActive
+
+	settingsJSON, err := json.Marshal(settings.SecretGeneratorSettingsAttributes)
+	if err != nil {
+		return err
+	}
+	settings.Settings.Settings = settingsJSON
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.SecretGeneratorSettingsAttributes)); err != nil {
+		return err
+	}
+	settings.Settings.Settings = nil
+	return nil
+}
+
+func (s secretGeneratorSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.SecretGeneratorSettings, error) {
+	settings, err := s.list(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*domain.SecretGeneratorSettings, len(settings))
+	for i := range settings {
+		list[i] = &domain.SecretGeneratorSettings{Settings: *settings[i]}
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].SecretGeneratorSettingsAttributes); err != nil {
+			return nil, err
+		}
+		list[i].Settings.Settings = nil
+	}
+	return list, nil
+}
+
+func (s secretGeneratorSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.SecretGeneratorSettings, error) {
+	settings, err := s.get(ctx, client, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &domain.SecretGeneratorSettings{Settings: *settings}
+	if err = json.Unmarshal(item.Settings.Settings, &item.SecretGeneratorSettingsAttributes); err != nil {
 		return nil, err
 	}
 	item.Settings.Settings = nil
