@@ -13,7 +13,7 @@ Instrumentation:
       Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
-      # Disable https for grpc and http exporters
+      # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
       # Interval for batching traces before export
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_BATCHDURATION
@@ -32,7 +32,7 @@ Instrumentation:
       Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
-      # Disable https for grpc and http exporters
+      # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
       # Interval at which metrics are exported
       BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
@@ -63,7 +63,7 @@ Instrumentation:
       Type: "none" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_ENDPOINT
-      # Disable https for grpc and http exporters
+      # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_INSECURE
       # Interval at which metrics are exported
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_BATCHDURATION
