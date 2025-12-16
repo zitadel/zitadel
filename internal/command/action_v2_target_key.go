@@ -68,7 +68,7 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 	if err != nil {
 		return time.Time{}, err
 	}
-	return writeModel.WriteModel.ChangeDate, nil
+	return writeModel.ChangeDate, nil
 }
 
 func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
@@ -89,7 +89,7 @@ func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID,
 		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.PublicKeyExpired")
 	}
 	if writeModel.Active {
-		return writeModel.WriteModel.ChangeDate, nil
+		return writeModel.ChangeDate, nil
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyActivatedEvent(
 		ctx,
@@ -99,7 +99,7 @@ func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID,
 	if err != nil {
 		return time.Time{}, err
 	}
-	return writeModel.WriteModel.ChangeDate, nil
+	return writeModel.ChangeDate, nil
 }
 
 func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
@@ -117,7 +117,7 @@ func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyI
 		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
 	}
 	if !writeModel.Active {
-		return writeModel.WriteModel.ChangeDate, nil
+		return writeModel.ChangeDate, nil
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyDeactivatedEvent(
 		ctx,
@@ -127,7 +127,7 @@ func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyI
 	if err != nil {
 		return time.Time{}, err
 	}
-	return writeModel.WriteModel.ChangeDate, nil
+	return writeModel.ChangeDate, nil
 }
 
 func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, resourceOwner string) (_ time.Time, err error) {
@@ -142,7 +142,7 @@ func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, r
 		return time.Time{}, err
 	}
 	if !writeModel.TargetExists || !writeModel.KeyExists {
-		return writeModel.WriteModel.ChangeDate, nil
+		return writeModel.ChangeDate, nil
 	}
 	if writeModel.Active {
 		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyDeleteActiveKey, "Errors.Target.PublicKeyActive")
@@ -155,7 +155,7 @@ func (c *Commands) RemoveTargetPublicKey(ctx context.Context, targetID, keyID, r
 	if err != nil {
 		return time.Time{}, err
 	}
-	return writeModel.WriteModel.ChangeDate, nil
+	return writeModel.ChangeDate, nil
 }
 
 func checkPublicKeyAndComputeFingerprint(key []byte) (string, error) {

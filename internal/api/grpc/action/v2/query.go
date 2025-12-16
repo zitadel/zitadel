@@ -498,6 +498,8 @@ func publicKeyExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.Searc
 
 func publicKeyFieldNameToSortingColumn(column action.PublicKeyFieldName) query.Column {
 	switch column {
+	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_UNSPECIFIED:
+		return query.AuthNKeyColumnCreationDate
 	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CREATION_DATE:
 		return query.AuthNKeyColumnCreationDate
 	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CHANGE_DATE:

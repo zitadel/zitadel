@@ -745,12 +745,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets       []target_domain.Target
-		targets                []target
-		fullMethod             string
-		req                    connect.AnyRequest
-		resp                   connect.AnyResponse
-		getActiveSigningWebKey execution.GetActiveSigningWebKey
+		executionTargets []target_domain.Target
+		targets          []target
+		fullMethod       string
+		req              connect.AnyRequest
+		resp             connect.AnyResponse
 	}
 	type res struct {
 		want    interface{}

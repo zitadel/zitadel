@@ -611,9 +611,7 @@ type callTestServer struct {
 	statusCode  int
 	respondBody []byte
 	signingKey  string
-
-	server *http.Server
-	called bool
+	called      bool
 }
 
 func (s *callTestServer) Called() bool {
