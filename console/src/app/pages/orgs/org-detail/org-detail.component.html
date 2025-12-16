@@ -10,11 +10,19 @@
     [hasActions]="hasWrite$ | async"
   >
     <ng-container topActions *ngIf="hasWrite$ | async">
-      <button mat-menu-item *ngIf="$any(org.state) === OrganizationState.ACTIVE" (click)="changeState(OrganizationState.INACTIVE)">
+      <button
+        mat-menu-item
+        *ngIf="$any(org.state) === OrganizationState.ACTIVE"
+        (click)="changeState(OrganizationState.INACTIVE)"
+      >
         {{ 'ORG.PAGES.DEACTIVATE' | translate }}
       </button>
 
-      <button mat-menu-item *ngIf="$any(org.state) === OrganizationState.INACTIVE" (click)="changeState(OrganizationState.ACTIVE)">
+      <button
+        mat-menu-item
+        *ngIf="$any(org.state) === OrganizationState.INACTIVE"
+        (click)="changeState(OrganizationState.ACTIVE)"
+      >
         {{ 'ORG.PAGES.REACTIVATE' | translate }}
       </button>
 
