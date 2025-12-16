@@ -45,6 +45,7 @@ const (
 	UserAuthMethodTypeOTP // generic OTP when parsing AMR from OIDC
 	UserAuthMethodTypePrivateKey
 	userAuthMethodTypeCount
+	UserAuthMethodTypeRecoveryCode
 )
 
 // HasMFA checks whether the user authenticated with multiple auth factors.
@@ -63,6 +64,7 @@ func HasMFA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeOTPEmail,
 			UserAuthMethodTypeIDP,
 			UserAuthMethodTypeOTP,
+			UserAuthMethodTypeRecoveryCode,
 			UserAuthMethodTypePrivateKey:
 			factors++
 		case UserAuthMethodTypeUnspecified,
@@ -83,6 +85,7 @@ func Has2FA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeTOTP,
 			UserAuthMethodTypeOTPSMS,
 			UserAuthMethodTypeOTPEmail,
+			UserAuthMethodTypeRecoveryCode,
 			UserAuthMethodTypeOTP:
 			factors++
 		case UserAuthMethodTypeUnspecified,
@@ -105,6 +108,25 @@ func RequiresMFA(forceMFA, forceMFALocalOnly, isInternalLogin bool) bool {
 		return forceMFA || forceMFALocalOnly
 	}
 	return forceMFA && !forceMFALocalOnly
+}
+
+// AuthMethodToSecondFactor maps user auth methods to their corresponding second factor types
+func AuthMethodToSecondFactor(method UserAuthMethodType) SecondFactorType {
+	switch method {
+	case UserAuthMethodTypeTOTP:
+		return SecondFactorTypeTOTP
+	case UserAuthMethodTypeU2F:
+		return SecondFactorTypeU2F
+	case UserAuthMethodTypeOTPSMS:
+		return SecondFactorTypeOTPSMS
+	case UserAuthMethodTypeOTPEmail:
+		return SecondFactorTypeOTPEmail
+	case UserAuthMethodTypeOTP:
+		return SecondFactorTypeOTPSMS
+	default:
+		// First-factor methods: password, IDP, passwordless, private key
+		return 0
+	}
 }
 
 type PersonalAccessTokenState int32

@@ -24,15 +24,19 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	app_v2beta "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	authorization_v2 "github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
+	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
+	instance_v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	internal_permission_v2beta "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -41,6 +45,7 @@ import (
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	project_v2 "github.com/zitadel/zitadel/pkg/grpc/project/v2"
 	project_v2beta "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
@@ -83,10 +88,15 @@ type Client struct {
 	SAMLv2                   saml_pb.SAMLServiceClient
 	SCIM                     *scim.Client
 	Projectv2Beta            project_v2beta.ProjectServiceClient
-	InstanceV2Beta           instance.InstanceServiceClient
-	AppV2Beta                app.AppServiceClient
+	ProjectV2                project_v2.ProjectServiceClient
+	InstanceV2Beta           instance_v2beta.InstanceServiceClient //nolint:staticcheck // deprecated but still used in tests
+	InstanceV2               instance_v2.InstanceServiceClient
+	AppV2Beta                app_v2beta.AppServiceClient
+	ApplicationV2            application.ApplicationServiceClient
 	InternalPermissionv2Beta internal_permission_v2beta.InternalPermissionServiceClient
-	AuthorizationV2Beta      authorization.AuthorizationServiceClient
+	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
+	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
+	AuthorizationV2          authorization_v2.AuthorizationServiceClient
 	GroupV2                  group_v2.GroupServiceClient
 }
 
@@ -128,10 +138,15 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SAMLv2:                   saml_pb.NewSAMLServiceClient(cc),
 		SCIM:                     scim.NewScimClient(target),
 		Projectv2Beta:            project_v2beta.NewProjectServiceClient(cc),
-		InstanceV2Beta:           instance.NewInstanceServiceClient(cc),
-		AppV2Beta:                app.NewAppServiceClient(cc),
+		ProjectV2:                project_v2.NewProjectServiceClient(cc),
+		InstanceV2Beta:           instance_v2beta.NewInstanceServiceClient(cc),
+		InstanceV2:               instance_v2.NewInstanceServiceClient(cc),
+		AppV2Beta:                app_v2beta.NewAppServiceClient(cc),
+		ApplicationV2:            application.NewApplicationServiceClient(cc),
 		InternalPermissionv2Beta: internal_permission_v2beta.NewInternalPermissionServiceClient(cc),
-		AuthorizationV2Beta:      authorization.NewAuthorizationServiceClient(cc),
+		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
+		AuthorizationV2Beta:      authorization_v2beta.NewAuthorizationServiceClient(cc),
+		AuthorizationV2:          authorization_v2.NewAuthorizationServiceClient(cc),
 		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
@@ -962,20 +977,23 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID string) *authorization.CreateAuthorizationResponse {
-	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
-		UserId:    userID,
-		ProjectId: projectID,
+func (i *Instance) CreateAuthorizationProject(t *testing.T, ctx context.Context, projectID, userID, organizationID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
 }
 
-func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, orgID, userID string) *authorization.CreateAuthorizationResponse {
-	resp, err := i.Client.AuthorizationV2Beta.CreateAuthorization(ctx, &authorization.CreateAuthorizationRequest{
+func (i *Instance) CreateAuthorizationProjectGrant(t *testing.T, ctx context.Context, projectID, organizationID, userID string, roles ...string) *authorization_v2.CreateAuthorizationResponse {
+	resp, err := i.Client.AuthorizationV2.CreateAuthorization(ctx, &authorization_v2.CreateAuthorizationRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
-		OrganizationId: gu.Ptr(orgID),
+		OrganizationId: organizationID,
+		RoleKeys:       roles,
 	})
 	require.NoError(t, err)
 	return resp
@@ -1301,6 +1319,15 @@ func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name st
 func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *group_v2.DeleteGroupResponse {
 	resp, err := i.Client.GroupV2.DeleteGroup(ctx, &group_v2.DeleteGroupRequest{
 		Id: id,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) AddUsersToGroup(ctx context.Context, t *testing.T, groupID string, userIDs []string) *group_v2.AddUsersToGroupResponse {
+	resp, err := i.Client.GroupV2.AddUsersToGroup(ctx, &group_v2.AddUsersToGroupRequest{
+		Id:      groupID,
+		UserIds: userIDs,
 	})
 	require.NoError(t, err)
 	return resp

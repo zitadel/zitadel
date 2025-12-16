@@ -18,12 +18,15 @@ permissions:
   packages: write
   issues: write
   pull-requests: write
-  actions: write
 
 jobs:
   lint_test_build:
     uses: ./.github/workflows/lint_test_build.yml
+    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
     with:
+      go_version: "1.25"
       node_version: "22"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -31,12 +34,14 @@ jobs:
 
   pack:
     uses: ./.github/workflows/pack.yml
+    permissions:
+      contents: write
+      packages: write
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    permissions:
-      packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
+      go_version: "1.25"
       node_version: "22"
       semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"

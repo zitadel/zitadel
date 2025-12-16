@@ -159,18 +159,6 @@
     "signInWithAzureAD": "Mit AzureAD anmelden",
     "signInWithGithub": "Mit GitHub anmelden",
     "signInWithGitlab": "Mit GitLab anmelden",
-    "loginSuccess": {
-      "title": "Anmeldung erfolgreich",
-      "description": "Sie haben sich erfolgreich angemeldet!"
-    },
-    "linkingSuccess": {
-      "title": "Konto verknüpft",
-      "description": "Sie haben Ihr Konto erfolgreich verknüpft!"
-    },
-    "registerSuccess": {
-      "title": "Registrierung erfolgreich",
-      "description": "Sie haben sich erfolgreich registriert!"
-    },
     "loginError": {
       "title": "Anmeldung fehlgeschlagen",
       "description": "Beim Anmelden ist ein Fehler aufgetreten."
@@ -182,6 +170,35 @@
     "completeRegister": {
       "title": "Registrierung abschließen",
       "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
+    },
+    "accountNotFound": {
+      "title": "Konto nicht gefunden",
+      "description": "Wir konnten kein Konto finden, das mit Ihren Identitätsanbieter-Anmeldedaten verknüpft ist.",
+      "info": "Es wurde kein bestehendes Konto gefunden. Bitte melden Sie sich mit einem bestehenden Konto an oder wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "registrationFailed": {
+      "title": "Registrierung nicht verfügbar",
+      "description": "Wir konnten den Registrierungsprozess nicht abschließen.",
+      "info": "Die Organisation für die Registrierung konnte nicht ermittelt werden. Bitte wenden Sie sich an Ihren Administrator.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "processing": {
+      "message": "Authentifizierung wird verarbeitet...",
+      "noRedirect": "Keine Weiterleitung oder Fehler vom Server erhalten",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "errors": {
+      "missingParameters": "Erforderliche Parameter fehlen",
+      "missingIdpInfo": "IDP-Informationen fehlen",
+      "idpNotFound": "Identitätsanbieter nicht gefunden",
+      "linkingNotAllowed": "Verknüpfung ist für diesen Identitätsanbieter nicht erlaubt",
+      "linkingFailed": "Verknüpfung des Identitätsanbieters zum Konto fehlgeschlagen",
+      "autoLinkingFailed": "Automatische Verknüpfung des Kontos fehlgeschlagen",
+      "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
+      "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
+      "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
     }
   },
   "ldap": {
@@ -245,7 +262,23 @@
       "title": "Mit einem Passkey authentifizieren",
       "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
       "usePassword": "Passwort verwenden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey-Challenge konnte nicht angefordert werden",
+        "couldNotVerifyPasskey": "Passkey konnte nicht verifiziert werden",
+        "noResponseReceived": "Passkey-Verifizierung fehlgeschlagen - keine Antwort erhalten",
+        "noRedirectProvided": "Passkey-Verifizierung abgeschlossen, aber keine Weiterleitung bereitgestellt",
+        "couldNotRetrievePasskey": "Fehler beim Abrufen des Passkeys",
+        "verificationCancelled": "Passkey-Verifizierung wurde abgebrochen",
+        "verificationFailed": "Fehler bei der Passkey-Verifizierung",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+        "userNotFound": "Benutzer nicht im System gefunden",
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotSetSession": "Sitzung konnte nicht gesetzt werden",
+        "couldNotGetUser": "Benutzerdaten konnten nicht abgerufen werden",
+        "couldNotRetrieveSessionCookie": "Sitzungs-Cookie konnte nicht abgerufen werden"
+      }
     },
     "set": {
       "title": "Passkey einrichten",
@@ -374,7 +407,9 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "noHostFound": "Kein Host gefunden",
       "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
-      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden"
+      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
+      "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
+      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden"
     }
   },
   "authenticator": {
@@ -416,6 +451,7 @@
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-    "tryagain": "Erneut versuchen"
+    "tryagain": "Erneut versuchen",
+    "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
   }
 }

@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package zitadel.application.v2;
+
+import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/application/v2/login.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
+
+message OIDCLocalizedMessage {
+  string key = 1;
+  string localized_message = 2;
+}
+
+enum OIDCResponseType {
+  OIDC_RESPONSE_TYPE_UNSPECIFIED = 0;
+  OIDC_RESPONSE_TYPE_CODE = 1;
+  OIDC_RESPONSE_TYPE_ID_TOKEN = 2;
+  OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN = 3;
+}
+
+enum OIDCGrantType {
+  OIDC_GRANT_TYPE_AUTHORIZATION_CODE = 0;
+  OIDC_GRANT_TYPE_IMPLICIT = 1;
+  OIDC_GRANT_TYPE_REFRESH_TOKEN = 2;
+  OIDC_GRANT_TYPE_DEVICE_CODE = 3;
+  OIDC_GRANT_TYPE_TOKEN_EXCHANGE = 4;
+}
+
+enum OIDCApplicationType {
+  OIDC_APP_TYPE_WEB = 0;
+  OIDC_APP_TYPE_USER_AGENT = 1;
+  OIDC_APP_TYPE_NATIVE = 2;
+}
+
+enum OIDCAuthMethodType {
+  OIDC_AUTH_METHOD_TYPE_BASIC = 0;
+  OIDC_AUTH_METHOD_TYPE_POST = 1;
+  OIDC_AUTH_METHOD_TYPE_NONE = 2;
+  OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 3;
+}
+
+enum OIDCVersion {
+  OIDC_VERSION_1_0 = 0;
+}
+
+enum OIDCTokenType {
+  OIDC_TOKEN_TYPE_BEARER = 0;
+  OIDC_TOKEN_TYPE_JWT = 1;
+}
+
+message OIDCConfiguration {
+  // RedirectURIs are the allowed callback URIs for the OAuth2 / OIDC flows,
+  // where the authorization code or tokens will be sent to.
+  // The redirect_uri parameter in the authorization request must exactly match one of these URIs.
+  repeated string redirect_uris = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://console.zitadel.ch/auth/callback\"]"}];
+
+  // ResponseTypes define whether a code, id_token token or just id_token will be returned.
+  // The response_type parameter in the authorization request must exactly match one of these values.
+  repeated OIDCResponseType response_types = 2;
+
+  // GrantTypes define the flow type the application is allowed to use.
+  // The grant_type parameter in the token request must exactly match one of these values.
+  repeated OIDCGrantType grant_types = 3;
+
+  // ApplicationType defines the OAuth2/OIDC client type and their ability to maintain
+  // confidentiality of their credentials.
+  // This influences the allowed grant types and the required authentication method.
+  OIDCApplicationType application_type = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "determines the paradigm of the application"}];
+
+  // The unique OAuth2/OIDC client_id used for authentication of the application,
+  // e.g. at the token endpoint.
+  string client_id = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334@ZITADEL\""}];
+
+  // The authentication method type used by the application to authenticate at the token endpoint.
+  OIDCAuthMethodType auth_method_type = 6;
+
+  // PostLogoutRedirectURIs are the allowed URIs to redirect to after a logout.
+  // The post_logout_redirect_uri parameter in the logout request must exactly match one of these URIs.
+  repeated string post_logout_redirect_uris = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://console.zitadel.ch/logout\"]"}];
+
+  // Version defines the OIDC version used by the application.
+  // Currently, only version 1.0 is supported.
+  // Future versions might introduce breaking changes.
+  OIDCVersion version = 8;
+
+  // NonCompliant specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant.
+  // Non-compliant configurations can run into interoperability issues with OIDC libraries and tools.
+  // Compliance problems are listed in the compliance_problems field.
+  bool non_compliant = 9;
+
+  // ComplianceProblems lists the problems for non-compliant configurations.
+  // In case of a compliant configuration, this list is empty.
+  repeated OIDCLocalizedMessage compliance_problems = 10;
+
+  // DevelopmentMode can be enabled for development purposes. This allows the use of
+  // OIDC non-compliant and potentially insecure settings, such as the use of
+  // HTTP redirect URIs or wildcard redirect URIs.
+  bool development_mode = 11;
+
+  // The AccessTokenType defines the type of the access token returned from ZITADEL.
+  // Bearer tokens are opaque to clients. JWT tokens are self-contained and can be validated by the client.
+  // Bearer tokens must be introspected at the ZITADEL token endpoint.
+  OIDCTokenType access_token_type = 12;
+
+  // If AccessTokenRoleAssertion is enabled, the roles of the user are added to the access token.
+  // Ensure that the access token is a JWT token and not a bearer token. And either request the roles
+  // by scope or enable the user role assertion on the project.
+  bool access_token_role_assertion = 13;
+
+  // If IDTokenRoleAssertion is enabled, the roles of the user are added to the id token.
+  // Ensure that either the roles are requested by scope or enable the user role assertion on the
+  // project.
+  bool id_token_role_assertion = 14;
+
+  // If IDTokenUserinfoAssertion is enabled, the claims of profile, email, address and phone scopes
+  // are added to the id token even if an access token is issued. This can be required by some applications
+  // that do not call the userinfo endpoint after authentication or directly use the id_token for retrieving
+  // user information.
+  // Attention: this violates the OIDC specification, which states that these claims must only be
+  // requested from the userinfo endpoint if an access token is issued. This is to prevent
+  // leaking of personal information in the id token, which is often stored in the browser and
+  // therefore more vulnerable.
+  bool id_token_userinfo_assertion = 15;
+
+  // ClockSkew is used to compensate time differences between the servers of ZITADEL and the application.
+  // It is added to the "exp" claim and subtracted from "iat", "auth_time" and "nbf" claims.
+  // The default is 0s, the maximum is 5s.
+  google.protobuf.Duration clock_skew = 16;
+
+  // AdditionalOrigins are HTTP origins (scheme + host + port) from where the API can be used
+  // additional to the redirect_uris.
+  // This is useful if the application is used from an origin different to the redirect_uris,
+  // e.g. if the application is a SPA served in a native app, where the redirect_uri is a custom scheme,
+  // but the application is served from a https origin.
+  repeated string additional_origins = 17 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://console.zitadel.ch/auth/callback\"]"}];
+
+  // AllowedOrigins are all HTTP origins where the application is allowed to be used from.
+  // This is used to prevent CORS issues in browsers.
+  // If the origin of the request is not in this list, the request will be rejected.
+  // This is especially important for SPAs.
+  // Note that this is a generated list from the redirect_uris and additional_origins.
+  // If you use the application from another origin, you have to add it to the additional_origins.
+  repeated string allowed_origins = 18 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://console.zitadel.ch\"]"}];
+
+  // For native apps a successful login usually shows a success page with a link to open the application again.
+  // SkipNativeAppSuccessPage can be used to skip this page and open the application directly.
+  bool skip_native_app_success_page = 19;
+
+  // BackChannelLogoutURI is used to notify the application about terminated sessions according
+  // to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html).
+  string back_channel_logout_uri = 20 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://example.com/auth/backchannel\"]"}];
+
+  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
+  // hosted on any other domain.
+  // If unset, the login UI is chosen by the instance default.
+  LoginVersion login_version = 21;
+}

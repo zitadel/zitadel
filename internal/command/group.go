@@ -30,20 +30,6 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// todo: check permissions
-
-	if err = group.IsValid(); err != nil {
-		return nil, err
-	}
-	if group.ResourceOwner == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-msc0Tt", "Errors.Group.MissingOrganizationID")
-	}
-	// check whether the organization where the group should be created exists
-	err = c.checkOrgExists(ctx, group.ResourceOwner)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-j1mH8l", "Errors.Org.NotFound")
-	}
-
 	// create a unique group ID if not provided
 	if group.AggregateID == "" {
 		group.AggregateID, err = c.idGenerator.Next()
@@ -52,8 +38,25 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 		}
 	}
 
+	if err = group.IsValid(); err != nil {
+		return nil, err
+	}
+	if group.ResourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-msc0Tt", "Errors.Group.MissingOrganizationID")
+	}
+
+	if err = c.checkPermissionCreateGroup(ctx, group.ResourceOwner, group.AggregateID); err != nil {
+		return nil, err
+	}
+
+	// check whether the organization where the group should be created exists
+	err = c.checkOrgExists(ctx, group.ResourceOwner)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-j1mH8l", "Errors.Org.NotFound")
+	}
+
 	// check if a group with the same ID already exists
-	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group.AggregateID, group.ResourceOwner)
+	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group.AggregateID, group.ResourceOwner, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +100,16 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (d
 		return nil, err
 	}
 
-	// todo: check permissions
-	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner)
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner, nil)
 	if err != nil {
 		return nil, err
 	}
 	if !existingGroup.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
+	}
+
+	if err = c.checkPermissionUpdateGroup(ctx, existingGroup.ResourceOwner, existingGroup.AggregateID); err != nil {
+		return nil, err
 	}
 
 	changedEvent := existingGroup.NewChangedEvent(
@@ -130,12 +136,16 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, "")
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, "", nil)
 	if err != nil {
 		return nil, err
 	}
 	if !existingGroup.State.Exists() {
 		return writeModelToObjectDetails(&existingGroup.WriteModel), nil
+	}
+
+	if err = c.checkPermissionDeleteGroup(ctx, existingGroup.ResourceOwner, existingGroup.AggregateID); err != nil {
+		return nil, err
 	}
 
 	err = c.pushAppendAndReduce(ctx,
@@ -150,11 +160,22 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }
 
-func (c *Commands) getGroupWriteModelByID(ctx context.Context, id, orgID string) (*GroupWriteModel, error) {
-	groupWriteModel := NewGroupWriteModel(id, orgID)
+func (c *Commands) getGroupWriteModelByID(ctx context.Context, groupID, orgID string, userIDs []string) (*GroupWriteModel, error) {
+	groupWriteModel := NewGroupWriteModel(groupID, orgID, userIDs)
 	err := c.eventstore.FilterToQueryReducer(ctx, groupWriteModel)
 	if err != nil {
 		return nil, err
 	}
 	return groupWriteModel, nil
+}
+
+func (c *Commands) checkGroupExists(ctx context.Context, groupID string, userIDs []string) (*GroupWriteModel, error) {
+	group, err := c.getGroupWriteModelByID(ctx, groupID, "", userIDs)
+	if err != nil {
+		return nil, err
+	}
+	if !group.State.Exists() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-eQfeur", "Errors.Group.NotFound")
+	}
+	return group, nil
 }

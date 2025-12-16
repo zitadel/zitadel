@@ -36,6 +36,14 @@ export const LANGS: Lang[] = [
     name: "Türkçe",
     code: "tr",
   },
+  {
+    name: "日本語",
+    code: "ja",
+  },
+  {
+    name: "Українська",
+    code: "uk",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";

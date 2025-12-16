@@ -6,6 +6,7 @@
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go"
@@ -61,7 +62,7 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -v -ldflags=\"-s -w\"'",
+            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
@@ -115,9 +116,7 @@
         "test-unit": {
             "description": "Runs the unit tests with coverage",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate"
             ],
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
             "inputs": [
@@ -131,9 +130,7 @@
         "test-integration-build": {
             "description": "Builds the test binary for integration tests.",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate"
             ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
             "cache": true,
@@ -215,6 +212,9 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
+            "inputs": [
+                "{workspaceRoot}/console/dist/console/**/*"
+            ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
@@ -305,7 +305,8 @@
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
                     "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
-                ]
+                ],
+                "parallel": false
             },
             "cache": true,
             "inputs": [
@@ -350,19 +351,19 @@
             "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
             "executor": "nx:run-commands",
             "options": {
+                "parallel": false,
                 "commands": [
                     "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\".artifacts/pack/zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
                 ]
             }
         },
         "pack-darwin-amd64": {
             "description": "Packages the API for Darwin AMD64 (Intel) architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -378,9 +379,8 @@
         "pack-darwin-arm64": {
             "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -396,9 +396,8 @@
         "pack-linux-amd64": {
             "description": "Packages the API for Linux AMD64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -414,9 +413,8 @@
         "pack-linux-arm64": {
             "description": "Packages the API for Linux ARM64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -432,9 +430,8 @@
         "pack-windows-amd64": {
             "description": "Packages the API for Windows AMD64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
             "cache": true,
@@ -450,9 +447,8 @@
         "pack-windows-arm64": {
             "description": "Packages the API for Windows ARM64 architecture",
             "dependsOn": [
-                "generate-stubs",
-                "generate-assets",
-                "generate-statik"
+                "generate",
+                "build-console"
             ],
             "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
             "cache": true,

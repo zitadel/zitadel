@@ -92,7 +92,10 @@ func (i *idProvider) Update(ctx context.Context, client database.QueryExecutor, 
 		i.InstanceIDCondition(instanceID),
 		i.OrgIDCondition(orgID),
 	}
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
@@ -431,6 +434,14 @@ func (i *idProvider) GetSAML(ctx context.Context, client database.QueryExecutor,
 // columns
 // -------------------------------------------------------------
 
+// PrimaryKeyColumns implements [domain.Repository].
+func (i idProvider) PrimaryKeyColumns() []database.Column {
+	return []database.Column{
+		i.InstanceIDColumn(),
+		i.IDColumn(),
+	}
+}
+
 func (idProvider) InstanceIDColumn() database.Column {
 	return database.NewColumn("identity_providers", "instance_id")
 }
@@ -498,6 +509,13 @@ func (idProvider) UpdatedAtColumn() database.Column {
 // -------------------------------------------------------------
 // conditions
 // -------------------------------------------------------------
+
+func (i idProvider) PrimaryKeyCondition(instanceID, id string) database.Condition {
+	return database.And(
+		i.InstanceIDCondition(instanceID),
+		i.IDCondition(id),
+	)
+}
 
 func (i idProvider) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, id)

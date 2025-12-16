@@ -10,12 +10,13 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 // GetGroup returns a group that matches the group ID in the request
 func (s *Server) GetGroup(ctx context.Context, req *connect.Request[group_v2.GetGroupRequest]) (*connect.Response[group_v2.GetGroupResponse], error) {
-	group, err := s.query.GetGroupByID(ctx, req.Msg.GetId())
+	group, err := s.query.GetGroupByID(ctx, req.Msg.GetId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +31,28 @@ func (s *Server) ListGroups(ctx context.Context, req *connect.Request[group_v2.L
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchGroups(ctx, queries)
+	resp, err := s.query.SearchGroups(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&group_v2.ListGroupsResponse{
 		Groups:     groupsToPb(resp.Groups),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
+	}), nil
+}
+
+// ListGroupUsers returns a list of users from user groupUsers that match the search criteria
+func (s *Server) ListGroupUsers(ctx context.Context, req *connect.Request[group_v2.ListGroupUsersRequest]) (*connect.Response[group_v2.ListGroupUsersResponse], error) {
+	queries, err := listGroupUsersRequestToModel(req.Msg, s.systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.SearchGroupUsers(ctx, queries, s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&group_v2.ListGroupUsersResponse{
+		GroupUsers: groupUsersToPb(resp.GroupUsers),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}), nil
 }
@@ -118,5 +135,87 @@ func groupToPb(g *query.Group) *group_v2.Group {
 		OrganizationId: g.ResourceOwner,
 		CreationDate:   timestamppb.New(g.CreationDate),
 		ChangeDate:     timestamppb.New(g.ChangeDate),
+	}
+}
+
+func listGroupUsersRequestToModel(req *group_v2.ListGroupUsersRequest, systemDefaults systemdefaults.SystemDefaults) (*query.GroupUsersSearchQuery, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(systemDefaults, req.GetPagination())
+	if err != nil {
+		return nil, err
+	}
+	queries, err := groupUsersSearchFiltersToQuery(req.GetFilters())
+	if err != nil {
+		return nil, err
+	}
+	return &query.GroupUsersSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: groupUsersFieldNameToSortingColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func groupUsersSearchFiltersToQuery(filters []*group_v2.GroupUsersSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(filters))
+	for i, f := range filters {
+		q[i], err = groupUsersFilterToQuery(f)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func groupUsersFilterToQuery(f *group_v2.GroupUsersSearchFilter) (query.SearchQuery, error) {
+	switch q := f.Filter.(type) {
+	case *group_v2.GroupUsersSearchFilter_UserIds:
+		return query.NewGroupUsersUserIDsSearchQuery(q.UserIds.GetIds())
+	case *group_v2.GroupUsersSearchFilter_GroupIds:
+		return query.NewGroupUsersGroupIDsSearchQuery(q.GroupIds.GetIds())
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-osMHhx", "List.Query.Invalid")
+	}
+}
+
+func groupUsersFieldNameToSortingColumn(field *group_v2.GroupUserFieldName) query.Column {
+	if field == nil {
+		return query.GroupUsersColumnCreationDate
+	}
+	switch *field {
+	case group_v2.GroupUserFieldName_GROUP_USER_FIELD_NAME_CREATION_DATE,
+		group_v2.GroupUserFieldName_GROUP_USER_FIELD_NAME_UNSPECIFIED:
+		return query.GroupUsersColumnCreationDate
+	case group_v2.GroupUserFieldName_GROUP_USER_FIELD_NAME_USER_ID:
+		return query.GroupUsersColumnUserID
+	case group_v2.GroupUserFieldName_GROUP_USER_FIELD_NAME_GROUP_ID:
+		return query.GroupUsersColumnGroupID
+	default:
+		return query.GroupUsersColumnCreationDate
+	}
+}
+
+func groupUsersToPb(groupUsers []*query.GroupUser) []*group_v2.GroupUser {
+	pbGroupUsers := make([]*group_v2.GroupUser, len(groupUsers))
+	for i, gu := range groupUsers {
+		pbGroupUsers[i] = groupUserToPb(gu)
+	}
+	return pbGroupUsers
+}
+
+func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
+	return &group_v2.GroupUser{
+		GroupId:        gu.GroupID,
+		OrganizationId: gu.ResourceOwner,
+		User: &authorization_v2beta.User{
+			Id:                 gu.UserID,
+			PreferredLoginName: gu.PreferredLoginName,
+			DisplayName:        gu.DisplayName,
+			AvatarUrl:          gu.AvatarUrl,
+			OrganizationId:     gu.ResourceOwner,
+		},
+		CreationDate: timestamppb.New(gu.CreationDate),
 	}
 }

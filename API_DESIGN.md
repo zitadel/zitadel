@@ -53,7 +53,7 @@ Please check out the structure Buf style guide for more information about the fo
 As a rule of thumb, redundant API methods are deprecated.
 
 - The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` MUST be set to true.
-- One or more links to recommended replacement methods MUST be added to the deprecation message as a proto comment above the rpc spec.
+- One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
 - Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
 
 #### Example
@@ -252,7 +252,7 @@ Methods on a resource MUST be named using the following convention:
 | Create    | Create\<resource\> | Create a new resource. If the new resource conflicts with an existing resources uniqueness (id, loginname, ...) the creation MUST be prevented and an error returned.                                                                       |
 | Update    | Update\<resource\> | Update an existing resource. In most cases this SHOULD allow partial updates. If there are exception, they MUST be explicitly documented on the endpoint. The resource MUST already exists. An error is returned otherwise.                 |
 | Delete    | Delete\<resource\> | Delete an existing resource. If the resource does not exist, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented.                                                                    |
-| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. It SHOULD allow partial changes. |
+| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. |
 | Get       | Get\<resource\>    | Retrieve a single resource by its unique identifier. If the resource does not exist, an error MUST be returned.                                                                                                                             |
 | List      | List\<resource\>   | Retrieve a list of resources. The endpoint SHOULD provide options to filter, sort and paginate.                                                                                                                                             |
 
@@ -269,6 +269,30 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Verify` for verifying a resource.
 - `Send` for sending a resource.
 - etc.
+
+#### REST Path
+
+Paths of operations MUST be structured as follows:
+
+| Operation     | Method | Path                                     |
+|---------------|--------|------------------------------------------|
+| Create/Add    | POST   | /\<version\>/\<resource\>                |
+| Update        | POST   | /\<version\>/\<resource\>/\<identifier\> |
+| Delete/Remove | DELETE | /\<version\>/\<resource\>/\<identifier\> |
+| Set           | PUT    | /\<version\>/\<resource\>                |
+| Get           | GET    | /\<version\>/\<resource\>/\<identifier\> |
+| List          | POST   | /\<version\>/\<resource\>/search         |
+
+Which results in an example path for operations like `/v2beta/users/search`.
+
+Paths of status changes on resources MUST be structured as follows:
+
+| Operation  | Method | Path                                                |
+|------------|--------|-----------------------------------------------------|
+| Activate   | POST   | /\<version\>/\<resource\>/\<identifier\>/activate   |
+| Deactivate | POST   | /\<version\>/\<resource\>/\<identifier\>/deactivate |
+
+Which results in an example path for status changes like `/v2beta/users/1234567890/activate`.
 
 ## Authentication and Authorization
 

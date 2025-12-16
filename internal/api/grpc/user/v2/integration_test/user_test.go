@@ -6,8 +6,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"net/url"
-	"os"
 	"testing"
 	"time"
 
@@ -17,11 +15,9 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -29,35 +25,6 @@ import (
 	user_v1 "github.com/zitadel/zitadel/pkg/grpc/user"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
-
-var (
-	CTX                            context.Context
-	IamCTX                         context.Context
-	LoginCTX                       context.Context
-	UserCTX                        context.Context
-	SystemCTX                      context.Context
-	SystemUserWithNoPermissionsCTX context.Context
-	Instance                       *integration.Instance
-	Client                         user.UserServiceClient
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-		defer cancel()
-
-		Instance = integration.NewInstance(ctx)
-
-		SystemUserWithNoPermissionsCTX = integration.WithSystemUserWithNoPermissionsAuthorization(ctx)
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
-		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
-		SystemCTX = integration.WithSystemAuthorization(ctx)
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		Client = Instance.Client.UserV2
-		return m.Run()
-	}())
-}
 
 func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
@@ -74,7 +41,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "default verification",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -115,7 +82,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "default verification (org domain ctx)",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgDomain{
@@ -156,7 +123,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "return email verification code",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -201,7 +168,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "custom template",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -247,7 +214,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "return phone verification code",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -294,7 +261,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "custom template error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -335,7 +302,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "missing REQUIRED profile",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -366,7 +333,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "missing REQUIRED email",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -400,7 +367,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "missing idp",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -447,7 +414,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "with idp",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -499,7 +466,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "with totp",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -545,7 +512,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "password not complexity conform",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -579,7 +546,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "hashed password",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -618,7 +585,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 		{
 			name: "unsupported hashed password",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -783,7 +750,7 @@ func TestServer_Deprecated_AddHumanUser_Permission(t *testing.T) {
 		{
 			name: "Org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -897,7 +864,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Username: gu.Ptr("changed"),
 				},
@@ -907,12 +874,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change username, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Username: gu.Ptr(integration.Username()),
 				},
@@ -927,12 +894,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change profile, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Profile: &user.SetHumanProfile{
 						GivenName:         "Donald",
@@ -954,12 +921,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change email, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Email: &user.SetHumanEmail{
 						Email:        "changed@test.com",
@@ -977,12 +944,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change email, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Email: &user.SetHumanEmail{
 						Email:        "changed@test.com",
@@ -1001,12 +968,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change phone, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Phone: &user.SetHumanPhone{
 						Phone:        "+41791234567",
@@ -1024,12 +991,12 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change phone, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Phone: &user.SetHumanPhone{
 						Phone:        "+41791234568",
@@ -1048,9 +1015,9 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change password, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
-				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
+				resp, err := Client.PasswordReset(OrgCTX, &user.PasswordResetRequest{
 					UserId: userID,
 					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
@@ -1065,7 +1032,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_Password{
@@ -1087,9 +1054,9 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change hashed password, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
-				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
+				resp, err := Client.PasswordReset(OrgCTX, &user.PasswordResetRequest{
 					UserId: userID,
 					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
@@ -1104,7 +1071,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_HashedPassword{
@@ -1125,9 +1092,9 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change hashed password, code, not supported",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
-				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
+				resp, err := Client.PasswordReset(OrgCTX, &user.PasswordResetRequest{
 					UserId: userID,
 					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
@@ -1144,7 +1111,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_HashedPassword{
@@ -1160,10 +1127,10 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change password, old password, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 
-				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
+				resp, err := Client.PasswordReset(OrgCTX, &user.PasswordResetRequest{
 					UserId: userID,
 					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
@@ -1173,7 +1140,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 					return err
 				}
 				pw := "Password1."
-				_, err = Client.SetPassword(CTX, &user.SetPasswordRequest{
+				_, err = Client.SetPassword(OrgCTX, &user.SetPasswordRequest{
 					UserId: userID,
 					NewPassword: &user.Password{
 						Password:       pw,
@@ -1192,7 +1159,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 				return nil
 			},
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_Password{
@@ -1288,7 +1255,7 @@ func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 		{
 			name: "org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
 					Username: gu.Ptr(integration.Username()),
@@ -1336,7 +1303,7 @@ func TestServer_LockUser(t *testing.T) {
 		{
 			name: "lock, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.LockUserRequest{
 					UserId: "notexisting",
 				},
@@ -1358,10 +1325,10 @@ func TestServer_LockUser(t *testing.T) {
 		{
 			name: "lock, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1376,10 +1343,10 @@ func TestServer_LockUser(t *testing.T) {
 		{
 			name: "lock machine, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1394,12 +1361,12 @@ func TestServer_LockUser(t *testing.T) {
 		{
 			name: "lock, already locked",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+					_, err := Client.LockUser(OrgCTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1410,12 +1377,12 @@ func TestServer_LockUser(t *testing.T) {
 		{
 			name: "lock machine, already locked",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+					_, err := Client.LockUser(OrgCTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1455,7 +1422,7 @@ func TestServer_UnLockUser(t *testing.T) {
 		{
 			name: "unlock, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.UnlockUserRequest{
 					UserId: "notexisting",
 				},
@@ -1477,10 +1444,10 @@ func TestServer_UnLockUser(t *testing.T) {
 		{
 			name: "unlock, not locked",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1490,10 +1457,10 @@ func TestServer_UnLockUser(t *testing.T) {
 		{
 			name: "unlock machine, not locked",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1503,12 +1470,12 @@ func TestServer_UnLockUser(t *testing.T) {
 		{
 			name: "unlock, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+					_, err := Client.LockUser(OrgCTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1524,12 +1491,12 @@ func TestServer_UnLockUser(t *testing.T) {
 		{
 			name: "unlock machine, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+					_, err := Client.LockUser(OrgCTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1574,7 +1541,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.DeactivateUserRequest{
 					UserId: "notexisting",
 				},
@@ -1596,10 +1563,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1614,10 +1581,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate machine, ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1632,12 +1599,12 @@ func TestServer_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate, already deactivated",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+					_, err := Client.DeactivateUser(OrgCTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1648,12 +1615,12 @@ func TestServer_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate machine, already deactivated",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+					_, err := Client.DeactivateUser(OrgCTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1694,7 +1661,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ReactivateUserRequest{
 					UserId: "notexisting",
 				},
@@ -1716,10 +1683,10 @@ func TestServer_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate, not deactivated",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1729,10 +1696,10 @@ func TestServer_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate machine, not deactivated",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1742,12 +1709,12 @@ func TestServer_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+					_, err := Client.DeactivateUser(OrgCTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1763,12 +1730,12 @@ func TestServer_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate machine, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+					_, err := Client.DeactivateUser(OrgCTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -1799,7 +1766,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
+	projectResp := Instance.CreateProject(OrgCTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	type args struct {
 		req     *user.DeleteUserRequest
@@ -1817,7 +1784,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
 				},
-				func(*testing.T, *user.DeleteUserRequest) context.Context { return CTX },
+				func(*testing.T, *user.DeleteUserRequest) context.Context { return OrgCTX },
 			},
 			wantErr: true,
 		},
@@ -1826,9 +1793,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					return CTX
+					return OrgCTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1843,9 +1810,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
-					resp := Instance.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					return CTX
+					return OrgCTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1860,12 +1827,12 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(_ *testing.T, request *user.DeleteUserRequest) context.Context {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
-					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
-					return CTX
+					Instance.CreateProjectUserGrant(t, OrgCTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
+					Instance.CreateProjectMembership(t, OrgCTX, projectResp.GetId(), request.UserId)
+					Instance.CreateOrgMembership(t, OrgCTX, Instance.DefaultOrg.Id, request.UserId)
+					return OrgCTX
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -1880,7 +1847,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
+					removeUser, err := Client.CreateUser(OrgCTX, &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserType: &user.CreateUserRequest_Human_{
 							Human: &user.CreateUserRequest_Human{
@@ -1898,10 +1865,10 @@ func TestServer_DeleteUser(t *testing.T) {
 					require.NoError(t, err)
 
 					// allow self management incl. deletion
-					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, removeUser.Id, "ORG_USER_SELF_MANAGER")
+					Instance.CreateOrgMembership(t, OrgCTX, Instance.DefaultOrg.Id, removeUser.Id, "ORG_USER_SELF_MANAGER")
 
 					request.UserId = removeUser.Id
-					Instance.RegisterUserPasskey(CTX, removeUser.Id)
+					Instance.RegisterUserPasskey(OrgCTX, removeUser.Id)
 					token := createVerifiedWebAuthNSession(LoginCTX, t, removeUser.Id)
 					return integration.WithAuthorizationToken(UserCTX, token)
 				},
@@ -1927,306 +1894,6 @@ func TestServer_DeleteUser(t *testing.T) {
 		})
 	}
 }
-
-func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
-	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
-	notDefaultOrgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
-	samlIdpID := Instance.AddSAMLProvider(IamCTX)
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
-	samlPostIdpID := Instance.AddSAMLPostProvider(IamCTX)
-	jwtIdPID := Instance.AddJWTProvider(IamCTX)
-	type args struct {
-		ctx context.Context
-		req *user.StartIdentityProviderIntentRequest
-	}
-	type want struct {
-		details            *object.Details
-		url                string
-		parametersExisting []string
-		parametersEqual    map[string]string
-		postForm           bool
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    want
-		wantErr bool
-	}{
-		{
-			name: "missing urls",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpResp.Id,
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "next step oauth auth url",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpResp.Id,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url: "https://example.com/oauth/v2/authorize",
-				parametersEqual: map[string]string{
-					"client_id":     "clientID",
-					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
-					"response_type": "code",
-					"scope":         "openid profile email",
-				},
-				parametersExisting: []string{"state"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step oauth auth url, default org",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpResp.Id,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url: "https://example.com/oauth/v2/authorize",
-				parametersEqual: map[string]string{
-					"client_id":     "clientID",
-					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
-					"response_type": "code",
-					"scope":         "openid profile email",
-				},
-				parametersExisting: []string{"state"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step oauth auth url, default org",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: notDefaultOrgIdpResp.Id,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url: "https://example.com/oauth/v2/authorize",
-				parametersEqual: map[string]string{
-					"client_id":     "clientID",
-					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
-					"response_type": "code",
-					"scope":         "openid profile email",
-				},
-				parametersExisting: []string{"state"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step oauth auth url org",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpResp.Id,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url: "https://example.com/oauth/v2/authorize",
-				parametersEqual: map[string]string{
-					"client_id":     "clientID",
-					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Domain + ":8082/idps/callback",
-					"response_type": "code",
-					"scope":         "openid profile email",
-				},
-				parametersExisting: []string{"state"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step saml default",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: samlIdpID,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url:                "http://localhost:8000/sso",
-				parametersExisting: []string{"RelayState", "SAMLRequest"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step saml auth url",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: samlRedirectIdpID,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url:                "http://localhost:8000/sso",
-				parametersExisting: []string{"RelayState", "SAMLRequest"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step saml form",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: samlPostIdpID,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url:                "http://localhost:8000/sso",
-				parametersExisting: []string{"RelayState", "SAMLRequest"},
-				postForm:           true,
-			},
-			wantErr: false,
-		},
-		{
-			name: "next step jwt idp",
-			args: args{
-				CTX,
-				&user.StartIdentityProviderIntentRequest{
-					IdpId: jwtIdPID,
-					Content: &user.StartIdentityProviderIntentRequest_Urls{
-						Urls: &user.RedirectURLs{
-							SuccessUrl: "https://example.com/success",
-							FailureUrl: "https://example.com/failure",
-						},
-					},
-				},
-			},
-			want: want{
-				details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-				url:                "https://example.com/jwt",
-				parametersExisting: []string{"authRequestID", "userAgentID"},
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			if tt.want.url != "" && !tt.want.postForm {
-				authUrl, err := url.Parse(got.GetAuthUrl())
-				require.NoError(t, err)
-
-				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
-				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
-
-				for _, existing := range tt.want.parametersExisting {
-					assert.True(t, authUrl.Query().Has(existing))
-				}
-				for key, equal := range tt.want.parametersEqual {
-					assert.Equal(t, equal, authUrl.Query().Get(key))
-				}
-			}
-			if tt.want.postForm {
-				assert.Equal(t, tt.want.url, got.GetFormData().GetUrl())
-
-				require.Len(t, got.GetFormData().GetFields(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
-				for _, existing := range tt.want.parametersExisting {
-					assert.Contains(t, got.GetFormData().GetFields(), existing)
-				}
-				for key, equal := range tt.want.parametersEqual {
-					assert.Equal(t, got.GetFormData().GetFields()[key], equal)
-				}
-			}
-			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
-				Details: tt.want.details,
-			}, got)
-		})
-	}
-}
-
 func createVerifiedWebAuthNSession(ctx context.Context, t *testing.T, userID string) string {
 	// check if user is already processed
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
@@ -2239,685 +1906,11 @@ func createVerifiedWebAuthNSession(ctx context.Context, t *testing.T, userID str
 	return token
 }
 
-func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, integration.IDPName()).GetId()
-	azureIdpID := Instance.AddAzureADProvider(IamCTX, integration.IDPName()).GetId()
-	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, integration.IDPName()).GetId()
-	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
-	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
-	jwtIdPID := Instance.AddJWTProvider(IamCTX)
-	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
-	require.NoError(t, err)
-	intentID := authURL.Query().Get("state")
-	expiry := time.Now().Add(1 * time.Hour)
-	expiryFormatted := expiry.Round(time.Millisecond).UTC().Format("2006-01-02T15:04:05.999Z07:00")
-
-	intentUser := Instance.CreateHumanUser(IamCTX)
-	_, err = Instance.CreateUserIDPlink(IamCTX, intentUser.GetUserId(), "idpUserID", oauthIdpID, "username")
-	require.NoError(t, err)
-
-	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "", expiry)
-	require.NoError(t, err)
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user", expiry)
-	require.NoError(t, err)
-	successfulExpiredID, expiredToken, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "id", "user", time.Now().Add(time.Second))
-	require.NoError(t, err)
-	// make sure the intent is expired
-	time.Sleep(2 * time.Second)
-	successfulConsumedID, consumedToken, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), oauthIdpID, "idpUserID", intentUser.GetUserId(), expiry)
-	require.NoError(t, err)
-	// make sure the intent is consumed
-	Instance.CreateIntentSession(t, IamCTX, intentUser.GetUserId(), successfulConsumedID, consumedToken)
-
-	azureADSuccessful, azureADToken, azureADChangeDate, azureADSequence, err := sink.SuccessfulAzureADIntent(Instance.ID(), azureIdpID, "id", "", expiry)
-	require.NoError(t, err)
-	azureADSuccessfulWithUserID, azureADWithUserIDToken, azureADWithUserIDChangeDate, azureADWithUserIDSequence, err := sink.SuccessfulAzureADIntent(Instance.ID(), azureIdpID, "id", "user", expiry)
-	require.NoError(t, err)
-
-	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "", expiry)
-	require.NoError(t, err)
-	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user", expiry)
-	require.NoError(t, err)
-
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
-	require.NoError(t, err)
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "user")
-	require.NoError(t, err)
-
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "", expiry)
-	require.NoError(t, err)
-	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user", expiry)
-	require.NoError(t, err)
-
-	jwtSuccessfulID, jwtToken, jwtChangeDate, jwtSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "", expiry)
-	require.NoError(t, err)
-	jwtSuccessfulWithUserID, jwtWithUserToken, jwtWithUserChangeDate, jwtWithUserSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "user", expiry)
-	require.NoError(t, err)
-
-	type args struct {
-		ctx context.Context
-		req *user.RetrieveIdentityProviderIntentRequest
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *user.RetrieveIdentityProviderIntentResponse
-		wantErr bool
-	}{
-		{
-			name: "failed intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    intentID,
-					IdpIntentToken: "",
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "wrong token",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    successfulID,
-					IdpIntentToken: "wrong token",
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "retrieve successful oauth intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    successfulID,
-					IdpIntentToken: token,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(changeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      sequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    oauthIdpID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"RawInfo": map[string]interface{}{
-								"id":                 "id",
-								"preferred_username": "username",
-							},
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("und"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: oauthIdpID, UserId: "id"},
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful intent with linked user",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    successfulWithUserID,
-					IdpIntentToken: withUsertoken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(withUserchangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      withUsersequence,
-				},
-				UserId: "user",
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    oauthIdpID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"RawInfo": map[string]interface{}{
-								"id":                 "id",
-								"preferred_username": "username",
-							},
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful expired intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    successfulExpiredID,
-					IdpIntentToken: expiredToken,
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "retrieve successful consumed intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    successfulConsumedID,
-					IdpIntentToken: consumedToken,
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "retrieve successful azure AD intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    azureADSuccessful,
-					IdpIntentToken: azureADToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(azureADChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      azureADSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    azureIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id":                "id",
-							"userPrincipalName": "username",
-							"displayName":       "displayname",
-							"givenName":         "firstname",
-							"surname":           "lastname",
-							"mail":              "email@email.com",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Username: gu.Ptr("username"),
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("und"),
-						GivenName:         "firstname",
-						FamilyName:        "lastname",
-						DisplayName:       gu.Ptr("displayname"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: azureIdpID, UserId: "id", UserName: "username"},
-					},
-					Email: &user.SetHumanEmail{
-						Email:        "email@email.com",
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful azure AD intent with user ID",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    azureADSuccessfulWithUserID,
-					IdpIntentToken: azureADWithUserIDToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(azureADWithUserIDChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      azureADWithUserIDSequence,
-				},
-				UserId: "user",
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    azureIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id":                "id",
-							"userPrincipalName": "username",
-							"displayName":       "displayname",
-							"givenName":         "firstname",
-							"surname":           "lastname",
-							"mail":              "email@email.com",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful oidc intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    oidcSuccessful,
-					IdpIntentToken: oidcToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(oidcChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      oidcSequence,
-				},
-				UserId: "",
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    oidcIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub":                "id",
-							"preferred_username": "username",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Username: gu.Ptr("username"),
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("und"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: oidcIdpID, UserId: "id", UserName: "username"},
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful oidc intent with linked user",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    oidcSuccessfulWithUserID,
-					IdpIntentToken: oidcWithUserIDToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(oidcWithUserIDChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      oidcWithUserIDSequence,
-				},
-				UserId: "user",
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    oidcIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub":                "id",
-							"preferred_username": "username",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful ldap intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    ldapSuccessfulID,
-					IdpIntentToken: ldapToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(ldapChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      ldapSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Ldap{
-						Ldap: &user.IDPLDAPAccessInformation{
-							Attributes: func() *structpb.Struct {
-								s, err := structpb.NewStruct(map[string]interface{}{
-									"id":       []interface{}{"id"},
-									"username": []interface{}{"username"},
-									"language": []interface{}{"en"},
-								})
-								require.NoError(t, err)
-								return s
-							}(),
-						},
-					},
-					IdpId:    ldapIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id":                "id",
-							"preferredUsername": "username",
-							"preferredLanguage": "en",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Username: gu.Ptr("username"),
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("en"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: ldapIdpID, UserId: "id", UserName: "username"},
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful ldap intent with linked user",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    ldapSuccessfulWithUserID,
-					IdpIntentToken: ldapWithUserToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(ldapWithUserChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      ldapWithUserSequence,
-				},
-				UserId: "user",
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Ldap{
-						Ldap: &user.IDPLDAPAccessInformation{
-							Attributes: func() *structpb.Struct {
-								s, err := structpb.NewStruct(map[string]interface{}{
-									"id":       []interface{}{"id"},
-									"username": []interface{}{"username"},
-									"language": []interface{}{"en"},
-								})
-								require.NoError(t, err)
-								return s
-							}(),
-						},
-					},
-					IdpId:    ldapIdpID,
-					UserId:   "id",
-					UserName: "username",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id":                "id",
-							"preferredUsername": "username",
-							"preferredLanguage": "en",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful saml intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    samlSuccessfulID,
-					IdpIntentToken: samlToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(samlChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      samlSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Saml{
-						Saml: &user.IDPSAMLAccessInformation{
-							Assertion: []byte(fmt.Sprintf(`<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="id" IssueInstant="0001-01-01T00:00:00Z" Version=""><Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion" NameQualifier="" SPNameQualifier="" Format="" SPProvidedID=""></Issuer><Conditions NotBefore="0001-01-01T00:00:00Z" NotOnOrAfter="%s"></Conditions></Assertion>`, expiryFormatted)),
-						},
-					},
-					IdpId:    samlIdpID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id": "id",
-							"attributes": map[string]interface{}{
-								"attribute1": []interface{}{"value1"},
-							},
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("und"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: samlIdpID, UserId: "id"},
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful saml intent with linked user",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    samlSuccessfulWithUserID,
-					IdpIntentToken: samlWithUserToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(samlWithUserChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      samlWithUserSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Saml{
-						Saml: &user.IDPSAMLAccessInformation{
-							Assertion: []byte(fmt.Sprintf(`<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="id" IssueInstant="0001-01-01T00:00:00Z" Version=""><Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion" NameQualifier="" SPNameQualifier="" Format="" SPProvidedID=""></Issuer><Conditions NotBefore="0001-01-01T00:00:00Z" NotOnOrAfter="%s"></Conditions></Assertion>`, expiryFormatted)),
-						},
-					},
-					IdpId:    samlIdpID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"id": "id",
-							"attributes": map[string]interface{}{
-								"attribute1": []interface{}{"value1"},
-							},
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				UserId: "user",
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful jwt intent",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    jwtSuccessfulID,
-					IdpIntentToken: jwtToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(jwtChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      jwtSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							IdToken: gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    jwtIdPID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub": "id",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				AddHumanUser: &user.AddHumanUserRequest{
-					Profile: &user.SetHumanProfile{
-						PreferredLanguage: gu.Ptr("und"),
-					},
-					IdpLinks: []*user.IDPLink{
-						{IdpId: jwtIdPID, UserId: "id"},
-					},
-					Email: &user.SetHumanEmail{
-						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "retrieve successful jwt intent with linked user",
-			args: args{
-				CTX,
-				&user.RetrieveIdentityProviderIntentRequest{
-					IdpIntentId:    jwtSuccessfulWithUserID,
-					IdpIntentToken: jwtWithUserToken,
-				},
-			},
-			want: &user.RetrieveIdentityProviderIntentResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(jwtWithUserChangeDate),
-					ResourceOwner: Instance.ID(),
-					Sequence:      jwtWithUserSequence,
-				},
-				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							IdToken: gu.Ptr("idToken"),
-						},
-					},
-					IdpId:    jwtIdPID,
-					UserId:   "id",
-					UserName: "",
-					RawInformation: func() *structpb.Struct {
-						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub": "id",
-						})
-						require.NoError(t, err)
-						return s
-					}(),
-				},
-				UserId: "user",
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RetrieveIdentityProviderIntent(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			assert.EqualExportedValues(t, tt.want, got)
-		})
-	}
-}
-
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userID)
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	sessionToken := createVerifiedWebAuthNSession(LoginCTX, t, userID)
-	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(OrgCTX, sessionToken)
 
 	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
 	require.NoError(t, err)
@@ -2942,38 +1935,38 @@ func ctxFromNewUserWithVerifiedPasswordlessLegacy(t *testing.T) (context.Context
 }
 
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
-	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithoutAuth := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
-	userIDWithPasskey := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userIDWithPasskey)
+	userIDWithPasskey := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userIDWithPasskey)
 
-	userMultipleAuth := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userMultipleAuth)
-	provider, err := Instance.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
+	userMultipleAuth := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userMultipleAuth)
+	provider, err := Instance.Client.Mgmt.AddGenericOIDCProvider(OrgCTX, &mgmt.AddGenericOIDCProviderRequest{
 		Name:         "ListAuthenticationMethodTypes",
 		Issuer:       "https://example.com",
 		ClientId:     "client_id",
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
-	_, err = Instance.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
+	_, err = Instance.Client.Mgmt.AddCustomLoginPolicy(OrgCTX, &mgmt.AddCustomLoginPolicyRequest{})
 	require.Condition(t, func() bool {
 		code := status.Convert(err).Code()
 		return code == codes.AlreadyExists || code == codes.OK
 	})
-	_, err = Instance.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
+	_, err = Instance.Client.Mgmt.AddIDPToLoginPolicy(OrgCTX, &mgmt.AddIDPToLoginPolicyRequest{
 		IdpId:     provider.GetId(),
 		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 	})
 	require.NoError(t, err)
-	_, err = Instance.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+	_, err = Instance.Client.UserV2.AddIDPLink(OrgCTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
 		UserId:   "external-id",
 		UserName: "displayName",
 	}})
 	require.NoError(t, err)
 	// This should not remove the user IDP links
-	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
+	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(OrgCTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
 		IdpId: provider.GetId(),
 	})
 	require.NoError(t, err)
@@ -2993,7 +1986,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "no auth",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithoutAuth,
 				},
@@ -3007,7 +2000,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "with auth (passkey)",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithPasskey,
 				},
@@ -3024,7 +2017,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "with auth (passkey) with domain",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithPasskey,
 					DomainQuery: &user.DomainQuery{
@@ -3044,7 +2037,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "with auth (passkey) with wrong domain",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithPasskey,
 					DomainQuery: &user.DomainQuery{
@@ -3061,7 +2054,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "with auth (passkey) with legacy",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userLegacyID,
 					DomainQuery: &user.DomainQuery{
@@ -3078,7 +2071,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "with auth (passkey) with legacy included",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userLegacyID,
 					DomainQuery: &user.DomainQuery{
@@ -3099,7 +2092,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "multiple auth",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userMultipleAuth,
 				},
@@ -3117,7 +2110,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "multiple auth with domain",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userMultipleAuth,
 					DomainQuery: &user.DomainQuery{
@@ -3138,7 +2131,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		{
 			name: "multiple auth with wrong domain",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userMultipleAuth,
 					DomainQuery: &user.DomainQuery{
@@ -3188,10 +2181,10 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				Result: nil,
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+				userIDWithoutAuth := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				args.UserId = userIDWithoutAuth
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with u2f",
@@ -3204,8 +2197,8 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithU2F := Instance.CreateHumanUser(CTX).GetUserId()
-				U2FId := Instance.RegisterUserU2F(CTX, userWithU2F)
+				userWithU2F := Instance.CreateHumanUser(OrgCTX).GetUserId()
+				U2FId := Instance.RegisterUserU2F(OrgCTX, userWithU2F)
 
 				args.UserId = userWithU2F
 				want.Result[0].Type = &user.AuthFactor_U2F{
@@ -3215,7 +2208,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				}
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with totp, u2f",
@@ -3234,8 +2227,8 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
-				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(OrgCTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(OrgCTX, userWithTOTP)
 
 				args.UserId = userWithTOTP
 				want.Result[1].Type = &user.AuthFactor_U2F{
@@ -3245,7 +2238,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				}
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with totp, u2f filtered",
@@ -3260,8 +2253,8 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
-				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(OrgCTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(OrgCTX, userWithTOTP)
 
 				args.UserId = userWithTOTP
 				want.Result[0].Type = &user.AuthFactor_U2F{
@@ -3271,7 +2264,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				}
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with sms",
@@ -3287,12 +2280,12 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
-				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
+				userWithSMS := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
+				Instance.RegisterUserOTPSMS(OrgCTX, userWithSMS)
 
 				args.UserId = userWithSMS
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with email",
@@ -3308,12 +2301,12 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
-				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
+				userWithEmail := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.GetId(), integration.Email(), integration.Phone()).GetUserId()
+				Instance.RegisterUserOTPEmail(OrgCTX, userWithEmail)
 
 				args.UserId = userWithEmail
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with not ready u2f",
@@ -3322,8 +2315,8 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				Result: []*user.AuthFactor{},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
-				_, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+				userWithNotReadyU2F := Instance.CreateHumanUser(OrgCTX).GetUserId()
+				_, err := Instance.Client.UserV2.RegisterU2F(OrgCTX, &user.RegisterU2FRequest{
 					UserId: userWithNotReadyU2F,
 					Domain: Instance.Domain,
 				})
@@ -3331,7 +2324,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 
 				args.UserId = userWithNotReadyU2F
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with not ready u2f state filtered",
@@ -3346,8 +2339,8 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				},
 			},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
-				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+				userWithNotReadyU2F := Instance.CreateHumanUser(OrgCTX).GetUserId()
+				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(OrgCTX, &user.RegisterU2FRequest{
 					UserId: userWithNotReadyU2F,
 					Domain: Instance.Domain,
 				})
@@ -3361,21 +2354,21 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				}
 			},
-			ctx: CTX,
+			ctx: OrgCTX,
 		},
 		{
 			name: "with no userId",
 			args: &user.ListAuthenticationFactorsRequest{
 				UserId: "",
 			},
-			ctx:     CTX,
+			ctx:     OrgCTX,
 			wantErr: true,
 		},
 		{
 			name: "with no permission",
 			args: &user.ListAuthenticationFactorsRequest{},
 			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
-				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "totp").GetUserId()
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(OrgCTX, "totp").GetUserId()
 
 				args.UserId = userWithTOTP
 			},
@@ -3388,7 +2381,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				UserId: "unknown",
 			},
 			want: &user.ListAuthenticationFactorsResponse{},
-			ctx:  CTX,
+			ctx:  OrgCTX,
 		},
 	}
 	for _, tt := range tests {
@@ -3397,7 +2390,7 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				tt.dep(tt.args, tt.want)
 			}
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(OrgCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListAuthenticationFactors(tt.ctx, tt.args)
 				if tt.wantErr {
@@ -3427,7 +2420,7 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "create, not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.CreateInviteCodeRequest{
 					UserId: "notexisting",
 				},
@@ -3438,10 +2431,10 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "create, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreateInviteCodeRequest{},
 				prepare: func(request *user.CreateInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3456,7 +2449,7 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "create, invalid template",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreateInviteCodeRequest{
 					Verification: &user.CreateInviteCodeRequest_SendCode{
 						SendCode: &user.SendInviteCode{
@@ -3465,7 +2458,7 @@ func TestServer_CreateInviteCode(t *testing.T) {
 					},
 				},
 				prepare: func(request *user.CreateInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3475,7 +2468,7 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "create, valid template",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreateInviteCodeRequest{
 					Verification: &user.CreateInviteCodeRequest_SendCode{
 						SendCode: &user.SendInviteCode{
@@ -3485,7 +2478,7 @@ func TestServer_CreateInviteCode(t *testing.T) {
 					},
 				},
 				prepare: func(request *user.CreateInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3500,12 +2493,12 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "recreate",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreateInviteCodeRequest{},
 				prepare: func(request *user.CreateInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+					_, err := Instance.Client.UserV2.CreateInviteCode(OrgCTX, &user.CreateInviteCodeRequest{
 						UserId: resp.GetUserId(),
 						Verification: &user.CreateInviteCodeRequest_SendCode{
 							SendCode: &user.SendInviteCode{
@@ -3527,14 +2520,14 @@ func TestServer_CreateInviteCode(t *testing.T) {
 		{
 			name: "create, return code, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreateInviteCodeRequest{
 					Verification: &user.CreateInviteCodeRequest_ReturnCode{
 						ReturnCode: &user.ReturnInviteCode{},
 					},
 				},
 				prepare: func(request *user.CreateInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3585,7 +2578,7 @@ func TestServer_ResendInviteCode(t *testing.T) {
 		{
 			name: "user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.ResendInviteCodeRequest{
 					UserId: "notexisting",
 				},
@@ -3596,10 +2589,10 @@ func TestServer_ResendInviteCode(t *testing.T) {
 		{
 			name: "code not existing",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ResendInviteCodeRequest{},
 				prepare: func(request *user.ResendInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3609,12 +2602,12 @@ func TestServer_ResendInviteCode(t *testing.T) {
 		{
 			name: "code not sent before",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ResendInviteCodeRequest{},
 				prepare: func(request *user.ResendInviteCodeRequest) error {
-					userResp := Instance.CreateHumanUser(CTX)
+					userResp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = userResp.GetUserId()
-					Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					Instance.CreateInviteCode(OrgCTX, userResp.GetUserId())
 					return nil
 				},
 			},
@@ -3623,12 +2616,12 @@ func TestServer_ResendInviteCode(t *testing.T) {
 		{
 			name: "resend, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.ResendInviteCodeRequest{},
 				prepare: func(request *user.ResendInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
-					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+					_, err := Instance.Client.UserV2.CreateInviteCode(OrgCTX, &user.CreateInviteCodeRequest{
 						UserId: resp.GetUserId(),
 					})
 					return err
@@ -3674,7 +2667,7 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 		{
 			name: "user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.VerifyInviteCodeRequest{
 					UserId: "notexisting",
 				},
@@ -3685,10 +2678,10 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 		{
 			name: "code not existing",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyInviteCodeRequest{},
 				prepare: func(request *user.VerifyInviteCodeRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3698,14 +2691,14 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 		{
 			name: "invalid code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyInviteCodeRequest{
 					VerificationCode: "invalid",
 				},
 				prepare: func(request *user.VerifyInviteCodeRequest) error {
-					userResp := Instance.CreateHumanUser(CTX)
+					userResp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = userResp.GetUserId()
-					Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					Instance.CreateInviteCode(OrgCTX, userResp.GetUserId())
 					return nil
 				},
 			},
@@ -3714,12 +2707,12 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 		{
 			name: "verify, ok",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyInviteCodeRequest{},
 				prepare: func(request *user.VerifyInviteCodeRequest) error {
-					userResp := Instance.CreateHumanUser(CTX)
+					userResp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = userResp.GetUserId()
-					codeResp := Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					codeResp := Instance.CreateInviteCode(OrgCTX, userResp.GetUserId())
 					request.VerificationCode = codeResp.GetInviteCode()
 					return nil
 				},
@@ -3764,7 +2757,7 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 		{
 			name: "user not existing",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.HumanMFAInitSkippedRequest{
 					UserId: "notexisting",
 				},
@@ -3775,10 +2768,10 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 		{
 			name: "ok",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.HumanMFAInitSkippedRequest{},
 				func(request *user.HumanMFAInitSkippedRequest) error {
-					resp := Instance.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(OrgCTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -3790,7 +2783,7 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 				},
 			},
 			checkState: func(t *testing.T, userID string, resp *user.HumanMFAInitSkippedResponse) {
-				state, err := Client.GetUserByID(CTX, &user.GetUserByIDRequest{
+				state, err := Client.GetUserByID(OrgCTX, &user.GetUserByIDRequest{
 					UserId: userID,
 				})
 				require.NoError(t, err)
@@ -3840,7 +2833,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -3871,7 +2864,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -3905,7 +2898,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -3940,7 +2933,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -3977,7 +2970,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4010,7 +3003,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4036,7 +3029,7 @@ func TestServer_CreateUser(t *testing.T) {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4060,7 +3053,7 @@ func TestServer_CreateUser(t *testing.T) {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4086,7 +3079,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4124,7 +3117,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4163,7 +3156,7 @@ func TestServer_CreateUser(t *testing.T) {
 				idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4203,7 +3196,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4237,7 +3230,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4274,7 +3267,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4309,7 +3302,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4342,7 +3335,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							UserType: &user.CreateUserRequest_Human_{
@@ -4370,7 +3363,7 @@ func TestServer_CreateUser(t *testing.T) {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							Username:       &username,
@@ -4392,7 +3385,7 @@ func TestServer_CreateUser(t *testing.T) {
 			testCase: func(runId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: Instance.DefaultOrg.Id,
 							UserType: &user.CreateUserRequest_Machine_{
@@ -4413,7 +3406,7 @@ func TestServer_CreateUser(t *testing.T) {
 			testCase: func(runId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							UserId:         &runId,
 							OrganizationId: Instance.DefaultOrg.Id,
@@ -4437,7 +3430,7 @@ func TestServer_CreateUser(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: "does not exist",
 							Username:       &username,
@@ -4464,7 +3457,7 @@ func TestServer_CreateUser(t *testing.T) {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.CreateUserRequest{
 							OrganizationId: "does not exist",
 							Username:       &username,
@@ -4533,7 +3526,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			email := username + "@example.com"
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					req: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						Username:       &username,
@@ -4562,7 +3555,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			email := username + "@example.com"
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					req: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserType: &user.CreateUserRequest_Human_{
@@ -4589,7 +3582,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					req: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						Username:       &username,
@@ -4610,7 +3603,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					req: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserType: &user.CreateUserRequest_Machine_{
@@ -4630,7 +3623,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 		testCase: func(runId string) testCase {
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					req: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserId:         &runId,
@@ -4719,7 +3712,7 @@ func TestServer_CreateUser_Permission(t *testing.T) {
 		{
 			name: "human org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.CreateUserRequest{
 					OrganizationId: newOrg.GetOrganizationId(),
 					UserType: &user.CreateUserRequest_Human_{
@@ -4789,7 +3782,7 @@ func TestServer_CreateUser_Permission(t *testing.T) {
 		{
 			name: "machine org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.CreateUserRequest{
 					OrganizationId: newOrg.GetOrganizationId(),
 					UserType: &user.CreateUserRequest_Machine_{
@@ -4855,7 +3848,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -4879,7 +3872,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -4907,7 +3900,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -4933,7 +3926,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -4961,7 +3954,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 				email := username + "@example.com"
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -4987,7 +3980,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5006,7 +3999,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5031,7 +4024,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5056,7 +4049,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5081,7 +4074,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Machine_{
@@ -5100,7 +4093,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+			userId := Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
@@ -5143,7 +4136,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Machine_{
@@ -5161,7 +4154,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 			testCase: func(runId, userId string) testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: userId,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5182,7 +4175,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id).GetId()
+			userId := Instance.CreateUserTypeMachine(OrgCTX, Instance.DefaultOrg.Id).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
@@ -5217,7 +4210,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 			email := username + "@example.com"
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					create: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserId:         &runId,
@@ -5257,7 +4250,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 			email := username + "@example.com"
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					create: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserId:         &runId,
@@ -5292,7 +4285,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 			username := fmt.Sprintf("donald.duck+%s", runId)
 			return testCase{
 				args: args{
-					ctx: CTX,
+					ctx: OrgCTX,
 					create: &user.CreateUserRequest{
 						OrganizationId: Instance.DefaultOrg.Id,
 						UserId:         &runId,
@@ -5407,7 +4400,7 @@ func TestServer_UpdateUser_Permission(t *testing.T) {
 			testCase: func() testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: newHumanUserID,
 							UserType: &user.UpdateUserRequest_Human_{
@@ -5485,7 +4478,7 @@ func TestServer_UpdateUser_Permission(t *testing.T) {
 			testCase: func() testCase {
 				return testCase{
 					args: args{
-						CTX,
+						OrgCTX,
 						&user.UpdateUserRequest{
 							UserId: newMachineUserID,
 							UserType: &user.UpdateUserRequest_Machine_{

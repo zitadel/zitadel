@@ -3,6 +3,9 @@ name: Package und Publish Archives and Images
 on:
   workflow_call:
     inputs:
+      go_version:
+        required: true
+        type: string
       node_version:
         required: true
         type: string
@@ -26,9 +29,6 @@ on:
         description: 'base64 endcrypted key to connect to Google'
         required: true
 
-permissions:
-  packages: write
-
 env:
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
@@ -37,6 +37,8 @@ env:
 jobs:
   version:
     uses: ./.github/workflows/version.yml
+    permissions:
+      contents: write
     with:
       semantic_version: ${{ inputs.semantic_version }}
       dry_run: true
@@ -46,6 +48,9 @@ jobs:
       group: zitadel-public
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     needs: version
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -55,7 +60,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version: ${{ inputs.go_version }}
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
