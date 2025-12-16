@@ -61,12 +61,10 @@ func (u *UpdateInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	if updateCount == 0 {
-		err = zerrors.ThrowNotFound(nil, "DOM-ghfov1", "Errors.Instance.NotFound")
-		return err
+		return zerrors.ThrowNotFound(nil, "DOM-ghfov1", "Errors.Instance.NotFound")
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch")
-		return err
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-HlrNmD", "Errors.Instance.UpdateMismatch")
 	}
 
 	return err

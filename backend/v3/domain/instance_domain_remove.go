@@ -93,8 +93,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainWritePermission); authZErr != nil {
-		err = zerrors.ThrowPermissionDenied(authZErr, "DOM-eroxID", "Errors.PermissionDenied")
-		return err
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-eroxID", "Errors.PermissionDenied")
 	}
 
 	domainRepo := opts.instanceDomainRepo

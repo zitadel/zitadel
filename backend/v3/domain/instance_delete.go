@@ -74,8 +74,7 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	if deletedRows > 1 {
-		err = zerrors.ThrowInternal(nil, "DOM-Od04Jx", "Errors.Instsance.DeleteMismatch")
-		return err
+		return zerrors.ThrowInternal(nil, "DOM-Od04Jx", "Errors.Instsance.DeleteMismatch")
 	}
 
 	if deletedRows < 1 {
