@@ -280,7 +280,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s64ChangePushPosition,
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
-		steps.s68TargetAddPayloadTypeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -344,6 +343,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s48Apps7SAMLConfigsLoginVersion,
 		steps.s59SetupWebkeys, // this step needs commands.
 		steps.s66SessionRecoveryCodeCheckedAt,
+		steps.s68TargetAddPayloadTypeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
