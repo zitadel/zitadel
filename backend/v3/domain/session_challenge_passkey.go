@@ -19,8 +19,8 @@ import (
 
 const (
 	expectedUpdatedRows = 1
-	objectTypeSession   = "session"
-	objectTypeUser      = "user"
+	objectTypeSession   = "Session"
+	objectTypeUser      = "User"
 )
 
 var _ Commander = (*PasskeyChallengeCommand)(nil)
@@ -75,10 +75,10 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 	}
 
 	if p.sessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "missing session id")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "Errors.Missing.SessionID")
 	}
 	if p.instanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "missing instance id")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "Errors.Missing.InstanceID")
 	}
 
 	// get session
@@ -88,7 +88,7 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 		return err
 	}
 	if session.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "missing user id in session")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "Errors.Missing.Session.UserID")
 	}
 
 	// retrieve user and their passkeys based on user verification requirement
@@ -106,13 +106,13 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 
 	// ensure the user is a human user
 	if user.Human == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "Errors.User.NotHuman")
 	}
 
 	// ensure the user is active
 	// (@grvijayan) todo: clarify this requirement
 	if user.State != UserStateActive {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "user not active")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "Errors.User.NotActive")
 	}
 
 	p.Session = session
@@ -138,7 +138,7 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
 	if err = json.Unmarshal(credentialAssertionData, webAuthNChallenge.PublicKeyCredentialRequestOptions); err != nil {
-		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "failed to unmarshal credential assertion data")
+		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "Errors.Unmarshal")
 	}
 
 	// update the session with the passkey challenge
@@ -201,7 +201,7 @@ func (p *PasskeyChallengeCommand) beginWebAuthNLogin(ctx context.Context, userVe
 		UserVerificationFromDomain(userVerificationDomain),
 	)
 	if err != nil {
-		return nil, nil, "", zerrors.ThrowInternal(err, "DOM-Fy333Q", "failed to begin webauthn login")
+		return nil, nil, "", zerrors.ThrowInternal(err, "DOM-Fy333Q", "Errors.WebAuthN.BeginLogin")
 	}
 	return sessionData, credentialAssertionData, rpID, nil
 }

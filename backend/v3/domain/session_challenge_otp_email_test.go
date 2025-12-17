@@ -48,14 +48,14 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			sessionID:           "",
 			instanceID:          "instance-id",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPEmail{},
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-BQ5UgK", "session id missing"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-BQ5UgK", "Errors.Missing.SessionID"),
 		},
 		{
 			name:                "no instance id",
 			sessionID:           "session-id",
 			instanceID:          "",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPEmail{},
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "instance id missing"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.MissingInstanceID"),
 		},
 		{
 			name:                "failed to get session",
@@ -74,7 +74,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-JArUai", "failed fetching session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-JArUai", "Errors.Get.Session"),
 		},
 		{
 			name:                "session not found",
@@ -93,7 +93,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-JArUai", "session not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-JArUai", "Errors.NotFound.Session"),
 		},
 		{
 			name:                "missing user id in session",
@@ -114,7 +114,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-wG2XoJ", "missing user id in session"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-wG2XoJ", "Errors.Missing.Session.UserID"),
 		},
 		{
 			name:                "failed to get user",
@@ -148,7 +148,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-56MWkg", "failed fetching user"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-56MWkg", "Errors.Get.User"),
 		},
 		{
 			name:                "user not found",
@@ -182,7 +182,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-56MWkg", "user not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-56MWkg", "Errors.NotFound.User"),
 		},
 		{
 			name:                "human user not set",
@@ -222,7 +222,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "user email not configured"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "Errors.NotFound.User.Human.Email"),
 		},
 		{
 			name:                "email not set",
@@ -265,7 +265,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "user email not configured"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "Errors.NotFound.User.Human.Email"),
 		},
 		{
 			name:                "email address not set",
@@ -314,7 +314,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "user email not configured"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "Errors.NotFound.User.Human.Email"),
 		},
 		{
 			name:                "email otp not enabled",
@@ -364,7 +364,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4q", "email OTP not enabled"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4q", "Errors.OTPEmail.NotEnabled"),
 		},
 		{
 			name:                "valid OTP Email challenge request",
@@ -628,7 +628,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "failed fetching secret_generator_settings"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "Errors.Get.SecretGeneratorSettings"),
 		},
 		{
 			name:                        "failed to generate code",
@@ -664,7 +664,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			session: &domain.Session{
 				ID: "session-id",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "DOM-wkDwQM", "invalid URL template"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOM-wkDwQM", "Errors.Invalid.URLTemplate"),
 		},
 		{
 			name: "failed to update session",
@@ -707,7 +707,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-YfQIA3", "failed updating session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-YfQIA3", "Errors.Update.Session"),
 		},
 		{
 			name: "failed to update session - no rows updated",
@@ -756,7 +756,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "DOM-YfQIA3", "session not found"),
+			wantErr: zerrors.ThrowNotFound(nil, "DOM-YfQIA3", "Errors.NotFound.Session"),
 		},
 		{
 			name: "failed to update session - more than 1 row updated",
@@ -800,7 +800,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(nil, "DOM-YfQIA3", "unexpected number of rows updated"),
+			wantErr: zerrors.ThrowInternal(nil, "DOM-YfQIA3", "Errors.Update.MultipleRows"),
 		},
 		{
 			name: "update session succeeded - delivery type return code",

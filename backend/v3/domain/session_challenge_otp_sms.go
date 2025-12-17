@@ -81,15 +81,15 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 
 	// validate required fields
 	if o.sessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "session id missing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "Errors.Missing.SessionID")
 	}
 	if o.instanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "instance id missing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "Errors.Missing.InstanceID")
 	}
 
 	// validate that sms provider is set
 	if o.smsProvider == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "sms provider not configured")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "Errors.Missing.SMSProvider")
 	}
 
 	// get session
@@ -99,7 +99,7 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 		return err
 	}
 	if session.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "missing user id in session")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "Errors.Missing.Session.UserID")
 	}
 
 	// get user
@@ -115,11 +115,11 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 
 	// validate human user and user phone
 	if user.Human == nil || user.Human.Phone == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "user phone not configured")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "Errors.NotFound.User.Human.Phone")
 	}
 	// validate phone OTP is enabled
 	if user.Human.Phone.OTP.EnabledAt.IsZero() {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "phone OTP not enabled")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.OTPSMS.NotEnabled")
 	}
 	o.Session = session
 	o.User = user
@@ -229,7 +229,7 @@ func getOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 			),
 		),
 	)
-	if err := handleGetError(err, "DOM-x7Yd3E", "secret_generator_settings"); err != nil {
+	if err := handleGetError(err, "DOM-x7Yd3E", "SecretGeneratorSettings"); err != nil {
 		return nil, err
 	}
 
@@ -250,7 +250,7 @@ func getOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 		}
 		attrs = cfg.OTPEmail.SecretGeneratorAttrsWithExpiry
 	default:
-		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "invalid otp request type")
+		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "Errors.Invalid.OTP.Type")
 	}
 	return &crypto.GeneratorConfig{
 		Length:              *attrs.Length,

@@ -101,10 +101,10 @@ func handleGetError(inputErr error, errorID, objectType string) error {
 	}
 
 	if errors.Is(inputErr, &database.NoRowFoundError{}) {
-		return zerrors.ThrowNotFoundf(inputErr, errorID, "%s not found", objectType)
+		return zerrors.ThrowNotFoundf(inputErr, errorID, "Errors.NotFound.%s", objectType)
 	}
 
-	return zerrors.ThrowInternalf(inputErr, errorID, "failed fetching %s", objectType)
+	return zerrors.ThrowInternalf(inputErr, errorID, "Errors.Get.%s", objectType)
 }
 
 func handleUpdateError(inputErr error, expectedRowCount, actualRowCount int64, errorID, objectType string) error {
@@ -113,15 +113,15 @@ func handleUpdateError(inputErr error, expectedRowCount, actualRowCount int64, e
 	}
 
 	if inputErr != nil {
-		return zerrors.ThrowInternalf(inputErr, errorID, "failed updating %s", objectType)
+		return zerrors.ThrowInternalf(inputErr, errorID, "Errors.Update.%s", objectType)
 	}
 
 	if actualRowCount == 0 {
-		return zerrors.ThrowNotFoundf(nil, errorID, "%s not found", objectType)
+		return zerrors.ThrowNotFoundf(nil, errorID, "Errors.NotFound.%s", objectType)
 	}
 
 	if actualRowCount != expectedRowCount {
-		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedRowCount, actualRowCount), errorID, "unexpected number of rows updated")
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedRowCount, actualRowCount), errorID, "Errors.Update.MultipleRows")
 	}
 
 	return nil

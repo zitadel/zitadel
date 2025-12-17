@@ -50,14 +50,14 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			sessionID:           "",
 			instanceID:          "instance-id",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPSMS{},
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "session id missing"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "Errors.Missing.SessionID"),
 		},
 		{
 			name:                "no instance id",
 			sessionID:           "session-id",
 			instanceID:          "",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPSMS{},
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "instance id missing"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "Errors.Missing.InstanceID"),
 		},
 		{
 			name:                "no sms provider",
@@ -65,7 +65,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			instanceID:          "instance-id",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPSMS{},
 			smsProvider:         nil,
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "sms provider not configured"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "Errors.Missing.SMSProvider"),
 		},
 		{
 			name:                "failed to get session",
@@ -87,7 +87,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-2aGWWE", "failed fetching session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-2aGWWE", "Errors.Get.Session"),
 		},
 		{
 			name:                "session not found",
@@ -109,7 +109,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-2aGWWE", "session not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-2aGWWE", "Errors.NotFound.Session"),
 		},
 		{
 			name:                "missing user id in session",
@@ -133,7 +133,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "missing user id in session"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-Vi16Fs", "Errors.Missing.Session.UserID"),
 		},
 		{
 			name:                "failed to get user",
@@ -170,7 +170,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-3aGHDs", "failed fetching user"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-3aGHDs", "Errors.Get.User"),
 		},
 		{
 			name:                "user not found",
@@ -207,7 +207,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-3aGHDs", "user not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-3aGHDs", "Errors.NotFound.User"),
 		},
 		{
 			name:                "human user not set",
@@ -250,7 +250,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "user phone not configured"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "Errors.NotFound.User.Human.Phone"),
 		},
 		{
 			name:                "phone not set",
@@ -296,7 +296,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "user phone not configured"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "Errors.NotFound.User.Human.Phone"),
 		},
 		{
 			name:                "phone otp not enabled",
@@ -345,7 +345,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "phone OTP not enabled"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.OTPSMS.NotEnabled"),
 		},
 		{
 			name:                "valid OTP SMS challenge request",
@@ -608,7 +608,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "failed fetching secret_generator_settings"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-x7Yd3E", "Errors.Get.SecretGeneratorSettings"),
 		},
 		{
 			name:                   "failed to generate code",
@@ -883,7 +883,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-AigB0Z", "failed updating session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-AigB0Z", "Errors.Update.Session"),
 		},
 		{
 			name: "failed to update session - no rows updated",
@@ -930,7 +930,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "DOM-AigB0Z", "session not found"),
+			wantErr: zerrors.ThrowNotFound(nil, "DOM-AigB0Z", "Errors.NotFound.Session"),
 		},
 		{
 			name: "failed to update session - more than 1 row updated",
@@ -977,7 +977,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(nil, "DOM-AigB0Z", "unexpected number of rows updated"),
+			wantErr: zerrors.ThrowInternal(nil, "DOM-AigB0Z", "Errors.Update.MultipleRows"),
 		},
 	}
 	for _, tt := range tests {

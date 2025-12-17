@@ -72,10 +72,10 @@ func (o *OTPEmailChallengeCommand) Validate(ctx context.Context, opts *InvokeOpt
 	}
 	// validate required fields
 	if o.sessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-BQ5UgK", "session id missing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-BQ5UgK", "Errors.Missing.SessionID")
 	}
 	if o.instanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "instance id missing")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.MissingInstanceID")
 	}
 
 	// get session
@@ -85,7 +85,7 @@ func (o *OTPEmailChallengeCommand) Validate(ctx context.Context, opts *InvokeOpt
 		return err
 	}
 	if session.UserID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-wG2XoJ", "missing user id in session")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-wG2XoJ", "Errors.Missing.Session.UserID")
 	}
 
 	// get user
@@ -101,11 +101,11 @@ func (o *OTPEmailChallengeCommand) Validate(ctx context.Context, opts *InvokeOpt
 
 	// validate human user and user email
 	if user.Human == nil || user.Human.Email.Address == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "user email not configured")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2d", "Errors.NotFound.User.Human.Email")
 	}
 	// validate email OTP is enabled
 	if user.Human.Email.OTP.EnabledAt.IsZero() {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4q", "email OTP not enabled")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4q", "Errors.OTPEmail.NotEnabled")
 	}
 
 	o.Session = session
@@ -198,7 +198,7 @@ func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context,
 	case nil:
 		// no additional action needed
 	default:
-		return nil, "", zerrors.ThrowUnimplementedf(nil, "DOM-cc1bRa", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
+		return nil, "", zerrors.ThrowUnimplementedf(nil, "DOM-cc1bRa", "Errors.Unimplemented.DeliveryType.%T", t)
 	}
 	return challengeOTPEmail, otpEmailChallenge, nil
 }
@@ -230,10 +230,10 @@ func validateURLTemplate(w io.Writer, tmpl string) error {
 	}
 	parsed, err := template.New("").Parse(tmpl)
 	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "DOM-wkDwQM", "invalid URL template")
+		return zerrors.ThrowInvalidArgument(err, "DOM-wkDwQM", "Errors.Invalid.URLTemplate")
 	}
 	if err = parsed.Execute(w, otpEmailURLData); err != nil {
-		return zerrors.ThrowInvalidArgument(err, "DOM-F5Yv8l", "invalid URL template")
+		return zerrors.ThrowInvalidArgument(err, "DOM-F5Yv8l", "Errors.Invalid.URLTemplate")
 	}
 	return nil
 }

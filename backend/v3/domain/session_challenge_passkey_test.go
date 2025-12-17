@@ -47,14 +47,14 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			name:                    "no session id",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
 			sessionID:               "",
-			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "missing session id"),
+			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "Errors.Missing.SessionID"),
 		},
 		{
 			name:                    "no instance id",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
 			sessionID:               "session-id",
 			instanceID:              "",
-			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "missing instance id"),
+			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "Errors.Missing.InstanceID"),
 		},
 		{
 			name:                    "failed to fetch session",
@@ -73,7 +73,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-zy4hYC", "failed fetching session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-zy4hYC", "Errors.Get.Session"),
 		},
 		{
 			name:                    "session not found",
@@ -92,7 +92,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-zy4hYC", "session not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-zy4hYC", "Errors.NotFound.Session"),
 		},
 		{
 			name:                    "session without user id",
@@ -113,7 +113,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "missing user id in session"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-uVyrt2", "Errors.Missing.Session.UserID"),
 		},
 		{
 			name:                    "failed to fetch user",
@@ -161,7 +161,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Return(nil, assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-8cGMtd", "failed fetching user"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-8cGMtd", "Errors.Get.User"),
 		},
 		{
 			name:                    "user not found",
@@ -208,7 +208,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Return(nil, new(database.NoRowFoundError))
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-8cGMtd", "user not found"),
+			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-8cGMtd", "Errors.NotFound.User"),
 		},
 		{
 			name:                    "user not human",
@@ -255,7 +255,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Return(&domain.User{}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "Errors.User.NotHuman"),
 		},
 		{
 			name:                    "user not active",
@@ -305,7 +305,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "user not active"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "Errors.User.NotActive"),
 		},
 		{
 			name:                    "valid request passkey challenge",
@@ -506,7 +506,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return nil, nil, "", assert.AnError
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-Fy333Q", "failed to begin webauthn login"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-Fy333Q", "Errors.WebAuthN.BeginLogin"),
 		},
 		{
 			name:                    "invalid credential assertion data",
@@ -519,7 +519,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Challenge: "challenge",
 				}, []byte("invalid"), "rpID", nil
 			},
-			wantErr: zerrors.ThrowInternal(nil, "DOM-liSCA4", "failed to unmarshal credential assertion data"),
+			wantErr: zerrors.ThrowInternal(nil, "DOM-liSCA4", "Errors.Unmarshal"),
 		},
 		{
 			name: "failed to update session",
@@ -563,7 +563,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), assert.AnError)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-yd3f4", "failed updating session"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-yd3f4", "Errors.Update.Session"),
 		},
 		{
 			name: "failed to update session - no rows updated",
@@ -607,7 +607,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "DOM-yd3f4", "session not found"),
+			wantErr: zerrors.ThrowNotFound(nil, "DOM-yd3f4", "Errors.NotFound.Session"),
 		},
 		{
 			name: "failed to update session - more than 1 row updated",
@@ -651,7 +651,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(nil, "DOM-yd3f4", "unexpected number of rows updated"),
+			wantErr: zerrors.ThrowInternal(nil, "DOM-yd3f4", "Errors.Update.MultipleRows"),
 		},
 		{
 			name: "session updated successfully with the passkey challenge - required user verification",
