@@ -15,13 +15,13 @@ status: stable
 
 #### Auth library
 
-This example uses **[vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context)**, a Vue 3 wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**, which implements the [OpenID Connect](https://openid.net/connect/) (OIDC) flow. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library manages [PKCE](/docs/concepts/pkce), performs token exchange, and exposes helpers for [session state](https://zitadel.com/docs/concepts/tokens) management.
+This example uses **[vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context)**, a Vue 3 wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**, which implements the [OpenID Connect](https://openid.net/connect/) (OIDC) flow. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library manages PKCE(/docs/concepts/pkce), performs token exchange, and exposes helpers for [session state](https://zitadel.com/docs/concepts/tokens) management.
 
 ---
 
 ## What this example demonstrates
 
-This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with [PKCE](/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with PKCE(/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The application uses [vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context) to wrap authentication logic around [Vue Router](https://router.vuejs.org) navigation guards, automatically protecting routes and ensuring only authenticated users can access sensitive areas. The [withAuthenticationRequired](https://github.com/authts/vue-oidc-context#protecting-routes) higher-order component secures individual routes by checking [session state](https://zitadel.com/docs/concepts/tokens) before rendering protected views.
 

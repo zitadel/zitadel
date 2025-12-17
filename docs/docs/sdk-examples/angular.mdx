@@ -15,13 +15,13 @@ status: stable
 
 #### Auth library
 
-This example uses **[@edgeflare/ngx-oidc](https://www.npmjs.com/package/@edgeflare/ngx-oidc)** (built on **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**) to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](/docs/concepts/pkce) code challenge generation, perform secure token exchange, and provide session management helpers.
+This example uses **[@edgeflare/ngx-oidc](https://www.npmjs.com/package/@edgeflare/ngx-oidc)** (built on **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**) to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage PKCE(/docs/concepts/pkce) code challenge generation, perform secure token exchange, and provide session management helpers.
 
 ---
 
 ## What this example demonstrates
 
-This Angular application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with [PKCE](/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the OAuth callback and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This Angular application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with PKCE(/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the OAuth callback and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The application integrates authentication logic into Angular routing: protected routes use router guards to automatically redirect unauthenticated users to the sign-in flow, and callback routes complete the PKCE exchange and restore session state. The example requests standard OIDC scopes (`openid`, `profile`, `email`), `offline_access` for refresh tokens, and Zitadel-specific scopes for metadata and role information.
 
