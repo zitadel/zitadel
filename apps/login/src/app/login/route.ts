@@ -21,6 +21,7 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 
 export async function GET(request: NextRequest) {
   const _headers = await headers();
+  console.log("headers are", Object.fromEntries(_headers.entries()));
   const { serviceConfig } = getServiceConfig(_headers);
 
   const searchParams = request.nextUrl.searchParams;

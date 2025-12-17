@@ -1,3 +1,4 @@
+import { trace } from '@opentelemetry/api';
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -37,6 +38,8 @@ import { createServiceForHost } from "./service";
 import { tracingInterceptor } from "./otel";
 
 const useCache = process.env.DEBUG !== "true";
+
+const tracer = trace.getTracer('custom-tracer');
 
 async function cacheWrapper<T>(callback: Promise<T>) {
   "use cache";
@@ -99,13 +102,26 @@ export async function getLoginSettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const span = tracer.startSpan('getLoginSettings');
+  try {
 
-  const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+    console.log("Getting login settings for organization:", organization);
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+    const dummyContext = makeReqCtx(organization);
+    console.log("Using request context:", dummyContext);
+    const callback = settingsService
+      .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+
+    span.setAttributes({
+      'custom.thisisatest': 'true',
+    });
+
+    return useCache ? cacheWrapper(callback) : callback;
+  } finally {
+    span.end();
+  }
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {

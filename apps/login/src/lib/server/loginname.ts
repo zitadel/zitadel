@@ -36,6 +36,7 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
+  console.log("from loginapp headers are:", Object.fromEntries(_headers.entries()));
   const { serviceConfig } = getServiceConfig(_headers);
 
   const t = await getTranslations("loginname");
