@@ -64,7 +64,7 @@ Once you have your [Zitadel application configured](https://zitadel.com/docs/gui
    NEXTAUTH_URL=http://localhost:3000
    ```
    Replace these values with:
-	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/instance-settings) (the **ZITADEL_DOMAIN**)
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **ZITADEL_DOMAIN**)
 	- The **Client ID** you copied when creating the application
 	- A randomly generated **SESSION_SECRET** using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 	- A randomly generated **ZITADEL_CLIENT_SECRET** (required by Auth.js / NextAuth.js even though PKCE doesn't require it)

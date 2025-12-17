@@ -61,7 +61,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/integra
    NEXTAUTH_URL="http://localhost:3000"
    ```
    Replace these values with:
-	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/instance-settings) (the **Issuer**)
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **Issuer**)
 	- The **Client ID** you copied when [creating the application](/docs/guides/integrate/login/oidc/pkce-setup)
 	- The **redirect URIs** you configured in the PKCE setup (must match exactly)
 	- A secure random string for `SESSION_SECRET` (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
