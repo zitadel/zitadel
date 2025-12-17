@@ -264,6 +264,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserSessionKeyUserAgentID, userAgent),
