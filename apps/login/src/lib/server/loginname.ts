@@ -285,7 +285,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // Resolve organization from command or session
-    const organization = command.organization ?? session?.factors?.user?.organizationId ?? user.details?.resourceOwner;
+    let organization = command.organization ?? session?.factors?.user?.organizationId ?? user.details?.resourceOwner;
+
+    if (userLoginSettings?.ignoreUnknownUsernames) {
+      organization = command.organization;
+      if (!organization && ORG_SUFFIX_REGEX.test(command.loginName)) {
+        const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
+        const suffix = matched?.[1] ?? "";
+        const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
+
+        if (orgs.result && orgs.result.length === 1) {
+          const orgToCheckForDiscovery = orgs.result[0].id;
+          const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
+
+          if (orgLoginSettings?.allowDomainDiscovery) {
+            organization = orgToCheckForDiscovery;
+          }
+        }
+      }
+    }
 
     const methods = await listAuthenticationMethodTypes({
       serviceConfig,

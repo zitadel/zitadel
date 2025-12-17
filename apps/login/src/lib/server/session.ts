@@ -1,6 +1,6 @@
 "use server";
 
-import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
+import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
@@ -8,10 +8,10 @@ import {
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import { Duration } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { completeFlowOrGetUrl } from "../client";
@@ -111,16 +111,36 @@ export type UpdateSessionCommand = {
 
 export async function updateSession(options: UpdateSessionCommand) {
   let { loginName, sessionId, organization, checks, requestId, challenges } = options;
-  const recentSession = sessionId
+  let recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
       ? await getSessionCookieByLoginName({ loginName, organization })
       : await getMostRecentSessionCookie();
 
   if (!recentSession) {
-    return {
-      error: "Could not find session",
-    };
+    if (loginName) {
+      const checks = create(ChecksSchema, {
+        user: { search: { case: "loginName", value: loginName } },
+      });
+
+      const result = await createSessionAndUpdateCookie({
+        checks,
+        requestId,
+      }).catch((error) => {
+        // console.error("Could not create session", error);
+        return undefined;
+      });
+
+      if (result && "sessionCookie" in result) {
+        recentSession = result.sessionCookie;
+      }
+    }
+
+    if (!recentSession) {
+      return {
+        error: "Could not find session",
+      };
+    }
   }
 
   const _headers = await headers();
@@ -131,7 +151,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     return { error: "Could not get host" };
   }
 
-  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
+  if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;

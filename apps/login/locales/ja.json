@@ -318,11 +318,13 @@
       "couldNotLoadUser": "ユーザーを読み込めませんでした",
       "couldNotLoadAuthenticators": "認証方法を読み込めませんでした",
       "couldNotCreateSession": "セッションを作成できませんでした",
+
       "noHostFound": "ホストが見つかりません",
       "userAlreadyVerified": "ユーザーは既に確認済みです！",
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
-      "emailSendFailed": "確認メールの送信に失敗しました"
+      "emailSendFailed": "確認メールの送信に失敗しました",
+      "contextMissing": "エラーが発生しました。もう一度お試しください。"
     }
   },
   "authenticator": {

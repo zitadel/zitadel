@@ -145,6 +145,7 @@
       "codeOrVerificationRequired": "Bir kod sağlamalı veya geçerli bir Kullanıcı Doğrulama Kontrolüne sahip olmalısınız",
       "verificationRequired": "Kullanıcı Doğrulama Kontrolü yapılmalıdır",
       "couldNotLoadSession": "Oturum yüklenemedi",
+
       "couldNotLoadAuthMethods": "Kimlik doğrulama yöntemleri yüklenemedi",
       "failedPrecondition": "Ön koşul başarısız",
       "sessionNotValid": "Oturum geçerli değil",
@@ -388,7 +389,8 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "noHostFound": "Host bulunamadı",
       "userAlreadyVerified": "Kullanıcı zaten doğrulanmış!",
-      "couldNotResendInvite": "Davet yeniden gönderilemedi"
+      "couldNotResendInvite": "Davet yeniden gönderilemedi",
+      "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin."
     }
   },
   "authenticator": {
@@ -430,6 +432,7 @@
     "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
     "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
-    "tryagain": "Tekrar Dene"
+    "tryagain": "Tekrar Dene",
+    "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
   }
 }

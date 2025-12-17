@@ -411,7 +411,8 @@
       "userAlreadyVerified": "L'utente è già verificato!",
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
-      "emailSendFailed": "Impossibile inviare l'email di verifica"
+      "emailSendFailed": "Impossibile inviare l'email di verifica",
+      "contextMissing": "Si è verificato un errore. Riprova."
     }
   },
   "authenticator": {

@@ -7,8 +7,10 @@ import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { create } from "@zitadel/client";
+import { LoginSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -72,6 +74,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         loginName,
         organization,
       },
+    }).catch(async (error) => {
+      const loginSettings = await getLoginSettings({ serviceConfig, organization });
+      if (!loginSettings?.ignoreUnknownUsernames) {
+        console.error("loadMostRecentSession failed", error);
+      }
+      // ignore error, as we might not have a session yet
+      return undefined;
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
@@ -93,8 +102,42 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
-  if (!id) {
-    throw Error("Failed to get user id");
+  if (!id && loginName) {
+    const loginSettings = await getLoginSettings({ serviceConfig, organization });
+    const users = await searchUsers({
+      serviceConfig,
+      searchValue: loginName,
+      loginSettings:
+        loginSettings ??
+        create(LoginSettingsSchema, {
+          ignoreUnknownUsernames: true,
+          disableLoginWithEmail: false,
+          disableLoginWithPhone: false,
+          allowUsernamePassword: true,
+          allowRegister: true,
+          allowExternalIdp: true,
+          forceMfa: false,
+          hidePasswordReset: false,
+        }), // Default settings if null
+      organizationId: organization,
+    });
+
+    if (users.result && users.result.length === 1) {
+      const foundUser = users.result[0];
+      id = foundUser.userId;
+      user = foundUser;
+      if (user.type.case === "human") {
+        human = user.type.value as HumanUser;
+      }
+
+      // If we found the user and need to send email, do it now
+      if (doSend && id) {
+        await sendEmail(id);
+      }
+    } else if (loginSettings?.ignoreUnknownUsernames) {
+      // Prevent enumeration by pretending we found a user
+      id = "000000000000000000";
+    }
   }
 
   const params = new URLSearchParams({
@@ -163,14 +206,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </div>
         )}
 
-        <VerifyForm
-          loginName={loginName}
-          organization={organization}
-          userId={id}
-          code={code}
-          isInvite={invite === "true"}
-          requestId={requestId}
-        />
+        {id && (
+          <VerifyForm
+            loginName={loginName}
+            organization={organization}
+            userId={id}
+            code={code}
+            isInvite={invite === "true"}
+            requestId={requestId}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

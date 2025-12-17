@@ -411,7 +411,8 @@
       "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
-      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej"
+      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
     }
   },
   "authenticator": {
@@ -454,6 +455,6 @@
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
-    "couldNotContinueSession": "Nie można kontynuować sesji - brakujące informacje o użytkowniku"
+    "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
   }
 }

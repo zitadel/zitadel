@@ -62,6 +62,13 @@ export function SetPasswordForm({
     setError("");
     setLoading(true);
 
+    // do not send code for dummy userid that is set to prevent user enumeration
+    if (userId === "000000000000000000") {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setLoading(false);
+      return;
+    }
+
     const response = await resetPassword({
       loginName,
       organization,

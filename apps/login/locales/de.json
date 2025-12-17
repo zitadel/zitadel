@@ -411,7 +411,8 @@
       "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
-      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden"
+      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     }
   },
   "authenticator": {

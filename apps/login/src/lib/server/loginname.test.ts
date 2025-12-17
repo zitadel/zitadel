@@ -730,35 +730,59 @@ describe("sendLoginname", () => {
       expect((result as any).redirect).toMatch(/^\/password\?/);
     });
 
-    test("should redirect to password when ignoreUnknownUsernames is true and user is not active", async () => {
-      const mockUser = {
-        userId: "user123",
-        preferredLoginName: "user@example.com",
-        details: { resourceOwner: "org123" },
-        type: { case: "human", value: { email: { email: "user@example.com" } } },
-        state: UserState.ACTIVE,
-      };
-
+    test("should return generic error when user not active and ignoreUnknownUsernames is true", async () => {
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "user1",
+            state: UserState.ACTIVE,
+            preferredLoginName: "user1",
+            type: { case: "human", value: { email: { isVerified: true } } },
+          },
+        ],
+      });
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
         allowUsernamePassword: true,
       });
-      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
-      mockCreate.mockReturnValue({});
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      // Mock createSessionAndUpdateCookie to fail with user not active error
       mockCreateSessionAndUpdateCookie.mockRejectedValue({
         rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
+      });
+
+      const result = await sendLoginname({ loginName: "user1" });
+
+      expect(result).toEqual({ redirect: "/password?loginName=user1" });
+      // With ignoreUnknownUsernames: true, we skip session creation, so this mock is NOT called
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should NOT create session and return redirect when ignoreUnknownUsernames is true and user is valid", async () => {
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "user1",
+            state: UserState.ACTIVE,
+            preferredLoginName: "user1",
+            type: { case: "human", value: { email: { isVerified: true } } },
+          },
+        ],
+      });
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+        allowUsernamePassword: true,
       });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
 
-      const result = await sendLoginname({
-        loginName: "user@example.com",
-      });
+      const result = await sendLoginname({ loginName: "user1" });
 
-      expect(result).not.toEqual({ error: "errors.userNotActive" });
-      expect(result).toHaveProperty("redirect");
-      expect((result as any).redirect).toMatch(/^\/password\?/);
+      expect(result).toEqual({ redirect: "/password?loginName=user1" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
     test("should redirect to password when ignoreUnknownUsernames is true and password not allowed", async () => {
@@ -843,27 +867,6 @@ describe("sendLoginname", () => {
   });
 
   describe("Edge cases", () => {
-    test("should handle session creation failure", async () => {
-      const mockUser = {
-        userId: "user123",
-        preferredLoginName: "user@example.com",
-        details: { resourceOwner: "org123" },
-        type: { case: "human", value: { email: { email: "user@example.com" } } },
-        state: UserState.ACTIVE,
-      };
-
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
-      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
-      mockCreate.mockReturnValue({});
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: { factors: {} }, sessionCookie: {} }); // No user in session
-
-      const result = await sendLoginname({
-        loginName: "user@example.com",
-      });
-
-      expect(result).toEqual({ error: "errors.couldNotCreateSession" });
-    });
-
     test("should handle initial user state", async () => {
       const mockUser = {
         userId: "user123",

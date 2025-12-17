@@ -411,7 +411,8 @@
       "userAlreadyVerified": "用户已验证！",
       "couldNotResendInvite": "无法重新发送邀请",
       "inviteSendFailed": "发送邀请邮件失败",
-      "emailSendFailed": "发送验证邮件失败"
+      "emailSendFailed": "发送验证邮件失败",
+      "contextMissing": "发生错误。请重试。"
     }
   },
   "authenticator": {

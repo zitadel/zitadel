@@ -25,14 +25,7 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  organization,
-  requestId,
-  code,
-  isInvite,
-}: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -51,6 +44,13 @@ export function VerifyForm({
   async function resendCode() {
     setError("");
     setLoading(true);
+
+    // do not send code for dummy userid that is set to prevent user enumeration
+    if (userId === "000000000000000000") {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setLoading(false);
+      return;
+    }
 
     const response = await resendVerification({
       userId,
@@ -73,9 +73,7 @@ export function VerifyForm({
   }
 
   const fcn = useCallback(
-    async function submitCodeAndContinue(
-      value: Inputs,
-    ): Promise<boolean | void> {
+    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setLoading(true);
 
       const response = await sendVerification({

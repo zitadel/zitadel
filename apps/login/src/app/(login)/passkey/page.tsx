@@ -25,23 +25,19 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceConfig.baseUrl, sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-      });
+    ? await loadSessionById(sessionId, organization)
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
-  async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session) {
         return response.session;
       }
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   return (
     <DynamicTheme branding={branding}>
