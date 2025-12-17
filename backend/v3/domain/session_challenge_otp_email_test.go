@@ -1217,7 +1217,6 @@ func getSettingsTypeCondition(repo *domainmock.MockSecretGeneratorSettingsReposi
 	return typeCondition
 }
 
-
 func getOTPEmailChallengeChange(repo *domainmock.MockSessionRepository, challenge *domain.SessionChallengeOTPEmail) database.Change {
 	changes := database.NewChanges(
 		database.NewChange(
