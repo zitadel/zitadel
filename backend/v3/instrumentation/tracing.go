@@ -24,33 +24,6 @@ type TraceConfig struct {
 	Exporter ExporterConfig
 }
 
-// TODO: remove for v5 release
-type LegacyTraceConfig struct {
-	Type      string
-	Fraction  float64
-	Endpoint  string
-	ProjectID string
-}
-
-// SetLegacyConfig sets the fields of the TraceConfig based on the provided LegacyTraceConfig.
-// If the Type field is already set to a value other than [ExporterTypeNone], the legacy config is ignored.
-func (c *TraceConfig) SetLegacyConfig(lc *LegacyTraceConfig) {
-	typ := c.Exporter.Type
-	if lc == nil || !typ.isNone() {
-		return
-	}
-	typeMap := map[string]ExporterType{
-		"otel":   ExporterTypeGRPC,
-		"google": ExporterTypeGoogle,
-		"log":    ExporterTypeStdOut,
-	}
-
-	c.Fraction = lc.Fraction
-	c.Exporter.Type = typeMap[lc.Type]
-	c.Exporter.Endpoint = lc.Endpoint
-	c.Exporter.GoogleProjectID = lc.ProjectID
-}
-
 type Tracer struct {
 	trace.Tracer
 }

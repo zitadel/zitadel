@@ -45,7 +45,6 @@ type Config struct {
 	ExternalSecure  bool
 	Instrumentation instrumentation.Config
 	Log             *logging.Config
-	Metrics         *instrumentation.LegacyMetricConfig
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -93,7 +92,6 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 		return nil, nil, fmt.Errorf("unable to read default config: %w", err)
 	}
 
-	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
