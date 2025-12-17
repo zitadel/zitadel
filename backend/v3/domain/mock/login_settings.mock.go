@@ -1582,6 +1582,44 @@ func (c *MockLoginSettingsRepositoryTypeColumnCall) DoAndReturn(f func() databas
 	return c
 }
 
+// TypeCondition mocks base method.
+func (m *MockLoginSettingsRepository) TypeCondition(typ domain.SettingType) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TypeCondition", typ)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// TypeCondition indicates an expected call of TypeCondition.
+func (mr *MockLoginSettingsRepositoryMockRecorder) TypeCondition(typ any) *MockLoginSettingsRepositoryTypeConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TypeCondition", reflect.TypeOf((*MockLoginSettingsRepository)(nil).TypeCondition), typ)
+	return &MockLoginSettingsRepositoryTypeConditionCall{Call: call}
+}
+
+// MockLoginSettingsRepositoryTypeConditionCall wrap *gomock.Call
+type MockLoginSettingsRepositoryTypeConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockLoginSettingsRepositoryTypeConditionCall) Return(arg0 database.Condition) *MockLoginSettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockLoginSettingsRepositoryTypeConditionCall) Do(f func(domain.SettingType) database.Condition) *MockLoginSettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockLoginSettingsRepositoryTypeConditionCall) DoAndReturn(f func(domain.SettingType) database.Condition) *MockLoginSettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // UniqueColumns mocks base method.
 func (m *MockLoginSettingsRepository) UniqueColumns() []database.Column {
 	m.ctrl.T.Helper()

@@ -68,7 +68,7 @@ func TestHandleUpdateError(t *testing.T) {
 			actualRowCount:   1,
 			errorID:          "test-002",
 			objectType:       "session",
-			expectedErr:      zerrors.ThrowInternalf(errors.New("db error"), "test-002", "failed updating %s", "session"),
+			expectedErr:      zerrors.ThrowInternalf(errors.New("db error"), "test-002", "Errors.Update.%s", "session"),
 		},
 		{
 			name:             "no rows affected",
@@ -77,7 +77,7 @@ func TestHandleUpdateError(t *testing.T) {
 			actualRowCount:   0,
 			errorID:          "test-003",
 			objectType:       "idp",
-			expectedErr:      zerrors.ThrowNotFoundf(nil, "test-003", "%s not found", "idp"),
+			expectedErr:      zerrors.ThrowNotFoundf(nil, "test-003", "Errors.NotFound.%s", "idp"),
 		},
 		{
 			name:             "unexpected number of rows updated",
@@ -86,7 +86,7 @@ func TestHandleUpdateError(t *testing.T) {
 			actualRowCount:   5,
 			errorID:          "test-004",
 			objectType:       "org",
-			expectedErr:      zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, 5), "test-004", "unexpected number of rows updated"),
+			expectedErr:      zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, 5), "test-004", "Errors.Update.MultipleRows"),
 		},
 		{
 			name:             "counts mismatch",
@@ -95,7 +95,7 @@ func TestHandleUpdateError(t *testing.T) {
 			actualRowCount:   1,
 			errorID:          "test-005",
 			objectType:       "project",
-			expectedErr:      zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(2, 1), "test-005", "unexpected number of rows updated"),
+			expectedErr:      zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(2, 1), "test-005", "Errors.Update.MultipleRows"),
 		},
 	}
 

@@ -56,7 +56,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 					Return(nil, sessionGetErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-eppPwQ", "failed fetching session"),
+			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-eppPwQ", "Errors.Get.session"),
 		},
 		{
 			testName:    "when session not found should return not found error",
@@ -71,7 +71,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 					Return(nil, notFoundErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-eppPwQ", "session not found"),
+			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-eppPwQ", "Errors.NotFound.session"),
 		},
 		{
 			testName:    "when retrieving user fails should return error",
@@ -94,7 +94,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 					Return(nil, userGetErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-TxDSma", "failed fetching user"),
+			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-TxDSma", "Errors.Get.user"),
 		},
 		{
 			testName:    "when user not found should return not found error",
@@ -117,7 +117,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 					Return(nil, notFoundErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-TxDSma", "user not found"),
+			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-TxDSma", "Errors.NotFound.user"),
 		},
 		{
 			testName:    "when user is not human should return precondition failed error",

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/http"
 	old_domain "github.com/zitadel/zitadel/internal/domain"
+	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func PasskeysToCredentials(ctx context.Context, passkeys []*Passkey, rpID string) []webauthn.Credential {
@@ -43,6 +44,23 @@ func UserVerificationFromDomain(verification old_domain.UserVerificationRequirem
 		fallthrough
 	default:
 		return protocol.VerificationDiscouraged
+	}
+}
+
+// (@grvijayan) todo: we could use the protocol.UserVerificationRequirement type directly
+// in session_factor.SessionChallengePasskey to avoid the intermediate conversion to the type in old domain.
+func UserVerificationRequirementToDomain(req session_grpc.UserVerificationRequirement) old_domain.UserVerificationRequirement {
+	switch req {
+	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED:
+		return old_domain.UserVerificationRequirementUnspecified
+	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED:
+		return old_domain.UserVerificationRequirementRequired
+	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED:
+		return old_domain.UserVerificationRequirementPreferred
+	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED:
+		return old_domain.UserVerificationRequirementDiscouraged
+	default:
+		return old_domain.UserVerificationRequirementUnspecified
 	}
 }
 

@@ -69,7 +69,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 					Return(repo)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(getErr, "DOM-CUnePh", "failed fetching session"),
+			expectedError: zerrors.ThrowInternal(getErr, "DOM-CUnePh", "Errors.Get.session"),
 		},
 		{
 			testName: "when session has no passkey challenge should return precondition failed error",
@@ -206,7 +206,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 					Return(nil, getErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(getErr, "DOM-pB6Mlm", "failed fetching user"),
+			expectedError: zerrors.ThrowInternal(getErr, "DOM-pB6Mlm", "Errors.Get.user"),
 		},
 		{
 			testName: "when all validations pass should return no error",
@@ -443,7 +443,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 				repo := domainmock.NewMockUserRepository(ctrl)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "failed updating session"),
+			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-Uadvap", "Errors.Update.session"),
 		},
 		{
 			testName: "when session not found should return not found error",
@@ -500,7 +500,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 				repo := domainmock.NewMockUserRepository(ctrl)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-Uadvap", "session not found"),
+			expectedError: zerrors.ThrowNotFound(nil, "DOM-Uadvap", "Errors.NotFound.session"),
 		},
 		{
 			testName: "when user update fails should return error",
@@ -567,7 +567,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 					Return(int64(0), userUpdateErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "failed updating user"),
+			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-wdwZYk", "Errors.Update.user"),
 		},
 		{
 			testName: "when execute succeeds should return no error",
