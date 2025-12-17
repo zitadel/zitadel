@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -11,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
 	"github.com/zitadel/zitadel/internal/query"
-	"go.uber.org/mock/gomock"
 )
 
 func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
