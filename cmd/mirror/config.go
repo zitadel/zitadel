@@ -31,7 +31,6 @@ type Migration struct {
 	Log             *logging.Config
 	Machine         *id.Config
 	Instrumentation instrumentation.Config
-	Metrics         instrumentation.LegacyMetricConfig
 }
 
 var (
