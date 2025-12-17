@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[React](https://react.dev) is a JavaScript library for building user interfaces with component composition, declarative views, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your React application.
+[React](https://react.dev) is a JavaScript library for building user interfaces with component composition, declarative views, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your React application.
 
 #### Auth library
 
@@ -36,7 +36,7 @@ The example leverages [React Router](https://reactrouter.com) for client-side na
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/integrate/login/oidc/)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/`)
 5. Copy your **Client ID** for use in the next steps

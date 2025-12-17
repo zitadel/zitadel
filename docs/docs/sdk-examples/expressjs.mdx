@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[Express.js](https://expressjs.com) is a fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org) that provides a robust set of features for building web and mobile applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your Express application.
+[Express.js](https://expressjs.com) is a fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org) that provides a robust set of features for building web and mobile applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Express application.
 
 #### Auth library
 
@@ -36,7 +36,7 @@ Sign-out functionality implements **[federated logout](https://zitadel.com/docs/
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps

@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[SvelteKit](https://kit.svelte.dev) is a framework for building web applications with flexible filesystem-based routing and a unified approach to server-side and client-side logic. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your application.
+[SvelteKit](https://kit.svelte.dev) is a framework for building web applications with flexible filesystem-based routing and a unified approach to server-side and client-side logic. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your application.
 
 #### Auth library
 
@@ -36,7 +36,7 @@ The logout flow implements **[federated logout](https://zitadel.com/docs/guides/
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
