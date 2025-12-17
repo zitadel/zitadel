@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projetos",
-      "DESCRIPTION": "Um projeto hospeda um ou mais aplicativos, que você pode usar para autenticar seus usuários. Você também pode autorizar seus usuários com projetos. Para permitir que usuários de outras organizações façam login em seus aplicativos, conceda-lhes acesso ao seu projeto.<br/><br/>Se você não conseguir encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso.",
+      "DESCRIPTION": "Um projeto hospeda um ou mais aplicativos, que você pode usar para autenticar seus usuários. Por exemplo, você pode ter um único projeto com 3 aplicativos; um para o seu frontend da web, um para o seu aplicativo móvel e um para o seu backend. Você também pode autorizar seus usuários com projetos. Para permitir que usuários de outras organizações façam login em seus aplicativos, conceda-lhes acesso ao seu projeto.<br/><br/>Se você não conseguir encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso.",
       "OWNED": {
         "TITLE": "Projetos Proprietários",
         "DESCRIPTION": "Estes são os projetos que você possui. Você pode gerenciar as configurações desses projetos, autorizações e aplicativos."
@@ -1547,7 +1547,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1797,7 +1798,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -2748,7 +2750,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

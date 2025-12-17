@@ -10,10 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -33,6 +34,7 @@ const (
 	LoginPostLogoutRedirectParam = "post_logout_redirect"
 	LoginLogoutHintParam         = "logout_hint"
 	LoginUILocalesParam          = "ui_locales"
+	LoginLogoutTokenParam        = "logout_token"
 	LoginPath                    = "/login"
 	LogoutPath                   = "/logout"
 	LogoutDonePath               = "/logout/done"
@@ -298,7 +300,11 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		} else {
 			logoutURI = logoutURI.JoinPath(LogoutPath)
 		}
-		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
+		signer, _, err := GetSignerOnce(o.query.GetActiveSigningWebKey)(ctx)
+		if err != nil {
+			return "", err
+		}
+		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales, signer)
 	}
 
 	// V1:
@@ -375,7 +381,13 @@ func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postL
 	return login.ExternalLogoutPath(sessionID)
 }
 
-func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales []language.Tag) string {
+type logoutTokenPayload struct {
+	PostLogoutRedirectURI string       `json:"post_logout_redirect_uri,omitempty"`
+	LogoutHint            string       `json:"logout_hint,omitempty"`
+	UILocales             oidc.Locales `json:"ui_locales,omitempty"`
+}
+
+func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales oidc.Locales, signer jose.Signer) (string, error) {
 	if strings.HasSuffix(logoutURI.Path, "/") && len(logoutURI.Path) > 1 {
 		logoutURI.Path = strings.TrimSuffix(logoutURI.Path, "/")
 	}
@@ -386,14 +398,19 @@ func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, u
 		q.Set(LoginLogoutHintParam, logoutHint)
 	}
 	if len(uiLocales) > 0 {
-		locales := make([]string, len(uiLocales))
-		for i, locale := range uiLocales {
-			locales[i] = locale.String()
-		}
-		q.Set(LoginUILocalesParam, strings.Join(locales, " "))
+		q.Set(LoginUILocalesParam, uiLocales.String())
 	}
+	logoutToken, err := crypto.Sign(&logoutTokenPayload{
+		PostLogoutRedirectURI: redirectURI,
+		LogoutHint:            logoutHint,
+		UILocales:             uiLocales,
+	}, signer)
+	if err != nil {
+		return "", err
+	}
+	q.Set(LoginLogoutTokenParam, logoutToken)
 	logoutURI.RawQuery = q.Encode()
-	return logoutURI.String()
+	return logoutURI.String(), nil
 }
 
 // v2PostLogoutRedirectURI will take care that the post_logout_redirect_uri is correctly set for v2 logins.

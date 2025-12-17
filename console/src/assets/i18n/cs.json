@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekty",
-      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
+      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Například můžete mít jeden projekt se 3 aplikacemi; jednu pro váš webový frontend, jednu pro vaši mobilní aplikaci a jednu pro váš backend. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
       "OWNED": {
         "TITLE": "Vlastněné projekty",
         "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, oprávnění a aplikace."
@@ -1546,7 +1546,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1796,7 +1797,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2761,7 +2763,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",
