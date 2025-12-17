@@ -104,7 +104,12 @@ func (p *PasskeyChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts
 		return err
 	}
 
-	// ensure user is active
+	// ensure the user is a human user
+	if user.Human == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user")
+	}
+
+	// ensure the user is active
 	// (@grvijayan) todo: clarify this requirement
 	if user.State != UserStateActive {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "user not active")
@@ -165,9 +170,6 @@ func (p *PasskeyChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) 
 	if p.RequestChallengePasskey == nil {
 		return nil, nil
 	}
-	if p.ChallengePasskey == nil {
-		return nil, zerrors.ThrowInternal(nil, "DOM-MALUxr", "failed to push WebAuthN challenged event")
-	}
 	return []eventstore.Command{
 		session.NewWebAuthNChallengedEvent(
 			ctx,
@@ -186,9 +188,6 @@ func (p *PasskeyChallengeCommand) String() string {
 
 // beginWebAuthNLogin starts the WebAuthN login process for the user with the specified user verification requirement.
 func (p *PasskeyChallengeCommand) beginWebAuthNLogin(ctx context.Context, userVerificationDomain old_domain.UserVerificationRequirement) (*webauthn.SessionData, []byte, string, error) {
-	if p.User.Human == nil {
-		return nil, nil, "", zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user")
-	}
 	webUser := &webAuthNUser{
 		userID:      p.User.ID,
 		username:    p.User.Username,

@@ -600,11 +600,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 							database.WithCondition(
 								database.And(
 									getSettingsInstanceIDCondition(repo, "instance-id"),
-									database.NewTextCondition(
-										getSettingsTypeColumn(repo),
-										database.TextOperationEqual,
-										domain.SettingTypeSecretGenerator.String(),
-									),
+									getSettingsTypeCondition(repo, domain.SettingTypeSecretGenerator),
 								),
 							),
 						),

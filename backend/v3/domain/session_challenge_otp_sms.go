@@ -225,11 +225,7 @@ func getOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 		database.WithCondition(
 			database.And(
 				settingsRepo.InstanceIDCondition(instanceID),
-				database.NewTextCondition( // (@grvijayan) todo: check TypeCondition
-					settingsRepo.TypeColumn(),
-					database.TextOperationEqual,
-					SettingTypeSecretGenerator.String(),
-				),
+				settingsRepo.TypeCondition(SettingTypeSecretGenerator),
 			),
 		),
 	)

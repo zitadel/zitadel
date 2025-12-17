@@ -211,6 +211,53 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			wantErr: zerrors.ThrowNotFound(new(database.NoRowFoundError), "DOM-8cGMtd", "user not found"),
 		},
 		{
+			name:                    "user not human",
+			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
+			sessionID:               "session-id",
+			instanceID:              "instance-id",
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewMockSessionRepository(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
+						database.WithCondition(
+							getSessionIDCondition(repo, "session-id"),
+						),
+					)).
+					Times(1).
+					Return(&domain.Session{
+						UserID: "user-id",
+					}, nil)
+				return repo
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				repo := domainmock.NewMockUserRepository(ctrl)
+				humanRepo := domainmock.NewMockHumanUserRepository(ctrl)
+				repo.EXPECT().
+					LoadPasskeys().
+					Times(1).
+					Return(repo)
+				repo.EXPECT().
+					Human().
+					Times(1).
+					Return(humanRepo)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
+						database.WithCondition(
+							getUserIDCondition(repo, "user-id"),
+						),
+					),
+						dbmock.QueryOptions(
+							database.WithCondition(
+								getPasskeyTypeCondition(humanRepo, domain.PasskeyTypeU2F),
+							),
+						)).
+					Times(1).
+					Return(&domain.User{}, nil)
+				return repo
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user"),
+		},
+		{
 			name:                    "user not active",
 			RequestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
 			sessionID:               "session-id",
@@ -254,6 +301,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					Times(1).
 					Return(&domain.User{
 						State: domain.UserStateInactive,
+						Human: &domain.HumanUser{},
 					}, nil)
 				return repo
 			},
@@ -389,12 +437,6 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 			requestChallengePasskey: nil,
 		},
 		{
-			name:                    "no session challenge passkey",
-			requestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
-			challengePasskey:        nil,
-			wantErr:                 zerrors.ThrowInternal(nil, "DOM-MALUxr", "failed to push WebAuthN challenged event"),
-		},
-		{
 			name:                    "valid request passkey challenge",
 			requestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
 			challengePasskey: &domain.SessionChallengePasskey{
@@ -454,12 +496,6 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			name:                    "no request passkey challenge",
 			requestChallengePasskey: nil,
 			wantErr:                 nil,
-		},
-		{
-			name:                    "not a human user",
-			requestChallengePasskey: &session_grpc.RequestChallenges_WebAuthN{},
-			user:                    &domain.User{},
-			wantErr:                 zerrors.ThrowPreconditionFailed(nil, "DOM-nd3f4", "user is not a human user"),
 		},
 		{
 			name:                    "failed to begin webauthn login",

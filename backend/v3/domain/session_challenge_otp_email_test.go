@@ -620,11 +620,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 							database.WithCondition(
 								database.And(
 									getSettingsInstanceIDCondition(repo, "instance-id"),
-									database.NewTextCondition(
-										getSettingsTypeColumn(repo),
-										database.TextOperationEqual,
-										domain.SettingTypeSecretGenerator.String(),
-									),
+									getSettingsTypeCondition(repo, domain.SettingTypeSecretGenerator),
 								),
 							),
 						),
@@ -1186,11 +1182,7 @@ func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPRe
 					database.WithCondition(
 						database.And(
 							getSettingsInstanceIDCondition(repo, "instance-id"),
-							database.NewTextCondition(
-								getSettingsTypeColumn(repo),
-								database.TextOperationEqual,
-								domain.SettingTypeSecretGenerator.String(),
-							),
+							getSettingsTypeCondition(repo, domain.SettingTypeSecretGenerator),
 						),
 					),
 				),
@@ -1213,6 +1205,16 @@ func getSettingsInstanceIDCondition(repo *domainmock.MockSecretGeneratorSettings
 		Times(1).
 		Return(instanceIDCondition)
 	return instanceIDCondition
+}
+
+func getSettingsTypeCondition(repo *domainmock.MockSecretGeneratorSettingsRepository, settingType domain.SettingType) database.Condition {
+	typeCondition := getTextCondition("zitadel.settings", "type", settingType.String())
+
+	repo.EXPECT().
+		TypeCondition(settingType).
+		Times(1).
+		Return(typeCondition)
+	return typeCondition
 }
 
 func getSettingsTypeColumn(repo *domainmock.MockSecretGeneratorSettingsRepository) database.Column {
