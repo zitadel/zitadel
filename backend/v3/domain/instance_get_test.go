@@ -167,7 +167,7 @@ func TestGetInstanceCommand_Execute(t *testing.T) {
 				return instanceRepo
 			},
 			inputInstanceID: "instance-1",
-			expectedError:   zerrors.ThrowNotFound(notFoundErr, "DOM-QVrUwc", "instance not found"),
+			expectedError:   zerrors.ThrowNotFound(notFoundErr, "DOM-QVrUwc", "Errors.Instance.NotFound"),
 		},
 		{
 			testName: "when retrieving instance succeeds should set instance on struct and return no error",

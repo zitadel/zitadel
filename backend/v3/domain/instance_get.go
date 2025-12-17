@@ -31,7 +31,7 @@ func (g *GetInstanceQuery) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(g.ID)))
 	if err != nil {
 		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-QVrUwc", "instance not found")
+			return zerrors.ThrowNotFound(err, "DOM-QVrUwc", "Errors.Instance.NotFound")
 		}
 		return zerrors.ThrowInternal(err, "DOM-lvsRce", "Errors.Instance.Get")
 	}
