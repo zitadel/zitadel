@@ -10,7 +10,7 @@ export function register() {
      propagators: ['tracecontext', 'baggage'],
      instrumentationConfig: {
       fetch: {
-        // This URLs will have the tracing context propagated to them.
+        // These URLs will have the tracing context propagated to them.
         propagateContextUrls: [
           'localhost:8080',
           'zitadel.com',

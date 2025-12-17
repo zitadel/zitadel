@@ -104,19 +104,12 @@ export async function getLoginSettings({
 }>) {
   const span = tracer.startSpan('getLoginSettings');
   try {
-
-
-    console.log("Getting login settings for organization:", organization);
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
     const dummyContext = makeReqCtx(organization);
     console.log("Using request context:", dummyContext);
     const callback = settingsService
       .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
       .then((resp) => (resp.settings ? resp.settings : undefined));
-
-    span.setAttributes({
-      'custom.thisisatest': 'true',
-    });
 
     return useCache ? cacheWrapper(callback) : callback;
   } finally {

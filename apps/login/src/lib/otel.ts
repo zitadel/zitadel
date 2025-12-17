@@ -2,10 +2,7 @@ import { Interceptor } from "@connectrpc/connect";
 import { context, propagation } from "@opentelemetry/api";
 
 export const tracingInterceptor: Interceptor = (next) => async (req) => {
-    console.log("Tracing Interceptor - Incoming Request:", req);
-
     const fields: Record<string, string> = { "traceparent": "", "tracestate": "" };
-    console.log("about to handle activeContext");
     const activeContext = context.active();
     console.log("Tracing Interceptor - Active Context before injection:", activeContext);
     propagation.inject(activeContext, fields);
