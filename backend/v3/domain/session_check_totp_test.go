@@ -55,7 +55,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				repo.EXPECT().Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(idCondition))).Return(nil, sessionGetErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-e4OuhO", "failed fetching session"),
+			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-e4OuhO", "Errors.Get.session"),
 		},
 		{
 			testName:  "when session not found should return not found error",
@@ -67,7 +67,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				repo.EXPECT().Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(idCondition))).Return(nil, notFoundErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-e4OuhO", "session not found"),
+			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-e4OuhO", "Errors.NotFound.session"),
 		},
 		{
 			testName:  "when session userID is empty should return precondition failed error",
@@ -97,7 +97,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				repo.EXPECT().Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(idCondition))).Return(nil, userGetErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-PZvWq0", "failed fetching user"),
+			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-PZvWq0", "Errors.Get.user"),
 		},
 		{
 			testName:  "when user not found should return not found error",
@@ -115,7 +115,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				repo.EXPECT().Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(idCondition))).Return(nil, notFoundErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-PZvWq0", "user not found"),
+			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-PZvWq0", "Errors.NotFound.user"),
 		},
 		{
 			testName:  "when user is not human should return precondition failed error",
@@ -321,7 +321,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				mock.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().Return("clear txt", nil)
 				return mock
 			},
-			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-aoMAzO", "failed updating user"),
+			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-aoMAzO", "Errors.Update.user"),
 		},
 		{
 			testName:     "when session update fails after successful TOTP should return error",
@@ -359,7 +359,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				mock.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().Return("clear txt", nil)
 				return mock
 			},
-			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-ymhCTD", "failed updating session"),
+			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-ymhCTD", "Errors.Update.session"),
 		},
 		{
 			testName:  "when lockout policy fetch fails should return error",
@@ -453,7 +453,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				repo.EXPECT().Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).Return(int64(0), userUpdateErr).AnyTimes()
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-lQLpIa", "failed updating user"),
+			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-lQLpIa", "Errors.Update.user"),
 		},
 		{
 			testName:  "when TOTP verification fails should update user with failed check and fail on session update",
@@ -513,7 +513,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				repo.EXPECT().Update(gomock.Any(), gomock.Any(), idCondition, gomock.Any()).Return(int64(0), sessionUpdateErr)
 				return repo
 			},
-			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-rSa1yU", "failed updating session"),
+			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-rSa1yU", "Errors.Update.session"),
 		},
 		{
 			testName:  "when TOTP verification fails should update user with failed check",
