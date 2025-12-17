@@ -38,6 +38,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app
 		if err != nil {
 			return nil, err
 		}
+		oidcAppRequest.AppID = req.Msg.GetId()
 
 		oidcApp, err := s.command.AddOIDCApplication(ctx, oidcAppRequest, "")
 		if err != nil {
