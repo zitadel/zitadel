@@ -1217,13 +1217,6 @@ func getSettingsTypeCondition(repo *domainmock.MockSecretGeneratorSettingsReposi
 	return typeCondition
 }
 
-func getSettingsTypeColumn(repo *domainmock.MockSecretGeneratorSettingsRepository) database.Column {
-	repo.EXPECT().
-		TypeColumn().
-		Times(1).
-		Return(database.NewColumn("zitadel.settings", "type"))
-	return database.NewColumn("zitadel.settings", "type")
-}
 
 func getOTPEmailChallengeChange(repo *domainmock.MockSessionRepository, challenge *domain.SessionChallengeOTPEmail) database.Change {
 	changes := database.NewChanges(
