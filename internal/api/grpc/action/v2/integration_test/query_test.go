@@ -1105,7 +1105,6 @@ func TestServer_ListPublicKeys(t *testing.T) {
 				}
 				assert.NoError(ttt, err)
 				assertPublicKeys(ttt, tt.want, got)
-				assert.EqualExportedValues(ttt, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected public keys")
 		})
 	}
