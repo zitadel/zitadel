@@ -709,6 +709,137 @@ describe("sendLoginname", () => {
       expect(result).toHaveProperty("redirect");
       expect((result as any).redirect).toMatch(/^\/password\?/);
     });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and more than one user found", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({
+        result: [
+          { userId: "user1", preferredLoginName: "user1@example.com" },
+          { userId: "user2", preferredLoginName: "user2@example.com" },
+        ],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.moreThanOneUserFound" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and user is not active", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+        allowUsernamePassword: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockRejectedValue({
+        rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotActive" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and password not allowed", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        allowUsernamePassword: false,
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockListIDPLinks.mockResolvedValue({ result: [] });
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.usernamePasswordNotAllowed" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
+
+    test("should redirect to password when ignoreUnknownUsernames is true and passkeys not allowed", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        passkeysType: PasskeysType.NOT_ALLOWED,
+        ignoreUnknownUsernames: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSKEY],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.passkeysNotAllowed" });
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/password\?/);
+    });
   });
 
   describe("Edge cases", () => {

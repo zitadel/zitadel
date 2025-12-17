@@ -81,7 +81,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     console.log("No users found, will proceed with org discovery");
   }
 
-  const handleUserNotFound = (currentLoginSettings: LoginSettings | undefined, organization: string | undefined) => {
+  const preventUserEnumeration = (currentLoginSettings: LoginSettings | undefined, organization: string | undefined) => {
     if (currentLoginSettings?.ignoreUnknownUsernames) {
       console.log("ignoreUnknownUsernames is true, redirecting to password");
       const paramsPasswordDefault = new URLSearchParams({
@@ -219,6 +219,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   if (users.length > 1) {
     console.log("multiple users found, returning error");
+    if (loginSettingsByContext?.ignoreUnknownUsernames) {
+      return preventUserEnumeration(loginSettingsByContext, command.organization);
+    }
     return { error: t("errors.moreThanOneUserFound") };
   } else if (users.length == 1 && users[0].userId) {
     const user = users[0];
@@ -234,15 +237,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname) {
-        return handleUserNotFound(userLoginSettings, command.organization);
+        return preventUserEnumeration(userLoginSettings, command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
-        return handleUserNotFound(userLoginSettings, command.organization);
+        return preventUserEnumeration(userLoginSettings, command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
-        return handleUserNotFound(userLoginSettings, command.organization);
+        return preventUserEnumeration(userLoginSettings, command.organization);
       }
     }
 
@@ -275,6 +278,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // TODO: check if handling of userstate INITIAL is needed
     if (user.state === UserState.INITIAL) {
+      if (userLoginSettings?.ignoreUnknownUsernames) {
+        return preventUserEnumeration(userLoginSettings, command.organization);
+      }
       return { error: t("errors.initialUserNotSupported") };
     }
 
@@ -316,6 +322,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               return idpResp;
             }
 
+            if (userLoginSettings?.ignoreUnknownUsernames) {
+              return preventUserEnumeration(userLoginSettings, command.organization);
+            }
+
             return {
               error: t("errors.usernamePasswordNotAllowed"),
             };
@@ -341,6 +351,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
+            if (userLoginSettings?.ignoreUnknownUsernames) {
+              return preventUserEnumeration(userLoginSettings, command.organization);
+            }
             return {
               error: t("errors.passkeysNotAllowed"),
             };
@@ -390,6 +403,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
         if (!userLoginSettings?.allowUsernamePassword) {
+          if (userLoginSettings?.ignoreUnknownUsernames) {
+            return preventUserEnumeration(userLoginSettings, command.organization);
+          }
           return {
             error: "Username Password not allowed! Contact your administrator for more information.",
           };
@@ -455,7 +471,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
     console.log("IDP redirect failed, returning user not found");
 
-    return handleUserNotFound(effectiveLoginSettings, discoveredOrganization);
+    return preventUserEnumeration(effectiveLoginSettings, discoveredOrganization);
   } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowUsernamePassword) {
     console.log("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
@@ -480,5 +496,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  return handleUserNotFound(effectiveLoginSettings, discoveredOrganization);
+  return preventUserEnumeration(effectiveLoginSettings, discoveredOrganization);
 }

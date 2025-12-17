@@ -52,6 +52,10 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
 
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
+    const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return {};
+    }
     return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = users.result[0].userId;
@@ -92,6 +96,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 
   if (!sessionCookie) {
     const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
+    loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
       user = users.result[0];
@@ -100,8 +105,6 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         user: { search: { case: "userId", value: users.result[0].userId } },
         password: { password: command.checks.password?.password },
       });
-
-      loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
       try {
         const result = await createSessionAndUpdateCookie({
@@ -113,6 +116,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
+          if (loginSettings?.ignoreUnknownUsernames) {
+            return { error: t("errors.failedToAuthenticateNoLimit") };
+          }
           const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
 
           const hasLimit =
@@ -132,6 +138,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
+      if (loginSettings?.ignoreUnknownUsernames) {
+        return { error: t("errors.failedToAuthenticateNoLimit") };
+      }
       return { error: t("errors.couldNotVerifyPassword") };
     }
   } else {
@@ -160,6 +169,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       });
     } catch (error: any) {
       if ("failedAttempts" in error && error.failedAttempts) {
+        if (loginSettings?.ignoreUnknownUsernames) {
+          return { error: t("errors.failedToAuthenticateNoLimit") };
+        }
         const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
 
         const hasLimit =
@@ -303,7 +315,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 }
 
 // this function lets users with code set a password or users with valid User Verification Check
-export async function changePassword(command: { code?: string; userId: string; password: string }) {
+export async function changePassword(command: { code?: string; userId: string; password: string; organization?: string }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
@@ -312,6 +324,10 @@ export async function changePassword(command: { code?: string; userId: string; p
   const { user } = await getUserByID({ serviceConfig, userId: command.userId });
 
   if (!user || user.userId !== command.userId) {
+    const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("set.errors.couldNotSetPassword") };
+    }
     return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = user.userId;
@@ -437,7 +453,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   }
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  // also if the user has MFA but it is not verified, we use the service account
+  // also if the user has no MFA but it is not verified, we use the service account
   if (forceMfa || (hasMfa && !mfaVerified)) {
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceConfig, payload }).catch((error) => {

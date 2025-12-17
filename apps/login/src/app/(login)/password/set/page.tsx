@@ -28,27 +28,28 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
-    session = await loadMostRecentSession({ serviceConfig, sessionParams: {
+    session = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization });
+
+  const passwordComplexity = await getPasswordComplexitySettings({
+    serviceConfig,
+    organization: session?.factors?.user?.organizationId,
   });
 
-  const passwordComplexity = await getPasswordComplexitySettings({ serviceConfig, organization: session?.factors?.user?.organizationId,
-  });
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ serviceConfig, userId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId });
     user = userResponse.user;
 
     if (user?.type.case === "human") {
@@ -97,10 +98,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         )}
 
-        {passwordComplexity && (loginName ?? user?.preferredLoginName) && (userId ?? session?.factors?.user?.id) ? (
+        {passwordComplexity &&
+        (loginName ?? user?.preferredLoginName) &&
+        (userId ?? session?.factors?.user?.id ?? (loginSettings?.ignoreUnknownUsernames ? "unknown" : undefined)) ? (
           <SetPasswordForm
             code={code}
-            userId={userId ?? (session?.factors?.user?.id as string)}
+            userId={userId ?? (session?.factors?.user?.id as string) ?? "unknown"}
             loginName={loginName ?? (user?.preferredLoginName as string)}
             requestId={requestId}
             organization={organization}

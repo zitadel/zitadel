@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { checkSessionAndSetPassword } from "./password";
+import { checkSessionAndSetPassword, sendPassword, resetPassword, changePassword } from "./password";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 // Mock dependencies
@@ -33,10 +33,21 @@ vi.mock("../zitadel", () => ({
   getSession: vi.fn(),
   setPassword: vi.fn(),
   createServerTransport: vi.fn(),
+  listUsers: vi.fn(),
+  getLockoutSettings: vi.fn(),
+  passwordReset: vi.fn(),
+  getUserByID: vi.fn(),
+  setUserPassword: vi.fn(),
+}));
+
+vi.mock("./cookie", () => ({
+  createSessionAndUpdateCookie: vi.fn(),
+  setSessionAndUpdateCookie: vi.fn(),
 }));
 
 vi.mock("../cookies", () => ({
   getSessionCookieById: vi.fn(),
+  getSessionCookieByLoginName: vi.fn(),
 }));
 
 vi.mock("next-intl/server", () => ({
@@ -81,7 +92,7 @@ describe("checkSessionAndSetPassword", () => {
       session: {
         factors: {
           user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: 100 } }, // Password verified
+          password: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } }, // Password verified recently
         },
       },
     });
@@ -148,8 +159,8 @@ describe("checkSessionAndSetPassword", () => {
       session: {
         factors: {
           user: { id: "user123", organizationId: "org123" },
-          password: { verifiedAt: { seconds: 100 } },
-          totp: { verifiedAt: { seconds: 100 } }, // Verified
+          password: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } },
+          totp: { verifiedAt: { seconds: Math.floor(Date.now() / 1000) } }, // Verified
         },
       },
     });
@@ -205,5 +216,199 @@ describe("checkSessionAndSetPassword", () => {
     await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
 
     expect(mockSetPassword).toHaveBeenCalled();
+  });
+});
+
+describe("sendPassword", () => {
+  let mockHeaders: any;
+  let mockGetServiceConfig: any;
+  let mockGetSessionCookieByLoginName: any;
+  let mockListUsers: any;
+  let mockGetLoginSettings: any;
+  let mockCreateSessionAndUpdateCookie: any;
+  let mockGetLockoutSettings: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { getSessionCookieByLoginName } = await import("../cookies");
+    const { listUsers, getLoginSettings, getLockoutSettings } = await import("../zitadel");
+    const { createSessionAndUpdateCookie } = await import("./cookie");
+
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceConfig = vi.mocked(getServiceConfig);
+    mockGetSessionCookieByLoginName = vi.mocked(getSessionCookieByLoginName);
+    mockListUsers = vi.mocked(listUsers);
+    mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
+    mockGetLockoutSettings = vi.mocked(getLockoutSettings);
+
+    mockHeaders.mockResolvedValue({});
+    mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+  });
+
+  test("should return generic error when user not found and ignoreUnknownUsernames is true", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+
+    const result = await sendPassword({
+      loginName: "unknown@example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+  });
+
+  test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+
+    const result = await sendPassword({
+      loginName: "unknown@example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotVerifyPassword" });
+  });
+
+  test("should return generic error when password verification fails and ignoreUnknownUsernames is true", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockListUsers.mockResolvedValue({
+      details: { totalResult: BigInt(1) },
+      result: [{ userId: "user123" }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+  });
+
+  test("should return specific error with lockout info when password verification fails and ignoreUnknownUsernames is false", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockListUsers.mockResolvedValue({
+      details: { totalResult: BigInt(1) },
+      result: [{ userId: "user123" }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+    mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({
+      error: "errors.failedToAuthenticate",
+    });
+  });
+});
+
+describe("resetPassword", () => {
+  let mockHeaders: any;
+  let mockGetServiceConfig: any;
+  let mockListUsers: any;
+  let mockGetLoginSettings: any;
+  let mockPasswordReset: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { listUsers, getLoginSettings, passwordReset } = await import("../zitadel");
+
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceConfig = vi.mocked(getServiceConfig);
+    mockListUsers = vi.mocked(listUsers);
+    mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockPasswordReset = vi.mocked(passwordReset);
+
+    mockHeaders.mockResolvedValue({ get: vi.fn((key) => "example.com") });
+    mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+  });
+
+  test("should return generic success when user not found and ignoreUnknownUsernames is true", async () => {
+    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+
+    const result = await resetPassword({
+      loginName: "unknown@example.com",
+    });
+
+    expect(result).toEqual({});
+    expect(mockPasswordReset).not.toHaveBeenCalled();
+  });
+
+  test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
+    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+
+    const result = await resetPassword({
+      loginName: "unknown@example.com",
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
+    expect(mockPasswordReset).not.toHaveBeenCalled();
+  });
+});
+
+describe("changePassword", () => {
+  let mockHeaders: any;
+  let mockGetServiceConfig: any;
+  let mockGetUserByID: any;
+  let mockGetLoginSettings: any;
+  let mockSetUserPassword: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { getUserByID, getLoginSettings, setUserPassword } = await import("../zitadel");
+
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceConfig = vi.mocked(getServiceConfig);
+    mockGetUserByID = vi.mocked(getUserByID);
+    mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockSetUserPassword = vi.mocked(setUserPassword);
+
+    mockHeaders.mockResolvedValue({ get: vi.fn((key) => "example.com") });
+    mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+  });
+
+  test("should return generic error when user not found and ignoreUnknownUsernames is true", async () => {
+    mockGetUserByID.mockResolvedValue({}); // User not found
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+
+    const result = await changePassword({
+      userId: "unknown",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "set.errors.couldNotSetPassword" });
+    expect(mockSetUserPassword).not.toHaveBeenCalled();
+  });
+
+  test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
+    mockGetUserByID.mockResolvedValue({}); // User not found
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+
+    const result = await changePassword({
+      userId: "unknown",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
+    expect(mockSetUserPassword).not.toHaveBeenCalled();
   });
 });

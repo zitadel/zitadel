@@ -89,7 +89,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       });
 
     if (response && "error" in response) {
-      setError(response.error);
+      setError(response.error as string);
       return;
     }
 
