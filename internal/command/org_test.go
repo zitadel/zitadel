@@ -2048,7 +2048,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "no permission, error",
 			fields: fields{
 				eventstore:   expectEventstore(),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id"),
 				newCode:      mockEncryptedCode("userinit", time.Hour),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},

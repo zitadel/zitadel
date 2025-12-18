@@ -503,6 +503,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, organizationID string, per
 func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist))
 	if err != nil {
 		return nil, err
