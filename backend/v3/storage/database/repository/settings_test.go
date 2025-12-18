@@ -498,6 +498,11 @@ func TestSetLoginSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1167,6 +1172,11 @@ func TestSetBrandingSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1252,34 +1262,42 @@ func TestActivateBrandingSettings(t *testing.T) {
 	}{
 		{
 			name: "activate instance",
-			condition: database.And(
-				repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "activate organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				existingOrganizationSettings.OrganizationID,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "non-existing instance",
-			condition: database.And(
-				repo.InstanceIDCondition("foo"),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				"foo",
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 0,
 		},
 
 		{
 			name: "non-existing organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(gu.Ptr("foo")),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				gu.Ptr("foo"),
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			wantRowsAffected: 0,
 		},
@@ -1370,27 +1388,33 @@ func TestActivateAtBrandingSettings(t *testing.T) {
 	}{
 		{
 			name: "activate instance",
-			condition: database.And(
-				repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				existingInstanceSettings.InstanceID,
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "activate organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+			condition: repo.UniqueCondition(
+				existingOrganizationSettings.InstanceID,
+				existingOrganizationSettings.OrganizationID,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 1,
 		},
 		{
 			name: "non-existing instance",
-			condition: database.And(
-				repo.InstanceIDCondition("foo"),
-				repo.OrganizationIDCondition(nil),
+			condition: repo.UniqueCondition(
+				"foo",
+				nil,
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 0,
@@ -1398,9 +1422,11 @@ func TestActivateAtBrandingSettings(t *testing.T) {
 
 		{
 			name: "non-existing organization",
-			condition: database.And(
-				repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-				repo.OrganizationIDCondition(gu.Ptr("foo")),
+			condition: repo.UniqueCondition(
+				existingOrganizationSettings.InstanceID,
+				gu.Ptr("foo"),
+				domain.SettingTypeBranding,
+				domain.SettingStatePreview,
 			),
 			updatedAt:        time.Now(),
 			wantRowsAffected: 0,
@@ -1454,9 +1480,11 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = repo.Activate(t.Context(), tx,
-		database.And(
-			repo.InstanceIDCondition(existingInstanceSettings.InstanceID),
-			repo.OrganizationIDCondition(existingInstanceSettings.OrganizationID),
+		repo.UniqueCondition(
+			existingInstanceSettings.InstanceID,
+			existingInstanceSettings.OrganizationID,
+			domain.SettingTypeBranding,
+			domain.SettingStatePreview,
 		),
 	)
 	require.NoError(t, err)
@@ -1492,9 +1520,11 @@ func TestDeleteBrandingSettings(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = repo.Activate(t.Context(), tx,
-		database.And(
-			repo.InstanceIDCondition(existingOrganizationSettings.InstanceID),
-			repo.OrganizationIDCondition(existingOrganizationSettings.OrganizationID),
+		repo.UniqueCondition(
+			existingOrganizationSettings.InstanceID,
+			existingOrganizationSettings.OrganizationID,
+			domain.SettingTypeBranding,
+			domain.SettingStatePreview,
 		),
 	)
 	require.NoError(t, err)
@@ -1892,6 +1922,11 @@ func TestSetPasswordComplexitySettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2279,6 +2314,11 @@ func TestSetPasswordExpirySettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -2674,6 +2714,11 @@ func TestSetLockoutSettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -3072,6 +3117,11 @@ func TestSetSecuritySettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3469,6 +3519,11 @@ func TestSetDomainSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3840,6 +3895,11 @@ func TestSetOrganizationSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -4206,6 +4266,11 @@ func TestSetNotificationSettings(t *testing.T) {
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
 		},
 	}
 	for _, tt := range tests {
@@ -4652,6 +4717,11 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -4752,5 +4822,327 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
 		})
+	}
+}
+
+func TestGetSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	settings := []*domain.SecretGeneratorSettings{
+		createSecretGeneratorSettings(firstInstanceID, nil),
+		createSecretGeneratorSettings(secondInstanceID, nil),
+		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
+		createSecretGeneratorSettings(secondInstanceID, gu.Ptr(secondOrgID)),
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      *domain.SecretGeneratorSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.IDCondition(settings[0].ID),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "not found",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			wantErr:   database.NewNoRowFoundError(nil),
+		},
+		{
+			name:      "too many",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			wantErr:   database.NewMultipleRowsFoundError(nil),
+		},
+		{
+			name:      "ok, instance",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, settings[0].ID),
+			want:      settings[0],
+		},
+		{
+			name:      "ok, organization",
+			condition: repo.PrimaryKeyCondition(secondInstanceID, settings[3].ID),
+			want:      settings[3],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.Get(t.Context(), tx, database.WithCondition(tt.condition))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestListSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	firstInstanceID := createInstance(t, tx)
+	secondInstanceID := createInstance(t, tx)
+	firstOrgID := createOrganization(t, tx, firstInstanceID)
+	secondOrgID := createOrganization(t, tx, secondInstanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	settings := []*domain.SecretGeneratorSettings{
+		createSecretGeneratorSettings(firstInstanceID, nil),
+		createSecretGeneratorSettings(secondInstanceID, nil),
+		createSecretGeneratorSettings(firstInstanceID, gu.Ptr(firstOrgID)),
+		createSecretGeneratorSettings(secondInstanceID, gu.Ptr(secondOrgID)),
+	}
+
+	for _, setting := range settings {
+		err := repo.Set(t.Context(), tx, setting)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name      string
+		condition database.Condition
+		want      []*domain.SecretGeneratorSettings
+		wantErr   error
+	}{
+		{
+			name:      "incomplete condition",
+			condition: repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			wantErr:   database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:      "no results, ok",
+			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
+			want:      []*domain.SecretGeneratorSettings{},
+		},
+		{
+			name:      "all from instance",
+			condition: repo.InstanceIDCondition(firstInstanceID),
+			want:      []*domain.SecretGeneratorSettings{settings[2], settings[0]},
+		},
+		{
+			name: "only from instance",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(nil),
+			),
+			want: []*domain.SecretGeneratorSettings{settings[0]},
+		},
+		{
+			name: "all from first org",
+			condition: database.And(
+				repo.InstanceIDCondition(firstInstanceID),
+				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
+			),
+			want: []*domain.SecretGeneratorSettings{settings[2]},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := repo.List(t.Context(), tx,
+				database.WithCondition(tt.condition),
+				database.WithOrderByAscending(repo.InstanceIDColumn(), repo.OrganizationIDColumn()),
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.EqualExportedValues(t, tt.want, got)
+		})
+	}
+}
+
+func TestSetSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	existingSettings := createSecretGeneratorSettings(instanceID, gu.Ptr(orgID))
+
+	err := repo.Set(t.Context(), tx, existingSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		settings *domain.SecretGeneratorSettings
+		wantErr  error
+	}{
+		{
+			name:     "create instance",
+			settings: createSecretGeneratorSettings(instanceID, nil),
+		},
+		{
+			name:     "update organization",
+			settings: createSecretGeneratorSettings(instanceID, gu.Ptr(orgID)),
+		},
+		{
+			name:     "non-existing instance",
+			settings: createSecretGeneratorSettings("foo", nil),
+			wantErr:  new(database.ForeignKeyError),
+		},
+		{
+			name:     "non-existing org",
+			settings: createSecretGeneratorSettings(instanceID, gu.Ptr("foo")),
+			wantErr:  new(database.ForeignKeyError),
+		},
+		{
+			name:     "nil settings",
+			settings: nil,
+			wantErr:  database.ErrInvalidChangeTarget,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, rollback := savepointForRollback(t, tx)
+			defer rollback()
+			err := repo.Set(t.Context(), savepoint, tt.settings)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestDeleteSecretGeneratorSettings(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	existingInstanceSettings := createSecretGeneratorSettings(instanceID, nil)
+	err := repo.Set(t.Context(), tx, existingInstanceSettings)
+	require.NoError(t, err)
+
+	existingOrganizationSettings := createSecretGeneratorSettings(instanceID, gu.Ptr(orgID))
+	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name             string
+		condition        database.Condition
+		wantRowsAffected int64
+		wantErr          error
+	}{
+		{
+			name:             "incomplete condition",
+			condition:        repo.InstanceIDCondition(instanceID),
+			wantRowsAffected: 0,
+			wantErr:          database.NewMissingConditionError(repo.IDColumn()),
+		},
+		{
+			name:             "not found",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete instance",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete instance twice",
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+		{
+			name:             "delete organization",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 1,
+		},
+		{
+			name:             "delete organization twice",
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+			wantRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowsAffected, err := repo.Delete(t.Context(), tx, tt.condition)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantRowsAffected, rowsAffected)
+		})
+	}
+}
+
+func createDefaultSecretGeneratorAttrs() domain.SecretGeneratorAttrs {
+	return domain.SecretGeneratorAttrs{
+		Length:              gu.Ptr(uint(32)),
+		IncludeUpperLetters: gu.Ptr(true),
+		IncludeLowerLetters: gu.Ptr(true),
+		IncludeDigits:       gu.Ptr(true),
+		IncludeSymbols:      gu.Ptr(false),
+	}
+}
+
+func createDefaultSecretGeneratorAttrsWithExpiry(expiry time.Duration) domain.SecretGeneratorAttrsWithExpiry {
+	return domain.SecretGeneratorAttrsWithExpiry{
+		Expiry: gu.Ptr(expiry),
+		SecretGeneratorAttrs: domain.SecretGeneratorAttrs{
+			Length:              gu.Ptr(uint(32)),
+			IncludeUpperLetters: gu.Ptr(true),
+			IncludeLowerLetters: gu.Ptr(true),
+			IncludeDigits:       gu.Ptr(true),
+			IncludeSymbols:      gu.Ptr(false),
+		},
+	}
+}
+
+func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSettingsAttributes {
+	attrs := createDefaultSecretGeneratorAttrs()
+	oneDay := 24 * time.Hour
+	thirtyMinutes := 30 * time.Minute
+	tenMinutes := 10 * time.Minute
+
+	return domain.SecretGeneratorSettingsAttributes{
+		ClientSecret: &domain.ClientSecretAttributes{
+			SecretGeneratorAttrs: attrs,
+		},
+		InitializeUserCode: &domain.InitializeUserCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(oneDay),
+		},
+		EmailVerificationCode: &domain.EmailVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
+		},
+		PhoneVerificationCode: &domain.PhoneVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
+		},
+		PasswordVerificationCode: &domain.PasswordVerificationCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
+		},
+		PasswordlessInitCode: &domain.PasswordlessInitCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(tenMinutes),
+		},
+		DomainVerification: &domain.DomainVerificationAttributes{
+			SecretGeneratorAttrs: attrs,
+		},
+		OTPSMS: &domain.OTPSMSAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
+		},
+		OTPEmail: &domain.OTPEmailAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
+		},
+	}
+}
+
+func createSecretGeneratorSettings(instanceID string, organizationID *string) *domain.SecretGeneratorSettings {
+	return &domain.SecretGeneratorSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceID,
+			OrganizationID: organizationID,
+		},
+		SecretGeneratorSettingsAttributes: createDefaultSecretGeneratorSettingsAttributes(),
 	}
 }

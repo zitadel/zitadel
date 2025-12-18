@@ -3,9 +3,9 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
+import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
-import { getOriginalHostWithProtocol } from "@/lib/server/host";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -24,12 +24,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   let sessionFactors;
   let user: User | undefined;
@@ -43,7 +40,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   async function sendEmail(userId: string) {
-    const hostWithProtocol = await getOriginalHostWithProtocol();
+    const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
     if (invite === "true") {
       await sendInviteEmailCode({
@@ -70,7 +67,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
-      serviceUrl,
+      serviceConfig,
       sessionParams: {
         loginName,
         organization,
@@ -85,10 +82,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendEmail(userId);
     }
 
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {

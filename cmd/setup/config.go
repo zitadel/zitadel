@@ -163,6 +163,7 @@ type Steps struct {
 	s64ChangePushPosition                   *ChangePushPosition
 	s65FixUserMetadata5Index                *FixUserMetadata5Index
 	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
+	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

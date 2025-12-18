@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrNoChanges = errors.New("update must contain a change")
+	ErrNoChanges           = errors.New("update must contain a change")
+	ErrInvalidChangeTarget = errors.New("change target must not be nil")
 )
 
 type MissingConditionError struct {
