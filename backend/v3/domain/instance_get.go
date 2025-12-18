@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -29,7 +30,10 @@ func (g *GetInstanceQuery) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	instance, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(g.ID)))
 	if err != nil {
-		return err
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return zerrors.ThrowNotFound(err, "DOM-QVrUwc", "Errors.Instance.NotFound")
+		}
+		return zerrors.ThrowInternal(err, "DOM-lvsRce", "Errors.Instance.Get")
 	}
 
 	g.returnedInstance = instance
@@ -45,14 +49,14 @@ func (g *GetInstanceQuery) String() string {
 func (g *GetInstanceQuery) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	g.ID = strings.TrimSpace(g.ID)
 	if g.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "invalid instance ID")
+		return zerrors.ThrowInvalidArgument(nil, "DOM-32a0o2", "Errors.Instance.ID")
 	}
 	if g.ID != authz.GetInstance(ctx).InstanceID() {
 		return zerrors.ThrowPermissionDenied(nil, "DOM-n0SvVB", "input instance ID doesn't match context instance")
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Uq6b00", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Uq6b00", "Errors.PermissionDenied")
 	}
 
 	return nil
