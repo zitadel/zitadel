@@ -21,6 +21,10 @@ export const LANGS: Lang[] = [
     code: "es",
   },
   {
+    name: "Français",
+    code: "fr",
+  },
+  {
     name: "Polski",
     code: "pl",
   },
@@ -39,6 +43,10 @@ export const LANGS: Lang[] = [
   {
     name: "日本語",
     code: "ja",
+  },
+  {
+    name: "Українська",
+    code: "uk",
   },
 ];
 

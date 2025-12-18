@@ -131,7 +131,7 @@ Authentication
 Multi-Tenancy
 
 - [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
-- [Customizable onboaring](https://zitadel.com/docs/guides/solution-scenarios/onboarding) for B2B and their users
+- [Customizable onboarding](https://zitadel.com/docs/guides/solution-scenarios/onboarding) for B2B and their users
 - [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
 - [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
 
