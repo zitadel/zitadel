@@ -267,6 +267,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -312,6 +313,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -391,6 +393,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Device Authorization
   UserCode:

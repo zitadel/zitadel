@@ -15,7 +15,7 @@ vi.mock("@zitadel/client", () => ({
 }));
 
 vi.mock("../service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(),
+  getServiceConfig: vi.fn(),
 }));
 
 vi.mock("../idp", () => ({
@@ -39,7 +39,8 @@ vi.mock("./cookie", () => ({
 }));
 
 vi.mock("./host", () => ({
-  getOriginalHost: vi.fn(),
+  getInstanceHost: vi.fn(),
+  getPublicHost: vi.fn(),
 }));
 
 // this returns the key itself that can be checked not the translated value
@@ -57,7 +58,8 @@ describe("sendLoginname", () => {
   let mockCreateSessionAndUpdateCookie: any;
   let mockListAuthenticationMethodTypes: any;
   let mockListIDPLinks: any;
-  let mockGetOriginalHost: any;
+  let mockGetInstanceHost: any;
+  let mockGetPublicHost: any;
   let mockStartIdentityProviderFlow: any;
   let mockGetActiveIdentityProviders: any;
   let mockGetIDPByID: any;
@@ -70,7 +72,7 @@ describe("sendLoginname", () => {
     // Import mocked modules
     const { headers } = await import("next/headers");
     const { create } = await import("@zitadel/client");
-    const { getServiceUrlFromHeaders } = await import("../service-url");
+    const { getServiceConfig } = await import("../service-url");
     const {
       getLoginSettings,
       searchUsers,
@@ -81,19 +83,20 @@ describe("sendLoginname", () => {
       getOrgsByDomain,
     } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("./cookie");
-    const { getOriginalHost } = await import("./host");
+    const { getInstanceHost, getPublicHost } = await import("./host");
     const { idpTypeToSlug } = await import("../idp");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
     mockCreate = vi.mocked(create);
-    mockGetServiceUrlFromHeaders = vi.mocked(getServiceUrlFromHeaders);
+    mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockSearchUsers = vi.mocked(searchUsers);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockListIDPLinks = vi.mocked(listIDPLinks);
-    mockGetOriginalHost = vi.mocked(getOriginalHost);
+    mockGetInstanceHost = vi.mocked(getInstanceHost);
+    mockGetPublicHost = vi.mocked(getPublicHost);
     mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
     mockGetIDPByID = vi.mocked(getIDPByID);
@@ -102,8 +105,9 @@ describe("sendLoginname", () => {
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
-    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceUrl: "https://api.example.com" });
-    mockGetOriginalHost.mockResolvedValue("example.com");
+    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+    mockGetInstanceHost.mockReturnValue("example.com");
+    mockGetPublicHost.mockReturnValue("example.com");
     mockIdpTypeToSlug.mockReturnValue("google");
     mockGetIDPByID.mockResolvedValue({
       id: "idp123",
@@ -243,7 +247,7 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
         expect(mockListIDPLinks).toHaveBeenCalledWith({
-          serviceUrl: "https://api.example.com",
+          serviceConfig: { baseUrl: "https://api.example.com" },
           userId: "user123",
         });
       });
@@ -283,7 +287,7 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
         expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-          serviceUrl: "https://api.example.com",
+          serviceConfig: { baseUrl: "https://api.example.com" },
           orgId: "org123", // User's organization from resourceOwner
         });
       });
@@ -523,7 +527,7 @@ describe("sendLoginname", () => {
 
       // Verify org discovery was called with correct domain
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         domain: "example.com",
       });
     });
@@ -562,13 +566,13 @@ describe("sendLoginname", () => {
 
       // Verify org discovery was called
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         domain: "company.com",
       });
 
       // Verify IDP redirect was called with discovered org
       expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         orgId: "discovered-org-456",
       });
     });

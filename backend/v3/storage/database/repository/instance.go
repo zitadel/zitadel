@@ -35,7 +35,7 @@ func (instance) unqualifiedTableName() string {
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE instance_domains.instance_id IS NOT NULL) AS domains` +
+		` , jsonb_agg(DISTINCT jsonb_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE instance_domains.instance_id IS NOT NULL) AS domains` +
 		` FROM zitadel.instances`
 )
 
@@ -110,7 +110,10 @@ func (i instance) Update(ctx context.Context, client database.QueryExecutor, id 
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instances SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 	idCondition := i.IDCondition(id)
 	writeCondition(&builder, idCondition)
 
@@ -149,15 +152,19 @@ func (i instance) SetUpdatedAt(time time.Time) database.Change {
 func (i instance) SetIAMProject(id string) database.Change {
 	return database.NewChange(i.IAMProjectIDColumn(), id)
 }
+
 func (i instance) SetDefaultOrg(id string) database.Change {
 	return database.NewChange(i.DefaultOrgIDColumn(), id)
 }
+
 func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
 	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
 }
+
 func (i instance) SetConsoleClientID(id string) database.Change {
 	return database.NewChange(i.ConsoleClientIDColumn(), id)
 }
+
 func (i instance) SetConsoleAppID(id string) database.Change {
 	return database.NewChange(i.ConsoleAppIDColumn(), id)
 }
@@ -182,7 +189,6 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 
 // ExistsDomain creates a correlated [database.Exists] condition on instance_domains.
 // Use this filter to make sure the Instance returned contains a specific domain.
-// of the instance in the aggregated result.
 // Example usage:
 //
 //	domainRepo := instanceRepo.Domains(true) // ensure domains are loaded/aggregated
