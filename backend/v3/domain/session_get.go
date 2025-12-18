@@ -70,9 +70,7 @@ func (g *GetSessionQuery) Execute(ctx context.Context, opts *InvokeOpts) error {
 		return nil
 	}
 	// verify session token
-	// (@grvijayan) todo: tokenID is not available in the new session model
-	tokenID := ""
-	if err = g.sessionTokenVerifier(ctx, g.sessionToken, g.sessionID, tokenID); err != nil {
+	if err = g.sessionTokenVerifier(ctx, g.sessionToken, g.sessionID, session.Token); err != nil {
 		return zerrors.ThrowPermissionDenied(err, "QUERY-M3f4fS", "Errors.PermissionDenied")
 	}
 	g.session = session
@@ -91,17 +89,16 @@ func (g *GetSessionQuery) Result() *Session {
 
 func checkSessionPermission(ctx context.Context, session *Session, opts *InvokeOpts) error {
 	data := authz.GetCtxData(ctx)
-	// (@grvijayan) todo: no permission check needed if the user created the session
-	// creator not available in the new session model
+	// (@grvijayan) todo: 1. no permission check needed if the requestor created the session
+	// creator is not yet available in the new session model
 
-	// no permission check needed if the user is retrieving their own session
-	if session.Factors != nil &&
-		session.Factors.GetUserFactor().UserID != "" &&
-		data.UserID == session.Factors.GetUserFactor().UserID {
+	// 2. no permission check needed if the requestor is retrieving their own session
+	if session.UserID != "" &&
+		data.UserID == session.UserID {
 		return nil
 	}
 
-	// no permission check needed for the same useragent
+	// 3. no permission check needed for the same useragent
 	if session.UserAgent != nil &&
 		session.UserAgent.FingerprintID != nil &&
 		*session.UserAgent.FingerprintID != "" &&
@@ -110,10 +107,27 @@ func checkSessionPermission(ctx context.Context, session *Session, opts *InvokeO
 		return nil
 	}
 
-	// (@grvijayan) todo: if session belongs to a user, check for permission on the user resource
-	// resource owner is not available in the new session model session factors
+	// 4. check if the requestor has permissions on the user's organization
+	// get user's organization
+	userRepo := opts.userRepo
+	user, err := userRepo.Get(ctx, opts.DB(),
+		database.WithCondition(
+			userRepo.IDCondition(session.UserID),
+		),
+	)
+	if err = handleGetError(err, "QUERY-4n9fGv", objectTypeUser); err != nil {
+		return err
+	}
 
-	// check permission on the instance by default
+	// check permission on the organization
+	if user.OrganizationID != "" {
+		if authZErr := opts.Permissions.CheckOrganizationPermission(ctx, SessionReadPermission, user.OrganizationID); authZErr != nil {
+			return zerrors.ThrowPermissionDenied(authZErr, "QUERY-6l8oWp", "Errors.PermissionDenied")
+		}
+		return nil
+	}
+
+	// 5. check permission on the instance by default
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, SessionReadPermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "QUERY-5RJSUU", "Errors.PermissionDenied")
 	}
