@@ -10,9 +10,9 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { DurationSchema } from '@bufbuild/protobuf/wkt';
 import { MatSelectModule } from '@angular/material/select';
-import { PayloadType, PayloadTypeJson, Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
+import { PayloadType, Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import { CreateTargetRequestSchema, UpdateTargetRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
-import { getEnumKeyFromValue, getEnumKeys } from '../../../utils/enum.utils';
+import { getEnumKeyFromValue, getEnumKeys } from 'src/app/utils/enum.utils';
 
 type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
 
@@ -34,7 +34,7 @@ type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
 export class ActionTwoAddTargetDialogComponent {
   protected readonly targetTypes = ['restCall', 'restWebhook', 'restAsync'] as const;
   protected readonly targetForm: ReturnType<typeof this.buildTargetForm>;
-  protected readonly payloadTypes: string[] = getEnumKeys(PayloadType);
+  protected readonly payloadTypes = getEnumKeys(PayloadType);
 
   constructor(
     private fb: FormBuilder,
@@ -71,13 +71,10 @@ export class ActionTwoAddTargetDialogComponent {
         nonNullable: true,
         validators: [requiredValidator],
       }),
-      payloadType: new FormControl<string>(
-        getEnumKeyFromValue(PayloadType, PayloadType.UNSPECIFIED) || this.payloadTypes[0],
-        {
-          nonNullable: true,
-          validators: [requiredValidator],
-        },
-      ),
+      payloadType: new FormControl<(typeof this.payloadTypes)[number]>(this.payloadTypes[0], {
+        nonNullable: true,
+        validators: [requiredValidator],
+      }),
       endpoint: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
       timeout: new FormControl<number>(10, { nonNullable: true, validators: [requiredValidator] }),
       interruptOnError: new FormControl<boolean>(false, { nonNullable: true }),
@@ -108,7 +105,7 @@ export class ActionTwoAddTargetDialogComponent {
       endpoint,
       timeout: timeoutDuration,
       targetType,
-      payloadType: PayloadType[payloadType as keyof typeof PayloadType],
+      payloadType: PayloadType[payloadType],
     };
 
     this.dialogRef.close(
