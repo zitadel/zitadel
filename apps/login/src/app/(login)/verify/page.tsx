@@ -172,8 +172,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
-          user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          (user || loginName) && (
+            <UserAvatar
+              loginName={loginName ?? user?.preferredLoginName}
+              displayName={
+                !loginSettings?.ignoreUnknownUsernames
+                  ? human?.profile?.displayName
+                  : (loginName ?? user?.preferredLoginName)
+              }
+              showDropdown={false}
+            />
           )
         )}
       </div>

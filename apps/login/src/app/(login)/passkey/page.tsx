@@ -56,8 +56,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let user: User | undefined;
   let human: HumanUser | undefined;
 
+  let loginSettings;
   if (!sessionFactors && loginName) {
-    const loginSettings = await getLoginSettings({ serviceConfig, organization });
+    loginSettings = await getLoginSettings({ serviceConfig, organization });
 
     if (loginSettings) {
       const users = await searchUsers({
@@ -96,8 +97,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
-          user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          (user || loginName) && (
+            <UserAvatar
+              loginName={loginName ?? user?.preferredLoginName}
+              displayName={
+                !loginSettings?.ignoreUnknownUsernames
+                  ? human?.profile?.displayName
+                  : (loginName ?? user?.preferredLoginName)
+              }
+              showDropdown={false}
+            />
           )
         )}
       </div>

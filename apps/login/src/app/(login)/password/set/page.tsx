@@ -119,10 +119,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        ) : user ? (
+        ) : user || loginName ? (
           <UserAvatar
-            loginName={user?.preferredLoginName}
-            displayName={displayName}
+            loginName={loginName ?? user?.preferredLoginName}
+            displayName={!loginSettings?.ignoreUnknownUsernames ? displayName : (loginName ?? user?.preferredLoginName)}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
