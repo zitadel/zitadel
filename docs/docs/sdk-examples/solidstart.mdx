@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[SolidStart](https://start.solidjs.com) is a full-stack web framework built on top of [SolidJS](https://solidjs.com) that enables you to create performant web applications with a modern development experience. This example demonstrates how to integrate **[Zitadel](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain [sessions](https://zitadel.com/docs/concepts/structure/users#sessions) across the app.
+[SolidStart](https://start.solidjs.com) is a full-stack web framework built on top of [SolidJS](https://solidjs.com) that enables you to create performant web applications with a modern development experience. This example demonstrates how to integrate **[ZITADEL](https://zitadel.com/docs)** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain [sessions](https://zitadel.com/docs/concepts/structure/users#sessions) across the app.
 
 #### Auth library
 
@@ -21,9 +21,9 @@ This example uses **[@auth/solid-start](https://www.npmjs.com/package/@auth/soli
 
 ## What this example demonstrates
 
-This example shows a complete authentication implementation using [SolidStart](https://start.solidjs.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page and click a login button to authenticate with Zitadel using the secure **[PKCE flow](/docs/concepts/pkce)**. The [Auth.js](https://authjs.dev) library handles the [OAuth 2.0](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows) authorization code exchange and manages secure [session storage](https://zitadel.com/docs/concepts/structure/users#sessions) using encrypted [JWT tokens](https://zitadel.com/docs/concepts/tokens). After successful authentication, users are redirected to a protected profile page displaying their user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name, email, and custom [Zitadel metadata](https://zitadel.com/docs/apis/openidoauth/claims#reserved-claims).
+This example shows a complete authentication implementation using [SolidStart](https://start.solidjs.com) with [ZITADEL](https://zitadel.com/docs). Users start on a public landing page and click a login button to authenticate with ZITADEL using the secure **[PKCE flow](/docs/concepts/pkce)**. The [Auth.js](https://authjs.dev) library handles the [OAuth 2.0](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows) authorization code exchange and manages secure [session storage](https://zitadel.com/docs/concepts/structure/users#sessions) using encrypted [JWT tokens](https://zitadel.com/docs/concepts/tokens). After successful authentication, users are redirected to a protected profile page displaying their user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name, email, and custom [ZITADEL metadata](https://zitadel.com/docs/apis/openidoauth/claims#reserved-claims).
 
-The application implements automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate. When an [access token](https://zitadel.com/docs/concepts/tokens) expires, the refresh logic seamlessly exchanges the [refresh token](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) for new tokens in the background. [Route protection](https://start.solidjs.com/api/createAsync) is implemented using [SolidStart's server functions](https://start.solidjs.com/api/server$), ensuring only authenticated users can access sensitive areas. The logout flow implements [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout) with CSRF protection using state parameters, properly terminating both the local session and the Zitadel session before redirecting users back to the application.
+The application implements automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate. When an [access token](https://zitadel.com/docs/concepts/tokens) expires, the refresh logic seamlessly exchanges the [refresh token](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) for new tokens in the background. [Route protection](https://start.solidjs.com/api/createAsync) is implemented using [SolidStart's server functions](https://start.solidjs.com/api/server$), ensuring only authenticated users can access sensitive areas. The logout flow implements [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout) with CSRF protection using state parameters, properly terminating both the local session and the ZITADEL session before redirecting users back to the application.
 
 ---
 
@@ -31,22 +31,22 @@ The application implements automatic [token refresh](https://zitadel.com/docs/ap
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications) configured:
+Once you have your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications) configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-solidstart).
-2. Create a `.env` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use the exact environment variable names from the repository:
+2. Create a `.env` file and configure it with the values from your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications). Use the exact environment variable names from the repository:
    ```
    NODE_ENV=development
    PORT=3000
@@ -61,7 +61,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/
    NEXTAUTH_URL="http://localhost:3000"
    ```
    Replace these values with:
-	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **Issuer**)
+	- Your actual [ZITADEL instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **Issuer**)
 	- The **Client ID** you copied when [creating the application](/docs/guides/integrate/login/oidc/pkce-setup)
 	- The **redirect URIs** you configured in the PKCE setup (must match exactly)
 	- A secure random string for `SESSION_SECRET` (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)

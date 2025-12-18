@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[Qwik](https://qwik.dev) is a framework for building resumable web applications with instant-on interactivity and optimal performance. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across the app.
+[Qwik](https://qwik.dev) is a framework for building resumable web applications with instant-on interactivity and optimal performance. This example demonstrates how to integrate **ZITADEL** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across the app.
 
 #### Auth library
 
@@ -33,22 +33,22 @@ Sign-out functionality implements **[federated logout](https://zitadel.com/docs/
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications) configured:
+Once you have your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications) configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-qwik).
-2. Create a `.env.local` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications):
+2. Create a `.env.local` file and configure it with the values from your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications):
    ```
    VITE_PORT=3000
    VITE_SESSION_SECRET=your-very-secret-and-strong-session-key
@@ -60,7 +60,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/
    VITE_ZITADEL_POST_LOGOUT_URL=http://localhost:3000/api/auth/logout/callback
    ```
    Replace these values with:
-	- Your actual Zitadel instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/))
+	- Your actual ZITADEL instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/))
 	- The **Client ID** you copied when creating the application
 	- A randomly generated session secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 	- A randomly generated client secret value (Auth.js requires this for internal configuration)

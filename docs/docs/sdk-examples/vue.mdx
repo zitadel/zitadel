@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[Vue.js](https://vuejs.org) is a progressive JavaScript framework for building user interfaces with reactive data binding, component composition, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Vue.js application.
+[Vue.js](https://vuejs.org) is a progressive JavaScript framework for building user interfaces with reactive data binding, component composition, and a rich ecosystem. This example demonstrates how to integrate **ZITADEL** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Vue.js application.
 
 #### Auth library
 
@@ -21,11 +21,11 @@ This example uses **[vue-oidc-context](https://www.npmjs.com/package/vue-oidc-co
 
 ## What this example demonstrates
 
-This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with PKCE(/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [ZITADEL](https://zitadel.com/docs) with PKCE(/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with ZITADEL's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The application uses [vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context) to wrap authentication logic around [Vue Router](https://router.vuejs.org) navigation guards, automatically protecting routes and ensuring only authenticated users can access sensitive areas. The [withAuthenticationRequired](https://github.com/authts/vue-oidc-context#protecting-routes) higher-order component secures individual routes by checking [session state](https://zitadel.com/docs/concepts/tokens) before rendering protected views.
 
-The example includes secure sign-out functionality implementing **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** through Zitadel's [end-session endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints#end-session), which terminates both the local application session and the Zitadel session. The app demonstrates proper handling of [refresh tokens](https://zitadel.com/docs/concepts/tokens) using the `offline_access` [scope](https://zitadel.com/docs/apis/openidoauth/scopes), and includes comprehensive [error handling](https://github.com/authts/vue-oidc-context#error-handling) for authentication failures.
+The example includes secure sign-out functionality implementing **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** through ZITADEL's [end-session endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints#end-session), which terminates both the local application session and the ZITADEL session. The app demonstrates proper handling of [refresh tokens](https://zitadel.com/docs/concepts/tokens) using the `offline_access` [scope](https://zitadel.com/docs/apis/openidoauth/scopes), and includes comprehensive [error handling](https://github.com/authts/vue-oidc-context#error-handling) for authentication failures.
 
 ---
 
@@ -33,22 +33,22 @@ The example includes secure sign-out functionality implementing **[federated log
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
+1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/), follow these steps:
+Once you have your [ZITADEL application configured](https://zitadel.com/docs/guides/integrate/login/oidc/), follow these steps:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-vuejs).
-2. Create a `.env` file in the project root and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications):
+2. Create a `.env` file in the project root and configure it with the values from your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications):
 ```
 VITE_ZITADEL_DOMAIN=https://your-instance.zitadel.cloud
 VITE_ZITADEL_CLIENT_ID=your_client_id_from_console
@@ -57,7 +57,7 @@ VITE_ZITADEL_POST_LOGOUT_URL=http://localhost:3000
 VITE_POST_LOGIN_URL=/profile
    ```
 Replace these values with:
-- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **Issuer**)
+- Your actual [ZITADEL instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **Issuer**)
 - The **Client ID** you copied when creating the application in the [PKCE setup](/docs/guides/integrate/login/oidc/pkce-setup)
 - The **redirect URI** you configured (must match exactly)
 - The **post-logout redirect URI** for [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
