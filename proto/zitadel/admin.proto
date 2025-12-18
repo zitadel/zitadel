@@ -210,7 +210,7 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
-            description: "The health endpoint allows an external system to probe if ZITADEL system API is alive. Response as soon as ZITADLE is running."
+            description: "The health endpoint allows an external system to probe if ZITADEL system API is alive. Response as soon as ZITADEL is running."
             tags: "General";
             responses: {
                 key: "200";
