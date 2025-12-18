@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
-
 	"github.com/zitadel/zitadel/internal/zerrors"
 	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
