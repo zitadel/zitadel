@@ -129,12 +129,12 @@ func TestServer_SessionReduces(t *testing.T) {
 
 	metadata := []*domain.SessionMetadata{
 		{
-			domain.Metadata{
+			Metadata: domain.Metadata{
 				InstanceID: instanceID,
 				Key:        "key1",
 				Value:      []byte("value1"),
 			},
-			createdSession.GetSessionId(),
+			SessionID: createdSession.GetSessionId(),
 		},
 	}
 
@@ -305,7 +305,7 @@ func TestServer_SessionReduces(t *testing.T) {
 						},
 						Expiry:            0,
 						CodeReturned:      true,
-						URLTmpl:           "",
+						URLTemplate:       "",
 						TriggeredAtOrigin: "",
 					},
 					&domain.SessionChallengeOTPSMS{

@@ -1,6 +1,6 @@
 CREATE TABLE zitadel.session_user_agents (
-    instance_id TEXT
-    , fingerprint_id TEXT CHECK (fingerprint_id <> '')
+    instance_id TEXT NOT NULL
+    , fingerprint_id TEXT NOT NULL CHECK (fingerprint_id <> '')
     , ip INET
     , description TEXT
     , headers JSONB
@@ -15,7 +15,7 @@ CREATE TABLE zitadel.sessions (
     , user_agent_id TEXT
     , lifetime INTERVAL
     , expiration TIMESTAMPTZ
-    , user_id TEXT -- this column in used for referential integrity
+    , user_id TEXT -- this column is used for referential integrity
     , creator_id TEXT
     , created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
     , updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL

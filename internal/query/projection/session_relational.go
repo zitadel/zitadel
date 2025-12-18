@@ -165,7 +165,7 @@ func (p *sessionRelationalProjection) reduceUserChecked(event eventstore.Event) 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UHE92", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -190,7 +190,7 @@ func (p *sessionRelationalProjection) reducePasswordChecked(event eventstore.Eve
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-3krfa", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -215,7 +215,7 @@ func (p *sessionRelationalProjection) reduceIntentChecked(event eventstore.Event
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ajkd2", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -239,7 +239,7 @@ func (p *sessionRelationalProjection) reduceWebAuthNChallenged(event eventstore.
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-do35d", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -266,7 +266,7 @@ func (p *sessionRelationalProjection) reduceWebAuthNChecked(event eventstore.Eve
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-djk22", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -292,7 +292,7 @@ func (p *sessionRelationalProjection) reduceTOTPChecked(event eventstore.Event) 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-cklr9", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -317,7 +317,7 @@ func (p *sessionRelationalProjection) reduceOTPSMSChallenged(event eventstore.Ev
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fk4f9", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -347,7 +347,7 @@ func (p *sessionRelationalProjection) reduceOTPSMSChecked(event eventstore.Event
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-dk39f", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -372,7 +372,7 @@ func (p *sessionRelationalProjection) reduceOTPEmailChallenged(event eventstore.
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fkf93", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -385,7 +385,7 @@ func (p *sessionRelationalProjection) reduceOTPEmailChallenged(event eventstore.
 				Code:              e.Code,
 				Expiry:            e.Expiry,
 				CodeReturned:      e.ReturnCode,
-				URLTmpl:           e.URLTmpl,
+				URLTemplate:       e.URLTmpl,
 				TriggeredAtOrigin: e.TriggeredAtOrigin,
 			}),
 		)
@@ -402,7 +402,7 @@ func (p *sessionRelationalProjection) reduceOTPEmailChecked(event eventstore.Eve
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-3kll0", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -427,7 +427,7 @@ func (p *sessionRelationalProjection) reduceRecoveryCodeChecked(event eventstore
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-fk45a", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 
@@ -452,7 +452,7 @@ func (p *sessionRelationalProjection) reduceTokenSet(event eventstore.Event) (*h
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-asddt", "reduce.wrong.db.pool %T", ex)
 		}
 		v3Tx := v3_sql.SQLTx(tx)
 

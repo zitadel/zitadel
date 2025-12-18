@@ -29,7 +29,7 @@ func (j *JSON[T]) Scan(src any) (err error) {
 }
 
 // UnmarshalJSON allows encoding/json to decode nested JSON into JSON[T] fields.
-// This makes json.Unmarshal work for fields inside aggregated JSON (e.g. JSON arrays).
+// This makes [json.Unmarshal] work for fields inside aggregated JSON (e.g. JSON arrays).
 func (j *JSON[T]) UnmarshalJSON(data []byte) error {
 	if len(data) == 0 || string(data) == "null" {
 		return nil

@@ -209,7 +209,7 @@ type SessionChallengeOTPEmail struct {
 	Code              *crypto.CryptoValue `json:"code,omitempty" db:"code"`
 	Expiry            time.Duration       `json:"expiry,omitzero" db:"expiry"`
 	CodeReturned      bool                `json:"codeReturned,omitempty" db:"code_returned"`
-	URLTmpl           string              `json:"urlTmpl,omitempty" db:"url_template"`
+	URLTemplate       string              `json:"urlTemplate,omitempty" db:"url_template"`
 	TriggeredAtOrigin string              `json:"triggeredAtOrigin,omitempty" db:"triggered_at_origin"`
 }
 
