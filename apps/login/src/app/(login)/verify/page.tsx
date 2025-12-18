@@ -9,8 +9,7 @@ import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { create } from "@zitadel/client";
-import { LoginSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -34,6 +33,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let user: User | undefined;
   let human: HumanUser | undefined;
   let id: string | undefined;
+  let loginSettings: LoginSettings | undefined;
 
   let error: string | undefined;
 
@@ -75,7 +75,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         organization,
       },
     }).catch(async (error) => {
-      const loginSettings = await getLoginSettings({ serviceConfig, organization });
+      loginSettings = await getLoginSettings({ serviceConfig, organization });
       if (!loginSettings?.ignoreUnknownUsernames) {
         console.error("loadMostRecentSession failed", error);
       }
@@ -103,22 +103,19 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   id = userId ?? sessionFactors?.factors?.user?.id;
 
   if (!id && loginName) {
-    const loginSettings = await getLoginSettings({ serviceConfig, organization });
+    if (!loginSettings) {
+      loginSettings = await getLoginSettings({ serviceConfig, organization });
+    }
+
+    if (!loginSettings) {
+      console.error("loginSettings not found");
+      return;
+    }
+
     const users = await searchUsers({
       serviceConfig,
       searchValue: loginName,
-      loginSettings:
-        loginSettings ??
-        create(LoginSettingsSchema, {
-          ignoreUnknownUsernames: true,
-          disableLoginWithEmail: false,
-          disableLoginWithPhone: false,
-          allowUsernamePassword: true,
-          allowRegister: true,
-          allowExternalIdp: true,
-          forceMfa: false,
-          hidePasswordReset: false,
-        }), // Default settings if null
+      loginSettings: loginSettings,
       organizationId: organization,
     });
 

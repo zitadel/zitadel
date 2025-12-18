@@ -41,19 +41,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     ? await loadSessionById(sessionId, organization)
     : await loadSessionByLoginname(loginName, organization);
 
-  async function getAuthMethodsAndUser(
-    serviceUrl: string,
-
-    session?: Session,
-  ) {
+  async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ serviceConfig, userId,
-    }).then((methods) => {
+    return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
       return getUserByID({ serviceConfig, userId }).then((user) => {
         const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -69,21 +64,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({ serviceConfig, sessionParams: {
+    return loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(serviceConfig.baseUrl, session);
+      return getAuthMethodsAndUser(session);
     });
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(serviceConfig.baseUrl, sessionResponse.session);
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
+      return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
@@ -95,10 +90,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     );
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: sessionWithData.factors.user?.organizationId,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: sessionWithData.factors.user?.organizationId });
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: sessionWithData.factors.user?.organizationId,
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: sessionWithData.factors.user?.organizationId,
   });
 
   // check if user was verified recently
@@ -122,7 +118,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     redirect(`/verify?` + params);
   }
 
-  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: sessionWithData.factors?.user?.organizationId,
+  const identityProviders = await getActiveIdentityProviders({
+    serviceConfig,
+    orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {
     return resp.identityProviders;

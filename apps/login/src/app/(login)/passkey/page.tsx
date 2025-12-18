@@ -6,7 +6,9 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getSession, searchUsers } from "@/lib/zitadel";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -24,9 +26,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
+  let sessionFactors = sessionId ? await loadSessionById(sessionId, organization) : undefined;
+
+  if (!sessionFactors && !sessionId) {
+    sessionFactors = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: { loginName, organization },
+    }).catch(() => {
+      // ignore error
+      return undefined;
+    });
+  }
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
@@ -39,6 +49,30 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
+  let user: User | undefined;
+  let human: HumanUser | undefined;
+
+  if (!sessionFactors && loginName) {
+    const loginSettings = await getLoginSettings({ serviceConfig, organization });
+
+    if (loginSettings) {
+      const users = await searchUsers({
+        serviceConfig,
+        searchValue: loginName,
+        loginSettings: loginSettings,
+        organizationId: organization,
+      });
+
+      if (users.result && users.result.length === 1) {
+        const foundUser = users.result[0];
+        user = foundUser;
+        if (user.type.case === "human") {
+          human = user.type.value as HumanUser;
+        }
+      }
+    }
+  }
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
@@ -50,13 +84,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="verify.description" namespace="passkey" />
         </p>
 
-        {sessionFactors && (
+        {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
+        ) : (
+          user && (
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          )
         )}
       </div>
 
