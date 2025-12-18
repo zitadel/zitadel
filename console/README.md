@@ -24,13 +24,13 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-pnpm nx @zitadel/console:lint
+pnpm nx run @zitadel/console:lint
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-pnpm nx @zitadel/console:lint-fix
+pnpm nx run @zitadel/console:lint-fix
 ```
 
 ## Project Structure

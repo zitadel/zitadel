@@ -9,12 +9,21 @@ Instrumentation:
       # "stdErr": Exports traces to standard error
       # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
       # "http": Exports traces using the OTEL HTTP exporter
+<<<<<<< HEAD
+      # "google": Exports traces to Google Cloud Trace
+      Type: "grpc" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "localhost:4317" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
+      # Disable https for grpc and http exporters
+      Insecure: true # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
+=======
       # "google": Exports traces to Google Cloud. Need to configure GoogleProjectID below!
       Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
+>>>>>>> b0e25bc6714cad8b9f324283dbc397c6f6e3d3e1
       # Interval for batching traces before export
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_BATCHDURATION
       # Project ID for Google Cloud Trace exporter
@@ -29,16 +38,22 @@ Instrumentation:
       # "http": Exports metrics using the OTEL HTTP exporter
       # "google": Exports metrics to Google Cloud. Need to configure GoogleProjectID below!
       # "prometheus": Exposes metrics via an HTTP endpoint for Prometheus to scrape
-      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+      Type: "grpc" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
+<<<<<<< HEAD
+      Endpoint: "localhost:4317" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
+      # Disable https for grpc and http exporters
+      Insecure: true # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
+=======
       Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
+>>>>>>> b0e25bc6714cad8b9f324283dbc397c6f6e3d3e1
       # Interval at which metrics are exported
       BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
       # Project ID for Google Cloud Trace exporter
       GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
-  
+
   # Structured logging can print logs on standard error and/or export them using OTEL.
   Log:
     # Log lines lower than this level are not emitted.
@@ -55,6 +70,18 @@ Instrumentation:
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
     Exporter:
       # The following exporter types are supported:
+<<<<<<< HEAD
+      #   - "none": Disables log exporting
+      #   - "stdOut": Exports logs to standard output
+      #   - "stdErr": Exports logs to standard error
+      # - "grpc": Exports logs using the OTEL gRPC exporter (recommended)
+      #   - "http": Exports logs using the OTEL HTTP exporter
+      Type: "grpc" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "localhost:4317" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_ENDPOINT
+      # Disable https for grpc and http exporters
+      Insecure: true # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_INSECURE
+=======
       #   - "none": Disables OTEL log exporter
       #   - "stdOut": Exports OTEL logs to standard output
       #   - "stdErr": Exports OTEL logs to standard error
@@ -65,6 +92,7 @@ Instrumentation:
       Endpoint: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_INSECURE
+>>>>>>> b0e25bc6714cad8b9f324283dbc397c6f6e3d3e1
       # Interval at which metrics are exported
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_BATCHDURATION
   Profile:
@@ -102,10 +130,10 @@ Tracing:
   # for type 'google'
   # ProjectID: ''
   # Fraction: 1.0
-  Type: none # ZITADEL_TRACING_TYPE
+  Type: otel # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
   # The endpoint of the otel collector endpoint
-  Endpoint: "" #ZITADEL_TRACING_ENDPOINT
+  Endpoint: "localhost:4317" #ZITADEL_TRACING_ENDPOINT
   # The name of the service in traces
   ServiceName: "ZITADEL" #ZITADEL_TRACING_SERVICENAME
 
