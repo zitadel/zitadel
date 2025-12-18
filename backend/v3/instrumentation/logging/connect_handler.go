@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"slices"
 	"strings"
-	"time"
 
 	"connectrpc.com/connect"
 	slogctx "github.com/veqryn/slog-context"
@@ -21,7 +20,6 @@ func NewConnectInterceptor(next connect.UnaryFunc, ignoredMethodSuffixes ...stri
 			return next(ctx, req)
 		}
 
-		start := time.Now()
 		logger := instrumentation.Logger()
 		ctx = instrumentation.SetConnectRequestDetails(ctx, req)
 		ctx = slogctx.NewCtx(ctx, logger)
@@ -35,7 +33,6 @@ func NewConnectInterceptor(next connect.UnaryFunc, ignoredMethodSuffixes ...stri
 			assertConnectLevel(code),
 			"connect RPC served",
 			"code", code,
-			"duration", time.Since(start),
 		)
 
 		return resp, err

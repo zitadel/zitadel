@@ -31,11 +31,9 @@ type Metrics interface {
 	RegisterHistogram(name, description, unit string, buckets []float64) error
 }
 
-const pkgName = "github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
-
 var M = sync.OnceValue(func() Metrics {
 	return instrumentation.NewMeter(
-		pkgName,
+		instrumentation.Name,
 		metric.WithInstrumentationVersion(build.Version()),
 	)
 })

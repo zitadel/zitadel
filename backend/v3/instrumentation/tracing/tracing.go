@@ -21,17 +21,19 @@ type Tracer interface {
 	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *instrumentation.Span)
 }
 
-const TracerName = "zitadel/backend/v3/instrumentation/tracing"
-
 var globalTracer = sync.OnceValue(func() Tracer {
 	return instrumentation.NewTracer(
-		TracerName,
+		instrumentation.Name,
 		api_trace.WithInstrumentationVersion(build.Version()),
 	)
 })
 
+func GlobalTracer() Tracer {
+	return globalTracer()
+}
+
 func NewSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
-	return globalTracer().NewSpan(ctx, GetCaller())
+	return globalTracer().NewSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
 func NewNamedSpan(ctx context.Context, name string) (context.Context, *instrumentation.Span) {
@@ -39,23 +41,23 @@ func NewNamedSpan(ctx context.Context, name string) (context.Context, *instrumen
 }
 
 func NewClientSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
-	return globalTracer().NewClientSpan(ctx, GetCaller())
+	return globalTracer().NewClientSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
 func NewServerSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
-	return globalTracer().NewServerSpan(ctx, GetCaller())
+	return globalTracer().NewServerSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
 func NewClientInterceptorSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
-	return globalTracer().NewClientInterceptorSpan(ctx, GetCaller())
+	return globalTracer().NewClientInterceptorSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
 func NewServerInterceptorSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
-	return globalTracer().NewServerInterceptorSpan(ctx, GetCaller())
+	return globalTracer().NewServerInterceptorSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
 func NewSpanHTTP(r *http.Request) (*http.Request, *instrumentation.Span) {
-	return globalTracer().NewSpanHTTP(r, GetCaller())
+	return globalTracer().NewSpanHTTP(r, instrumentation.GetCallingFunc(1))
 }
 
 func TraceIDFromCtx(ctx context.Context) string {

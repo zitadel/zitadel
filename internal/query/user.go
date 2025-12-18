@@ -5,18 +5,17 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"slices"
 	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -122,14 +121,6 @@ type NotifyUser struct {
 	LastPhone          string
 	VerifiedPhone      string
 	PasswordSet        bool
-}
-
-func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
-	users.Users = slices.DeleteFunc(users.Users,
-		func(user *User) bool {
-			return userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck) != nil
-		},
-	)
 }
 
 func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery) sq.SelectBuilder {
@@ -619,14 +610,12 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	permissionCheckV2 := permissionCheck != nil
 	users, err := q.searchUsers(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
-		usersCheckPermission(ctx, users, permissionCheck)
-	}
+
 	return users, nil
 }
 

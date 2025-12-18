@@ -240,6 +240,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
 	steps.s65FixUserMetadata5Index = &FixUserMetadata5Index{dbClient: dbClient}
 	steps.s66SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
+	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -293,6 +294,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s63AlterResourceCounts,
 		steps.s64ChangePushPosition,
 		steps.s65FixUserMetadata5Index,
+		steps.s67SyncMemberRoleFields,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

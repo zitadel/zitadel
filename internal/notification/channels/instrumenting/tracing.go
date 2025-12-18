@@ -3,8 +3,8 @@ package instrumenting
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func traceMessages(ctx context.Context, channel channels.NotificationChannel, spanName string) channels.NotificationChannel {

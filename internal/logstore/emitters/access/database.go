@@ -6,7 +6,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
@@ -15,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var _ logstore.UsageStorer[*record.AccessLog] = (*databaseLogStorage)(nil)
