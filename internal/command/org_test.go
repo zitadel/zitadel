@@ -1441,6 +1441,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),

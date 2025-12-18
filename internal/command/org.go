@@ -523,6 +523,7 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck Org
 	}, nil
 }
 
+//nolint:gocognit
 func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck OrganizationPermissionCheck, mustExist bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
