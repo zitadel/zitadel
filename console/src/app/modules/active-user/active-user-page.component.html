@@ -1,10 +1,21 @@
-@if (activeUser.data(); as average) {
-  {{ average }}
-}
+<div class="max-width-container pt-4 flex flex-col gap-4">
+  <div>
+    <span class="flex flex-row gap-4 items-center">
+      <h1>ZITADEL Analytics</h1>
+      <p class="state active uppercase mt-2">monitoring</p>
+    </span>
+    <p>See your metrics for active users</p>
+  </div>
+  <div>
+    <h2 class="font-bold">Active users</h2>
+    <p>An active user is one who has logged in withing the specified time period</p>
+  </div>
 
-<mat-date-range-input [rangePicker]="picker">
-  <input matStartDate placeholder="Start date" [formControl]="form.controls.start">
-  <input matEndDate placeholder="End date" [formControl]="form.controls.end">
-</mat-date-range-input>
-<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-<mat-date-range-picker #picker></mat-date-range-picker>
+  <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
+    <cnsl-active-user-card-daily [(start)]="dailyStart" [(end)]="dailyEnd" [chart]="dailyActiveUser.data()">
+    </cnsl-active-user-card-daily>
+
+    <cnsl-active-user-card-monthly [(start)]="monthlyStart" [(end)]="monthlyEnd"  [chart]="monthlyActiveUser.data()">
+    </cnsl-active-user-card-monthly>
+  </div>
+</div>

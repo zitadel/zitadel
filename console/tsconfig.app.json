@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["node"],
-    "useDefineForClassFields": false,
     "lib": [
       "ES2022",
       "dom"

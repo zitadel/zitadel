@@ -8,15 +8,11 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/console",
         "browser": "console/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "console/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -29,18 +25,11 @@
             "output": "assets/docs/img/tech"
           }
         ],
-        "styles": [
-          "console/src/styles.scss"
-        ],
-        "scripts": [
-          "node_modules/tinycolor2/dist/tinycolor-min.js"
-        ],
+        "styles": ["console/src/styles.scss", "console/src/tailwind.css"],
+        "scripts": ["node_modules/tinycolor2/dist/tinycolor-min.js"],
         "stylePreprocessorOptions": {
           "sass": {
-            "silenceDeprecations": [
-              "import",
-              "mixed-decls"
-            ]
+            "silenceDeprecations": ["import", "mixed-decls"]
           }
         }
       },
@@ -123,9 +112,7 @@
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": [
-        "{options.reportsDirectory}"
-      ],
+      "outputs": ["{options.reportsDirectory}"],
       "options": {
         "reportsDirectory": "../../coverage/console"
       }

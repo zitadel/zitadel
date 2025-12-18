@@ -1,0 +1,10 @@
+:host {
+  display: contents;
+}
+
+.picker-content {
+  background-color: var(--mat-dialog-container-color);
+  color: var(--mat-datepicker-calendar-container-text-color);
+  box-shadow: var(--mat-datepicker-calendar-container-elevation-shadow);
+  border-radius: var(--mat-datepicker-calendar-container-shape);
+}

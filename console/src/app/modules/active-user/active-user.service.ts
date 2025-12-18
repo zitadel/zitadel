@@ -1,15 +1,17 @@
-import { Injectable } from '@angular/core';
-import { create, MessageInitShape } from '@bufbuild/protobuf';
+import { inject, Injectable } from "@angular/core";
+import { create, MessageInitShape } from "@bufbuild/protobuf";
 import {
   ActiveUserRequestSchema,
   ActiveUserRequest as ActiveUserRequestGrpc,
   ActiveUserEntry,
-} from '@zitadel/proto/zitadel/analytics/v2beta/active_user_service_pb';
-import { queryOptions, skipToken } from '@tanstack/angular-query-experimental';
-import { ActiveUserGrpcProviderService } from './active-user-grpc-provider.service';
-import { TimestampSchema } from '@bufbuild/protobuf/wkt';
+} from "@zitadel/proto/zitadel/analytics/v2beta/active_user_service_pb";
+import { queryOptions, skipToken } from "@tanstack/angular-query-experimental";
+import { ActiveUserGrpcProviderService } from "./active-user-grpc-provider.service";
+import { TimestampSchema } from "@bufbuild/protobuf/wkt";
 
-export type PrecisionType = NonNullable<ActiveUserRequestGrpc['precision']['case']>;
+export type PrecisionType = NonNullable<
+  ActiveUserRequestGrpc["precision"]["case"]
+>;
 
 type ActiveUserRequest = {
   precision: PrecisionType;
@@ -19,15 +21,21 @@ type ActiveUserRequest = {
 
 @Injectable()
 export class ActiveUserService {
-  private readonly activeUserService = this.activeUserGrpcProviderService.getClient();
-
-  constructor(private readonly activeUserGrpcProviderService: ActiveUserGrpcProviderService) {}
+  private readonly activeUserGrpcProviderService = inject(
+    ActiveUserGrpcProviderService
+  );
+  private readonly activeUserService =
+    this.activeUserGrpcProviderService.getClient();
 
   public getActiveUser(request?: ActiveUserRequest) {
     const req = request
       ? ({
-          startingDateInclusive: dateToTimestamp(request.startingDateInclusive),
-          endingDateInclusive: dateToTimestamp(request.endingDateInclusive),
+          startingDateInclusive: dateToTimestamp(
+            resetTime(request.startingDateInclusive)
+          ),
+          endingDateInclusive: dateToTimestamp(
+            resetTime(request.endingDateInclusive)
+          ),
           precision: {
             case: request.precision,
             value: {},
@@ -52,8 +60,13 @@ export class ActiveUserService {
         : undefined;
 
     return queryOptions({
-      queryKey: ['activeUser', queryKey],
-      queryFn: req ? () => this.activeUserService.listActiveUsers(req).then((res) => res.entries) : skipToken,
+      queryKey: ["activeUser", queryKey],
+      queryFn: req
+        ? () =>
+            this.activeUserService
+              .listActiveUsers(req)
+              .then((res) => res.entries)
+        : skipToken,
     });
   }
 }
@@ -64,7 +77,9 @@ export function averageActiveUserEntries(entries: ActiveUserEntry[]): bigint {
     return BigInt(0);
   }
 
-  const sum = entries.map((entry) => entry.value).reduce((acc, curr) => acc + curr, BigInt(0));
+  const sum = entries
+    .map((entry) => entry.value)
+    .reduce((acc, curr) => acc + curr, BigInt(0));
   return sum / BigInt(entries.length);
 }
 
@@ -74,4 +89,10 @@ export function dateToTimestamp(date: Date) {
   const nanos = (millis % 1000) * 1000 * 1000;
 
   return create(TimestampSchema, { seconds: BigInt(seconds), nanos });
+}
+
+export function resetTime(date: Date) {
+  const clone = new Date(date);
+  clone.setHours(0, 0, 0, 0);
+  return clone;
 }

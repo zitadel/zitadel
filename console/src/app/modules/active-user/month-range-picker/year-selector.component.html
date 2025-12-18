@@ -1,0 +1,12 @@
+<div class="grid grid-cols-[repeat(4,minmax(0,max-content))] justify-between">
+  @for (year of years(); track year) {
+    @let disabled = year < notBefore();
+    <button class="w-min p-2 rounded" [disabled]="disabled" [class.text-gray-500]="disabled"
+            [class.bg-(--mat-datepicker-calendar-date-selected-state-background-color)]="year === selectedYear()"
+            type="button"
+            (click)="selectedYearChange.emit(year)"
+    >
+      {{ year }}
+    </button>
+  }
+</div>
