@@ -44,8 +44,7 @@ func (r Router) Get(executionID string) ([]Target, bool) {
 // GetEventBestMatch returns the best matching execution targets for an event.
 // The following match priority is used:
 //  1. Exact match
-//  2. Wildcard match
-//  3. Prefix match ("event")
+//  2. Longest matching prefix (with wildcard suffix .* for events)
 func (r Router) GetEventBestMatch(executionID string) ([]Target, bool) {
 	t, ok := r.Get(executionID)
 	if ok {
@@ -53,9 +52,11 @@ func (r Router) GetEventBestMatch(executionID string) ([]Target, bool) {
 	}
 	var bestMatch element
 	for _, e := range r {
-		if e.ID == "event" && strings.HasPrefix(executionID, e.ID) {
+		if strings.HasPrefix(executionID, e.ID) {
 			bestMatch, ok = e, true
 		}
+
+		// .* is suffixed for "all" condition on events
 		cut, has := strings.CutSuffix(e.ID, ".*")
 		if has && strings.HasPrefix(executionID, cut) {
 			bestMatch, ok = e, true

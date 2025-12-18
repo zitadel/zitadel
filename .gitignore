@@ -99,4 +99,10 @@ dist
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 
+# AI Files
+CLAUDE.md
+AGENTS.md
+.mcp.json
+.gemini/*
+
 .angular

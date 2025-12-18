@@ -93,7 +93,10 @@ func (i instanceDomain) Update(ctx context.Context, client database.QueryExecuto
 
 	var builder database.StatementBuilder
 	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
-	database.Changes(changes).Write(&builder)
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
 
 	writeCondition(&builder, condition)
 
@@ -158,6 +161,11 @@ func (i instanceDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
 // TypeCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition {
 	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typ.String())
+}
+
+// IsGeneratedCondition implements domain.InstanceDomainRepository.
+func (i *instanceDomain) IsGeneratedCondition(isGenerated bool) database.Condition {
+	return database.NewBooleanCondition(i.IsGeneratedColumn(), isGenerated)
 }
 
 // -------------------------------------------------------------

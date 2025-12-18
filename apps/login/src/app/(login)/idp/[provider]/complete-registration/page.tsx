@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterFormIDPIncomplete } from "@/components/register-form-idp-incomplete";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { headers } from "next/headers";
 
@@ -16,11 +16,9 @@ export default async function CompleteRegistrationPage(props: {
   const { id, token, requestId, organization, idpId, idpUserId, idpUserName, givenName, familyName, email } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
   if (!id || !token || !idpId || !organization || !idpUserId || !idpUserName) {

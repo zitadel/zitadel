@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projecten",
-      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele app, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
       "OWNED": {
         "TITLE": "Eigen Projecten",
         "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
@@ -1546,7 +1546,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1796,7 +1797,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2420,7 +2422,8 @@
       "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
       "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
-      "4": "Eenmalig wachtwoord per SMS (SMS OTP)"
+      "4": "Eenmalig wachtwoord per SMS (SMS OTP)",
+      "5": "Herstelcodes"
     }
   },
   "LOGINPOLICY": {
@@ -2770,7 +2773,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",
