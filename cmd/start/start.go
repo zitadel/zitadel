@@ -204,6 +204,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	new_domain.SetOTPEmailSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPEmail)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	new_domain.SetSessionTokenVerifierFn(sessionTokenVerifier)
+
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
