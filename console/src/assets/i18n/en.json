@@ -2658,7 +2658,7 @@
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "When this option is enabled, the authenticated user's assigned roles will be added directly to their ID token. Ensure to enable the Project setting 'Assign user roles during authentication' or request via custom scope.",
-      "IDTOKENUSERINFOASSERTION": "Include user's roles in the ID Token",
+      "IDTOKENUSERINFOASSERTION": "Include user's profile info in the ID Token",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
       "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
       "RECOMMENDED": "recommended",
