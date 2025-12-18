@@ -16,20 +16,35 @@ type LoadMostRecentSessionParams = {
   };
 };
 
-export async function loadMostRecentSession({ serviceConfig, sessionParams }: LoadMostRecentSessionParams): Promise<Session | undefined> {
+export async function loadMostRecentSession({
+  serviceConfig,
+  sessionParams,
+}: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
     loginName: sessionParams.loginName,
     organization: sessionParams.organization,
   });
 
-  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((resp: GetSessionResponse) => resp.session);
+  if (!recent) {
+    return undefined;
+  }
+
+  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then(
+    (resp: GetSessionResponse) => resp.session,
+  );
 }
 
 /**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-export async function isSessionValid({ serviceConfig, session }: { serviceConfig: ServiceConfig; session: Session }): Promise<boolean> {
+export async function isSessionValid({
+  serviceConfig,
+  session,
+}: {
+  serviceConfig: ServiceConfig;
+  session: Session;
+}): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
     console.warn("Session has no user");

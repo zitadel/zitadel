@@ -49,7 +49,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceConfig,
-    organization: session?.factors?.user?.organizationId,
+    organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
