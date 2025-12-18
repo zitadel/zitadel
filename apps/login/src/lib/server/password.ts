@@ -86,8 +86,6 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error);
   });
 
   let session;
@@ -368,11 +366,9 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
 
-  let sessionCookie;
-  try {
-    sessionCookie = await getSessionCookieById({ sessionId });
-  } catch (error) {
-    console.error("Error getting session cookie:", error);
+  const sessionCookie = await getSessionCookieById({ sessionId });
+
+  if (!sessionCookie) {
     return { error: "Could not load session cookie" };
   }
 

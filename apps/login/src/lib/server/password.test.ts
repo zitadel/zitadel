@@ -333,7 +333,7 @@ describe("resetPassword", () => {
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockPasswordReset = vi.mocked(passwordReset);
 
-    mockHeaders.mockResolvedValue({ get: vi.fn((key) => "example.com") });
+    mockHeaders.mockResolvedValue({ get: vi.fn(() => "example.com") });
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
   });
 
@@ -382,7 +382,7 @@ describe("changePassword", () => {
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockSetUserPassword = vi.mocked(setUserPassword);
 
-    mockHeaders.mockResolvedValue({ get: vi.fn((key) => "example.com") });
+    mockHeaders.mockResolvedValue({ get: vi.fn(() => "example.com") });
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
   });
 

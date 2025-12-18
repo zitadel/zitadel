@@ -74,6 +74,11 @@ export async function registerPasskeyLink(
   if (command.sessionId) {
     // Session-based flow (existing logic)
     const sessionCookie = await getSessionCookieById({ sessionId: command.sessionId });
+
+    if (!sessionCookie) {
+      return { error: "Could not get session cookie" };
+    }
+
     session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
 
     if (!session?.session?.factors?.user?.id) {
@@ -197,6 +202,11 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     const sessionCookie = await getSessionCookieById({
       sessionId: command.sessionId,
     });
+
+    if (!sessionCookie) {
+      throw new Error("Could not get session cookie");
+    }
+
     const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
     const userId = session?.session?.factors?.user?.id;
 

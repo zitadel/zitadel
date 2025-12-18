@@ -109,39 +109,8 @@ export type UpdateSessionCommand = {
   lifetime?: Duration;
 };
 
-export async function updateSession(options: UpdateSessionCommand) {
+export async function updateOrCreateSession(options: UpdateSessionCommand) {
   let { loginName, sessionId, organization, checks, requestId, challenges } = options;
-  let recentSession = sessionId
-    ? await getSessionCookieById({ sessionId })
-    : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization })
-      : await getMostRecentSessionCookie();
-
-  if (!recentSession) {
-    if (loginName) {
-      const checks = create(ChecksSchema, {
-        user: { search: { case: "loginName", value: loginName } },
-      });
-
-      const result = await createSessionAndUpdateCookie({
-        checks,
-        requestId,
-      }).catch((error) => {
-        // console.error("Could not create session", error);
-        return undefined;
-      });
-
-      if (result && "sessionCookie" in result) {
-        recentSession = result.sessionCookie;
-      }
-    }
-
-    if (!recentSession) {
-      return {
-        error: "Could not find session",
-      };
-    }
-  }
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -155,6 +124,41 @@ export async function updateSession(options: UpdateSessionCommand) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
+  }
+
+  let recentSession = sessionId
+    ? await getSessionCookieById({ sessionId })
+    : loginName
+      ? await getSessionCookieByLoginName({ loginName, organization })
+      : await getMostRecentSessionCookie();
+
+  if (!recentSession) {
+    if (!loginName) {
+      return { error: "Could not get session context" };
+    }
+
+    const checks = create(ChecksSchema, {
+      user: { search: { case: "loginName", value: loginName } },
+    });
+
+    const result = await createSessionAndUpdateCookie({
+      checks,
+      challenges,
+      requestId,
+    }).catch((error) => {
+      console.error("Could not create session", error);
+      return undefined;
+    });
+
+    if (result && "sessionCookie" in result) {
+      recentSession = result.sessionCookie;
+    }
+
+    if (!recentSession) {
+      return {
+        error: "Could not find session",
+      };
+    }
   }
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
@@ -213,6 +217,10 @@ export async function clearSession(options: ClearSessionOptions) {
   const { sessionId } = options;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
+
+  if (!sessionCookie) {
+    return;
+  }
 
   const deleteResponse = await deleteSession({
     serviceConfig,

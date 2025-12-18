@@ -59,8 +59,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ serviceConfig, userId,
-    }).then((methods) => {
+    return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
       return getUserByID({ serviceConfig, userId }).then((user) => {
         const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -77,7 +76,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({ serviceConfig, sessionParams: {
+    return loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
@@ -88,19 +89,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
       return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: sessionWithData.factors?.user?.organizationId,
+  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: sessionWithData?.factors?.user?.organizationId,
   });
 
-  const { valid } = isSessionValid(sessionWithData);
+  const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
 
   return (
     <DynamicTheme branding={branding}>

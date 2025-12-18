@@ -90,8 +90,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: "loginName" in command ? command.loginName : user.preferredLoginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error); // checked later
   });
 
   if (sessionCookie) {

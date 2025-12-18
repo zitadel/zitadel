@@ -7,7 +7,6 @@ import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getSession, searchUsers } from "@/lib/zitadel";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -40,6 +39,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
+
+    if (!recent) {
+      return undefined;
+    }
+
     return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session) {
         return response.session;

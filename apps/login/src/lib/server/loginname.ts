@@ -312,10 +312,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // always resend invite if user has no auth method set
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
+      console.log("humanUser.email?.isVerified", humanUser?.email?.isVerified);
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         send: "true", // set this to true to request a new code immediately
-        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        invite: !humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
       });
 
       if (command.requestId) {

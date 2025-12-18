@@ -3,7 +3,7 @@
 import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import {
   createSessionForUserIdAndIdpIntent,
-  createSessionFromChecks,
+  createSessionFromChecksAndChallenges,
   getSecuritySettings,
   getSession,
   setSession,
@@ -44,6 +44,7 @@ export async function createSessionAndUpdateCookie(command: {
   checks: Checks;
   requestId: string | undefined;
   lifetime?: Duration;
+  challenges?: RequestChallenges;
 }): Promise<{ session: Session; sessionCookie: CustomCookieData }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -59,7 +60,12 @@ export async function createSessionAndUpdateCookie(command: {
     } as Duration; // for usecases where the lifetime is not specified (user discovery)
   }
 
-  const createdSession = await createSessionFromChecks({ serviceConfig, checks: command.checks, lifetime: sessionLifetime });
+  const createdSession = await createSessionFromChecksAndChallenges({
+    serviceConfig,
+    checks: command.checks,
+    lifetime: sessionLifetime,
+    challenges: command.challenges,
+  });
 
   if (createdSession) {
     return getSession({

@@ -77,6 +77,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
+
+    if (!recent) {
+      return undefined;
+    }
+
     return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
       return getAuthMethodsAndUser(sessionResponse.session);
     });
