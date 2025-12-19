@@ -84,7 +84,7 @@ export async function isSessionValid({
       mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
 
       if (!mfaValid) {
-        console.error("MFA is required but not valid");
+        console.warn("[Session] MFA is required but not valid");
       }
     } else {
       // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
@@ -97,7 +97,7 @@ export async function isSessionValid({
 
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
       if (!mfaValid) {
-        console.error("MFA is required but not valid");
+        console.warn("[Session] MFA is required but not valid");
       }
     }
   }
@@ -108,7 +108,7 @@ export async function isSessionValid({
 
   if (!stillValid) {
     console.warn(
-      "Session is expired",
+      "[Session] Session is expired",
       session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
     );
     return false;
@@ -121,7 +121,7 @@ export async function isSessionValid({
   }
 
   if (!mfaValid) {
-    console.error("MFA is required but not valid");
+    console.warn("[Session] MFA is required but not valid");
     return false;
   }
 
@@ -132,6 +132,7 @@ export async function isSessionValid({
     const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser && !humanUser.email?.isVerified) {
+      console.warn("[Session] Email is not verified");
       return false;
     }
   }
