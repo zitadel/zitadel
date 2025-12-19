@@ -155,7 +155,7 @@ func TestCommands_AddTargetPublicKey(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-nd3fsd", "Errors.Target.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, ErrTargetNotFound, "Errors.Target.NotFound"),
 			},
 		},
 		{
@@ -260,7 +260,7 @@ func TestCommands_ActivateTargetPublicKey(t *testing.T) {
 				keyID:    "key-1",
 			},
 			res: res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, ErrKeyNotFound, "Errors.Target.NotFound"),
 			},
 		},
 		{
@@ -289,7 +289,7 @@ func TestCommands_ActivateTargetPublicKey(t *testing.T) {
 				keyID:    "key-1",
 			},
 			res: res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.PublicKeyExpired"),
+				err: zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyExpired, "Errors.Target.PublicKeyExpired"),
 			},
 		},
 		{
@@ -429,7 +429,7 @@ func TestCommands_DeactivateTargetPublicKey(t *testing.T) {
 				keyID:    "key-1",
 			},
 			res: res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, ErrKeyNotFound, "Errors.Target.NotFound"),
 			},
 		},
 		{

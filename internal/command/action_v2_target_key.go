@@ -21,6 +21,9 @@ const (
 	ErrPublicKeyFormat          = "ErrPublicKeyFormat"
 	ErrExpirationDateBeforeNow  = "ErrExpirationDateBeforeNow"
 	ErrPublicKeyDeleteActiveKey = "ErrPublicKeyDeleteActiveKey"
+	ErrTargetNotFound           = "ErrTargetNotFound"
+	ErrKeyNotFound              = "ErrKeyNotFound"
+	ErrPublicKeyExpired         = "ErrPublicKeyExpired"
 )
 
 type TargetPublicKey struct {
@@ -55,7 +58,7 @@ func (c *Commands) AddTargetPublicKey(ctx context.Context, key *TargetPublicKey,
 		return time.Time{}, err
 	}
 	if !writeModel.TargetExists {
-		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nd3fsd", "Errors.Target.NotFound")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrTargetNotFound, "Errors.Target.NotFound")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, target.NewKeyAddedEvent(
 		ctx,
@@ -83,10 +86,10 @@ func (c *Commands) ActivateTargetPublicKey(ctx context.Context, targetID, keyID,
 		return time.Time{}, err
 	}
 	if !writeModel.TargetExists || !writeModel.KeyExists {
-		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrKeyNotFound, "Errors.Target.NotFound")
 	}
 	if !writeModel.ExpirationDate.IsZero() && writeModel.ExpirationDate.Before(time.Now()) {
-		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.PublicKeyExpired")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrPublicKeyExpired, "Errors.Target.PublicKeyExpired")
 	}
 	if writeModel.Active {
 		return writeModel.ChangeDate, nil
@@ -114,7 +117,7 @@ func (c *Commands) DeactivateTargetPublicKey(ctx context.Context, targetID, keyI
 		return time.Time{}, err
 	}
 	if !writeModel.TargetExists || !writeModel.KeyExists {
-		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAF4g", "Errors.Target.NotFound")
+		return time.Time{}, zerrors.ThrowPreconditionFailed(nil, ErrKeyNotFound, "Errors.Target.NotFound")
 	}
 	if !writeModel.Active {
 		return writeModel.ChangeDate, nil

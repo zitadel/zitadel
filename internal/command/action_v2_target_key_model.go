@@ -36,6 +36,7 @@ func (wm *TargetKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *target.KeyActivatedEvent:
+			// don't check for KeyID, as only one key can be active at a time any activation event affects all keys
 			wm.WriteModel.AppendEvents(e)
 		case *target.KeyDeactivatedEvent:
 			if wm.KeyID != e.KeyID {

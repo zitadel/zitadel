@@ -576,7 +576,7 @@ Errors:
     InvalidURL: La destinazione ha un URL non valido
     NotFound: Obiettivo non trovato
     InvalidExpirationDate: La data di scadenza della chiave deve essere nel futuro
-    PublicKeyExpired: La chiave pubblica della destinazione è scaduta
+    PublicKeyExpired: La chiave pubblica dell'obiettivo è scaduta
     PublicKeyActive: Impossibile eliminare la chiave pubblica della destinazione attiva
     InvalidPublicKey: La chiave pubblica non è valida. Deve essere una chiave pubblica RSA o ECDSA codificata PEM in formato PKCS#8
   Execution:

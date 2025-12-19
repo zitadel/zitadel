@@ -21,7 +21,7 @@ type KeyAddedEvent struct {
 	KeyID          string    `json:"keyId,omitempty"`
 	PublicKey      []byte    `json:"publicKey,omitempty"`
 	Fingerprint    string    `json:"fingerprint,omitempty"`
-	ExpirationDate time.Time `json:"expirationDate,omitempty"`
+	ExpirationDate time.Time `json:"expirationDate,omitzero"`
 }
 
 func (e *KeyAddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {

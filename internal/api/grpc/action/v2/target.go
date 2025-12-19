@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -72,7 +73,7 @@ func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.A
 		expirationDate = req.Msg.GetExpirationDate().AsTime()
 	}
 	key := &command.TargetPublicKey{
-		TargetID:   req.Msg.GetTargetId(),
+		TargetID:   strings.TrimSpace(req.Msg.GetTargetId()),
 		PublicKey:  req.Msg.GetPublicKey(),
 		Expiration: expirationDate,
 	}
@@ -88,7 +89,7 @@ func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.A
 
 func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[action.ActivatePublicKeyRequest]) (*connect.Response[action.ActivatePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	changeDate, err := s.command.ActivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	changeDate, err := s.command.ActivateTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +100,7 @@ func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[act
 
 func (s *Server) DeactivatePublicKey(ctx context.Context, req *connect.Request[action.DeactivatePublicKeyRequest]) (*connect.Response[action.DeactivatePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	changeDate, err := s.command.DeactivateTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	changeDate, err := s.command.DeactivateTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +111,7 @@ func (s *Server) DeactivatePublicKey(ctx context.Context, req *connect.Request[a
 
 func (s *Server) RemovePublicKey(ctx context.Context, req *connect.Request[action.RemovePublicKeyRequest]) (*connect.Response[action.RemovePublicKeyResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	deletionDate, err := s.command.RemoveTargetPublicKey(ctx, req.Msg.GetTargetId(), req.Msg.GetKeyId(), instanceID)
+	deletionDate, err := s.command.RemoveTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
 	if err != nil {
 		return nil, err
 	}
