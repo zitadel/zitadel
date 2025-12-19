@@ -61,3 +61,26 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 		},
 	}, nil
 }
+
+func GetSession(ctx context.Context, req *connect.Request[session.GetSessionRequest]) (*connect.Response[session.GetSessionResponse], error) {
+	sessionGetQuery := domain.NewGetSessionQuery(
+		req.Msg.GetSessionId(),
+		authz.GetInstance(ctx).InstanceID(),
+		req.Msg.GetSessionToken(),
+		nil, // todo: check passing the verifier fn here?
+	)
+	err := domain.Invoke(ctx,
+		sessionGetQuery,
+		//domain.WithSessionRepo(repository.SessionRepository()), // todo: uncomment when these repos are available
+		//domain.WithUserRepo(repository.UserRepository()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[session.GetSessionResponse]{
+		Msg: &session.GetSessionResponse{
+			Session: sessionToPb(sessionGetQuery.Result()),
+		},
+	}, nil
+}
