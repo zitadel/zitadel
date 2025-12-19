@@ -39,7 +39,6 @@ export async function loginWithOIDCAndSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        // console.log("Redirecting to re-authenticate:", res.redirect);
         return { redirect: res.redirect };
       }
     }
@@ -64,7 +63,6 @@ export async function loginWithOIDCAndSession({
           }),
         });
         if (callbackUrl) {
-          // console.log("Redirecting to callback URL:", callbackUrl);
           return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };
@@ -91,7 +89,6 @@ export async function loginWithOIDCAndSession({
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          // console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
           return { redirect: signedinUrl + "?" + params.toString() };
         } else {
           return { error: "Unknown error occurred" };
