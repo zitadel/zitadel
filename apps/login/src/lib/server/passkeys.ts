@@ -280,9 +280,14 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   const { serviceConfig } = getServiceConfig(_headers);
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
+  const userId = session?.factors?.user?.id;
+  if (!userId) {
+    return { error: t("verify.errors.couldNotFindSession") };
+  }
+
   let userResponse;
   try {
-    userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
+    userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
     console.error("Error fetching user by ID:", error);
     return { error: t("verify.errors.couldNotGetUser") };
@@ -294,7 +299,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(session, humanUser, organization, requestId);
+  const emailVerificationCheck = checkEmailVerification(session as any, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;

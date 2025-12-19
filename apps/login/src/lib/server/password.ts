@@ -117,7 +117,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch (error) {
+    } catch {
+      console.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
       sessionCookie = undefined;

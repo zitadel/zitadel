@@ -5,7 +5,6 @@ import {
   deleteSession,
   getLoginSettings,
   getSecuritySettings,
-  getUserByID,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
   listUsers,
