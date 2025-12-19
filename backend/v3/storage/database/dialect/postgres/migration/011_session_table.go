@@ -6,11 +6,11 @@ import (
 
 var (
 	//go:embed 011_session_table/up.sql
-	up010SessionTable string
+	up011SessionTable string
 	//go:embed 011_session_table/down.sql
-	down010SessionTable string
+	down011SessionTable string
 )
 
 func init() {
-	registerSQLMigration(10, up010SessionTable, down010SessionTable) // TODO: needs to be set to 11 after user (10) is merged
+	registerSQLMigration(11, up011SessionTable, down011SessionTable)
 }

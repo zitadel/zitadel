@@ -11,7 +11,7 @@ CREATE TABLE zitadel.session_user_agents (
 CREATE TABLE zitadel.sessions (
     instance_id TEXT NOT NULL
     , id TEXT NOT NULL CHECK (id <> '')
-    , token TEXT
+    , token_id TEXT
     , user_agent_id TEXT
     , lifetime INTERVAL
     , expiration TIMESTAMPTZ

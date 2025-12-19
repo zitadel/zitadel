@@ -112,7 +112,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: createdSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
 				UserID:     "",
@@ -154,7 +154,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: createdSession.GetDetails().GetChangeDate().AsTime().Add(lifetime),
 				UserID:     "",
@@ -187,7 +187,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     "",
@@ -262,7 +262,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
@@ -356,7 +356,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
@@ -418,7 +418,7 @@ func TestServer_SessionReduces(t *testing.T) {
 			assertSessionsEqual(collect, &domain.Session{
 				InstanceID: instanceID,
 				ID:         createdSession.GetSessionId(),
-				Token:      createdSession.GetSessionToken(),
+				TokenID:    createdSession.GetSessionToken(),
 				Lifetime:   lifetime,
 				Expiration: lifetimeUpdated.Add(lifetime),
 				UserID:     testUser.GetId(),
@@ -479,7 +479,7 @@ func assertSessionsEqual(t *assert.CollectT, expected, actual *domain.Session) {
 	t.Helper()
 	assert.Equal(t, expected.InstanceID, actual.InstanceID)
 	assert.Equal(t, expected.ID, actual.ID)
-	assert.NotNil(t, actual.Token)
+	assert.NotNil(t, actual.TokenID)
 	assert.Equal(t, expected.Lifetime, actual.Lifetime)
 	assert.Equal(t, expected.Expiration.UTC(), actual.Expiration.UTC())
 	assert.Equal(t, expected.UserID, actual.UserID)

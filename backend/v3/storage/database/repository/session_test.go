@@ -324,7 +324,7 @@ func TestSession_Update(t *testing.T) {
 				require.NoError(t, err)
 
 				// update with updated values
-				session.Token = "new-token"
+				session.TokenID = "new-token"
 				return session
 			},
 			update: []database.Change{
@@ -745,7 +745,7 @@ func TestSession_Update(t *testing.T) {
 				// update with updated values
 				session.UpdatedAt = testNow
 				session.Lifetime = time.Hour * 48
-				session.Token = "new-token"
+				session.TokenID = "new-token"
 				session.Factors = []domain.SessionFactor{
 					&domain.SessionFactorUser{
 						UserID:         "user-id",
@@ -899,7 +899,7 @@ func TestSession_Update(t *testing.T) {
 
 			assert.Equal(t, createdSession.ID, session.ID)
 			assert.Equal(t, createdSession.Lifetime, session.Lifetime)
-			assert.Equal(t, createdSession.Token, session.Token)
+			assert.Equal(t, createdSession.TokenID, session.TokenID)
 			assert.WithinRange(t, session.Expiration, beforeUpdate.Add(createdSession.Lifetime), afterUpdate.Add(createdSession.Lifetime))
 			assert.Equal(t, createdSession.CreatorID, session.CreatorID)
 			assert.Equal(t, createdSession.UserAgent, session.UserAgent)

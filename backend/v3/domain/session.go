@@ -10,7 +10,7 @@ import (
 type Session struct {
 	InstanceID string             `json:"instanceId,omitempty" db:"instance_id"`
 	ID         string             `json:"id,omitempty" db:"id"`
-	Token      string             `json:"token,omitempty" db:"token"`
+	TokenID    string             `json:"tokenId,omitempty" db:"token_id"`
 	Lifetime   time.Duration      `json:"lifetime,omitempty" db:"lifetime"`
 	Expiration time.Time          `json:"expiration,omitzero" db:"expiration"`
 	UserID     string             `json:"userId,omitempty" db:"user_id"`
@@ -51,8 +51,8 @@ type sessionColumns interface {
 	InstanceIDColumn() database.Column
 	// IDColumn returns the column for the id field.
 	IDColumn() database.Column
-	// TokenColumn returns the column for the token field.
-	TokenColumn() database.Column
+	// TokenIDColumn returns the column for the token id field.
+	TokenIDColumn() database.Column
 	// LifetimeColumn returns the column for the lifetime field.
 	LifetimeColumn() database.Column
 	// ExpirationColumn returns the column for the expiration field.
@@ -100,7 +100,7 @@ type sessionChanges interface {
 	// Only use this when reducing events,
 	// during regular updates the DB sets this column automatically.
 	SetUpdatedAt(updatedAt time.Time) database.Change
-	// SetToken sets the token field of the session.
+	// SetToken sets the token id field of the session.
 	SetToken(token string) database.Change
 	// SetLifetime sets the lifetime field of the session and will update the computed expiration field.
 	SetLifetime(lifetime time.Duration) database.Change

@@ -39,7 +39,7 @@ const querySessionStmt = `
 SELECT 
 	sessions.instance_id
 	, sessions.id
-	, sessions.token
+	, sessions.token_id
 	, sessions.lifetime
 	, sessions.expiration
 	, sessions.user_id
@@ -247,7 +247,7 @@ func (s session) SetUpdatedAt(updatedAt time.Time) database.Change {
 
 // SetToken implements [domain.sessionChanges].
 func (s session) SetToken(token string) database.Change {
-	return database.NewChange(s.TokenColumn(), token)
+	return database.NewChange(s.TokenIDColumn(), token)
 }
 
 // SetLifetime implements [domain.sessionChanges].
@@ -501,9 +501,9 @@ func (s session) IDColumn() database.Column {
 	return database.NewColumn(s.unqualifiedTableName(), "id")
 }
 
-// TokenColumn implements [domain.sessionColumns].
-func (s session) TokenColumn() database.Column {
-	return database.NewColumn(s.unqualifiedTableName(), "token")
+// TokenIDColumn implements [domain.sessionColumns].
+func (s session) TokenIDColumn() database.Column {
+	return database.NewColumn(s.unqualifiedTableName(), "token_id")
 }
 
 // LifetimeColumn implements [domain.sessionColumns].
@@ -547,7 +547,7 @@ func (s session) UpdatedAtColumn() database.Column {
 
 type rawSession struct {
 	*domain.Session
-	Token      *string                           `json:"token" db:"token"`
+	TokenID    *string                           `json:"tokenID" db:"token_id"`
 	Lifetime   *time.Duration                    `json:"lifetime" db:"lifetime"`
 	Expiration *time.Time                        `json:"expiration" db:"expiration"`
 	UserID     *string                           `json:"userID" db:"user_id"`
@@ -592,7 +592,7 @@ func scanSessions(ctx context.Context, querier database.Querier, builder *databa
 }
 
 func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
-	raw.Session.Token = gu.Value(raw.Token)
+	raw.Session.TokenID = gu.Value(raw.TokenID)
 	raw.Session.Lifetime = gu.Value(raw.Lifetime)
 	raw.Session.Expiration = gu.Value(raw.Expiration)
 	raw.Session.UserID = gu.Value(raw.UserID)
