@@ -276,10 +276,7 @@
         "couldNotFindSession": "找不到会话",
         "couldNotUpdateSession": "无法更新会话",
         "userNotFound": "系统中未找到用户",
-        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
-        "couldNotSetSession": "无法设置会话",
-        "couldNotGetUser": "无法检索用户数据",
-        "couldNotRetrieveSessionCookie": "无法检索会话Cookie"
+        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
       }
     },
     "set": {

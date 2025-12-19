@@ -276,10 +276,7 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
-        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
-        "couldNotSetSession": "Nie można ustawić sesji",
-        "couldNotGetUser": "Nie można pobrać danych użytkownika",
-        "couldNotRetrieveSessionCookie": "Nie można pobrać pliku cookie sesji"
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
       }
     },
     "set": {

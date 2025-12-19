@@ -276,10 +276,7 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
-        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
-        "couldNotSetSession": "Impossibile impostare la sessione",
-        "couldNotGetUser": "Impossibile recuperare i dati dell'utente",
-        "couldNotRetrieveSessionCookie": "Impossibile recuperare il cookie di sessione"
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
       }
     },
     "set": {

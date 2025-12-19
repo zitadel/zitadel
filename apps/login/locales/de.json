@@ -276,10 +276,7 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
-        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
-        "couldNotSetSession": "Sitzung konnte nicht gesetzt werden",
-        "couldNotGetUser": "Benutzerdaten konnten nicht abgerufen werden",
-        "couldNotRetrieveSessionCookie": "Sitzungs-Cookie konnte nicht abgerufen werden"
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
       }
     },
     "set": {

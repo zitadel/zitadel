@@ -276,10 +276,7 @@
         "couldNotFindSession": "Не удалось найти сеанс",
         "couldNotUpdateSession": "Не удалось обновить сеанс",
         "userNotFound": "Пользователь не найден в системе",
-        "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей",
-        "couldNotSetSession": "Не удалось установить сеанс",
-        "couldNotGetUser": "Не удалось получить данные пользователя",
-        "couldNotRetrieveSessionCookie": "Не удалось получить cookie сеанса"
+        "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей"
       }
     },
     "set": {

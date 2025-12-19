@@ -276,10 +276,7 @@
         "couldNotFindSession": "No se pudo encontrar la sesión",
         "couldNotUpdateSession": "No se pudo actualizar la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
-        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso",
-        "couldNotSetSession": "No se pudo establecer la sesión",
-        "couldNotGetUser": "No se pudieron recuperar los datos del usuario",
-        "couldNotRetrieveSessionCookie": "No se pudo recuperar la cookie de sesión"
+        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
       }
     },
     "set": {
