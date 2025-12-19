@@ -38,6 +38,7 @@ vi.mock("../zitadel", () => ({
   passwordReset: vi.fn(),
   getUserByID: vi.fn(),
   setUserPassword: vi.fn(),
+  getPasswordExpirySettings: vi.fn(),
 }));
 
 vi.mock("./cookie", () => ({
@@ -52,6 +53,17 @@ vi.mock("../cookies", () => ({
 
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
+}));
+
+vi.mock("../verify-helper", () => ({
+  checkEmailVerification: vi.fn(),
+  checkMFAFactors: vi.fn(),
+  checkPasswordChangeRequired: vi.fn(),
+  checkUserVerification: vi.fn(),
+}));
+
+vi.mock("../client", () => ({
+  completeFlowOrGetUrl: vi.fn(),
 }));
 
 describe("checkSessionAndSetPassword", () => {
@@ -226,6 +238,7 @@ describe("sendPassword", () => {
   let mockListUsers: any;
   let mockGetLoginSettings: any;
   let mockCreateSessionAndUpdateCookie: any;
+  let mockSetSessionAndUpdateCookie: any;
   let mockGetLockoutSettings: any;
 
   beforeEach(async () => {
@@ -235,7 +248,7 @@ describe("sendPassword", () => {
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieByLoginName } = await import("../cookies");
     const { listUsers, getLoginSettings, getLockoutSettings } = await import("../zitadel");
-    const { createSessionAndUpdateCookie } = await import("./cookie");
+    const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
@@ -243,7 +256,19 @@ describe("sendPassword", () => {
     mockListUsers = vi.mocked(listUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
+    mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
+    mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
+    mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
     mockGetLockoutSettings = vi.mocked(getLockoutSettings);
+
+    const { completeFlowOrGetUrl } = await import("../client");
+    vi.mocked(completeFlowOrGetUrl).mockResolvedValue({ redirect: "https://example.com" });
+
+    // eslint-disable-next-line
+    const verifyHelper = await import("../verify-helper");
+    vi.mocked(verifyHelper.checkPasswordChangeRequired).mockReturnValue(undefined);
+    vi.mocked(verifyHelper.checkEmailVerification).mockReturnValue(undefined);
+    vi.mocked(verifyHelper.checkMFAFactors).mockResolvedValue(undefined);
 
     mockHeaders.mockResolvedValue({});
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
@@ -311,8 +336,52 @@ describe("sendPassword", () => {
       error: "errors.failedToAuthenticate",
     });
   });
-});
 
+  test("should recreate session when session verification fails with keys/session terminated error and ignoreUnknownUsernames is true", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    });
+
+    const terminatedError = { message: "session already terminated" };
+    mockSetSessionAndUpdateCookie.mockRejectedValue(terminatedError);
+
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+
+    mockListUsers.mockResolvedValue({
+      details: { totalResult: BigInt(1) },
+      result: [
+        {
+          userId: "user123",
+          type: {
+            case: "human",
+            value: {
+              email: { email: "user@example.com", isVerified: true },
+              phone: { phone: "+1234567890", isVerified: true },
+            },
+          },
+          state: 1, // Active
+          preferredLoginName: "user@example.com",
+        },
+      ],
+    });
+
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: { factors: { user: { id: "user123", loginName: "user@example.com" } } },
+      sessionCookie: { id: "newSession", token: "newToken" },
+    });
+
+    // Execute
+    await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+});
 describe("resetPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;

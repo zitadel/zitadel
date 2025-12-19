@@ -89,12 +89,47 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   });
 
   let session;
-  let user: User;
+  let user: User | undefined;
   let loginSettings: LoginSettings | undefined;
+
+  if (sessionCookie) {
+    try {
+      loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
+
+      if (loginSettings) {
+        let lifetime = loginSettings.passwordCheckLifetime;
+
+        if (!lifetime || !lifetime.seconds) {
+          console.warn("No password lifetime provided, defaulting to 24 hours");
+          lifetime = {
+            seconds: BigInt(60 * 60 * 24), // default to 24 hours
+            nanos: 0,
+          } as Duration;
+        }
+
+        session = await setSessionAndUpdateCookie({
+          recentCookie: sessionCookie,
+          checks: command.checks,
+          requestId: command.requestId,
+          lifetime,
+        });
+      } else {
+        // Force fallback if settings can't be loaded
+        throw new Error("Could not load login settings");
+      }
+    } catch (error) {
+      // If the session was terminated or any other error occurred during update,
+      // we fall back to creating a new session.
+      sessionCookie = undefined;
+      session = undefined;
+    }
+  }
 
   if (!sessionCookie) {
     const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
-    loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    if (!loginSettings) {
+      loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    }
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
       user = users.result[0];
@@ -141,63 +176,17 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       }
       return { error: t("errors.couldNotVerifyPassword") };
     }
-  } else {
-    loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
+  }
 
-    if (!loginSettings) {
-      return { error: "Could not load login settings" };
-    }
+  if (!session?.factors?.user?.id) {
+    return { error: t("errors.couldNotCreateSessionForUser") };
+  }
 
-    let lifetime = loginSettings.passwordCheckLifetime;
-
-    if (!lifetime || !lifetime.seconds) {
-      console.warn("No password lifetime provided, defaulting to 24 hours");
-      lifetime = {
-        seconds: BigInt(60 * 60 * 24), // default to 24 hours
-        nanos: 0,
-      } as Duration;
-    }
-
-    try {
-      session = await setSessionAndUpdateCookie({
-        recentCookie: sessionCookie,
-        checks: command.checks,
-        requestId: command.requestId,
-        lifetime,
-      });
-    } catch (error: any) {
-      if ("failedAttempts" in error && error.failedAttempts) {
-        if (loginSettings?.ignoreUnknownUsernames) {
-          return { error: t("errors.failedToAuthenticateNoLimit") };
-        }
-        const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
-
-        const hasLimit =
-          lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-        const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-        const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
-
-        return {
-          error: t(messageKey, {
-            failedAttempts: error.failedAttempts,
-            maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
-            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-          }),
-        };
-      }
-      throw error;
-    }
-
-    if (!session?.factors?.user?.id) {
-      return { error: t("errors.couldNotCreateSessionForUser") };
-    }
-
+  if (!user) {
     const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
-
     if (!userResponse.user) {
       return { error: t("errors.userNotFound") };
     }
-
     user = userResponse.user;
   }
 

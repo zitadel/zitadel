@@ -45,7 +45,7 @@ export async function createSessionAndUpdateCookie(command: {
   requestId: string | undefined;
   lifetime?: Duration;
   challenges?: RequestChallenges;
-}): Promise<{ session: Session; sessionCookie: CustomCookieData }> {
+}): Promise<{ session: Session; sessionCookie: CustomCookieData; challenges?: Challenges }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -96,7 +96,7 @@ export async function createSessionAndUpdateCookie(command: {
 
         await addSessionToCookie({ session: sessionCookie, iFrameEnabled });
 
-        return { session: response.session as Session, sessionCookie };
+        return { session: response.session as Session, sessionCookie, challenges: createdSession.challenges };
       } else {
         throw "could not get session or session does not have loginName";
       }
