@@ -577,7 +577,7 @@ Errors:
     NotFound: Obiettivo non trovato
     InvalidExpirationDate: La data di scadenza della chiave deve essere nel futuro
     PublicKeyExpired: La chiave pubblica dell'obiettivo è scaduta
-    PublicKeyActive: Impossibile eliminare la chiave pubblica della destinazione attiva
+    PublicKeyActive: Impossibile eliminare la chiave pubblica dell'obiettivo attivo
     InvalidPublicKey: La chiave pubblica non è valida. Deve essere una chiave pubblica RSA o ECDSA codificata PEM in formato PKCS#8
   Execution:
     ConditionInvalid: La condizione di esecuzione non è valida
