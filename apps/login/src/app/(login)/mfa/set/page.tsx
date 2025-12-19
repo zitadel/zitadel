@@ -30,8 +30,12 @@ function isSessionValid(session: Partial<Session>): {
   verifiedAt?: Timestamp;
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
   const validIDP = session?.factors?.intent?.verifiedAt;
+
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey || validIDP;
