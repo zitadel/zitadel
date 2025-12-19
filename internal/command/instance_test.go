@@ -1566,8 +1566,9 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx             context.Context
+		instanceID      string
+		errorIfNotFound bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1613,12 +1614,27 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance not existing, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance removed, not found error",
@@ -1643,12 +1659,42 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance removed, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewInstanceAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewInstanceRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+								nil,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance remove, ok",
@@ -1714,7 +1760,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID, tt.args.errorIfNotFound)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
