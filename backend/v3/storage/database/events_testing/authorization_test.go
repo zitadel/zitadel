@@ -25,15 +25,13 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	orgID := Instance.DefaultOrg.Id
 	authorizationRepo := repository.AuthorizationRepository()
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-
 	t.Run("user grant added reduces", func(t *testing.T) {
 		// create user
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
-		createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2})
 	})
 
 	t.Run("user grant update reduces", func(t *testing.T) {
@@ -73,6 +71,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 		afterUpdate := time.Now().Add(500 * time.Millisecond)
 
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -108,6 +107,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now().Add(500 * time.Millisecond)
 
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -148,6 +148,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 		after := time.Now().Add(500 * time.Millisecond)
 
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -181,6 +182,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -197,7 +199,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2})
 		// delete the user
 		_, err := UserClient.DeleteUser(CTX, &user_v2.DeleteUserRequest{
 			UserId: user.UserId,
@@ -205,6 +207,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// ensure authorization is deleted
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -221,7 +224,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2})
 		// delete the project
 		_, err := ProjectClient.DeleteProject(CTX, &project_v2beta.DeleteProjectRequest{
 			Id: projectID,
@@ -229,6 +232,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// ensure authorization is deleted
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -245,7 +249,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgID, []string{role1, role2})
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgID, user.UserId, projectID, []string{role1, role2})
 		// delete a project role
 		before := time.Now()
 		_, err := ProjectClient.RemoveProjectRole(CTX, &project_v2beta.RemoveProjectRoleRequest{
@@ -256,6 +260,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		after := time.Now()
 
 		// ensure authorization is updated
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -287,7 +292,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create user
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
-		createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1}, retryDuration, tick)
+		createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1})
 	})
 
 	t.Run("project grant removed reduces", func(t *testing.T) {
@@ -309,7 +314,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create user
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1})
 		// delete project grant
 		_, err = ProjectClient.DeleteProjectGrant(CTX, &project_v2beta.DeleteProjectGrantRequest{
 			ProjectId:             projectID,
@@ -318,6 +323,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// ensure authorization is deleted
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -344,7 +350,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create user
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1, role2})
 		// update project grant
 		//beforeUpdate := time.Now()
 		_, err = ProjectClient.UpdateProjectGrant(CTX, &project_v2beta.UpdateProjectGrantRequest{
@@ -356,6 +362,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		//afterUpdate := time.Now().Add(500 * time.Millisecond) // add some buffer for eventual consistency of cascading changes
 
 		// ensure authorization is updated
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -376,7 +383,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		role1, role2 := "role1", "role2"
 		projectID := prepareProjectAndProjectRoles(t, orgResp.OrganizationId, []string{role1, role2})
 		// create authorization with roles
-		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgResp.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
+		createdAuthorization := createAndEnsureAuthorization(t, instanceID, orgResp.OrganizationId, user.UserId, projectID, []string{role1, role2})
 		// delete the organization
 		_, err := OrgClient.DeleteOrganization(CTX, &org_v2beta.DeleteOrganizationRequest{
 			Id: orgResp.OrganizationId,
@@ -384,6 +391,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// ensure authorization is deleted
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instanceID, createdAuthorization.Id),
@@ -418,6 +426,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		afterCreate := time.Now().Add(500 * time.Millisecond)
 
 		// ensure authorization exists
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instance.ID(), createdAuthorization.Id),
@@ -436,6 +445,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// ensure authorization is deleted
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
 			az, err := authorizationRepo.Get(CTX, pool, database.WithCondition(
 				authorizationRepo.PrimaryKeyCondition(instance.ID(), createdAuthorization.Id),
@@ -446,7 +456,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 }
 
-func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, projectID string, roles []string, retryDuration time.Duration, tick time.Duration) *authorization_v2.CreateAuthorizationResponse {
+func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, projectID string, roles []string) *authorization_v2.CreateAuthorizationResponse {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	// create authorization
 	beforeCreate := time.Now()
 	createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
