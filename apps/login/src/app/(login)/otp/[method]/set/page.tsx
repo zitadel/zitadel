@@ -167,13 +167,15 @@ export default async function Page(props: {
             ></TotpRegister>
           </div>
         ) : (
-          <div className="mt-8 flex w-full flex-col items-center gap-2">
-            <Link href={urlToContinue} className="self-end w-full">
-              <Button type="submit" className="self-end w-full" variant={ButtonVariants.Primary}>
-                <Translated i18nKey="set.submit" namespace="otp" />
-              </Button>
-            </Link>
-            <BackButton data-testid="back-button" />
+            <div className="mt-8 flex w-full flex-row items-center">
+              <BackButton />
+              <span className="flex-grow"></span>
+
+              <Link href={urlToContinue}>
+                <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+                  <Translated i18nKey="set.submit" namespace="otp" />
+                </Button>
+              </Link>
           </div>
         )}
       </div>
