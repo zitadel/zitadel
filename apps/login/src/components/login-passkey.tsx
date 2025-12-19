@@ -50,7 +50,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
           return submitLoginAndContinue(pK)
             .catch((error) => {
-              setError(error);
+              setError(error instanceof Error ? error.message : String(error));
               return;
             })
             .finally(() => {
@@ -58,7 +58,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             });
         })
         .catch((error) => {
-          setError(error);
+          setError(error instanceof Error ? error.message : String(error));
           return;
         })
         .finally(() => {
@@ -254,7 +254,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
             return submitLoginAndContinue(pK)
               .catch((error) => {
-                setError(error);
+                setError(error instanceof Error ? error.message : String(error));
                 return;
               })
               .finally(() => {
