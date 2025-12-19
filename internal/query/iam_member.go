@@ -23,10 +23,10 @@ var (
 		name:  projection.MemberUserIDCol,
 		table: instanceMemberTable,
 	}
-	InstanceMemberGroupID = Column{
-		name:  projection.GroupMemberGroupIDCol,
-		table: instanceMemberTable,
-	}
+	// InstanceMemberGroupID = Column{
+	// 	name:  projection.GroupUserGroupIDCol,
+	// 	table: instanceMemberTable,
+	// }
 	InstanceMemberRoles = Column{
 		name:  projection.MemberRolesCol,
 		table: instanceMemberTable,
@@ -193,59 +193,59 @@ func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members,
 		}
 }
 
-func prepareInstanceGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
-	return sq.Select(
-			InstanceMemberGroupID.identifier(),
-			InstanceMemberRoles.identifier(),
-			GroupColumnName.identifier(),
-			GroupColumnDescription.identifier(),
-			countColumn.identifier(),
-		).From(instanceMemberTable.identifier()).
-			LeftJoin(join(GroupColumnID, OrgMemberGroupID)).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*GroupMembers, error) {
-			members := make([]*GroupMember, 0)
-			var count uint64
+// func prepareInstanceGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupUsers, error)) {
+// 	return sq.Select(
+// 			InstanceMemberGroupID.identifier(),
+// 			InstanceMemberRoles.identifier(),
+// 			GroupColumnName.identifier(),
+// 			GroupColumnDescription.identifier(),
+// 			countColumn.identifier(),
+// 		).From(instanceMemberTable.identifier()).
+// 			LeftJoin(join(GroupColumnID, OrgMemberGroupID)).
+// 			PlaceholderFormat(sq.Dollar),
+// 		func(rows *sql.Rows) (*GroupUsers, error) {
+// 			members := make([]*GroupUser, 0)
+// 			var count uint64
 
-			for rows.Next() {
-				member := new(GroupMember)
+// 			for rows.Next() {
+// 				member := new(GroupUser)
 
-				var (
-					groupName        = sql.NullString{}
-					groupDescription = sql.NullString{}
-				)
+// 				var (
+// 					groupName        = sql.NullString{}
+// 					groupDescription = sql.NullString{}
+// 				)
 
-				err := rows.Scan(
-					&member.CreationDate,
-					&member.ChangeDate,
-					&member.Sequence,
-					&member.ResourceOwner,
-					&member.Roles,
-					&member.GroupID,
-					&groupName,
-					&groupDescription,
+// 				err := rows.Scan(
+// 					&member.CreationDate,
+// 					&member.ChangeDate,
+// 					&member.Sequence,
+// 					&member.ResourceOwner,
+// 					&member.Roles,
+// 					&member.GroupID,
+// 					&groupName,
+// 					&groupDescription,
 
-					&count,
-				)
+// 					&count,
+// 				)
 
-				if err != nil {
-					return nil, err
-				}
+// 				if err != nil {
+// 					return nil, err
+// 				}
 
-				member.GroupName = groupName.String
-				member.GroupDescription = groupDescription.String
-				members = append(members, member)
-			}
+// 				member.GroupName = groupName.String
+// 				member.GroupDescription = groupDescription.String
+// 				members = append(members, member)
+// 			}
 
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-EqJFc", "Errors.Query.CloseRows")
-			}
+// 			if err := rows.Close(); err != nil {
+// 				return nil, zerrors.ThrowInternal(err, "QUERY-EqJFc", "Errors.Query.CloseRows")
+// 			}
 
-			return &GroupMembers{
-				GroupMembers: members,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
+// 			return &GroupUsers{
+// 				GroupUsers: members,
+// 				SearchResponse: SearchResponse{
+// 					Count: count,
+// 				},
+// 			}, nil
+// 		}
+// }

@@ -88,3 +88,45 @@ func UserMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.Searc
 		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-Vn7qy", "List.Query.Invalid")
 	}
 }
+
+// Group Metadata
+func GroupMetadataListToPb(dataList []*query.GroupMetadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
+	for i, data := range dataList {
+		mds[i] = GroupMetadataToPb(data)
+	}
+	return mds
+}
+
+func GroupMetadataToPb(data *query.GroupMetadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
+		Key:   data.Key,
+		Value: data.Value,
+		Details: object.ToViewDetailsPb(
+			data.Sequence,
+			data.CreationDate,
+			data.ChangeDate,
+			data.ResourceOwner,
+		),
+	}
+}
+
+func GroupMetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = GroupMetadataQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func GroupMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.SearchQuery, error) {
+	switch q := metadataQuery.Query.(type) {
+	case *meta_pb.MetadataQuery_KeyQuery:
+		return query.NewGroupMetadataKeySearchQuery(q.KeyQuery.Key, object.TextMethodToQuery(q.KeyQuery.Method))
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-Um7qy", "List.Query.Invalid")
+	}
+}

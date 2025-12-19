@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -78,7 +79,8 @@ type Group struct {
 	Name        string
 	Description string
 
-	UserID string
+	UserID     string
+	Attributes []string
 }
 
 type GroupSearchQueries struct {
@@ -276,7 +278,7 @@ func (q *Queries) GroupByUserID(ctx context.Context, shouldTriggerBulk bool, id 
 
 	stmt, scan := prepareUserGroupsQuery()
 	eq := sq.Eq{
-		GroupMemberUserID.identifier():     id,
+		GroupUserUserID.identifier():       id,
 		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, args, err := stmt.Where(eq).ToSql()
@@ -305,10 +307,11 @@ func prepareUserGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error
 			GroupColumnName.identifier(),
 			GroupColumnDescription.identifier(),
 
-			GroupMemberUserID.identifier(),
+			GroupUserUserID.identifier(),
+			GroupUserAttributes.identifier(),
 			countColumn.identifier()).
 			From(groupsTable.identifier()).
-			LeftJoin(join(GroupMemberGroupID, GroupColumnID)).
+			LeftJoin(join(GroupUserGroupID, GroupColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Groups, error) {
 			groups := make([]*Group, 0)
@@ -317,7 +320,8 @@ func prepareUserGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error
 			for rows.Next() {
 				group := new(Group)
 				var (
-					userId = sql.NullString{}
+					userId     = sql.NullString{}
+					attributes database.TextArray[string]
 				)
 				err := rows.Scan(
 					&group.ID,
@@ -329,6 +333,7 @@ func prepareUserGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error
 					&group.Name,
 					&group.Description,
 					&userId,
+					&attributes,
 					&count,
 				)
 
@@ -337,6 +342,9 @@ func prepareUserGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error
 				}
 
 				group.UserID = userId.String
+				for _, a := range attributes {
+					group.Attributes = append(group.Attributes, a)
+				}
 				groups = append(groups, group)
 			}
 

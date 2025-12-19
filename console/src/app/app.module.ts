@@ -246,5 +246,5 @@ const authConfig: AuthConfig = {
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor() {}
+  constructor() { }
 }

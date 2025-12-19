@@ -44,8 +44,13 @@ const (
 
 	oidcCtx = "oidc"
 
-	ScopeIAMGroups = "groups"
-	ClaimGroups    = ScopeIAMGroups
+	ScopeIAMGroups    = "groups"
+	ClaimGroups       = ScopeIAMGroups
+	ScopeGroupDetails = "urn:zitadel:iam:group:details"
+	ClaimGroupDetails = "urn:zitadel:iam:group:details"
+
+	ScopeGroupMetaData = "urn:zitadel:iam:group:metadata"
+	ClaimGroupMetaData = ScopeGroupMetaData
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {

@@ -6,6 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta;filter";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 enum TextFilterMethod {
   TEXT_FILTER_METHOD_EQUALS = 0;
@@ -20,6 +21,38 @@ enum TextFilterMethod {
 
 enum ListFilterMethod {
   LIST_FILTER_METHOD_IN = 0;
+}
+
+message IDFilter {
+  // Only return resources that belong to this id.
+  string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488337\"";
+    }
+  ];
+}
+
+
+message InIDsFilter {
+  // Defines the ids to query for.
+  repeated string ids = 1 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
 }
 
 enum TimestampFilterMethod {

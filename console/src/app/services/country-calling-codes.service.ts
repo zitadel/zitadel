@@ -11,7 +11,7 @@ export interface CountryPhoneCode {
 
 @Injectable()
 export class CountryCallingCodesService {
-  constructor(private translateService: TranslateService) {}
+  constructor(private translateService: TranslateService) { }
 
   public getCountryCallingCodes(): CountryPhoneCode[] {
     const currentLang = this.translateService.currentLang ?? 'en';

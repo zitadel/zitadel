@@ -49,8 +49,8 @@ import {
   AddGoogleProviderResponse,
   AddGroupGrantRequest,
   AddGroupGrantResponse,
-  AddGroupMemberRequest,
-  AddGroupMemberResponse,
+  AddGroupUserRequest,
+  AddGroupUserResponse,
   AddGroupRequest,
   AddGroupResponse,
   AddHumanUserRequest,
@@ -258,8 +258,8 @@ import {
   ListGroupChangesResponse,
   ListGroupGrantRequest,
   ListGroupGrantResponse,
-  ListGroupMembersRequest,
-  ListGroupMembersResponse,
+  ListGroupUsersRequest,
+  ListGroupUsersResponse,
   ListGroupsRequest,
   ListGroupsResponse,
   ListHumanAuthFactorsRequest,
@@ -356,8 +356,8 @@ import {
   RemoveGroupGrantResponse,
   RemoveGroupRequest,
   RemoveGroupResponse,
-  RemoveGroupMemberRequest,
-  RemoveGroupMemberResponse,
+  RemoveGroupUserRequest,
+  RemoveGroupUserResponse,
   RemoveHumanAuthFactorOTPEmailRequest,
   RemoveHumanAuthFactorOTPEmailResponse,
   RemoveHumanAuthFactorOTPRequest,
@@ -563,7 +563,9 @@ import {
   UpdateUserNameRequest,
   UpdateUserNameResponse,
   ValidateOrgDomainRequest,
-  ValidateOrgDomainResponse
+  ValidateOrgDomainResponse,
+  UpdateGroupUserRequest,
+  UpdateGroupUserResponse,
 } from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
@@ -580,6 +582,7 @@ import {
   UserGrantQuery,
 } from '../proto/generated/zitadel/user_pb';
 import { Group, GroupState, GroupQuery, GroupFieldName, GroupGrantQuery } from 'src/app/proto/generated/zitadel/group_pb';
+import { SearchQuery as GroupSearchQuery } from 'src/app/proto/generated/zitadel/group_member_pb';
 import { GrpcService } from './grpc.service';
 
 export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
@@ -593,7 +596,7 @@ export class ManagementService {
   public grantedProjects: BehaviorSubject<GrantedProject.AsObject[]> = new BehaviorSubject<GrantedProject.AsObject[]>([]);
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
-  constructor(private readonly grpcService: GrpcService) {}
+  constructor(private readonly grpcService: GrpcService) { }
 
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultLoginTexts(req, null).then((resp) => resp.toObject());
@@ -1863,13 +1866,13 @@ export class ManagementService {
     return this.grpcService.mgmt.listProjectMembers(req, null).then((resp) => resp.toObject());
   }
 
-  public listGroupMembers(
+  public listGroupUsers(
     groupId: string,
     limit: number,
     offset: number,
-    queryList?: SearchQuery[],
-  ): Promise<ListGroupMembersResponse.AsObject> {
-    const req = new ListGroupMembersRequest();
+    queryList?: GroupSearchQuery[],
+  ): Promise<ListGroupUsersResponse.AsObject> {
+    const req = new ListGroupUsersRequest();
     const query = new ListQuery();
     req.setQuery(query);
     req.setGroupId(groupId);
@@ -1883,7 +1886,7 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     req.setQuery(query);
-    return this.grpcService.mgmt.listGroupMembers(req, null).then((resp) => resp.toObject());
+    return this.grpcService.mgmt.listGroupUsers(req, null).then((resp) => resp.toObject());
   }
 
   public listUserMemberships(
@@ -2571,15 +2574,29 @@ export class ManagementService {
     return this.grpcService.mgmt.addProjectMember(req, null).then((resp) => resp.toObject());
   }
 
-  public addGroupMember(
+  public addGroupUser(
     groupId: string,
     userId: string,
-  ): Promise<AddGroupMemberResponse.AsObject> {
-    const req = new AddGroupMemberRequest();
+    attributesList: string[],
+  ): Promise<AddGroupUserResponse.AsObject> {
+    const req = new AddGroupUserRequest();
     req.setGroupId(groupId);
     req.setUserId(userId);
-    return this.grpcService.mgmt.addGroupMember(req, null).then((resp) => resp.toObject());
+    req.setAttributesList(attributesList);
+    return this.grpcService.mgmt.addGroupUser(req, null).then((resp) => resp.toObject());
   }
+
+  // public updateGroupUser(s
+  //   groupId: string,
+  //   userId: string,
+  //   attributesList: string[],
+  // ): Promise<UpdateGroupUserResponse.AsObject> {
+  //   const req = new UpdateGroupUserRequest();
+  //   req.setGroupId(groupId);
+  //   req.setUserId(userId);
+  //   req.setAttributesList(attributesList);
+  //   return this.grpcService.mgmt.updateGroupUser(req, null).then((resp) => resp.toObject());
+  // }
 
   public updateProjectMember(
     projectId: string,
@@ -2815,11 +2832,11 @@ export class ManagementService {
     return this.grpcService.mgmt.removeProjectMember(req, null).then((resp) => resp.toObject());
   }
 
-  public removeGroupMember(GroupId: string, userId: string): Promise<RemoveGroupMemberResponse.AsObject> {
-    const req = new RemoveGroupMemberRequest();
+  public removeGroupUser(GroupId: string, userId: string): Promise<RemoveGroupUserResponse.AsObject> {
+    const req = new RemoveGroupUserRequest();
     req.setGroupId(GroupId);
     req.setUserId(userId);
-    return this.grpcService.mgmt.removeGroupMember(req, null).then((resp) => resp.toObject());
+    return this.grpcService.mgmt.removeGroupUser(req, null).then((resp) => resp.toObject());
   }
 
   public listApps(
@@ -2841,6 +2858,11 @@ export class ManagementService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
+    const res = this.grpcService.mgmt.listApps(req, null).then((resp) => {
+      console.log('listApps resp:', resp);
+      resp.toObject()
+    });
+    console.log('listApps response:', res);
     return this.grpcService.mgmt.listApps(req, null).then((resp) => resp.toObject());
   }
 

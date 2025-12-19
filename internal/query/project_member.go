@@ -23,10 +23,10 @@ var (
 		name:  projection.MemberUserIDCol,
 		table: projectMemberTable,
 	}
-	ProjectMemberGroupID = Column{
-		name:  projection.GroupMemberGroupIDCol,
-		table: projectMemberTable,
-	}
+	// ProjectMemberGroupID = Column{
+	// 	name:  projection.GroupMemberGroupIDCol,
+	// 	table: projectMemberTable,
+	// }
 	ProjectMemberRoles = Column{
 		name:  projection.MemberRolesCol,
 		table: projectMemberTable,
@@ -100,33 +100,33 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	return members, err
 }
 
-func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembersQuery) (members *GroupMembers, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+// func (q *Queries) ProjectGroupMembers(ctx context.Context, queries *ProjectMembersQuery) (members *GroupMembers, err error) {
+// 	ctx, span := tracing.NewSpan(ctx)
+// 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectGroupMembersQuery()
-	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-S9auT", "Errors.Query.InvalidRequest")
-	}
+// 	query, scan := prepareProjectGroupMembersQuery()
+// 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+// 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+// 	if err != nil {
+// 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-S9auT", "Errors.Query.InvalidRequest")
+// 	}
 
-	currentSequence, err := q.latestState(ctx, projectMemberTable)
-	if err != nil {
-		return nil, err
-	}
+// 	currentSequence, err := q.latestState(ctx, projectMemberTable)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		members, err = scan(rows)
-		return err
-	}, stmt, args...)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-cq0pj", "Errors.Internal")
-	}
+// 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+// 		members, err = scan(rows)
+// 		return err
+// 	}, stmt, args...)
+// 	if err != nil {
+// 		return nil, zerrors.ThrowInternal(err, "QUERY-cq0pj", "Errors.Internal")
+// 	}
 
-	members.State = currentSequence
-	return members, err
-}
+// 	members.State = currentSequence
+// 	return members, err
+// }
 
 func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
@@ -223,64 +223,65 @@ func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, 
 			}, nil
 		}
 }
-func prepareProjectGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
-	return sq.Select(
-			ProjectMemberCreationDate.identifier(),
-			ProjectMemberChangeDate.identifier(),
-			ProjectMemberSequence.identifier(),
-			ProjectMemberResourceOwner.identifier(),
-			ProjectMemberGroupID.identifier(),
-			ProjectMemberRoles.identifier(),
-			GroupColumnName.identifier(),
-			GroupColumnDescription.identifier(),
-			countColumn.identifier(),
-		).From(projectMemberTable.identifier()).
-			LeftJoin(join(GroupColumnID, ProjectMemberGroupID)).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*GroupMembers, error) {
-			members := make([]*GroupMember, 0)
-			var count uint64
 
-			for rows.Next() {
-				member := new(GroupMember)
+// func prepareProjectGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+// 	return sq.Select(
+// 			ProjectMemberCreationDate.identifier(),
+// 			ProjectMemberChangeDate.identifier(),
+// 			ProjectMemberSequence.identifier(),
+// 			ProjectMemberResourceOwner.identifier(),
+// 			ProjectMemberGroupID.identifier(),
+// 			ProjectMemberRoles.identifier(),
+// 			GroupColumnName.identifier(),
+// 			GroupColumnDescription.identifier(),
+// 			countColumn.identifier(),
+// 		).From(projectMemberTable.identifier()).
+// 			LeftJoin(join(GroupColumnID, ProjectMemberGroupID)).
+// 			PlaceholderFormat(sq.Dollar),
+// 		func(rows *sql.Rows) (*GroupMembers, error) {
+// 			members := make([]*GroupMember, 0)
+// 			var count uint64
 
-				var (
-					groupName        = sql.NullString{}
-					groupDescription = sql.NullString{}
-				)
+// 			for rows.Next() {
+// 				member := new(GroupMember)
 
-				err := rows.Scan(
-					&member.CreationDate,
-					&member.ChangeDate,
-					&member.Sequence,
-					&member.ResourceOwner,
-					&member.Roles,
-					&member.GroupID,
-					&groupName,
-					&groupDescription,
+// 				var (
+// 					groupName        = sql.NullString{}
+// 					groupDescription = sql.NullString{}
+// 				)
 
-					&count,
-				)
+// 				err := rows.Scan(
+// 					&member.CreationDate,
+// 					&member.ChangeDate,
+// 					&member.Sequence,
+// 					&member.ResourceOwner,
+// 					&member.Roles,
+// 					&member.GroupID,
+// 					&groupName,
+// 					&groupDescription,
 
-				if err != nil {
-					return nil, err
-				}
+// 					&count,
+// 				)
 
-				member.GroupName = groupName.String
-				member.GroupDescription = groupDescription.String
+// 				if err != nil {
+// 					return nil, err
+// 				}
 
-				members = append(members, member)
-			}
+// 				member.GroupName = groupName.String
+// 				member.GroupDescription = groupDescription.String
 
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-WI1Ii", "Errors.Query.CloseRows")
-			}
+// 				members = append(members, member)
+// 			}
 
-			return &GroupMembers{
-				GroupMembers: members,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
+// 			if err := rows.Close(); err != nil {
+// 				return nil, zerrors.ThrowInternal(err, "QUERY-WI1Ii", "Errors.Query.CloseRows")
+// 			}
+
+// 			return &GroupMembers{
+// 				GroupMembers: members,
+// 				SearchResponse: SearchResponse{
+// 					Count: count,
+// 				},
+// 			}, nil
+// 		}
+// }

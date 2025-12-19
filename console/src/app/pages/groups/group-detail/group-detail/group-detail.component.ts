@@ -21,7 +21,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { LanguagesService } from '../../../../services/languages.service';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { GroupMemberCreateDialogComponent } from 'src/app/modules/add-group-member-dialog/group-member-create-dialog.component';
-import { GroupMembersDataSource } from './group-members-datasource';
+import { GroupUsersDataSource } from './group-members-datasource';
 
 const MEMBERS: SidenavSetting = { id: 'members', i18nKey: 'GROUP.SETTINGS.MEMBERS' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'GROUP.SETTINGS.GROUPGRANTS' };
@@ -48,7 +48,7 @@ export class GroupDetailComponent implements OnInit {
   public error: string = '';
 
   public changePageFactory!: Function;
-  public dataSource!: GroupMembersDataSource;
+  public dataSource!: GroupUsersDataSource;
   public groupName: string = '';
   public INITIALPAGESIZE: number = 25;
 
@@ -219,7 +219,7 @@ export class GroupDetailComponent implements OnInit {
         if (users && users.length) {
           Promise.all(
             users.map((user) => {
-              return this.mgmtGroupService.addGroupMember((this.group as Group.AsObject).id, user.id);
+              return this.mgmtGroupService.addGroupUser((this.group as Group.AsObject).id, user.id, []);
             }),
           )
             .then(() => {
@@ -237,9 +237,9 @@ export class GroupDetailComponent implements OnInit {
     });
   }
 
-  public removeGroupMember(member: Member.AsObject | Member.AsObject): void {
+  public removeGroupUser(member: Member.AsObject | Member.AsObject): void {
     this.mgmtGroupService
-      .removeGroupMember((this.group as Group.AsObject).id, member.userId)
+      .removeGroupUser((this.group as Group.AsObject).id, member.userId)
       .then(() => {
         setTimeout(() => {
           this.changePage.emit();
@@ -257,7 +257,7 @@ export class GroupDetailComponent implements OnInit {
       if (resp.group) {
         this.group = resp.group;
         this.groupName = this.group.name;
-        this.dataSource = new GroupMembersDataSource(this.mgmtGroupService);
+        this.dataSource = new GroupUsersDataSource(this.mgmtGroupService);
         this.dataSource.loadMembers(this.group.id, 0, this.INITIALPAGESIZE);
 
         this.changePageFactory = (event?: PageEvent) => {

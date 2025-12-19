@@ -5,11 +5,11 @@ import "zitadel/user.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-package zitadel.group_member.v1;
+package zitadel.group_users.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/groupmember";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/groupusers";
 
-message GroupMember {
+message GroupUser {
     string user_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
@@ -62,6 +62,12 @@ message GroupMember {
             description: "type of the user (human / machine)"
         }
     ];
+    repeated string attributes = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "attributes of the group user"
+            example: "\"role.super.man\""
+        }
+    ];
 }
 
 message SearchQuery {
@@ -72,6 +78,7 @@ message SearchQuery {
         LastNameQuery last_name_query = 2;
         EmailQuery email_query = 3;
         UserIDQuery user_id_query = 4;
+        AttributesQuery attributes_query = 5;
     }
 }
 
@@ -142,6 +149,16 @@ message GroupIDQuery {
             description: "the id of the user"
             max_length: 200;
             example: "\"69629023906488334\"";
+        }
+    ];
+}
+
+message AttributesQuery {
+    repeated string attributes = 1 [
+        (validate.rules).repeated = {min_items: 1, max_items: 50, items: {string: {max_len: 200}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200,
+            example: "[\"Superwoman\", \"Supergirl\"]"
         }
     ];
 }

@@ -234,7 +234,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           .catch((error) => {
             this.toastService.showError(error);
           });
-      } else if (membership.projectGrantId) {
+      } else if (membership.projectGrantId && membership.projectId) {
         this.mgmtService
           .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, newRoles)
           .then(() => {

@@ -8,17 +8,17 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
-import { GroupMembersDataSource } from 'src/app/pages/groups/group-detail/group-detail/group-members-datasource';
+import { GroupUsersDataSource } from 'src/app/pages/groups/group-detail/group-detail/group-members-datasource';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
-type MemberDatasource = GroupMembersDataSource;
+type MemberDatasource = GroupUsersDataSource;
 
 @Component({
   selector: 'cnsl-group-members-table',
   templateUrl: './group-members-table.component.html',
   styleUrls: ['./group-members-table.component.scss'],
 })
-export class GroupMembersTableComponent implements OnInit, OnDestroy {
+export class GroupUsersTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;
   @Input() public canDelete: boolean | null = false;
   @Input() public canWrite: boolean | null = false;

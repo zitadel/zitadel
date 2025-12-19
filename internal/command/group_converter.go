@@ -29,3 +29,12 @@ func groupWriteModelToGroup(writeModel *GroupWriteModel) *domain.Group {
 // 		UserID:     writeModel.UserID,
 // 	}
 // }
+
+func writeModelToGroupMetadata(wm *GroupMetadataWriteModel) *domain.Metadata {
+	return &domain.Metadata{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		Key:        wm.Key,
+		Value:      wm.Value,
+		State:      wm.State,
+	}
+}

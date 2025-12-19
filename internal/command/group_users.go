@@ -5,74 +5,58 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/group"
+	groupusers "github.com/zitadel/zitadel/internal/repository/group_users"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddGroupMember(ctx context.Context, member *domain.Member, resourceOwner string) (_ *domain.Member, err error) {
+func (c *Commands) AddGroupUser(ctx context.Context, user *domain.GroupUser, resourceOwner string) (_ *domain.GroupUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	addedMember := NewGroupMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
-	// addedGroupMember := NewUserGroupMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
+	addedUser := NewGroupUserWriteModel(user.AggregateID, user.UserID, resourceOwner, user.Attributes)
 
-	groupAgg := GroupAggregateFromWriteModel(&addedMember.WriteModel)
-	// userGroupAgg := GroupAggregateFromWriteModel(&addedGroupMember.WriteModel)
+	groupAgg := GroupAggregateFromWriteModel(&addedUser.WriteModel)
 
-	event, err := c.addGroupMember(ctx, groupAgg, addedMember, member)
+	event, err := c.addGroupUser(ctx, groupAgg, addedUser, user)
 	if err != nil {
 		return nil, err
 	}
-
-	// userEvent, err := c.addUserGroupMember(ctx, userGroupAgg, addedGroupMember, member.AggregateID)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
 
-	// userPushedEvents, err := c.eventstore.Push(ctx, userEvent)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	err = AppendAndReduce(addedMember, pushedEvents...)
+	err = AppendAndReduce(addedUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
 
-	// err = AppendAndReduce(addedGroupMember, userPushedEvents...)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return groupMemberWriteModelToMember(&addedMember.MemberWriteModel), nil
+	return groupUserWriteModelToUser(addedUser), nil
 }
 
-func (c *Commands) addGroupMember(ctx context.Context, groupAgg *eventstore.Aggregate, addedMember *GroupMemberWriteModel, member *domain.Member) (_ eventstore.Command, err error) {
+func (c *Commands) addGroupUser(ctx context.Context, groupAgg *eventstore.Aggregate, addedUser *GroupUserWriteModel, member *domain.GroupUser) (_ eventstore.Command, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !member.IsGroupMemberValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-X9n3m", "Errors.Group.Member.Invalid")
+	if !member.IsValid() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-X9n3m", "Errors.Group.User.Invalid")
 	}
 
-	err = c.checkUserExists(ctx, addedMember.UserID, "")
+	err = c.checkUserExists(ctx, addedUser.UserID, "")
 	if err != nil {
 		return nil, err
 	}
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err = c.eventstore.FilterToQueryReducer(ctx, addedUser)
 	if err != nil {
 		return nil, err
 	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "GROUP-QvYJ2", "Errors.Group.Member.AlreadyExists")
+	if addedUser.State == domain.GroupUserStateActive {
+		return nil, zerrors.ThrowAlreadyExists(nil, "GROUP-QvYJ2", "Errors.Group.User.AlreadyExists")
 	}
 
-	return group.NewGroupMemberAddedEvent(ctx, groupAgg, member.UserID), nil
+	return groupusers.NewGroupUserAddedEvent(ctx, groupAgg, member.UserID, member.Attributes...), nil
 }
 
 // func (c *Commands) addUserGroupMember(ctx context.Context, userGroupAgg *eventstore.Aggregate, addedGroup *UserGroupMemberWriteModel, group string) (_ eventstore.Command, err error) {
@@ -100,35 +84,35 @@ func (c *Commands) addGroupMember(ctx context.Context, groupAgg *eventstore.Aggr
 
 // Need to update these to remove user from the users13 table and group_members table
 // ChangeGroupMember updates an existing member
-func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
-	if !member.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-MjbZi", "Errors.Group.Member.Invalid")
+func (c *Commands) ChangeGroupUser(ctx context.Context, user *domain.GroupUser, resourceOwner string) (*domain.GroupUser, error) {
+	if !user.IsValid() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-MjbZi", "Errors.Group.User.Invalid")
 	}
 
-	existingMember, err := c.groupMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
+	existingUser, err := c.groupUserWriteModelByID(ctx, user.AggregateID, user.UserID, resourceOwner, user.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
-	groupAgg := GroupAggregateFromWriteModel(&existingMember.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, group.NewGroupMemberChangedEvent(ctx, groupAgg, member.UserID))
+	groupAgg := GroupAggregateFromWriteModel(&existingUser.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, groupusers.NewGroupUserChangedEvent(ctx, groupAgg, user.UserID, user.Attributes...))
 	if err != nil {
 		return nil, err
 	}
 
-	err = AppendAndReduce(existingMember, pushedEvents...)
+	err = AppendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
 
-	return groupMemberWriteModelToMember(&existingMember.MemberWriteModel), nil
+	return groupUserWriteModelToUser(existingUser), nil
 }
 
-func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveGroupUser(ctx context.Context, groupID, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if groupID == "" || userID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-77nHd", "Errors.Group.Member.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-77nHd", "Errors.Group.User.Invalid")
 	}
-	m, err := c.groupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
+	m, err := c.groupUserWriteModelByID(ctx, groupID, userID, resourceOwner, nil)
 	if zerrors.IsNotFound(err) {
 		// empty response because we have no data that match the request
 		return &domain.ObjectDetails{}, err
@@ -141,7 +125,7 @@ func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resou
 
 	groupAgg := GroupAggregateFromWriteModel(&m.WriteModel)
 	// userGroupAgg := GroupAggregateFromWriteModel(&um.WriteModel)
-	removeEvent := c.removeGroupMember(ctx, groupAgg, userID, false)
+	removeEvent := c.removeGroupUser(ctx, groupAgg, userID, false)
 
 	// userEvents := c.removeUserGroupMember(ctx, userGroupAgg, groupID, false)
 
@@ -167,14 +151,14 @@ func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resou
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
-func (c *Commands) removeGroupMember(ctx context.Context, groupAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
+func (c *Commands) removeGroupUser(ctx context.Context, groupAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
 	if cascade {
-		return group.NewGroupMemberCascadeRemovedEvent(
+		return groupusers.NewGroupUserCascadeRemovedEvent(
 			ctx,
 			groupAgg,
 			userID)
 	} else {
-		return group.NewGroupMemberRemovedEvent(ctx, groupAgg, userID)
+		return groupusers.NewGroupUserRemovedEvent(ctx, groupAgg, userID)
 	}
 }
 
@@ -189,11 +173,11 @@ func (c *Commands) removeGroupMember(ctx context.Context, groupAgg *eventstore.A
 // 	}
 // }
 
-func (c *Commands) groupMemberWriteModelByID(ctx context.Context, groupID, userID, resourceOwner string) (member *GroupMemberWriteModel, err error) {
+func (c *Commands) groupUserWriteModelByID(ctx context.Context, groupID, userID, resourceOwner string, attributes []string) (member *GroupUserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewGroupMemberWriteModel(groupID, userID, resourceOwner)
+	writeModel := NewGroupUserWriteModel(groupID, userID, resourceOwner, attributes)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

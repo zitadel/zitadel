@@ -143,19 +143,21 @@ func (q *Queries) GetOIDCUserinfoClientByID(ctx context.Context, clientID string
 }
 
 type OIDCGroupInfo struct {
-	Group       *Group       `json:"group,omitempty"`
+	Group *Group `json:"group,omitempty"`
+	// GroupMetadata []GroupMetadata `json:"group_metadata,omitempty"`
 	GroupGrants []GroupGrant `json:"group_grants,omitempty"`
 }
 
 func (q *Queries) getOIDCGroupInfo(ctx context.Context, groupID string, roleAudience []string, roleOrgIDs ...string) (groupInfo *OIDCGroupInfo, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
 	if len(roleOrgIDs) > 0 {
+		// fmt.Printf("querying group info with role org ids: %v, groupID: %s,InstanceID: %s, roleAudience: %v\n", roleOrgIDs, groupID, authz.GetInstance(ctx).InstanceID(), roleAudience)
 		groupInfo, err = database.QueryJSONObject[OIDCGroupInfo](ctx, q.client, oidcGroupInfoWithRoleOrgIDsQuery,
 			groupID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience), database.TextArray[string](roleOrgIDs),
 		)
 	} else {
+		// fmt.Printf("querying group info with groupID: %s,InstanceID: %s, roleAudience: %v\n", groupID, authz.GetInstance(ctx).InstanceID(), roleAudience)
 		groupInfo, err = database.QueryJSONObject[OIDCGroupInfo](ctx, q.client, oidcGroupInfoQuery,
 			groupID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
 		)

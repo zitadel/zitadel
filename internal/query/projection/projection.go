@@ -53,11 +53,12 @@ var (
 	InstanceMemberProjection            *handler.Handler
 	ProjectMemberProjection             *handler.Handler
 	ProjectGrantMemberProjection        *handler.Handler
-	GroupMemberProjection               *handler.Handler
+	GroupUserProjection                 *handler.Handler
 	AuthNKeyProjection                  *handler.Handler
 	PersonalAccessTokenProjection       *handler.Handler
 	UserGrantProjection                 *handler.Handler
 	GroupGrantProjection                *handler.Handler
+	GroupMetadataProjection             *handler.Handler
 	UserMetadataProjection              *handler.Handler
 	UserAuthMethodProjection            *handler.Handler
 	InstanceProjection                  *handler.Handler
@@ -151,7 +152,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceTrustedDomainProjection = newInstanceTrustedDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_trusted_domains"]))
 	InstanceMemberProjection = newInstanceMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
 	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
-	GroupMemberProjection = newGroupMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_members"]))
+	GroupUserProjection = newGroupUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_members"]))
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	AuthNKeyProjection = newAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
 	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
@@ -159,6 +160,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
 	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
 	GroupGrantProjection = newGroupGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_grants"]))
+	GroupMetadataProjection = newGroupMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_metadata"]))
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
@@ -319,7 +321,8 @@ func newProjectionsList() {
 		UserMetadataProjection,
 		UserAuthMethodProjection,
 		GroupGrantProjection,
-		GroupMemberProjection,
+		GroupUserProjection,
+		GroupMetadataProjection,
 		InstanceProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,

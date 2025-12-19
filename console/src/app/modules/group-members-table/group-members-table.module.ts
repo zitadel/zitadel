@@ -20,10 +20,10 @@ import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { TableActionsModule } from '../table-actions/table-actions.module';
 import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
-import { GroupMembersTableComponent } from './group-members-table.component';
+import { GroupUsersTableComponent } from './group-members-table.component';
 
 @NgModule({
-  declarations: [GroupMembersTableComponent],
+  declarations: [GroupUsersTableComponent],
   imports: [
     CommonModule,
     InputModule,
@@ -46,6 +46,6 @@ import { GroupMembersTableComponent } from './group-members-table.component';
     AvatarModule,
     MatButtonModule,
   ],
-  exports: [GroupMembersTableComponent],
+  exports: [GroupUsersTableComponent],
 })
-export class GroupMembersTableModule {}
+export class GroupMembersTableModule { }

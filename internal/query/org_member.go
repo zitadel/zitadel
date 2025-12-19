@@ -23,10 +23,10 @@ var (
 		name:  projection.MemberUserIDCol,
 		table: orgMemberTable,
 	}
-	OrgMemberGroupID = Column{
-		name:  projection.GroupMemberGroupIDCol,
-		table: orgMemberTable,
-	}
+	// OrgMemberGroupID = Column{
+	// 	name:  projection.GroupMemberGroupIDCol,
+	// 	table: orgMemberTable,
+	// }
 	OrgMemberRoles = Column{
 		name:  projection.MemberRolesCol,
 		table: orgMemberTable,
@@ -100,33 +100,33 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 	return members, err
 }
 
-func (q *Queries) OrgGroupMembers(ctx context.Context, queries *OrgMembersQuery) (members *GroupMembers, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+// func (q *Queries) OrgGroupMembers(ctx context.Context, queries *OrgMembersQuery) (members *GroupMembers, err error) {
+// 	ctx, span := tracing.NewSpan(ctx)
+// 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareOrgGroupMembersQuery()
-	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-QCBVB", "Errors.Query.InvalidRequest")
-	}
+// 	query, scan := prepareOrgGroupMembersQuery()
+// 	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+// 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+// 	if err != nil {
+// 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-QCBVB", "Errors.Query.InvalidRequest")
+// 	}
 
-	currentSequence, err := q.latestState(ctx, orgsTable)
-	if err != nil {
-		return nil, err
-	}
+// 	currentSequence, err := q.latestState(ctx, orgsTable)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		members, err = scan(rows)
-		return err
-	}, stmt, args...)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-6Qznl", "Errors.Internal")
-	}
+// 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+// 		members, err = scan(rows)
+// 		return err
+// 	}, stmt, args...)
+// 	if err != nil {
+// 		return nil, zerrors.ThrowInternal(err, "QUERY-6Qznl", "Errors.Internal")
+// 	}
 
-	members.State = currentSequence
-	return members, err
-}
+// 	members.State = currentSequence
+// 	return members, err
+// }
 
 func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
@@ -224,63 +224,63 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 		}
 }
 
-func prepareOrgGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
-	return sq.Select(
-			OrgMemberCreationDate.identifier(),
-			OrgMemberChangeDate.identifier(),
-			OrgMemberSequence.identifier(),
-			OrgMemberResourceOwner.identifier(),
-			OrgMemberGroupID.identifier(),
-			GroupColumnName.identifier(),
-			GroupColumnDescription.identifier(),
-			OrgMemberRoles.identifier(),
-			countColumn.identifier(),
-		).From(orgMemberTable.identifier()).
-			LeftJoin(join(GroupColumnID, OrgMemberGroupID)).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*GroupMembers, error) {
-			members := make([]*GroupMember, 0)
-			var count uint64
+// func prepareOrgGroupMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+// 	return sq.Select(
+// 			OrgMemberCreationDate.identifier(),
+// 			OrgMemberChangeDate.identifier(),
+// 			OrgMemberSequence.identifier(),
+// 			OrgMemberResourceOwner.identifier(),
+// 			OrgMemberGroupID.identifier(),
+// 			GroupColumnName.identifier(),
+// 			GroupColumnDescription.identifier(),
+// 			OrgMemberRoles.identifier(),
+// 			countColumn.identifier(),
+// 		).From(orgMemberTable.identifier()).
+// 			LeftJoin(join(GroupColumnID, OrgMemberGroupID)).
+// 			PlaceholderFormat(sq.Dollar),
+// 		func(rows *sql.Rows) (*GroupMembers, error) {
+// 			members := make([]*GroupMember, 0)
+// 			var count uint64
 
-			for rows.Next() {
-				member := new(GroupMember)
+// 			for rows.Next() {
+// 				member := new(GroupMember)
 
-				var (
-					groupName        = sql.NullString{}
-					groupDescription = sql.NullString{}
-				)
+// 				var (
+// 					groupName        = sql.NullString{}
+// 					groupDescription = sql.NullString{}
+// 				)
 
-				err := rows.Scan(
-					&member.CreationDate,
-					&member.ChangeDate,
-					&member.Sequence,
-					&member.ResourceOwner,
-					&member.Roles,
-					&member.GroupID,
-					&groupName,
-					&groupDescription,
+// 				err := rows.Scan(
+// 					&member.CreationDate,
+// 					&member.ChangeDate,
+// 					&member.Sequence,
+// 					&member.ResourceOwner,
+// 					&member.Roles,
+// 					&member.GroupID,
+// 					&groupName,
+// 					&groupDescription,
 
-					&count,
-				)
+// 					&count,
+// 				)
 
-				if err != nil {
-					return nil, err
-				}
+// 				if err != nil {
+// 					return nil, err
+// 				}
 
-				member.GroupName = groupName.String
-				member.GroupDescription = groupDescription.String
-				members = append(members, member)
-			}
+// 				member.GroupName = groupName.String
+// 				member.GroupDescription = groupDescription.String
+// 				members = append(members, member)
+// 			}
 
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-M44NV", "Errors.Query.CloseRows")
-			}
+// 			if err := rows.Close(); err != nil {
+// 				return nil, zerrors.ThrowInternal(err, "QUERY-M44NV", "Errors.Query.CloseRows")
+// 			}
 
-			return &GroupMembers{
-				GroupMembers: members,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
+// 			return &GroupMembers{
+// 				GroupMembers: members,
+// 				SearchResponse: SearchResponse{
+// 					Count: count,
+// 				},
+// 			}, nil
+// 		}
+// }

@@ -763,10 +763,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
 
-      if (this.app.samlConfig?.metadataUrl?.length > 0) {
+      if (this.app.samlConfig?.metadataUrl?.length) {
         req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
       }
-      if (this.app.samlConfig?.metadataXml?.length > 0) {
+      if (this.app.samlConfig?.metadataXml?.length) {
         req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
 

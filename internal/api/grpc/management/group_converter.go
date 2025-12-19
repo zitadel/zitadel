@@ -5,7 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grp_grpc "github.com/zitadel/zitadel/internal/api/grpc/group"
-	group_member_grpc "github.com/zitadel/zitadel/internal/api/grpc/groupmember"
+	groupuser_grpc "github.com/zitadel/zitadel/internal/api/grpc/groupuser"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -39,12 +40,12 @@ func GroupGrantsToIDs(groupGrants *query.GroupGrants) []string {
 	return converted
 }
 
-func AddGroupMemberRequestToDomain(ctx context.Context, req *mgmt_pb.AddGroupMemberRequest) *domain.Member {
-	return domain.NewMember(req.GroupId, req.UserId)
+func AddGroupUserRequestToDomain(ctx context.Context, req *mgmt_pb.AddGroupUserRequest) *domain.GroupUser {
+	return domain.NewGroupUser(req.GroupId, req.UserId, req.Attributes...)
 }
 
-func UpdateGroupMemberRequestToDomain(req *mgmt_pb.UpdateGroupMemberRequest) *domain.Member {
-	return domain.NewMember(req.GroupId, req.UserId)
+func UpdateGroupUserRequestToDomain(req *mgmt_pb.UpdateGroupUserRequest) *domain.GroupUser {
+	return domain.NewGroupUser(req.GroupId, req.UserId, req.Attributes...)
 }
 
 func listGroupRequestToModel(req *mgmt_pb.ListGroupsRequest) (*query.GroupSearchQueries, error) {
@@ -112,27 +113,24 @@ func listGroupRequestToModel(req *mgmt_pb.ListGroupsRequest) (*query.GroupSearch
 // 	}, nil
 // }
 
-func ListGroupMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListGroupMembersRequest) (*query.GroupMembersQuery, error) {
+func ListGroupUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListGroupUsersRequest) (*query.GroupUsersQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := group_member_grpc.MemberQueriesToQuery(req.Queries)
+	queries, err := groupuser_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	ownerQuery, err := query.NewGroupUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	queries = append(queries, ownerQuery)
-	return &query.GroupMembersQuery{
-		MembersQuery: query.MembersQuery{
-			SearchRequest: query.SearchRequest{
-				Offset: offset,
-				Limit:  limit,
-				Asc:    asc,
-				//SortingColumn: //TODO: sorting
-			},
-			Queries: queries,
+	return &query.GroupUsersQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
 		},
+		Queries: queries,
 		GroupID: req.GroupId,
 	}, nil
 }
@@ -176,4 +174,33 @@ func GroupFieldNameToSortingColumn(field group.GroupFieldName) query.Column {
 	default:
 		return query.GroupColumnID
 	}
+}
+
+// Group Metadata
+
+func BulkSetGroupMetadataToDomain(req *mgmt_pb.BulkSetGroupMetadataRequest) []*domain.Metadata {
+	metadata := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metadata[i] = &domain.Metadata{
+			Key:   data.Key,
+			Value: data.Value,
+		}
+	}
+	return metadata
+}
+
+func ListGroupMetadataToDomain(req *mgmt_pb.ListGroupMetadataRequest) (*query.GroupMetadataSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := metadata.GroupMetadataQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.GroupMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }

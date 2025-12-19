@@ -29,7 +29,7 @@ export class UserGroupsComponent implements OnInit {
     public totalResult: number = 0;
     public viewTimestamp!: Timestamp.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    public loading$: Observable < boolean > = this.loadingSubject.asObservable();
+    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     public GroupState: any = GroupState;
     public changePage: EventEmitter<void> = new EventEmitter();
     @Input() public displayedColumnsHuman: string[] = [
@@ -46,9 +46,9 @@ export class UserGroupsComponent implements OnInit {
         private groupService: ManagementService,
         private toast: ToastService,
         private dialog: MatDialog,
-      ) {
-        
-      }
+    ) {
+
+    }
 
     public masterToggle(): void {
         this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
@@ -97,14 +97,14 @@ export class UserGroupsComponent implements OnInit {
         dialogRef.afterClosed().subscribe((resp) => {
             if (resp) {
                 this.groupService
-                .removeGroupMember(group.id, this.userId)
-                .then(() => {
-                    this.toast.showInfo('GROUP.TOAST.MEMBERREMOVED', true);
-                    this.getData();
-                })
-                .catch((error) => {
-                    this.toast.showError(error);
-                });
+                    .removeGroupUser(group.id, this.userId)
+                    .then(() => {
+                        this.toast.showInfo('GROUP.TOAST.MEMBERREMOVED', true);
+                        this.getData();
+                    })
+                    .catch((error) => {
+                        this.toast.showError(error);
+                    });
             }
         });
     }
@@ -114,27 +114,27 @@ export class UserGroupsComponent implements OnInit {
     }
 
     public openAddGroup(): void {
-        const dialogRef = this.dialog.open(GroupCreateDialogComponent, {width: '400px'});
+        const dialogRef = this.dialog.open(GroupCreateDialogComponent, { width: '400px' });
         dialogRef.afterClosed().subscribe((resp) => {
             if (resp) {
                 const groups: string[] = resp.groups;
                 if (groups && groups.length) {
                     Promise.all(
                         groups.map((group) => {
-                            return this.groupService.addGroupMember(group, this.userId);
+                            return this.groupService.addGroupUser(group, this.userId, []);
                         }),
                     )
-                    .then(() => {
-                        setTimeout(() => {
+                        .then(() => {
+                            setTimeout(() => {
+                                this.changePage.emit();
+                                this.getData();
+                            }, 1000);
+                            this.toast.showInfo('GROUP.TOAST.MEMBERSADDED', true);
+                        })
+                        .catch((error) => {
                             this.changePage.emit();
-                            this.getData();
-                        }, 1000);
-                        this.toast.showInfo('GROUP.TOAST.MEMBERSADDED', true);
-                    })
-                    .catch((error) => {
-                        this.changePage.emit();
-                        this.toast.showError(error);
-                    });
+                            this.toast.showError(error);
+                        });
                 }
             }
         });

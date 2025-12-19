@@ -229,7 +229,7 @@ var (
 		table: membershipAlias,
 	}
 	membershipGroupID = Column{
-		name:  projection.GroupMemberGroupIDCol,
+		name:  projection.GroupUserGroupIDCol,
 		table: membershipAlias,
 	}
 	// membershipGroupGrantID = Column{

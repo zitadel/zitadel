@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable, catchError } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 import { App, OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -18,7 +18,7 @@ export class ApplicationGridComponent implements OnInit {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public OIDCAppType: any = OIDCAppType;
 
-  constructor(private mgmtService: ManagementService) {}
+  constructor(private mgmtService: ManagementService) { }
 
   ngOnInit(): void {
     this.loadApps();

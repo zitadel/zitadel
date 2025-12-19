@@ -349,11 +349,21 @@ Errors:
     NotActive: Group is not active
     NotInactive: Group is not deactivated
     NotFound: Group not found
+    Metadata:
+      NotFound: Metadata not found
+      Invalid: Metadata is invalid
+      AlreadyExists: Metadata already exists
+      NotExisting: Metadata doesn't exist
     Member:
       NotFound: Group member not found
       Invalid: Group member is invalid
       AlreadyExists: Group member already exists
       NotExisting: Group member doesn't exist
+    User:
+      NotFound: Group User not found
+      Invalid: Group User is invalid
+      AlreadyExists: Group User already exists
+      NotExisting: Group User doesn't exist
   GroupGrant:
     AlreadyExists: User grant already exists
     NotFound: User grant not found
@@ -1412,12 +1422,22 @@ EventTypes:
     deactivated: Group deactivated
     reactivated: Group reactivated
     removed: Group removed
+    metadata:
+      set: Group metadata set
+      changed: Group metadata changed
+      removed: Group metadata removed
     member:
       added: Group member added
       changed: Group member changed
       removed: Group member removed
       cascade:
         removed: Group member cascade removed
+    user:
+      added: Group user added
+      changed: Group user changed
+      removed: Group user removed
+      cascade:
+        removed: Group user cascade removed
     role:
       added: Project role added
       changed: Project role changed

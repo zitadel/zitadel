@@ -101,6 +101,7 @@ func (s *Server) userInfo(
 		once                         sync.Once
 		rawUserInfo                  *oidc.UserInfo
 		qu                           *query.OIDCUserInfo
+		grp                          *query.Groups
 		qg                           *query.OIDCGroupInfos
 		roleAudience, requestedRoles []string
 	)
@@ -115,7 +116,7 @@ func (s *Server) userInfo(
 			if err != nil {
 				return
 			}
-			grp, err := s.query.GroupByUserID(ctx, true, userID)
+			grp, err = s.query.GroupByUserID(ctx, true, userID)
 			if err != nil {
 				return
 			}
@@ -124,7 +125,7 @@ func (s *Server) userInfo(
 			if err != nil {
 				return
 			}
-			rawUserInfo = userInfoToOIDCV2(qu, grp, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
+			rawUserInfo = userInfoToOIDCV2(qu, qg, grp, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
 		})
 		if err != nil {
 			return nil, err
@@ -139,6 +140,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRolesV2(projectID, qu, qg, roleAudience, requestedRoles, roleAssertion, userInfo)
+		assertGroupDetails(projectID, grp, qg, roleAudience, requestedRoles, userInfo)
 		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
 	}
 }
@@ -224,7 +226,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 }
 */
 
-func userInfoToOIDCV2(user *query.OIDCUserInfo, group *query.Groups, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
+func userInfoToOIDCV2(user *query.OIDCUserInfo, groupInfo *query.OIDCGroupInfos, group *query.Groups, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
 	out := &oidc.UserInfo{
 		Subject: user.User.ID,
 	}
@@ -256,6 +258,8 @@ func userInfoToOIDCV2(user *query.OIDCUserInfo, group *query.Groups, userInfoAss
 			setUserInfoOrgClaims(user, out)
 		case ScopeIAMGroups:
 			setGroupInfoV2(group, out)
+		// case ScopeGroupMetaData:
+		// 	setGroupMetadata(groupInfo, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -552,12 +556,6 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	return nil
 }
 
-// func setGroupInfo(user *query.User, out *oidc.UserInfo) {
-// 	if len(user.GroupIDs) > 0 {
-// 		out.AppendClaims(ClaimGroups, user.GroupIDs)
-// 	}
-// }
-
 func fetchGroupName(groups *query.Groups) []string {
 	names := make([]string, 0, len(groups.Groups))
 	for _, group := range groups.Groups {
@@ -571,6 +569,178 @@ func setGroupInfoV2(groups *query.Groups, out *oidc.UserInfo) {
 		out.AppendClaims(ClaimGroups, fetchGroupName(groups))
 	}
 }
+
+// GroupDetails represents the detailed role information for a group.
+// It tracks which roles are assigned to the group across different projects
+// and maintains references to the requested project and audience projects.
+//
+// Attributes: List of custom attributes associated with the group user (e.g., department, team)
+// Roles: Map of project IDs to their respective roles for this group
+// requestProjectID: The ID of the project that was explicitly requested (for filtering)
+// requestAudIDs: Map of project IDs that are part of the requested audience (for filtering)
+type GroupDetails struct {
+	Attributes []string                `json:"attributes,omitempty"`
+	Roles      map[string]projectRoles `json:"roles,omitempty"`
+
+	requestProjectID string
+	requestAudIDs    map[string]bool
+}
+
+func (p *GroupDetails) Add(projectID, roleKey, orgID, domain string, isRequested bool, isAudienceReq bool) {
+	if p.Roles == nil {
+		p.Roles = make(map[string]projectRoles, 1)
+	}
+	if p.Roles[projectID] == nil {
+		p.Roles[projectID] = make(projectRoles)
+	}
+	if isRequested {
+		p.requestProjectID = projectID
+	}
+	if p.requestAudIDs == nil {
+		p.requestAudIDs = make(map[string]bool, 1)
+	}
+	if isAudienceReq {
+		p.requestAudIDs[projectID] = true
+	}
+	p.Roles[projectID].Add(roleKey, orgID, domain)
+}
+
+func setGroupDetails(info *oidc.UserInfo, details *map[string]GroupDetails) {
+	info.AppendClaims(ClaimGroupDetails, details)
+}
+
+func checkGrantedGroupDetailsRoles(roles *GroupDetails, grant query.GroupGrant, requestedRole string, isRequested bool) {
+	for _, grantedRole := range grant.Roles {
+		if requestedRole == grantedRole {
+			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested, false)
+		}
+	}
+}
+
+// newProjectRolesWithGroup builds a map of group names to their detailed role information.
+// It processes all group grants and applies role filtering based on requested roles and audience.
+//
+// Algorithm:
+// 1. Iterate through each group and collect its attributes from the groups list
+// 2. Check forspecific roles were requested:
+//   - Include grants that match the requested roles
+//
+// 3. If no specific roles were requested:
+//   - Include all grants that match the audience projects
+//
+// 4. Filter the collected roles to only include:
+//   - Roles for the requested project (if any)
+//   - Roles for audience projects
+//
+// 5. Only add a group to the result if it has filtered roles
+//
+// Parameters:
+// - projectID: The primary project ID (used for filtering)
+// - groups: List of all user's groups with their attributes
+// - groupInfos: OIDC group information containing group grants
+// - requestedRoles: List of roles explicitly requested in the scope
+// - roleAudience: List of project IDs that are audience for roles
+func newProjectRolesWithGroup(projectID string, groups *query.Groups, groupInfos *query.OIDCGroupInfos, requestedRoles []string, roleAudience []string) *map[string]GroupDetails {
+	groupDetails := make(map[string]GroupDetails)
+
+	// Return early if there are no groups or group infos to process
+	if groups == nil || groupInfos == nil || len(groupInfos.Group) == 0 {
+		return &groupDetails
+	}
+
+	// Process each group to collect its attributes, grants, and filter roles
+	for _, groupInfo := range groupInfos.Group {
+		groupDetail := new(GroupDetails)
+		groupName := groupInfo.Group.Name
+
+		// Collect attributes for this group from the groups list
+		for _, group := range groups.Groups {
+			if group.Name == groupName {
+				groupDetail.Attributes = append(groupDetail.Attributes, group.Attributes...)
+				break
+			}
+		}
+
+		// If specific roles were requested, Include grants that match requested roles
+		if len(requestedRoles) > 0 {
+			for _, grant := range groupInfo.GroupGrants {
+				for _, requestedRole := range requestedRoles {
+					checkGrantedGroupDetailsRoles(groupDetail, grant, requestedRole, grant.ProjectID == projectID)
+				}
+			}
+		}
+
+		// No specific roles requested, include all grants that match the audience
+		for _, grant := range groupInfo.GroupGrants {
+			for _, role := range grant.Roles {
+				for _, projectAud := range roleAudience {
+					groupDetail.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID, grant.ProjectID == projectAud)
+				}
+			}
+
+		}
+
+		// Filter roles: only include requested roles or audience roles
+		if len(groupDetail.Roles) > 0 {
+			filteredRoles := make(map[string]projectRoles)
+
+			// Include roles for requested project
+			if groupDetail.requestProjectID != "" {
+				if projectRole, ok := groupDetail.Roles[groupDetail.requestProjectID]; ok {
+					filteredRoles[groupDetail.requestProjectID] = projectRole
+				}
+			}
+
+			// Include roles for audience projects
+			for requestAudID := range groupDetail.requestAudIDs {
+				if projectRole, ok := groupDetail.Roles[requestAudID]; ok {
+					filteredRoles[requestAudID] = projectRole
+				}
+			}
+
+			// Only add group if it has filtered roles
+			if len(filteredRoles) > 0 {
+				groupDetail.Roles = filteredRoles
+				groupDetails[groupName] = *groupDetail
+			}
+		}
+	}
+	return &groupDetails
+}
+
+func assertGroupDetails(projectID string, groups *query.Groups, groupsInfo *query.OIDCGroupInfos, roleAudience []string, requestedRoles []string, out *oidc.UserInfo) {
+	// prevent returning obtained grants if none where requested
+	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
+		setGroupDetails(out, newProjectRolesWithGroup(projectID, groups, groupsInfo, requestedRoles, roleAudience))
+	}
+}
+
+// func setGroupMetadata(groups *query.OIDCGroupInfos, out *oidc.UserInfo) {
+// 	if groups == nil || len(groups.Group) == 0 {
+// 		return
+// 	}
+// 	groupMetadata := make(map[string]map[string]string)
+// 	for _, group := range groups.Group {
+// 		if group.Group == nil || len(group.GroupMetadata) == 0 {
+// 			continue
+// 		}
+// 		mdmap := make(map[string]string, len(group.GroupMetadata))
+// 		for _, md := range group.GroupMetadata {
+// 			// Skip metadata entries with empty values to avoid base64 decode errors
+// 			if len(md.Value) == 0 {
+// 				continue
+// 			}
+// 			mdmap[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
+// 		}
+// 		// Only add group metadata if it has valid entries
+// 		if len(mdmap) > 0 {
+// 			groupMetadata[group.Group.Name] = mdmap
+// 		}
+// 	}
+// 	if len(groupMetadata) > 0 {
+// 		out.AppendClaims(ClaimGroupMetaData, groupMetadata)
+// 	}
+// }
 
 type ContextInfo struct {
 	Function     string               `json:"function,omitempty"`

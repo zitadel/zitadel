@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ListGroupMembersResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ListGroupUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -11,7 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class GroupMembersDataSource extends DataSource<Member.AsObject> {
+export class GroupUsersDataSource extends DataSource<Member.AsObject> {
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
 
@@ -33,9 +33,9 @@ export class GroupMembersDataSource extends DataSource<Member.AsObject> {
     this.loadingSubject.next(true);
 
     const promise:
-      | Promise<ListGroupMembersResponse.AsObject>
+      | Promise<ListGroupUsersResponse.AsObject>
       | undefined =
-      this.service.listGroupMembers(groupId, pageSize, offset);
+      this.service.listGroupUsers(groupId, pageSize, offset);
     if (promise) {
       from(promise)
         .pipe(

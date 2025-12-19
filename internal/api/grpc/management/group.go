@@ -6,9 +6,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
 	group_grpc "github.com/zitadel/zitadel/internal/api/grpc/group"
-	groupmember_grpc "github.com/zitadel/zitadel/internal/api/grpc/groupmember"
+	groupuser_grpc "github.com/zitadel/zitadel/internal/api/grpc/groupuser"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/group"
@@ -181,7 +184,7 @@ func (s *Server) ReactivateGroup(ctx context.Context, req *mgmt_pb.ReactivateGro
 	}, nil
 }
 
-func (s *Server) removeGroupDependencies(ctx context.Context, groupID string) ([]*command.CascadingMembership, []string, error) {
+func (s *Server) RemoveGroupDependencies(ctx context.Context, groupID string) ([]*command.CascadingMembership, []string, error) {
 	groupGrantGroupQuery, err := query.NewGroupGrantGroupIDSearchQuery(groupID)
 	if err != nil {
 		return nil, nil, err
@@ -216,16 +219,13 @@ func (s *Server) RemoveGroup(ctx context.Context, req *mgmt_pb.RemoveGroupReques
 	if err != nil {
 		return nil, err
 	}
-	groupMember, err := s.query.GroupMembers(ctx, &query.GroupMembersQuery{
-		MembersQuery: query.MembersQuery{
-			Queries: nil,
-		},
+	groupUser, err := s.query.GroupUsers(ctx, &query.GroupUsersQuery{
 		GroupID: req.Id,
 	})
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgumentf(err, "GROUP-IDasq", "GroupMember %v", groupMember)
+		return nil, zerrors.ThrowInvalidArgumentf(err, "GROUP-IDasq", "GroupMember %v", groupUser)
 	}
-	details, err := s.command.RemoveGroup(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberToUserIDs(groupMember.GroupMembers), groupGrantsToIDs(grants.GroupGrants)...)
+	details, err := s.command.RemoveGroup(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberToUserIDs(groupUser.GroupUsers), groupGrantsToIDs(grants.GroupGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -234,51 +234,51 @@ func (s *Server) RemoveGroup(ctx context.Context, req *mgmt_pb.RemoveGroupReques
 	}, nil
 }
 
-func (s *Server) ListGroupMembers(ctx context.Context, req *mgmt_pb.ListGroupMembersRequest) (*mgmt_pb.ListGroupMembersResponse, error) {
-	queries, err := ListGroupMembersRequestToModel(ctx, req)
+func (s *Server) ListGroupUsers(ctx context.Context, req *mgmt_pb.ListGroupUsersRequest) (*mgmt_pb.ListGroupUsersResponse, error) {
+	queries, err := ListGroupUsersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.query.GroupMembers(ctx, queries)
+	members, err := s.query.GroupUsers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListGroupMembersResponse{
-		Result:  groupmember_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.GroupMembers),
+	return &mgmt_pb.ListGroupUsersResponse{
+		Result:  groupuser_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.GroupUsers),
 		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.LastRun),
 	}, nil
 }
 
-func (s *Server) AddGroupMember(ctx context.Context, req *mgmt_pb.AddGroupMemberRequest) (*mgmt_pb.AddGroupMemberResponse, error) {
-	member, err := s.command.AddGroupMember(ctx, AddGroupMemberRequestToDomain(ctx, req), authz.GetCtxData(ctx).OrgID)
+func (s *Server) AddGroupUser(ctx context.Context, req *mgmt_pb.AddGroupUserRequest) (*mgmt_pb.AddGroupUserResponse, error) {
+	groupuser, err := s.command.AddGroupUser(ctx, AddGroupUserRequestToDomain(ctx, req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.AddGroupMemberResponse{
-		Details: object_grpc.AddToDetailsPb(member.Sequence, member.ChangeDate, member.ResourceOwner),
+	return &mgmt_pb.AddGroupUserResponse{
+		Details: object_grpc.AddToDetailsPb(groupuser.Sequence, groupuser.ChangeDate, groupuser.ResourceOwner),
 	}, nil
 }
 
-func (s *Server) UpdateGroupMember(ctx context.Context, req *mgmt_pb.UpdateGroupMemberRequest) (*mgmt_pb.UpdateGroupMemberResponse, error) {
-	member, err := s.command.ChangeGroupMember(ctx, UpdateGroupMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+func (s *Server) UpdateGroupUser(ctx context.Context, req *mgmt_pb.UpdateGroupUserRequest) (*mgmt_pb.UpdateGroupUserResponse, error) {
+	groupuser, err := s.command.ChangeGroupUser(ctx, UpdateGroupUserRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.UpdateGroupMemberResponse{
+	return &mgmt_pb.UpdateGroupUserResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			member.Sequence,
-			member.ChangeDate,
-			member.ResourceOwner,
+			groupuser.Sequence,
+			groupuser.ChangeDate,
+			groupuser.ResourceOwner,
 		),
 	}, nil
 }
 
-func (s *Server) RemoveGroupMember(ctx context.Context, req *mgmt_pb.RemoveGroupMemberRequest) (*mgmt_pb.RemoveGroupMemberResponse, error) {
-	details, err := s.command.RemoveGroupMember(ctx, req.GroupId, req.UserId, authz.GetCtxData(ctx).OrgID)
+func (s *Server) RemoveGroupUser(ctx context.Context, req *mgmt_pb.RemoveGroupUserRequest) (*mgmt_pb.RemoveGroupUserResponse, error) {
+	details, err := s.command.RemoveGroupUser(ctx, req.GroupId, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveGroupMemberResponse{
+	return &mgmt_pb.RemoveGroupUserResponse{
 		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
@@ -291,10 +291,93 @@ func groupGrantsToIDs(groupGrants []*query.GroupGrant) []string {
 	return converted
 }
 
-func memberToUserIDs(groupMember []*query.GroupMember) []string {
-	converted := make([]string, len(groupMember))
-	for i, group := range groupMember {
+func memberToUserIDs(groupUser []*query.GroupUser) []string {
+	converted := make([]string, len(groupUser))
+	for i, group := range groupUser {
 		converted[i] = group.UserID
 	}
 	return converted
+}
+
+// Group Metadata
+
+func (s *Server) ListGroupMetadata(ctx context.Context, req *mgmt_pb.ListGroupMetadataRequest) (*mgmt_pb.ListGroupMetadataResponse, error) {
+	metadataQueries, err := ListGroupMetadataToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	err = metadataQueries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchGroupMetadata(ctx, true, req.Id, metadataQueries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListGroupMetadataResponse{
+		Result:  metadata.GroupMetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
+	}, nil
+}
+
+func (s *Server) GetGroupMetadata(ctx context.Context, req *mgmt_pb.GetGroupMetadataRequest) (*mgmt_pb.GetGroupMetadataResponse, error) {
+	owner, err := query.NewGroupMetadataResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	data, err := s.query.GetGroupMetadataByKey(ctx, true, req.Id, req.Key, false, owner)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetGroupMetadataResponse{
+		Metadata: metadata.GroupMetadataToPb(data),
+	}, nil
+}
+
+func (s *Server) SetGroupMetadata(ctx context.Context, req *mgmt_pb.SetGroupMetadataRequest) (*mgmt_pb.SetGroupMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.SetGroupMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetGroupMetadataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) BulkSetGroupMetadata(ctx context.Context, req *mgmt_pb.BulkSetGroupMetadataRequest) (*mgmt_pb.BulkSetGroupMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkSetGroupMetadata(ctx, req.Id, ctxData.OrgID, BulkSetGroupMetadataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkSetGroupMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) RemoveGroupMetadata(ctx context.Context, req *mgmt_pb.RemoveGroupMetadataRequest) (*mgmt_pb.RemoveGroupMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.RemoveGroupMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveGroupMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) BulkRemoveGroupMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveGroupMetadataRequest) (*mgmt_pb.BulkRemoveGroupMetadataResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	result, err := s.command.BulkRemoveGroupMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkRemoveGroupMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }

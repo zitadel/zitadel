@@ -268,6 +268,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 	type args struct {
 		user              *query.OIDCUserInfo
 		group             *query.Groups
+		groupInfo         *query.OIDCGroupInfos
 		userInfoAssertion bool
 		scope             []string
 	}
@@ -508,7 +509,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assetPrefix := "https://foo.com/assets"
-			got := userInfoToOIDCV2(tt.args.user, tt.args.group, tt.args.userInfoAssertion, tt.args.scope, assetPrefix)
+			got := userInfoToOIDCV2(tt.args.user, tt.args.groupInfo, tt.args.group, tt.args.userInfoAssertion, tt.args.scope, assetPrefix)
 			assert.Equal(t, tt.want, got)
 		})
 	}

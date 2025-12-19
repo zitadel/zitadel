@@ -13,39 +13,38 @@ import (
 )
 
 var (
-	groupMembersQuery = regexp.QuoteMeta("SELECT" +
-		" members.creation_date" +
-		", members.change_date" +
-		", members.sequence" +
-		", members.resource_owner" +
-		", members.user_id" +
-		", members.group_id" +
-		", members.roles" +
+	groupUsersQuery = regexp.QuoteMeta("SELECT" +
+		"  groupusers.creation_date" +
+		", groupusers.change_date" +
+		", groupusers.sequence" +
+		", groupusers.resource_owner" +
+		", groupusers.user_id" +
+		", groupusers.group_id" +
+		", groupusers.attributes" +
 		", projections.login_names3.login_name" +
-		", projections.users13_humans.email" +
-		", projections.users13_humans.first_name" +
-		", projections.users13_humans.last_name" +
-		", projections.users13_humans.display_name" +
-		", projections.users13_machines.name" +
-		", projections.users13_humans.avatar_key" +
-		", projections.users13.type" +
+		", projections.users14_humans.email" +
+		", projections.users14_humans.first_name" +
+		", projections.users14_humans.last_name" +
+		", projections.users14_humans.display_name" +
+		", projections.users14_machines.name" +
+		", projections.users14_humans.avatar_key" +
+		", projections.users14.type" +
 		", COUNT(*) OVER () " +
-		"FROM projections.group_members AS members " +
-		"LEFT JOIN projections.users13_humans " +
-		"ON members.user_id = projections.users13_humans.user_id " +
-		"AND members.instance_id = projections.users13_humans.instance_id " +
-		"LEFT JOIN projections.users13_machines " +
-		"ON members.user_id = projections.users13_machines.user_id " +
-		"AND members.instance_id = projections.users13_machines.instance_id " +
-		"LEFT JOIN projections.users13 " +
-		"ON members.user_id = projections.users13.id " +
-		"AND members.instance_id = projections.users13.instance_id " +
+		"FROM projections.group_users AS groupusers " +
+		"LEFT JOIN projections.users14_humans " +
+		"ON groupusers.user_id = projections.users14_humans.user_id " +
+		"AND groupusers.instance_id = projections.users14_humans.instance_id " +
+		"LEFT JOIN projections.users14_machines " +
+		"ON groupusers.user_id = projections.users14_machines.user_id " +
+		"AND groupusers.instance_id = projections.users14_machines.instance_id " +
+		"LEFT JOIN projections.users14 " +
+		"ON groupusers.user_id = projections.users14.id " +
+		"AND groupusers.instance_id = projections.users14.instance_id " +
 		"LEFT JOIN projections.login_names3 " +
-		"ON members.user_id = projections.login_names3.user_id " +
-		"AND members.instance_id = projections.login_names3.instance_id " +
-		`AS OF SYSTEM TIME '-1 ms' ` +
+		"ON groupusers.user_id = projections.login_names3.user_id " +
+		"AND groupusers.instance_id = projections.login_names3.instance_id " +
 		"WHERE projections.login_names3.is_primary = $1")
-	groupMembersColumns = []string{
+	groupUsersColumns = []string{
 		"creation_date",
 		"change_date",
 		"sequence",
@@ -65,7 +64,7 @@ var (
 	}
 )
 
-func Test_GroupMemberPrepares(t *testing.T) {
+func Test_GroupUserPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -77,26 +76,26 @@ func Test_GroupMemberPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareGroupMembersQuery no result",
-			prepare: prepareGroupMembersQuery,
+			name:    "prepareGroupUsersQuery no result",
+			prepare: prepareGroupUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					groupMembersQuery,
+					groupUsersQuery,
 					nil,
 					nil,
 				),
 			},
-			object: &GroupMembers{
-				GroupMembers: []*GroupMember{},
+			object: &GroupUsers{
+				GroupUsers: []*GroupUser{},
 			},
 		},
 		{
-			name:    "prepareGroupMembersQuery human found",
-			prepare: prepareGroupMembersQuery,
+			name:    "prepareGroupUsersQuery human found",
+			prepare: prepareGroupUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					groupMembersQuery,
-					groupMembersColumns,
+					groupUsersQuery,
+					groupUsersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -118,11 +117,11 @@ func Test_GroupMemberPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &GroupMembers{
+			object: &GroupUsers{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				GroupMembers: []*GroupMember{
+				GroupUsers: []*GroupUser{
 					{
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
@@ -130,7 +129,7 @@ func Test_GroupMemberPrepares(t *testing.T) {
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
 						GroupID:            "group-id",
-						Roles:              database.TextArray[string]{"role-1", "role-2"},
+						Attributes:         database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -143,12 +142,12 @@ func Test_GroupMemberPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareGroupMembersQuery machine found",
-			prepare: prepareGroupMembersQuery,
+			name:    "prepareGroupUsersQuery machine found",
+			prepare: prepareGroupUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					groupMembersQuery,
-					groupMembersColumns,
+					groupUsersQuery,
+					groupUsersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -170,11 +169,11 @@ func Test_GroupMemberPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &GroupMembers{
+			object: &GroupUsers{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				GroupMembers: []*GroupMember{
+				GroupUsers: []*GroupUser{
 					{
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
@@ -182,7 +181,7 @@ func Test_GroupMemberPrepares(t *testing.T) {
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
 						GroupID:            "group-id",
-						Roles:              database.TextArray[string]{"role-1", "role-2"},
+						Attributes:         database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",
@@ -195,12 +194,12 @@ func Test_GroupMemberPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareGroupMembersQuery multiple users",
-			prepare: prepareGroupMembersQuery,
+			name:    "prepareGroupUsersQuery multiple users",
+			prepare: prepareGroupUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					groupMembersQuery,
-					groupMembersColumns,
+					groupUsersQuery,
+					groupUsersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -239,11 +238,11 @@ func Test_GroupMemberPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &GroupMembers{
+			object: &GroupUsers{
 				SearchResponse: SearchResponse{
 					Count: 2,
 				},
-				GroupMembers: []*GroupMember{
+				GroupUsers: []*GroupUser{
 					{
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
@@ -251,7 +250,7 @@ func Test_GroupMemberPrepares(t *testing.T) {
 						ResourceOwner:      "ro",
 						UserID:             "user-id-1",
 						GroupID:            "group-id",
-						Roles:              database.TextArray[string]{"role-1", "role-2"},
+						Attributes:         database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -267,7 +266,7 @@ func Test_GroupMemberPrepares(t *testing.T) {
 						ResourceOwner:      "ro",
 						UserID:             "user-id-2",
 						GroupID:            "group-id",
-						Roles:              database.TextArray[string]{"role-1", "role-2"},
+						Attributes:         database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",
@@ -280,11 +279,11 @@ func Test_GroupMemberPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareGroupMembersQuery sql err",
-			prepare: prepareGroupMembersQuery,
+			name:    "prepareGroupUsersQuery sql err",
+			prepare: prepareGroupUsersQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					groupMembersQuery,
+					groupUsersQuery,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -294,7 +293,7 @@ func Test_GroupMemberPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*GroupMembership)(nil),
+			object: (*GroupUsers)(nil),
 		},
 	}
 	for _, tt := range tests {
