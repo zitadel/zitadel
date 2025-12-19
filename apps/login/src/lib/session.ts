@@ -84,6 +84,7 @@ export async function isSessionValid({
       mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
 
       if (!mfaValid) {
+        console.error("MFA is required but not valid");
       }
     } else {
       // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
@@ -96,6 +97,7 @@ export async function isSessionValid({
 
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
       if (!mfaValid) {
+        console.error("MFA is required but not valid");
       }
     }
   }
@@ -119,6 +121,7 @@ export async function isSessionValid({
   }
 
   if (!mfaValid) {
+    console.error("MFA is required but not valid");
     return false;
   }
 
