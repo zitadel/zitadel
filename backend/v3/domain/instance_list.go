@@ -5,11 +5,11 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
+	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 )
 
 type ListInstancesQuery struct {
-	Request *instance.ListInstancesRequest
+	Request *instance_v2.ListInstancesRequest
 
 	toReturn []*Instance
 }
@@ -21,7 +21,7 @@ func (l *ListInstancesQuery) Result() []*Instance {
 
 var _ Querier[[]*Instance] = (*ListInstancesQuery)(nil)
 
-func NewListInstancesCommand(inputRequest *instance.ListInstancesRequest) *ListInstancesQuery {
+func NewListInstancesCommand(inputRequest *instance_v2.ListInstancesRequest) *ListInstancesQuery {
 	return &ListInstancesQuery{
 		Request: inputRequest,
 	}
@@ -41,7 +41,7 @@ func (l *ListInstancesQuery) Execute(ctx context.Context, opts *InvokeOpts) (err
 
 	instances, err := instanceRepo.List(ctx, opts.DB(), conds, sorting, limit, offset)
 	if err != nil {
-		return err
+		return zerrors.ThrowInternal(err, "DOM-AIRPxN", "Errors.Instance.List")
 	}
 
 	l.toReturn = instances
@@ -55,20 +55,20 @@ func (l *ListInstancesQuery) Pagination() (database.QueryOption, database.QueryO
 }
 
 func (l *ListInstancesQuery) conditions(instanceRepo InstanceRepository, domainRepo InstanceDomainRepository) (database.QueryOption, error) {
-	conditions := make([]database.Condition, len(l.Request.GetQueries()))
-	for i, query := range l.Request.GetQueries() {
-		switch assertedType := query.GetQuery().(type) {
-		case *instance.Query_DomainQuery:
-			domainConditions := make([]database.Condition, len(assertedType.DomainQuery.GetDomains()))
-			for j, domain := range assertedType.DomainQuery.GetDomains() {
+	conditions := make([]database.Condition, len(l.Request.GetFilters()))
+	for i, query := range l.Request.GetFilters() {
+		switch assertedType := query.GetFilter().(type) {
+		case *instance_v2.Filter_CustomDomainsFilter:
+			domainConditions := make([]database.Condition, len(assertedType.CustomDomainsFilter.GetDomains()))
+			for j, domain := range assertedType.CustomDomainsFilter.GetDomains() {
 				domainConditions[j] = domainRepo.DomainCondition(database.TextOperationEqual, domain)
 			}
 			conditions[i] = instanceRepo.ExistsDomain(
 				database.Or(domainConditions...),
 			)
-		case *instance.Query_IdQuery:
-			idConditions := make([]database.Condition, len(assertedType.IdQuery.GetIds()))
-			for j, id := range assertedType.IdQuery.GetIds() {
+		case *instance_v2.Filter_InIdsFilter:
+			idConditions := make([]database.Condition, len(assertedType.InIdsFilter.GetIds()))
+			for j, id := range assertedType.InIdsFilter.GetIds() {
 				idConditions[j] = instanceRepo.IDCondition(id)
 			}
 			conditions[i] = database.Or(idConditions...)
@@ -84,13 +84,13 @@ func (l *ListInstancesQuery) Sorting(instanceRepo InstanceRepository) database.Q
 	var sortingCol database.Column
 
 	switch l.Request.GetSortingColumn() {
-	case instance.FieldName_FIELD_NAME_CREATION_DATE:
+	case instance_v2.FieldName_FIELD_NAME_CREATION_DATE:
 		sortingCol = instanceRepo.CreatedAtColumn()
-	case instance.FieldName_FIELD_NAME_ID:
+	case instance_v2.FieldName_FIELD_NAME_ID:
 		sortingCol = instanceRepo.IDColumn()
-	case instance.FieldName_FIELD_NAME_NAME:
+	case instance_v2.FieldName_FIELD_NAME_NAME:
 		sortingCol = instanceRepo.NameColumn()
-	case instance.FieldName_FIELD_NAME_UNSPECIFIED:
+	case instance_v2.FieldName_FIELD_NAME_UNSPECIFIED:
 		fallthrough
 	default:
 		return func(opts *database.QueryOpts) {}
@@ -115,7 +115,7 @@ func (l *ListInstancesQuery) Validate(ctx context.Context, opts *InvokeOpts) (er
 	// the instance in context. In here, instead we should probably loop through all retrieved
 	// instances and check their permissions.
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-cuT6Ws", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-cuT6Ws", "Errors.PermissionDenied")
 	}
 
 	return nil

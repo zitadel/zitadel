@@ -1,6 +1,6 @@
 import { Cookie } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { createResponse, getLoginSettings } from "@/lib/zitadel";
+import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { isSessionValid } from "./session";
 
 type LoginWithSAMLAndSession = {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   samlRequest: string;
   sessionId: string;
   sessions: Session[];
@@ -82,13 +82,7 @@ export async function getSAMLFormCookie(uid: string): Promise<string | null> {
   }
 }
 
-export async function loginWithSAMLAndSession({
-  serviceUrl,
-  samlRequest,
-  sessionId,
-  sessions,
-  sessionCookies,
-}: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
+export async function loginWithSAMLAndSession({ serviceConfig, samlRequest, sessionId, sessions, sessionCookies }: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
   console.log(`Login with session: ${sessionId} and samlRequest: ${samlRequest}`);
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
@@ -96,10 +90,7 @@ export async function loginWithSAMLAndSession({
   if (selectedSession && selectedSession.id) {
     console.log(`Found session ${selectedSession.id}`);
 
-    const isValid = await isSessionValid({
-      serviceUrl,
-      session: selectedSession,
-    });
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
     console.log("Session is valid:", isValid);
 
@@ -129,9 +120,7 @@ export async function loginWithSAMLAndSession({
 
       // works not with _rsc request
       try {
-        const { url } = await createResponse({
-          serviceUrl,
-          req: create(CreateResponseRequestSchema, {
+        const { url } = await createResponse({ serviceConfig, req: create(CreateResponseRequestSchema, {
             samlRequestId: samlRequest,
             responseKind: {
               case: "session",
@@ -149,10 +138,7 @@ export async function loginWithSAMLAndSession({
         console.error(error);
 
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
-          const loginSettings = await getLoginSettings({
-            serviceUrl,
-            organization: selectedSession.factors?.user?.organizationId,
-          });
+          const loginSettings = await getLoginSettings({ serviceConfig, organization: selectedSession.factors?.user?.organizationId });
 
           if (loginSettings?.defaultRedirectUri) {
             return { redirect: loginSettings.defaultRedirectUri };

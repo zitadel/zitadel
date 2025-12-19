@@ -7,7 +7,7 @@ import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { cookies, headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { getServiceUrlFromHeaders } from "../service-url";
+import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { getOrSetFingerprintId } from "../fingerprint";
 import crypto from "crypto";
@@ -30,11 +30,9 @@ export type RegisterUserResponse = {
 export async function registerUser(command: RegisterUserCommand) {
   const t = await getTranslations("register");
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const addResponse = await addHumanUser({
-    serviceUrl,
-    email: command.email,
+  const addResponse = await addHumanUser({ serviceConfig, email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     password: command.password ? command.password : undefined,
@@ -45,9 +43,7 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: command.organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization,
   });
 
   let checkPayload: any = {
@@ -100,9 +96,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: "/passkey/set?" + params };
   } else {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session?.factors?.user?.id,
+    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id,
     });
 
     if (!userResponse.user) {
@@ -162,11 +156,9 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   const t = await getTranslations("register");
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const addUserResponse = await addHumanUser({
-    serviceUrl,
-    email: command.email,
+  const addUserResponse = await addHumanUser({ serviceConfig, email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     organization: command.organization,
@@ -176,14 +168,10 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: command.organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization,
   });
 
-  const idpLink = await addIDPLink({
-    serviceUrl,
-    idp: {
+  const idpLink = await addIDPLink({ serviceConfig, idp: {
       id: command.idpId,
       userId: command.idpUserId,
       userName: command.idpUserName,
@@ -207,7 +195,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   }
 
   // const userResponse = await getUserByID({
-  //   serviceUrl,
+  //   serviceConfig.baseUrl,
   //   userId: session?.factors?.user?.id,
   // });
 
@@ -227,9 +215,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   // check if user has MFA methods
   let authMethods;
   if (session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId: session.factors.user.id,
+    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
@@ -239,7 +225,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   // Always check MFA factors, even if no auth methods are configured
   // This ensures that force MFA settings are respected
   const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
+    serviceConfig,
     session,
     loginSettings,
     authMethods || [], // Pass empty array if no auth methods
