@@ -1,5 +1,5 @@
 ---
-title: OpenID Connect and Oauth2 web keys
+title: OpenID Connect and OAuth2 web keys
 sidebar_label: Web Keys
 ---
 
