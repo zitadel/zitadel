@@ -43,9 +43,9 @@ type OTPSMSChallengeCommand struct {
 
 // NewOTPSMSChallengeCommand creates a command to generate an OTP SMS challenge for a session.
 func NewOTPSMSChallengeCommand(
-	requestChallengeOTPSMS *session_grpc.RequestChallenges_OTPSMS,
 	sessionID string,
 	instanceID string,
+	requestChallengeOTPSMS *session_grpc.RequestChallenges_OTPSMS,
 	secretGeneratorConfig *crypto.GeneratorConfig,
 	otpAlgorithm crypto.EncryptionAlgorithm,
 	smsProvider getActiveSMSProviderFn,

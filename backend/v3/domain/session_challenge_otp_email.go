@@ -37,9 +37,9 @@ type OTPEmailChallengeCommand struct {
 }
 
 func NewOTPEmailChallengeCommand(
-	requestChallengeOTPEmail *session_grpc.RequestChallenges_OTPEmail,
 	sessionID string,
 	instanceID string,
+	requestChallengeOTPEmail *session_grpc.RequestChallenges_OTPEmail,
 	secretGeneratorConfig *crypto.GeneratorConfig,
 	otpAlgorithm crypto.EncryptionAlgorithm,
 	newEmailCodeFn newOTPCodeFunc) *OTPEmailChallengeCommand {

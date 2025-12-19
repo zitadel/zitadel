@@ -444,9 +444,9 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewOTPEmailChallengeCommand(
-				tt.requestChallengeOTP,
 				tt.sessionID,
 				tt.instanceID,
+				tt.requestChallengeOTP,
 				nil,
 				nil,
 				nil,
@@ -561,9 +561,9 @@ func TestOTPEmailChallengeCommand_Events(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			cmd := domain.NewOTPEmailChallengeCommand(
-				tt.requestChallengeOTPEmail,
 				"session-id",
 				"instance-id",
+				tt.requestChallengeOTPEmail,
 				nil,
 				nil,
 				nil,
@@ -1099,9 +1099,9 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			ctx := authz.NewMockContext("instance-id", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewOTPEmailChallengeCommand(
-				tt.requestChallengeOTPEmail,
 				"session-id",
 				"instance-id",
+				tt.requestChallengeOTPEmail,
 				tt.secretGeneratorConfig,
 				tt.otpAlgorithm,
 				tt.newEmailCodeFn,

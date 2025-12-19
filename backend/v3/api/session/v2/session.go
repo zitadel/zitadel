@@ -34,10 +34,17 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 	executors[7] = domain.NewOTPCheckCommand(sessionID, instanceID, nil, nil, nil, nil, request.Msg.GetChecks().GetOtpEmail(), domain.OTPEmailRequestType)
 	executors[8] = domain.NewRecoveryCodeCheckCommand(sessionID, instanceID, request.Msg.GetChecks().GetRecoveryCode())
 
-	// TODO(IAM-Marco): Add challenges
-	// executors[9] = domain.NewPasskeyChallengeCommand()
-	// executors[10] = domain.NewOTPChallengeCommand(domain.OTPSMSRequestType)
-	// executors[11] = domain.NewOTPChallengeCommand(domain.OTPEmailRequestType)
+	executors[9] = domain.NewPasskeyChallengeCommand(sessionID, instanceID, request.Msg.GetChallenges().GetWebAuthN(), nil)
+	executors[10] = domain.NewOTPSMSChallengeCommand(
+		sessionID,
+		instanceID,
+		request.Msg.GetChallenges().GetOtpSms(),
+		nil,
+		nil,
+		func(ctx context.Context, instanceID string) (string, error) { return "", nil }, // TODO(IAM-Marco): Finish implementation
+		nil,
+	)
+	executors[11] = domain.NewOTPEmailChallengeCommand(sessionID, instanceID, request.Msg.GetChallenges().GetOtpEmail(), nil, nil, nil)
 
 	batcher := domain.BatchExecutors(executors...)
 

@@ -428,9 +428,9 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewOTPSMSChallengeCommand(
-				tt.requestChallengeOTP,
 				tt.sessionID,
 				tt.instanceID,
+				tt.requestChallengeOTP,
 				nil,
 				nil,
 				tt.smsProvider,
@@ -521,9 +521,9 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			cmd := domain.NewOTPSMSChallengeCommand(
-				tt.requestChallengeOTPSMS,
 				"session-id",
 				"instance-id",
+				tt.requestChallengeOTPSMS,
 				nil,
 				nil,
 				nil,
@@ -985,9 +985,10 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			t.Parallel()
 			ctx := authz.NewMockContext("instance-id", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewOTPSMSChallengeCommand(tt.requestChallengeOTPSMS,
+			cmd := domain.NewOTPSMSChallengeCommand(
 				"session-id",
 				"instance-id",
+				tt.requestChallengeOTPSMS,
 				tt.secretGeneratorConfig,
 				tt.otpAlgorithm,
 				tt.smsProviderFn,
