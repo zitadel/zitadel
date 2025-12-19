@@ -82,10 +82,6 @@ export async function isSessionValid({
       const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
       mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
-
-      if (!mfaValid) {
-        console.warn("[Session] MFA is required but not valid");
-      }
     } else {
       // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
       // (excluding IDP which should be handled separately)
@@ -96,9 +92,6 @@ export async function isSessionValid({
       // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
 
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
-      if (!mfaValid) {
-        console.warn("[Session] MFA is required but not valid");
-      }
     }
   }
 

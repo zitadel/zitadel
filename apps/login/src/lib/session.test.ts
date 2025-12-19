@@ -104,6 +104,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
+      expect(result).toBe(false);
       expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -123,7 +124,8 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session is expired", expect.any(String));
+      expect(result).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] Session is expired", expect.any(String));
       consoleSpy.mockRestore();
     });
   });
@@ -245,7 +247,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] MFA is required but not valid");
       consoleSpy.mockRestore();
     });
 
@@ -445,7 +447,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] MFA is required but not valid");
       consoleSpy.mockRestore();
     });
 
@@ -599,7 +601,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] MFA is required but not valid");
       consoleSpy.mockRestore();
     });
 
@@ -765,7 +767,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] Email is not verified");
       consoleSpy.mockRestore();
     });
 
@@ -1196,7 +1198,7 @@ describe("isSessionValid", () => {
 
       // Session expiring exactly now should be considered expired
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session is expired", expect.any(String));
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] Session is expired", expect.any(String));
       consoleSpy.mockRestore();
     });
 
