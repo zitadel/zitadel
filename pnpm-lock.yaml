@@ -428,9 +428,6 @@ importers:
       '@zitadel/proto':
         specifier: workspace:*
         version: link:../packages/zitadel-proto
-      devtools:
-        specifier: link:@tanstack/angular-query-experimental/devtools
-        version: link:@tanstack/angular-query-experimental/devtools
       eslint:
         specifier: ^8.57.1
         version: 8.57.1

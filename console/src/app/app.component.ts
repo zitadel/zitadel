@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { ViewportScroller } from '@angular/common';
-import { Component, DestroyRef, effect, HostBinding, HostListener, Inject, ViewChild, DOCUMENT } from '@angular/core';
+import { Component, DestroyRef, HostBinding, HostListener, Inject, ViewChild, DOCUMENT } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -11,7 +11,6 @@ import { Observable, of } from 'rxjs';
 import { filter, map, startWith, switchMap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { Org } from './proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';

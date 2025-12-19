@@ -219,7 +219,7 @@ export class GrpcAuthService {
         }
       }
     } else {
-      let orgs = this.cachedOrgs.getValue();
+      let orgs: Org.AsObject[];
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
 
       if (org) {

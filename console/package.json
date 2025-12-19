@@ -79,7 +79,6 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "devtools": "link:@tanstack/angular-query-experimental/devtools",
     "@zitadel/client": "workspace:*",
     "@zitadel/proto": "workspace:*",
     "eslint": "^8.57.1",

@@ -24,8 +24,8 @@ export class HeaderComponent {
 
   @Output() public changedActiveOrg = new EventEmitter<void>();
   public showAccount: boolean = false;
-  public BreadcrumbType: any = BreadcrumbType;
-  public ActionKeysType: any = ActionKeysType;
+  public BreadcrumbType = BreadcrumbType;
+  public ActionKeysType = ActionKeysType;
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
