@@ -36,6 +36,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
 		checkPassword *session_grpc.CheckPassword
 		sessionID     string
+		instanceID    string
 		expectedError error
 		expectedUser  domain.User
 	}{
@@ -45,9 +46,21 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			testName:      "when session ID is not set should return error",
+			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-cRKWNx", "Errors.Missing.SessionID"),
+		},
+		{
+			testName:      "when instance ID is not set should return error",
+			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
+			sessionID:     "session-1",
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-JnEtcJ", "Errors.Missing.InstanceID"),
+		},
+		{
 			testName:      "when retrieving session fails should return error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -67,6 +80,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when session not found should return not found error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -86,6 +100,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when session userID is empty should return precondition failed error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -108,6 +123,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when retrieving user fails should return error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -143,6 +159,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when user not found should return not found error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -178,6 +195,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when user is not human should return precondition failed error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -216,6 +234,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when user is locked should return precondition failed error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -259,6 +278,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when user password is not set should return precondition failed error",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -302,6 +322,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			testName:      "when all validations pass should return no error and set user",
 			checkPassword: &session_grpc.CheckPassword{Password: "test-password"},
 			sessionID:     "session-1",
+			instanceID:    "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -357,9 +378,9 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext("instance-1", "", "")
+			ctx := authz.NewMockContext(tc.instanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasswordCheckCommand("session-1", "instance-1", nil, nil, tc.checkPassword)
+			cmd := domain.NewPasswordCheckCommand(tc.sessionID, tc.instanceID, nil, nil, tc.checkPassword)
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),

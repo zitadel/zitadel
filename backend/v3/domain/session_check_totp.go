@@ -164,6 +164,13 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return nil
 	}
 
+	if t.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-HhGveR", "Errors.Missing.SessionID")
+	}
+	if t.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-89Zi8Z", "Errors.Missing.InstanceID")
+	}
+
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 

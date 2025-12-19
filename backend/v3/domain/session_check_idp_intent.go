@@ -84,6 +84,13 @@ func (i *IDPIntentCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return nil
 	}
 
+	if i.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-5Y8pb4", "Errors.Missing.SessionID")
+	}
+	if i.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Q4YFIq", "Errors.Missing.InstanceID")
+	}
+
 	sessionRepo := opts.sessionRepo
 	// TODO(IAM-Marco): Uncomment when IDP intents are available
 	// idpIntentRepo := opts.idpIntentRepo

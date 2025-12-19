@@ -55,7 +55,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			sessionID:           "session-id",
 			instanceID:          "",
 			requestChallengeOTP: &session_grpc.RequestChallenges_OTPEmail{},
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.MissingInstanceID"),
+			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.Missing.InstanceID"),
 		},
 		{
 			name:                "failed to get session",
