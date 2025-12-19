@@ -13,20 +13,21 @@ type LoginWithOIDCAndSession = {
   sessions: Session[];
   sessionCookies: Cookie[];
 };
-export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sessionId, sessions, sessionCookies }: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
-  console.log(`Login with session: ${sessionId} and authRequest: ${authRequest}`);
-
+export async function loginWithOIDCAndSession({
+  serviceConfig,
+  authRequest,
+  sessionId,
+  sessions,
+  sessionCookies,
+}: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    console.log(`Found session ${selectedSession.id}`);
-
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
     console.log("Session is valid:", isValid);
 
     if (!isValid && selectedSession.factors?.user) {
-      console.log("Session is not valid, need to re-authenticate user");
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
       // TODO: handle IDP intent direcly if available
       const command: SendLoginnameCommand = {
@@ -38,7 +39,7 @@ export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sess
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        console.log("Redirecting to re-authenticate:", res.redirect);
+        // console.log("Redirecting to re-authenticate:", res.redirect);
         return { redirect: res.redirect };
       }
     }
@@ -52,7 +53,9 @@ export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sess
       };
 
       try {
-        const { callbackUrl } = await createCallback({ serviceConfig, req: create(CreateCallbackRequestSchema, {
+        const { callbackUrl } = await createCallback({
+          serviceConfig,
+          req: create(CreateCallbackRequestSchema, {
             authRequestId: authRequest,
             callbackKind: {
               case: "session",
@@ -61,7 +64,7 @@ export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sess
           }),
         });
         if (callbackUrl) {
-          console.log("Redirecting to callback URL:", callbackUrl);
+          // console.log("Redirecting to callback URL:", callbackUrl);
           return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };
@@ -70,7 +73,10 @@ export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sess
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
-          const loginSettings = await getLoginSettings({ serviceConfig, organization: selectedSession.factors?.user?.organizationId });
+          const loginSettings = await getLoginSettings({
+            serviceConfig,
+            organization: selectedSession.factors?.user?.organizationId,
+          });
 
           if (loginSettings?.defaultRedirectUri) {
             return { redirect: loginSettings.defaultRedirectUri };
@@ -85,7 +91,7 @@ export async function loginWithOIDCAndSession({ serviceConfig, authRequest, sess
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
+          // console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
           return { redirect: signedinUrl + "?" + params.toString() };
         } else {
           return { error: "Unknown error occurred" };

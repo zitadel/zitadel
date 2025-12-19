@@ -104,7 +104,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session has no user");
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
   });
@@ -245,12 +245,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session has no valid MFA factor. Configured methods:",
-        expect.any(Array),
-        "Session factors:",
-        expect.any(Object),
-      );
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
@@ -450,17 +445,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session has no valid MFA factor. Configured methods:",
-        [AuthenticationMethodType.TOTP],
-        "Session factors:",
-        expect.objectContaining({
-          totp: undefined,
-          otpEmail: undefined,
-          otpSms: undefined,
-          webAuthN: undefined,
-        }),
-      );
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
@@ -614,7 +599,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid multifactor", expect.any(Object));
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
@@ -780,10 +765,7 @@ describe("isSessionValid", () => {
       const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled",
-        mockUserId,
-      );
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
@@ -1178,7 +1160,7 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(true);
     });
@@ -1210,7 +1192,7 @@ describe("isSessionValid", () => {
         authMethodTypes: [],
       } as any);
 
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       // Session expiring exactly now should be considered expired
       expect(result).toBe(false);
@@ -1299,7 +1281,7 @@ describe("isSessionValid", () => {
       } as any);
 
       // Malformed timestamps are handled gracefully, returning false for invalid sessions
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
       expect(result).toBe(false);
       consoleSpy.mockRestore();
     });
@@ -1347,7 +1329,7 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(true);
     });
@@ -1386,7 +1368,7 @@ describe("isSessionValid", () => {
       } as any);
 
       // Old verification timestamps are still valid as long as session hasn't expired
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(true);
     });
@@ -1420,7 +1402,7 @@ describe("isSessionValid", () => {
       } as any);
 
       // Future timestamps should still be considered valid
-      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
 
       expect(result).toBe(true);
     });
