@@ -7,7 +7,8 @@ import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_servic
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { systemAPIToken } from "./api";
-import { createServerTransport } from "./zitadel";
+import { hasSystemUserCredentials, hasServiceUserToken } from "./deployment";
+import { createServerTransport, ServiceConfig } from "./zitadel";
 
 type ServiceClass =
   | typeof IdentityProviderService
@@ -18,32 +19,27 @@ type ServiceClass =
   | typeof SettingsService
   | typeof SAMLService;
 
-export async function createServiceForHost<T extends ServiceClass>(
-  service: T,
-  serviceUrl: string,
-) {
+export async function createServiceForHost<T extends ServiceClass>(service: T, serviceConfig: ServiceConfig) {
   let token;
 
-  // if we are running in a multitenancy context, use the system user token
-  if (
-    process.env.AUDIENCE &&
-    process.env.SYSTEM_USER_ID &&
-    process.env.SYSTEM_USER_PRIVATE_KEY
-  ) {
+  // Determine authentication method based on available credentials
+  // Prefer system user JWT if available, fallback to service user token
+  if (hasSystemUserCredentials()) {
     token = await systemAPIToken();
-  } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
+  } else if (hasServiceUserToken()) {
+    // Use service user token authentication (self-hosted)
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
+  } else {
+    throw new Error(
+      "No authentication credentials found. Set either system user credentials (AUDIENCE, SYSTEM_USER_ID, SYSTEM_USER_PRIVATE_KEY) or ZITADEL_SERVICE_USER_TOKEN",
+    );
   }
 
-  if (!serviceUrl) {
-    throw new Error("No instance url found");
+  if (!serviceConfig) {
+    throw new Error("No service config found");
   }
 
-  if (!token) {
-    throw new Error("No token found");
-  }
-
-  const transport = createServerTransport(token, serviceUrl);
+  const transport = createServerTransport(token, serviceConfig);
 
   return createClientFor<T>(service)(transport);
 }

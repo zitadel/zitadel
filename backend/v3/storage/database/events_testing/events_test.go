@@ -17,11 +17,13 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func getEnv(key, fallback string) string {
@@ -42,15 +44,17 @@ var ConnString = fmt.Sprintf(
 )
 
 var (
-	dbPool        *pgxpool.Pool
-	CTX           context.Context
-	IAMCTX        context.Context
-	Instance      *integration.Instance
-	SystemClient  system.SystemServiceClient
-	OrgClient     v2beta_org.OrganizationServiceClient
-	ProjectClient v2beta_project.ProjectServiceClient
-	AdminClient   admin.AdminServiceClient
-	MgmtClient    mgmt.ManagementServiceClient
+	dbPool              *pgxpool.Pool
+	CTX                 context.Context
+	IAMCTX              context.Context
+	Instance            *integration.Instance
+	SystemClient        system.SystemServiceClient
+	OrgClient           v2beta_org.OrganizationServiceClient
+	ProjectClient       v2beta_project.ProjectServiceClient
+	AdminClient         admin.AdminServiceClient
+	MgmtClient          mgmt.ManagementServiceClient
+	UserClient          user_v2.UserServiceClient
+	AuthorizationClient authorization.AuthorizationServiceClient
 )
 
 var pool database.Pool
@@ -69,6 +73,8 @@ func TestMain(m *testing.M) {
 		ProjectClient = Instance.Client.Projectv2Beta
 		AdminClient = Instance.Client.Admin
 		MgmtClient = Instance.Client.Mgmt
+		UserClient = Instance.Client.UserV2
+		AuthorizationClient = Instance.Client.AuthorizationV2
 
 		defer func() {
 			_, err := Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &v2beta.DeleteInstanceRequest{

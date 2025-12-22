@@ -37,12 +37,9 @@ const nextConfig = {
   output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true,
   experimental: {
-    dynamicIO: true,
     // Add React 19 compatibility optimizations
     optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    useCache: true,
   },
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
