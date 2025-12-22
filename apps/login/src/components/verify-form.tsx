@@ -3,7 +3,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -72,8 +72,11 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     return response;
   }
 
+  const processedCode = useRef<string | undefined>(undefined);
+
   const fcn = useCallback(
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
+      setError("");
       setLoading(true);
 
       const response = await sendVerification({
@@ -105,7 +108,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   );
 
   useEffect(() => {
-    if (code) {
+    if (code && code !== processedCode.current) {
+      processedCode.current = code;
       fcn({ code });
     }
   }, [code, fcn]);
