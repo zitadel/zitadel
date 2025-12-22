@@ -37,9 +37,9 @@ type OTPEmailChallengeCommand struct {
 }
 
 func NewOTPEmailChallengeCommand(
-	requestChallengeOTPEmail *session_grpc.RequestChallenges_OTPEmail,
 	sessionID string,
 	instanceID string,
+	requestChallengeOTPEmail *session_grpc.RequestChallenges_OTPEmail,
 	secretGeneratorConfig *crypto.GeneratorConfig,
 	otpAlgorithm crypto.EncryptionAlgorithm,
 	newEmailCodeFn newOTPCodeFunc) *OTPEmailChallengeCommand {
@@ -75,7 +75,7 @@ func (o *OTPEmailChallengeCommand) Validate(ctx context.Context, opts *InvokeOpt
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-BQ5UgK", "Errors.Missing.SessionID")
 	}
 	if o.instanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.MissingInstanceID")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-kDnkDn", "Errors.Missing.InstanceID")
 	}
 
 	// get session

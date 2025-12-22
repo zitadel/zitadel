@@ -220,6 +220,13 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 		return nil
 	}
 
+	if p.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-cRKWNx", "Errors.Missing.SessionID")
+	}
+	if p.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-JnEtcJ", "Errors.Missing.InstanceID")
+	}
+
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 

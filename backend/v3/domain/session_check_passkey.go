@@ -148,6 +148,13 @@ func (p *PasskeyCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (e
 		return nil
 	}
 
+	if p.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID")
+	}
+	if p.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID")
+	}
+
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo.LoadPasskeys()
 

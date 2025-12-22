@@ -35,6 +35,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
 		checkPasskey  *session_grpc.CheckWebAuthN
+		sessionID     string
+		instanceID    string
 		expectedError error
 	}{
 		{
@@ -43,10 +45,27 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			testName: "when sessionID is not set should return error",
+			checkPasskey: &session_grpc.CheckWebAuthN{
+				CredentialAssertionData: &structpb.Struct{},
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID"),
+		},
+		{
+			testName: "when instanceID is not set should return error",
+			checkPasskey: &session_grpc.CheckWebAuthN{
+				CredentialAssertionData: &structpb.Struct{},
+			},
+			sessionID:     "session-1",
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID"),
+		},
+		{
 			testName: "when retrieving session fails should return error",
 			checkPasskey: &session_grpc.CheckWebAuthN{
 				CredentialAssertionData: &structpb.Struct{},
 			},
+			sessionID:  "session-1",
+			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -76,6 +95,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			checkPasskey: &session_grpc.CheckWebAuthN{
 				CredentialAssertionData: &structpb.Struct{},
 			},
+			sessionID:  "session-1",
+			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -108,6 +129,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			checkPasskey: &session_grpc.CheckWebAuthN{
 				CredentialAssertionData: &structpb.Struct{},
 			},
+			sessionID:  "session-1",
+			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 
@@ -150,6 +173,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			checkPasskey: &session_grpc.CheckWebAuthN{
 				CredentialAssertionData: &structpb.Struct{},
 			},
+			sessionID:  "session-1",
+			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -213,6 +238,8 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			checkPasskey: &session_grpc.CheckWebAuthN{
 				CredentialAssertionData: &structpb.Struct{},
 			},
+			sessionID:  "session-1",
+			instanceID: "instance-1",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				idCondition := getSessionIDCondition(repo, "session-1")
@@ -281,9 +308,9 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			ctx := authz.NewMockContext("instance-1", "", "")
+			ctx := authz.NewMockContext(tc.instanceID, "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyCheckCommand("session-1", "instance-1", tc.checkPasskey, nil)
+			cmd := domain.NewPasskeyCheckCommand(tc.sessionID, tc.instanceID, tc.checkPasskey, nil)
 
 			opts := &domain.InvokeOpts{}
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)

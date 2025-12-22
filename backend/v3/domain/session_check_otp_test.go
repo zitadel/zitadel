@@ -34,6 +34,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
 		checkOTP      *session_grpc.CheckOTP
 		sessionID     string
+		instanceID    string
 		requestType   domain.OTPRequestType
 		expectedError error
 		expectedUser  domain.User
@@ -44,9 +45,23 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			testName:      "when no session ID set should return error",
+			checkOTP:      &session_grpc.CheckOTP{Code: "123456"},
+			requestType:   domain.OTPSMSRequestType,
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-J2gf7h", "Errors.Missing.SessionID"),
+		},
+		{
+			testName:      "when no instance ID set should return error",
+			checkOTP:      &session_grpc.CheckOTP{Code: "123456"},
+			sessionID:     "session-1",
+			requestType:   domain.OTPSMSRequestType,
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-RpM3IG", "Errors.Missing.InstanceID"),
+		},
+		{
 			testName:    "when retrieving session fails should return error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -62,6 +77,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when session not found should return not found error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -77,6 +93,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when retrieving user fails should return error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -100,6 +117,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when user not found should return not found error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -123,6 +141,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when user is not human should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -146,6 +165,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when checkOTP code is empty should return invalid argument error",
 			checkOTP:    &session_grpc.CheckOTP{Code: ""},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -169,6 +189,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when SMS OTP challenge is nil should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -195,6 +216,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when SMS OTP user phone is nil should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -223,6 +245,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when SMS OTP not enabled should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -257,6 +280,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when SMS OTP code and generator ID both missing should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -294,6 +318,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when email OTP challenge is nil should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPEmailRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -320,6 +345,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when email OTP not enabled should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPEmailRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -354,6 +380,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when email OTP code is nil should return precondition failed error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPEmailRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -388,6 +415,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when SMS OTP validation passes should return no error and set user",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPSMSRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -433,6 +461,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when email OTP validation passes should return no error and set user",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: domain.OTPEmailRequestType,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -477,6 +506,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			testName:    "when request type unknown should return invalid argument error",
 			checkOTP:    &session_grpc.CheckOTP{Code: "123456"},
 			sessionID:   "session-1",
+			instanceID:  "instance-1",
 			requestType: 99,
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
@@ -529,7 +559,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 				domain.WithUserRepo(tc.userRepo(ctrl))(opts)
 			}
 
-			cmd := domain.NewOTPCheckCommand(tc.sessionID, "instance-1", nil, nil, nil, nil, tc.checkOTP, tc.requestType)
+			cmd := domain.NewOTPCheckCommand(tc.sessionID, tc.instanceID, nil, nil, nil, nil, tc.checkOTP, tc.requestType)
 			err := cmd.Validate(t.Context(), opts)
 
 			assert.Equal(t, tc.expectedError, err)

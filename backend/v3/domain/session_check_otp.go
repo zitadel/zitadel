@@ -293,6 +293,13 @@ func (o *OTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err e
 		return nil
 	}
 
+	if o.sessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-J2gf7h", "Errors.Missing.SessionID")
+	}
+	if o.instanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-RpM3IG", "Errors.Missing.InstanceID")
+	}
+
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 

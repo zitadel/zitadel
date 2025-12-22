@@ -117,8 +117,16 @@ func (u *UserCheckCommand) String() string {
 // Validate implements [Commander].
 func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if u.CheckUser == nil {
-		return
+		return nil
 	}
+
+	if u.SessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID")
+	}
+	if u.InstanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID")
+	}
+
 	var usrQueryOpt database.QueryOption
 	userRepo := opts.userRepo
 
