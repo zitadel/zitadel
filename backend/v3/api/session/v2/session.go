@@ -62,6 +62,7 @@ func CreateSession(ctx context.Context, request *connect.Request[session.CreateS
 	}, nil
 }
 
+// GetSession returns the session for the given session ID and token (optional)
 func GetSession(ctx context.Context, req *connect.Request[session.GetSessionRequest]) (*connect.Response[session.GetSessionResponse], error) {
 	sessionGetQuery := domain.NewGetSessionQuery(
 		req.Msg.GetSessionId(),
@@ -71,8 +72,8 @@ func GetSession(ctx context.Context, req *connect.Request[session.GetSessionRequ
 	)
 	err := domain.Invoke(ctx,
 		sessionGetQuery,
-		//domain.WithSessionRepo(repository.SessionRepository()), // todo: uncomment when these repos are available
-		//domain.WithUserRepo(repository.UserRepository()),
+		// domain.WithSessionRepo(repository.SessionRepository()), // todo: uncomment when these repos are available
+		// domain.WithUserRepo(repository.UserRepository()),
 	)
 	if err != nil {
 		return nil, err

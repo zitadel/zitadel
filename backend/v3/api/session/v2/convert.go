@@ -4,10 +4,10 @@ import (
 	"time"
 
 	"github.com/muhlemmer/gu"
-	
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func sessionToPb(s *domain.Session) *session.Session {
