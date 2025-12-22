@@ -12,6 +12,8 @@ import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
+
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
@@ -63,7 +65,7 @@ export function SetPasswordForm({
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
-    if (userId === "000000000000000000") {
+    if (userId === UNKNOWN_USER_ID) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setLoading(false);
       return;

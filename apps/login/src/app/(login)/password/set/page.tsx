@@ -4,6 +4,7 @@ import { SetPasswordForm } from "@/components/set-password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -91,7 +92,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       }
     } else if (loginSettings?.ignoreUnknownUsernames) {
       // Prevent enumeration by pretending we found a user
-      userId = "000000000000000000";
+      userId = UNKNOWN_USER_ID;
     }
   }
 
@@ -138,10 +139,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
         {passwordComplexity &&
         (loginName ?? user?.preferredLoginName) &&
-        (userId ?? session?.factors?.user?.id ?? (loginSettings?.ignoreUnknownUsernames ? "unknown" : undefined)) ? (
+        (userId ?? session?.factors?.user?.id ?? (loginSettings?.ignoreUnknownUsernames ? UNKNOWN_USER_ID : undefined)) ? (
           <SetPasswordForm
             code={code}
-            userId={userId ?? (session?.factors?.user?.id as string) ?? "unknown"}
+            userId={userId ?? (session?.factors?.user?.id as string) ?? UNKNOWN_USER_ID}
             loginName={loginName ?? (user?.preferredLoginName as string)}
             requestId={requestId}
             organization={organization}

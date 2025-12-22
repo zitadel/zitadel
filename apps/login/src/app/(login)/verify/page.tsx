@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
@@ -133,7 +134,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       }
     } else if (loginSettings?.ignoreUnknownUsernames) {
       // Prevent enumeration by pretending we found a user
-      id = "000000000000000000";
+      id = UNKNOWN_USER_ID;
     }
   }
 

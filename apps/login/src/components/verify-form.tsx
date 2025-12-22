@@ -2,6 +2,7 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -46,7 +47,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
-    if (userId === "000000000000000000") {
+    if (userId === UNKNOWN_USER_ID) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setLoading(false);
       return;
