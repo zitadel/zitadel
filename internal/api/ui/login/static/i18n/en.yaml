@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalUserDescription: Login with an external user.
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
   RegisterButtonText: Register
   NextButtonText: Next
 
@@ -26,7 +26,7 @@ SelectAccount:
   OtherUser: Other User
   SessionState0: active
   SessionState1: Signed out
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
 
 Password:
   Title: Password
@@ -267,6 +267,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -312,6 +313,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -391,6 +393,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Device Authorization
   UserCode:

@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
+	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
 //go:embed picture.png
@@ -1383,6 +1384,153 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 				),
 			)
 
+			require.ErrorIs(collect, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+}
+
+func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
+	t.Parallel()
+	settingsRepo := repository.SecretGeneratorSettingsRepository()
+	newInstance := integration.NewInstance(t.Context())
+
+	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
+
+	t.Run("test secret generator settings set", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+				),
+			)
+			require.NoError(collect, err)
+			// ClientSecret
+			assert.Equal(collect, uint(64), *setting.ClientSecret.Length)
+			assert.Equal(collect, true, *setting.ClientSecret.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.ClientSecret.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.ClientSecret.IncludeDigits)
+			assert.Equal(collect, false, *setting.ClientSecret.IncludeSymbols)
+
+			// InitializeUserCode
+			assert.Equal(collect, uint(6), *setting.InitializeUserCode.Length)
+			assert.Equal(collect, 72*time.Hour, *setting.InitializeUserCode.Expiry)
+			assert.Equal(collect, false, *setting.InitializeUserCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.InitializeUserCode.IncludeSymbols)
+
+			// EmailVerificationCode
+			assert.Equal(collect, uint(6), *setting.EmailVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, *setting.EmailVerificationCode.Expiry)
+			assert.Equal(collect, false, *setting.EmailVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.EmailVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.EmailVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.EmailVerificationCode.IncludeSymbols)
+
+			// PhoneVerificationCode
+			assert.Equal(collect, uint(6), *setting.PhoneVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, *setting.PhoneVerificationCode.Expiry)
+			assert.Equal(collect, false, *setting.PhoneVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.PhoneVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.PhoneVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.PhoneVerificationCode.IncludeSymbols)
+
+			// PasswordVerificationCode
+			assert.Equal(collect, uint(6), *setting.PasswordVerificationCode.Length)
+			assert.Equal(collect, 1*time.Hour, *setting.PasswordVerificationCode.Expiry)
+			assert.Equal(collect, false, *setting.PasswordVerificationCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.PasswordVerificationCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.PasswordVerificationCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.PasswordVerificationCode.IncludeSymbols)
+
+			// PasswordlessInitCode
+			assert.Equal(collect, uint(12), *setting.PasswordlessInitCode.Length)
+			assert.Equal(collect, 1*time.Hour, *setting.PasswordlessInitCode.Expiry)
+			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.PasswordlessInitCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.PasswordlessInitCode.IncludeSymbols)
+
+			// DomainVerification
+			assert.Equal(collect, uint(32), *setting.DomainVerification.Length)
+			assert.Equal(collect, true, *setting.DomainVerification.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.DomainVerification.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.DomainVerification.IncludeDigits)
+			assert.Equal(collect, false, *setting.DomainVerification.IncludeSymbols)
+
+			// OTPSMS
+			assert.Equal(collect, uint(8), *setting.OTPSMS.Length)
+			assert.Equal(collect, 5*time.Minute, *setting.OTPSMS.Expiry)
+			assert.Equal(collect, false, *setting.OTPSMS.IncludeLowerLetters)
+			assert.Equal(collect, false, *setting.OTPSMS.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.OTPSMS.IncludeDigits)
+			assert.Equal(collect, false, *setting.OTPSMS.IncludeSymbols)
+
+			// OTPEmail
+			assert.Equal(collect, uint(8), *setting.OTPEmail.Length)
+			assert.Equal(collect, 5*time.Minute, *setting.OTPEmail.Expiry)
+			assert.Equal(collect, false, *setting.OTPEmail.IncludeLowerLetters)
+			assert.Equal(collect, false, *setting.OTPEmail.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.OTPEmail.IncludeDigits)
+			assert.Equal(collect, false, *setting.OTPEmail.IncludeSymbols)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test secret generator settings update", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Admin.UpdateSecretGenerator(IAMCTX, &admin.UpdateSecretGeneratorRequest{
+			GeneratorType:       settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INIT_CODE,
+			IncludeLowerLetters: true,
+			Expiry:              durationpb.New(24 * time.Hour),
+			Length:              uint32(8),
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+			assert.Equal(collect, uint(8), *setting.InitializeUserCode.Length)
+			assert.Equal(collect, 24*time.Hour, *setting.InitializeUserCode.Expiry)
+			assert.Equal(collect, true, *setting.InitializeUserCode.IncludeLowerLetters)
+			assert.WithinRange(collect, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test delete instance reduces", func(t *testing.T) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+				),
+			)
+			require.NoError(collect, err)
+			require.NotNil(collect, setting)
+		}, retryDuration, tick)
+
+		_, err := newInstance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
+			InstanceId: newInstance.ID(),
+		})
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			_, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+				),
+			)
 			require.ErrorIs(collect, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})

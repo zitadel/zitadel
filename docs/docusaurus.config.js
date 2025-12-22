@@ -470,6 +470,7 @@ module.exports = {
   ],
   markdown: {
     mermaid: true,
+    emoji: false
   },
   themes: [
     "docusaurus-theme-github-codeblock",
