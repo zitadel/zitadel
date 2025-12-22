@@ -1,0 +1,454 @@
+{
+  "common": {
+    "back": "Terug",
+    "title": "Inloggen met Zitadel"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "description": "Selecteer het account dat je wilt gebruiken.",
+    "addAnother": "Nog een account toevoegen",
+    "noResults": "Geen accounts gevonden",
+    "verified": "geverifieerd",
+    "expired": "verlopen"
+  },
+  "logout": {
+    "title": "Uitloggen",
+    "description": "Klik op een account om de sessie te beëindigen",
+    "noResults": "Geen accounts gevonden",
+    "clear": "Sessie beëindigen",
+    "verifiedAt": "Laatst actief: {time}",
+    "success": {
+      "title": "Succesvol uitgelogd",
+      "description": "Je bent succesvol uitgelogd."
+    }
+  },
+  "loginname": {
+    "title": "Welkom terug!",
+    "description": "Voer jouw inloggegevens in.",
+    "register": "Nieuwe gebruiker registreren",
+    "submit": "Verder",
+    "labels": {
+      "loginname": "Loginnaam",
+      "username": "Gebruikersnaam",
+      "usernameOrPhoneNumber": "Telefoonnummer of gebruikersnaam",
+      "usernameOrEmail": "E-mail of gebruikersnaam"
+    },
+    "required": {
+      "loginName": "Dit veld is verplicht"
+    },
+    "errors": {
+      "internalError": "Er is een interne fout opgetreden",
+      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+      "couldNotSearchUsers": "Kon gebruikers niet zoeken",
+      "couldNotGetDomain": "Kon domein niet ophalen",
+      "couldNotGetHost": "Kon host niet ophalen",
+      "couldNotStartIDPFlow": "Kon IDP-stroom niet starten",
+      "moreThanOneUserFound": "Meer dan één gebruiker gevonden. Geef een unieke identificatie op.",
+      "userNotFound": "Gebruiker niet in het systeem gevonden",
+      "couldNotCreateSession": "Kon sessie voor gebruiker niet aanmaken",
+      "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
+      "usernamePasswordNotAllowed": "Gebruikersnaam en wachtwoord niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+      "passkeysNotAllowed": "Passkeys niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+      "couldNotFindIdentityProvider": "Kon identiteitsprovider niet vinden.",
+      "userNotActive": "Gebruiker is niet actief. Neem contact op met jouw beheerder voor meer informatie."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Er is een fout opgetreden",
+      "multipleUsersFound": "Meerdere gebruikers gevonden",
+      "userNotFound": "Gebruiker niet in het systeem gevonden"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Wachtwoord",
+      "description": "Voer jouw wachtwoord in.",
+      "resetPassword": "Wachtwoord resetten",
+      "submit": "Verder",
+      "labels": {
+        "password": "Wachtwoord"
+      },
+      "required": {
+        "password": "Dit veld is verplicht"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+        "couldNotResetPassword": "Kon wachtwoord niet resetten"
+      },
+      "info": {
+        "passwordResetSent": "Het wachtwoord is opnieuw ingesteld. Controleer jouw e-mail"
+      }
+    },
+    "set": {
+      "title": "Stel Wachtwoord in",
+      "description": "Stel het wachtwoord voor jouw account in",
+      "codeSent": "Er is een code naar jouw e-mailadres verzonden.",
+      "noCodeReceived": "Geen code ontvangen?",
+      "resend": "Code opnieuw versturen",
+      "submit": "Verder",
+      "labels": {
+        "code": "Code",
+        "newPassword": "Nieuw Wachtwoord",
+        "confirmPassword": "Bevestig Wachtwoord"
+      },
+      "required": {
+        "code": "Dit veld is verplicht",
+        "newPassword": "U moet een wachtwoord opgeven!",
+        "confirmPassword": "Dit veld is verplicht"
+      },
+      "errors": {
+        "couldNotSetPassword": "Kon wachtwoord niet instellen",
+        "couldNotResetPassword": "Kon wachtwoord niet resetten",
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren"
+      }
+    },
+    "change": {
+      "title": "Verander Wachtwoord",
+      "description": "Stel het wachtwoord voor jouw account in",
+      "submit": "Verder",
+      "labels": {
+        "newPassword": "Nieuw wachtwoord",
+        "confirmPassword": "Bevestig wachtwoord"
+      },
+      "required": {
+        "newPassword": "Je moet een nieuw wachtwoord opgeven!",
+        "confirmPassword": "Dit veld is verplicht"
+      },
+      "errors": {
+        "couldNotChangePassword": "Kon wachtwoord niet wijzigen",
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+        "unknownError": "Onbekende fout"
+      }
+    },
+    "complexity": {
+      "length": "Moet minstens {minLength} tekens lang zijn.",
+      "hasSymbol": "Moet een symbool bevatten.",
+      "hasNumber": "Moet een nummer bevatten.",
+      "hasUppercase": "Moet een hoofdletter bevatten.",
+      "hasLowercase": "Moet een kleine letter bevatten.",
+      "equals": "Wachtwoordbevestiging komt overeen.",
+      "matches": "Komt overeen",
+      "doesNotMatch": "Komt niet overeen"
+    },
+    "errors": {
+      "noHostFound": "Geen host gevonden",
+      "couldNotSendResetLink": "Kon link voor wachtwoordherstel niet verzenden",
+      "couldNotCreateSessionForUser": "Kon sessie voor gebruiker niet aanmaken",
+      "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+      "failedToAuthenticate": "Authenticatie mislukt. U had {failedAttempts} van {maxPasswordAttempts} wachtwoordpogingen.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Authenticatie mislukt.",
+      "accountLockedContactAdmin": " Neem contact op met jouw beheerder om jouw account te ontgrendelen",
+      "userNotFound": "Gebruiker niet in het systeem gevonden",
+      "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
+      "userInitialStateNotSupported": "Initiële gebruikersstatus wordt niet ondersteund",
+      "codeOrVerificationRequired": "U moet een code opgeven of een geldige gebruikersverificatie hebben",
+      "verificationRequired": "Gebruikersverificatie moet worden uitgevoerd",
+      "couldNotLoadSession": "Kon sessie niet laden",
+      "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
+      "failedPrecondition": "Voorwaarde mislukt",
+      "sessionNotValid": "Sessie is niet geldig"
+    }
+  },
+  "idp": {
+    "title": "Aanmelden met SSO",
+    "description": "Selecteer een van de volgende providers om u aan te melden",
+    "orSignInWith": "of meld u aan met",
+    "signInWithApple": "Aanmelden met Apple",
+    "signInWithGoogle": "Aanmelden met Google",
+    "signInWithAzureAD": "Aanmelden met AzureAD",
+    "signInWithGithub": "Aanmelden met GitHub",
+    "signInWithGitlab": "Aanmelden met GitLab",
+    "loginError": {
+      "title": "Inloggen mislukt",
+      "description": "Er is een fout opgetreden tijdens het inloggen."
+    },
+    "linkingError": {
+      "title": "Koppelen van account mislukt",
+      "description": "Er is een fout opgetreden tijdens het koppelen van jouw account."
+    },
+    "completeRegister": {
+      "title": "Vul jouw gegevens aan",
+      "description": "U moet jouw registratie voltooien door jouw e-mailadres en naam op te geven."
+    },
+    "accountNotFound": {
+      "title": "Account niet gevonden",
+      "description": "We hebben geen account gevonden dat aan jouw identiteitsprovidergegevens is gekoppeld.",
+      "info": "Er is geen bestaand account gevonden. Meld u aan met een bestaand account of neem contact op met jouw beheerder voor hulp.",
+      "backToLogin": "Terug naar inloggen"
+    },
+    "registrationFailed": {
+      "title": "Registratie niet beschikbaar",
+      "description": "We konden het registratieproces niet voltooien.",
+      "info": "Kan de organisatie voor registratie niet bepalen. Neem contact op met jouw beheerder voor hulp.",
+      "backToLogin": "Terug naar inloggen"
+    },
+    "processing": {
+      "message": "Authenticatie wordt verwerkt...",
+      "noRedirect": "Geen omleiding of fout van server ontvangen",
+      "unexpectedError": "Er is een onverwachte fout opgetreden"
+    },
+    "errors": {
+      "missingParameters": "Vereiste parameters ontbreken",
+      "missingIdpInfo": "IDP-informatie ontbreekt",
+      "idpNotFound": "Identiteitsprovider niet gevonden",
+      "linkingNotAllowed": "Koppelen is niet toegestaan voor deze identiteitsprovider",
+      "linkingFailed": "Koppelen van identiteitsprovider aan account mislukt",
+      "autoLinkingFailed": "Automatisch koppelen van account mislukt",
+      "userCreationFailed": "Aanmaken van gebruikersaccount mislukt",
+      "orgResolutionFailed": "Kon organisatie voor registratie niet bepalen",
+      "sessionCreationFailed": "Kon sessie niet aanmaken of omleiding bepalen",
+      "unknownError": "Er is een onbekende fout opgetreden"
+    }
+  },
+  "ldap": {
+    "title": "LDAP-inlog",
+    "description": "Voer jouw LDAP-inloggegevens in.",
+    "submit": "Verder",
+    "labels": {
+      "username": "Gebruikersnaam",
+      "password": "Wachtwoord"
+    },
+    "required": {
+      "username": "Dit veld is verplicht",
+      "password": "Dit veld is verplicht"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verifieer jouw identiteit",
+      "description": "Kies een van de volgende factoren.",
+      "noResults": "Er zijn geen tweede factoren beschikbaar om in te stellen."
+    },
+    "set": {
+      "title": "Stel 2-factor in",
+      "description": "Kies een van de volgende tweede factoren.",
+      "skip": "Overslaan"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verifieer 2-Factor",
+      "totpDescription": "Voer de code uit jouw authenticator-app in.",
+      "smsDescription": "Voer de code in die u via sms heeft ontvangen.",
+      "emailDescription": "Voer de code in die u via e-mail heeft ontvangen.",
+      "noCodeReceived": "Geen code ontvangen?",
+      "resendCode": "Code opnieuw versturen",
+      "submit": "Verder",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dit veld is verplicht"
+      }
+    },
+    "set": {
+      "title": "Stel 2-factor in",
+      "totpDescription": "Scan de QR-code met jouw authenticator-app.",
+      "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
+      "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
+      "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+      "submit": "Verder",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dit veld is verplicht"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Authenticeer met een passkey",
+      "description": "Jouw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+      "usePassword": "Gebruik wachtwoord",
+      "submit": "Doorgaan",
+      "errors": {
+        "couldNotRequestChallenge": "Kon passkey-uitdaging niet aanvragen",
+        "couldNotVerifyPasskey": "Kon passkey niet verifiëren",
+        "noResponseReceived": "Passkey-verificatie mislukt - geen reactie ontvangen",
+        "noRedirectProvided": "Passkey-verificatie voltooid maar er werd geen omleiding geleverd",
+        "couldNotRetrievePasskey": "Er trad een fout op bij het ophalen van de passkey",
+        "verificationCancelled": "Passkey-verificatie is geannuleerd",
+        "verificationFailed": "Er trad een fout op tijdens de passkey-verificatie",
+        "couldNotFindSession": "Kon sessie niet vinden",
+        "couldNotUpdateSession": "Kon sessie niet bijwerken",
+        "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
+      }
+    },
+    "set": {
+      "title": "Stel een passkey in",
+      "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+      "info": {
+        "description": "Een passkey is een authenticatiemethode op een apparaat zoals jouw vingerafdruk, Apple FaceID of iets dergelijks. ",
+        "link": "Wachtwoordloze authenticatie"
+      },
+      "skip": "Overslaan",
+      "submit": "Doorgaan"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verifieer 2-Factor",
+      "description": "Verifieer jouw account met jouw apparaat."
+    },
+    "set": {
+      "title": "Stel 2-factor in",
+      "description": "Stel een apparaat in als tweede factor.",
+      "submit": "Doorgaan"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Wachtwoord"
+    },
+    "disabled": {
+      "title": "Registratie uitgeschakeld",
+      "description": "Registratie is uitgeschakeld. Neem contact op met jouw beheerder."
+    },
+    "missingdata": {
+      "title": "Ontbrekende gegevens",
+      "description": "Geef e-mail, voornaam en achternaam op om te registreren."
+    },
+    "title": "Registreren",
+    "description": "Maak jouw ZITADEL-account aan.",
+    "noMethodAvailableWarning": "Geen authenticatiemethode beschikbaar. Neem contact op met jouw beheerder.",
+    "selectMethod": "Selecteer de methode waarmee u wilt verifiëren",
+    "agreeTo": "Om te registreren moet u akkoord gaan met de voorwaarden",
+    "termsOfService": "Servicevoorwaarden",
+    "privacyPolicy": "Privacybeleid",
+    "submit": "Doorgaan",
+    "password": {
+      "title": "Stel Wachtwoord in",
+      "description": "Stel het wachtwoord voor jouw account in",
+      "submit": "Doorgaan",
+      "labels": {
+        "password": "Wachtwoord",
+        "confirmPassword": "Bevestig Wachtwoord"
+      },
+      "required": {
+        "password": "U moet een wachtwoord opgeven!",
+        "confirmPassword": "Dit veld is verplicht"
+      }
+    },
+    "labels": {
+      "firstname": "Voornaam",
+      "lastname": "Achternaam",
+      "email": "E-Mail"
+    },
+    "required": {
+      "firstname": "Dit veld is verplicht",
+      "lastname": "Dit veld is verplicht",
+      "email": "Dit veld is verplicht"
+    },
+    "errors": {
+      "couldNotCreateUser": "Kon gebruiker niet aanmaken",
+      "couldNotCreateSession": "Kon sessie niet aanmaken",
+      "userNotFound": "Gebruiker niet in het systeem gevonden",
+      "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
+      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+    }
+  },
+  "invite": {
+    "title": "Gebruiker uitnodigen",
+    "description": "Geef het e-mailadres en de naam op van de gebruiker die u wilt uitnodigen.",
+    "info": "De gebruiker ontvangt een e-mail met verdere instructies.",
+    "notAllowed": "Uw instellingen staan het uitnodigen van gebruikers niet toe.",
+    "submit": "Doorgaan",
+    "success": {
+      "title": "Gebruiker uitgenodigd",
+      "description": "De e-mail is succesvol verzonden.",
+      "verified": "De gebruiker is uitgenodigd en heeft zijn e-mail al geverifieerd.",
+      "notVerifiedYet": "De gebruiker is uitgenodigd. Zij ontvangen een e-mail met verdere instructies.",
+      "submit": "Nog een gebruiker uitnodigen"
+    }
+  },
+  "signedin": {
+    "title": "Welkom {user}!",
+    "description": "U bent aangemeld.",
+    "continue": "Verder",
+    "error": {
+      "title": "Fout",
+      "description": "Er is een fout opgetreden tijdens het aanmelden."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Geen gebruikers-ID opgegeven!",
+    "successTitle": "Gebruiker geverifieerd",
+    "successDescription": "De gebruiker is succesvol geverifieerd.",
+    "setupAuthenticator": "Authenticator instellen",
+    "verify": {
+      "title": "Gebruiker verifiëren",
+      "description": "Voer de code in uit de verificatie-e-mail.",
+      "noCodeReceived": "Geen code ontvangen?",
+      "resendCode": "Code opnieuw versturen",
+      "codeSent": "Er is zojuist een code naar jouw e-mailadres gestuurd.",
+      "submit": "Doorgaan",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dit veld is verplicht"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Kon e-mail niet opnieuw versturen",
+      "couldNotVerifyUser": "Kon gebruiker niet verifiëren",
+      "couldNotVerifyInvite": "Kon uitnodiging niet verifiëren",
+      "couldNotVerifyEmail": "Kon e-mail niet verifiëren",
+      "couldNotVerify": "Kon niet verifiëren",
+      "couldNotLoadUser": "Kon gebruiker niet laden",
+      "couldNotLoadAuthenticators": "Kon mogelijke authenticators niet laden",
+      "couldNotCreateSession": "Kon sessie niet aanmaken",
+      "noHostFound": "Geen host gevonden",
+      "userAlreadyVerified": "Gebruiker is al geverifieerd!",
+      "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
+      "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
+      "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+    }
+  },
+  "authenticator": {
+    "title": "Kies authenticatiemethode",
+    "description": "Selecteer de methode waarmee u wilt verifiëren",
+    "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
+    "allSetup": "U heeft al een authenticator ingesteld!",
+    "linkWithIDP": "of link met een identiteitsprovider"
+  },
+  "device": {
+    "usercode": {
+      "title": "Apparaatcode",
+      "description": "Voer de code in die op jouw app of apparaat wordt weergegeven.",
+      "submit": "Doorgaan",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "Dit veld is verplicht"
+      }
+    },
+    "request": {
+      "title": "{appName} wil verbinding maken",
+      "description": "{appName} krijgt toegang tot:",
+      "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+      "submit": "Toestaan",
+      "deny": "Weigeren"
+    },
+    "scope": {
+      "openid": "Verifieer jouw identiteit.",
+      "email": "Bekijk jouw e-mailadres.",
+      "profile": "Bekijk jouw volledige profielinformatie.",
+      "offline_access": "Sta offline toegang tot jouw account toe."
+    }
+  },
+  "error": {
+    "noUserCode": "Geen gebruikerscode opgegeven!",
+    "noDeviceRequest": "Geen apparaatverzoek gevonden.",
+    "unknownContext": "Kon de context van de gebruiker niet ophalen. Zorg ervoor dat u eerst de gebruikersnaam invoert of een loginName als zoekparameter opgeeft.",
+    "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
+    "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
+    "tryagain": "Opnieuw proberen",
+    "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
+  }
+}
