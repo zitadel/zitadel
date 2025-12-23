@@ -56,14 +56,6 @@ They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Z
 
 <CustomLoginPolicy/>
 
-## Test the setup
-
-<TestSetup loginscreen="your SAML login"/>
-
-![SAML Button](/img/guides/zitadel_login_saml.png)
-
-![SAML Login](/img/guides/mocksaml_login.png)
-
 ## Configure an action to autofill user data
 
 ### Required when using Login V2: Use Actions V2 to map the required fields for user creation
@@ -272,3 +264,11 @@ function mapSAMLIDPAttrs(ctx, api) {
     }
 }
 ```
+
+## Test the setup
+
+<TestSetup loginscreen="your SAML login"/>
+
+![SAML Button](/img/guides/zitadel_login_saml.png)
+
+![SAML Login](/img/guides/mocksaml_login.png)
