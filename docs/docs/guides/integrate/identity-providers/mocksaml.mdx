@@ -58,16 +58,16 @@ They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Z
 
 ## Configure an action to autofill user data
 
-### Required when using Login V2: Use Actions V2 to map the required fields for user creation
-Creation of users in ZITADEL will fail if the required fields to create a user are not set.
+### Required for Login V2
+The creation of users in ZITADEL will fail if the required fields to create a user are not set.
 
-This can be achieved by using Actions V2 to map the SAML attributes returned by the IDP to the required fields in ZITADEL.
+This can be achieved by using **Actions V2** to map the SAML attributes returned by the IDP to the required fields in ZITADEL.
 See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation.md)
 guide for more information on setting up a Target and an Execution. In short,
 * Create an Actions V2 Target of type `REST Call`
 * Create an Execution of type `Response` on the method `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`
 
-The following minimal example modifies the response `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` to set the required fields
+The following minimal example modifies the response of `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` to set the required fields
 for user creation. This example is specific to MockSAML, please adjust the attributes according to your IDP configuration.
 
 ``` go
@@ -233,7 +233,8 @@ func main() {
 
 
 
-### Optional when using Login V1: Use Actions V1 to optionally prefill user data
+### Optional for Login V1
+Use Actions V1 to optionally prefill user data.
 
 <PrefillAction fields="firstname, lastname, email, display name and username" provider="mockSaml"/>
 
