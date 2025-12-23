@@ -33,6 +33,10 @@ vi.mock("./idp", () => ({
   createNewSessionFromIdpIntent: vi.fn(),
 }));
 
+vi.mock("@/lib/cookies", () => ({
+  getSessionCookieById: vi.fn(),
+}));
+
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
 }));
@@ -53,6 +57,7 @@ describe("processIDPCallback", () => {
   let mockGetUserByID: any;
   let mockGetDefaultOrg: any;
   let mockCreateNewSessionFromIdpIntent: any;
+  let mockGetSessionCookieById: any;
 
   const defaultParams = {
     provider: "google",
@@ -126,6 +131,7 @@ describe("processIDPCallback", () => {
       getDefaultOrg,
     } = await import("../zitadel");
     const { createNewSessionFromIdpIntent } = await import("./idp");
+    const { getSessionCookieById } = await import("@/lib/cookies");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -142,6 +148,7 @@ describe("processIDPCallback", () => {
     mockGetUserByID = vi.mocked(getUserByID);
     mockGetDefaultOrg = vi.mocked(getDefaultOrg);
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -336,7 +343,7 @@ describe("processIDPCallback", () => {
   describe("CASE 2: Link IDP to existing user", () => {
     const linkParams = {
       ...defaultParams,
-      link: "true",
+      sessionId: "session123",
     };
 
     test("should link IDP and create session when linking is allowed", async () => {
@@ -351,6 +358,8 @@ describe("processIDPCallback", () => {
       });
 
       const result = await processIDPCallback(linkParams);
+
+      expect(mockGetSessionCookieById).toHaveBeenCalledWith({ sessionId: "session123" });
 
       expect(mockAddIDPLink).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },

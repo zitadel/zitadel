@@ -14,6 +14,7 @@ type Props = {
   requestId?: string;
   organization?: string;
   link?: string;
+  sessionId?: string;
   postErrorRedirectUrl?: string;
 };
 
@@ -21,7 +22,16 @@ type Props = {
  * Client component that handles IDP callback processing.
  * Must be client-side to allow cookie modifications via server actions.
  */
-export function IdpProcessHandler({ provider, id, token, requestId, organization, link, postErrorRedirectUrl }: Props) {
+export function IdpProcessHandler({
+  provider,
+  id,
+  token,
+  requestId,
+  organization,
+  link,
+  sessionId,
+  postErrorRedirectUrl,
+}: Props) {
   const t = useTranslations("idp");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +54,7 @@ export function IdpProcessHandler({ provider, id, token, requestId, organization
       token,
       requestId,
       organization,
-      link,
+      sessionId,
       postErrorRedirectUrl,
     })
       .then((result) => {
@@ -69,7 +79,7 @@ export function IdpProcessHandler({ provider, id, token, requestId, organization
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, postErrorRedirectUrl, router]);
+  }, [provider, id, token, requestId, organization, link, sessionId, postErrorRedirectUrl, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

@@ -24,6 +24,8 @@ import {
   AddHumanUserRequestSchema,
   UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getSession } from "@/lib/zitadel";
+import { getSessionCookieById } from "@/lib/cookies";
 import { createNewSessionFromIdpIntent } from "./idp";
 import { getTranslations } from "next-intl/server";
 
@@ -44,13 +46,11 @@ async function resolveOrganizationForUser({
     const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
     const suffix = matched?.[1] ?? "";
 
-    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix,
-    });
+    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
     if (orgToCheckForDiscovery) {
-      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery,
-      });
+      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
       if (orgLoginSettings?.allowDomainDiscovery) {
         return orgToCheckForDiscovery;
       }
@@ -69,7 +69,9 @@ async function resolveOrganizationForUser({
  * 2. The specific IDP is activated for the organization
  *
  */
-export async function validateIDPLinkingPermissions({ serviceConfig, userOrganizationId,
+export async function validateIDPLinkingPermissions({
+  serviceConfig,
+  userOrganizationId,
   idpId,
 }: {
   serviceConfig: ServiceConfig;
@@ -77,17 +79,14 @@ export async function validateIDPLinkingPermissions({ serviceConfig, userOrganiz
   idpId: string;
 }): Promise<boolean> {
   // Check organization login settings
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: userOrganizationId,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: userOrganizationId });
 
   if (!loginSettings?.allowExternalIdp) {
     return false;
   }
 
   // Check if the IDP is activated for the organization and allows linking
-  const activeIDPs = await getActiveIdentityProviders({ serviceConfig, orgId: userOrganizationId,
-    linking_allowed: true,
-  });
+  const activeIDPs = await getActiveIdentityProviders({ serviceConfig, orgId: userOrganizationId, linking_allowed: true });
 
   const isIDPActive = activeIDPs.identityProviders?.some((idp) => idp.id === idpId);
 
@@ -111,16 +110,16 @@ export async function processIDPCallback({
   token,
   requestId,
   organization,
-  link,
   postErrorRedirectUrl,
+  sessionId,
 }: {
   provider: string;
   id: string;
   token: string;
   requestId?: string;
   organization?: string;
-  link?: string;
   postErrorRedirectUrl?: string;
+  sessionId?: string;
 }): Promise<{ redirect?: string; error?: string }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -146,13 +145,43 @@ export async function processIDPCallback({
     });
 
     // Consume the single-use token ONCE
-    const intent = await retrieveIDPIntent({ serviceConfig, id,
-      token,
-    });
+    const intent = await retrieveIDPIntent({ serviceConfig, id, token });
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, userId, addHumanUser, updateHumanUser } = intent;
+    const { idpInformation, addHumanUser, updateHumanUser } = intent;
+    let { userId } = intent;
+
+    // Check if implicit linking (via sessionId) is requested
+    // If so, we retrieve the session and validate it to get the userId
+    if (sessionId && !userId) {
+      try {
+        const sessionCookie = await getSessionCookieById({ sessionId: sessionId });
+        if (!sessionCookie) {
+          console.warn("[IDP Process] Session for linking not found or invalid");
+          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+        }
+
+        // Fetch the session details to get the userId
+        const sessionResp = await getSession({
+          serviceConfig,
+          sessionId: sessionCookie.id,
+          sessionToken: sessionCookie.token,
+        });
+        const session = sessionResp.session;
+
+        if (!session?.factors?.user?.id) {
+          console.warn("[IDP Process] Session found but no userId associated for linking.");
+          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+        }
+
+        userId = session.factors.user.id;
+        console.log("[IDP Process] Resolved userId from session link:", userId);
+      } catch (error) {
+        console.warn("[IDP Process] Error retrieving session for linking:", error);
+        return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+      }
+    }
 
     if (!idpInformation) {
       console.error("[IDP Process] IDP information missing");
@@ -160,8 +189,7 @@ export async function processIDPCallback({
     }
 
     // Get IDP configuration
-    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId,
-    });
+    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId });
 
     if (!idp) {
       return { error: t("errors.idpNotFound") };
@@ -177,6 +205,7 @@ export async function processIDPCallback({
       if (requestId) params.set("requestId", requestId);
       if (organization) params.set("organization", organization);
       if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
+      if (sessionId) params.set("linkToSessionId", sessionId); // Include sessionId in redirects
 
       if (additionalParams) {
         Object.entries(additionalParams).forEach(([key, value]) => {
@@ -190,11 +219,13 @@ export async function processIDPCallback({
     // ============================================
     // CASE 1: User exists and should sign in
     // ============================================
-    if (userId && !link) {
+    if (userId && !sessionId) {
       // Auto-update user if enabled
       if (options?.isAutoUpdate && updateHumanUser) {
         try {
-          await updateHuman({ serviceConfig, request: create(UpdateHumanUserRequestSchema, {
+          await updateHuman({
+            serviceConfig,
+            request: create(UpdateHumanUserRequestSchema, {
               userId: userId,
               profile: updateHumanUser.profile,
               email: updateHumanUser.email,
@@ -235,7 +266,7 @@ export async function processIDPCallback({
     // ============================================
     // CASE 2: Link IDP to existing user
     // ============================================
-    if (link && userId) {
+    if (sessionId && userId) {
       if (!options?.isLinkingAllowed) {
         console.error("[IDP Process] Linking not allowed by IDP configuration");
         const params = buildRedirectParams();
@@ -253,7 +284,9 @@ export async function processIDPCallback({
         }
 
         // Validate IDP linking permissions
-        const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: targetUser.details.resourceOwner,
+        const isAllowed = await validateIDPLinkingPermissions({
+          serviceConfig,
+          userOrganizationId: targetUser.details.resourceOwner,
           idpId: idpInformation.idpId,
         });
 
@@ -263,7 +296,9 @@ export async function processIDPCallback({
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
         }
 
-        await addIDPLink({ serviceConfig, idp: {
+        await addIDPLink({
+          serviceConfig,
+          idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
             userName: idpInformation.userName,
@@ -296,7 +331,11 @@ export async function processIDPCallback({
         return { error: t("errors.sessionCreationFailed") };
       } catch (error) {
         console.error("[IDP Process] Error linking IDP:", error);
-        const params = buildRedirectParams();
+        const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
+        let params = buildRedirectParams({ error: errorMessage });
+        if ((error as any)?.code === 6) {
+          params = buildRedirectParams({ error: "external_idp_taken" });
+        }
         return { redirect: `/idp/${provider}/linking-failed?${params}` };
       }
     }
@@ -313,13 +352,15 @@ export async function processIDPCallback({
           return response.result ? response.result[0] : null;
         });
       } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
-        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
-          organizationId: organization,
-        }).then((response) => {
-          return response.result ? response.result[0] : null;
-        });
+        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName, organizationId: organization }).then(
+          (response) => {
+            return response.result ? response.result[0] : null;
+          },
+        );
       } else {
-        foundUser = await listUsers({ serviceConfig, userName: idpInformation.userName,
+        foundUser = await listUsers({
+          serviceConfig,
+          userName: idpInformation.userName,
           email,
           organizationId: organization,
         }).then((response) => {
@@ -336,7 +377,9 @@ export async function processIDPCallback({
           }
 
           // Validate IDP linking permissions
-          const isAllowed = await validateIDPLinkingPermissions({ serviceConfig, userOrganizationId: foundUser.details.resourceOwner,
+          const isAllowed = await validateIDPLinkingPermissions({
+            serviceConfig,
+            userOrganizationId: foundUser.details.resourceOwner,
             idpId: idpInformation.idpId,
           });
 
@@ -346,7 +389,9 @@ export async function processIDPCallback({
             return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
           }
 
-          await addIDPLink({ serviceConfig, idp: {
+          await addIDPLink({
+            serviceConfig,
+            idp: {
               id: idpInformation.idpId,
               userId: idpInformation.userId,
               userName: idpInformation.userName,
@@ -379,7 +424,8 @@ export async function processIDPCallback({
           return { error: t("errors.sessionCreationFailed") };
         } catch (error) {
           console.error("[IDP Process] Error auto-linking user:", error);
-          const params = buildRedirectParams();
+          const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
+          const params = buildRedirectParams({ error: errorMessage });
           return { redirect: `/idp/${provider}/linking-failed?${params}` };
         }
       }
@@ -411,8 +457,7 @@ export async function processIDPCallback({
       });
 
       try {
-        const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization,
-        });
+        const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization });
         console.log("[IDP Process] User auto-created successfully, creating session");
 
         // Create session for newly created user

@@ -13,7 +13,7 @@ export default async function ProcessPage(props: {
   const searchParams = await props.searchParams;
 
   const { provider } = params;
-  const { id, token, requestId, organization, link, postErrorRedirectUrl } = searchParams;
+  const { id, token, requestId, organization, link, postErrorRedirectUrl, linkToSessionId } = searchParams;
 
   // Validate required parameters before passing to client component
   if (!id || !token) {
@@ -28,6 +28,7 @@ export default async function ProcessPage(props: {
       requestId={requestId}
       organization={organization}
       link={link}
+      sessionId={linkToSessionId}
       postErrorRedirectUrl={postErrorRedirectUrl}
     />
   );
