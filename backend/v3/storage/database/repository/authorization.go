@@ -37,18 +37,28 @@ func (a authorization) qualifiedAuthorizationRolesTableName() string {
 // -------------------------------------------------------------
 
 const insertAuthorizationStmt = `INSERT INTO zitadel.authorizations (
-	instance_id, id, user_id, grant_id, project_id, state
+	instance_id, id, user_id, grant_id, project_id, state, created_at, updated_at
 )
-VALUES ($1, $2, $3, $4, $5, $6)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING created_at, updated_at`
 
 const insertAuthorizationWithRolesStmt = `WITH roles AS (
   INSERT INTO zitadel.authorization_roles
       (instance_id, authorization_id, grant_id, project_id, role_key)
-      VALUES ($1, $2, $4, $5, unnest($7::text[])))` + insertAuthorizationStmt
+      VALUES ($1, $2, $4, $5, unnest($9::text[])))` + insertAuthorizationStmt
 
 // Create implements [domain.AuthorizationRepository].
 func (a authorization) Create(ctx context.Context, client database.QueryExecutor, authorization *domain.Authorization) error {
+	var (
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !authorization.CreatedAt.IsZero() {
+		createdAt = authorization.CreatedAt
+	}
+	if !authorization.UpdatedAt.IsZero() {
+		updatedAt = authorization.UpdatedAt
+	}
+
 	builder := database.NewStatementBuilder(insertAuthorizationWithRolesStmt,
 		authorization.InstanceID,
 		authorization.ID,
@@ -56,6 +66,8 @@ func (a authorization) Create(ctx context.Context, client database.QueryExecutor
 		authorization.GrantID,
 		authorization.ProjectID,
 		authorization.State,
+		createdAt,
+		updatedAt,
 		authorization.Roles,
 	)
 
