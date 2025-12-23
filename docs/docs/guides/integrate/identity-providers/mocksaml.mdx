@@ -59,9 +59,9 @@ They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Z
 ## Configure an action to autofill user data
 
 ### Required when using Login V2: Use Actions V2 to map the required fields for user creation
-Creation of the user in Zitadel will fail if the required fields are not set.
+Creation of users in ZITADEL will fail if the required fields to create a user are not set.
 
-This can be achieved by using Actions V2 to map the SAML attributes returned by the IDP to the required fields in Zitadel.
+This can be achieved by using Actions V2 to map the SAML attributes returned by the IDP to the required fields in ZITADEL.
 See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation.md)
 guide for more information on setting up a Target and an Execution. In short,
 * Create an Actions V2 Target of type `REST Call`
@@ -241,7 +241,7 @@ NOTE: The name of the action should be the same as the function name. In this ex
 
 ```js
 function mapSAMLIDPAttrs(ctx, api) {
-	if (ctx.v1.externalUser.externalIdpId != "external-idp-id") {
+    if (ctx.v1.externalUser.externalIdpId != "external-idp-id") {
         return
     }
     // the attribute names below represent the ones used by MockSAML, please adjust accordingly for your IDP.
@@ -250,17 +250,17 @@ function mapSAMLIDPAttrs(ctx, api) {
     let email = ctx.v1.providerInfo.attributes["email"];
     let username = ctx.v1.providerInfo.attributes["email"];
     if (firstname != undefined) {
-    	api.setFirstName(firstname[0]);
+        api.setFirstName(firstname[0]);
     }
     if (lastname != undefined) {
-	    api.setLastName(lastname[0]);
+        api.setLastName(lastname[0]);
     }
     if (email != undefined) {
-    	api.setEmail(email[0]);
-	    api.setEmailVerified(true);
+        api.setEmail(email[0]);
+        api.setEmailVerified(true);
     }
     if (username != undefined) {
-	    api.setPreferredUsername(username[0]);
+        api.setPreferredUsername(username[0]);
     }
 }
 ```
