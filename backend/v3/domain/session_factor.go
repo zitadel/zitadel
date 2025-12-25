@@ -8,93 +8,111 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-type SessionFactorType int
+//go:generate enumer -type=SessionFactorType -trimprefix SessionFactorType -transform snake -linecomment -sql
+type SessionFactorType uint8
 
 const (
 	SessionFactorTypeUnknown SessionFactorType = iota
 	SessionFactorTypeUser
 	SessionFactorTypePassword
-	SessionFactorTypePasskey // formerly known as WebAuthn
+	// SessionFactorTypePasskey was formerly known as WebAuthn
+	SessionFactorTypePasskey
 	SessionFactorTypeIdentityProviderIntent
+	// SessionFactorTypeTOTP used to be called OTP in some places
 	SessionFactorTypeTOTP
-	SessionFactorTypeOTPSMS
+	SessionFactorTypeOTPSMS // otp_sms
 	SessionFactorTypeOTPEmail
+	SessionFactorTypeRecoveryCode
 )
 
 type SessionFactor interface {
-	sessionFactorType() SessionFactorType
+	SessionFactorType() SessionFactorType
 }
 
 type SessionFactorUser struct {
-	UserID         string
-	LastVerifiedAt time.Time
+	UserID         string    `json:"userId,omitempty" db:"user_id"`
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorUser) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorUser) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeUser
 }
 
 type SessionFactorPassword struct {
-	LastVerifiedAt time.Time
-	LastFailedAt   time.Time
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorPassword) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorPassword) SessionFactorType() SessionFactorType {
 	return SessionFactorTypePassword
 }
 
 type SessionFactorIdentityProviderIntent struct {
-	LastVerifiedAt time.Time
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorIdentityProviderIntent) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorIdentityProviderIntent) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeIdentityProviderIntent
 }
 
 type SessionFactorPasskey struct {
-	LastVerifiedAt time.Time
-	UserVerified   bool
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	UserVerified   bool      `json:"userVerified,omitempty" db:"user_verified"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorPasskey) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorPasskey) SessionFactorType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
 
 type SessionFactorTOTP struct {
-	LastVerifiedAt time.Time
-	LastFailedAt   time.Time
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorTOTP) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorTOTP) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeTOTP
 }
 
 type SessionFactorOTPSMS struct {
-	LastVerifiedAt time.Time
-	LastFailedAt   time.Time
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorOTPSMS) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorOTPSMS) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
 
 type SessionFactorOTPEmail struct {
-	LastVerifiedAt time.Time
-	LastFailedAt   time.Time
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
 }
 
-// sessionFactorType implements [SessionFactor].
-func (s *SessionFactorOTPEmail) sessionFactorType() SessionFactorType {
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorOTPEmail) SessionFactorType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
+type SessionFactorRecoveryCode struct {
+	LastVerifiedAt time.Time `json:"lastVerifiedAt,omitzero" db:"last_verified_at"`
+	LastFailedAt   time.Time `json:"lastFailedAt,omitzero" db:"last_failed_at"`
+}
+
+// SessionFactorType implements [SessionFactor].
+func (s *SessionFactorRecoveryCode) SessionFactorType() SessionFactorType {
+	return SessionFactorTypeRecoveryCode
+}
+
 type SessionFactors []SessionFactor
+
+func (s *SessionFactors) AppendTo(factor SessionFactor) {
+	*s = append(*s, factor)
+}
 
 // GetUserFactor returns the user factor from the factors.
 func (s SessionFactors) GetUserFactor() *SessionFactorUser {
@@ -138,6 +156,12 @@ func (s SessionFactors) GetOTPEmailFactor() *SessionFactorOTPEmail {
 	return factor
 }
 
+// GetRecoveryCodeFactor returns the recovery code factor from the factors.
+func (s SessionFactors) GetRecoveryCodeFactor() *SessionFactorRecoveryCode {
+	factor, _ := GetFactor[*SessionFactorRecoveryCode](s)
+	return factor
+}
+
 // GetFactor returns the factor of the given type from the factors.
 func GetFactor[T SessionFactor](factors SessionFactors) (T, bool) {
 	var nilT T
@@ -150,51 +174,55 @@ func GetFactor[T SessionFactor](factors SessionFactors) (T, bool) {
 }
 
 type SessionChallenge interface {
-	sessionChallengeType() SessionFactorType
+	SessionChallengeType() SessionFactorType
 }
 
 type SessionChallengePasskey struct {
-	LastChallengedAt     time.Time
-	Challenge            string
-	AllowedCredentialIDs [][]byte
-	UserVerification     domain.UserVerificationRequirement
-	RPID                 string
+	LastChallengedAt     time.Time                          `json:"lastChallengedAt,omitzero" db:"last_challenged_at"`
+	Challenge            string                             `json:"challenge,omitempty" db:"challenge"`
+	AllowedCredentialIDs [][]byte                           `json:"allowedCredentialIDs,omitempty" db:"allowed_credential_ids"`
+	UserVerification     domain.UserVerificationRequirement `json:"userVerification,omitempty" db:"user_verification"`
+	RPID                 string                             `json:"rpId,omitempty" db:"rp_id"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengePasskey) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengePasskey) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypePasskey
 }
 
 type SessionChallengeOTPSMS struct {
-	LastChallengedAt  time.Time
-	Code              *crypto.CryptoValue
-	Expiry            time.Duration
-	CodeReturned      bool
-	GeneratorID       string
-	TriggeredAtOrigin string
+	LastChallengedAt  time.Time           `json:"lastChallengedAt,omitzero" db:"last_challenged_at"`
+	Code              *crypto.CryptoValue `json:"code,omitempty" db:"code"`
+	Expiry            time.Duration       `json:"expiry,omitzero" db:"expiry"`
+	CodeReturned      bool                `json:"codeReturned,omitempty" db:"code_returned"`
+	GeneratorID       string              `json:"generatorId,omitempty" db:"generator_id"`
+	TriggeredAtOrigin string              `json:"triggeredAtOrigin,omitempty" db:"triggered_at_origin"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengeOTPSMS) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengeOTPSMS) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPSMS
 }
 
 type SessionChallengeOTPEmail struct {
-	LastChallengedAt  time.Time
-	Code              *crypto.CryptoValue
-	Expiry            time.Duration
-	CodeReturned      bool
-	URLTmpl           string
-	TriggeredAtOrigin string
+	LastChallengedAt  time.Time           `json:"lastChallengedAt,omitzero" db:"last_challenged_at"`
+	Code              *crypto.CryptoValue `json:"code,omitempty" db:"code"`
+	Expiry            time.Duration       `json:"expiry,omitzero" db:"expiry"`
+	CodeReturned      bool                `json:"codeReturned,omitempty" db:"code_returned"`
+	URLTemplate       string              `json:"urlTemplate,omitempty" db:"url_template"`
+	TriggeredAtOrigin string              `json:"triggeredAtOrigin,omitempty" db:"triggered_at_origin"`
 }
 
-// sessionChallengeType implements [SessionChallenge].
-func (s *SessionChallengeOTPEmail) sessionChallengeType() SessionFactorType {
+// SessionChallengeType implements [SessionChallenge].
+func (s *SessionChallengeOTPEmail) SessionChallengeType() SessionFactorType {
 	return SessionFactorTypeOTPEmail
 }
 
 type SessionChallenges []SessionChallenge
+
+func (s *SessionChallenges) AppendTo(challenge SessionChallenge) {
+	*s = append(*s, challenge)
+}
 
 // GetPasskeyChallenge returns the passkey challenge from the challenges.
 func (s SessionChallenges) GetPasskeyChallenge() *SessionChallengePasskey {
@@ -225,30 +253,9 @@ func GetChallenge[T SessionChallenge](challenges SessionChallenges) (T, bool) {
 	return nilT, false
 }
 
-type SessionFactorColumns interface {
-	// InstanceIDColumn returns the column for the instance id field.
-	InstanceIDColumn() database.Column
-	// SessionIDColumn returns the column for the session id field.
-	SessionIDColumn() database.Column
-	// FactorTypeColumn returns the column for the factor type field.
-	FactorTypeColumn() database.Column
-	// LastChallengedAtColumn returns the column for the last challenged at field.
-	LastChallengedAtColumn() database.Column
-	// LastFailedAtColumn returns the column for the last failed at field.
-	LastFailedAtColumn() database.Column
-	// LastVerifiedAtColumn returns the column for the last verified at field.
-	LastVerifiedAtColumn() database.Column
-}
-
 type SessionFactorConditions interface {
-	// PrimaryKeyCondition returns a filter on the primary key fields.
-	PrimaryKeyCondition(instanceID, sessionID string, factorType SessionFactorType) database.Condition
-	// InstanceIDCondition returns an equal filter on the instance id field.
-	InstanceIDCondition(instanceID string) database.Condition
-	// SessionIDCondition returns an equal filter on the session id field.
-	SessionIDCondition(sessionID string) database.Condition
 	// FactorTypeCondition returns an equal filter on the factor type field.
 	FactorTypeCondition(factorType SessionFactorType) database.Condition
-	// FactorLastVerifiedBeforeCondition returns a filter on the factor last verified field before the given time.
-	FactorLastVerifiedBeforeCondition(lastVerifiedAt time.Time) database.Condition
+	// LastVerifiedBeforeCondition returns a filter on the factor last verified field before the given time.
+	LastVerifiedBeforeCondition(lastVerifiedAt time.Time) database.Condition
 }

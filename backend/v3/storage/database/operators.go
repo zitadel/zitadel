@@ -60,9 +60,9 @@ const (
 
 	// TextOperationContainsIgnoreCase checks if the first string contains the second ignoring case
 	TextOperationContainsIgnoreCase // LIKE
-	// TextOperationEndsWith checks if the first string ends with the second ignoring case
+	// TextOperationEndsWithIgnoreCase checks if the first string ends with the second ignoring case
 	TextOperationEndsWithIgnoreCase // LIKE
-	// TextOperationStartsWith checks if the first string starts with the second ignoring case
+	// TextOperationStartsWithIgnoreCase checks if the first string starts with the second ignoring case
 	TextOperationStartsWithIgnoreCase // LIKE
 	// TextOperationEqualIgnoreCase compares two strings for equality ignoring case
 	TextOperationEqualIgnoreCase // =
@@ -133,11 +133,11 @@ const (
 	// NumberOperationLessThan compares two numbers to check if the first is less than the second.
 	NumberOperationLessThan // <
 	// NumberOperationLessThanOrEqual compares two numbers to check if the first is less than or equal to the second.
-	NumberOperationAtLeast // <=
+	NumberOperationLessThanOrEqual // <=
 	// NumberOperationGreaterThan compares two numbers to check if the first is greater than the second.
 	NumberOperationGreaterThan // >
 	// NumberOperationGreaterThanOrEqual compares two numbers to check if the first is greater than or equal to the second.
-	NumberOperationAtMost // >=
+	NumberOperationGreaterThanOrEqual // >=
 )
 
 func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value any) {
