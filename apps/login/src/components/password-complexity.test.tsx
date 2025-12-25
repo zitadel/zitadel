@@ -145,4 +145,55 @@ describe("<PasswordComplexity/>", () => {
     expect(screen.getByTestId("uppercase-check")).toBeInTheDocument();
     expect(screen.getByTestId("lowercase-check")).toBeInTheDocument();
   });
+
+  test("should not render optional checks when policy flags are false", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <PasswordComplexity
+          password="abc"
+          equals
+          passwordComplexitySettings={
+            {
+              minLength: BigInt(3),
+              requiresLowercase: false,
+              requiresUppercase: false,
+              requiresNumber: false,
+              requiresSymbol: false,
+              resourceOwnerType: 0,
+            } as any
+          }
+        />
+      </NextIntlClientProvider>,
+    );
+
+    expect(screen.queryByTestId("symbol-check")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("number-check")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("uppercase-check")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("lowercase-check")).not.toBeInTheDocument();
+  });
+
+  test("should render an enabled rule in failing state when password does not match", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <PasswordComplexity
+          password="password1!"
+          equals
+          passwordComplexitySettings={
+            {
+              minLength: BigInt(8),
+              requiresLowercase: true,
+              requiresUppercase: true,
+              requiresNumber: true,
+              requiresSymbol: true,
+              resourceOwnerType: 0,
+            } as any
+          }
+        />
+      </NextIntlClientProvider>,
+    );
+
+    const uppercaseCheck = screen.getByTestId("uppercase-check");
+    const uppercaseIcon = uppercaseCheck.querySelector("svg");
+    expect(uppercaseIcon).toHaveClass("text-warn-light-500");
+  });
 });
