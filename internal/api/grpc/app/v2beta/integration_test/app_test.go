@@ -183,6 +183,42 @@ func TestCreateApplication(t *testing.T) {
 	}
 }
 
+func TestCreateOIDCApplication_WithProvidedID(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
+
+	t.Parallel()
+
+	customID := integration.ID()
+	res, err := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: p.GetId(),
+		Name:      integration.ApplicationName(),
+		Id:        customID,
+		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+			OidcRequest: &app.CreateOIDCApplicationRequest{
+				RedirectUris:           []string{"http://example.com"},
+				ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+				GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+				AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+				AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+				PostLogoutRedirectUris: []string{"http://example.com/home"},
+				Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+				AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+				BackChannelLogoutUri:   "http://example.com/logout",
+				LoginVersion: &app.LoginVersion{
+					Version: &app.LoginVersion_LoginV2{
+						LoginV2: &app.LoginV2{BaseUri: &baseURI},
+					},
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, customID, res.GetAppId())
+	assert.NotEmpty(t, res.GetOidcResponse().GetClientId())
+	assert.NotZero(t, res.GetCreationDate())
+}
+
 func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
