@@ -1,7 +1,9 @@
+@use 'sass:map';
+
 @mixin header-dropdown-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
   $border-radius: 0.5rem;
 
   .dropdown-content {
@@ -11,7 +13,7 @@
     border-radius: $border-radius;
     border: 1px solid rgba(#8795a1, 0.2);
     box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
-    background: map-get($background, cards);
+    background: map.get($background, cards);
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     grid-template-columns: repeat(auto-fit, minmax(0, 1fr));

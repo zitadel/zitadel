@@ -1,12 +1,14 @@
+@use 'sass:map';
+
 @mixin app-detail-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
-  $divider-color: map-get($foreground, dividers);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
+  $divider-color: map.get($foreground, dividers);
 
   .metadata-option {
     margin-top: 0.5rem;

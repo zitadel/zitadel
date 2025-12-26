@@ -1,7 +1,9 @@
+@use 'sass:map';
+
 @mixin contributors-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .contributor-groups {
     padding: 0.5rem 0;
@@ -12,7 +14,7 @@
       flex-wrap: wrap;
       border-radius: 50vw;
       padding: 6px 9px;
-      background-color: map-get($background, contributor);
+      background-color: map.get($background, contributor);
       padding-left: 9px;
       transition: all 0.2s ease;
 
@@ -52,7 +54,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: map-get($background, contributor-avatar);
+          background-color: map.get($background, contributor-avatar);
           color: white;
 
           .contributor-avatar {

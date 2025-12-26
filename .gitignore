@@ -12,6 +12,7 @@
 # Coverage
 coverage.txt
 profile*.cov
+coverage
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -103,3 +104,5 @@ CLAUDE.md
 AGENTS.md
 .mcp.json
 .gemini/*
+
+.angular

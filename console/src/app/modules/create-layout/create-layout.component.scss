@@ -1,6 +1,8 @@
+@use 'sass:map';
+
 @mixin app-create-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
 
   // Number of steps creating app
   $steps: 3;

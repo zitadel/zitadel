@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin theme-setting($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
+  $primary: map.get($theme, primary);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $back: map.get($background, background);
 
   .theme-flex {
     display: flex;
@@ -26,7 +28,7 @@
 
       .moon,
       .sun {
-        color: map-get($foreground, text);
+        color: map.get($foreground, text);
         fill: transparent;
         height: 1rem;
         width: 1rem;

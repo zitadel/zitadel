@@ -1,6 +1,8 @@
+@use 'sass:map';
+
 @mixin auth-user-detail-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .user-container {
     padding-top: 1rem;
@@ -26,7 +28,7 @@
           opacity: 0.6;
           font-size: 15px;
           cursor: pointer;
-          color: map-get($foreground, text);
+          color: map.get($foreground, text);
           display: flex;
           align-items: center;
 

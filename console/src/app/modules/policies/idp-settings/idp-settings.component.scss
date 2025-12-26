@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .idps-title-row {
   display: flex;
   align-items: center;
@@ -18,11 +20,11 @@
 }
 
 @mixin idp-settings-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
 
   .cnsl-idp-table-wrapper {
     display: block;
@@ -63,7 +65,7 @@
       box-sizing: border-box;
       transition: box-shadow 0.1s ease-in;
       align-items: center;
-      color: map-get($foreground, text);
+      color: map.get($foreground, text);
 
       .coming-soon-label {
         position: absolute;
