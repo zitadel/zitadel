@@ -11,21 +11,17 @@ const myUserService = async (serviceConfig: ServiceConfig, sessionToken: string)
   return createUserServiceClient(transportPromise);
 };
 
-export async function setMyPassword({
-  sessionId,
-  password,
-}: {
-  sessionId: string;
-  password: string;
-}) {
+export async function setMyPassword({ sessionId, password }: { sessionId: string; password: string }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
-  const { session } = await getSession({ serviceConfig, sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
+  if (!sessionCookie) {
+    return { error: "Could not load session cookie" };
+  }
+
+  const { session } = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
 
   if (!session) {
     return { error: "Could not load session" };

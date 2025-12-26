@@ -2,7 +2,7 @@
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { sendPasskey } from "@/lib/server/passkeys";
-import { updateSession } from "@/lib/server/session";
+import { updateOrCreateSession } from "@/lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -38,7 +38,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     if (!initialized.current) {
       initialized.current = true;
       setLoading(true);
-      updateSessionForChallenge()
+      updateOrCreateSessionForChallenge()
         .then((response) => {
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
@@ -50,7 +50,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
           return submitLoginAndContinue(pK)
             .catch((error) => {
-              setError(error);
+              setError(error instanceof Error ? error.message : String(error));
               return;
             })
             .finally(() => {
@@ -58,7 +58,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             });
         })
         .catch((error) => {
-          setError(error);
+          setError(error instanceof Error ? error.message : String(error));
           return;
         })
         .finally(() => {
@@ -68,14 +68,14 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function updateSessionForChallenge(
+  async function updateOrCreateSessionForChallenge(
     userVerificationRequirement: number = login
       ? UserVerificationRequirement.REQUIRED
       : UserVerificationRequirement.DISCOURAGED,
   ) {
     setError("");
     setLoading(true);
-    const session = await updateSession({
+    const sessionResponse = await updateOrCreateSession({
       loginName,
       sessionId,
       organization,
@@ -87,7 +87,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       }),
       requestId,
     })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         setError(t("verify.errors.couldNotRequestChallenge"));
         return;
       })
@@ -95,12 +96,12 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         setLoading(false);
       });
 
-    if (session && "error" in session && session.error) {
-      setError(session.error);
+    if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
+      setError(sessionResponse.error);
       return;
     }
 
-    return session;
+    return sessionResponse;
   }
 
   async function submitLogin(data: JsonObject) {
@@ -238,7 +239,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           variant={ButtonVariants.Primary}
           disabled={loading}
           onClick={async () => {
-            const response = await updateSessionForChallenge().finally(() => {
+            const response = await updateOrCreateSessionForChallenge().finally(() => {
               setLoading(false);
             });
 
@@ -253,7 +254,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
             return submitLoginAndContinue(pK)
               .catch((error) => {
-                setError(error);
+                setError(error instanceof Error ? error.message : String(error));
                 return;
               })
               .finally(() => {

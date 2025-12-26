@@ -4,10 +4,19 @@ import { SetPasswordForm } from "@/components/set-password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings, getUserByID } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getLoginSettings,
+  getPasswordComplexitySettings,
+  getUserByID,
+  searchUsers,
+} from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { create } from "@zitadel/client";
+import { LoginSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -20,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, organization, requestId, code, initial } = searchParams;
+  let { userId, loginName, organization, requestId, code, initial } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -28,31 +37,62 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
-    session = await loadMostRecentSession({ serviceConfig, sessionParams: {
+    session = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
         loginName,
         organization,
       },
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization });
+
+  const passwordComplexity = await getPasswordComplexitySettings({
+    serviceConfig,
+    organization: organization ?? session?.factors?.user?.organizationId,
   });
 
-  const passwordComplexity = await getPasswordComplexitySettings({ serviceConfig, organization: session?.factors?.user?.organizationId,
-  });
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ serviceConfig, userId,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId });
     user = userResponse.user;
 
     if (user?.type.case === "human") {
       displayName = (user.type.value as HumanUser).profile?.displayName;
+    }
+  } else if (loginName) {
+    const users = await searchUsers({
+      serviceConfig,
+      searchValue: loginName,
+      loginSettings:
+        loginSettings ??
+        create(LoginSettingsSchema, {
+          ignoreUnknownUsernames: true,
+          disableLoginWithEmail: false,
+          disableLoginWithPhone: false,
+          allowUsernamePassword: true,
+          allowRegister: true,
+          allowExternalIdp: true,
+          forceMfa: false,
+          hidePasswordReset: false,
+        }), // Default settings if null
+      organizationId: organization,
+    });
+
+    if (users.result && users.result.length === 1) {
+      const foundUser = users.result[0];
+      userId = foundUser.userId;
+      user = foundUser;
+      if (user.type.case === "human") {
+        displayName = (user.type.value as HumanUser).profile?.displayName;
+      }
+    } else if (loginSettings?.ignoreUnknownUsernames) {
+      // Prevent enumeration by pretending we found a user
+      userId = UNKNOWN_USER_ID;
     }
   }
 
@@ -80,10 +120,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        ) : user ? (
+        ) : user || loginName ? (
           <UserAvatar
-            loginName={user?.preferredLoginName}
-            displayName={displayName}
+            loginName={loginName ?? user?.preferredLoginName}
+            displayName={!loginSettings?.ignoreUnknownUsernames ? displayName : (loginName ?? user?.preferredLoginName)}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -97,10 +137,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         )}
 
-        {passwordComplexity && (loginName ?? user?.preferredLoginName) && (userId ?? session?.factors?.user?.id) ? (
+        {passwordComplexity &&
+        (loginName ?? user?.preferredLoginName) &&
+        (userId ?? session?.factors?.user?.id ?? (loginSettings?.ignoreUnknownUsernames ? UNKNOWN_USER_ID : undefined)) ? (
           <SetPasswordForm
             code={code}
-            userId={userId ?? (session?.factors?.user?.id as string)}
+            userId={userId ?? (session?.factors?.user?.id as string) ?? UNKNOWN_USER_ID}
             loginName={loginName ?? (user?.preferredLoginName as string)}
             requestId={requestId}
             organization={organization}

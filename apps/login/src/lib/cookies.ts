@@ -157,7 +157,7 @@ export async function removeSessionFromCookie<T>({
   }
 }
 
-export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
+export async function getMostRecentSessionCookie<T>(): Promise<Cookie | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -170,7 +170,7 @@ export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
 
     return latest;
   } else {
-    return Promise.reject("no session cookie found");
+    return undefined;
   }
 }
 
@@ -180,7 +180,7 @@ export async function getSessionCookieById<T>({
 }: {
   sessionId: string;
   organization?: string;
-}): Promise<SessionCookie<T>> {
+}): Promise<SessionCookie<T> | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -193,10 +193,10 @@ export async function getSessionCookieById<T>({
     if (found) {
       return found;
     } else {
-      return Promise.reject();
+      return undefined;
     }
   } else {
-    return Promise.reject();
+    return undefined;
   }
 }
 
@@ -206,7 +206,7 @@ export async function getSessionCookieByLoginName<T>({
 }: {
   loginName?: string;
   organization?: string;
-}): Promise<SessionCookie<T>> {
+}): Promise<SessionCookie<T> | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -218,10 +218,10 @@ export async function getSessionCookieByLoginName<T>({
     if (found) {
       return found;
     } else {
-      return Promise.reject("no cookie found with loginName: " + loginName);
+      return undefined;
     }
   } else {
-    return Promise.reject("no session cookie found");
+    return undefined;
   }
 }
 
@@ -316,9 +316,9 @@ export async function getMostRecentCookieWithLoginname<T>({
     if (latest) {
       return latest;
     } else {
-      return Promise.reject("Could not get the context or retrieve a session");
+      return undefined;
     }
   } else {
-    return Promise.reject("Could not read session cookie");
+    return undefined;
   }
 }
