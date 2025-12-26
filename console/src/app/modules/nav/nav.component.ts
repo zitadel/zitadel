@@ -14,6 +14,7 @@ import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/ke
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-nav',
@@ -83,7 +84,7 @@ export class NavComponent implements OnDestroy {
     }),
   );
 
-  @Input() public org?: Organization | null;
+  @Input() public org?: Organization | Org | null;
   public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
