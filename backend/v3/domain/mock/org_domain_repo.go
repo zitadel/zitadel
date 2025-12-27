@@ -23,30 +23,36 @@ func NewOrgDomainRepo(ctrl *gomock.Controller) *OrgDomainRepo {
 }
 
 func (r *OrgDomainRepo) EXPECT() *MockOrganizationDomainRepositoryMockRecorder {
+	r.mock.ctrl.T.Helper()
 	return r.mock.EXPECT()
 }
 
 func (r *OrgDomainRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Get(ctx, client, opts...)
 
 }
 
 func (r *OrgDomainRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.List(ctx, client, opts...)
 
 }
 
 func (r *OrgDomainRepo) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Add(ctx, client, domain)
 
 }
 
 func (r *OrgDomainRepo) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Update(ctx, client, condition, changes...)
 
 }
 
 func (r *OrgDomainRepo) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Remove(ctx, client, condition)
 
 }
