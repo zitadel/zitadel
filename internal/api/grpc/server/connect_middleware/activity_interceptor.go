@@ -19,7 +19,7 @@ func ActivityInterceptor() connect.UnaryInterceptorFunc {
 			ctx = activityInfoFromGateway(ctx, req.Header()).SetMethod(req.Spec().Procedure).IntoContext(ctx)
 			resp, err := handler(ctx, req)
 			if isResourceAPI(req.Spec().Procedure) {
-				code, _, _, _ := gerrors.ExtractZITADELError(err)
+				code, _, _ := gerrors.ExtractZITADELError(err)
 				ctx = ainfo.ActivityInfoFromContext(ctx).SetGRPCStatus(code).IntoContext(ctx)
 				activity.TriggerGRPCWithContext(ctx, activity.ResourceAPI)
 			}

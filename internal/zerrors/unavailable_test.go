@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestUnavailableError(t *testing.T) {
-	var err interface{} = new(zerrors.UnavailableError)
-	_, ok := err.(zerrors.Unavailable)
-	assert.True(t, ok)
-}
+func TestUnavailable(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowUnavailablef(t *testing.T) {
-	err := zerrors.ThrowUnavailablef(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.UnavailableError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowUnavailable", func(t *testing.T) {
+		err := zerrors.ThrowUnavailable(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsUnavailable(t *testing.T) {
-	err := zerrors.ThrowUnavailable(nil, "id", "msg")
-	ok := zerrors.IsUnavailable(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnavailable, zitadelErr.Kind)
 
-	err = errors.New("I am found!")
-	ok = zerrors.IsUnavailable(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowUnavailablef", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowUnavailablef(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnavailable, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsUnavailable", func(t *testing.T) {
+		err := zerrors.ThrowUnavailable(parentErr, id, message)
+		isUnavailable := zerrors.IsUnavailable(err)
+		assert.True(t, isUnavailable)
+	})
 }

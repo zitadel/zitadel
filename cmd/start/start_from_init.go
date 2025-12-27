@@ -2,10 +2,11 @@ package start
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -24,31 +25,46 @@ Last ZITADEL starts.
 
 Requirements:
 - postgreSQL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return fmt.Errorf("invalid tlsMode: %w", err)
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return fmt.Errorf("no master key provided: %w", err)
+			}
 
 			initCtx, cancel := context.WithCancel(cmd.Context())
 			initialise.InitAll(initCtx, initialise.MustNewConfig(viper.GetViper()))
 			cancel()
 
 			err = setup.BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
+			}
 
-			setupConfig := setup.MustNewConfig(viper.GetViper())
+			setupConfig, shutdown, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			setupSteps := setup.MustNewSteps(viper.New())
 
 			setupCtx, cancel := context.WithCancel(cmd.Context())
 			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
 			cancel()
 
-			startConfig := MustNewConfig(viper.GetViper())
+			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
-			logging.OnError(err).Fatal("unable to start zitadel")
+			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},
 	}
 

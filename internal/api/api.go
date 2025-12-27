@@ -12,10 +12,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -26,7 +28,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -131,7 +132,12 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	api.connectOTELInterceptor, err = otelconnect.NewInterceptor()
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otel.GetTracerProvider()),
+		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
+		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
+		otelconnect.WithoutServerPeerAttributes(),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -199,6 +205,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.CallDurationHandler(),
 		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+		connect_middleware.LogHandler(grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
 		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName, instance_pb.InstanceService_ServiceDesc.ServiceName),
 		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),

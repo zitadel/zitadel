@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 func countMessages(ctx context.Context, channel channels.NotificationChannel, successMetricName, errorMetricName string) channels.NotificationChannel {

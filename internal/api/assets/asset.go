@@ -79,7 +79,7 @@ type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, defaul
 func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
 	return func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
 		logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
-		code, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
+		code, ok := http_util.ZitadelErrorToHTTPStatusCode(r.Context(), err)
 		if !ok {
 			code = defaultCode
 		}

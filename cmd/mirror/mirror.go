@@ -3,6 +3,8 @@ package mirror
 import (
 	"bytes"
 	_ "embed"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -44,18 +46,28 @@ Order of execution:
 				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
 			}
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return fmt.Errorf("unable to create migration config: %w", err)
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			projectionConfig := mustNewProjectionsConfig(viper.GetViper())
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Fatal("unable to read master key")
+			if err != nil {
+				return fmt.Errorf("unable to read master key: %w", err)
+			}
 
 			copySystem(cmd.Context(), config)
 			copyAuth(cmd.Context(), config)
 			copyEventstore(cmd.Context(), config)
 
 			projections(cmd.Context(), projectionConfig, masterKey)
+			return nil
 		},
 	}
 
