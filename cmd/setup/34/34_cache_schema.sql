@@ -1,6 +1,6 @@
 create schema if not exists cache;
 
-create unlogged table if not exists cache.objects (
+create table if not exists cache.objects (
 	cache_name varchar not null,
     id uuid not null default gen_random_uuid(),
     created_at timestamptz not null default now(),
@@ -11,7 +11,7 @@ create unlogged table if not exists cache.objects (
 )
 partition by list (cache_name);
 
-create unlogged table if not exists cache.string_keys(
+create table if not exists cache.string_keys(
     cache_name varchar not null check (cache_name <> ''),
     index_id integer not null check (index_id > 0),
     index_key varchar not null check (index_key <> ''),
