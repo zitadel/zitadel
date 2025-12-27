@@ -19,7 +19,7 @@ export interface SignInWithIDPProps {
   identityProviders: IdentityProvider[];
   requestId?: string;
   organization?: string;
-  linkOnly?: boolean;
+  sessionId?: string;
   postErrorRedirectUrl?: string;
   showLabel?: boolean;
 }
@@ -28,7 +28,7 @@ export function SignInWithIdp({
   identityProviders,
   requestId,
   organization,
-  linkOnly,
+  sessionId,
   postErrorRedirectUrl,
   showLabel = true,
 }: Readonly<SignInWithIDPProps>) {
@@ -59,7 +59,7 @@ export function SignInWithIdp({
         <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
         <input type="hidden" name="requestId" value={requestId} />
         <input type="hidden" name="organization" value={organization} />
-        <input type="hidden" name="linkOnly" value={linkOnly ? "true" : "false"} />
+        {sessionId && <input type="hidden" name="sessionId" value={sessionId} />}
         {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
         <Component key={id} name={name} />
       </form>
