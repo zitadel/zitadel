@@ -36,7 +36,7 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}): Promise<{ redirect: string } | { error: string }> {
+}): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
