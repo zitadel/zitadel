@@ -435,7 +435,8 @@
     "TOS": "Услови на користење",
     "OPENSHORTCUTSTOOLTIP": "Внесете ? за прикажување на кратенки за тастатура",
     "SETTINGS": "Подесувања",
-    "CUSTOMERPORTAL": "Портал за клиенти"
+    "CUSTOMERPORTAL": "Портал за клиенти",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Интегрирајте го ZITADEL во вашата апликација",
@@ -698,9 +699,9 @@
     "PROJECTNAME": "Име на проектот",
     "RESOURCEOWNER": "Сопственик на ресурсот",
     "METHODS": {
+      "1": "е еднакво на",
       "5": "содржи",
-      "7": "завршува со",
-      "1": "е еднакво на"
+      "7": "завршува со"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1503,7 +1504,9 @@
       "SECURITY": "Подесувања за безбедност",
       "EVENTS": "Настани",
       "FAILEDEVENTS": "Неуспешни настани",
-      "VIEWS": "Прегледи"
+      "VIEWS": "Прегледи",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Општи информации",
@@ -1513,7 +1516,8 @@
       "TEXTS": "Текстови и јазици",
       "APPEARANCE": "Изглед",
       "OTHER": "Друго",
-      "STORAGE": "складирање"
+      "STORAGE": "складирање",
+      "ACTIONS": "Actions"
     },
     "BETA": "БЕТА"
   },
@@ -1972,7 +1976,6 @@
         "GRANTED_SINGULAR": "Проект доделен на {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Подесувања за брендирање",
         "0": {
           "TITLE": "Неспецифицирано",
           "DESC": "Откако корисникот ќе биде идентификуван, ќе се прикаже брендирањето на организацијата на идентификуваниот корисник, пред да се прикаже стандардното системско брендирање."
@@ -1985,6 +1988,7 @@
           "TITLE": "Користи ги подесувањата на организацијата на корисникот",
           "DESC": "Ќе се прикаже брендирањето на организацијата на проектот, но откако корисникот ќе биде идентификуван, ќе се прикаже подесувањето на организацијата на идентификуваниот корисник."
         },
+        "TITLE": "Подесувања за брендирање",
         "DIALOG": {
           "TITLE": "Подесувања за брендирање",
           "DESCRIPTION": "Изберете го однесувањето на најавата при користење на проектот."
@@ -2016,16 +2020,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Статус",
       "0": "Не е дефинирано",
       "1": "Активно",
-      "2": "Неактивно"
+      "2": "Неактивно",
+      "TITLE": "Статус"
     },
     "TYPE": {
-      "TITLE": "Тип",
       "0": "Непознат тип",
       "1": "Сопствен",
-      "2": "Доделен"
+      "2": "Доделен",
+      "TITLE": "Тип"
     },
     "NAME": "Име",
     "NAMEDIALOG": {
@@ -2177,7 +2181,8 @@
       "UPDATED": "Проектот е променет.",
       "GRANTUPDATED": "Доделувањето е променето.",
       "DELETED": "Проектот е избришан."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2235,6 +2240,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Внесете ги податоците за вашиот LDAP провајдер"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2269,10 +2282,10 @@
       "2": "неактивно"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Tenant ID",
       "0": "Заедничко",
       "1": "Организации",
-      "2": "Корисници"
+      "2": "Корисници",
+      "3": "Tenant ID"
     },
     "AZUREADTENANTTYPE": "Tenant Type",
     "AZUREADTENANTID": "Tenant ID",
@@ -2368,7 +2381,27 @@
     "ISIDTOKENMAPPING": "Совпаѓање од ID токен",
     "ISIDTOKENMAPPING_DESC": "Ако е избрано, информациите од провајдерот се мапираат од ID токенот, а не од userinfo крајната точка.",
     "USEPKCE": "Користете PKCE",
-    "USEPKCE_DESC": "Определува дали параметрите code_challenge и code_challenge_method се вклучени во барањето за авторизација"
+    "USEPKCE_DESC": "Определува дали параметрите code_challenge и code_challenge_method се вклучени во барањето за авторизација",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
+    "REMOVE_WARN_TITLE": "Remove IdP",
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2441,7 +2474,11 @@
         "DELETE_TITLE": "Избришете ја конфигурацијата SMTP",
         "DELETE_DESCRIPTION": "Ќе избришете конфигурација. Потврдете го ова дејство со внесување на името на испраќачот",
         "DELETED": "SMTP конфигурацијата е избришана",
-        "SENDER": "Внесете {{ value }}, за да ја избришете оваа SMTP конфигурација."
+        "SENDER": "Внесете {{ value }}, за да ја избришете оваа SMTP конфигурација.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2517,7 +2554,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Следни Чекори",
         "0": {
           "TITLE": "Додади улоги",
           "DESC": "Внесете ги улогите за вашиот проект"
@@ -2529,8 +2565,24 @@
         "2": {
           "TITLE": "Помош и Поддршка",
           "DESC": "Прочитајте ја нашата документација за креирање на апликации или контактирајте ја нашата поддршка"
-        }
-      }
+        },
+        "TITLE": "Следни Чекори"
+      },
+      "CREATE_PROJECT_AUTO": "Автоматски креирај проект",
+      "CREATE_PROJECT_AUTO_DESC": "Препорачано ако сте нови на ZITADEL. Ние ќе се грижиме за поставувањето на проектот за вас.",
+      "QUICK_CREATE_TITLE": "Креирај апликација",
+      "QUICK_CREATE_DESC": "Креирајте апликација во три едноставни чекори.",
+      "QUICK_CREATE_FRAMEWORK": "Изберете го вашиот framework",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Ние ви нудиме препорачана конфигурација за вашата апликација. Изберете го framework-от кој го користите или планирате да го користите.",
+      "QUICK_CREATE_NAME": "Именувајте ја вашата апликација",
+      "CUSTOM_APP_TITLE": "Прилагодена апликација",
+      "CUSTOM_APP_DESC": "Ќе го создадеме вашиот проект и апликација со конфигурацијата што ја избирате подолу.",
+      "CUSTOM_APP_NAME": "Име на апликацијата",
+      "CUSTOM_APP_NAME_LABEL": "Име",
+      "CUSTOM_APP_TYPE": "Тип на апликација",
+      "CUSTOM_APP_AUTH_METHOD": "Метод на автентикација",
+      "CUSTOM_APP_CANCEL": "Откажи",
+      "CUSTOM_APP_CREATE": "Креирај апликација"
     },
     "NAMEDIALOG": {
       "TITLE": "Преименувај апликација",
@@ -2723,6 +2775,90 @@
     "LOGINV2": {
       "USEV2": "Користете нов интерфејс за најава",
       "BASEURL": "Прилагоден основен URL за новиот интерфејс за најава"
+    },
+    "QUICKSTART": "Брз почеток",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Брз почеток",
+      "DESCRIPTION": "Поставете ја вашата апликација и започнете со ZITADEL автентикација.",
+      "GETSTARTED": "Започнете со вашата апликација",
+      "GETSTARTED_DESC": "Овој водич ќе ви помогне брзо и лесно да интегрирате ZITADEL автентикација во вашата апликација.",
+      "FRAMEWORK": "Фрејмворк",
+      "VIEWDOCS": "Преглед на документацијата",
+      "VIEWEXAMPLE": "Преглед на пример",
+      "ENVVARS": "Променливи на средината",
+      "ENVVARS_DESC": "Додадете ги овие променливи на средината во вашата апликација:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Од каде сакате да започнете?",
+      "QUICKSTART_SUBTITLE": "Изберете ја опцијата која најдобро ја опишува вашата ситуација:",
+      "OPTION1": "Опција 1: Клонирај примерна апликација",
+      "OPTION1_DESC": "Започнете брзо со работна примерна апликација:",
+      "OPTION1_NOTE": "Откако ќе ја клонирате, ажурирајте ги променливите на средината со деталите за вашата апликација.",
+      "OPTION2": "Опција 2: Интегрирајте постоечка апликација",
+      "OPTION2_DESC": "Интегрирајте ZITADEL автентикација во вашата постоечка апликација:",
+      "STEP1": "Инсталирајте ZITADEL SDK за вашиот фрејмворк",
+      "STEP2": "Конфигурирајте ги вашите променливи на средината",
+      "STEP3": "Додадете автентикација во вашата апликација",
+      "STEP4": "Тестирајте ја интеграцијата",
+      "GENERIC": "Општа интеграција",
+      "GENERIC_DESC": "Изберете од нашите опсежни примери и водичи:",
+      "ALLEXAMPLES": "Сите примери",
+      "INTEGRATION_GUIDE": "Водич за интеграција",
+      "NEXTSTEPS": "Следни чекори",
+      "CONFIGURE": "Конфигурирајте поставки",
+      "CONFIGURE_DESC": "Прилагодете ја OIDC конфигурацијата на вашата апликација",
+      "REDIRECTS": "Поставете пренасочувања",
+      "REDIRECTS_DESC": "Конфигурирајте URL за пренасочување и за излез",
+      "URLS_DESC": "Прегледајте важни URL за интеграција",
+      "TERMINAL": "Терминал",
+      "SCENARIO_NEW_TITLE": "Сакам да креирам целосно нова апликација",
+      "SCENARIO_NEW_DESC": "Совршено! Ќе ви помогнеме да започнете брзо со пример кој вклучува ZITADEL автентикација.",
+      "SCENARIO_NEW_TOGGLE": "Сè уште немам апликација",
+      "SCENARIO_EXISTING_TITLE": "Сакам да интегрирам во постоечка апликација",
+      "SCENARIO_EXISTING_DESC": "Одлично! Ќе ве водиме низ додавањето ZITADEL автентикација чекор по чекор.",
+      "SCENARIO_EXISTING_TOGGLE": "Имам постоечка апликација",
+      "CLONE_EXAMPLE": "Клонирај пример",
+      "CLONE_NOTE": "Откако ќе клонирате, едноставно ажурирајте го .env фајлот со вашите детали и сте подготвени!",
+      "BROWSE_EXAMPLES": "Прелистајте ги сите примери",
+      "GENERIC_NEW_NOTE": "Изберете пример кој одговара на вашата технолошка стек и клонирајте го за брзо започнување.",
+      "EXISTING_STEP1_TITLE": "Инсталирај SDK",
+      "EXISTING_STEP1_DESC": "Додадете го SDK во вашиот проект",
+      "EXISTING_STEP2_TITLE": "Додадете ја вашата конфигурација",
+      "EXISTING_STEP2_DESC": "Копирајте и поставете ги овие променливи на средината во конфигурациониот фајл на вашата апликација",
+      "EXISTING_STEP3_TITLE": "Поставете автентикација",
+      "EXISTING_STEP3_DESC": "Следете го нашиот водич чекор по чекор за додавање автентикација",
+      "VIEW_SDKS": "Преглед на SDK документација",
+      "AUTH_STATUS_CHECKING": "Проверка на статусот на автентикација...",
+      "AUTH_STATUS_SUCCESS": "Вашата апликација е успешно автентицирана со ZITADEL.",
+      "AUTH_STATUS_PENDING": "Се чека на првата корисничка автентикација.",
+      "AUTH_STATUS_PENDING_DESC": "Следете го упатството за интеграција подолу за да ја поставите автентикацијата.",
+      "SUCCESS_TITLE": "🎉 Одлично! Вашата апликација е успешно поврзана",
+      "SUCCESS_DESC": "Вашата апликација е успешно автентицирана со ZITADEL. Сега можете да ги користите променливите на средината подолу за интеграцијата.",
+      "ENVVARS_AUTHENTICATED_DESC": "Користете ги овие променливи на средината во вашата апликација:",
+      "INTEGRATION_ENVVARS_TITLE": "Конфигурација на вашата апликација",
+      "INTEGRATION_ENVVARS_DESC": "Додадете ги овие променливи на средината за да се поврзете со ZITADEL:",
+      "NEW_STEP1_TITLE": "Клонирај примерна апликација",
+      "NEW_STEP1_DESC": "Започнете брзо со работен пример кој има вградено ZITADEL автентикација.",
+      "NEW_STEP2_TITLE": "Конфигурирајте ги променливите на средината",
+      "NEW_STEP2_DESC": "Додадете ги овие променливи во апликацијата. Поставете ги во .env фајл во коренот на проектот или преземете .env фајлот и зачувајте го.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Ажурирајте го примерниот .env.example со овие вредности, потоа преименувајте го во .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Заменете го 'your-client-secret' со вашиот реален клиентски таен код. Ако не го зачувавте при создавањето на апликацијата, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "генерирајте нов тука",
+      "NEW_STEP3_TITLE": "Пуштете и тестирајте ја апликацијата",
+      "NEW_STEP3_DESC": "Инсталирајте зависности.",
+      "NEW_STEP3_DESC2": "Пуштете ја апликацијата и тестирајте го автентикацискиот процес.",
+      "NEW_STEP4_TITLE": "Преглед на документацијата",
+      "NEW_STEP4_DESC": "Следете го нашиот водич за прилагодување и проширување на апликацијата со ZITADEL.",
+      "STEP4_ACTION": "Види Документација",
+      "GENERIC_NEW_TITLE": "Изберете точка на почеток",
+      "GENERIC_EXISTING_TITLE": "Изберете пристап за интеграција",
+      "GENERIC_EXISTING_NOTE": "Бидејќи нема специфичен SDK за вашиот фрејмворк, можете да користите нашите општи водичи или директно да работите со OIDC/OAuth2 endpoints.",
+      "API_DOCS": "API документација",
+      "NEW_STEP_DOCS_TITLE": "Преглед на целосна документација",
+      "NEW_STEP_DOCS_DESC": "Научете повеќе за напредни конфигурации и најдобри практики за вашиот фрејмворк.",
+      "EXISTING_STEP_DOCS_TITLE": "Научете повеќе за интеграција",
+      "EXISTING_STEP_DOCS_DESC": "Истражете ја нашата детална документација за напредна конфигурација и решавање на проблеми.",
+      "SELECT_FRAMEWORK": "Изберете го вашиот фрејмворк",
+      "SELECT_FRAMEWORK_DESC": "Изберете го фрејмворкот кој го користите за прилагодени упатства и примери."
     }
   },
   "GENDERS": {
@@ -2758,10 +2894,10 @@
     "ADD": "Додај Менаџер",
     "CREATIONTYPE": "Тип на креирање",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Организација",
       "0": "Сопствен Проект",
       "1": "Доделен Проект",
+      "2": "Организација",
+      "3": "IAM",
       "4": "Проект"
     },
     "EDITROLE": "Уреди улоги",

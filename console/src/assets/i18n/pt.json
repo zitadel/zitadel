@@ -435,7 +435,8 @@
     "TOS": "Termos de Serviço",
     "OPENSHORTCUTSTOOLTIP": "Digite ? para mostrar os atalhos do teclado",
     "SETTINGS": "Configurações",
-    "CUSTOMERPORTAL": "Portal do Cliente"
+    "CUSTOMERPORTAL": "Portal do Cliente",
+    "TARGETS": "Targets"
   },
   "QUICKSTART": {
     "TITLE": "Integrar a ZITADEL na sua aplicação",
@@ -457,9 +458,11 @@
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Alterar Quadro",
-        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação."
+        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação.",
+        "DESCRIPTION": "Choose one of the available frameworks for quick setup of your application."
       }
-    }
+    },
+    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes."
   },
   "ACTIONS": {
     "ACTIONS": "Ações",
@@ -698,9 +701,9 @@
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
     "METHODS": {
+      "1": "igual a",
       "5": "contém",
-      "7": "termina com",
-      "1": "igual a"
+      "7": "termina com"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -979,7 +982,8 @@
         "DELETESUCCESS": "Excluído com sucesso!",
         "CROPPERERROR": "Ocorreu um erro ao carregar seu arquivo. Tente um formato e tamanho diferentes, se necessário."
       },
-      "COUNTRY": "País"
+      "COUNTRY": "País",
+      "PASSWORD": "Password"
     },
     "MACHINE": {
       "TITLE": "Detalhes do Usuário de Serviço",
@@ -1503,7 +1507,9 @@
       "SECURITY": "Configurações de Segurança",
       "EVENTS": "Eventos",
       "FAILEDEVENTS": "Eventos com Falha",
-      "VIEWS": "Visualizações"
+      "VIEWS": "Visualizações",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "Geral",
@@ -1513,7 +1519,8 @@
       "TEXTS": "Textos e Idiomas",
       "APPEARANCE": "Aparência",
       "OTHER": "Outro",
-      "STORAGE": "armazenar"
+      "STORAGE": "armazenar",
+      "ACTIONS": "Actions"
     },
     "BETA": "BETA"
   },
@@ -1658,7 +1665,8 @@
       "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
       "LOGINV2_BASEURI": "URI base",
       "ENABLERELATIONALTABLES": "Tabelas relacionais",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Ative isso para usar tabelas relacionais em vez de projeções para armazenar dados. Atualmente, este interruptor não faz nada.",
+      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
     },
     "DIALOG": {
       "RESET": {
@@ -1910,7 +1918,8 @@
       "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login for iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
       "ERRORMSGPOPUP": "Mostrar Erro em Diálogo",
       "DISABLEWATERMARK": "Ocultar Marca d'água",
-      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by ZITADEL na interface de login"
+      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by ZITADEL na interface de login",
+      "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login."
     },
     "RESET": "Redefinir para o padrão da instância",
     "CREATECUSTOM": "Criar Política Personalizada",
@@ -1971,7 +1980,6 @@
         "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
-        "TITLE": "Configuração de Marca",
         "0": {
           "TITLE": "Não Especificado",
           "DESC": "Assim que o usuário for identificado, a marca da organização do usuário identificado será exibida antes da marca padrão do sistema."
@@ -1984,6 +1992,7 @@
           "TITLE": "Usar configuração da organização do usuário",
           "DESC": "Será exibida a marca da organização do projeto, mas assim que o usuário for identificado, será exibida a configuração da organização do usuário identificado."
         },
+        "TITLE": "Configuração de Marca",
         "DIALOG": {
           "TITLE": "Configuração de Marca",
           "DESCRIPTION": "Selecione o comportamento do login ao usar o projeto."
@@ -2015,16 +2024,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Status",
       "0": "Não definido",
       "1": "Ativo",
-      "2": "Inativo"
+      "2": "Inativo",
+      "TITLE": "Status"
     },
     "TYPE": {
-      "TITLE": "Tipo",
       "0": "Tipo desconhecido",
       "1": "Próprio",
-      "2": "Concedido"
+      "2": "Concedido",
+      "TITLE": "Tipo"
     },
     "NAME": "Nome",
     "NAMEDIALOG": {
@@ -2176,7 +2185,8 @@
       "UPDATED": "Projeto alterado.",
       "GRANTUPDATED": "Concessão alterada.",
       "DELETED": "Projeto excluído."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Click to edit project name"
   },
   "ROLES": {
     "DIALOG": {
@@ -2234,6 +2244,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Insira as credenciais para o seu Provedor de Identidade LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with SAML",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -2268,10 +2286,10 @@
       "2": "inativo"
     },
     "AZUREADTENANTTYPES": {
-      "3": "ID do Locatário",
       "0": "Comum",
       "1": "Organizações",
-      "2": "Consumidores"
+      "2": "Consumidores",
+      "3": "ID do Locatário"
     },
     "AZUREADTENANTTYPE": "Tipo de Locatário",
     "AZUREADTENANTID": "ID do Locatário",
@@ -2367,7 +2385,27 @@
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
     "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
     "USEPKCE": "Usar PKCE",
-    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação",
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
+    "REMOVE_WARN_TITLE": "Remove IdP",
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    }
   },
   "MFA": {
     "LIST": {
@@ -2440,7 +2478,11 @@
         "DELETE_TITLE": "Excluir configuração SMTP",
         "DELETE_DESCRIPTION": "Você está prestes a excluir uma configuração. Confirme esta ação digitando o nome do remetente",
         "DELETED": "A configuração SMTP foi excluída",
-        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP."
+        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP.",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result",
+        "TEST_TITLE": "Test your SMTP config"
       }
     },
     "CREATE": {
@@ -2516,7 +2558,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Próximos Passos",
         "0": {
           "TITLE": "Adicionar funções",
           "DESC": "Insira as funções do seu projeto"
@@ -2528,8 +2569,24 @@
         "2": {
           "TITLE": "Ajuda e Suporte",
           "DESC": "Leia nossa documentação sobre como criar aplicativos ou entre em contato com nosso suporte"
-        }
-      }
+        },
+        "TITLE": "Próximos Passos"
+      },
+      "CREATE_PROJECT_AUTO": "Criar projeto automaticamente",
+      "CREATE_PROJECT_AUTO_DESC": "Recomendado se você é novo no ZITADEL. Cuidaremos da configuração do projeto para você.",
+      "QUICK_CREATE_TITLE": "Criar Aplicação",
+      "QUICK_CREATE_DESC": "Crie uma aplicação em três passos simples.",
+      "QUICK_CREATE_FRAMEWORK": "Selecione o seu framework",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Fornecemos uma configuração recomendada para a sua aplicação. Escolha o framework que está a utilizar ou pretende utilizar.",
+      "QUICK_CREATE_NAME": "Dê um nome à sua aplicação",
+      "CUSTOM_APP_TITLE": "Aplicação personalizada",
+      "CUSTOM_APP_DESC": "Criaremos o seu projeto e aplicação com a configuração que escolher abaixo.",
+      "CUSTOM_APP_NAME": "Nome da aplicação",
+      "CUSTOM_APP_NAME_LABEL": "Nome",
+      "CUSTOM_APP_TYPE": "Tipo de aplicação",
+      "CUSTOM_APP_AUTH_METHOD": "Método de autenticação",
+      "CUSTOM_APP_CANCEL": "Cancelar",
+      "CUSTOM_APP_CREATE": "Criar aplicação"
     },
     "NAMEDIALOG": {
       "TITLE": "Renomear Aplicativo",
@@ -2722,6 +2779,90 @@
     "LOGINV2": {
       "USEV2": "Usar a nova interface de usuário de login",
       "BASEURL": "URL base personalizado para a nova interface de usuário de login"
+    },
+    "QUICKSTART": "Início Rápido",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Início Rápido",
+      "DESCRIPTION": "Coloque sua aplicação em funcionamento com a autenticação ZITADEL.",
+      "GETSTARTED": "Comece com sua aplicação",
+      "GETSTARTED_DESC": "Este guia ajudará você a integrar a autenticação ZITADEL em sua aplicação de forma rápida e fácil.",
+      "FRAMEWORK": "Framework",
+      "VIEWDOCS": "Ver Documentação",
+      "VIEWEXAMPLE": "Ver Exemplo",
+      "ENVVARS": "Variáveis de Ambiente",
+      "ENVVARS_DESC": "Adicione estas variáveis de ambiente à sua aplicação:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Qual é o seu ponto de partida?",
+      "QUICKSTART_SUBTITLE": "Escolha a opção que melhor descreve sua situação:",
+      "OPTION1": "Opção 1: Clonar Aplicação de Exemplo",
+      "OPTION1_DESC": "Comece rapidamente com uma aplicação de exemplo funcional:",
+      "OPTION1_NOTE": "Após clonar, atualize as variáveis de ambiente com os detalhes da sua aplicação.",
+      "OPTION2": "Opção 2: Integrar Aplicação Existente",
+      "OPTION2_DESC": "Integre a autenticação ZITADEL em sua aplicação existente:",
+      "STEP1": "Instale o SDK ZITADEL para seu framework",
+      "STEP2": "Configure suas variáveis de ambiente",
+      "STEP3": "Adicione autenticação à sua aplicação",
+      "STEP4": "Teste a integração",
+      "GENERIC": "Integração Geral",
+      "GENERIC_DESC": "Escolha entre nossos exemplos e guias completos:",
+      "ALLEXAMPLES": "Todos os Exemplos",
+      "INTEGRATION_GUIDE": "Guia de Integração",
+      "NEXTSTEPS": "Próximos Passos",
+      "CONFIGURE": "Configurar Definições",
+      "CONFIGURE_DESC": "Personalize a configuração OIDC da sua aplicação",
+      "REDIRECTS": "Configurar Redirecionamentos",
+      "REDIRECTS_DESC": "Configure URLs de redirecionamento e logout",
+      "URLS_DESC": "Veja URLs importantes para integração",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Quero criar uma aplicação nova",
+      "SCENARIO_NEW_DESC": "Perfeito! Vamos ajudá-lo a começar rapidamente com um exemplo funcional que inclui autenticação ZITADEL.",
+      "SCENARIO_NEW_TOGGLE": "Ainda não tenho uma aplicação",
+      "SCENARIO_EXISTING_TITLE": "Quero integrar em uma aplicação existente",
+      "SCENARIO_EXISTING_DESC": "Ótimo! Vamos guiá-lo passo a passo para adicionar autenticação ZITADEL à sua aplicação atual.",
+      "SCENARIO_EXISTING_TOGGLE": "Tenho uma aplicação existente",
+      "CLONE_EXAMPLE": "Clonar Exemplo",
+      "CLONE_NOTE": "Após clonar, atualize o arquivo .env com os detalhes da sua aplicação e você estará pronto!",
+      "BROWSE_EXAMPLES": "Explorar Todos os Exemplos",
+      "GENERIC_NEW_NOTE": "Escolha um exemplo que corresponda à sua stack tecnológica e clone-o para começar rapidamente.",
+      "EXISTING_STEP1_TITLE": "Instale o SDK",
+      "EXISTING_STEP1_DESC": "Adicione o SDK ao seu projeto",
+      "EXISTING_STEP2_TITLE": "Adicione sua configuração",
+      "EXISTING_STEP2_DESC": "Copie e cole estas variáveis de ambiente no arquivo de configuração da sua aplicação",
+      "EXISTING_STEP3_TITLE": "Configure a autenticação",
+      "EXISTING_STEP3_DESC": "Siga nosso guia passo a passo para adicionar autenticação à sua aplicação",
+      "VIEW_SDKS": "Ver Documentação do SDK",
+      "AUTH_STATUS_CHECKING": "Verificando status de autenticação...",
+      "AUTH_STATUS_SUCCESS": "Sua aplicação foi autenticada com ZITADEL.",
+      "AUTH_STATUS_PENDING": "Aguardando primeira autenticação de usuário.",
+      "AUTH_STATUS_PENDING_DESC": "Siga o guia de integração abaixo para configurar a autenticação.",
+      "SUCCESS_TITLE": "🎉 Ótimo! Sua aplicação está conectada com sucesso",
+      "SUCCESS_DESC": "Sua aplicação foi autenticada com sucesso com ZITADEL. Agora você pode usar as variáveis de ambiente abaixo para sua integração.",
+      "ENVVARS_AUTHENTICATED_DESC": "Use estas variáveis de ambiente em sua aplicação:",
+      "INTEGRATION_ENVVARS_TITLE": "Configuração da sua Aplicação",
+      "INTEGRATION_ENVVARS_DESC": "Adicione estas variáveis de ambiente à sua aplicação para conectar-se ao ZITADEL:",
+      "NEW_STEP1_TITLE": "Clone a aplicação de exemplo",
+      "NEW_STEP1_DESC": "Comece rapidamente com um exemplo funcional que inclui autenticação ZITADEL.",
+      "NEW_STEP2_TITLE": "Configure suas variáveis de ambiente",
+      "NEW_STEP2_DESC": "Adicione estas variáveis de ambiente à sua aplicação. Cole-as em um arquivo .env na raiz do projeto ou baixe o arquivo .env e salve-o.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Atualize o arquivo .env.example do exemplo com esses valores e renomeie-o para .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Substitua 'your-client-secret' pelo seu segredo de cliente real. Se você não o salvou durante a criação da aplicação, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "gere um novo aqui",
+      "NEW_STEP3_TITLE": "Execute e teste sua aplicação",
+      "NEW_STEP3_DESC": "Instale as dependências.",
+      "NEW_STEP3_DESC2": "Inicie sua aplicação e teste o fluxo de autenticação.",
+      "NEW_STEP4_TITLE": "Veja a documentação",
+      "NEW_STEP4_DESC": "Siga nosso guia sobre como personalizar e expandir sua aplicação com ZITADEL.",
+      "STEP4_ACTION": "Ver Documentos",
+      "GENERIC_NEW_TITLE": "Escolha seu ponto de partida",
+      "GENERIC_EXISTING_TITLE": "Escolha sua abordagem de integração",
+      "GENERIC_EXISTING_NOTE": "Como não há SDK específico disponível para seu framework, você pode usar nossos guias gerais de integração ou trabalhar diretamente com os endpoints OIDC/OAuth2.",
+      "API_DOCS": "Documentação da API",
+      "NEW_STEP_DOCS_TITLE": "Ver documentação completa",
+      "NEW_STEP_DOCS_DESC": "Saiba mais sobre opções avançadas de configuração e melhores práticas para seu framework.",
+      "EXISTING_STEP_DOCS_TITLE": "Saiba mais sobre integração",
+      "EXISTING_STEP_DOCS_DESC": "Explore nossa documentação detalhada para configuração avançada e solução de problemas.",
+      "SELECT_FRAMEWORK": "Selecione seu framework",
+      "SELECT_FRAMEWORK_DESC": "Escolha o framework que você está usando para obter orientações e exemplos de integração personalizados."
     }
   },
   "GENDERS": {
@@ -2757,10 +2898,10 @@
     "ADD": "Adicionar um Gerente",
     "CREATIONTYPE": "Tipo de Criação",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organização",
       "0": "Projeto Próprio",
       "1": "Projeto Concedido",
+      "2": "Organização",
+      "3": "IAM",
       "4": "Projeto"
     },
     "EDITROLE": "Editar funções",
