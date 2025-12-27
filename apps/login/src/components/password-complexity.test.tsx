@@ -172,7 +172,7 @@ describe("<PasswordComplexity/>", () => {
     expect(screen.queryByTestId("lowercase-check")).not.toBeInTheDocument();
   });
 
-  test("should render an enabled rule in failing state when password does not match", () => {
+  test("should render failing state for uppercase requirement when password lacks uppercase", () => {
     render(
       <NextIntlClientProvider locale="en" messages={messages}>
         <PasswordComplexity
