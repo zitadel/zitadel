@@ -47,12 +47,12 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
 export async function setLanguageCookie(language: string) {
   const cookiesList = await cookies();
 
-  cookiesList.set({
-        name: LANGUAGE_COOKIE_NAME,
-        value: language,
-        httpOnly: true,
-        path: "/",
-    });
+  await cookiesList.set({
+    name: LANGUAGE_COOKIE_NAME,
+    value: language,
+    httpOnly: true,
+    path: "/",
+  });
 }
 
 export async function secureSessionCookiesUsed(): Promise<boolean> {
