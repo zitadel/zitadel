@@ -121,7 +121,8 @@
                 "i18n-iso-countries/langs/ko.json",
                 "i18n-iso-countries/langs/ro.json",
                 "i18n-iso-countries/langs/tr.json",
-                "i18n-iso-countries/langs/uk.json"
+                "i18n-iso-countries/langs/uk.json",
+                "i18n-iso-countries/langs/ar.json"
               ]
             }
           },
