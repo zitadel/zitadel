@@ -25,7 +25,7 @@ func TestServer_CreateTarget(t *testing.T) {
 		signingKey   bool
 	}
 	alreadyExistingTargetName := integration.TargetName()
-	instance.CreateTarget(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", target_domain.TargetTypeAsync, false)
+	instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", target_domain.TargetTypeAsync, false)
 	tests := []struct {
 		name string
 		ctx  context.Context
@@ -262,7 +262,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -289,7 +289,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "no change, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -307,7 +307,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -325,7 +325,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "regenerate signingkey, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -343,7 +343,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -365,7 +365,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -383,7 +383,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -401,7 +401,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type async, ok",
 			prepare: func(request *action.UpdateTargetRequest) {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeAsync, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeAsync, false).GetId()
 				request.Id = targetID
 			},
 			args: args{
@@ -497,7 +497,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				return creationDate, time.Time{}
 			},
@@ -509,7 +509,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *action.DeleteTargetRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				targetID := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
+				targetID := instance.CreateTargetWithoutPayloadType(iamOwnerCtx, t, "", "https://example.com", target_domain.TargetTypeWebhook, false).GetId()
 				request.Id = targetID
 				instance.DeleteTarget(iamOwnerCtx, t, targetID)
 				return creationDate, time.Now().UTC()

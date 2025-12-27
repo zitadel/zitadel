@@ -30,6 +30,7 @@ func Test_createTargetToCommand(t *testing.T) {
 				Endpoint:         "",
 				Timeout:          0,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeUnspecified,
 			},
 		},
 		{
@@ -40,7 +41,8 @@ func Test_createTargetToCommand(t *testing.T) {
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
@@ -48,6 +50,7 @@ func Test_createTargetToCommand(t *testing.T) {
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeJSON,
 			},
 		},
 		{
@@ -58,7 +61,8 @@ func Test_createTargetToCommand(t *testing.T) {
 				TargetType: &action.CreateTargetRequest_RestAsync{
 					RestAsync: &action.RESTAsync{},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JWT,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
@@ -66,6 +70,7 @@ func Test_createTargetToCommand(t *testing.T) {
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeJWT,
 			},
 		},
 		{
@@ -78,7 +83,8 @@ func Test_createTargetToCommand(t *testing.T) {
 						InterruptOnError: true,
 					},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JWE,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
@@ -86,6 +92,7 @@ func Test_createTargetToCommand(t *testing.T) {
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: true,
+				PayloadType:      target_domain.PayloadTypeJWE,
 			},
 		},
 	}

@@ -26,12 +26,12 @@ var headersToForward = map[string]bool{
 	strings.ToLower(http_utils.Origin):        true,
 }
 
-func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFunc {
+func ExecutionHandler(alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey) connect.UnaryInterceptorFunc {
 	return func(handler connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (_ connect.AnyResponse, err error) {
 
 			requestTargets := execution.QueryExecutionTargetsForRequest(ctx, req.Spec().Procedure)
-			handledReq, err := executeTargetsForRequest(ctx, requestTargets, req.Spec().Procedure, req, alg)
+			handledReq, err := executeTargetsForRequest(ctx, requestTargets, req.Spec().Procedure, req, alg, activeSigningKey)
 			if err != nil {
 				return nil, err
 			}
@@ -42,12 +42,12 @@ func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFu
 			}
 
 			responseTargets := execution.QueryExecutionTargetsForResponse(ctx, req.Spec().Procedure)
-			return executeTargetsForResponse(ctx, responseTargets, req.Spec().Procedure, handledReq, response, alg)
+			return executeTargetsForResponse(ctx, responseTargets, req.Spec().Procedure, handledReq, response, alg, activeSigningKey)
 		}
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, alg crypto.EncryptionAlgorithm) (_ connect.AnyRequest, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey) (_ connect.AnyRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -67,14 +67,14 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		Headers:    SetRequestHeaders(req.Header()),
 	}
 
-	_, err = execution.CallTargets(ctx, targets, info, alg)
+	_, err = execution.CallTargets(ctx, targets, info, alg, activeSigningKey)
 	if err != nil {
 		return nil, err
 	}
 	return req, nil
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, resp connect.AnyResponse, alg crypto.EncryptionAlgorithm) (_ connect.AnyResponse, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, resp connect.AnyResponse, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey) (_ connect.AnyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -95,7 +95,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		Headers:    SetRequestHeaders(req.Header()),
 	}
 
-	_, err = execution.CallTargets(ctx, targets, info, alg)
+	_, err = execution.CallTargets(ctx, targets, info, alg, activeSigningKey)
 	if err != nil {
 		return nil, err
 	}

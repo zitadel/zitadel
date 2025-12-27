@@ -573,6 +573,10 @@ Errors:
     NoTimeout: Cíl nemá časový limit
     InvalidURL: Cíl má neplatnou adresu URL
     NotFound: Cíl nenalezen
+    InvalidExpirationDate: Datum vypršení platnosti klíče musí být v budoucnosti
+    PublicKeyExpired: Veřejný klíč cíle vypršel
+    PublicKeyActive: Nelze odstranit aktivní veřejný klíč cíle
+    InvalidPublicKey: Veřejný klíč je neplatný. Musí být PEM kódovaný RSA nebo ECDSA veřejný klíč ve formátu PKCS#8
   Execution:
     ConditionInvalid: Podmínka provedení je neplatná
     Invalid: Provedení je neplatné
@@ -581,6 +585,7 @@ Errors:
     NoTargets: Nejsou definovány žádné cíle
     Failed: Provedení se nezdařilo
     ResponseIsNotValidJSON: Odpověď není platný JSON
+    MissingEncryptionKey: Chybí klíč pro šifrování
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:

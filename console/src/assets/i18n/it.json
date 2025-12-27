@@ -622,6 +622,14 @@
           "restAsync": "REST Asincrono"
         },
         "TYPES_DESCRIPTION": "Webhook, la chiamata gestisce il codice di stato ma la risposta è irrilevante\nCall, la chiamata gestisce il codice di stato e la risposta\nAsync, la chiamata non gestisce né il codice di stato né la risposta, ma può essere eseguita in parallelo con altri obiettivi",
+        "PAYLOAD_TYPE": "Tipo di payload",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Non specificato",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token crittografato (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Payload JSON standard con un'intestazione di firma per la verifica.\nJWT: Il payload viene inviato come JWT firmato. La verifica è autonoma utilizzando la firma del JWT.\nJWE: Il JWT è inoltre crittografato per prevenire l'accesso non autorizzato alle informazioni del payload.",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Inserisci l'endpoint in cui è ospitato il tuo codice. Assicurati che sia accessibile per noi!",
         "TIMEOUT": "Timeout",

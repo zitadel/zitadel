@@ -622,6 +622,14 @@
           "restAsync": "REST Asynchroniczny"
         },
         "TYPES_DESCRIPTION": "Webhook, wywołanie obsługuje kod stanu, ale odpowiedź jest nieistotna\nCall, wywołanie obsługuje kod stanu i odpowiedź\nAsync, wywołanie nie obsługuje ani kodu stanu, ani odpowiedzi, ale może być wywoływane równolegle z innymi celami",
+        "PAYLOAD_TYPE": "Typ ładunku",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nieokreślony",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Zaszyfrowany JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardowy ładunek JSON z nagłówkiem podpisu do weryfikacji.\nJWT: Ładunek jest wysyłany jako podpisany JWT. Weryfikacja odbywa się za pomocą podpisu JWT.\nJWE: JWT jest dodatkowo szyfrowany, aby zapobiec nieautoryzowanemu dostępowi do informacji w ładunku.",
         "ENDPOINT": "Punkt końcowy",
         "ENDPOINT_DESCRIPTION": "Wprowadź punkt końcowy, w którym hostowany jest Twój kod. Upewnij się, że jest dla nas dostępny!",
         "TIMEOUT": "Limit czasu",

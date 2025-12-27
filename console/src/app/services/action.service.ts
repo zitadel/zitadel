@@ -22,7 +22,7 @@ import {
   SetExecutionResponse,
   UpdateTargetRequestSchema,
   UpdateTargetResponse,
-} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+} from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 import { UserService } from './user.service';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 

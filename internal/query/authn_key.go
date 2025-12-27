@@ -84,6 +84,10 @@ var (
 		name:  projection.AuthNKeyEnabledCol,
 		table: authNKeyTable,
 	}
+	AuthNKeyColumnFingerprint = Column{
+		name:  projection.AuthNKeyFingerprintCol,
+		table: authNKeyTable,
+	}
 )
 
 type AuthNKeys struct {
@@ -100,8 +104,11 @@ type AuthNKey struct {
 	Sequence      uint64
 	ApplicationID string
 
-	Expiration time.Time
-	Type       domain.AuthNKeyType
+	Expiration  time.Time
+	Type        domain.AuthNKeyType
+	Enabled     bool
+	PublicKey   []byte
+	Fingerprint string
 }
 
 type AuthNKeysData struct {
@@ -141,6 +148,7 @@ const (
 	JoinFilterUnspecified JoinFilter = iota
 	JoinFilterApp
 	JoinFilterUserMachine
+	JoinFilterTarget
 )
 
 // SearchAuthNKeys returns machine or app keys, depending on the join filter.
@@ -173,10 +181,16 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	case JoinFilterUserMachine:
 		query = query.Join(join(MachineUserIDCol, AuthNKeyColumnIdentifier))
 		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnIdentifier)
+	case JoinFilterTarget:
+		query = query.Join(join(TargetColumnID, AuthNKeyColumnObjectID))
 	}
 	eq := sq.Eq{
-		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	// Until now all disabled keys were just filtered out, but target keys can be explicitly disabled and
+	// the state needs to be returned rather than filtering them out.
+	if joinFilter != JoinFilterTarget {
+		eq[AuthNKeyColumnEnabled.identifier()] = true
 	}
 
 	stmt, args, err := query.Where(eq).ToSql()
@@ -283,6 +297,14 @@ func NewAuthNKeyIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnID, id, TextEquals)
 }
 
+func NewAuthNKeyInIDsSearchQuery(ids []string) (SearchQuery, error) {
+	return NewInTextQuery(AuthNKeyColumnID, ids)
+}
+
+func NewAuthNKeyEnabledSearchQuery(enabled bool) (SearchQuery, error) {
+	return NewBoolQuery(AuthNKeyColumnEnabled, enabled)
+}
+
 func NewAuthNKeyIdentifyerQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnIdentifier, id, TextEquals)
 }
@@ -291,8 +313,19 @@ func NewAuthNKeyCreationDateQuery(ts time.Time, compare TimestampComparison) (Se
 	return NewTimestampQuery(AuthNKeyColumnCreationDate, ts, compare)
 }
 
-func NewAuthNKeyExpirationDateDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
-	return NewTimestampQuery(AuthNKeyColumnExpiration, ts, compare)
+func NewAuthNKeyExpirationDateQuery(ts time.Time, compare TimestampComparison) (SearchQuery, error) {
+	query, err := NewTimestampQuery(AuthNKeyColumnExpiration, ts, compare)
+	if err != nil {
+		return nil, err
+	}
+	if compare != TimestampGreater && compare != TimestampGreaterOrEquals {
+		return query, nil
+	}
+	noExpiration, err := NewIsNullQuery(AuthNKeyColumnExpiration)
+	if err != nil {
+		return nil, err
+	}
+	return NewOrQuery(query, noExpiration)
 }
 
 //go:embed authn_key_user.sql
@@ -344,6 +377,9 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		AuthNKeyColumnExpiration.identifier(),
 		AuthNKeyColumnType.identifier(),
 		AuthNKeyColumnObjectID.identifier(),
+		AuthNKeyColumnEnabled.identifier(),
+		AuthNKeyColumnPublicKey.identifier(),
+		AuthNKeyColumnFingerprint.identifier(),
 		countColumn.identifier(),
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
@@ -352,6 +388,8 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		authNKeys := make([]*AuthNKey, 0)
 		var count uint64
 		for rows.Next() {
+			var expiration sql.NullTime
+			var fingerprint sql.NullString
 			authNKey := new(AuthNKey)
 			err := rows.Scan(
 				&authNKey.ID,
@@ -360,13 +398,22 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.ChangeDate,
 				&authNKey.ResourceOwner,
 				&authNKey.Sequence,
-				&authNKey.Expiration,
+				&expiration,
 				&authNKey.Type,
 				&authNKey.ApplicationID,
+				&authNKey.Enabled,
+				&authNKey.PublicKey,
+				&fingerprint,
 				&count,
 			)
 			if err != nil {
 				return nil, err
+			}
+			if expiration.Valid {
+				authNKey.Expiration = expiration.Time
+			}
+			if fingerprint.Valid {
+				authNKey.Fingerprint = fingerprint.String
 			}
 			authNKeys = append(authNKeys, authNKey)
 		}

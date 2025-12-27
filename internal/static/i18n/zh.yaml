@@ -576,6 +576,10 @@ Errors:
     NoTimeout: 目标没有超时
     InvalidURL: 目标的 URL 无效
     NotFound: 未找到目标
+    InvalidExpirationDate: 密钥的到期日期必须是将来的时间
+    PublicKeyExpired: 目标公钥已过期
+    PublicKeyActive: 无法删除处于活动状态的目标公钥
+    InvalidPublicKey: 公钥无效。必须是 PEM 编码的 RSA 或 ECDSA 公钥，格式为 PKCS#8
   Execution:
     ConditionInvalid: 执行条件无效
     Invalid: 执行无效
@@ -584,6 +588,7 @@ Errors:
     NoTargets: 没有定义目标
     Failed: 执行失败
     ResponseIsNotValidJSON: 响应不是有效的 JSON
+    MissingEncryptionKey: 缺少加密密钥
   UserSchema:
     NotEnabled: 未启用“用户架构”功能
     Type:

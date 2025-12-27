@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -30,6 +32,7 @@ const (
 	AuthNKeyPublicKeyCol     = "public_key"
 	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
+	AuthNKeyFingerprintCol   = "fingerprint"
 )
 
 type authNKeyProjection struct{}
@@ -53,11 +56,12 @@ func (*authNKeyProjection) Init() *old_handler.Check {
 			handler.NewColumn(AuthNKeyAggregateIDCol, handler.ColumnTypeText),
 			handler.NewColumn(AuthNKeySequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(AuthNKeyObjectIDCol, handler.ColumnTypeText),
-			handler.NewColumn(AuthNKeyExpirationCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(AuthNKeyExpirationCol, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(AuthNKeyIdentifierCol, handler.ColumnTypeText),
 			handler.NewColumn(AuthNKeyPublicKeyCol, handler.ColumnTypeBytes),
 			handler.NewColumn(AuthNKeyEnabledCol, handler.ColumnTypeBool, handler.Default(true)),
 			handler.NewColumn(AuthNKeyTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
+			handler.NewColumn(AuthNKeyFingerprintCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
 			handler.WithIndex(handler.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
@@ -118,6 +122,31 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
+			Aggregate: target.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  target.KeyAddedEventType,
+					Reduce: p.reduceAuthNKeyAdded,
+				},
+				{
+					Event:  target.KeyActivatedEventType,
+					Reduce: p.reduceTargetKeyActivated,
+				},
+				{
+					Event:  target.KeyDeactivatedEventType,
+					Reduce: p.reduceTargetKeyDeactivated,
+				},
+				{
+					Event:  target.KeyRemovedEventType,
+					Reduce: p.reduceAuthNKeyRemoved,
+				},
+				{
+					Event:  target.RemovedEventType,
+					Reduce: p.reduceAuthNKeyRemoved,
+				},
+			},
+		},
+		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
@@ -141,30 +170,43 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var authNKeyEvent struct {
 		eventstore.BaseEvent
-		keyID      string
-		objectID   string
-		expiration time.Time
-		identifier string
-		publicKey  []byte
-		keyType    domain.AuthNKeyType
+		keyID       string
+		objectID    string
+		expiration  sql.NullTime
+		identifier  string
+		publicKey   []byte
+		keyType     domain.AuthNKeyType
+		fingerprint sql.NullString
+		enabled     bool
 	}
 	switch e := event.(type) {
 	case *project.ApplicationKeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.AppID
-		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: true}
 		authNKeyEvent.identifier = e.ClientID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
+		authNKeyEvent.enabled = true
 	case *user.MachineKeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
 		authNKeyEvent.objectID = e.Aggregate().ID
-		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: true}
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
+		authNKeyEvent.enabled = true
+	case *target.KeyAddedEvent:
+		authNKeyEvent.BaseEvent = e.BaseEvent
+		authNKeyEvent.keyID = e.KeyID
+		authNKeyEvent.objectID = e.Aggregate().ID
+		authNKeyEvent.expiration = sql.NullTime{Time: e.ExpirationDate, Valid: !e.ExpirationDate.IsZero()}
+		authNKeyEvent.identifier = e.Aggregate().ID
+		authNKeyEvent.publicKey = e.PublicKey
+		authNKeyEvent.fingerprint = sql.NullString{String: e.Fingerprint, Valid: true}
+		authNKeyEvent.enabled = false
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
@@ -183,6 +225,8 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 			handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
 			handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
 			handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
+			handler.NewCol(AuthNKeyFingerprintCol, authNKeyEvent.fingerprint),
+			handler.NewCol(AuthNKeyEnabledCol, authNKeyEvent.enabled),
 		},
 	), nil
 }
@@ -239,6 +283,10 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 		condition = handler.NewCond(AuthNKeyIDCol, e.KeyID)
 	case *user.UserRemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
+	case *target.KeyRemovedEvent:
+		condition = handler.NewCond(AuthNKeyIDCol, e.KeyID)
+	case *target.RemovedEvent:
+		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
 	}
@@ -262,6 +310,58 @@ func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(AuthNKeyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *authNKeyProjection) reduceTargetKeyActivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*target.KeyActivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AuthNKeyEnabledCol, false),
+				handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+				handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID),
+				handler.NewCond(AuthNKeyEnabledCol, true),
+			},
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AuthNKeyEnabledCol, true),
+				handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+				handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AuthNKeyIDCol, e.KeyID),
+				handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *authNKeyProjection) reduceTargetKeyDeactivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*target.KeyDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AuthNKeyEnabledCol, false),
+			handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+			handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyIDCol, e.KeyID),
+			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }

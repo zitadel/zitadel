@@ -575,6 +575,10 @@ Errors:
     NoTimeout: Target tidak memiliki batas waktu
     InvalidURL: Target memiliki URL yang tidak valid
     NotFound: Sasaran tidak ditemukan
+    InvalidExpirationDate: Tanggal kadaluwarsa kunci harus di masa depan
+    PublicKeyExpired: Kunci publik target telah kedaluwarsa
+    PublicKeyActive: Tidak dapat menghapus kunci publik target yang aktif
+    InvalidPublicKey: Kunci publik tidak valid. Harus merupakan kunci publik RSA atau ECDSA yang dikodekan PEM dalam format PKCS#8
   Execution:
     ConditionInvalid: Kondisi eksekusi tidak valid
     Invalid: Eksekusi tidak valid
@@ -583,6 +587,7 @@ Errors:
     NoTargets: Tidak ada target yang ditentukan
     Failed: Eksekusi gagal
     ResponseIsNotValidJSON: Responsnya bukan JSON yang valid
+    MissingEncryptionKey: Kunci enkripsi hilang
   UserSchema:
     NotEnabled: Fitur "Skema Pengguna" tidak diaktifkan
     Type:

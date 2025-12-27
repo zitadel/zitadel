@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
@@ -24,6 +25,7 @@ const (
 	TargetTimeoutCol          = "timeout"
 	TargetInterruptOnErrorCol = "interrupt_on_error"
 	TargetSigningKey          = "signing_key"
+	TargetPayloadType         = "payload_type"
 )
 
 type targetProjection struct{}
@@ -51,6 +53,7 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64),
 			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool),
 			handler.NewColumn(TargetSigningKey, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(TargetPayloadType, handler.ColumnTypeEnum, handler.Default(target_domain.PayloadTypeUnspecified)),
 		},
 			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
@@ -108,6 +111,7 @@ func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(TargetTimeoutCol, e.Timeout),
 			handler.NewCol(TargetInterruptOnErrorCol, e.InterruptOnError),
 			handler.NewCol(TargetSigningKey, e.SigningKey),
+			handler.NewCol(TargetPayloadType, e.PayloadType),
 		},
 	), nil
 }
@@ -139,6 +143,9 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 	}
 	if e.SigningKey != nil {
 		values = append(values, handler.NewCol(TargetSigningKey, e.SigningKey))
+	}
+	if e.PayloadType != target_domain.PayloadTypeUnspecified {
+		values = append(values, handler.NewCol(TargetPayloadType, e.PayloadType))
 	}
 	return handler.NewUpdateStatement(
 		e,

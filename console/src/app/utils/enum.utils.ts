@@ -30,8 +30,8 @@ type NumericEnum = Record<string, string | number> & Record<number, string>;
  * // Returns: ['SAML_BINDING_UNSPECIFIED', 'SAML_BINDING_POST', ...]
  * ```
  */
-export function getEnumKeys<T extends NumericEnum>(enumObject: T): string[] {
-  return Object.keys(enumObject).filter((key) => isNaN(Number(key)));
+export function getEnumKeys<T extends NumericEnum>(enumObject: T): (keyof T)[] {
+  return Object.keys(enumObject).filter((key) => isNaN(Number(key))) as unknown as (keyof T)[];
 }
 
 /**
@@ -45,7 +45,7 @@ export function getEnumKeys<T extends NumericEnum>(enumObject: T): string[] {
  * // Returns: 'SAML_BINDING_POST'
  * ```
  */
-export function getEnumKeyFromValue<T extends NumericEnum>(enumObject: T, value: number): string | undefined {
+export function getEnumKeyFromValue<T extends NumericEnum>(enumObject: T, value: number): keyof T | undefined {
   return Object.keys(enumObject).find((key) => enumObject[key] === value && isNaN(Number(key)));
 }
 

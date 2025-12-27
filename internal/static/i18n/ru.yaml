@@ -564,6 +564,10 @@ Errors:
     NoTimeout: У цели нет тайм-аута
     InvalidURL: Цель имеет неверный URL-адрес
     NotFound: Цель не найдена
+    InvalidExpirationDate: Дата истечения срока действия ключа должна быть в будущем
+    PublicKeyExpired: Публичный ключ цели просрочен
+    PublicKeyActive: Невозможно удалить активный публичный ключ цели
+    InvalidPublicKey: Публичный ключ недействителен. Должен быть PEM-кодированный RSA или ECDSA публичный ключ в формате PKCS#8
   Execution:
     ConditionInvalid: Недопустимое условие выполнения
     Invalid: Исполнение недействительно
@@ -572,6 +576,7 @@ Errors:
     NoTargets: Цели не определены
     Failed: Выполнение не удалось
     ResponseIsNotValidJSON: Ответ не является допустимым JSON
+    MissingEncryptionKey: Отсутствует ключ шифрования
   UserSchema:
     NotEnabled: Функция «Пользовательская схема» не включена
     Type:

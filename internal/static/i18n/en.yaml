@@ -576,6 +576,10 @@ Errors:
     NoTimeout: Target has no timeout
     InvalidURL: Target has an invalid URL
     NotFound: Target not found
+    InvalidExpirationDate: Key expiration date must be in the future
+    PublicKeyExpired: Target public key is expired
+    PublicKeyActive: Cannot delete active target public key
+    InvalidPublicKey: The public key is invalid. Must be a PEM encoded RSA or ECDSA public key in PKCS#8 format
   Execution:
     ConditionInvalid: Execution condition is invalid
     Invalid: Execution is invalid
@@ -584,6 +588,7 @@ Errors:
     NoTargets: No targets defined
     Failed: Execution failed
     ResponseIsNotValidJSON: Response is not valid JSON
+    MissingEncryptionKey: No encryption key found for target
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:

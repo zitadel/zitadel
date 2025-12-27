@@ -26,6 +26,7 @@ var (
 		` projections.targets2.endpoint,` +
 		` projections.targets2.interrupt_on_error,` +
 		` projections.targets2.signing_key,` +
+		` projections.targets2.payload_type,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.targets2`
 	prepareTargetsCols = []string{
@@ -39,6 +40,7 @@ var (
 		"endpoint",
 		"interrupt_on_error",
 		"signing_key",
+		"payload_type",
 		"count",
 	}
 
@@ -51,7 +53,8 @@ var (
 		` projections.targets2.timeout,` +
 		` projections.targets2.endpoint,` +
 		` projections.targets2.interrupt_on_error,` +
-		` projections.targets2.signing_key` +
+		` projections.targets2.signing_key,` +
+		` projections.targets2.payload_type` +
 		` FROM projections.targets2`
 	prepareTargetCols = []string{
 		"id",
@@ -64,6 +67,7 @@ var (
 		"endpoint",
 		"interrupt_on_error",
 		"signing_key",
+		"payload_type",
 	}
 )
 
@@ -114,6 +118,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJSON,
 						},
 					},
 				),
@@ -141,6 +146,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJSON,
 					},
 				},
 			},
@@ -169,6 +175,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJSON,
 						},
 						{
 							"id-2",
@@ -186,6 +193,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJWT,
 						},
 						{
 							"id-3",
@@ -203,6 +211,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJWE,
 						},
 					},
 				),
@@ -230,6 +239,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJSON,
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -249,6 +259,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJWT,
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -268,6 +279,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJWE,
 					},
 				},
 			},
@@ -330,6 +342,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						target_domain.PayloadTypeJSON,
 					},
 				),
 			},
@@ -351,6 +364,7 @@ func Test_TargetPrepares(t *testing.T) {
 					KeyID:      "encKey",
 					Crypted:    []byte("crypted"),
 				},
+				PayloadType: target_domain.PayloadTypeJSON,
 			},
 		},
 		{

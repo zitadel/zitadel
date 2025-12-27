@@ -570,6 +570,10 @@ Errors:
     NoTimeout: Ціль не має часу очікування
     InvalidURL: Ціль має недійсний URL
     NotFound: Ціль не знайдена
+    InvalidExpirationDate: Дата закінчення терміну дії ключа має бути в майбутньому
+    PublicKeyExpired: Публічний ключ цілі прострочено
+    PublicKeyActive: Неможливо видалити активний публічний ключ цілі
+    InvalidPublicKey: Публічний ключ недійсний. Має бути PEM-кодований RSA або ECDSA публічний ключ у форматі PKCS#8
   Execution:
     ConditionInvalid: Умова виконання недійсна
     Invalid: Виконання недійсне
@@ -578,6 +582,7 @@ Errors:
     NoTargets: Не визначено цілей
     Failed: Виконання не вдалося
     ResponseIsNotValidJSON: Відповідь не є дійсним JSON
+    MissingEncryptionKey: Відсутній ключ шифрування для виконання
   UserSchema:
     NotEnabled: Функція "Схема користувача" не увімкнена
     Type:

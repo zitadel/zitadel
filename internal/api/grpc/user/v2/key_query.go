@@ -98,7 +98,7 @@ func authnKeyCreatedFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQue
 }
 
 func authnKeyExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
-	return query.NewAuthNKeyExpirationDateDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
+	return query.NewAuthNKeyExpirationDateQuery(f.Timestamp.AsTime(), filter.TimestampMethodPbToQuery(f.Method))
 }
 
 // authnKeyFieldNameToSortingColumn defaults to the creation date because this ensures deterministic pagination

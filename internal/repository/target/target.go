@@ -19,12 +19,13 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name             string                   `json:"name"`
-	TargetType       target_domain.TargetType `json:"targetType"`
-	Endpoint         string                   `json:"endpoint"`
-	Timeout          time.Duration            `json:"timeout"`
-	InterruptOnError bool                     `json:"interruptOnError"`
-	SigningKey       *crypto.CryptoValue      `json:"signingKey"`
+	Name             string                    `json:"name"`
+	TargetType       target_domain.TargetType  `json:"targetType"`
+	Endpoint         string                    `json:"endpoint"`
+	Timeout          time.Duration             `json:"timeout"`
+	InterruptOnError bool                      `json:"interruptOnError"`
+	SigningKey       *crypto.CryptoValue       `json:"signingKey"`
+	PayloadType      target_domain.PayloadType `json:"payloadType"`
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -48,12 +49,20 @@ func NewAddedEvent(
 	timeout time.Duration,
 	interruptOnError bool,
 	signingKey *crypto.CryptoValue,
+	payloadType target_domain.PayloadType,
 ) *AddedEvent {
 	return &AddedEvent{
 		*eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		name, targetType, endpoint, timeout, interruptOnError, signingKey}
+		name,
+		targetType,
+		endpoint,
+		timeout,
+		interruptOnError,
+		signingKey,
+		payloadType,
+	}
 }
 
 type ChangedEvent struct {
@@ -65,6 +74,7 @@ type ChangedEvent struct {
 	Timeout          *time.Duration            `json:"timeout,omitempty"`
 	InterruptOnError *bool                     `json:"interruptOnError,omitempty"`
 	SigningKey       *crypto.CryptoValue       `json:"signingKey,omitempty"`
+	PayloadType      target_domain.PayloadType `json:"payloadType,omitempty"`
 
 	oldName string
 }
@@ -141,6 +151,12 @@ func ChangeInterruptOnError(interruptOnError bool) func(event *ChangedEvent) {
 func ChangeSigningKey(signingKey *crypto.CryptoValue) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.SigningKey = signingKey
+	}
+}
+
+func ChangePayloadType(payloadType target_domain.PayloadType) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.PayloadType = payloadType
 	}
 }
 
