@@ -116,7 +116,7 @@ services:
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
       - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
-      - NODE_ENV=test
+      - NON_SECURE_SESSION_COOKIE=true
     volumes:
       - '.:/current-dir:ro'
     networks:

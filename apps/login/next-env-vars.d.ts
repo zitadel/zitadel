@@ -23,9 +23,14 @@ declare namespace NodeJS {
     ZITADEL_SERVICE_USER_TOKEN: string;
 
     /**
-     * Optional: wheter a user must have verified email
+     * Optional: whether a user must have verified email
      */
     EMAIL_VERIFICATION: string;
+
+    /**
+     * Optional: remove the secure flag to session cookies for non-HTTPS development environments - use with caution!
+     */
+    NON_SECURE_SESSION_COOKIE?: string;
 
     /**
      * Optional: custom request headers to be added to every request
