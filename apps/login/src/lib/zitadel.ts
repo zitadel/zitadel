@@ -21,6 +21,8 @@ import {
   AddHumanUserRequestSchema,
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
+  ResendPhoneCodeRequest,
+  ResendPhoneCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
@@ -945,6 +947,25 @@ export async function verifyEmail({
   );
 }
 
+export async function verifyPhone({
+  serviceConfig,
+  userId,
+  verificationCode,
+}: WithServiceConfig<{
+  userId: string;
+  verificationCode: string;
+}>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.verifyPhone(
+    {
+      userId,
+      verificationCode,
+    },
+    {},
+  );
+}
+
 export async function resendEmailCode({
   serviceConfig,
   userId,
@@ -966,6 +987,25 @@ export async function resendEmailCode({
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
   return userService.resendEmailCode(request, {});
+}
+
+export async function resendPhoneCode({
+  serviceConfig,
+  userId,
+}: WithServiceConfig<{
+  userId: string;
+}>) {
+  const request: ResendPhoneCodeRequest = create(ResendPhoneCodeRequestSchema, {
+    userId,
+    verification: {
+      case: "sendCode",
+      value: {},
+    },
+  });
+
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.resendPhoneCode(request, {});
 }
 
 export async function retrieveIDPIntent({

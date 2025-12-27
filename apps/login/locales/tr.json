@@ -243,6 +243,8 @@
       "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
       "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
       "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+      "emailOtpAdded": "E-posta ile kod başarıyla eklendi.",
+      "smsOtpAdded": "SMS ile kod başarıyla eklendi.",
       "submit": "Devam",
       "labels": {
         "code": "Kod"

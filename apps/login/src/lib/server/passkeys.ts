@@ -21,7 +21,7 @@ import { userAgent } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceConfig } from "../service-url";
-import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { checkEmailVerification, checkPhoneVerification, checkUserVerification } from "../verify-helper";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 import { completeFlowOrGetUrl } from "../client";
@@ -306,6 +306,13 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
+  }
+
+  // check to see if user phone was verified (if user has a phone)
+  const phoneVerificationCheck = checkPhoneVerification(session, humanUser, organization, requestId);
+
+  if (phoneVerificationCheck?.redirect) {
+    return phoneVerificationCheck;
   }
 
   let redirectResult;

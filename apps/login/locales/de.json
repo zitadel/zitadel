@@ -248,6 +248,8 @@
       "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+      "emailOtpAdded": "Code per E-Mail wurde erfolgreich hinzugefügt.",
+      "smsOtpAdded": "Code per SMS wurde erfolgreich hinzugefügt.",
       "submit": "Weiter",
       "labels": {
         "code": "Code"

@@ -10,6 +10,7 @@ import {
   verifyInviteCode,
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
+  verifyPhone,
 } from "@/lib/zitadel";
 import crypto from "crypto";
 
@@ -53,6 +54,7 @@ type VerifyUserByEmailCommand = {
   code: string;
   isInvite: boolean;
   requestId?: string;
+  isPhoneVerification?: boolean;
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
@@ -64,6 +66,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     ? await verifyInviteCode({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
         console.warn(error);
         return { error: t("errors.couldNotVerifyInvite") };
+      })
+    : command.isPhoneVerification
+    ? await verifyPhone({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
+        console.warn(error);
+        return { error: t("errors.couldNotVerifyPhone") };
       })
     : await verifyEmail({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
         console.warn(error);
@@ -111,6 +118,9 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: t("errors.couldNotLoadAuthenticators") };
   }
 
+  // Load login settings once for reuse
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
+
   // if no authmethods are found on the user, redirect to set one up
   if (authMethodResponse && authMethodResponse.authMethodTypes && authMethodResponse.authMethodTypes.length == 0) {
     if (!sessionCookie) {
@@ -135,6 +145,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     const params = new URLSearchParams({
       sessionId: session.id,
+      initial: "true",
     });
 
     if (session.factors?.user?.loginName) {
@@ -154,6 +165,18 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       path: "/",
       maxAge: 300, // 5 minutes
     });
+
+    // Check if password is the only available authentication method
+    const onlyPasswordAllowed = loginSettings?.allowUsernamePassword && 
+      loginSettings?.passkeysType !== 1; // PasskeysType.ALLOWED = 1
+    
+    // Check if external IDPs are available
+    const noExternalIdp = !loginSettings?.allowExternalIdp;
+
+    // If password is the only option, redirect directly to password setup
+    if (onlyPasswordAllowed && noExternalIdp) {
+      return { redirect: `/password/set?${params}` };
+    }
 
     return { redirect: `/authenticator/set?${params}` };
   }
@@ -183,7 +206,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { redirect: `/verify/success?${verifySuccessParams}` };
   }
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
+  // If we just verified email (not phone or invite), check if phone verification is needed
+  if (!command.isPhoneVerification && !command.isInvite && user.type.case === "human") {
+    const humanUser = user.type.value as any;
+    const { checkPhoneVerification } = await import("../verify-helper");
+    const phoneVerificationCheck = checkPhoneVerification(session, humanUser, command.organization, command.requestId);
+    
+    if (phoneVerificationCheck?.redirect) {
+      return phoneVerificationCheck;
+    }
+  }
 
   // redirect to mfa factor if user has one, or redirect to set one up
   const mfaFactorCheck = await checkMFAFactors(
@@ -225,6 +257,7 @@ type resendVerifyEmailCommand = {
   userId: string;
   isInvite: boolean;
   requestId?: string;
+  isPhoneVerification?: boolean;
 };
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
@@ -234,6 +267,16 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+  if (command.isPhoneVerification) {
+    const { resendPhoneCode } = await import("@/lib/zitadel");
+    return resendPhoneCode({ serviceConfig, userId: command.userId }).catch((error) => {
+      if (error.code === 9) {
+        return { error: t("errors.phoneAlreadyVerified") };
+      }
+      return { error: t("errors.couldNotResendPhone") };
+    });
+  }
 
   return command.isInvite
     ? createInviteCode({
@@ -274,4 +317,39 @@ export async function sendInviteEmailCode(command: SendEmailCommand) {
   const { serviceConfig } = getServiceConfig(_headers);
 
   return createInviteCode({ serviceConfig, userId: command.userId, urlTemplate: command.urlTemplate });
+}
+
+// Separate email verification functions
+type EmailVerificationCommand = {
+  userId: string;
+  loginName?: string;
+  organization?: string;
+  code: string;
+  isInvite: boolean;
+  requestId?: string;
+};
+
+export async function sendEmailVerification(command: EmailVerificationCommand) {
+  return sendVerification({ ...command, isPhoneVerification: false });
+}
+
+export async function resendEmailVerification(command: { userId: string; isInvite: boolean; requestId?: string }) {
+  return resendVerification({ ...command, isPhoneVerification: false });
+}
+
+// Separate phone verification functions
+type PhoneVerificationCommand = {
+  userId: string;
+  loginName?: string;
+  organization?: string;
+  code: string;
+  requestId?: string;
+};
+
+export async function sendPhoneVerification(command: PhoneVerificationCommand) {
+  return sendVerification({ ...command, isInvite: false, isPhoneVerification: true });
+}
+
+export async function resendPhoneVerification(command: { userId: string }) {
+  return resendVerification({ userId: command.userId, isInvite: false, isPhoneVerification: true });
 }
