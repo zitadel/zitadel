@@ -32,9 +32,14 @@ func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *d
 	return writeModelToOrgMetadata(setMetadata), nil
 }
 
-func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, permissionCheck OrganizationPermissionCheck, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metadatas) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
+	}
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, orgID); err != nil {
+			return nil, err
+		}
 	}
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {
@@ -108,9 +113,14 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, permissionCheck OrganizationPermissionCheck, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metadataKeys) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mw2d", "Errors.Metadata.NoData")
+	}
+	if permissionCheck != nil {
+		if err := permissionCheck(ctx, orgID); err != nil {
+			return nil, err
+		}
 	}
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {

@@ -12,21 +12,26 @@ import "zitadel/object/v2/object.proto";
 
 
 message Organization {
-  // Unique identifier of the organization.
+  // ID is the unique identifier of the organization.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
     }
   ];
+
+  // Details about the organizations' creation and change date.
   zitadel.object.v2.Details details = 2;
-  // Current state of the organization, for example active, inactive and deleted.
+
+  // Current state of the organization, for example active, inactive or deleted.
   OrganizationState state = 3;
+
   // Name of the organization.
   string name = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ZITADEL\"";
     }
   ];
+
   // Primary domain used in the organization.
   string primary_domain = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -40,4 +45,39 @@ enum OrganizationState {
   ORGANIZATION_STATE_ACTIVE = 1;
   ORGANIZATION_STATE_INACTIVE = 2;
   ORGANIZATION_STATE_REMOVED = 3;
+}
+
+enum DomainValidationType {
+  DOMAIN_VALIDATION_TYPE_UNSPECIFIED = 0;
+  // HTTP validation requires you to host a specific file on your domain.
+  // This file is checked by us to verify that you own the domain.
+  DOMAIN_VALIDATION_TYPE_HTTP = 1;
+  // DNS validation requires you to create a specific TXT record in your domain's DNS settings.
+  // This record is checked by us to verify that you own the domain.
+  DOMAIN_VALIDATION_TYPE_DNS = 2;
+}
+
+message Domain {
+  // OrganizationID is the unique identifier of the organization the domain belongs to.
+  string organization_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // Domain is the fully qualified domain name.
+  string domain = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"zitadel.com\"";
+    }
+  ];
+
+  // IsVerified is a boolean flag indicating if the domain has been verified.
+  bool is_verified = 3;
+
+  // IsPrimary is a boolean flag indicating if the domain is the primary domain of the organization.
+  bool is_primary = 4;
+
+  // ValidationType indicates the protocol used to validate the domain ownership.
+  DomainValidationType validation_type = 5;
 }
