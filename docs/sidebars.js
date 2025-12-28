@@ -381,6 +381,7 @@ module.exports = {
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/generic-oidc",
             "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/linkedin-oauth",
