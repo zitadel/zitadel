@@ -624,6 +624,14 @@
           "restAsync": "REST Asynchrone"
         },
         "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
+        "PAYLOAD_TYPE": "Type de charge utile",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Non spécifié",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token chiffré (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Charge utile JSON standard avec un en‑tête de signature pour la vérification.\nJWT: La charge utile est envoyée sous forme de JWT signé. La vérification se fait via la signature du JWT.\nJWE: Le JWT est en plus chiffré pour empêcher l'accès non autorisé aux informations de la charge utile.",
         "ENDPOINT": "Point de terminaison",
         "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
         "TIMEOUT": "Délai d'attente",

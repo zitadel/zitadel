@@ -624,6 +624,14 @@
           "restAsync": "REST Asynchroon"
         },
         "TYPES_DESCRIPTION": "Webhook, de oproep verwerkt de statuscode maar de reactie is irrelevant\nCall, de oproep verwerkt de statuscode en de reactie\nAsync, de oproep verwerkt noch de statuscode noch de reactie, maar kan parallel aan andere doelen worden aangeroepen",
+        "PAYLOAD_TYPE": "Payload-type",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Niet opgegeven",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Versleuteld JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standaard JSON-payload met een handtekening-header voor verificatie.\nJWT: De payload wordt als een ondertekend JWT verzonden. Verificatie gebeurt via de JWT-handtekening.\nJWE: Het JWT wordt daarnaast versleuteld om ongeautoriseerde toegang tot payloadinformatie te voorkomen.",
         "ENDPOINT": "Eindpunt",
         "ENDPOINT_DESCRIPTION": "Voer het eindpunt in waar uw code wordt gehost. Zorg ervoor dat het voor ons toegankelijk is!",
         "TIMEOUT": "Time-out",

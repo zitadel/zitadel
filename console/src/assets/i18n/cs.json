@@ -624,6 +624,14 @@
           "restAsync": "REST Asynchronní"
         },
         "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
+        "PAYLOAD_TYPE": "Typ obsahu",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Neurčeno",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifrovaný JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardní JSON payload s hlavičkou pro podpis a ověření.\nJWT: Payload je odeslán jako podepsané JWT. Ověření probíhá pomocí podpisu JWT.\nJWE: JWT je navíc zašifrován, aby se předešlo neoprávněnému přístupu k informacím v payloadu.",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",

@@ -624,6 +624,14 @@
           "restAsync": "REST Aszinkron"
         },
         "TYPES_DESCRIPTION": "Webhook, a hívás kezeli az állapotkódot, de a válasz lényegtelen\nCall, a hívás kezeli az állapotkódot és a választ\nAsync, a hívás sem az állapotkódot, sem a választ nem kezeli, de párhuzamosan hívható más célokkal",
+        "PAYLOAD_TYPE": "Tartalom típusa",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nincs megadva",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Titkosított JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Szabványos JSON üzenet aláírási fejlécvel az ellenőrzéshez.\nJWT: Az üzenet aláírt JWT-ként kerül elküldésre. Az ellenőrzés a JWT aláírásával történik.\nJWE: A JWT további titkosítást kap, hogy megakadályozza az illetéktelen hozzáférést az üzenet adataihoz.",
         "ENDPOINT": "Végpont",
         "ENDPOINT_DESCRIPTION": "Adja meg azt a végpontot, ahol a kódja található. Győződjön meg arról, hogy elérhető számunkra!",
         "TIMEOUT": "Időtúllépés",

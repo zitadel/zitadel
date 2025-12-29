@@ -624,6 +624,14 @@
           "restAsync": "REST Asynkron"
         },
         "TYPES_DESCRIPTION": "Webhook, anropet hanterar statuskoden men svaret är irrelevant\nCall, anropet hanterar statuskoden och svaret\nAsync, anropet hanterar varken statuskod eller svar men kan anropas parallellt med andra mål",
+        "PAYLOAD_TYPE": "Payload-typ",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Ej angiven",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Krypterad JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON-payload med en signatur-header för verifiering.\nJWT: Payload skickas som en signerad JWT. Verifiering sker via JWT-signaturen.\nJWE: JWT är dessutom krypterad för att förhindra obehörig åtkomst till payload-information.",
         "ENDPOINT": "Slutpunkt",
         "ENDPOINT_DESCRIPTION": "Ange slutpunkten där din kod finns. Se till att den är tillgänglig för oss!",
         "TIMEOUT": "Tidsgräns",

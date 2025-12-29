@@ -624,6 +624,14 @@
           "restAsync": "REST 非同期"
         },
         "TYPES_DESCRIPTION": "Webhook、呼び出しはステータスコードを処理しますが、応答は無関係です\nCall、呼び出しはステータスコードと応答を処理します\nAsync、呼び出しはステータスコードも応答も処理しませんが、他のターゲットと並行して呼び出すことができます",
+        "PAYLOAD_TYPE": "ペイロードの種類",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "暗号化された JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 検証用の署名ヘッダーを持つ標準の JSON ペイロード。\nJWT: ペイロードは署名付き JWT として送信されます。検証は JWT の署名で行われます。\nJWE: JWT はさらに暗号化され、ペイロード情報への不正アクセスを防ぎます。",
         "ENDPOINT": "エンドポイント",
         "ENDPOINT_DESCRIPTION": "コードがホストされているエンドポイントを入力します。アクセス可能であることを確認してください。",
         "TIMEOUT": "タイムアウト",

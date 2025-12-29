@@ -624,6 +624,14 @@
           "restAsync": "REST Async"
         },
         "TYPES_DESCRIPTION": "Webhook, çağrı durum kodunu işler ancak yanıt önemsizdir\nCall, çağrı durum kodunu ve yanıtını işler\nAsync, çağrı ne durum kodunu ne de yanıtını işler, ancak diğer Hedeflerle paralel olarak çağrılabilir",
+        "PAYLOAD_TYPE": "Yük türü",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Belirtilmemiş",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Şifrelenmiş JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Doğrulama için imza başlığı olan standart JSON payload.\nJWT: Payload imzalı bir JWT olarak gönderilir. Doğrulama, JWT imzası ile gerçekleştirilir.\nJWE: JWT, payload bilgilerine yetkisiz erişimi önlemek için ayrıca şifrelenir.",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Kodunuzun barındırıldığı endpoint'i girin. Bize erişilebilir olduğundan emin olun!",
         "TIMEOUT": "Zaman Aşımı",

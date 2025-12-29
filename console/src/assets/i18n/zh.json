@@ -624,6 +624,14 @@
           "restAsync": "REST 异步"
         },
         "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
+        "PAYLOAD_TYPE": "有效负载类型",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "加密的 JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 用于验证的签名头的标准 JSON 有效负载。\nJWT: 有效负载作为已签名的 JWT 发送。验证通过 JWT 签名完成。\nJWE: JWT 另外被加密，以防止对有效负载信息的未授权访问。",
         "ENDPOINT": "端点",
         "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
         "TIMEOUT": "超时",

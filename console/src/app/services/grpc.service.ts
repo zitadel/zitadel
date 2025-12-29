@@ -27,10 +27,10 @@ import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
-import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
 import { AppService } from '@zitadel/proto/zitadel/app/v2beta/app_service_pb';
 import { ProjectService } from '@zitadel/proto/zitadel/project/v2beta/project_service_pb';
 import { AuthorizationService } from '@zitadel/proto/zitadel/authorization/v2beta/authorization_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
 const createActionServiceClient = createClientFor(ActionService);

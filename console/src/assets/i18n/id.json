@@ -624,6 +624,14 @@
           "restAsync": "REST Asinkron"
         },
         "TYPES_DESCRIPTION": "Webhook, panggilan menangani kode status tetapi respons tidak relevan\nCall, panggilan menangani kode status dan respons\nAsync, panggilan tidak menangani kode status maupun respons, tetapi dapat dipanggil secara paralel dengan Target lain",
+        "PAYLOAD_TYPE": "Tipe payload",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Tidak ditentukan",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token terenkripsi (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Payload JSON standar dengan header tanda tangan untuk verifikasi.\nJWT: Payload dikirim sebagai JWT yang ditandatangani. Verifikasi dilakukan melalui tanda tangan JWT.\nJWE: JWT dienkripsi tambahan untuk mencegah akses tidak sah ke informasi payload.",
         "ENDPOINT": "Titik Akhir",
         "ENDPOINT_DESCRIPTION": "Masukkan titik akhir tempat kode Anda dihosting. Pastikan dapat diakses oleh kami!",
         "TIMEOUT": "Batas Waktu",
