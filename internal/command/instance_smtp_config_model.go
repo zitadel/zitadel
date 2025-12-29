@@ -202,55 +202,12 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 		changes = append(changes, instance.ChangeSMTPConfigSMTPHost(smtpHost))
 	}
 	if plainAuth != nil {
-		if wm.SMTPConfig.PlainAuth == nil {
-			changes = append(changes, instance.ChangeSMTPConfigSMTPUser(plainAuth.User))
-			changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(plainAuth.Password))
-		} else {
-			if wm.SMTPConfig.PlainAuth.User != plainAuth.User {
-				changes = append(changes, instance.ChangeSMTPConfigSMTPUser(plainAuth.User))
-			}
-			// TODO (wim): clarify: this check does nothing does it? If append happened with a nil password the change event
-			// would carry the a nil password, which is ignored in the reducer.
-			// TODO (wim): clarify: if above statement is true, do we mis data to handle this correctrly? When someone tries to
-			// remove the password from the config, it will always result in the previous password. Not sure whether that is a
-			//problem here but it might be in other places?
-			if plainAuth.Password != nil {
-				changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(plainAuth.Password))
-			}
-		}
+		changes = append(changes, smtpPlainAuthChanges(wm, *plainAuth)...)
 	}
 	if xoauth2Auth != nil {
-		if wm.SMTPConfig.XOAuth2Auth == nil {
-			changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(xoauth2Auth.User))
-			changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(xoauth2Auth.ClientId))
-			changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret))
-			changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint))
-			changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
-		} else {
-			if wm.SMTPConfig.XOAuth2Auth.User != xoauth2Auth.User {
-				changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(xoauth2Auth.User))
-			}
-			if wm.SMTPConfig.XOAuth2Auth.ClientId != xoauth2Auth.User {
-				changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(xoauth2Auth.ClientId))
-			}
-			if wm.SMTPConfig.XOAuth2Auth.ClientSecret != xoauth2Auth.ClientSecret {
-				changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret))
-			}
-			if wm.SMTPConfig.XOAuth2Auth.TokenEndpoint != xoauth2Auth.TokenEndpoint {
-				changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint))
-			}
-			if len(wm.SMTPConfig.XOAuth2Auth.Scopes) != len(xoauth2Auth.Scopes) {
-				changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
-			} else {
-				for _, s := range xoauth2Auth.Scopes {
-					if !slices.Contains(xoauth2Auth.Scopes, s) {
-						changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
-						break
-					}
-				}
-			}
-		}
+		changes = append(changes, smtpXOAuthChanges(wm, *xoauth2Auth)...)
 	}
+
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
@@ -259,6 +216,75 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 		return nil, false, err
 	}
 	return changeEvent, true, nil
+}
+
+func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) []instance.SMTPConfigChanges {
+	// if no auth is yet present, set both
+	if wm.SMTPConfig.PlainAuth == nil {
+		return []instance.SMTPConfigChanges{
+			instance.ChangeSMTPConfigSMTPUser(auth.User),
+			instance.ChangeSMTPConfigSMTPPassword(auth.Password),
+		}
+	}
+
+	// if auth is already present, add changes for the changed values
+	var changes []instance.SMTPConfigChanges
+
+	if wm.SMTPConfig.PlainAuth.User != auth.User {
+		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(auth.User))
+	}
+
+	// TODO (wim): clarify: this check does nothing does it? If append happened with a nil password the change event
+	// would carry the a nil password, which is ignored in the reducer.
+	// TODO (wim): clarify: if above statement is true, do we mis data to handle this correctrly? When someone tries to
+	// remove the password from the config, it will always result in the previous password. Not sure whether that is a
+	// problem here but it might be in other places?
+	if auth.Password != nil {
+		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(auth.Password))
+	}
+
+	return changes
+}
+
+func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) []instance.SMTPConfigChanges {
+	// if no auth is yet present, set both
+	if wm.SMTPConfig.XOAuth2Auth == nil {
+		return []instance.SMTPConfigChanges{
+			instance.ChangeSMTPConfigXOAuth2User(auth.User),
+			instance.ChangeSMTPConfigXOAuth2ClientId(auth.ClientId),
+			instance.ChangeSMTPConfigXOAuth2ClientSecret(auth.ClientSecret),
+			instance.ChangeSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint),
+			instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes),
+		}
+	}
+
+	// if auth is already present, add changes for the changed values
+	var changes []instance.SMTPConfigChanges
+
+	if wm.SMTPConfig.XOAuth2Auth.User != auth.User {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(auth.User))
+	}
+	if wm.SMTPConfig.XOAuth2Auth.ClientId != auth.User {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(auth.ClientId))
+	}
+	if wm.SMTPConfig.XOAuth2Auth.ClientSecret != auth.ClientSecret {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(auth.ClientSecret))
+	}
+	if wm.SMTPConfig.XOAuth2Auth.TokenEndpoint != auth.TokenEndpoint {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint))
+	}
+	if len(wm.SMTPConfig.XOAuth2Auth.Scopes) != len(auth.Scopes) {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
+	} else {
+		for _, s := range auth.Scopes {
+			if !slices.Contains(auth.Scopes, s) {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
+				break
+			}
+		}
+	}
+
+	return changes
 }
 
 func (wm *IAMSMTPConfigWriteModel) NewHTTPChangedEvent(
@@ -378,7 +404,7 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	}
 	if e.PlainAuth.User != nil {
 		wm.SMTPConfig.PlainAuth.User = *e.PlainAuth.User
-	} else if e.PlainAuth.User != nil {
+	} else if e.User != nil {
 		wm.SMTPConfig.PlainAuth.User = *e.User
 	}
 	if e.PlainAuth.Password != nil {

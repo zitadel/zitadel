@@ -19,11 +19,12 @@ func (a *GenericAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 		return "", nil, zerrors.ThrowInternal(nil, "SMTP-TODO-GET_ERROR_CODE", "wrong host name")
 	}
 
-	if slices.Contains(server.Auth, "XOAUTH2") && a.XOAuth2 != nil {
+	switch {
+	case slices.Contains(server.Auth, "XOAUTH2") && a.XOAuth2 != nil:
 		a.selectedMethod = a.XOAuth2
-	} else if slices.Contains(server.Auth, "PLAIN") && a.PlainOrLogin != nil {
+	case slices.Contains(server.Auth, "PLAIN") && a.PlainOrLogin != nil:
 		a.selectedMethod = a.PlainOrLogin
-	} else if slices.Contains(server.Auth, "LOGIN") && a.PlainOrLogin != nil {
+	case slices.Contains(server.Auth, "LOGIN") && a.PlainOrLogin != nil:
 		a.selectedMethod = a.PlainOrLogin
 	}
 

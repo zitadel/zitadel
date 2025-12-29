@@ -77,8 +77,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					ResourceOwner: "INSTANCE",
 					From:          "from@domain.ch",
 					Host:          "host:587",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -135,13 +137,16 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"",
 							"host:587",
-							"user",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("password"),
+							&instance.PlainAuth{
+								User: "user",
+								Password: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
 							},
+							nil,
 						),
 					),
 				),
@@ -156,8 +161,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -196,13 +203,16 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
-							"user",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("password"),
+							&instance.PlainAuth{
+								User: "user",
+								Password: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
 							},
+							nil,
 						),
 					),
 				),
@@ -218,8 +228,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					FromName:       "name",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host:587",
-					User:           "user",
-					Password:       "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -243,8 +255,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -268,8 +282,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "   ",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -308,13 +324,16 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"",
 							"[2001:db8::1]:2525",
-							"user",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("password"),
+							&instance.PlainAuth{
+								User: "user",
+								Password: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
 							},
+							nil,
 						),
 					),
 				),
@@ -329,8 +348,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "[2001:db8::1]:2525",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -442,7 +463,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					User:          "user",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user",
+					},
 				},
 			},
 			res: res{
@@ -480,8 +503,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -496,7 +522,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@wrongdomain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					User:          "user",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user",
+					},
 				},
 			},
 			res: res{
@@ -532,8 +560,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -548,7 +579,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					User:          "user",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user",
+					},
 				},
 			},
 			res: res{
@@ -586,8 +619,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -616,7 +652,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host2:587",
-					User:           "user2",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user2",
+					},
 				},
 			},
 			res: res{
@@ -639,8 +677,10 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -663,8 +703,10 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "   ",
-					User:          "user",
-					Password:      "password",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
 				},
 			},
 			res: res{
@@ -702,8 +744,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -732,7 +777,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "[2001:db8::1]:2525",
-					User:           "user2",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user2",
+					},
 				},
 			},
 			res: res{
@@ -841,8 +888,11 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 						eventFromEventPusher(
@@ -1260,8 +1310,11 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -1301,8 +1354,11 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 						eventFromEventPusher(
@@ -1465,8 +1521,11 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 						eventFromEventPusher(
@@ -1512,8 +1571,11 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 						eventFromEventPusher(
@@ -1691,8 +1753,11 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								"user",
-								&crypto.CryptoValue{},
+								&instance.PlainAuth{
+									User:     "user",
+									Password: &crypto.CryptoValue{},
+								},
+								nil,
 							),
 						),
 					),
@@ -1837,9 +1902,11 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					From:     "test@example,com",
 					FromName: "Test",
 					SMTP: smtp.SMTP{
-						User:     "user",
-						Password: "",
-						Host:     "example.com:2525",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "",
+						},
+						Host: "example.com:2525",
 					},
 				},
 			},
@@ -1863,9 +1930,11 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					From:     "test@example,com",
 					FromName: "Test",
 					SMTP: smtp.SMTP{
-						User:     "user",
-						Password: "",
-						Host:     "example.com:2525",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "",
+						},
+						Host: "example.com:2525",
 					},
 				},
 			},
@@ -1887,9 +1956,11 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					From:     "test@example.com",
 					FromName: "Test",
 					SMTP: smtp.SMTP{
-						User:     "user",
-						Password: "password",
-						Host:     "mail.smtp2go.com:2525",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "password",
+						},
+						Host: "mail.smtp2go.com:2525",
 					},
 				},
 			},
@@ -1913,13 +1984,16 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
-								"user",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("password"),
+								&instance.PlainAuth{
+									User: "user",
+									Password: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
 								},
+								nil,
 							),
 						),
 					),
@@ -1935,9 +2009,11 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					From:     "test@example.com",
 					FromName: "Test",
 					SMTP: smtp.SMTP{
-						User:     "user",
-						Password: "",
-						Host:     "mail.smtp2go.com:2525",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "",
+						},
+						Host: "mail.smtp2go.com:2525",
 					},
 				},
 			},
@@ -2048,13 +2124,16 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
-								"user",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("password"),
+								&instance.PlainAuth{
+									User: "user",
+									Password: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
 								},
+								nil,
 							),
 						),
 					),

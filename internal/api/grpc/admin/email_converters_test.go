@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -84,7 +85,9 @@ func Test_emailProvidersToPb(t *testing.T) {
 							SenderName:     "sendername",
 							ReplyToAddress: "address",
 							Host:           "host",
-							User:           "user",
+							PlainAuth: &query.PlainAuth{
+								User: "user",
+							},
 						},
 						HTTPConfig: nil,
 						State:      1,
@@ -183,7 +186,9 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						SenderName:     "sendername",
 						ReplyToAddress: "address",
 						Host:           "host",
-						User:           "user",
+						PlainAuth: &query.PlainAuth{
+							User: "user",
+						},
 					},
 					HTTPConfig: &query.HTTP{
 						Endpoint:   "endpoint",
@@ -358,11 +363,13 @@ func Test_smtpToPb(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &query.SMTP{
-					SenderAddress:  "sender",
-					SenderName:     "sendername",
-					TLS:            true,
-					Host:           "host",
-					User:           "user",
+					SenderAddress: "sender",
+					SenderName:    "sendername",
+					TLS:           true,
+					Host:          "host",
+					PlainAuth: &query.PlainAuth{
+						User: "user",
+					},
 					ReplyToAddress: "address",
 				},
 			},
@@ -412,11 +419,13 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 				},
 			},
 			res: &command.AddSMTPConfig{
-				ResourceOwner:  "instance",
-				Description:    "description",
-				Host:           "host",
-				User:           "user",
-				Password:       "password",
+				ResourceOwner: "instance",
+				Description:   "description",
+				Host:          "host",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "user",
+					Password: "password",
+				},
 				Tls:            true,
 				From:           "sender",
 				FromName:       "sendername",
@@ -459,12 +468,14 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 				},
 			},
 			res: &command.ChangeSMTPConfig{
-				ResourceOwner:  "instance",
-				ID:             "id",
-				Description:    "description",
-				Host:           "host",
-				User:           "user",
-				Password:       "password",
+				ResourceOwner: "instance",
+				ID:            "id",
+				Description:   "description",
+				Host:          "host",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "user",
+					Password: "password",
+				},
 				Tls:            true,
 				From:           "sender",
 				FromName:       "sendername",
