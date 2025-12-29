@@ -158,56 +158,7 @@ export async function processIDPCallback({
     const { idpInformation, addHumanUser, updateHumanUser } = intent;
     let { userId } = intent;
 
-    // Check if implicit linking (via sessionId) is requested
-    // If so, we retrieve the session and validate it to get the userId
-    if (sessionId && !userId) {
-      // Verify that the flow was started with this session intent (CSRF protection)
-      // We check if the browser fingerprint matches the one hashed in the URL
-      const fingerprintCookie = await getFingerprintIdCookie();
-
-      if (!linkFingerprint || !fingerprintCookie?.value) {
-        console.warn("[IDP Process] Missing fingerprint information for linking verification");
-        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
-      }
-
-      const expectedHash = crypto
-        .createHash("sha256")
-        .update(sessionId + fingerprintCookie.value)
-        .digest("hex");
-
-      if (linkFingerprint !== expectedHash) {
-        console.warn("[IDP Process] Session linking fingerprint mismatch");
-        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
-      }
-
-      try {
-        const sessionCookie = await getSessionCookieById({ sessionId: sessionId });
-        if (!sessionCookie) {
-          console.warn("[IDP Process] Session for linking not found or invalid");
-          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
-        }
-
-        // Fetch the session details to get the userId
-        const sessionResp = await getSession({
-          serviceConfig,
-          sessionId: sessionCookie.id,
-          sessionToken: sessionCookie.token,
-        });
-        const session = sessionResp.session;
-
-        if (!session?.factors?.user?.id) {
-          console.warn("[IDP Process] Session found but no userId associated for linking.");
-          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
-        }
-
-        userId = session.factors.user.id;
-        console.log("[IDP Process] Resolved userId from session link:", userId);
-      } catch (error) {
-        console.warn("[IDP Process] Error retrieving session for linking:", error);
-        return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
-      }
-    }
-
+    // Verify we have IDP info early on
     if (!idpInformation) {
       console.error("[IDP Process] IDP information missing");
       return { redirect: `/idp/${provider}/failure?error=missing_idp_info` };
@@ -242,56 +193,59 @@ export async function processIDPCallback({
     };
 
     // ============================================
-    // CASE 1: User exists and should sign in
+    // CASE 1: Explicit Linking (via sessionId)
     // ============================================
-    if (userId && !sessionId) {
-      // Auto-update user if enabled
-      if (options?.isAutoUpdate && updateHumanUser) {
-        try {
-          await updateHuman({
-            serviceConfig,
-            request: create(UpdateHumanUserRequestSchema, {
-              userId: userId,
-              profile: updateHumanUser.profile,
-              email: updateHumanUser.email,
-              phone: updateHumanUser.phone,
-            }),
-          });
-          console.log("[IDP Process] User auto-updated successfully");
-        } catch (error: unknown) {
-          console.warn("[IDP Process] Error auto-updating user:", error);
+    // This happens when a logged-in user initiates an IDP flow to link it to their account.
+    // We check for !userId because if userId is present, it means the IDP identity is ALREADY linked to a user in Zitadel,
+    // so we should just log them in (Case 2, "User exists"), rather than trying to link again.
+    if (sessionId && !userId) {
+      // If userId wasn't in the intent, we must resolve it from the session
+      // 1. Security Check: Verify Fingerprint
+      const fingerprintCookie = await getFingerprintIdCookie();
+
+      if (!linkFingerprint || !fingerprintCookie?.value) {
+        console.warn("[IDP Process] Missing fingerprint information for linking verification");
+        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+      }
+
+      const expectedHash = crypto
+        .createHash("sha256")
+        .update(sessionId + fingerprintCookie.value)
+        .digest("hex");
+
+      if (linkFingerprint !== expectedHash) {
+        console.warn("[IDP Process] Session linking fingerprint mismatch");
+        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+      }
+
+      // 2. Retrieve Session & Resolve User
+      try {
+        const sessionCookie = await getSessionCookieById({ sessionId });
+        if (!sessionCookie) {
+          console.warn("[IDP Process] Session for linking not found or invalid");
+          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
         }
+
+        const sessionResp = await getSession({
+          serviceConfig,
+          sessionId: sessionCookie.id,
+          sessionToken: sessionCookie.token,
+        });
+        const session = sessionResp.session;
+
+        if (!session?.factors?.user?.id) {
+          console.warn("[IDP Process] Session found but no userId associated for linking.");
+          return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+        }
+
+        userId = session.factors.user.id;
+        console.log("[IDP Process] Resolved userId from session link:", userId);
+      } catch (error) {
+        console.warn("[IDP Process] Error retrieving session for linking:", error);
+        return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
       }
 
-      // Create session and handle redirect
-      console.log("[IDP Process] Creating session for existing user");
-      const sessionResult = await createNewSessionFromIdpIntent({
-        userId,
-        idpIntent: {
-          idpIntentId: id,
-          idpIntentToken: token,
-        },
-        requestId,
-        organization,
-      });
-
-      if ("error" in sessionResult && sessionResult.error) {
-        console.error("[IDP Process] Error creating session:", sessionResult.error);
-        return { error: sessionResult.error };
-      }
-
-      if ("redirect" in sessionResult && sessionResult.redirect) {
-        console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
-        return { redirect: sessionResult.redirect };
-      }
-
-      return { error: t("errors.sessionCreationFailed") };
-    }
-
-    // ============================================
-    // CASE 2: Link IDP to existing user
-    // ============================================
-    if (sessionId && userId) {
+      // 3. Perform Linking Logic
       if (!options?.isLinkingAllowed) {
         console.error("[IDP Process] Linking not allowed by IDP configuration");
         const params = buildRedirectParams();
@@ -299,7 +253,6 @@ export async function processIDPCallback({
       }
 
       try {
-        // Get user to retrieve their organization
         const targetUser = await getUserByID({ serviceConfig, userId });
 
         if (!targetUser || !targetUser.details?.resourceOwner) {
@@ -308,7 +261,6 @@ export async function processIDPCallback({
           return { redirect: `/idp/${provider}/linking-failed?${params}&error=user_not_found` };
         }
 
-        // Validate IDP linking permissions
         const isAllowed = await validateIDPLinkingPermissions({
           serviceConfig,
           userOrganizationId: targetUser.details.resourceOwner,
@@ -332,7 +284,6 @@ export async function processIDPCallback({
         });
         console.log("[IDP Process] IDP linked successfully, creating session");
 
-        // Create session after linking
         const sessionResult = await createNewSessionFromIdpIntent({
           userId,
           idpIntent: {
