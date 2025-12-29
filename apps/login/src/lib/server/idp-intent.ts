@@ -12,13 +12,18 @@ import {
   getActiveIdentityProviders,
   getUserByID,
   getDefaultOrg,
+  updateHuman,
   ServiceConfig,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { AddHumanUserRequest, AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+  UpdateHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSession } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/lib/cookies";
 import { createNewSessionFromIdpIntent } from "./idp";
@@ -150,7 +155,7 @@ export async function processIDPCallback({
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, addHumanUser } = intent;
+    const { idpInformation, addHumanUser, updateHumanUser } = intent;
     let { userId } = intent;
 
     // Verify we have IDP info early on
@@ -315,6 +320,25 @@ export async function processIDPCallback({
     // CASE 2: User exists and should sign in
     // ============================================
     if (userId && !sessionId) {
+      // Auto-update user if enabled
+      if (options?.isAutoUpdate && updateHumanUser) {
+        try {
+          console.log("[IDP Process] Auto-updating user profile");
+          await updateHuman({
+            serviceConfig,
+            request: create(UpdateHumanUserRequestSchema, {
+              userId,
+              profile: updateHumanUser.profile,
+              email: updateHumanUser.email,
+              phone: updateHumanUser.phone,
+            }),
+          });
+        } catch (error) {
+          console.warn("[IDP Process] Failed to auto-update user:", error);
+          // Continue with login even if update fails
+        }
+      }
+
       // Create session and handle redirect
       console.log("[IDP Process] Creating session for existing user");
       const sessionResult = await createNewSessionFromIdpIntent({
