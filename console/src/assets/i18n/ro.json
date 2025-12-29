@@ -623,6 +623,14 @@
           "restAsync": "REST Asincron"
         },
         "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
+        "PAYLOAD_TYPE": "Tipul payload-ului",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nespecificat",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token criptat (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Payload JSON standard cu un antet de semnătură pentru verificare.\nJWT: Payload-ul este trimis ca un JWT semnat. Verificarea se realizează prin semnătura JWT.\nJWE: JWT-ul este în plus criptat pentru a preveni accesul neautorizat la informațiile din payload.",
         "ENDPOINT": "Punct Final",
         "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
         "TIMEOUT": "Timeout",

@@ -508,10 +508,6 @@ module.exports = {
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-request-signature",
-            },
-            {
-              type: "doc",
               id: "guides/integrate/actions/testing-response",
             },
             {
@@ -529,6 +525,10 @@ module.exports = {
             {
               type: "doc",
               id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
             },
             {
               type: "doc",
