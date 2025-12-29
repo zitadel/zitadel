@@ -13,10 +13,10 @@ import {
 } from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2beta/query_pb';
+import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2/query_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
