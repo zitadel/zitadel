@@ -576,6 +576,10 @@ Errors:
     NoTimeout: ターゲットにはタイムアウトがありません
     InvalidURL: ターゲットに無効な URL があります
     NotFound: ターゲットが見つかりません
+    InvalidExpirationDate: キーの有効期限は将来の日付でなければなりません
+    PublicKeyExpired: 対象の公開鍵は期限切れです
+    PublicKeyActive: アクティブな対象の公開鍵は削除できません
+    InvalidPublicKey: 公開鍵が無効です。PKCS#8形式のPEMエンコードされたRSAまたはECDSA公開鍵である必要があります
   Execution:
     ConditionInvalid: 実行条件が不正です
     Invalid: 実行は無効です
@@ -584,6 +588,7 @@ Errors:
     NoTargets: ターゲットが定義されていません
     Failed: 実行に失敗しました
     ResponseIsNotValidJSON: 応答は有効な JSON ではありません
+    MissingEncryptionKey: 暗号化キーがありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:
