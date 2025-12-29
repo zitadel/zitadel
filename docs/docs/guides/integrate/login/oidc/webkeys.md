@@ -214,7 +214,7 @@ Once a key was activated and deactivated (by activation of the next key) deletio
 
 - Until access and ID tokens are expired. See [OIDC token lifetimes](/docs/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
 - ID tokens may be used as `id_token_hint` in authentication and end-session requests. The hint typically doesn't expire, but becomes invalid once the key is deleted.
-  It might be desired to keep keys around long enough to minimalize user impact.
+  It might be desirable to keep keys around long enough to minimize user impact.
 
 ### Rotation example
 

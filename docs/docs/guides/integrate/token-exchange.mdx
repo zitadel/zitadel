@@ -421,10 +421,10 @@ Doing similar request you can:
 
 ### Request an ID token example
 
-In the following example we exchange the intitial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
+In the following example we exchange the initial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
 
 :::info
-You can also obtain an ID token in the `id_token` response field by requestion an access token and the `openid` scope.
+You can also obtain an ID token in the `id_token` response field by requesting an access token and the `openid` scope.
 :::
 
 ```bash
@@ -871,7 +871,7 @@ And again the access token claims:
 
 ### Other usage examples
 
-Above we gave some of the most staightforward usecases. Of course, you can combine these examples to:
+Above we gave some of the most straightforward use cases. Of course, you can combine these examples to:
 
 - Impersonate and change the token type
 - Impersonate and change scope
@@ -901,4 +901,4 @@ In the [instance event list](/docs/concepts/eventstore/overview) the `User imper
 ## Finishing notes
 
 The current implementation of the Token Exchange grant was our first iteration on the subject.
-We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this pupose.
+We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this purpose.
