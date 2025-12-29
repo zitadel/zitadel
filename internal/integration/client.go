@@ -816,14 +816,24 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 	return resp.GetId()
 }
 
+var samlPrivateKeyOnce sync.Map  // map[*Instance]*sync.Once
+var samlCertificateOnce sync.Map // map[*Instance]*sync.Once
+
 func (i *Instance) SAMLPrivateKey() *rsa.PrivateKey {
 	if i.SAML.PrivateKey != nil {
 		return i.SAML.PrivateKey
 	}
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	logging.OnError(err).Panic("generate saml private key")
-	i.SAML.PrivateKey = privateKey
-	return privateKey
+
+	onceIface, _ := samlPrivateKeyOnce.LoadOrStore(i, &sync.Once{})
+	once := onceIface.(*sync.Once)
+
+	once.Do(func() {
+		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+		logging.OnError(err).Panic("generate saml private key")
+		i.SAML.PrivateKey = privateKey
+	})
+
+	return i.SAML.PrivateKey
 }
 
 func (i *Instance) SAMLCertificateString() string {
@@ -833,26 +843,34 @@ func (i *Instance) SAMLCertificate() *x509.Certificate {
 	if i.SAML.Certificate != nil {
 		return i.SAML.Certificate
 	}
-	template := &x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			Organization: []string{"Example Co"},
-			CommonName:   "www.example.com",
-		},
-		Issuer: pkix.Name{
-			Organization: []string{"Example Co"},
-			CommonName:   "www.example.com",
-		},
-		NotBefore:             time.Now().Add(-time.Hour),
-		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-	}
-	privateKey := i.SAMLPrivateKey()
-	cert, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
-	logging.OnError(err).Panic("create saml certificate")
-	i.SAML.Certificate, _ = x509.ParseCertificate(cert)
+
+	onceIface, _ := samlCertificateOnce.LoadOrStore(i, &sync.Once{})
+	once := onceIface.(*sync.Once)
+
+	once.Do(func() {
+		template := &x509.Certificate{
+			SerialNumber: big.NewInt(1),
+			Subject: pkix.Name{
+				Organization: []string{"Example Co"},
+				CommonName:   "www.example.com",
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"Example Co"},
+				CommonName:   "www.example.com",
+			},
+			NotBefore:             time.Now().Add(-time.Hour),
+			NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+			KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+			BasicConstraintsValid: true,
+			IsCA:                  true,
+		}
+		privateKey := i.SAMLPrivateKey()
+		cert, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
+		logging.OnError(err).Panic("create saml certificate")
+		parsedCert, err := x509.ParseCertificate(cert)
+		logging.OnError(err).Panic("parse saml certificate")
+		i.SAML.Certificate = parsedCert
+	})
 	return i.SAML.Certificate
 }
 
