@@ -142,7 +142,6 @@ describe("processIDPCallback", () => {
     const { createNewSessionFromIdpIntent } = await import("./idp");
     const { getSessionCookieById } = await import("@/lib/cookies");
     const { getFingerprintIdCookie } = await import("../fingerprint");
-    const crypto = await import("crypto");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
