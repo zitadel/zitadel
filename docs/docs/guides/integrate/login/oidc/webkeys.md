@@ -228,7 +228,7 @@ This strategy aims to fulfill the following requirements:
   Users that haven't logged in / refreshed tokens with the client app for that period,
   will need to re-enter their username.
 
-When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes general available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
+When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes generally available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
 
 | id  | created    | changed    | state           |
 | --- | ---------- | ---------- | --------------- |
