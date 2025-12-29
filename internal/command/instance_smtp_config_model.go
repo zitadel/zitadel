@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -28,11 +29,11 @@ type IAMSMTPConfigWriteModel struct {
 type SMTPConfig struct {
 	TLS            bool
 	Host           string
-	User           string
-	Password       *crypto.CryptoValue
 	SenderAddress  string
 	SenderName     string
 	ReplyToAddress string
+	PlainAuth      *instance.PlainAuth
+	XOAuth2Auth    *instance.XOAuth2Auth
 }
 
 func NewIAMSMTPConfigWriteModel(instanceID, id, domain string) *IAMSMTPConfigWriteModel {
@@ -85,7 +86,11 @@ func (wm *IAMSMTPConfigWriteModel) Reduce() error {
 				continue
 			}
 			if e.Password != nil {
-				wm.SMTPConfig.Password = e.Password
+				if wm.SMTPConfig.PlainAuth == nil {
+					wm.SMTPConfig.PlainAuth = &instance.PlainAuth{Password: e.Password}
+				} else {
+					wm.SMTPConfig.PlainAuth.Password = e.Password
+				}
 			}
 		case *instance.SMTPConfigHTTPAddedEvent:
 			if wm.ID != e.ID {
@@ -157,7 +162,18 @@ func (wm *IAMSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, description string, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, smtpPassword *crypto.CryptoValue) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
+	ctx context.Context, aggregate *eventstore.Aggregate,
+	id,
+	description string,
+	tls bool,
+	fromAddress,
+	fromName,
+	replyToAddress,
+	smtpHost string,
+	plainAuth *instance.PlainAuth,
+	xoauth2Auth *instance.XOAuth2Auth,
+) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 	if wm.SMTPConfig == nil {
@@ -185,11 +201,55 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 	if wm.SMTPConfig.Host != smtpHost {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPHost(smtpHost))
 	}
-	if wm.SMTPConfig.User != smtpUser {
-		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(smtpUser))
+	if plainAuth != nil {
+		if wm.SMTPConfig.PlainAuth == nil {
+			changes = append(changes, instance.ChangeSMTPConfigSMTPUser(plainAuth.User))
+			changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(plainAuth.Password))
+		} else {
+			if wm.SMTPConfig.PlainAuth.User != plainAuth.User {
+				changes = append(changes, instance.ChangeSMTPConfigSMTPUser(plainAuth.User))
+			}
+			// TODO (wim): clarify: this check does nothing does it? If append happened with a nil password the change event
+			// would carry the a nil password, which is ignored in the reducer.
+			// TODO (wim): clarify: if above statement is true, do we mis data to handle this correctrly? When someone tries to
+			// remove the password from the config, it will always result in the previous password. Not sure whether that is a
+			//problem here but it might be in other places?
+			if plainAuth.Password != nil {
+				changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(plainAuth.Password))
+			}
+		}
 	}
-	if smtpPassword != nil {
-		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(smtpPassword))
+	if xoauth2Auth != nil {
+		if wm.SMTPConfig.XOAuth2Auth == nil {
+			changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(xoauth2Auth.User))
+			changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(xoauth2Auth.ClientId))
+			changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret))
+			changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint))
+			changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
+		} else {
+			if wm.SMTPConfig.XOAuth2Auth.User != xoauth2Auth.User {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(xoauth2Auth.User))
+			}
+			if wm.SMTPConfig.XOAuth2Auth.ClientId != xoauth2Auth.User {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(xoauth2Auth.ClientId))
+			}
+			if wm.SMTPConfig.XOAuth2Auth.ClientSecret != xoauth2Auth.ClientSecret {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret))
+			}
+			if wm.SMTPConfig.XOAuth2Auth.TokenEndpoint != xoauth2Auth.TokenEndpoint {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint))
+			}
+			if len(wm.SMTPConfig.XOAuth2Auth.Scopes) != len(xoauth2Auth.Scopes) {
+				changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
+			} else {
+				for _, s := range xoauth2Auth.Scopes {
+					if !slices.Contains(xoauth2Auth.Scopes, s) {
+						changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes))
+						break
+					}
+				}
+			}
+		}
 	}
 	if len(changes) == 0 {
 		return nil, false, nil
@@ -241,12 +301,27 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 	wm.SMTPConfig = &SMTPConfig{
 		TLS:            e.TLS,
 		Host:           e.Host,
-		User:           e.User,
-		Password:       e.Password,
 		SenderName:     e.SenderName,
 		SenderAddress:  e.SenderAddress,
 		ReplyToAddress: e.ReplyToAddress,
 	}
+
+	if e.PlainAuth != nil {
+		wm.SMTPConfig.PlainAuth = &instance.PlainAuth{
+			User:     e.PlainAuth.User,
+			Password: e.PlainAuth.Password,
+		}
+	}
+	if e.XOAuth2Auth != nil {
+		wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{
+			User:          e.XOAuth2Auth.User,
+			ClientId:      e.XOAuth2Auth.ClientId,
+			ClientSecret:  e.XOAuth2Auth.ClientSecret,
+			TokenEndpoint: e.XOAuth2Auth.TokenEndpoint,
+			Scopes:        e.XOAuth2Auth.Scopes,
+		}
+	}
+
 	wm.State = domain.SMTPConfigStateInactive
 	// If ID has empty value we're dealing with the old and unique smtp settings
 	// These would be the default values for ID and State
@@ -287,12 +362,6 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	if e.Host != nil {
 		wm.SMTPConfig.Host = *e.Host
 	}
-	if e.User != nil {
-		wm.SMTPConfig.User = *e.User
-	}
-	if e.Password != nil {
-		wm.SMTPConfig.Password = e.Password
-	}
 	if e.FromAddress != nil {
 		wm.SMTPConfig.SenderAddress = *e.FromAddress
 	}
@@ -301,6 +370,42 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	}
 	if e.ReplyToAddress != nil {
 		wm.SMTPConfig.ReplyToAddress = *e.ReplyToAddress
+	}
+
+	if wm.SMTPConfig.PlainAuth == nil && (e.PlainAuth.User != nil || e.PlainAuth.Password != nil) {
+		wm.SMTPConfig.PlainAuth = &instance.PlainAuth{}
+		wm.SMTPConfig.XOAuth2Auth = nil
+	}
+	if e.PlainAuth.User != nil {
+		wm.SMTPConfig.PlainAuth.User = *e.PlainAuth.User
+	} else if e.PlainAuth.User != nil {
+		wm.SMTPConfig.PlainAuth.User = *e.User
+	}
+	if e.PlainAuth.Password != nil {
+		wm.SMTPConfig.PlainAuth.Password = e.PlainAuth.Password
+	} else if e.Password != nil {
+		wm.SMTPConfig.PlainAuth.Password = e.Password
+	}
+
+	if wm.SMTPConfig.XOAuth2Auth == nil &&
+		(e.XOAuth2Auth.User != nil || e.XOAuth2Auth.ClientId != nil || e.XOAuth2Auth.ClientSecret != nil || e.XOAuth2Auth.TokenEndpoint != nil || len(e.XOAuth2Auth.Scopes) != 0) {
+		wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{}
+		wm.SMTPConfig.PlainAuth = nil
+	}
+	if e.XOAuth2Auth.User != nil {
+		wm.SMTPConfig.XOAuth2Auth.User = *e.XOAuth2Auth.User
+	}
+	if e.XOAuth2Auth.ClientId != nil {
+		wm.SMTPConfig.XOAuth2Auth.ClientId = *e.XOAuth2Auth.ClientId
+	}
+	if e.XOAuth2Auth.ClientSecret != nil {
+		wm.SMTPConfig.XOAuth2Auth.ClientSecret = e.XOAuth2Auth.ClientSecret
+	}
+	if e.XOAuth2Auth.TokenEndpoint != nil {
+		wm.SMTPConfig.XOAuth2Auth.TokenEndpoint = *e.XOAuth2Auth.TokenEndpoint
+	}
+	if e.XOAuth2Auth.Scopes != nil {
+		wm.SMTPConfig.XOAuth2Auth.Scopes = e.XOAuth2Auth.Scopes
 	}
 
 	// If ID has empty value we're dealing with the old and unique smtp settings

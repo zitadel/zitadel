@@ -99,7 +99,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		return nil, err
 	}
 
-	err = smtpConfig.smtpAuth(client, host)
+	err = smtpConfig.smtpAuth(client)
 	if err != nil {
 		return nil, err
 	}
@@ -147,15 +147,23 @@ func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
-	if !smtpConfig.HasAuth() {
+func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
+	if smtpConfig.XOAuth2Auth != nil {
+		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, smtpConfig.Host))
+		if err != nil {
+			return zerrors.ThrowInternal(err, "EMAIL-TODO-GET_ERROR_CODE", "Errors.SMTP.CouldNotXOAuth2")
+		}
 		return nil
 	}
-	// Auth
-	err := client.Auth(PlainOrLoginAuth(smtpConfig.User, smtpConfig.Password, host))
-	if err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s9kfs", "Errors.SMTP.CouldNotAuth")
+
+	if smtpConfig.PlainAuth != nil {
+		err := client.Auth(PlainOrLoginAuth(smtpConfig.PlainAuth.User, smtpConfig.PlainAuth.Password, smtpConfig.Host))
+		if err != nil {
+			return zerrors.ThrowInternal(err, "EMAIL-s9kfs", "Errors.SMTP.CouldNotAuth")
+		}
+		return nil
 	}
+
 	return nil
 }
 

@@ -528,8 +528,8 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			smtpConfig.SMTP.User,
-			[]byte(smtpConfig.SMTP.Password),
+			smtpConfig.SMTP.PlainAuth.User,
+			[]byte(smtpConfig.SMTP.PlainAuth.Password),
 			smtpConfig.Tls,
 		),
 	)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -96,12 +97,32 @@ var (
 		name:  projection.SMTPConfigSMTPColumnHost,
 		table: smtpConfigsSMTPTable,
 	}
-	SMTPConfigSMTPColumnUser = Column{
-		name:  projection.SMTPConfigSMTPColumnUser,
+	SMTPConfigSMTPColumnPlainAuthUser = Column{
+		name:  projection.SMTPConfigSMTPColumnPlainAuthUser,
 		table: smtpConfigsSMTPTable,
 	}
-	SMTPConfigSMTPColumnPassword = Column{
-		name:  projection.SMTPConfigSMTPColumnPassword,
+	SMTPConfigSMTPColumnPlainAuthPassword = Column{
+		name:  projection.SMTPConfigSMTPColumnPlainAuthPassword,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnXOAuth2AuthUser = Column{
+		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthUser,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnXOAuth2AuthClientId = Column{
+		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthClientId,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnXOAuth2AuthClientSecret = Column{
+		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthClientSecret,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint = Column{
+		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnXOAuth2AuthScope = Column{
+		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthScope,
 		table: smtpConfigsSMTPTable,
 	}
 
@@ -155,8 +176,29 @@ type SMTP struct {
 	SenderName     string
 	ReplyToAddress string
 	Host           string
-	User           string
-	Password       *crypto.CryptoValue
+	PlainAuth      *PlainAuth
+	XOAuth2Auth    *XOAuth2Auth
+}
+
+type PlainAuth struct {
+	User     string
+	Password *crypto.CryptoValue
+}
+
+func (a PlainAuth) isEmpty() bool {
+	return a.User == "" && a.Password == nil
+}
+
+type XOAuth2Auth struct {
+	User          string
+	ClientId      string
+	ClientSecret  *crypto.CryptoValue
+	TokenEndpoint string
+	Scopes        []string
+}
+
+func (a XOAuth2Auth) isEmpty() bool {
+	return a.User == "" && a.ClientId == "" && a.ClientSecret == nil && a.TokenEndpoint == "" && len(a.Scopes) != 0
 }
 
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
@@ -228,8 +270,13 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigSMTPColumnSenderName.identifier(),
 			SMTPConfigSMTPColumnReplyToAddress.identifier(),
 			SMTPConfigSMTPColumnHost.identifier(),
-			SMTPConfigSMTPColumnUser.identifier(),
-			SMTPConfigSMTPColumnPassword.identifier(),
+			SMTPConfigSMTPColumnPlainAuthUser.identifier(),
+			SMTPConfigSMTPColumnPlainAuthPassword.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthUser.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthClientId.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthClientSecret.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthScope.identifier(),
 
 			SMTPConfigHTTPColumnID.identifier(),
 			SMTPConfigHTTPColumnEndpoint.identifier(),
@@ -259,8 +306,13 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				&smtpConfig.senderName,
 				&smtpConfig.replyToAddress,
 				&smtpConfig.host,
-				&smtpConfig.user,
-				&smtpConfig.password,
+				&smtpConfig.plainAuthUser,
+				&smtpConfig.plainAuthPassword,
+				&smtpConfig.xoauth2AuthUser,
+				&smtpConfig.xoauth2AuthClientId,
+				&smtpConfig.xoauth2AuthClientSecret,
+				&smtpConfig.xoauth2AuthTokenEndpoint,
+				&smtpConfig.xoauth2AuthScope,
 				&httpConfig.id,
 				&httpConfig.endpoint,
 				&httpConfig.signingKey,
@@ -295,8 +347,13 @@ func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs,
 			SMTPConfigSMTPColumnSenderName.identifier(),
 			SMTPConfigSMTPColumnReplyToAddress.identifier(),
 			SMTPConfigSMTPColumnHost.identifier(),
-			SMTPConfigSMTPColumnUser.identifier(),
-			SMTPConfigSMTPColumnPassword.identifier(),
+			SMTPConfigSMTPColumnPlainAuthUser.identifier(),
+			SMTPConfigSMTPColumnPlainAuthPassword.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthUser.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthClientId.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthClientSecret.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint.identifier(),
+			SMTPConfigSMTPColumnXOAuth2AuthScope.identifier(),
 
 			SMTPConfigHTTPColumnID.identifier(),
 			SMTPConfigHTTPColumnEndpoint.identifier(),
@@ -329,8 +386,13 @@ func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs,
 					&smtpConfig.senderName,
 					&smtpConfig.replyToAddress,
 					&smtpConfig.host,
-					&smtpConfig.user,
-					&smtpConfig.password,
+					&smtpConfig.plainAuthUser,
+					&smtpConfig.plainAuthPassword,
+					&smtpConfig.xoauth2AuthUser,
+					&smtpConfig.xoauth2AuthClientId,
+					&smtpConfig.xoauth2AuthClientSecret,
+					&smtpConfig.xoauth2AuthTokenEndpoint,
+					&smtpConfig.xoauth2AuthScope,
 					&httpConfig.id,
 					&httpConfig.endpoint,
 					&httpConfig.signingKey,
@@ -379,28 +441,57 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 }
 
 type sqlSmtpConfig struct {
-	id             sql.NullString
-	tls            sql.NullBool
-	senderAddress  sql.NullString
-	senderName     sql.NullString
-	replyToAddress sql.NullString
-	host           sql.NullString
-	user           sql.NullString
-	password       *crypto.CryptoValue
+	id                       sql.NullString
+	tls                      sql.NullBool
+	senderAddress            sql.NullString
+	senderName               sql.NullString
+	replyToAddress           sql.NullString
+	host                     sql.NullString
+	plainAuthUser            sql.NullString
+	plainAuthPassword        *crypto.CryptoValue
+	xoauth2AuthUser          sql.NullString
+	xoauth2AuthClientId      sql.NullString
+	xoauth2AuthClientSecret  *crypto.CryptoValue
+	xoauth2AuthTokenEndpoint sql.NullString
+	xoauth2AuthScope         sql.NullString
 }
 
 func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
 	if !c.id.Valid {
 		return
 	}
+
+	plainAuth := &PlainAuth{
+		User:     c.plainAuthUser.String,
+		Password: c.plainAuthPassword,
+	}
+	if plainAuth.isEmpty() {
+		plainAuth = nil
+	}
+
+	scopes := strings.Split(c.xoauth2AuthScope.String, " ")
+	if len(scopes) == 1 && scopes[0] == "" {
+		scopes = nil
+	}
+	xoauth2Auth := &XOAuth2Auth{
+		User:          c.xoauth2AuthUser.String,
+		ClientId:      c.xoauth2AuthClientId.String,
+		ClientSecret:  c.xoauth2AuthClientSecret,
+		TokenEndpoint: c.xoauth2AuthTokenEndpoint.String,
+		Scopes:        scopes,
+	}
+	if xoauth2Auth.isEmpty() {
+		xoauth2Auth = nil
+	}
+
 	smtpConfig.SMTPConfig = &SMTP{
 		TLS:            c.tls.Bool,
 		SenderAddress:  c.senderAddress.String,
 		SenderName:     c.senderName.String,
 		ReplyToAddress: c.replyToAddress.String,
 		Host:           c.host.String,
-		User:           c.user.String,
-		Password:       c.password,
+		PlainAuth:      plainAuth,
+		XOAuth2Auth:    xoauth2Auth,
 	}
 }
 

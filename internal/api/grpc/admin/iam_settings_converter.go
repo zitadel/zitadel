@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -134,7 +135,7 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 }
 
 func addSMTPToConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) *command.AddSMTPConfig {
-	return &command.AddSMTPConfig{
+	cmd := &command.AddSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
 		Description:    req.Description,
 		Tls:            req.Tls,
@@ -142,13 +143,20 @@ func addSMTPToConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) *c
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
-		User:           req.User,
-		Password:       req.Password,
 	}
+
+	if req.User != "" || req.Password != "" {
+		cmd.PlainAuth = &smtp.PlainAuthConfig{
+			User:     req.User,
+			Password: req.Password,
+		}
+	}
+
+	return cmd
 }
 
 func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) *command.ChangeSMTPConfig {
-	return &command.ChangeSMTPConfig{
+	cmd := &command.ChangeSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
 		ID:             req.Id,
 		Description:    req.Description,
@@ -157,27 +165,40 @@ func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigReque
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
-		User:           req.User,
-		Password:       req.Password,
 	}
+
+	if req.User != "" || req.Password != "" {
+		cmd.PlainAuth = &smtp.PlainAuthConfig{
+			User:     req.User,
+			Password: req.Password,
+		}
+	}
+
+	return cmd
 }
 
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
-	if smtp.SMTPConfig != nil {
-		return &settings_pb.SMTPConfig{
-			Description:    smtp.Description,
-			Tls:            smtp.SMTPConfig.TLS,
-			SenderAddress:  smtp.SMTPConfig.SenderAddress,
-			SenderName:     smtp.SMTPConfig.SenderName,
-			ReplyToAddress: smtp.SMTPConfig.ReplyToAddress,
-			Host:           smtp.SMTPConfig.Host,
-			User:           smtp.SMTPConfig.User,
-			Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
-			Id:             smtp.ID,
-			State:          settings_pb.SMTPConfigState(smtp.State),
-		}
+	if smtp.SMTPConfig == nil {
+		return nil
 	}
-	return nil
+
+	cfg := &settings_pb.SMTPConfig{
+		Description:    smtp.Description,
+		Tls:            smtp.SMTPConfig.TLS,
+		SenderAddress:  smtp.SMTPConfig.SenderAddress,
+		SenderName:     smtp.SMTPConfig.SenderName,
+		ReplyToAddress: smtp.SMTPConfig.ReplyToAddress,
+		Host:           smtp.SMTPConfig.Host,
+		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
+		Id:             smtp.ID,
+		State:          settings_pb.SMTPConfigState(smtp.State),
+	}
+
+	if smtp.SMTPConfig.PlainAuth != nil {
+		cfg.User = smtp.SMTPConfig.PlainAuth.User
+	}
+
+	return cfg
 }
 
 func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {

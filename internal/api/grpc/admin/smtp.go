@@ -117,13 +117,18 @@ func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPC
 }
 
 func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
-	config := smtp.Config{}
-	config.Tls = req.Tls
-	config.From = req.SenderAddress
-	config.FromName = req.SenderName
-	config.SMTP.Host = req.Host
-	config.SMTP.User = req.User
-	config.SMTP.Password = req.Password
+	config := smtp.Config{
+		Tls:      req.Tls,
+		From:     req.SenderAddress,
+		FromName: req.SenderName,
+		SMTP: smtp.SMTP{
+			Host: req.Host,
+			PlainAuth: &smtp.PlainAuthConfig{
+				User:     req.User,
+				Password: req.Password,
+			},
+		},
+	}
 
 	err := s.command.TestSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress, &config)
 	if err != nil {

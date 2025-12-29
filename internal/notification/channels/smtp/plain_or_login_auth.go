@@ -22,6 +22,11 @@ type plainOrLoginAuth struct {
 	authMethod string
 }
 
+type PlainAuthConfig struct {
+	User     string
+	Password string
+}
+
 func (a *plainOrLoginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if server.Name != a.host {
 		return "", nil, zerrors.ThrowInternal(nil, "SMTP-RRi75", "wrong host name")
