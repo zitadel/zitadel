@@ -97,6 +97,9 @@ export async function validateIDPLinkingPermissions({
   return true;
 }
 
+import crypto from "crypto";
+import { getFingerprintIdCookie } from "../fingerprint";
+
 /**
  * Server action to process IDP callback and handle ALL business logic.
  * This action:
@@ -112,6 +115,7 @@ export async function processIDPCallback({
   organization,
   postErrorRedirectUrl,
   sessionId,
+  linkFingerprint,
 }: {
   provider: string;
   id: string;
@@ -120,7 +124,9 @@ export async function processIDPCallback({
   organization?: string;
   postErrorRedirectUrl?: string;
   sessionId?: string;
+  linkFingerprint?: string;
 }): Promise<{ redirect?: string; error?: string }> {
+  // ... (headers and config retrieval) ...
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -155,6 +161,25 @@ export async function processIDPCallback({
     // Check if implicit linking (via sessionId) is requested
     // If so, we retrieve the session and validate it to get the userId
     if (sessionId && !userId) {
+      // Verify that the flow was started with this session intent (CSRF protection)
+      // We check if the browser fingerprint matches the one hashed in the URL
+      const fingerprintCookie = await getFingerprintIdCookie();
+
+      if (!linkFingerprint || !fingerprintCookie?.value) {
+        console.warn("[IDP Process] Missing fingerprint information for linking verification");
+        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+      }
+
+      const expectedHash = crypto
+        .createHash("sha256")
+        .update(sessionId + fingerprintCookie.value)
+        .digest("hex");
+
+      if (linkFingerprint !== expectedHash) {
+        console.warn("[IDP Process] Session linking fingerprint mismatch");
+        return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+      }
+
       try {
         const sessionCookie = await getSessionCookieById({ sessionId: sessionId });
         if (!sessionCookie) {

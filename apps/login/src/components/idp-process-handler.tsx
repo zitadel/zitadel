@@ -15,6 +15,7 @@ type Props = {
   organization?: string;
   link?: string;
   sessionId?: string;
+  linkFingerprint?: string;
   postErrorRedirectUrl?: string;
 };
 
@@ -30,6 +31,7 @@ export function IdpProcessHandler({
   organization,
   link,
   sessionId,
+  linkFingerprint,
   postErrorRedirectUrl,
 }: Props) {
   const t = useTranslations("idp");
@@ -55,6 +57,7 @@ export function IdpProcessHandler({
       requestId,
       organization,
       sessionId,
+      linkFingerprint,
       postErrorRedirectUrl,
     })
       .then((result) => {

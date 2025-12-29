@@ -8,9 +8,12 @@ import {
   startLDAPIdentityProviderFlow,
   ServiceConfig,
 } from "@/lib/zitadel";
-import { headers } from "next/headers";
+import crypto from "crypto";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
+import { getSessionCookieById } from "../cookies";
+import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
@@ -32,7 +35,26 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   const provider = formData.get("provider") as string;
   const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
 
-  if (sessionId) params.set("linkToSessionId", sessionId);
+  if (sessionId) {
+    try {
+      // Validate that the requestor owns the session they are trying to link
+      await getSessionCookieById({ sessionId });
+
+      // Get fingerprint (ensure it exists)
+      const fingerprintId = await getOrSetFingerprintId();
+
+      // Create hash to verify intent upon return
+      const linkFingerprint = crypto
+        .createHash("sha256")
+        .update(sessionId + fingerprintId)
+        .digest("hex");
+
+      params.set("linkToSessionId", sessionId);
+      params.set("linkFingerprint", linkFingerprint);
+    } catch {
+      return { error: "Invalid session for linking" };
+    }
+  }
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
   if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
