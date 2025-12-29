@@ -380,6 +380,7 @@ module.exports = {
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/generic-oidc",
             "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/linkedin-oauth",
@@ -506,10 +507,6 @@ module.exports = {
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-request-signature",
-            },
-            {
-              type: "doc",
               id: "guides/integrate/actions/testing-response",
             },
             {
@@ -527,6 +524,10 @@ module.exports = {
             {
               type: "doc",
               id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
             },
             {
               type: "doc",
@@ -808,15 +809,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Action (Beta)",
+              label: "Action",
               link: {
                 type: "generated-index",
-                title: "Action Service API (Beta)",
+                title: "Action Service API",
                 slug: "/apis/resources/action_service_v2",
                 description:
                   "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
                   "\n" +
                   "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
                   "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +

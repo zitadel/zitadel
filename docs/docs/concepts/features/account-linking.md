@@ -2,35 +2,36 @@
 title: Account linking
 ---
 
-ZITADEL supports linking of user accounts from different external identity providers such as social logins or enterprise IdPs.
-A user can authenticate from any of their accounts and still be recognized by your app and associated with the same user profile.
+ZITADEL supports linking user accounts from different external identity providers, such as social logins or enterprise IdPs, to a single ZITADEL user profile. This enables users to be recognized as the same user in your applications, regardless of which external account they use to log in.
 
-In ZITADEL, users have one user account to simplify access management and provide a consistent audit trail.
-A user account can have a link to multiple external identities.
+Each user in ZITADEL has one account for streamlined access management and a unified audit trail. Multiple external identities can be linked to this account.
 
 ### Advantages
 
-- Users can login with multiple identity providers without managing separate profiles
-- Already registered users can link existing profiles
-- Provide backup authentication methods in case an IdP is unavailable
-- Unified audit trail across multiple identities
+- Users can log in with several identity providers without maintaining separate profiles
+- Already registered users can link additional external profiles
+- Provides backup authentication methods if an IdP is unavailable
+- Enables unified auditing across all linked identities
 
 ### How it works
 
-ZITADEL gives you great flexibility to configure account linking for an organization and based on the external identity provider.
+Account linking is controlled by your organization and identity provider configuration.
 
-When using external identity providers (ie. social login, enterprise SSO), a user account will be created in ZITADEL.
-The [external identity](../structure/users#federated-users) will be linked to the ZITADEL account.
+When external identity providers (such as social logins or enterprise SSO) are configured, a user account is created in ZITADEL, and the [external identity](../structure/users#federated-users) is linked to the ZITADEL account.
 
-If login with "Username / Password" (ie. local account) is enabled and you have configured external IDPs, the user can decide if they want to login with an external IDP or the local account.
+> **Important:** If a user account in ZITADEL is already linked to an external identity and the user enters their username during login, ZITADEL will automatically redirect to the linked external identity provider for authentication.  
+> There is **no choice** presented to the user between authenticating with local username/password and an external IDP once accounts are linked.  
+> Only if the external login fails (for example, due to an expired or invalid IDP secret), will ZITADEL fall back to local authentication.
 
-When only one external identity provider is configured and login with "Username / Password" is disabled, then the user is immediately redirected to the external identity provider.
+Users are only shown options to pick local login or possible external IDPs **during registration**—that is, only when there is no existing account. For existing accounts that are linked to an external IDP, the system determines the authentication method automatically.
 
-In cases when a local account already exists and a user logs in with an external identity provider, you can instruct ZITADEL to link the external identity to the local account based on the username or email address.
+If only one external identity provider is configured and username/password login is disabled, all authentication requests are immediately redirected to the external provider.
+
+In cases where a local account exists and a user registers or logs in through an external identity provider, ZITADEL can be instructed to link the new external identity to the local account based on matching criteria (such as email address or username).
 
 ### Automatic account linking
 
-You can link accounts with the same email or username and prompt users to link them.
-On an [identity provider template settings](/docs/guides/integrate/identity-providers/introduction#key-settings-on-the-templates), you must enable "Account linking allowed".
+You can configure your identity provider to allow automatic account linking for users with the same email or username.  
+To enable this, set "Account linking allowed" in the [identity provider template settings](/docs/guides/integrate/identity-providers/introduction#key-settings-on-the-templates).
 
-Automatic account linking is beneficial for users who wish to associate multiple login methods with their ZITADEL account, providing flexibility and convenience in how they access your application.
+Automatic account linking helps users associate multiple login options with their ZITADEL account, offering flexibility—however, at login, the authentication method will be determined by the link, **not by user choice**.
