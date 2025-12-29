@@ -1,11 +1,13 @@
+@use 'sass:map';
+
 @mixin app-card-theme($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $accent: map-get($theme, accent);
-  $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: map-get($primary, 500);
-  $back: map-get($background, background);
+  $primary: map.get($theme, primary);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $accent: map.get($theme, accent);
+  $is-dark-theme: map.get($theme, is-dark);
+  $accent-color: map.get($primary, 500);
+  $back: map.get($background, background);
 
   .cnsl-app-card {
     padding: 1rem;
@@ -24,10 +26,10 @@
     font-weight: 600;
     background-color: $back;
     transition: background-color box-shadow 0.3s ease-in;
-    color: map-get($primary, default-contrast);
+    color: map.get($primary, default-contrast);
 
     &.add {
-      background-color: map-get($primary, 500);
+      background-color: map.get($primary, 500);
     }
 
     &.web {

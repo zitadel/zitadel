@@ -1,0 +1,19 @@
+<cnsl-active-user-card title="Monthly" [chart]="chart()">
+  <span description>
+    @if (toggle.value === "custom") {
+      active users between {{ start().toLocaleDateString() }} - {{ end().toLocaleDateString() }}
+    }
+    @else {
+      active users in the last {{ toggle.value }} months
+    }
+
+  </span>
+  <mat-button-toggle-group #toggle="matButtonToggleGroup" date-range-picker value="3" [(ngModel)]="state">
+    <mat-button-toggle [value]="3">3 months</mat-button-toggle>
+    <mat-button-toggle [value]="6">6 months</mat-button-toggle>
+    <mat-button-toggle [value]="12">12 months</mat-button-toggle>
+    <mat-button-toggle cnslMonthRangePickerTrigger value="custom">Custom
+      <cnsl-month-range-picker [(start)]="start" [(end)]="end" />
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</cnsl-active-user-card>

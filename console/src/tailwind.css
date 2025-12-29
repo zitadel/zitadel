@@ -1,0 +1,4 @@
+/* https://github.com/tailwindlabs/tailwindcss-intellisense/issues/1158#issuecomment-2968949608 */
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark-theme, .dark-theme *));

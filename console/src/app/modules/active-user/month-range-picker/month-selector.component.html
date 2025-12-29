@@ -1,0 +1,11 @@
+<div class="grid grid-cols-[repeat(6,minmax(0,max-content))] justify-between">
+  @for (month of monthService.monthNames(); track month) {
+    @let disabled = $index < notBefore() || $index > notAfter();
+    <button class="w-min p-2 rounded" [disabled]="disabled" type="button"
+            [class.bg-(--mat-datepicker-calendar-date-selected-state-background-color)]="$index === selectedMonth()"
+            [class.text-gray-500]="disabled"
+            (click)="selectedMonthChange.emit($index)">
+      {{ month }}
+    </button>
+  }
+</div>

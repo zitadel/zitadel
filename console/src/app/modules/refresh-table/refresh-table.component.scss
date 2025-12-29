@@ -1,5 +1,7 @@
+@use 'sass:map';
+
 @mixin refresh-table-theme($theme) {
-  $foreground: map-get($theme, foreground);
+  $foreground: map.get($theme, foreground);
 
   .refresh-table-header-row {
     display: flex;
@@ -10,7 +12,7 @@
     &.border-bottom {
       padding-bottom: 1rem;
       margin-bottom: 1rem;
-      border-bottom: 1px solid map-get($foreground, divider);
+      border-bottom: 1px solid map.get($foreground, divider);
     }
 
     .refresh-table-row {

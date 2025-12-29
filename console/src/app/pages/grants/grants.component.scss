@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .grants-title-row {
   display: flex;
   align-items: center;
@@ -21,17 +23,17 @@
 }
 
 @mixin grants-theme($theme) {
-  $foreground: map-get($theme, foreground);
+  $foreground: map.get($theme, foreground);
 
   .grants-title-row a {
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
   }
 
   .grants-controls {
     display: flex;
     align-items: center;
     padding-bottom: 1rem;
-    border-bottom: 1px solid map-get($foreground, dividers);
+    border-bottom: 1px solid map.get($foreground, dividers);
 
     .grants-toggle-group {
       display: flex;

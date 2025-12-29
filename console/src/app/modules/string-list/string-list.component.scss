@@ -1,15 +1,17 @@
+@use 'sass:map';
+
 @mixin string-list-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warncolor: map-get($warn, 500);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warncolor: map.get($warn, 500);
 
   .form-array-list {
     display: flex;
     flex-direction: row;
     max-width: 400px;
-    background: if($is-dark-theme, #00000020, map-get($background, cards));
+    background: if($is-dark-theme, #00000020, map.get($background, cards));
     margin-left: -1rem;
     margin-right: -1rem;
     padding: 0 1rem 0.5rem 1rem;
