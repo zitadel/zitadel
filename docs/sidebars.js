@@ -254,8 +254,8 @@ module.exports = {
               items: [
                 {
                   type: "link",
-                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
-                  label: "Login V2 [Beta]",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2",
+                  label: "Login V2",
                 },
               ],
             },
@@ -833,9 +833,7 @@ module.exports = {
                   "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
                   "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
                   "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n" +
-                  "\n" +
-                  "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
+                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users."
               },
               items: sidebar_api_actions_v2,
             },
