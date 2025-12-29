@@ -4,6 +4,8 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -95,6 +97,10 @@ type Instance struct {
 
 	Client   *Client
 	WebAuthN *webauthn.Client
+	SAML     struct {
+		PrivateKey  *rsa.PrivateKey
+		Certificate *x509.Certificate
+	}
 }
 
 // NewInstance returns a new instance that can be used for integration tests.
