@@ -150,7 +150,7 @@ export async function processIDPCallback({
 
     console.log("[IDP Process] Intent retrieved successfully, processing business logic");
 
-    const { idpInformation, addHumanUser, updateHumanUser } = intent;
+    const { idpInformation, addHumanUser } = intent;
     let { userId } = intent;
 
     // Verify we have IDP info early on
