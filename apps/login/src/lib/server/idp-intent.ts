@@ -4,7 +4,6 @@ import { getServiceConfig } from "@/lib/service-url";
 import {
   retrieveIDPIntent,
   getIDPByID,
-  updateHuman,
   addIDPLink,
   listUsers,
   addHuman,
@@ -19,11 +18,7 @@ import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-  UpdateHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AddHumanUserRequest, AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSession } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/lib/cookies";
 import { createNewSessionFromIdpIntent } from "./idp";
