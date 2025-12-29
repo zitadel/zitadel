@@ -9,7 +9,7 @@ import {
   ServiceConfig,
 } from "@/lib/zitadel";
 import crypto from "crypto";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
