@@ -312,6 +312,35 @@ export async function processIDPCallback({
     }
 
     // ============================================
+    // CASE 2: User exists and should sign in
+    // ============================================
+    if (userId && !sessionId) {
+      // Create session and handle redirect
+      console.log("[IDP Process] Creating session for existing user");
+      const sessionResult = await createNewSessionFromIdpIntent({
+        userId,
+        idpIntent: {
+          idpIntentId: id,
+          idpIntentToken: token,
+        },
+        requestId,
+        organization,
+      });
+
+      if ("error" in sessionResult && sessionResult.error) {
+        console.error("[IDP Process] Error creating session:", sessionResult.error);
+        return { error: sessionResult.error };
+      }
+
+      if ("redirect" in sessionResult && sessionResult.redirect) {
+        console.log("[IDP Process] Session created, redirecting to:", sessionResult.redirect);
+        return { redirect: sessionResult.redirect };
+      }
+
+      return { error: t("errors.sessionCreationFailed") };
+    }
+
+    // ============================================
     // CASE 3: Auto-linking (search for user and link)
     // ============================================
     if (options?.autoLinking) {
