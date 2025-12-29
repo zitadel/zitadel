@@ -72,8 +72,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// create target for target changes
 				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
+				targetCreatedPayloadType := action.PayloadType_PAYLOAD_TYPE_JSON
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false, targetCreatedPayloadType)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{
@@ -89,7 +90,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// replace original request with different targetID
 				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCallProto(wantRequest, 0, http.StatusOK, changedRequest)
 
-				targetRequest := waitForTarget(ctx, t, instance, urlRequest, target_domain.TargetTypeCall, false)
+				targetRequest := waitForTarget(ctx, t, instance, urlRequest, target_domain.TargetTypeCall, false, targetCreatedPayloadType)
 
 				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()})
 
@@ -105,9 +106,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout:    durationpb.New(5 * time.Second),
-						Endpoint:   targetCreatedURL,
-						SigningKey: targetCreated.GetSigningKey(),
+						Timeout:     durationpb.New(5 * time.Second),
+						Endpoint:    targetCreatedURL,
+						SigningKey:  targetCreated.GetSigningKey(),
+						PayloadType: targetCreatedPayloadType,
 					},
 				}
 
@@ -122,9 +124,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout:    durationpb.New(5 * time.Second),
-						Endpoint:   targetCreatedURL,
-						SigningKey: targetCreated.GetSigningKey(),
+						Timeout:     durationpb.New(5 * time.Second),
+						Endpoint:    targetCreatedURL,
+						SigningKey:  targetCreated.GetSigningKey(),
+						PayloadType: targetCreatedPayloadType,
 					},
 				}
 				// content for update
@@ -138,9 +141,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 							InterruptOnError: false,
 						},
 					},
-					Timeout:    durationpb.New(5 * time.Second),
-					Endpoint:   targetCreatedURL,
-					SigningKey: targetCreated.GetSigningKey(),
+					Timeout:     durationpb.New(5 * time.Second),
+					Endpoint:    targetCreatedURL,
+					SigningKey:  targetCreated.GetSigningKey(),
+					PayloadType: targetCreatedPayloadType,
 				}
 
 				// response received by target
@@ -157,7 +161,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCallProto(wantResponse, 0, http.StatusOK, changedResponse)
 
-				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, target_domain.TargetTypeCall, false)
+				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, target_domain.TargetTypeCall, false, targetCreatedPayloadType)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
 				return func() {
 						closeRequest()
@@ -195,7 +199,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}}
 				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCallProto(wantRequest, 0, http.StatusInternalServerError, nil)
 
-				targetRequest := waitForTarget(ctx, t, instance, urlRequest, target_domain.TargetTypeCall, true)
+				targetRequest := waitForTarget(ctx, t, instance, urlRequest, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()})
 				// GetTarget with used target
 				request.Id = targetRequest.GetId()
@@ -222,8 +226,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// create target for target changes
 				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
+				targetCreatedPayloadType := action.PayloadType_PAYLOAD_TYPE_JSON
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false, targetCreatedPayloadType)
 
 				// GetTarget with used target
 				request.Id = targetCreated.GetId()
@@ -240,9 +245,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout:    durationpb.New(5 * time.Second),
-						Endpoint:   targetCreatedURL,
-						SigningKey: targetCreated.GetSigningKey(),
+						Timeout:     durationpb.New(5 * time.Second),
+						Endpoint:    targetCreatedURL,
+						SigningKey:  targetCreated.GetSigningKey(),
+						PayloadType: targetCreatedPayloadType,
 					},
 				}
 
@@ -259,7 +265,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCallProto(wantResponse, 0, http.StatusInternalServerError, nil)
 
-				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, target_domain.TargetTypeCall, true)
+				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, target_domain.TargetTypeCall, true, targetCreatedPayloadType)
 				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
 				return func() {
 						closeResponse()
@@ -307,7 +313,7 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 0, http.StatusOK, nil)
 	defer closeF()
 
-	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true)
+	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
@@ -365,7 +371,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 5*time.Second, http.StatusOK, nil)
 	defer closeF()
 
-	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true)
+	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
@@ -416,7 +422,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
 	defer closeF()
 
-	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true)
+	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
@@ -499,8 +505,8 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 	}, retryDuration, tick, "timeout waiting for expected execution result")
 }
 
-func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
-	resp := instance.CreateTarget(ctx, t, "", endpoint, ty, interrupt)
+func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty target_domain.TargetType, interrupt bool, payloadType action.PayloadType) *action.CreateTargetResponse {
+	resp := instance.CreateTarget(ctx, t, "", endpoint, ty, interrupt, payloadType)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
@@ -779,7 +785,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
-	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true)
+	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), []string{targetResp.GetId()})
 	return userResp.GetUserId(), closeF
 }
@@ -1087,7 +1093,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
-	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true)
+	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), []string{targetResp.GetId()})
 	return userResp.GetUserId(), closeF
 }
@@ -1252,7 +1258,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
-	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true)
+	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), []string{targetResp.GetId()})
 
 	return userResp.GetUserId(), closeF
