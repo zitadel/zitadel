@@ -184,7 +184,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               identityProviders={identityProviders}
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
-              sessionId={sessionWithData.id} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+              sessionId={sessionWithData.id} // tell the callback function to link the IDP
             ></SignInWithIdp>
           </>
         )}
