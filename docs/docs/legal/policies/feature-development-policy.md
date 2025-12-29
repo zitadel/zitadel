@@ -12,7 +12,7 @@ This policy clarifies how we handle requests for feature prioritization and deve
 Shaping of the roadmap and prioritization of features is done by ZITADEL.
 You are welcome to give feedback on the [roadmap](https://zitadel.com/roadmap) and we are happy to [accept upstream pull requests](https://github.com/zitadel/zitadel/CONTRIBUTE.md) for ZITADEL.
 
-In case you can't contribute directly to the open source version of ZITADEL, but want to accelerate development, we may develop the feature on request, under the conditions layed out in this policy.
+In case you can't contribute directly to the open source version of ZITADEL, but want to accelerate development, we may develop the feature on request, under the conditions laid out in this policy.
 
 Features that will be part of the publicly available ZITADEL [repositories](https://github.com/zitadel/), ZITADEL Cloud, or optional components to our products that might be available only under a commercial license.
 
