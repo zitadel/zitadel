@@ -570,6 +570,10 @@ Errors:
     NoTimeout: Il target non ha timeout
     InvalidURL: La destinazione ha un URL non valido
     NotFound: Obiettivo non trovato
+    InvalidExpirationDate: La data di scadenza della chiave deve essere nel futuro
+    PublicKeyExpired: La chiave pubblica dell'obiettivo è scaduta
+    PublicKeyActive: Impossibile eliminare la chiave pubblica dell'obiettivo attivo
+    InvalidPublicKey: La chiave pubblica non è valida. Deve essere una chiave pubblica RSA o ECDSA codificata PEM in formato PKCS#8
   Execution:
     ConditionInvalid: La condizione di esecuzione non è valida
     Invalid: L'esecuzione non è valida
@@ -578,6 +582,7 @@ Errors:
     NoTargets: Nessun obiettivo definito
     Failed: Esecuzione fallita
     ResponseIsNotValidJSON: La risposta non è un JSON valido
+    MissingEncryptionKey: Chiave di crittografia mancante per l'esecuzione
   UserSchema:
     NotEnabled: La funzionalità "Schema utente" non è abilitata
     Type:

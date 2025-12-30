@@ -569,6 +569,10 @@ Errors:
     NoTimeout: Målet har ingen timeout
     InvalidURL: Målet har en ogiltig URL
     NotFound: Målet hittades inte
+    InvalidExpirationDate: Nyckelns utgångsdatum måste vara i framtiden
+    PublicKeyExpired: Målets publika nyckel har gått ut
+    PublicKeyActive: Kan inte ta bort en aktiv publik nyckel för målet
+    InvalidPublicKey: Den publika nyckeln är ogiltig. Måste vara en PEM-kodad RSA- eller ECDSA-publik nyckel i PKCS#8-format
   Execution:
     ConditionInvalid: Exekveringsvillkoret är ogiltigt
     Invalid: Exekveringen är ogiltig
@@ -577,6 +581,7 @@ Errors:
     NoTargets: Inga mål definierade
     Failed: Utförande misslyckades
     ResponseIsNotValidJSON: Svaret är inte giltigt JSON
+    MissingEncryptionKey: Krypteringsnyckel saknas för exekvering
   UserSchema:
     NotEnabled: Funktionen "Användarschema" är inte aktiverad
     Type:

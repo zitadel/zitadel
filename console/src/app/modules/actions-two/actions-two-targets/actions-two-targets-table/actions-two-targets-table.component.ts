@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, EventEmitter, Input, Output
 import { ReplaySubject } from 'rxjs';
 import { filter, startWith } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({

@@ -22,7 +22,7 @@ import {
   SetExecutionResponse,
   UpdateTargetRequestSchema,
   UpdateTargetResponse,
-} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+} from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 
 @Injectable({
   providedIn: 'root',

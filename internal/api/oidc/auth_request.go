@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
@@ -300,7 +301,7 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		} else {
 			logoutURI = logoutURI.JoinPath(LogoutPath)
 		}
-		signer, _, err := GetSignerOnce(o.query.GetActiveSigningWebKey)(ctx)
+		signer, _, err := sign.GetSignerOnce(o.query.GetActiveSigningWebKey)(ctx)
 		if err != nil {
 			return "", err
 		}

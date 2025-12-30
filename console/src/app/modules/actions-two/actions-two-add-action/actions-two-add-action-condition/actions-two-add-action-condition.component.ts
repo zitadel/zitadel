@@ -36,7 +36,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Message } from '@bufbuild/protobuf';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition } from '@zitadel/proto/zitadel/action/v2/execution_pb';
 import { startWith } from 'rxjs/operators';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;

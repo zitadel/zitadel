@@ -623,6 +623,14 @@
           "restAsync": "REST Async"
         },
         "TYPES_DESCRIPTION": "Webhook, the call handles the status code but response is irrelevant\nCall, the call handles the status code and response\nAsync, the call handles neither status code nor response, but can be called in parallel with other Targets",
+        "PAYLOAD_TYPE": "Payload Type",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Unspecified",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Encrypted JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON payload with an signature header for verification.\nJWT: Payload is sent as signed JWT. Verification is self-contained using the JWT signature.\nJWE: The JWT is additionally encrypted to prevent unauthorized access to payload information.",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
         "TIMEOUT": "Timeout",

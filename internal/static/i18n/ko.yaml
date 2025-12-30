@@ -570,6 +570,10 @@ Errors:
     NoTimeout: 대상에 타임아웃이 없습니다
     InvalidURL: 대상 URL이 유효하지 않습니다
     NotFound: 대상을 찾을 수 없습니다
+    InvalidExpirationDate: 키 만료 날짜는 미래여야 합니다
+    PublicKeyExpired: 대상 공개키가 만료되었습니다
+    PublicKeyActive: 활성 대상 공개키는 삭제할 수 없습니다
+    InvalidPublicKey: 공개키가 유효하지 않습니다. PKCS#8 형식의 PEM 인코딩된 RSA 또는 ECDSA 공개키여야 합니다
   Execution:
     ConditionInvalid: 실행 조건이 유효하지 않습니다
     Invalid: 실행이 유효하지 않습니다
@@ -578,6 +582,7 @@ Errors:
     NoTargets: 정의된 대상이 없습니다
     Failed: 실행 실패
     ResponseIsNotValidJSON: 응답이 유효한 JSON이 아닙니다
+    MissingEncryptionKey: 암호화 키가 누락되었습니다
   UserSchema:
     NotEnabled: "\"사용자 스키마\" 기능이 활성화되지 않았습니다"
     Type:

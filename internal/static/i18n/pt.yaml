@@ -569,6 +569,10 @@ Errors:
     NoTimeout: O destino não tem tempo limite
     InvalidURL: O destino tem um URL inválido
     NotFound: Destino não encontrado
+    InvalidExpirationDate: A data de expiração da chave deve estar no futuro
+    PublicKeyExpired: A chave pública do destino expirou
+    PublicKeyActive: Não é possível apagar a chave pública ativa do destino
+    InvalidPublicKey: A chave pública é inválida. Deve ser uma chave pública RSA ou ECDSA codificada em PEM no formato PKCS#8
   Execution:
     ConditionInvalid: A condição de execução é inválida
     Invalid: A execução é inválida
@@ -577,6 +581,7 @@ Errors:
     NoTargets: Nenhuma meta definida
     Failed: Falha na execução
     ResponseIsNotValidJSON: A resposta não é um JSON válido
+    MissingEncryptionKey: Chave de criptografia ausente
   UserSchema:
     NotEnabled: O recurso "Esquema do usuário" não está habilitado
     Type:
