@@ -90,18 +90,20 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: "loginName" in command ? command.loginName : user.preferredLoginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error); // checked later
   });
 
   if (sessionCookie) {
-    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token }).then(
-      (response) => {
+    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token })
+      .then((response) => {
         if (response?.session) {
           return response.session;
         }
-      },
-    );
+      })
+      .catch((error) => {
+        // user session is not found, so we create a new one
+        console.warn("[verify] user session is not found, so we create a new one", error);
+        return undefined;
+      });
   }
 
   // load auth methods for user
@@ -113,7 +115,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // if no authmethods are found on the user, redirect to set one up
   if (authMethodResponse && authMethodResponse.authMethodTypes && authMethodResponse.authMethodTypes.length == 0) {
-    if (!sessionCookie) {
+    if (!session) {
       const checks = create(ChecksSchema, {
         user: {
           search: {
@@ -123,10 +125,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         },
       });
 
-      session = await createSessionAndUpdateCookie({
+      const result = await createSessionAndUpdateCookie({
         checks,
         requestId: command.requestId,
       });
+      session = result.session;
     }
 
     if (!session) {

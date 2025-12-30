@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
-import {
-  changePassword,
-  resetPassword,
-  sendPassword,
-} from "@/lib/server/password";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { changePassword, resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -21,6 +12,8 @@ import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
+
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
@@ -71,6 +64,13 @@ export function SetPasswordForm({
     setError("");
     setLoading(true);
 
+    // do not send code for dummy userid that is set to prevent user enumeration
+    if (userId === UNKNOWN_USER_ID) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setLoading(false);
+      return;
+    }
+
     const response = await resetPassword({
       loginName,
       organization,
@@ -84,7 +84,7 @@ export function SetPasswordForm({
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
     }
@@ -92,9 +92,10 @@ export function SetPasswordForm({
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
-    let payload: { userId: string; password: string; code?: string } = {
+    let payload: { userId: string; password: string; code?: string; organization?: string } = {
       userId: userId,
       password: values.password,
+      organization,
     };
 
     // this is not required for initial password setup
@@ -148,20 +149,12 @@ export function SetPasswordForm({
         setLoading(false);
       });
 
-    if (
-      passwordResponse &&
-      "error" in passwordResponse &&
-      passwordResponse.error
-    ) {
+    if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
       setError(passwordResponse.error);
       return;
     }
 
-    if (
-      passwordResponse &&
-      "redirect" in passwordResponse &&
-      passwordResponse.redirect
-    ) {
+    if (passwordResponse && "redirect" in passwordResponse && passwordResponse.redirect) {
       return router.push(passwordResponse.redirect);
     }
 
@@ -173,9 +166,7 @@ export function SetPasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -271,17 +262,11 @@ export function SetPasswordForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
+          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="set.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
         </Button>
       </div>
     </form>

@@ -19,12 +19,13 @@ import {
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getTranslations } from "next-intl/server";
-import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
+import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
-import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
+import { updateOrCreateSession } from "./session";
 import { completeFlowOrGetUrl } from "../client";
+import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -74,6 +75,11 @@ export async function registerPasskeyLink(
   if (command.sessionId) {
     // Session-based flow (existing logic)
     const sessionCookie = await getSessionCookieById({ sessionId: command.sessionId });
+
+    if (!sessionCookie) {
+      return { error: "Could not get session cookie" };
+    }
+
     session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
 
     if (!session?.session?.factors?.user?.id) {
@@ -142,10 +148,11 @@ export async function registerPasskeyLink(
       },
     });
 
-    createdSession = await createSessionAndUpdateCookie({
+    const result = await createSessionAndUpdateCookie({
       checks,
       requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
     });
+    createdSession = result.session;
 
     if (!createdSession) {
       return { error: "Could not create session" };
@@ -196,6 +203,11 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     const sessionCookie = await getSessionCookieById({
       sessionId: command.sessionId,
     });
+
+    if (!sessionCookie) {
+      throw new Error("Could not get session cookie");
+    }
+
     const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
     const userId = session?.session?.factors?.user?.id;
 
@@ -241,56 +253,41 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const t = await getTranslations("passkey");
 
-  const recentSession = sessionId
-    ? await getSessionCookieById({ sessionId })
-    : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization })
-      : await getMostRecentSessionCookie();
+  const result = await updateOrCreateSession({
+    loginName,
+    sessionId,
+    organization,
+    checks,
+    requestId,
+    lifetime: command.lifetime,
+  });
 
-  if (!recentSession) {
-    return {
-      error: t("verify.errors.couldNotFindSession"),
-    };
+  if (result.error) {
+    // try to interpret validation errors as translation keys if possible, or fallback to generic
+    // For now returning the error string directly as key or default
+    return { error: result.error };
   }
+
+  // transformation to partial session for compatibility
+  const session = {
+    id: result.sessionId,
+    factors: result.factors,
+    // @ts-ignore
+    challenges: result.challenges,
+  };
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
-
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
-  let lifetime = command.lifetime; // Use provided lifetime first
-
-  if (!lifetime) {
-    lifetime = checks?.webAuthN
-      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-      : checks?.otpEmail || checks?.otpSms
-        ? loginSettings?.secondFactorCheckLifetime
-        : undefined;
-  }
-
-  if (!lifetime || !lifetime.seconds) {
-    console.warn("No passkey lifetime provided, defaulting to 24 hours");
-
-    lifetime = {
-      seconds: BigInt(60 * 60 * 24), // default to 24 hours
-      nanos: 0,
-    } as Duration;
-  }
-
-  const session = await setSessionAndUpdateCookie({
-    recentCookie: recentSession,
-    checks,
-    requestId,
-    lifetime,
-  });
-
-  if (!session || !session?.factors?.user?.id) {
-    return { error: t("verify.errors.couldNotUpdateSession") };
+  const userId = session?.factors?.user?.id;
+  if (!userId) {
+    return { error: t("verify.errors.couldNotFindSession") };
   }
 
   let userResponse;
   try {
-    userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
+    userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
     console.error("Error fetching user by ID:", error);
     return { error: t("verify.errors.couldNotGetUser") };
@@ -302,7 +299,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(session, humanUser, organization, requestId);
+  const emailVerificationCheck = checkEmailVerification(session as any, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
