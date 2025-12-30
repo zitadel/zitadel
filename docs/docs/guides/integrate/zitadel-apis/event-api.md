@@ -76,7 +76,7 @@ curl --request POST \
 ```
 
 The response will give you a list of aggregate types. The type is what the aggregate is called in ZITADEL itself (technical).
-You can also find a translation for the aggregae to better reflect it for an enduser perspective.
+You can also find a translation for the aggregate to better reflect it for an enduser perspective.
 
 The following example shows you the aggregate type for the user.
 

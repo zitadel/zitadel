@@ -73,7 +73,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTargetWithoutPayloadType(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{
@@ -223,7 +223,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTargetWithoutPayloadType(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
 
 				// GetTarget with used target
 				request.Id = targetCreated.GetId()

@@ -11,7 +11,7 @@ However, to improve day-two-operations,
 we recommend you run the init phase and the setup phase
 separately using `zitadel init` and  `zitadel setup` respectively.
 Both the init and the setup phases are idempotent,
-meaning you can run them as many times as you want whithout unexpectedly changing any state.
+meaning you can run them as many times as you want without unexpectedly changing any state.
 Nevertheless, they just __need__ to be run at certain points in time, whereas further runs are obsolete.
 The init phase has to run once over the full ZITADEL lifecycle, before the setup and runtime phases run first.
 The setup phase has to run each time a new ZITADEL version is deployed.

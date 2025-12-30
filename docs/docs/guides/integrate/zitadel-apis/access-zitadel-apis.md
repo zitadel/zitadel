@@ -119,7 +119,7 @@ curl --request POST \
 where 
 
 - `grant_type` must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to acces the ZITADEL APIs. For this example include `profile`.
+- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to access the ZITADEL APIs. For this example include `profile`.
 - `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`, `token_type` and time to expiry in seconds as `expires_in`.
