@@ -120,6 +120,7 @@ func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPC
 	return &admin_pb.TestSMTPConfigByIdResponse{}, nil
 }
 
+// TestSMTPConfig is deprecated. Please move to the new endpoint TestEmailProviderSMTP.
 func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
 	config := smtp.Config{
 		Tls:      req.Tls,
