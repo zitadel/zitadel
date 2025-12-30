@@ -121,50 +121,6 @@ option (gnostic.openapi.v3.document) = {
         }
       }
     }
-
-    // 3. RESPONSES
-    responses: {
-      additional_properties: {
-        name: "403";
-        value: {
-          response: {
-            description: "Returned when the user does not have permission to access the resource.";
-            content: {
-              additional_properties: {
-                name: "application/json";
-                value: {
-                  schema: {
-                    reference: {
-                      _ref: "#/components/schemas/rpcStatus";
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      additional_properties: {
-        name: "404";
-        value: {
-          response: {
-            description: "Returned when the resource does not exist.";
-            content: {
-              additional_properties: {
-                name: "application/json";
-                value: {
-                  schema: {
-                    reference: {
-                      _ref: "#/components/schemas/rpcStatus";
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   // 4. GLOBAL SECURITY
@@ -203,16 +159,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -242,16 +222,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -281,16 +285,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -318,16 +346,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -355,16 +407,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -392,16 +468,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -432,16 +532,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -479,16 +603,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -518,16 +666,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -558,16 +730,40 @@ service InstanceService {
         response_or_reference: {
           name: "403";
           value: {
-            reference: {
-              _ref: "#/components/responses/403"
+            response: {
+              description: "Returned when the user does not have permission to access the resource.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
         response_or_reference: {
           name: "404";
           value: {
-            reference: {
-              _ref: "#/components/responses/404"
+            response: {
+              description: "Returned when the resource does not exist.";
+              content: {
+                additional_properties: {
+                  name: "application/json";
+                  value: {
+                    schema: {
+                      reference: {
+                        _ref: "#/components/schemas/rpcStatus";
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
