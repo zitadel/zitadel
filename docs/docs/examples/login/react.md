@@ -65,7 +65,7 @@ yarn add @zitadel/react
 ### Create and configure the auth service
 
 The @zitadel/react package provides a `createZitadelAuth()` function which sets some defaults and initializes the underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) `UserManager` class.
-You can overwrite all the defaults with the aguments you pass to `createZitadelAuth()`.
+You can overwrite all the defaults with the arguments you pass to `createZitadelAuth()`.
 
 Export the object returned from `createZitadelAuth()`
 
