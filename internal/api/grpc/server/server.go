@@ -79,7 +79,7 @@ func CreateServer(
 				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.ExecutionHandler(targetEncAlg),
+				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),

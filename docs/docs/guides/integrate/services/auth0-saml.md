@@ -41,7 +41,7 @@ This includes:
 
 All the information is filled out as an example, and to connect with any other environment you only have to change the
 used domain, for example "example.com" with "zitadel.cloud".
-Lastly, upload the certificate used to sign the reponses, provided for you under the
+Lastly, upload the certificate used to sign the responses, provided for you under the
 URL \{your_instance_domain}/saml/v2/certificate.
 
 Then just press the button "Create" and the connection on Auth0 is configured.
