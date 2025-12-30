@@ -171,32 +171,28 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfi
 	var xoauth2Auth *instance.XOAuth2Auth
 
 	if config.PlainAuth != nil {
-		var password *crypto.CryptoValue
+		plainAuth = &instance.PlainAuth{
+			User: config.PlainAuth.User,
+		}
 		if config.PlainAuth.Password != "" {
-			password, err = crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
+			plainAuth.Password, err = crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
 			if err != nil {
 				return err
 			}
-		}
-		plainAuth = &instance.PlainAuth{
-			User:     config.PlainAuth.User,
-			Password: password,
 		}
 	}
 	if config.XOAuth2Auth != nil {
-		var clientSecret *crypto.CryptoValue
-		if config.XOAuth2Auth.ClientSecret != "" {
-			clientSecret, err = crypto.Encrypt([]byte(config.XOAuth2Auth.ClientSecret), c.smtpEncryption)
-			if err != nil {
-				return err
-			}
-		}
 		xoauth2Auth = &instance.XOAuth2Auth{
 			User:          config.XOAuth2Auth.User,
 			ClientId:      config.XOAuth2Auth.ClientId,
-			ClientSecret:  clientSecret,
 			TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
 			Scopes:        config.XOAuth2Auth.Scopes,
+		}
+		if config.XOAuth2Auth.ClientSecret != "" {
+			xoauth2Auth.ClientSecret, err = crypto.Encrypt([]byte(config.XOAuth2Auth.ClientSecret), c.smtpEncryption)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
@@ -477,6 +473,44 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 
 	if email == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9uy", "Errors.SMTPConfig.TestEmailNotFound")
+	}
+
+	if id == "" && config.SMTP.PlainAuth != nil && config.SMTP.PlainAuth.Password == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9kj", "Errors.SMTPConfig.TestPassword")
+	}
+
+	if id == "" && config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "TODO(wim) get error code", "Errors.SMTPConfig.TestClientSecret")
+	}
+
+	if config.SMTP.PlainAuth != nil && config.SMTP.PlainAuth.Password == "" {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+		if err != nil {
+			return err
+		}
+		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.PlainAuth == nil {
+			return zerrors.ThrowNotFound(nil, "SMTP-p9cc", "Errors.SMTPConfig.NotFound")
+		}
+
+		config.SMTP.PlainAuth.Password, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.PlainAuth.Password, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
+	}
+
+	if config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientSecret == "" {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+		if err != nil {
+			return err
+		}
+		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.XOAuth2Auth == nil {
+			return zerrors.ThrowNotFound(nil, "TODO(wim) get error code", "Errors.SMTPConfig.NotFound")
+		}
+
+		config.SMTP.XOAuth2Auth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientSecret, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Try to send an email
