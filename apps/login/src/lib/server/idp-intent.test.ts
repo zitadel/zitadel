@@ -10,6 +10,16 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn((schema: any, data: any) => data),
+  ConnectError: class extends Error {
+    code: any;
+    constructor(message: string, code: any) {
+      super(message);
+      this.code = code;
+    }
+  },
+  Code: {
+    AlreadyExists: 6,
+  },
 }));
 
 vi.mock("../service-url", () => ({
