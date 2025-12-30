@@ -165,6 +165,37 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		state = domain.SMTPConfigStateActive
 	}
 
+	columns := []handler.Column{
+		handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
+		handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
+		handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
+		handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
+		handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, e.ReplyToAddress),
+		handler.NewCol(SMTPConfigSMTPColumnHost, e.Host),
+	}
+
+	if e.PlainAuth != nil {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.PlainAuth.User),
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
+		)
+	} else {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.User),
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password),
+		)
+	}
+	if e.XOAuth2Auth != nil {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthUser, e.XOAuth2Auth.User),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientId, e.XOAuth2Auth.ClientId),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, e.XOAuth2Auth.ClientSecret),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
+		)
+	}
+
 	return handler.NewMultiStatement(
 		e,
 		handler.AddCreateStatement(
@@ -181,22 +212,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			},
 		),
 		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
-				handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
-				handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
-				handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
-				handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, e.ReplyToAddress),
-				handler.NewCol(SMTPConfigSMTPColumnHost, e.Host),
-				handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.User),
-				handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password),
-				handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthUser, e.User),
-				handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientId, e.Password),
-				handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, e.Password),
-				handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.Password),
-				handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.Password),
-			},
+			columns,
 			handler.WithTableSuffix(smtpConfigSMTPTableSuffix),
 		),
 	), nil

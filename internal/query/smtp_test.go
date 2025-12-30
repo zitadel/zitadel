@@ -29,6 +29,11 @@ var (
 		` projections.smtp_configs5_smtp.host,` +
 		` projections.smtp_configs5_smtp.username,` +
 		` projections.smtp_configs5_smtp.password,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_user,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_client_id,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_token_endpoint,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_scope,` +
 		` projections.smtp_configs5_http.id,` +
 		` projections.smtp_configs5_http.endpoint,` +
 		` projections.smtp_configs5_http.signing_key` +
@@ -50,6 +55,11 @@ var (
 		` projections.smtp_configs5_smtp.host,` +
 		` projections.smtp_configs5_smtp.username,` +
 		` projections.smtp_configs5_smtp.password,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_user,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_client_id,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_token_endpoint,` +
+		` projections.smtp_configs5_smtp.xoauth2auth_scope,` +
 		` projections.smtp_configs5_http.id,` +
 		` projections.smtp_configs5_http.endpoint,` +
 		` projections.smtp_configs5_http.signing_key,` +
@@ -74,6 +84,11 @@ var (
 		"smtp_host",
 		"smtp_user",
 		"smtp_password",
+		"xoauth2auth_user",
+		"xoauth2auth_client_id",
+		"xoauth2auth_client_secret",
+		"xoauth2auth_token_endpoint",
+		"xoauth2auth_scope",
 		"id",
 		"endpoint",
 		"signing_key",
@@ -136,6 +151,11 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -154,6 +174,7 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						User:     "user",
 						Password: &crypto.CryptoValue{},
 					},
+					XOAuth2Auth: &XOAuth2Auth{},
 				},
 				ID:          "2232323",
 				State:       domain.SMTPConfigStateActive,
@@ -175,6 +196,11 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						"2232323",
 						domain.SMTPConfigStateActive,
 						"test",
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -239,6 +265,11 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -257,6 +288,7 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						User:     "user2",
 						Password: &crypto.CryptoValue{},
 					},
+					XOAuth2Auth: &XOAuth2Auth{},
 				},
 				ID:          "44442323",
 				State:       domain.SMTPConfigStateInactive,
@@ -289,6 +321,11 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -307,6 +344,7 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						User:     "user3",
 						Password: &crypto.CryptoValue{},
 					},
+					XOAuth2Auth: &XOAuth2Auth{},
 				},
 				ID:          "23234444",
 				State:       domain.SMTPConfigStateInactive,
@@ -389,6 +427,11 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -413,6 +456,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 								User:     "user",
 								Password: &crypto.CryptoValue{},
 							},
+							XOAuth2Auth: &XOAuth2Auth{},
 						},
 						ID:          "2232323",
 						State:       domain.SMTPConfigStateActive,
@@ -437,6 +481,11 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							"2232323",
 							domain.SMTPConfigStateActive,
 							"test",
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -473,6 +522,11 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							testNow,
@@ -490,6 +544,11 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							"host3",
 							"user3",
 							&crypto.CryptoValue{},
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -535,6 +594,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 								User:     "user2",
 								Password: &crypto.CryptoValue{},
 							},
+							XOAuth2Auth: &XOAuth2Auth{},
 						},
 						ID:          "44442323",
 						State:       domain.SMTPConfigStateInactive,
@@ -555,6 +615,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 								User:     "user3",
 								Password: &crypto.CryptoValue{},
 							},
+							XOAuth2Auth: &XOAuth2Auth{},
 						},
 						ID:          "23234444",
 						State:       domain.SMTPConfigStateInactive,

@@ -128,6 +128,11 @@ func Test_emailProvidersToPb(t *testing.T) {
 							Host:           "host",
 							User:           "user",
 							ReplyToAddress: "address",
+							Auth: &settings_pb.EmailProviderSMTP_Plain{
+								Plain: &settings_pb.SMTPPlainAuth{
+									User: "user",
+								},
+							},
 						},
 					},
 				},
@@ -215,6 +220,11 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						Host:           "host",
 						User:           "user",
 						ReplyToAddress: "address",
+						Auth: &settings_pb.EmailProviderSMTP_Plain{
+							Plain: &settings_pb.SMTPPlainAuth{
+								User: "user",
+							},
+						},
 					},
 				},
 			},
@@ -259,7 +269,7 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := emailProviderToProviderPb(tt.args.req)
-			assert.Equal(t, tt.res, got)
+			assert.EqualValues(t, tt.res, got)
 		})
 	}
 }
@@ -381,6 +391,11 @@ func Test_smtpToPb(t *testing.T) {
 					Host:           "host",
 					User:           "user",
 					ReplyToAddress: "address",
+					Auth: &settings_pb.EmailProviderSMTP_Plain{
+						Plain: &settings_pb.SMTPPlainAuth{
+							User: "user",
+						},
+					},
 				},
 			},
 		},
