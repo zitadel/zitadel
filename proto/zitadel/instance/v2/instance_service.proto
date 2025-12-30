@@ -12,8 +12,171 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "gnostic/openapi/v3/annotations.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/instance/v2;instance";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "Instance Service";
+    version: "2.0";
+    description: "This API is intended to manage instances in ZITADEL.";
+    contact: {
+      name: "ZITADEL";
+      url: "https://zitadel.com";
+      email: "hi@zitadel.com";
+    }
+    license: {
+      name: "AGPL-3.0-only";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    }
+  }
+
+  servers: {
+    url: "https://$CUSTOM-DOMAIN";
+    description: "Default Instance";
+  }
+
+  external_docs: {
+    description: "Detailed information about ZITADEL";
+    url: "https://zitadel.com/docs";
+  }
+
+  components: {
+    // 1. SCHEMAS
+    schemas: {
+      additional_properties: {
+        name: "rpcStatus";
+        value: {
+          schema: {
+            type: "object";
+            description: "The `Status` type defines a logical error model.";
+            properties: {
+              additional_properties: {
+                name: "code";
+                value: {
+                  schema: {
+                    type: "integer";
+                    format: "int32";
+                    description: "The status code.";
+                  }
+                }
+              }
+              additional_properties: {
+                name: "message";
+                value: {
+                  schema: {
+                    type: "string";
+                    description: "A developer-facing error message.";
+                  }
+                }
+              }
+              additional_properties: {
+                name: "details";
+                value: {
+                  schema: {
+                    type: "array";
+                    items: {
+                      schema_or_reference: {
+                        schema: {
+                          type: "object";
+                        }
+                      }
+                    }
+                    description: "A list of messages that carry the error details.";
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 2. SECURITY SCHEMES
+    security_schemes: {
+      additional_properties: {
+        name: "OAuth2";
+        value: {
+          security_scheme: {
+            type: "oauth2";
+            description: "OAuth2 Authorization Code Flow";
+            flows: {
+              authorization_code: {
+                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+                scopes: {
+                  additional_properties: {
+                    name: "openid";
+                    value: "openid";
+                  }
+                  additional_properties: {
+                    name: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                    value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 3. RESPONSES
+    responses: {
+      additional_properties: {
+        name: "403";
+        value: {
+          response: {
+            description: "Returned when the user does not have permission to access the resource.";
+            content: {
+              additional_properties: {
+                name: "application/json";
+                value: {
+                  schema: {
+                    reference: {
+                      _ref: "#/components/schemas/rpcStatus";
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      additional_properties: {
+        name: "404";
+        value: {
+          response: {
+            description: "Returned when the resource does not exist.";
+            content: {
+              additional_properties: {
+                name: "application/json";
+                value: {
+                  schema: {
+                    reference: {
+                      _ref: "#/components/schemas/rpcStatus";
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 4. GLOBAL SECURITY
+  security: {
+    additional_properties: {
+      name: "OAuth2";
+      value: {
+        value: ["openid", "urn:zitadel:iam:org:project:id:zitadel:aud"];
+      }
+    }
+  }
+};
 
 // Service to manage instances and their domains.
 // The service provides methods to create, update, delete and list instances and their domains.
@@ -35,6 +198,26 @@ service InstanceService {
         permission: "system.instance.delete"
       }
     };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
+      }
+    };
   }
 
   // Get Instance
@@ -52,6 +235,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
@@ -73,6 +276,26 @@ service InstanceService {
         permission: "authenticated"
       }
     };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
+      }
+    };
   }
 
   // List Instances
@@ -88,6 +311,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "system.instance.read"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
@@ -107,6 +350,26 @@ service InstanceService {
         permission: "system.domain.write"
       }
     };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
+      }
+    };
   }
 
   // Remove Custom Domain
@@ -122,6 +385,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "system.domain.write"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
@@ -142,6 +425,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
@@ -171,6 +474,26 @@ service InstanceService {
         permission: "authenticated"
       }
     };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
+      }
+    };
   }
 
   // Remove Trusted Domain
@@ -188,6 +511,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
@@ -208,6 +551,26 @@ service InstanceService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+      }
+    };
+    option (gnostic.openapi.v3.operation) = {
+      responses: {
+        response_or_reference: {
+          name: "403";
+          value: {
+            reference: {
+              _ref: "#/components/responses/403"
+            }
+          }
+        }
+        response_or_reference: {
+          name: "404";
+          value: {
+            reference: {
+              _ref: "#/components/responses/404"
+            }
+          }
+        }
       }
     };
   }
