@@ -254,8 +254,8 @@ module.exports = {
               items: [
                 {
                   type: "link",
-                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2",
-                  label: "Login V2",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
+                  label: "Login V2 [Beta]",
                 },
               ],
             },
@@ -372,21 +372,22 @@ module.exports = {
           },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/azure-ad-oidc",
             "guides/integrate/identity-providers/azure-ad-saml",
+            "guides/integrate/identity-providers/generic-oidc",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
-            "guides/integrate/identity-providers/apple",
-            "guides/integrate/identity-providers/ldap",
-            "guides/integrate/identity-providers/openldap",
-            "guides/integrate/identity-providers/okta-oidc",
-            "guides/integrate/identity-providers/generic-oidc",
-            "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/jwt_idp",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/linkedin-oauth",
             "guides/integrate/identity-providers/mocksaml",
-            "guides/integrate/identity-providers/jwt_idp",
+            "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/pingfederate-saml",
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/additional-information",
           ],
@@ -487,7 +488,8 @@ module.exports = {
           label: "Actions",
           link: {
             type: "generated-index",
-            title: "Use Actions to integrate ZITADEL with your Favorite Services",
+            title:
+              "Use Actions to integrate ZITADEL with your Favorite Services",
             slug: "/guides/integrate/actions",
             description:
               "With the guides in this section you will learn how to use action to integrate Zitadel with your services.",
@@ -508,6 +510,10 @@ module.exports = {
             },
             {
               type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
+            },
+            {
+              type: "doc",
               id: "guides/integrate/actions/testing-response",
             },
             {
@@ -525,10 +531,6 @@ module.exports = {
             {
               type: "doc",
               id: "guides/integrate/actions/testing-event",
-            },
-            {
-              type: "doc",
-              id: "guides/integrate/actions/testing-request-signature",
             },
             {
               type: "doc",
@@ -651,12 +653,12 @@ module.exports = {
         {
           type: "link",
           label: "Support States",
-          href: "https://help.zitadel.com/zitadel-support-states"
+          href: "https://help.zitadel.com/zitadel-support-states",
         },
         {
           type: "link",
           label: "Zitadel Release Cycle",
-          href: "https://help.zitadel.com/zitadel-software-release-cycle"
+          href: "https://help.zitadel.com/zitadel-software-release-cycle",
         },
         "support/troubleshooting",
         {
@@ -688,7 +690,6 @@ module.exports = {
         id: "apis/apis/index",
       },
       items: [
-
         {
           type: "category",
           label: "V2",
@@ -741,8 +742,7 @@ module.exports = {
                 type: "generated-index",
                 title: "SAML Service API",
                 slug: "/apis/resources/saml_service_v2",
-                description:
-                  "Get SAML Request details and create responses.\n",
+                description: "Get SAML Request details and create responses.\n",
               },
               items: sidebar_api_saml_service_v2,
             },
@@ -818,22 +818,26 @@ module.exports = {
                   "\n" +
                   "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n",
               },
-              items: sidebar_api_webkey_service_v2
+              items: sidebar_api_webkey_service_v2,
             },
             {
               type: "category",
-              label: "Action",
+              label: "Action (Beta)",
               link: {
                 type: "generated-index",
-                title: "Action Service API",
+                title: "Action Service API (Beta)",
                 slug: "/apis/resources/action_service_v2",
                 description:
                   "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
                   "\n" +
+                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
+                  "\n" +
                   "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
                   "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
                   "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users."
+                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n" +
+                  "\n" +
+                  "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
             },
@@ -848,8 +852,7 @@ module.exports = {
                   "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
                   "\n" +
                   "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
-                  "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
-                ,
+                  "The whole functionality related to domains (custom and trusted) has been moved under this instance API.",
               },
               items: sidebar_api_instance_service_v2,
             },
@@ -861,7 +864,7 @@ module.exports = {
                 title: "Project Service API",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL."
+                  "This API is intended to manage projects and subresources for ZITADEL.",
               },
               items: sidebar_api_project_service_v2,
             },
@@ -875,7 +878,7 @@ module.exports = {
                 description:
                   "This API lets you manage Zitadel applications (API, SAML, OIDC).\n" +
                   "\n" +
-                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "
+                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), ",
               },
               items: sidebar_api_application_v2,
             },
@@ -890,7 +893,7 @@ module.exports = {
                   "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
                   "\n" +
                   "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
-                  "users, etc., please use the InternalPermissionService."
+                  "users, etc., please use the InternalPermissionService.",
               },
               items: sidebar_api_authorization_service_v2,
             },
@@ -902,7 +905,7 @@ module.exports = {
                 title: "Internal Permission Service API",
                 slug: "/apis/resources/internal_permission_service_v2",
                 description:
-                  "This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as \"administrators\"."
+                  'This API provides methods to manage permissions for resource and and their management in ZITADEL itself also known as "administrators".',
               },
               items: sidebar_api_internal_permission_service_v2,
             },
@@ -970,7 +973,7 @@ module.exports = {
               },
               items: sidebar_api_system,
             },
-            "apis/migration_v1_to_v2"
+            "apis/migration_v1_to_v2",
           ],
         },
         {
@@ -1214,8 +1217,8 @@ module.exports = {
             {
               type: "link",
               label: "Billing",
-              href: "https://help.zitadel.com/pricing-and-billing-of-zitadel-services"
-            }
+              href: "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
+            },
           ],
         },
         {
