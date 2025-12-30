@@ -249,7 +249,7 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			ForceMFA                   bool
 			ForceMFALocalOnly          bool
 			HidePasswordReset          bool
-			IgnoreUnknownUsername      bool
+			IgnoreUnknownUsernames     bool
 			AllowDomainDiscovery       bool
 			DisableLoginWithEmail      bool
 			DisableLoginWithPhone      bool
