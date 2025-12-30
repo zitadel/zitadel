@@ -246,7 +246,7 @@ func TestSession_FetchUser(t *testing.T) {
 				err: zerrors.ThrowInvalidArgument(nil, "SAML-swwg2", "Errors.Intent.MissingSingleMappingAttribute"),
 			},
 		},
-		//{
+		// {
 		//	name: "post with user param",
 		//	fields: fields{
 		//		name:        "saml",
@@ -287,8 +287,8 @@ func TestSession_FetchUser(t *testing.T) {
 		//			"urn:oid:1.3.6.1.4.1.5923.1.1.1.1":  {"Administrators", "Users"},
 		//		},
 		//	},
-		//},
-		//{
+		// },
+		// {
 		//	name: "post with user param (transient with custom mapping)",
 		//	fields: fields{
 		//		name:        "saml",
@@ -329,8 +329,8 @@ func TestSession_FetchUser(t *testing.T) {
 		//			"urn:oid:1.3.6.1.4.1.5923.1.1.1.1":  {"Administrators", "Users"},
 		//		},
 		//	},
-		//},
-		//{
+		// },
+		// {
 		//	name: "post with user param (transient with wrong existing custom mapping)",
 		//	fields: fields{
 		//		name:        "saml",
@@ -363,7 +363,7 @@ func TestSession_FetchUser(t *testing.T) {
 		//	want: want{
 		//		err: zerrors.ThrowInvalidArgument(nil, "SAML-swwg2", "Errors.Intent.MissingSingleMappingAttribute"),
 		//	},
-		//},
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
