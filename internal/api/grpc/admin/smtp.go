@@ -9,6 +9,7 @@ import (
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
+// GetSMTPConfig is deprecated. Please move to the new endpoint GetEmailProvider.
 func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
 	smtp, err := s.query.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -19,6 +20,7 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 	}, nil
 }
 
+// GetSMTPConfigById is deprecated. Please move to the new endpoint GetEmailProviderById.
 func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPConfigByIdRequest) (*admin_pb.GetSMTPConfigByIdResponse, error) {
 	smtp, err := s.query.SMTPConfigByID(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
@@ -29,6 +31,7 @@ func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPCon
 	}, nil
 }
 
+// AddSMTPConfig is deprecated. Please move to the new endpoint AddEmailProviderSMTP
 func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
 	config := addSMTPToConfig(ctx, req)
 	if err := s.command.AddSMTPConfig(ctx, config); err != nil {
@@ -40,6 +43,7 @@ func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigR
 	}, nil
 }
 
+// UpdateSMTPConfig is deprecated. Please move to the new endpoint UpdateEmailProviderSMTP
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
 	config := updateSMTPToConfig(ctx, req)
 	if err := s.command.ChangeSMTPConfig(ctx, config); err != nil {
