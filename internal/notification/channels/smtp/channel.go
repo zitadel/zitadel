@@ -151,7 +151,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
 	if smtpConfig.XOAuth2Auth != nil {
 		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, smtpConfig.Host))
 		if err != nil {
-			return zerrors.ThrowInternal(err, "EMAIL-TODO-GET_ERROR_CODE", "Errors.SMTP.CouldNotXOAuth2")
+			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotXOAuth2")
 		}
 		return nil
 	}

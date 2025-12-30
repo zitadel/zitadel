@@ -16,7 +16,7 @@ type GenericAuth struct {
 
 func (a *GenericAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if server.Name != a.Host {
-		return "", nil, zerrors.ThrowInternal(nil, "SMTP-TODO-GET_ERROR_CODE", "wrong host name")
+		return "", nil, zerrors.ThrowInternal(nil, "SMTP-BtXgkX", "wrong host name")
 	}
 
 	switch {
@@ -29,14 +29,14 @@ func (a *GenericAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	}
 
 	if a.selectedMethod == nil {
-		return "", nil, zerrors.ThrowInternalf(nil, "SMTP-TODO-GET_ERROR_CODE", "no supported auth method found (server supports: %v)", server.Auth)
+		return "", nil, zerrors.ThrowInternalf(nil, "SMTP-3mBHTz", "no supported auth method found (server supports: %v)", server.Auth)
 	}
 	return a.selectedMethod.Start(server)
 }
 
 func (a *GenericAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	if a.selectedMethod != nil {
-		return nil, zerrors.ThrowInternal(nil, "SMTP-TODO-GET_ERROR_CODE", "no auth method selected")
+		return nil, zerrors.ThrowInternal(nil, "SMTP-G99DUr", "no auth method selected")
 	}
 
 	return a.selectedMethod.Next(fromServer, more)

@@ -480,7 +480,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 	}
 
 	if id == "" && config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientSecret == "" {
-		return zerrors.ThrowInvalidArgument(nil, "TODO(wim) get error code", "Errors.SMTPConfig.TestClientSecret")
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-9OP96s", "Errors.SMTPConfig.TestClientSecret")
 	}
 
 	if config.SMTP.PlainAuth != nil && config.SMTP.PlainAuth.Password == "" {
@@ -504,7 +504,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 			return err
 		}
 		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.XOAuth2Auth == nil {
-			return zerrors.ThrowNotFound(nil, "TODO(wim) get error code", "Errors.SMTPConfig.NotFound")
+			return zerrors.ThrowNotFound(nil, "TODbO(wim) get error code", "Errors.SMTPConfig.NotFound")
 		}
 
 		config.SMTP.XOAuth2Auth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientSecret, c.smtpEncryption)
