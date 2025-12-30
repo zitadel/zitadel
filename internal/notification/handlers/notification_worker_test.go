@@ -443,9 +443,11 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 				},
 				SMTPConfig: &smtp.Config{
 					SMTP: smtp.SMTP{
-						Host:     "host",
-						User:     "user",
-						Password: "password",
+						Host: "host",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "password",
+						},
 					},
 					Tls:            true,
 					From:           "from",

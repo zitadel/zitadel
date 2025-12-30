@@ -340,7 +340,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					},
 				},
 			},
-		}, {
+		},
+		{
 			name: "reduceSMTPConfigHTTPChanged, signing key",
 			args: args{
 				event: getEvent(
