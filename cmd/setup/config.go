@@ -164,6 +164,7 @@ type Steps struct {
 	s65FixUserMetadata5Index                *FixUserMetadata5Index
 	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
+	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
