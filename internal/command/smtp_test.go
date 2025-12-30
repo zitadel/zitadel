@@ -360,6 +360,194 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add smtp config with plain auth but no password, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"configid",
+							"test",
+							true,
+							"from@domain.ch",
+							"name",
+							"replyto@domain.ch",
+							"host:587",
+							&instance.PlainAuth{
+								User: "user",
+							},
+							nil,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				smtp: &AddSMTPConfig{
+					ResourceOwner:  "INSTANCE",
+					Description:    "test",
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "replyto@domain.ch",
+					Host:           "host:587",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User: "user",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add smtp config without auth, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"configid",
+							"test",
+							true,
+							"from@domain.ch",
+							"name",
+							"replyto@domain.ch",
+							"host:587",
+							nil,
+							nil,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				smtp: &AddSMTPConfig{
+					ResourceOwner:  "INSTANCE",
+					Description:    "test",
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "replyto@domain.ch",
+					Host:           "host:587",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add smtp config with xoauth2 auth, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"configid",
+							"test",
+							true,
+							"from@domain.ch",
+							"name",
+							"replyto@domain.ch",
+							"host:587",
+							nil,
+							&instance.XOAuth2Auth{
+								User:     "user",
+								ClientId: "client-id",
+								ClientSecret: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
+								TokenEndpoint: "auth.example.com/token",
+								Scopes:        []string{"scope"},
+							},
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				smtp: &AddSMTPConfig{
+					ResourceOwner:  "INSTANCE",
+					Description:    "test",
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "replyto@domain.ch",
+					Host:           "host:587",
+					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
+						User:          "user",
+						ClientId:      "client-id",
+						ClientSecret:  "password",
+						TokenEndpoint: "auth.example.com/token",
+						Scopes:        []string{"scope"},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

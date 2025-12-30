@@ -82,13 +82,14 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 		}
 	}
 	if config.PlainAuth != nil {
-		password, err := crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
-		if err != nil {
-			return err
-		}
 		plainAuth = &instance.PlainAuth{
-			User:     config.PlainAuth.User,
-			Password: password,
+			User: config.PlainAuth.User,
+		}
+		if config.PlainAuth.Password != "" {
+			plainAuth.Password, err = crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
