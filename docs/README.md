@@ -20,6 +20,9 @@ Start a docs server
 # Start development server with live-reloading
 pnpm nx run @zitadel/docs:dev
 
+# To tell Nx to ignore cached outputs
+pnpm nx run @zitadel/docs:dev --skip-nx-cache
+
 # Or serve a production build
 pnpm nx run @zitadel/docs:prod
 ```
