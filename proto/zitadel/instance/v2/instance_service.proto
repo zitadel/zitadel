@@ -43,7 +43,6 @@ option (gnostic.openapi.v3.document) = {
   }
 
   components: {
-    // 1. SCHEMAS
     schemas: {
       additional_properties: {
         name: "rpcStatus";
@@ -93,7 +92,6 @@ option (gnostic.openapi.v3.document) = {
       }
     }
 
-    // 2. SECURITY SCHEMES
     security_schemes: {
       additional_properties: {
         name: "OAuth2";
@@ -123,7 +121,6 @@ option (gnostic.openapi.v3.document) = {
     }
   }
 
-  // 4. GLOBAL SECURITY
   security: {
     additional_properties: {
       name: "OAuth2";
