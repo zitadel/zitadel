@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	allowDomainRunes = regexp.MustCompile("^[a-zA-Z0-9\\.\\-]+$")
+	allowDomainRunes = regexp.MustCompile(`^[a-zA-Z0-9\.\-]+$`)
 )
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
@@ -59,6 +59,7 @@ func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain 
 func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := removeInstanceDomain(instanceAgg, instanceDomain)
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err

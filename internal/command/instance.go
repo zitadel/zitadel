@@ -892,17 +892,6 @@ func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) pre
 	}
 }
 
-func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	if iamWriteModel.ProjectID != "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
-	}
-	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
-}
-
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if err := domain.LanguageIsDefined(defaultLanguage); err != nil {
@@ -964,6 +953,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 	}
 
 	instanceAgg := instance.NewAggregate(instID)
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
 	if err != nil {
 		return nil, err
