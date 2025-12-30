@@ -309,7 +309,7 @@ export async function processIDPCallback({
         console.error("[IDP Process] Error linking IDP:", error);
         const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
         let params = buildRedirectParams({ error: errorMessage });
-        if ((error as any)?.code === 6) {
+        if (error && typeof error === "object" && "code" in error && (error as { code: unknown }).code === 6) {
           params = buildRedirectParams({ error: "external_idp_taken" });
         }
         return { redirect: `/idp/${provider}/linking-failed?${params}` };

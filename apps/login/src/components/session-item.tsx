@@ -141,12 +141,11 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
             <XCircleIcon
               className="h-5 w-5 opacity-50 transition-all hover:opacity-100 group-hover:block sm:hidden"
-              onClick={(event: React.MouseEvent) => {
+              onClick={async (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                clearSessionId(session.id).then(() => {
-                  reload();
-                });
+                await clearSessionId(session.id);
+                reload();
               }}
             />
           </div>
