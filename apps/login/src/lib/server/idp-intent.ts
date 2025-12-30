@@ -16,7 +16,7 @@ import {
   ServiceConfig,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
-import { create } from "@zitadel/client";
+import { Code, ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
@@ -264,7 +264,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       console.error("[IDP Process] Error linking IDP:", error);
       const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
       let params = buildRedirectParams({ error: errorMessage });
-      if (error && typeof error === "object" && "code" in error && (error as { code: unknown }).code === 6) {
+      if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
         params = buildRedirectParams({ error: "external_idp_taken" });
       }
       return { redirect: `/idp/${provider}/linking-failed?${params}` };
