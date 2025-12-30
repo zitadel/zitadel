@@ -77,6 +77,82 @@ All the necessary configuration is contained in the metadata which has to be exc
 
 ![SAML Provider](/img/guides/zitadel_saml_create_provider.png)
 
+After saving, open the newly created PingFederate SAML provider in ZITADEL.  
+In the details view you will find the **ZITADEL Service Provider** URLs, such as:
+
+- **ZITADEL Metadata URL**
+- **ZITADEL ACS Login Form URL** (for Login V1)
+- **ZITADEL Single Logout URL**
+- **ZITADEL ACS Intent API URL** (for Login V2 and programmatic SAML flows)
+
+You’ll need these in the next step.
+
+### Import ZITADEL metadata into PingFederate (recommended)
+
+Now that ZITADEL is configured, you can let PingFederate **consume ZITADEL’s SP metadata URL**.  
+This allows PingFederate to:
+
+- Auto-fill the ZITADEL **ACS URL**, **entity ID**, and **SLO URLs**.
+- Import and keep up-to-date the **verification/encryption certificates** from the metadata.
+
+#### Create a Partner Metadata URL for ZITADEL
+
+1. In the PingFederate admin console, go to:  
+   **System > Protocol Metadata > Partner Metadata URLs**.
+2. Click **Add New URL**.
+3. On the **URL** tab:
+   - **Name** – `ZITADEL SP Metadata` (or similar).
+   - **URL** – paste the **ZITADEL Metadata URL** you copied from ZITADEL.
+   - Keep **Validate Metadata Signature** enabled (recommended) unless you have a reason to disable it.
+4. Click **Load Metadata**.
+5. On the **Certificate Summary** tab, review the certificate information associated with the metadata.
+6. On the **Summary** tab, click **Done**, then **Save**.
+
+PingFederate can now use this metadata URL to configure and automatically update the SP connection. 
+
+### Import SP metadata into the ZITADEL SP Connection
+
+With the partner metadata URL defined, apply it to your existing SP Connection for ZITADEL.
+
+1. Go to **Applications > SP Connections**.
+2. Edit the SP Connection you created for ZITADEL.
+3. Go to the **Import Metadata** tab.
+4. Select **URL**.
+5. From the **Metadata URL** drop-down, select the **ZITADEL SP Metadata** entry you created.
+   - If you don’t see it, click **Manage Partner Metadata URLs** and verify it exists and loads correctly.
+6. Ensure **Enable Automatic Reloading** is checked if you want PingFederate to periodically refresh metadata (recommended).
+7. Click **Load Metadata**.
+
+PingFederate will:
+
+- Read the SP metadata from ZITADEL,
+- Populate the **ACS URL**, SLO URLs, and other protocol settings for the connection, and
+- Import the SP’s **signing/encryption certificates** for signature verification and encryption.
+
+You can review the updated values on:
+
+- **Browser SSO > Protocol Settings** (ACS URL, bindings, SLO URLs), and
+- **Credentials > Signature Verification / Encryption** (certificates imported from metadata).
+
+If needed, you can still override specific settings manually, but using the metadata URL is the preferred way to keep endpoints and certificates in sync.
+
+#### If you need to update the SP Connection with ZITADEL URLs
+
+1. In PingFederate, open the **SP Connection** you created for ZITADEL.
+2. Go to the **Browser SSO / Protocol Settings** (exact naming may vary by version).
+3. Update the SP settings:
+
+   - **Assertion Consumer Service (ACS) URL**  
+     Set this to the **ZITADEL ACS Intent API URL** from the SAML provider details.
+
+   - **SP Entity ID / Audience / Partner Entity ID**  
+     Set this to the **ZITADEL Metadata URL**.
+
+   - **Single Logout (optional)**  
+     If you want SAML Single Logout, configure PingFederate’s logout behavior to call the **ZITADEL Single Logout URL** using the appropriate binding (typically HTTP-Redirect).
+
+4. Save and **activate** the connection changes in PingFederate.
+
 ### Activate IdP
 
 <Activate/>
