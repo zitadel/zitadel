@@ -447,6 +447,71 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 				ReplyToAddress: "address",
 			},
 		},
+		{
+			name: "legacy auth (username password) should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User:     "user",
+					Password: "password",
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "user",
+					Password: "password",
+				},
+			},
+		},
+		{
+			name: "plain auth should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					Auth: &admin_pb.AddEmailProviderSMTPRequest_Plain{
+						Plain: &admin_pb.SMTPPlainAuth{
+							User:     "plain-user",
+							Password: "other_password",
+						},
+					},
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "plain-user",
+					Password: "other_password",
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth should map to xoauth2",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.AddEmailProviderSMTPRequest{
+					Auth: &admin_pb.AddEmailProviderSMTPRequest_Xoauth2{
+						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
+							User:          "xoauth2-user",
+							ClientId:      "my-client",
+							ClientSecret:  "some-secret",
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+						},
+					},
+				},
+			},
+			res: &command.AddSMTPConfig{
+				ResourceOwner: "instance",
+				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
+					User:          "xoauth2-user",
+					ClientId:      "my-client",
+					ClientSecret:  "some-secret",
+					TokenEndpoint: "auth.example.com/token",
+					Scopes:        []string{"scopes"},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -495,6 +560,77 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 				From:           "sender",
 				FromName:       "sendername",
 				ReplyToAddress: "address",
+			},
+		},
+		{
+			name: "legacy auth (username password) should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					User:     "user",
+					Password: "password",
+					Id:       "id",
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "user",
+					Password: "password",
+				},
+			},
+		},
+		{
+			name: "plain auth should map to plain",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					Id: "id",
+					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Plain{
+						Plain: &admin_pb.SMTPPlainAuth{
+							User:     "plain-user",
+							Password: "other_password",
+						},
+					},
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				PlainAuth: &smtp.PlainAuthConfig{
+					User:     "plain-user",
+					Password: "other_password",
+				},
+			},
+		},
+		{
+			name: "xoauth2 auth should map to xoauth2",
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance"),
+				req: &admin_pb.UpdateEmailProviderSMTPRequest{
+					Id: "id",
+					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2{
+						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
+							User:          "xoauth2-user",
+							ClientId:      "my-client",
+							ClientSecret:  "some-secret",
+							TokenEndpoint: "auth.example.com/token",
+							Scopes:        []string{"scopes"},
+						},
+					},
+				},
+			},
+			res: &command.ChangeSMTPConfig{
+				ResourceOwner: "instance",
+				ID:            "id",
+				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
+					User:          "xoauth2-user",
+					ClientId:      "my-client",
+					ClientSecret:  "some-secret",
+					TokenEndpoint: "auth.example.com/token",
+					Scopes:        []string{"scopes"},
+				},
 			},
 		},
 	}
