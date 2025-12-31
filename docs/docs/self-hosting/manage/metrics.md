@@ -297,7 +297,7 @@ rule_files:
 
 **Target is DOWN / connection refused**
 - In Docker: remember **`localhost` inside the Prometheus container is the container itself**, not your host. Use `host.docker.internal:8080` (plus `--add-host=host.docker.internal:host-gateway` on Linux), or join Prometheus to the **same Docker network** as ZITADEL and use the **service name** (e.g., `zitadel:8080`), or run with `--network host` on Linux.
-- In Kubernetes: verify the Service port name (`http`) and path (`/debug/metrics`) match your ServiceMonitor (or annotations). Check that Prometheus has RBAC to list Pods/Endpoints.
+- In Kubernetes: verify the Service port name (for example, `http-server` or `https-server`) and path (`/debug/metrics`) match your ServiceMonitor (or annotations). Check that Prometheus has RBAC to list Pods/Endpoints.
 
 **Metrics path mismatch**
 - ZITADEL uses **`/debug/metrics`**. If you see 404s, confirm your Prometheus job or annotations aren’t still using `/metrics`.
