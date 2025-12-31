@@ -1164,6 +1164,7 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
         "self-hosting/manage/service_ping",
+        "self-hosting/manage/metrics",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
