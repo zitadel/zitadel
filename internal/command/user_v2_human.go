@@ -151,7 +151,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 	if isUserStateExists(existingHuman.UserState) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
+		return zerrors.ThrowAlreadyExists(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
