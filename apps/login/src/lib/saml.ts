@@ -25,13 +25,7 @@ export async function setSAMLFormCookie(value: string): Promise<string> {
   const uid = await getSAMLFormUID();
 
   try {
-    // Check cookie size limits (typical limit is 4KB)
-    if (value.length > 4000) {
-      console.warn(`SAML form cookie value is large (${value.length} characters), may exceed browser limits`);
-    }
-
     // Log the attempt
-    console.log(`Setting SAML form cookie with uid: ${uid}, value length: ${value.length}`);
 
     await cookiesList.set({
       name: uid,
@@ -49,11 +43,6 @@ export async function setSAMLFormCookie(value: string): Promise<string> {
 
     return uid;
   } catch (error) {
-    console.error(`Failed to set SAML form cookie with uid: ${uid}`, {
-      error,
-      valueLength: value.length,
-      uid,
-    });
     throw new Error(`Failed to set SAML form cookie: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
@@ -65,34 +54,30 @@ export async function getSAMLFormCookie(uid: string): Promise<string | null> {
     const cookie = cookiesList.get(uid);
 
     if (!cookie) {
-      console.warn(`SAML form cookie not found for uid: ${uid}`);
       return null;
     }
 
     if (!cookie.value) {
-      console.warn(`SAML form cookie found but empty value for uid: ${uid}`);
       return null;
     }
 
-    console.log(`Successfully retrieved SAML form cookie for uid: ${uid}, value length: ${cookie.value.length}`);
     return cookie.value;
-  } catch (error) {
-    console.error(`Error retrieving SAML form cookie for uid: ${uid}`, error);
+  } catch {
     return null;
   }
 }
 
-export async function loginWithSAMLAndSession({ serviceConfig, samlRequest, sessionId, sessions, sessionCookies }: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
-  console.log(`Login with session: ${sessionId} and samlRequest: ${samlRequest}`);
-
+export async function loginWithSAMLAndSession({
+  serviceConfig,
+  samlRequest,
+  sessionId,
+  sessions,
+  sessionCookies,
+}: LoginWithSAMLAndSession): Promise<{ error: string } | { redirect: string }> {
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    console.log(`Found session ${selectedSession.id}`);
-
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
-
-    console.log("Session is valid:", isValid);
 
     if (!isValid && selectedSession.factors?.user) {
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
@@ -120,7 +105,9 @@ export async function loginWithSAMLAndSession({ serviceConfig, samlRequest, sess
 
       // works not with _rsc request
       try {
-        const { url } = await createResponse({ serviceConfig, req: create(CreateResponseRequestSchema, {
+        const { url } = await createResponse({
+          serviceConfig,
+          req: create(CreateResponseRequestSchema, {
             samlRequestId: samlRequest,
             responseKind: {
               case: "session",
@@ -138,7 +125,10 @@ export async function loginWithSAMLAndSession({ serviceConfig, samlRequest, sess
         console.error(error);
 
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
-          const loginSettings = await getLoginSettings({ serviceConfig, organization: selectedSession.factors?.user?.organizationId });
+          const loginSettings = await getLoginSettings({
+            serviceConfig,
+            organization: selectedSession.factors?.user?.organizationId,
+          });
 
           if (loginSettings?.defaultRedirectUri) {
             return { redirect: loginSettings.defaultRedirectUri };
