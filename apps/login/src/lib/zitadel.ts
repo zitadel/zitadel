@@ -774,8 +774,11 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }>): Promise<string | null> {
-    // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
-    const userService: Client<typeof UserService> = await createServiceForHost(UserService, {...serviceConfig, publicHost: ''});
+  // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, {
+    ...serviceConfig,
+    publicHost: "",
+  });
 
   return userService
     .startIdentityProviderIntent({
