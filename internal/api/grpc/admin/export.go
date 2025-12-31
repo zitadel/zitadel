@@ -290,7 +290,7 @@ func (s *Server) getDomains(ctx context.Context, orgID string) (_ []*org_pb.Doma
 	if err != nil {
 		return nil, err
 	}
-	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}}, false)
+	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}}, false, false)
 	if err != nil {
 		return nil, err
 	}

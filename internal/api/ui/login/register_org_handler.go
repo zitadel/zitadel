@@ -84,7 +84,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, userIDs...)
+	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, nil, userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
