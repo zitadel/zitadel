@@ -32,11 +32,6 @@ option (gnostic.openapi.v3.document) = {
     }
   }
 
-  servers: {
-    url: "https://$CUSTOM-DOMAIN";
-    description: "Default Instance";
-  }
-
   external_docs: {
     description: "Detailed information about ZITADEL";
     url: "https://zitadel.com/docs";
