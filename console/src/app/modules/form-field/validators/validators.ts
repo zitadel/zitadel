@@ -42,7 +42,8 @@ export function minArrayLengthValidator(minArrLength: number): ValidatorFn {
 }
 
 export function emailValidator(c: AbstractControl): ValidationErrors | null {
-  return i18nErr(Validators.email(c), 'ERRORS.NOTANEMAIL');
+  const EMAIL_REGEXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regexpValidator(c, EMAIL_REGEXP, 'ERRORS.NOTANEMAIL');
 }
 
 export function minLengthValidator(minLength: number): ValidatorFn {
