@@ -8,6 +8,7 @@ RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env
 COPY --chown=nextjs:nodejs .next/standalone ./
 
 USER nextjs
+VOLUME [ "/current-dir" ]
 ENV HOSTNAME="::" \
     PORT="3000" \
     NODE_ENV="production"
