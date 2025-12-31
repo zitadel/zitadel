@@ -13,6 +13,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -2015,8 +2016,8 @@ func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
 }
 
-func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*crypto.MockEncryptionAlgorithm, *crypto.CryptoValue) {
-	encAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*cryptomock.MockEncryptionAlgorithm, *crypto.CryptoValue) {
+	encAlg := cryptomock.NewMockEncryptionAlgorithm(ctrl)
 	encAlg.EXPECT().Algorithm().AnyTimes().Return("enc")
 	encAlg.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	encAlg.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})

@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	cryptomock "github.com/zitadel/zitadel/internal/crypto/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -22,7 +23,7 @@ import (
 
 func Test_idpIntentToIDPIntentPb(t *testing.T) {
 	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto := cryptomock.NewMockEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().Algorithm().Return("enc")
 		mCrypto.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
 		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
