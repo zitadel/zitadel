@@ -28,7 +28,7 @@
           <cnsl-framework-change
             *ngIf="framework"
             class="framework-selector"
-            (frameworkChanged)="setFramework($event)"
+            (frameworkChanged)="framework.set($event)"
           ></cnsl-framework-change>
           <div class="steps">
             <div class="step">

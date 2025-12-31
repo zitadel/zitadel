@@ -281,6 +281,13 @@ export class OwnedProjectDetailComponent implements OnInit {
     this.saveProject();
   }
 
+  public updateProjectName(newName: string): void {
+    if (this.project && newName.trim() && newName !== this.project.name) {
+      this.project.name = newName.trim();
+      this.updateName();
+    }
+  }
+
   public openAddMember(): void {
     const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
       data: {

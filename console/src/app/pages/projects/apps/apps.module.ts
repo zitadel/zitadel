@@ -37,22 +37,22 @@ import { OriginPipeModule } from 'src/app/pipes/origin-pipe/origin-pipe.module';
 import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 
 import { AdditionalOriginsComponent } from './additional-origins/additional-origins.component';
-import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
+import { AppCreateComponent } from './app-create/app-create.component';
 import { AuthMethodDialogComponent } from './app-detail/auth-method-dialog/auth-method-dialog.component';
-import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 import { IntegrateAppComponent } from './integrate/integrate.component';
 import { OIDCConfigurationComponent } from 'src/app/components/oidc-configuration/oidc-configuration.component';
 import { FrameworkChangeComponent } from 'src/app/components/framework-change/framework-change.component';
+import { FrameworkAutocompleteComponent } from 'src/app/components/framework-autocomplete/framework-autocomplete.component';
 import { CopyRowComponent } from 'src/app/components/copy-row/copy-row.component';
+import { EnvVarsBlockModule } from 'src/app/components/env-vars-block/env-vars-block.module';
 
 @NgModule({
   declarations: [
-    AppCreateComponent,
     AppDetailComponent,
-    AppSecretDialogComponent,
+    AppCreateComponent,
     RedirectUrisComponent,
     IntegrateAppComponent,
     AdditionalOriginsComponent,
@@ -60,6 +60,7 @@ import { CopyRowComponent } from 'src/app/components/copy-row/copy-row.component
   ],
   imports: [
     FrameworkChangeComponent,
+    FrameworkAutocompleteComponent,
     CommonModule,
     A11yModule,
     OIDCConfigurationComponent,
@@ -101,6 +102,7 @@ import { CopyRowComponent } from 'src/app/components/copy-row/copy-row.component
     ChangesModule,
     InfoSectionModule,
     CopyRowComponent,
+    EnvVarsBlockModule,
   ],
   exports: [TranslateModule],
 })
