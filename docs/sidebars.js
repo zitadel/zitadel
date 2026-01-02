@@ -42,15 +42,8 @@ module.exports = {
             "concepts/structure/applications",
             "guides/manage/console/applications",
             "guides/manage/console/users",
-            {
-              type: "category",
-              label: "Users & Roles",
-              items: [
-                "concepts/structure/users",
-                "concepts/structure/managers",
-                "concepts/structure/granted_projects",
-              ],
-            },
+            "concepts/structure/users",
+            "concepts/structure/managers",
           ],
         },
         {
@@ -233,7 +226,6 @@ module.exports = {
       collapsed: true,
       items: [
         "guides/manage/console/overview",
-        "guides/manage/console/default-settings",
         "guides/manage/user/reg-create-user",
         "guides/manage/user/scim2",
         "guides/manage/terraform-provider",
@@ -279,9 +271,9 @@ module.exports = {
           type: "category",
           label: "Policies",
           items: [
+            "guides/manage/console/default-settings",
             "guides/manage/customize/behavior",
             "concepts/structure/policies",
-            "guides/manage/console/default-settings",
             // TODO: File missing - Password Policies specific doc
             // TODO: File missing - Lockout Policies specific doc
             // TODO: File missing - Privacy Policies specific doc
