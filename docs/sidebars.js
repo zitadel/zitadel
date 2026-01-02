@@ -34,7 +34,6 @@ module.exports = {
           type: "category",
           label: "Key Concepts",
           items: [
-            "guides/manage/console/overview",
             "concepts/structure/instance",
             "concepts/structure/organizations",
             "guides/manage/console/organizations",
@@ -223,6 +222,7 @@ module.exports = {
       label: "ZITADEL Console",
       collapsed: true,
       items: [
+        "guides/manage/console/overview",
         "guides/manage/console/default-settings",
         "guides/manage/user/reg-create-user",
         "guides/manage/user/scim2",
