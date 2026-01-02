@@ -12,13 +12,13 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"google.golang.org/protobuf/types/known/structpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
@@ -631,7 +631,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						DisplayName:       gu.Ptr("displayname"),
 					},
 					Email: &user.SetHumanEmail{
-						Email: "email@email.com",
+						Email:        "email@email.com",
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},

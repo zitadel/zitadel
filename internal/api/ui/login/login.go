@@ -128,7 +128,18 @@ func CreateLogin(
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
+	login.router = CreateRouter(login,
+		middleware.TraceHandler(IgnoreInstanceEndpoints...),
+		middleware.LogHandler("login_v1", IgnoreInstanceEndpoints...),
+		oidcInstanceHandler,
+		samlInstanceHandler,
+		csrfInterceptor,
+		cacheInterceptor,
+		security,
+		userAgentCookie,
+		issuerInterceptor,
+		accessHandler,
+	)
 	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 

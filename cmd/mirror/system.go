@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"io"
 	"time"
 
@@ -21,9 +22,16 @@ func systemCmd() *cobra.Command {
 		Long: `mirrors the system tables of ZITADEL from one database to another
 ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			copySystem(cmd.Context(), config)
+			return nil
 		},
 	}
 

@@ -1,49 +1,77 @@
 package http
 
 import (
-	"errors"
+	"context"
+	"log/slog"
 	"net/http"
+
+	slogctx "github.com/veqryn/slog-context"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
+func ZitadelErrorToHTTPStatusCode(ctx context.Context, err error) (statusCode int, ok bool) {
 	if err == nil {
 		return http.StatusOK, true
 	}
-	//nolint:errorlint
-	switch err.(type) {
-	case *zerrors.AlreadyExistsError:
-		return http.StatusConflict, true
-	case *zerrors.DeadlineExceededError:
-		return http.StatusGatewayTimeout, true
-	case *zerrors.InternalError:
-		return http.StatusInternalServerError, true
-	case *zerrors.InvalidArgumentError:
-		return http.StatusBadRequest, true
-	case *zerrors.NotFoundError:
-		return http.StatusNotFound, true
-	case *zerrors.PermissionDeniedError:
-		return http.StatusForbidden, true
-	case *zerrors.PreconditionFailedError:
-		// use the same code as grpc-gateway:
-		// https://github.com/grpc-ecosystem/grpc-gateway/blob/9e33e38f15cb7d2f11096366e62ea391a3459ba9/runtime/errors.go#L59
-		return http.StatusBadRequest, true
-	case *zerrors.UnauthenticatedError:
-		return http.StatusUnauthorized, true
-	case *zerrors.UnavailableError:
-		return http.StatusServiceUnavailable, true
-	case *zerrors.UnimplementedError:
-		return http.StatusNotImplemented, true
-	case *zerrors.ResourceExhaustedError:
-		return http.StatusTooManyRequests, true
-	default:
-		c := new(zerrors.ZitadelError)
-		if errors.As(err, &c) {
-			return ZitadelErrorToHTTPStatusCode(errors.Unwrap(err))
-		}
+	statusCode, key, id, lvl := extractError(err)
+	msg := key
+	msg += " (" + id + ")"
+	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
+	if statusCode == statusUnknown {
 		return http.StatusInternalServerError, false
 	}
+	return statusCode, true
+}
+
+const statusUnknown = 0
+
+func extractError(err error) (statusCode int, msg, id string, lvl slog.Level) {
+	zitadelErr, ok := zerrors.AsZitadelError(err)
+	if !ok {
+		return statusUnknown, err.Error(), "", slog.LevelError
+	}
+	msg, id = zitadelErr.GetMessage(), zitadelErr.GetID()
+
+	switch zitadelErr.Kind {
+	case zerrors.KindAlreadyExists:
+		statusCode, lvl = http.StatusConflict, slog.LevelError
+	case zerrors.KindDeadlineExceeded:
+		statusCode, lvl = http.StatusGatewayTimeout, slog.LevelError
+	case zerrors.KindInternal:
+		statusCode, lvl = http.StatusInternalServerError, slog.LevelError
+	case zerrors.KindInvalidArgument:
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindNotFound:
+		statusCode, lvl = http.StatusNotFound, slog.LevelWarn
+	case zerrors.KindPermissionDenied:
+		statusCode, lvl = http.StatusForbidden, slog.LevelWarn
+	case zerrors.KindPreconditionFailed:
+		// use the same code as grpc-gateway:
+		// https://github.com/grpc-ecosystem/grpc-gateway/blob/9e33e38f15cb7d2f11096366e62ea391a3459ba9/runtime/errors.go#L59
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindUnauthenticated:
+		statusCode, lvl = http.StatusUnauthorized, slog.LevelWarn
+	case zerrors.KindUnavailable:
+		statusCode, lvl = http.StatusServiceUnavailable, slog.LevelError
+	case zerrors.KindUnimplemented:
+		statusCode, lvl = http.StatusNotImplemented, slog.LevelInfo
+	case zerrors.KindResourceExhausted:
+		statusCode, lvl = http.StatusTooManyRequests, slog.LevelError
+	case zerrors.KindCanceled:
+		statusCode, lvl = 499, slog.LevelWarn
+	case zerrors.KindDataLoss:
+		statusCode, lvl = http.StatusInternalServerError, slog.LevelError
+	case zerrors.KindOutOfRange:
+		statusCode, lvl = http.StatusBadRequest, slog.LevelWarn
+	case zerrors.KindAborted:
+		statusCode, lvl = http.StatusConflict, slog.LevelWarn
+	case zerrors.KindUnknown:
+		fallthrough
+	default:
+		statusCode, lvl = statusUnknown, slog.LevelError
+	}
+	return statusCode, msg, id, lvl
 }
 
 func HTTPStatusCodeToZitadelError(parent error, statusCode int, id string, message string) error {

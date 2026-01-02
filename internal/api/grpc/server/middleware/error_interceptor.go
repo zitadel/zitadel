@@ -17,5 +17,5 @@ func ErrorHandler() grpc.UnaryServerInterceptor {
 
 func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
 	resp, err := handler(ctx, req)
-	return resp, gerrors.ZITADELToGRPCError(err)
+	return resp, gerrors.ZITADELToGRPCError(ctx, err)
 }

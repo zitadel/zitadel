@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestUnauthenticatedError(t *testing.T) {
-	var err interface{} = new(zerrors.UnauthenticatedError)
-	_, ok := err.(zerrors.Unauthenticated)
-	assert.True(t, ok)
-}
+func TestUnauthenticated(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowUnauthenticatedf(t *testing.T) {
-	err := zerrors.ThrowUnauthenticatedf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.UnauthenticatedError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowUnauthenticated", func(t *testing.T) {
+		err := zerrors.ThrowUnauthenticated(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsUnauthenticated(t *testing.T) {
-	err := zerrors.ThrowUnauthenticated(nil, "id", "msg")
-	ok := zerrors.IsUnauthenticated(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnauthenticated, zitadelErr.Kind)
 
-	err = errors.New("I am found!")
-	ok = zerrors.IsUnauthenticated(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowUnauthenticatedf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowUnauthenticatedf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnauthenticated, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsUnauthenticated", func(t *testing.T) {
+		err := zerrors.ThrowUnauthenticated(parentErr, id, message)
+		isUnauthenticated := zerrors.IsUnauthenticated(err)
+		assert.True(t, isUnauthenticated)
+	})
 }

@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -118,7 +119,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 			wantOk:         true,
 		},
 		{
-			name: "no caos/zitadel error",
+			name: "no zitadel error",
 			args: args{
 				err: errors.New("error"),
 			},
@@ -128,7 +129,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotStatusCode, gotOk := ZitadelErrorToHTTPStatusCode(tt.args.err)
+			gotStatusCode, gotOk := ZitadelErrorToHTTPStatusCode(t.Context(), tt.args.err)
 			if gotStatusCode != tt.wantStatusCode {
 				t.Errorf("ZitadelErrorToHTTPStatusCode() gotStatusCode = %v, want %v", gotStatusCode, tt.wantStatusCode)
 			}
@@ -272,9 +273,9 @@ func TestHTTPStatusCodeToZitadelError(t *testing.T) {
 				statusCode: 1000,
 				id:         "id",
 				message:    "message",
-				parent:     errors.New("parent error"),
+				parent:     io.EOF,
 			},
-			wantErr: zerrors.ThrowUnknown(nil, "id", "message"),
+			wantErr: zerrors.ThrowUnknown(io.EOF, "id", "message"),
 		},
 	}
 	for _, tt := range tests {

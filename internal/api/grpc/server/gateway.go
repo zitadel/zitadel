@@ -20,10 +20,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -209,7 +209,7 @@ func addInterceptors(
 	handler = http_mw.CallDurationHandler(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
-	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.DefaultTraceHandler(handler)
 	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
@@ -218,6 +218,8 @@ func addInterceptors(
 		metrics.MetricTypeTotalCount,
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
+	handler = http_mw.TraceHandler(http_utils.Probes...)(handler)
+	handler = http_mw.LogHandler("grpc_gateway", http_utils.Probes...)(handler)
 	return handler
 }
 
