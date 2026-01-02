@@ -28,18 +28,31 @@ module.exports = {
       label: "Get Started",
       collapsed: false,
       items: [
+        "guides/overview",
+        "guides/start/quickstart",
         {
           type: "category",
-          label: "Overview",
+          label: "Key Concepts",
           items: [
-            "guides/overview",
-          ],
-        },
-        {
-          type: "category",
-          label: "Quickstart Guide",
-          items: [
-            "guides/start/quickstart",
+            "guides/manage/console/overview",
+            "concepts/structure/instance",
+            "concepts/structure/organizations",
+            "guides/manage/console/organizations",
+            "concepts/structure/projects",
+            "guides/manage/console/projects",
+            "concepts/structure/applications",
+            "guides/manage/console/applications",
+            "concepts/structure/policies",
+            "guides/manage/console/users",
+            {
+              type: "category",
+              label: "Users & Roles",
+              items: [
+                "concepts/structure/users",
+                "concepts/structure/managers",
+                "concepts/structure/granted_projects",
+              ],
+            },
           ],
         },
         {
@@ -181,38 +194,6 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Key Concepts",
-          items: [
-            {
-              type: "category",
-              label: "Instances, Orgs, Projects, Apps",
-              items: [
-                "concepts/structure/instance",
-                "concepts/structure/organizations",
-                "concepts/structure/projects",
-                "concepts/structure/applications",
-              ],
-            },
-            {
-              type: "category",
-              label: "Policies",
-              items: [
-                "concepts/structure/policies",
-              ],
-            },
-            {
-              type: "category",
-              label: "Users & Roles",
-              items: [
-                "concepts/structure/users",
-                "concepts/structure/managers",
-                "concepts/structure/granted_projects",
-              ],
-            },
-          ],
-        },
-        {
-          type: "category",
           label: "Use Cases",
           items: [
             "guides/solution-scenarios/b2b",
@@ -237,77 +218,72 @@ module.exports = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "ZITADEL Console",
+      collapsed: true,
+      items: [
+        "guides/manage/console/default-settings",
+        "guides/manage/user/reg-create-user",
+        "guides/manage/user/scim2",
+        "guides/manage/terraform-provider",
+      ],
+    },
+    {
+      type: "category",
+      label: "Configure Identity & Policies",
+      collapsed: true,
+      items: [
         {
           type: "category",
-          label: "Manage Console",
-          collapsed: true,
+          label: "Identity Providers",
           items: [
-            "guides/manage/console/overview",
-            "guides/manage/console/organizations",
-            "guides/manage/console/projects",
-            "guides/manage/console/applications",
-            "guides/manage/console/users",
-            "guides/manage/console/default-settings",
-            "guides/manage/user/reg-create-user",
-            "guides/manage/user/scim2",
-            "guides/manage/terraform-provider",
+            {
+              type: "category",
+              label: "External IDPs",
+              items: [
+                "guides/integrate/identity-providers/introduction",
+                "guides/integrate/identity-providers/google",
+                "guides/integrate/identity-providers/azure-ad-oidc",
+                "guides/integrate/identity-providers/azure-ad-saml",
+                "guides/integrate/identity-providers/github",
+                "guides/integrate/identity-providers/gitlab",
+                "guides/integrate/identity-providers/apple",
+                "guides/integrate/identity-providers/okta-oidc",
+                "guides/integrate/identity-providers/okta-saml",
+                "guides/integrate/identity-providers/keycloak",
+                "guides/integrate/identity-providers/linkedin-oauth",
+                "guides/integrate/identity-providers/onelogin-saml",
+                "guides/integrate/identity-providers/pingfederate-saml",
+              ],
+            },
+            {
+              type: "category",
+              label: "Custom Providers",
+              items: [
+                "guides/integrate/identity-providers/generic-oidc",
+                "guides/integrate/identity-providers/jwt_idp",
+                "guides/integrate/identity-providers/ldap",
+                "guides/integrate/identity-providers/openldap",
+                "guides/integrate/identity-providers/mocksaml",
+                "guides/integrate/identity-providers/migrate",
+                "guides/integrate/identity-providers/additional-information",
+              ],
+            },
           ],
         },
         {
           type: "category",
-          label: "Configure Identity & Policies",
-          collapsed: true,
+          label: "Policies",
           items: [
-            {
-              type: "category",
-              label: "Identity Providers",
-              items: [
-                {
-                  type: "category",
-                  label: "External IDPs",
-                  items: [
-                    "guides/integrate/identity-providers/introduction",
-                    "guides/integrate/identity-providers/google",
-                    "guides/integrate/identity-providers/azure-ad-oidc",
-                    "guides/integrate/identity-providers/azure-ad-saml",
-                    "guides/integrate/identity-providers/github",
-                    "guides/integrate/identity-providers/gitlab",
-                    "guides/integrate/identity-providers/apple",
-                    "guides/integrate/identity-providers/okta-oidc",
-                    "guides/integrate/identity-providers/okta-saml",
-                    "guides/integrate/identity-providers/keycloak",
-                    "guides/integrate/identity-providers/linkedin-oauth",
-                    "guides/integrate/identity-providers/onelogin-saml",
-                    "guides/integrate/identity-providers/pingfederate-saml",
-                  ],
-                },
-                {
-                  type: "category",
-                  label: "Custom Providers",
-                  items: [
-                    "guides/integrate/identity-providers/generic-oidc",
-                    "guides/integrate/identity-providers/jwt_idp",
-                    "guides/integrate/identity-providers/ldap",
-                    "guides/integrate/identity-providers/openldap",
-                    "guides/integrate/identity-providers/mocksaml",
-                    "guides/integrate/identity-providers/migrate",
-                    "guides/integrate/identity-providers/additional-information",
-                  ],
-                },
-              ],
-            },
-            {
-              type: "category",
-              label: "Policies",
-              items: [
-                "guides/manage/customize/behavior",
-                "concepts/structure/policies",
-                "guides/manage/console/default-settings",
-                // TODO: File missing - Password Policies specific doc
-                // TODO: File missing - Lockout Policies specific doc
-                // TODO: File missing - Privacy Policies specific doc
-              ],
-            },
+            "guides/manage/customize/behavior",
+            "concepts/structure/policies",
+            "guides/manage/console/default-settings",
+            // TODO: File missing - Password Policies specific doc
+            // TODO: File missing - Lockout Policies specific doc
+            // TODO: File missing - Privacy Policies specific doc
+          ],
+        },
         {
           type: "category",
           label: "Roles & Permissions",
@@ -510,80 +486,80 @@ module.exports = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Test & Debug",
+      collapsed: true,
+      items: [
         {
           type: "category",
-          label: "Test & Debug",
-          collapsed: true,
+          label: "Testing Tools",
           items: [
+            "guides/manage/console/overview",
             {
-              type: "category",
-              label: "Testing Tools",
-              items: [
-                "guides/manage/console/overview",
-                {
-                  type: "link",
-                  label: "OIDC Playground",
-                  href: "https://zitadel.com/playgrounds/oidc",
-                },
-                // TODO: File missing - API Playground specific doc
-              ],
+              type: "link",
+              label: "OIDC Playground",
+              href: "https://zitadel.com/playgrounds/oidc",
             },
-            {
-              type: "category",
-              label: "Common Issues",
-              items: [
-                "support/troubleshooting",
-                "guides/solution-scenarios/domain-discovery",
-                "guides/solution-scenarios/restrict-console",
-                // TODO: File missing - Token Errors specific doc
-                // TODO: File missing - Integration Failures specific doc
-              ],
-            },
-            {
-              type: "category",
-              label: "Debugging Guides",
-              items: [
-                "apis/observability/metrics",
-                "apis/observability/health",
-                "apis/statuscodes",
-              ],
-            },
+            // TODO: File missing - API Playground specific doc
           ],
         },
         {
           type: "category",
-          label: "Cloud Management",
-          collapsed: true,
+          label: "Common Issues",
           items: [
-            "guides/manage/cloud/start",
-            "guides/manage/cloud/instances",
-            "guides/manage/cloud/settings",
-            "guides/manage/cloud/billing",
-            "guides/manage/cloud/support",
-            "guides/manage/cloud/users",
+            "support/troubleshooting",
+            "guides/solution-scenarios/domain-discovery",
+            "guides/solution-scenarios/restrict-console",
+            // TODO: File missing - Token Errors specific doc
+            // TODO: File missing - Integration Failures specific doc
           ],
         },
         {
           type: "category",
-          label: "Migrate",
-          collapsed: true,
+          label: "Debugging Guides",
           items: [
-            "guides/migrate/introduction",
-            "guides/migrate/users",
-            "guides/migrate/sources/zitadel",
-            "guides/migrate/sources/auth0",
-            "guides/migrate/sources/keycloak",
+            "apis/observability/metrics",
+            "apis/observability/health",
+            "apis/statuscodes",
           ],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Cloud Management",
+      collapsed: true,
+      items: [
+        "guides/manage/cloud/start",
+        "guides/manage/cloud/instances",
+        "guides/manage/cloud/settings",
+        "guides/manage/cloud/billing",
+        "guides/manage/cloud/support",
+        "guides/manage/cloud/users",
+      ],
+    },
+    {
+      type: "category",
+      label: "Migrate",
+      collapsed: true,
+      items: [
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        "guides/migrate/sources/zitadel",
+        "guides/migrate/sources/auth0",
+        "guides/migrate/sources/keycloak",
+      ],
+    },
+    {
+      type: "category",
+      label: "Deploy & Operate",
+      collapsed: true,
+      items: [
         {
           type: "category",
-          label: "Deploy & Operate",
-          collapsed: true,
+          label: "Deployment Options",
           items: [
-            {
-              type: "category",
-              label: "Deployment Options",
-              items: [
             {
               type: "category",
               label: "Self-Hosted",
