@@ -219,7 +219,7 @@ module.exports = {
     },
     {
       type: "category",
-      label: "ZITADEL Console",
+      label: "Configure Identity & Policies",
       collapsed: true,
       items: [
         "guides/manage/console/overview",
@@ -227,13 +227,6 @@ module.exports = {
         "guides/manage/user/reg-create-user",
         "guides/manage/user/scim2",
         "guides/manage/terraform-provider",
-      ],
-    },
-    {
-      type: "category",
-      label: "Configure Identity & Policies",
-      collapsed: true,
-      items: [
         {
           type: "category",
           label: "Identity Providers",
