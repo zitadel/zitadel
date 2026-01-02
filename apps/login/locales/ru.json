@@ -248,6 +248,8 @@
       "smsDescription": "Введите номер телефона для получения кода по SMS.",
       "emailDescription": "Введите email для получения кода.",
       "totpRegisterDescription": "Отсканируйте QR-код или перейдите по ссылке вручную.",
+      "emailOtpAdded": "Код по email успешно добавлен.",
+      "smsOtpAdded": "Код по SMS успешно добавлен.",
       "submit": "Продолжить",
       "labels": {
         "code": "Код"

@@ -248,6 +248,8 @@
       "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+      "emailOtpAdded": "Il codice via email è stato aggiunto con successo.",
+      "smsOtpAdded": "Il codice via SMS è stato aggiunto con successo.",
       "submit": "Continua",
       "labels": {
         "code": "Codice"

@@ -37,7 +37,7 @@ export function UsernameForm({
   allowRegister,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       loginName: loginName ? loginName : "",
     },
@@ -58,24 +58,24 @@ export function UsernameForm({
       organization,
       requestId,
       suffix,
-    })
-      .catch(() => {
-        setError(t("errors.internalError"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("errors.internalError"));
+      setLoading(false);
+      return;
+    });
 
     if (res && "redirect" in res && res.redirect) {
+      // Keep loading state true during redirect
       return router.push(res.redirect);
     }
 
     if (res && "error" in res && res.error) {
       setError(res.error);
+      setLoading(false);
       return;
     }
 
+    setLoading(false);
     return res;
   }
 

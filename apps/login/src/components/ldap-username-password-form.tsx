@@ -24,7 +24,7 @@ type Props = {
 
 export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("ldap");
@@ -44,23 +44,24 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       username: values.loginName,
       password: values.password,
       link: link,
-    })
-      .catch(() => {
-        setError("Could not start LDAP flow");
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError("Could not start LDAP flow");
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Keep loading state true during redirect
       return router.push(response.redirect);
     }
+
+    setLoading(false);
   }
 
   return (
