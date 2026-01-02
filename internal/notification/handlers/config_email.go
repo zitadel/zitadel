@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// GetSMTPConfig reads the iam SMTP provider config
+// GetActiveEmailConfig reads the iam SMTP provider config
 func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.Config, error) {
 	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -23,13 +23,14 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 		Description: config.Description,
 	}
 	if config.SMTPConfig != nil {
-		if config.SMTPConfig.Password == nil {
-			return nil, zerrors.ThrowNotFound(err, "QUERY-Wrs3gw", "Errors.SMTPConfig.NotFound")
+		var password string
+		if config.SMTPConfig.Password != nil {
+			password, err = crypto.DecryptString(config.SMTPConfig.Password, n.SMTPPasswordCrypto)
+			if err != nil {
+				return nil, err
+			}
 		}
-		password, err := crypto.DecryptString(config.SMTPConfig.Password, n.SMTPPasswordCrypto)
-		if err != nil {
-			return nil, err
-		}
+
 		return &email.Config{
 			ProviderConfig: provider,
 			SMTPConfig: &smtp.Config{
