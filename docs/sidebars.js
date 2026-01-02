@@ -386,6 +386,7 @@ module.exports = {
             "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/okta-oidc",
             "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/onelogin-saml",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/pingfederate-saml",
             "guides/integrate/identity-providers/migrate",
