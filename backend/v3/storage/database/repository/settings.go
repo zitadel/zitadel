@@ -137,7 +137,7 @@ func (s settings) get(ctx context.Context, client database.QueryExecutor, opts .
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.Settings](ctx, client, builder)
+	return get[domain.Settings](ctx, client, builder)
 }
 
 func (s settings) list(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Settings, error) {
@@ -145,7 +145,7 @@ func (s settings) list(ctx context.Context, client database.QueryExecutor, opts 
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.Settings](ctx, client, builder)
+	return list[domain.Settings](ctx, client, builder)
 }
 
 func (s settings) set(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {

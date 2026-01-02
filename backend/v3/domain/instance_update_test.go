@@ -200,7 +200,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						"instance-1",
+						repo.PrimaryKeyCondition("instance-1"),
 						repo.SetName("test instance update"),
 					).
 					Times(1).
@@ -219,7 +219,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						"instance-1",
+						repo.PrimaryKeyCondition("instance-1"),
 						repo.SetName("test instance update"),
 					).
 					Times(1).
@@ -234,7 +234,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 				repo := domainmock.NewInstanceRepo(ctrl)
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						"instance-1",
+						repo.PrimaryKeyCondition("instance-1"),
 						repo.SetName("test instance update"),
 					).
 					Times(1).
@@ -252,7 +252,7 @@ func TestUpdateInstanceCommand_Execute(t *testing.T) {
 
 				repo.EXPECT().
 					Update(gomock.Any(), gomock.Any(),
-						"instance-1",
+						repo.PrimaryKeyCondition("instance-1"),
 						repo.SetName("test instance update"),
 					).
 					Times(1).
