@@ -1,13 +1,9 @@
 ---
-title: Metrics
+title: Prometheus
 description: Configure Prometheus to scrape ZITADEL metrics from /debug/metrics on Kubernetes and Docker.
 ---
 
-# ZITADEL Metrics
-
-ZITADEL exposes a rich set of default performance metrics out-of-the-box. These metrics are available in OpenTelemetry (OTEL) format at the **`/debug/metrics`** endpoint. These **default metrics** are enabled in standard deployments and can be scraped by Prometheus and other OTEL/Prometheus-aware collectors.
-
-## Configure Prometheus to scrape ZITADEL metrics
+# Prometheus
 
 This page shows platform-agnostic ways to scrape ZITADEL metrics using:
 

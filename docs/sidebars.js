@@ -1165,7 +1165,16 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
         "self-hosting/manage/service_ping",
-        "self-hosting/manage/metrics",
+        {
+          type: "category",
+          label: "Metrics",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/metrics/overview",
+          },
+          items: ["self-hosting/manage/metrics/prometheus"],
+        },
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
