@@ -41,7 +41,6 @@ module.exports = {
             "guides/manage/console/projects",
             "concepts/structure/applications",
             "guides/manage/console/applications",
-            "concepts/structure/policies",
             "guides/manage/console/users",
             {
               type: "category",
@@ -60,7 +59,6 @@ module.exports = {
           items: [
             "guides/integrate/login/login-users",
             "guides/integrate/login/oidc/login-users",
-            "guides/integrate/login/oidc/oauth-recommended-flows",
             "guides/integrate/login/hosted-login",
             {
               type: "link",
