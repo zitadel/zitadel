@@ -219,6 +219,18 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Migrate",
+      collapsed: true,
+      items: [
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        "guides/migrate/sources/zitadel",
+        "guides/migrate/sources/auth0",
+        "guides/migrate/sources/keycloak",
+      ],
+    },
+    {
+      type: "category",
       label: "Configure Identity & Policies",
       collapsed: true,
       items: [
@@ -485,17 +497,9 @@ module.exports = {
       collapsed: true,
       items: [
         {
-          type: "category",
-          label: "Testing Tools",
-          items: [
-            "guides/manage/console/overview",
-            {
-              type: "link",
-              label: "OIDC Playground",
-              href: "https://zitadel.com/playgrounds/oidc",
-            },
-            // TODO: File missing - API Playground specific doc
-          ],
+          type: "link",
+          label: "OIDC Playground",
+          href: "https://zitadel.com/playgrounds/oidc",
         },
         {
           type: "category",
@@ -521,7 +525,7 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Cloud Management",
+      label: "Customer Portal",
       collapsed: true,
       items: [
         "guides/manage/cloud/start",
@@ -530,18 +534,6 @@ module.exports = {
         "guides/manage/cloud/billing",
         "guides/manage/cloud/support",
         "guides/manage/cloud/users",
-      ],
-    },
-    {
-      type: "category",
-      label: "Migrate",
-      collapsed: true,
-      items: [
-        "guides/migrate/introduction",
-        "guides/migrate/users",
-        "guides/migrate/sources/zitadel",
-        "guides/migrate/sources/auth0",
-        "guides/migrate/sources/keycloak",
       ],
     },
     {
