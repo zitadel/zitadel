@@ -26,7 +26,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       email: "hi@zitadel.com"
     }
     license: {
-      name: "Apache 2.0",
+      name: "AGPL-3.0-only",
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
