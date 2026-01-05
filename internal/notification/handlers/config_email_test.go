@@ -132,14 +132,16 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		ctx := authz.NewMockContext(instId, "org-1", "user-1")
+		t.Run(tc.smtpConfig.Description, func(t *testing.T) {
+			ctx := authz.NewMockContext(instId, "org-1", "user-1")
 
-		queryMock := mock.NewMockQueries(ctrl)
-		queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(tc.smtpConfig, nil)
+			queryMock := mock.NewMockQueries(ctrl)
+			queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(tc.smtpConfig, nil)
 
-		notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, cryptAlgMock, nil)
-		cfg, err := notificationQueries.GetActiveEmailConfig(ctx)
-		assert.NoError(t, err)
-		assert.EqualValues(t, tc.expected, cfg)
+			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, cryptAlgMock, nil)
+			cfg, err := notificationQueries.GetActiveEmailConfig(ctx)
+			assert.NoError(t, err)
+			assert.EqualValues(t, tc.expected, cfg)
+		})
 	}
 }
