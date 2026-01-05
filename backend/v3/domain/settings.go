@@ -64,6 +64,7 @@ type settingsConditions interface {
 	IDCondition(id string) database.Condition
 	PrimaryKeyCondition(instanceID, id string) database.Condition
 	UniqueCondition(instanceID string, orgID *string, typ SettingType, state SettingState) database.Condition
+	TypeCondition(typ SettingType) database.Condition
 }
 
 type settingsChanges interface {
@@ -162,6 +163,7 @@ type LoginSettingsAttributes struct {
 	SecondFactorTypes []SecondFactorType `json:"secondFactors,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/login_settings.mock.go . LoginSettingsRepository
 type LoginSettingsRepository interface {
 	settingsRepository[LoginSettings]
 	loginSettingsJSONChanges
@@ -228,6 +230,7 @@ type BrandingSettingsAttributes struct {
 	FontURL             *url.URL                 `json:"fontUrl,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/branding_settings.mock.go . BrandingSettingsRepository
 type BrandingSettingsRepository interface {
 	settingsRepository[BrandingSettings]
 	brandingSettingsJSONChanges
@@ -261,6 +264,7 @@ type PasswordComplexitySettingsAttributes struct {
 	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/password_complexity_settings.mock.go . PasswordComplexitySettingsRepository
 type PasswordComplexitySettingsRepository interface {
 	settingsRepository[PasswordComplexitySettings]
 	passwordComplexitySettingsJSONChanges
@@ -283,6 +287,7 @@ type PasswordExpirySettingsAttributes struct {
 	MaxAgeDays     *uint64 `json:"maxAgeDays,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/password_expiry_settings.mock.go . PasswordExpirySettingsRepository
 type PasswordExpirySettingsRepository interface {
 	settingsRepository[PasswordExpirySettings]
 	passwordExpirySettingsJSONChanges
@@ -307,6 +312,7 @@ type LockoutSettingsAttributes struct {
 	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/lockout_settings.mock.go . LockoutSettingsRepository
 type LockoutSettingsRepository interface {
 	settingsRepository[LockoutSettings]
 	lockoutSettingsJSONChanges
@@ -331,6 +337,7 @@ type SecuritySettingsAttributes struct {
 	EnableImpersonation   *bool    `json:"enableImpersonation,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/security_settings.mock.go . SecuritySettingsRepository
 type SecuritySettingsRepository interface {
 	settingsRepository[SecuritySettings]
 	securitySettingsJSONChanges
@@ -354,6 +361,7 @@ type DomainSettingsAttributes struct {
 	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/domain_settings.mock.go . DomainSettingsRepository
 type DomainSettingsRepository interface {
 	settingsRepository[DomainSettings]
 	domainSettingsJSONChanges
@@ -373,6 +381,7 @@ type OrganizationSettingsAttributes struct {
 	OrganizationScopedUsernames *bool `json:"organizationScopedUsernames,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/organization_settings.mock.go . OrganizationSettingsRepository
 type OrganizationSettingsRepository interface {
 	settingsRepository[OrganizationSettings]
 	organizationSettingsJSONChanges
@@ -393,6 +402,7 @@ type NotificationSettingsAttributes struct {
 	PasswordChange *bool `json:"passwordChange,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/notification_settings.mock.go . NotificationSettingsRepository
 type NotificationSettingsRepository interface {
 	settingsRepository[NotificationSettings]
 	notificationSettingsJSONChanges
@@ -425,6 +435,7 @@ type LegalAndSupportSettingsAttributes struct {
 	CustomLinkText    *string `json:"customLinkText,omitempty"`
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/legal_and_support_settings.mock.go . LegalAndSupportSettingsRepository
 type LegalAndSupportSettingsRepository interface {
 	settingsRepository[LegalAndSupportSettings]
 	legalAndSupportSettingsJSONChanges

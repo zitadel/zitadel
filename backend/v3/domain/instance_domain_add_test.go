@@ -184,7 +184,7 @@ func TestAddInstanceDomainCommand_Validate(t *testing.T) {
 			}
 
 			err := cmd.Validate(ctx, opts)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -310,7 +310,7 @@ func TestAddInstanceDomainCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Then
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }

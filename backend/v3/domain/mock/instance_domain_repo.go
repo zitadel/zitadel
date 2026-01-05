@@ -23,30 +23,36 @@ func NewInstancesDomainRepo(ctrl *gomock.Controller) *InstancesDomainRepo {
 }
 
 func (r *InstancesDomainRepo) EXPECT() *MockInstanceDomainRepositoryMockRecorder {
+	r.mock.ctrl.T.Helper()
 	return r.mock.EXPECT()
 }
 
 func (r *InstancesDomainRepo) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Get(ctx, client, opts...)
 
 }
 
 func (r *InstancesDomainRepo) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.List(ctx, client, opts...)
 
 }
 
 func (r *InstancesDomainRepo) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddInstanceDomain) error {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Add(ctx, client, domain)
 
 }
 
 func (r *InstancesDomainRepo) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Update(ctx, client, condition, changes...)
 
 }
 
 func (r *InstancesDomainRepo) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	r.mock.ctrl.T.Helper()
 	return r.mock.Remove(ctx, client, condition)
 
 }
