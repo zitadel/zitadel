@@ -26,7 +26,7 @@ module.exports = {
     {
       type: "category",
       label: "Get Started",
-      collapsed: true,
+      collapsed: false,
       items: [
         "guides/overview",
         "guides/start/quickstart",
