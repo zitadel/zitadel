@@ -32,6 +32,19 @@ module.exports = {
         "guides/start/quickstart",
         {
           type: "category",
+          label: "Customer Portal",
+          collapsed: true,
+          items: [
+            "guides/manage/cloud/start",
+            "guides/manage/cloud/instances",
+            "guides/manage/cloud/settings",
+            "guides/manage/cloud/billing",
+            "guides/manage/cloud/support",
+            "guides/manage/cloud/users",
+          ],
+        },
+        {
+          type: "category",
           label: "Key Concepts",
           items: [
             "concepts/structure/instance",
@@ -496,19 +509,6 @@ module.exports = {
             // TODO: File missing - Integration Failures specific doc
           ],
         }
-      ],
-    },
-    {
-      type: "category",
-      label: "Customer Portal",
-      collapsed: true,
-      items: [
-        "guides/manage/cloud/start",
-        "guides/manage/cloud/instances",
-        "guides/manage/cloud/settings",
-        "guides/manage/cloud/billing",
-        "guides/manage/cloud/support",
-        "guides/manage/cloud/users",
       ],
     },
     {
