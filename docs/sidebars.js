@@ -71,37 +71,28 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Sample Apps",
+          label: "Quickstart Apps",
           items: [
             {
               type: "category",
-              label: "SPA / Frontend",
+              label: "Single Page Applications",
               items: [
-                "sdk-examples/react",
+                {
+                  type: "link",
+                  label: "Vanilla-JS",
+                  href: "https://github.com/zitadel/zitadel-vanilla-js",
+                },
                 "examples/login/react",
-                "sdk-examples/angular",
                 "examples/login/angular",
-                "sdk-examples/vue",
                 "examples/login/vue",
-                "sdk-examples/nextjs",
                 "examples/login/nextjs",
-                "sdk-examples/nuxtjs",
-                "sdk-examples/sveltekit",
-                "sdk-examples/qwik",
-                "sdk-examples/solidstart",
-                "sdk-examples/astro",
                 "examples/login/flutter",
               ],
             },
             {
               type: "category",
-              label: "Web Applications",
+              label: "Regular Web Applications",
               items: [
-                "sdk-examples/expressjs",
-                "sdk-examples/fastify",
-                "sdk-examples/hono",
-                "sdk-examples/nestjs",
-                "sdk-examples/symfony",
                 "examples/login/symfony",
                 "examples/login/java-spring",
                 "examples/login/python-django",
@@ -111,10 +102,6 @@ module.exports = {
               type: "category",
               label: "APIs / Backend Services",
               items: [
-                "sdk-examples/go",
-                "sdk-examples/java",
-                "sdk-examples/python-flask",
-                "sdk-examples/python-django",
                 "examples/secure-api/go",
                 "examples/secure-api/java-spring",
                 "examples/secure-api/python-django",
@@ -128,63 +115,6 @@ module.exports = {
               label: "Hybrid / Full-Stack",
               items: [
                 "examples/login/nextjs-b2b",
-              ],
-            },
-            {
-              type: "category",
-              label: "Sample Applications",
-              items: [
-                "sdk-examples/introduction",
-                {
-                  type: "link",
-                  label: "Dart",
-                  href: "https://github.com/smartive/zitadel-dart",
-                },
-                {
-                  type: "link",
-                  label: "Elixir",
-                  href: "https://github.com/maennchen/zitadel_api",
-                },
-                {
-                  type: "link",
-                  label: "FastAPI",
-                  href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-                },
-                {
-                  type: "link",
-                  label: "NextAuth",
-                  href: "https://next-auth.js.org/providers/zitadel",
-                },
-                {
-                  type: "link",
-                  label: "Node.js",
-                  href: "https://www.npmjs.com/package/@zitadel/node",
-                },
-                {
-                  type: "link",
-                  label: ".Net",
-                  href: "https://github.com/smartive/zitadel-net",
-                },
-                {
-                  type: "link",
-                  label: "Passport.js",
-                  href: "https://github.com/buehler/node-passport-zitadel",
-                },
-                {
-                  type: "link",
-                  label: "Rust",
-                  href: "https://github.com/smartive/zitadel-rust",
-                },
-                {
-                  type: "link",
-                  label: "Pylon",
-                  href: "https://github.com/getcronit/pylon",
-                },
-                {
-                  type: "link",
-                  label: "Vanilla-JS",
-                  href: "https://github.com/zitadel/zitadel-vanilla-js",
-                },
               ],
             },
           ],
@@ -362,28 +292,44 @@ module.exports = {
           type: "category",
           label: "SDKs",
           items: [
-            "sdk-examples/go",
+            "sdk-examples/introduction",
             {
               type: "category",
-              label: "JavaScript/TypeScript",
+              label: "Single Page Applications",
               items: [
+                "sdk-examples/react",
+                "sdk-examples/angular",
+                "sdk-examples/vue",
                 "sdk-examples/nextjs",
+                "sdk-examples/nuxtjs",
+                "sdk-examples/sveltekit",
+                "sdk-examples/qwik",
+                "sdk-examples/solidstart",
+                "sdk-examples/astro",
+              ],
+            },
+            {
+              type: "category",
+              label: "Regular Web Applications",
+              items: [
                 "sdk-examples/expressjs",
-                "sdk-examples/client-libraries/node",
+                "sdk-examples/fastify",
+                "sdk-examples/hono",
+                "sdk-examples/nestjs",
+                "sdk-examples/symfony",
               ],
             },
             {
               type: "category",
-              label: "Python",
+              label: "APIs / Backend Services",
               items: [
-                "sdk-examples/client-libraries/python",
-              ],
-            },
-            {
-              type: "category",
-              label: "Others",
-              items: [
+                "sdk-examples/go",
+                "sdk-examples/java",
                 "sdk-examples/client-libraries/java",
+                "sdk-examples/python-flask",
+                "sdk-examples/python-django",
+                "sdk-examples/client-libraries/node",
+                "sdk-examples/client-libraries/python",
                 "sdk-examples/client-libraries/php",
                 "sdk-examples/client-libraries/ruby",
                 {
@@ -393,13 +339,43 @@ module.exports = {
                 },
                 {
                   type: "link",
+                  label: "Elixir",
+                  href: "https://github.com/maennchen/zitadel_api",
+                },
+                {
+                  type: "link",
+                  label: "FastAPI",
+                  href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
+                },
+                {
+                  type: "link",
+                  label: "NextAuth",
+                  href: "https://next-auth.js.org/providers/zitadel",
+                },
+                {
+                  type: "link",
+                  label: "Node.js",
+                  href: "https://www.npmjs.com/package/@zitadel/node",
+                },
+                {
+                  type: "link",
                   label: ".Net",
                   href: "https://github.com/smartive/zitadel-net",
                 },
                 {
                   type: "link",
+                  label: "Passport.js",
+                  href: "https://github.com/buehler/node-passport-zitadel",
+                },
+                {
+                  type: "link",
                   label: "Rust",
                   href: "https://github.com/smartive/zitadel-rust",
+                },
+                {
+                  type: "link",
+                  label: "Pylon",
+                  href: "https://github.com/getcronit/pylon",
                 },
               ],
             },
