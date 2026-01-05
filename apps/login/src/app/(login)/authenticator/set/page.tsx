@@ -48,31 +48,31 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
-      return getUserByID({ serviceConfig, userId }).then((user) => {
-        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
+    const methods = await listAuthenticationMethodTypes({ serviceConfig, userId });
+    const user = await getUserByID({ serviceConfig, userId });
 
-        return {
-          factors: session?.factors,
-          authMethods: methods.authMethodTypes ?? [],
-          phoneVerified: humanUser?.phone?.isVerified ?? false,
-          emailVerified: humanUser?.email?.isVerified ?? false,
-          expirationDate: session?.expirationDate,
-        };
-      });
-    });
+    const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
+
+    return {
+      id: session?.id,
+      factors: session?.factors,
+      authMethods: methods.authMethodTypes ?? [],
+      phoneVerified: humanUser?.phone?.isVerified ?? false,
+      emailVerified: humanUser?.email?.isVerified ?? false,
+      expirationDate: session?.expirationDate,
+    };
   }
 
   async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
+    const session = await loadMostRecentSession({
       serviceConfig,
       sessionParams: {
         loginName,
         organization,
       },
-    }).then((session) => {
-      return getAuthMethodsAndUser(session);
     });
+
+    return getAuthMethodsAndUser(session);
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
@@ -82,9 +82,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       return undefined;
     }
 
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
-    });
+    const sessionResponse = await getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token });
+    return getAuthMethodsAndUser(sessionResponse.session);
   }
 
   if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
@@ -123,12 +122,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     redirect(`/verify?` + params);
   }
 
-  const identityProviders = await getActiveIdentityProviders({
+  const { identityProviders } = await getActiveIdentityProviders({
     serviceConfig,
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
-  }).then((resp) => {
-    return resp.identityProviders;
   });
 
   const params = new URLSearchParams({
@@ -188,7 +185,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               identityProviders={identityProviders}
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
-              linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+              sessionId={sessionWithData.id} // tell the callback function to link the IDP
             ></SignInWithIdp>
           </>
         )}

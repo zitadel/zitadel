@@ -6,8 +6,8 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 
 ## Quick Start
 
-Run the following commands from the repositorys root directory to install all dependencies needed.
-Using Corepack makes sure you have the pnpm version intalled that is declared in [](../package.json).
+Run the following commands from the repositories root directory to install all dependencies needed.
+Using Corepack makes sure you have the pnpm version installed that is declared in [](../package.json).
 
 ```bash
 corepack enable

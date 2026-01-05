@@ -84,7 +84,7 @@ After each iteration of load-test, we should consult the [Flowchart](#after-test
 
 #### Scale {#scale}
 
-An outcome of scale means that the service hit some kind of resource limit, like CPU or RAM which can be increased. In such cases we increase the suggested parameter and rerun the load-test for the same target. On the next test we should analyse if the increase in scale resulted in a performance improvement proportional to the scale parameter. For example if we scale from 1 to 2 containers, it might be reasonable to expect a doubling of iterations / sec. If such an increase is not noticed, there might be another bottleneck or unlying issue, such as locking.
+An outcome of scale means that the service hit some kind of resource limit, like CPU or RAM which can be increased. In such cases we increase the suggested parameter and rerun the load-test for the same target. On the next test we should analyze if the increase in scale resulted in a performance improvement proportional to the scale parameter. For example if we scale from 1 to 2 containers, it might be reasonable to expect a doubling of iterations / sec. If such an increase is not noticed, there might be another bottleneck or underlying issue, such as locking.
 
 #### Potential issues {#potential-issues}
 
