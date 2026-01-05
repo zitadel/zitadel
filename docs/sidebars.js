@@ -255,31 +255,15 @@ module.exports = {
           type: "category",
           label: "API Access",
           items: [
+            "guides/integrate/zitadel-apis/access-zitadel-apis",
+            "guides/integrate/zitadel-apis/access-zitadel-system-api",
+            "guides/integrate/zitadel-apis/event-api",
+            "guides/integrate/zitadel-apis/example-zitadel-api-with-go",
+            "guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net",
             {
-              type: "category",
-              label: "gRPC APIs",
-              items: [
-                "apis/introduction",
-                "apis/v2",
-                "apis/apis/index",
-                "apis/migration_v1_to_v2",
-                "guides/integrate/zitadel-apis/access-zitadel-apis",
-                "guides/integrate/zitadel-apis/access-zitadel-system-api",
-                "guides/integrate/zitadel-apis/event-api",
-                "guides/integrate/zitadel-apis/example-zitadel-api-with-go",
-                "guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net",
-              ],
-            },
-            {
-              type: "category",
-              label: "REST APIs",
-              items: [
-                {
-                  type: "link",
-                  label: "Zitadel APIs",
-                  href: "/docs/apis/introduction",
-                }
-              ],
+              type: "link",
+              label: "Zitadel APIs",
+              href: "/docs/apis/introduction",
             },
           ],
         },
@@ -380,7 +364,6 @@ module.exports = {
           type: "category",
           label: "External Integrations",
           items: [
-            "guides/manage/customize/behavior",
             {
               type: "category",
               label: "Actions V2",
@@ -479,93 +462,77 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Deployment Options",
+          label: "Self-Hosted",
           items: [
-            {
-              type: "category",
-              label: "Self-Hosted",
-              items: [
-                {
-                  type: "category",
-                  label: "Deploy",
-                  collapsed: false,
-                  items: [
-                    "self-hosting/deploy/overview",
-                    "self-hosting/deploy/linux",
-                    "self-hosting/deploy/macos",
-                    "self-hosting/deploy/compose",
-                    "self-hosting/deploy/devcontainer",
-                    "self-hosting/deploy/kubernetes",
-                    "self-hosting/deploy/troubleshooting/troubleshooting",
-                  ],
-                },
-                {
-                  type: "category",
-                  label: "Manage",
-                  collapsed: false,
-                  items: [
-                    "self-hosting/manage/production",
-                    "self-hosting/manage/productionchecklist",
-                    "self-hosting/manage/login-client",
-                    "self-hosting/manage/configure/configure",
-                    {
-                      type: "category",
-                      collapsed: false,
-                      label: "Reverse Proxy",
-                      link: {
-                        type: "doc",
-                        id: "self-hosting/manage/reverseproxy/reverse_proxy",
-                      },
-                      items: [
-                        "self-hosting/manage/reverseproxy/traefik/traefik",
-                        "self-hosting/manage/reverseproxy/nginx/nginx",
-                        "self-hosting/manage/reverseproxy/caddy/caddy",
-                        "self-hosting/manage/reverseproxy/httpd/httpd",
-                        "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
-                        "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
-                        "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
-                      ],
-                    },
-                    "self-hosting/manage/custom-domain",
-                    "self-hosting/manage/http2",
-                    "self-hosting/manage/tls_modes",
-                    "self-hosting/manage/database/database",
-                    "self-hosting/manage/cache",
-                    "self-hosting/manage/service_ping",
-                    "self-hosting/manage/updating_scaling",
-                    "self-hosting/manage/usage_control",
-                    {
-                      type: "category",
-                      label: "Command Line Interface",
-                      collapsed: false,
-                      link: {
-                        type: "doc",
-                        id: "self-hosting/manage/cli/overview",
-                      },
-                      items: ["self-hosting/manage/cli/mirror"],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              type: "category",
-              label: "Docker Compose",
-              items: [
-                "self-hosting/deploy/compose",
-              ],
-            },
-            {
-              type: "category",
-              label: "Kubernetes",
-              items: [
-                "self-hosting/deploy/kubernetes",
-              ],
-            },
+            "self-hosting/deploy/overview",
+            "self-hosting/deploy/linux",
+            "self-hosting/deploy/macos",
             "self-hosting/deploy/devcontainer",
-            "self-hosting/deploy/troubleshooting/troubleshooting",
+            {
+              type: "category",
+              label: "Manage",
+              collapsed: false,
+              items: [
+                "self-hosting/manage/production",
+                "self-hosting/manage/productionchecklist",
+                "self-hosting/manage/login-client",
+                "self-hosting/manage/configure/configure",
+                {
+                  type: "category",
+                  collapsed: false,
+                  label: "Reverse Proxy",
+                  link: {
+                    type: "doc",
+                    id: "self-hosting/manage/reverseproxy/reverse_proxy",
+                  },
+                  items: [
+                    "self-hosting/manage/reverseproxy/traefik/traefik",
+                    "self-hosting/manage/reverseproxy/nginx/nginx",
+                    "self-hosting/manage/reverseproxy/caddy/caddy",
+                    "self-hosting/manage/reverseproxy/httpd/httpd",
+                    "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
+                    "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
+                    "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
+                  ],
+                },
+                "self-hosting/manage/custom-domain",
+                "self-hosting/manage/http2",
+                "self-hosting/manage/tls_modes",
+                "self-hosting/manage/database/database",
+                "self-hosting/manage/cache",
+                "self-hosting/manage/service_ping",
+                "self-hosting/manage/updating_scaling",
+                "self-hosting/manage/usage_control",
+                {
+                  type: "category",
+                  label: "Command Line Interface",
+                  collapsed: false,
+                  link: {
+                    type: "doc",
+                    id: "self-hosting/manage/cli/overview",
+                  },
+                  items: ["self-hosting/manage/cli/mirror"],
+                },
+              ],
+            },
           ],
         },
+        {
+          type: "category",
+          label: "Docker Compose",
+          items: [
+            "self-hosting/deploy/compose",
+          ],
+        },
+        {
+          type: "category",
+          label: "Kubernetes",
+          items: [
+            "self-hosting/deploy/kubernetes",
+          ],
+        },
+        "self-hosting/deploy/devcontainer",
+        "self-hosting/deploy/troubleshooting/troubleshooting",
         {
           type: "category",
           label: "Configuration",
@@ -592,7 +559,7 @@ module.exports = {
             // TODO: File missing - Backup & Restore specific doc
           ],
         },
-                {
+        {
           type: "category",
           label: "Customer Portal",
           collapsed: true,
