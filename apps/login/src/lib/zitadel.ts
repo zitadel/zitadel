@@ -1,3 +1,4 @@
+import { trace } from '@opentelemetry/api';
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -34,8 +35,11 @@ import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
+import { tracingInterceptor } from "./otel";
 
 const useCache = process.env.DEBUG !== "true";
+
+const tracer = trace.getTracer('custom-tracer');
 
 async function cacheWrapper<T>(callback: Promise<T>) {
   "use cache";
@@ -59,13 +63,13 @@ export async function getHostedLoginTranslation({
       {
         level: organization
           ? {
-              case: "organizationId",
-              value: organization,
-            }
+            case: "organizationId",
+            value: organization,
+          }
           : {
-              case: "instance",
-              value: true,
-            },
+            case: "instance",
+            value: true,
+          },
         locale: locale,
       },
       {},
@@ -98,13 +102,19 @@ export async function getLoginSettings({
 }: WithServiceConfig<{
   organization?: string;
 }>) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+  const span = tracer.startSpan('getLoginSettings');
+  try {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+    const dummyContext = makeReqCtx(organization);
+    console.log("Using request context:", dummyContext);
+    const callback = settingsService
+      .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
+    return useCache ? cacheWrapper(callback) : callback;
+  } finally {
+    span.end();
+  }
 }
 
 export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) {
@@ -774,8 +784,8 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }>): Promise<string | null> {
-    // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
-    const userService: Client<typeof UserService> = await createServiceForHost(UserService, {...serviceConfig, publicHost: ''});
+  // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, { ...serviceConfig, publicHost: '' });
 
   return userService
     .startIdentityProviderIntent({
@@ -891,13 +901,13 @@ export async function authorizeOrDenyDeviceAuthorization({
     deviceAuthorizationId,
     decision: session
       ? {
-          case: "session",
-          value: session,
-        }
+        case: "session",
+        value: session,
+      }
       : {
-          case: "deny",
-          value: {},
-        },
+        case: "deny",
+        value: {},
+      },
   });
 }
 
@@ -1258,37 +1268,38 @@ export type WithServiceConfig<T = {}> = T & {
 };
 
 export function createServerTransport(token: string, serviceConfig: ServiceConfig) {
+  const interceptors = [tracingInterceptor];
+
+  if (process.env.CUSTOM_REQUEST_HEADERS || serviceConfig.instanceHost || serviceConfig.publicHost) {
+    interceptors.push((next) => {
+      return (req) => {
+        // Apply headers from serviceConfig
+        if (serviceConfig.instanceHost) {
+          req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+        }
+        if (serviceConfig.publicHost) {
+          req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+        }
+
+        // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+        if (process.env.CUSTOM_REQUEST_HEADERS) {
+          process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
+            const kv = header.indexOf(":");
+            if (kv > 0) {
+              req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+            } else {
+              console.warn(`Skipping malformed header: ${header}`);
+            }
+          });
+        }
+
+        return next(req);
+      };
+    });
+  }
+
   return libCreateServerTransport(token, {
     baseUrl: serviceConfig.baseUrl,
-    interceptors:
-      !process.env.CUSTOM_REQUEST_HEADERS && !serviceConfig.instanceHost && !serviceConfig.publicHost
-        ? undefined
-        : [
-            (next) => {
-              return (req) => {
-                // Apply headers from serviceConfig
-                if (serviceConfig.instanceHost) {
-                  req.header.set("x-zitadel-instance-host", serviceConfig.instanceHost);
-                }
-                if (serviceConfig.publicHost) {
-                  req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
-                }
-
-                // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-                if (process.env.CUSTOM_REQUEST_HEADERS) {
-                  process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-                    const kv = header.indexOf(":");
-                    if (kv > 0) {
-                      req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
-                    } else {
-                      console.warn(`Skipping malformed header: ${header}`);
-                    }
-                  });
-                }
-
-                return next(req);
-              };
-            },
-          ],
+    interceptors,
   });
 }

@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -19,6 +20,11 @@ import (
 )
 
 func (s *Server) GetLoginSettings(ctx context.Context, req *connect.Request[settings.GetLoginSettingsRequest]) (*connect.Response[settings.GetLoginSettingsResponse], error) {
+	// we do have a traceparent in the req here
+	ctx, span := tracing.NewSpan(ctx)
+	// span.SetProperty("request_org_id", object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()))
+
+	defer span.End()
 	current, err := s.query.LoginPolicyByID(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
