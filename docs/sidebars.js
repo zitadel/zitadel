@@ -386,6 +386,7 @@ module.exports = {
             "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/okta-oidc",
             "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/onelogin-saml",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/pingfederate-saml",
             "guides/integrate/identity-providers/migrate",
@@ -1164,6 +1165,16 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
         "self-hosting/manage/service_ping",
+        {
+          type: "category",
+          label: "Metrics",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/metrics/overview",
+          },
+          items: ["self-hosting/manage/metrics/prometheus"],
+        },
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
