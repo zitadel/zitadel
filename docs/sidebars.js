@@ -550,21 +550,62 @@ module.exports = {
       items: [
         {
           type: "category",
+          label: "Customer Portal",
+          collapsed: true,
+          link: {
+            type: "generated-index",
+            title: "Overview",
+            slug: "guides/manage/cloud/overview",
+            description:
+              "Our customer portal is used to manage all your ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
+          },
+          items: [
+            "guides/manage/cloud/start",
+            "guides/manage/cloud/instances",
+            "guides/manage/cloud/settings",
+            "guides/manage/cloud/billing",
+            "guides/manage/cloud/support",
+            "guides/manage/cloud/users",
+          ],
+        },
+        {
+          type: "category",
           label: "Self-Hosted",
           items: [
             "self-hosting/deploy/overview",
             "self-hosting/deploy/linux",
             "self-hosting/deploy/macos",
             "self-hosting/deploy/devcontainer",
+            "self-hosting/deploy/compose",
+            "self-hosting/deploy/kubernetes",
             {
               type: "category",
               label: "Manage",
               collapsed: true,
               items: [
-                "self-hosting/manage/production",
-                "self-hosting/manage/productionchecklist",
-                "self-hosting/manage/login-client",
-                "self-hosting/manage/configure/configure",
+                {
+                  type: "category",
+                  label: "Production & Operations",
+                  collapsed: false,
+                  items: [
+                    "self-hosting/manage/production",
+                    "self-hosting/manage/productionchecklist",
+                    "self-hosting/manage/updating_scaling",
+                    "self-hosting/manage/usage_control",
+                  ],
+                },
+                {
+                  type: "category",
+                  label: "Configuration",
+                  collapsed: true,
+                  items: [
+                    "self-hosting/manage/configure/configure",
+                    "self-hosting/manage/custom-domain",
+                    "self-hosting/manage/tls_modes",
+                    "self-hosting/manage/http2",
+                    "self-hosting/manage/login-client",
+                  ],
+                },
                 {
                   type: "category",
                   collapsed: true,
@@ -583,70 +624,48 @@ module.exports = {
                     "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
                   ],
                 },
-                "self-hosting/manage/custom-domain",
-                "self-hosting/manage/http2",
-                "self-hosting/manage/tls_modes",
-                "self-hosting/manage/database/database",
-                "self-hosting/manage/cache",
-                "self-hosting/manage/service_ping",
-                "self-hosting/manage/updating_scaling",
-                "self-hosting/manage/usage_control",
                 {
                   type: "category",
-                  label: "Metrics",
+                  label: "Infrastructure & Observability",
                   collapsed: true,
-                  link: {
-                    type: "doc",
-                    id: "self-hosting/manage/metrics/overview",
-                  },
-                  items: ["self-hosting/manage/metrics/prometheus"],
+                  items: [
+                    "self-hosting/manage/database/database",
+                    "self-hosting/manage/cache",
+                    "self-hosting/manage/service_ping",
+                    {
+                      type: "category",
+                      label: "Metrics",
+                      collapsed: true,
+                      link: {
+                        type: "doc",
+                        id: "self-hosting/manage/metrics/overview",
+                      },
+                      items: ["self-hosting/manage/metrics/prometheus"],
+                    },
+                  ],
                 },
                 {
                   type: "category",
-                  label: "Command Line Interface",
+                  label: "Tools",
                   collapsed: true,
-                  link: {
-                    type: "doc",
-                    id: "self-hosting/manage/cli/overview",
-                  },
-                  items: ["self-hosting/manage/cli/mirror"],
+                  items: [
+                    {
+                      type: "category",
+                      label: "Command Line Interface",
+                      collapsed: true,
+                      link: {
+                        type: "doc",
+                        id: "self-hosting/manage/cli/overview",
+                      },
+                      items: ["self-hosting/manage/cli/mirror"],
+                    },
+                  ],
                 },
               ],
             },
-
           ],
         },
-        {
-          type: "category",
-          label: "Docker Compose",
-          items: [
-            "self-hosting/deploy/compose",
-          ],
-        },
-        {
-          type: "category",
-          label: "Kubernetes",
-          items: [
-            "self-hosting/deploy/kubernetes",
-          ],
-        },
-        "self-hosting/deploy/devcontainer",
         "self-hosting/deploy/troubleshooting/troubleshooting",
-        {
-          type: "category",
-          label: "Configuration",
-          items: [
-            "self-hosting/manage/configure/configure",
-            "self-hosting/manage/production",
-            "self-hosting/manage/productionchecklist",
-            "self-hosting/manage/custom-domain",
-            "self-hosting/manage/tls_modes",
-            "self-hosting/manage/http2",
-            "self-hosting/manage/login-client",
-            // TODO: File missing - Environment Variables specific doc
-            // TODO: File missing - Advanced Settings specific doc
-          ],
-        },
         {
           type: "category",
           label: "Scaling & Performance",
@@ -654,28 +673,6 @@ module.exports = {
             "self-hosting/manage/updating_scaling",
             "self-hosting/manage/database/database",
             "self-hosting/manage/cache",
-            // TODO: File missing - High Availability specific doc
-            // TODO: File missing - Backup & Restore specific doc
-          ],
-        },
-        {
-          type: "category",
-          label: "Customer Portal",
-          collapsed: true,
-          link: {
-            type: "generated-index",
-            title: "Overview",
-            slug: "guides/manage/cloud/overview",
-            description:
-              "Our customer portal is used to manage all your ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
-          },
-          items: [
-            "guides/manage/cloud/start",
-            "guides/manage/cloud/instances",
-            "guides/manage/cloud/settings",
-            "guides/manage/cloud/billing",
-            "guides/manage/cloud/support",
-            "guides/manage/cloud/users",
           ],
         },
       ],
