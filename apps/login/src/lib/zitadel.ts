@@ -1282,7 +1282,13 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
                   process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
                     const kv = header.indexOf(":");
                     if (kv > 0) {
-                      req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
+                      const key = header.slice(0, kv).trim();
+                      const value = header.slice(kv + 1).trim();
+                      if (value) {
+                        req.header.set(key, value);
+                      } else {
+                        req.header.delete(key);
+                      }
                     } else {
                       console.warn(`Skipping malformed header: ${header}`);
                     }
