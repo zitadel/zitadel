@@ -594,12 +594,6 @@ export async function processIDPCallback({
   }
 
   try {
-    console.log("[IDP Process] Retrieving IDP intent (single call):", {
-      id,
-      tokenPreview: token.substring(0, 10) + "...",
-      timestamp: new Date().toISOString(),
-    });
-
     // Consume the single-use token ONCE
     const intent = await retrieveIDPIntent({ serviceConfig, id, token });
 
