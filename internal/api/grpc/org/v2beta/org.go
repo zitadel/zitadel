@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"errors"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -25,7 +24,7 @@ func (s *Server) CreateOrganization(ctx context.Context, request *connect.Reques
 	if err != nil {
 		return nil, err
 	}
-	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
+	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false, s.command.CheckPermissionOrganizationCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Reques
 		return orgv2.UpdateOrganizationBeta(ctx, request)
 	}
 
-	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName())
+	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +73,8 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Reques
 		return orgv2.DeleteOrganizationBeta(ctx, request)
 	}
 
-	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
+	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId(), s.command.CheckPermissionOrganizationDelete, false)
 	if err != nil {
-		var notFoundError *zerrors.NotFoundError
-		if errors.As(err, &notFoundError) {
-			return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{}), nil
-		}
 		return nil, err
 	}
 	return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{
@@ -88,7 +83,7 @@ func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Reques
 }
 
 func (s *Server) SetOrganizationMetadata(ctx context.Context, request *connect.Request[v2beta_org.SetOrganizationMetadataRequest]) (*connect.Response[v2beta_org.SetOrganizationMetadataResponse], error) {
-	result, err := s.command.BulkSetOrgMetadata(ctx, request.Msg.GetOrganizationId(), BulkSetOrgMetadataToDomain(request.Msg)...)
+	result, err := s.command.BulkSetOrgMetadata(ctx, request.Msg.GetOrganizationId(), s.command.CheckPermissionOrganizationWrite, BulkSetOrgMetadataToDomain(request.Msg)...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +97,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *connect.
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchOrgMetadata(ctx, true, request.Msg.GetOrganizationId(), metadataQueries, false)
+	res, err := s.query.SearchOrgMetadata(ctx, true, request.Msg.GetOrganizationId(), metadataQueries, false, true)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +111,7 @@ func (s *Server) ListOrganizationMetadata(ctx context.Context, request *connect.
 }
 
 func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationMetadataRequest]) (*connect.Response[v2beta_org.DeleteOrganizationMetadataResponse], error) {
-	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.Msg.GetOrganizationId(), request.Msg.Keys...)
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.Msg.GetOrganizationId(), s.command.CheckPermissionOrganizationWrite, request.Msg.Keys...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +125,7 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Re
 		return orgv2.DeactivateOrganizationBeta(ctx, request)
 	}
 
-	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId())
+	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +139,7 @@ func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Requ
 		return orgv2.ActivateOrganizationBeta(ctx, request)
 	}
 
-	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId())
+	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId(), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +153,7 @@ func (s *Server) AddOrganizationDomain(ctx context.Context, request *connect.Req
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.AddOrgDomain(ctx, request.Msg.GetOrganizationId(), request.Msg.GetDomain(), userIDs)
+	details, err := s.command.AddOrgDomain(ctx, request.Msg.GetOrganizationId(), request.Msg.GetDomain(), userIDs, s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +173,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *connect.Reque
 	}
 	queries.Queries = append(queries.Queries, orgIDQuery)
 
-	domains, err := s.query.SearchOrgDomains(ctx, queries, false)
+	domains, err := s.query.SearchOrgDomains(ctx, queries, false, true)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +187,7 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *connect.Reque
 }
 
 func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *connect.Request[org.DeleteOrganizationDomainRequest]) (*connect.Response[org.DeleteOrganizationDomainResponse], error) {
-	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req.Msg))
+	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req.Msg), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +197,7 @@ func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *connect.Requ
 }
 
 func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *connect.Request[org.GenerateOrganizationDomainValidationRequest]) (*connect.Response[org.GenerateOrganizationDomainValidationResponse], error) {
-	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req.Msg))
+	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req.Msg), s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +212,7 @@ func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *connect.
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, request.Msg), userIDs)
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, request.Msg), userIDs, s.command.CheckPermissionOrganizationWrite)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Lato } from "next/font/google";
-import { ReactNode, Suspense } from "react";
+import React, { Suspense } from "react";
 import ThemeSwitch from "@/components/theme-switch";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
