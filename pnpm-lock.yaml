@@ -133,7 +133,7 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0(@typescript-eslint/parser@8.52.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
-        specifier: ^8.52.0
+        specifier: ^8.35.1
         version: 8.52.0(eslint@8.57.1)(typescript@5.9.3)
       '@vercel/git-hooks':
         specifier: 1.0.0
@@ -262,14 +262,14 @@ importers:
         specifier: ^20.3.15
         version: 20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@bufbuild/protobuf':
-        specifier: 2.6.3
-        version: 2.6.3
+        specifier: ^2.10.2
+        version: 2.10.2
       '@connectrpc/connect':
         specifier: ~2.0.4
-        version: 2.0.4(@bufbuild/protobuf@2.6.3)
+        version: 2.0.4(@bufbuild/protobuf@2.10.2)
       '@connectrpc/connect-web':
         specifier: ~2.0.4
-        version: 2.0.4(@bufbuild/protobuf@2.6.3)(@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.6.3))
+        version: 2.0.4(@bufbuild/protobuf@2.10.2)(@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.10.2))
       '@ctrl/ngx-codemirror':
         specifier: ^6.1.0
         version: 6.1.0(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.15(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.15(@angular/animations@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(codemirror@5.65.20)
@@ -386,8 +386,8 @@ importers:
         specifier: ^20.3.15
         version: 20.3.15
       '@bufbuild/buf':
-        specifier: ~1.55.1
-        version: 1.55.1
+        specifier: ^1.62.1
+        version: 1.62.1
       '@types/file-saver':
         specifier: ^2.0.7
         version: 2.0.7
@@ -419,7 +419,7 @@ importers:
         specifier: ^5.62.0
         version: 5.62.0(@typescript-eslint/parser@8.52.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1)(typescript@5.9.2)
       '@typescript-eslint/parser':
-        specifier: ^8.52.0
+        specifier: ^8.35.1
         version: 8.52.0(eslint@8.57.1)(typescript@5.9.2)
       '@zitadel/client':
         specifier: workspace:*
@@ -589,7 +589,7 @@ importers:
         specifier: ^8.52.0
         version: 8.52.0(@typescript-eslint/parser@8.52.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
-        specifier: ^8.52.0
+        specifier: ^8.35.1
         version: 8.52.0(eslint@8.57.1)(typescript@5.9.3)
       eslint:
         specifier: ^8.57.1
@@ -1683,22 +1683,10 @@ packages:
   '@braintree/sanitize-url@7.1.1':
     resolution: {integrity: sha512-i1L7noDNxtFyL5DmZafWy1wRVhGehQmzZaz1HiN5e7iylJMSZR7ekOV7NsIqa5qBldlLrsKv4HbgFUVlQrz8Mw==}
 
-  '@bufbuild/buf-darwin-arm64@1.55.1':
-    resolution: {integrity: sha512-g76yEF2ALyjj+R8KVoIjPPS7zaPy6VDWg2b5PCCK04fKTbe5jyzOdYdvNyuM5hO8xpRPBjBrqO6LUAfS+0aRCQ==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [darwin]
-
   '@bufbuild/buf-darwin-arm64@1.62.1':
     resolution: {integrity: sha512-qklVRzBgdzLv9fVa9OX/ewpgX4H34b4mKezJsDPGRwAwykgswgF39jhihIRDJNI40/Gi2Ik0tvmg4v8aO2E/1Q==}
     engines: {node: '>=12'}
     cpu: [arm64]
-    os: [darwin]
-
-  '@bufbuild/buf-darwin-x64@1.55.1':
-    resolution: {integrity: sha512-hCkatzlV7DwHWEyzzcpsZgLtxABidT/EYBmLTy6oSCHimOJzR1c5ezKe75tX7myDAfV0HZExIM7+cSsWg3dTPg==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [darwin]
 
   '@bufbuild/buf-darwin-x64@1.62.1':
@@ -1707,22 +1695,10 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@bufbuild/buf-linux-aarch64@1.55.1':
-    resolution: {integrity: sha512-hA4jGPZ2N+FUZt03w+hPt6YsbhAdOh2gNKBQnuysj8kdTqZ4mw1wCOUoRg9h7eqOr/2XCcOibWYO36H2eS2OYQ==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [linux]
-
   '@bufbuild/buf-linux-aarch64@1.62.1':
     resolution: {integrity: sha512-NdLOdRSkhKDlOmRhwywbC0Bo5TcPuRscqwVLOWWkarDNG1mybMCZYTvzXyuvdHVILsq8aA3T5w9yfuzMsVNfQg==}
     engines: {node: '>=12'}
     cpu: [arm64]
-    os: [linux]
-
-  '@bufbuild/buf-linux-armv7@1.55.1':
-    resolution: {integrity: sha512-npnzJSAZRUdh8+fmgsbXt+dogA+iU/i/qWh+3XhdLXW220nWpd1jAXcpquaVfer8EwMEcYjqVf8FA7IXOgjGXw==}
-    engines: {node: '>=12'}
-    cpu: [arm]
     os: [linux]
 
   '@bufbuild/buf-linux-armv7@1.62.1':
@@ -1731,34 +1707,16 @@ packages:
     cpu: [arm]
     os: [linux]
 
-  '@bufbuild/buf-linux-x64@1.55.1':
-    resolution: {integrity: sha512-/48IjSA1kh/8kZl1bcDkikgH+9BMnPhhVqad+R7+3ttYOFqifet3n+hf2ipA26NtTpTfvOSRXj1tdx/80x0I1g==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [linux]
-
   '@bufbuild/buf-linux-x64@1.62.1':
     resolution: {integrity: sha512-lmN5op+lRlcaOLohfAhYh6VkEnj0mDxuhVAEXOtG9rTpxDguOgFFDzoYzoVdxtGDAg9npgQaUl7W58KO9kfTHw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [linux]
 
-  '@bufbuild/buf-win32-arm64@1.55.1':
-    resolution: {integrity: sha512-CE+jAN1ikRTIdny6Q/geccKsLhy4QEXzUaJUfAiUXqjSW2u/Et7+p9Wh6xUgXcSuIoz1aw8MVuCESrNMBt6LBg==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [win32]
-
   '@bufbuild/buf-win32-arm64@1.62.1':
     resolution: {integrity: sha512-jXO8TXIY8yVC/1br687WAJx7feRfccqOZYRDy9AaPupQ40Cv8l0L4TWckGketaftDcnJCWBStO5+rwjAmN7fug==}
     engines: {node: '>=12'}
     cpu: [arm64]
-    os: [win32]
-
-  '@bufbuild/buf-win32-x64@1.55.1':
-    resolution: {integrity: sha512-C4VYS96YBJkLhIKH6yh8BqHgIjqGe+G6yuAOOKxWsYdx3QbT5LYOr38AP1bzkFm0Gz9jOOr5n0pmAFwsOLYjiw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [win32]
 
   '@bufbuild/buf-win32-x64@1.62.1':
@@ -1767,11 +1725,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@bufbuild/buf@1.55.1':
-    resolution: {integrity: sha512-V9tpe2XlRVyq33cct2lNz9nDDQG95WbPKlxQkMKt5i7tPsfqE3vzbGiEC96K0QJWhIU28OkjYD8+1SyYKBWVYg==}
-    engines: {node: '>=12'}
-    hasBin: true
-
   '@bufbuild/buf@1.62.1':
     resolution: {integrity: sha512-0S+7jXEl9LXdG8+lyoqGbHFiKgFjRK/EuuFxw+szMT9qVOhg4//j0wIfZ/visOCU2FB1fQNuesb1MB4WVnwH0A==}
     engines: {node: '>=12'}
@@ -1779,9 +1732,6 @@ packages:
 
   '@bufbuild/protobuf@2.10.2':
     resolution: {integrity: sha512-uFsRXwIGyu+r6AMdz+XijIIZJYpoWeYzILt5yZ2d3mCjQrWUTVpVD9WL/jZAbvp+Ed04rOhrsk7FiTcEDseB5A==}
-
-  '@bufbuild/protobuf@2.6.3':
-    resolution: {integrity: sha512-w/gJKME9mYN7ZoUAmSMAWXk4hkVpxRKvEJCb3dV5g9wwWdxTJJ0ayOJAVcNxtdqaxDyFuC0uz4RSGVacJ030PQ==}
 
   '@bufbuild/protocompile@0.0.1':
     resolution: {integrity: sha512-cOTMtjcWLcbjF17dPYgeMtVC5jZyS0bSjz3jy8kDPjOgjgSYMD2u2It7w8aCc2z23hTPIKl/2SNdMnz0Jzu3Xg==}
@@ -16077,57 +16027,26 @@ snapshots:
 
   '@braintree/sanitize-url@7.1.1': {}
 
-  '@bufbuild/buf-darwin-arm64@1.55.1':
-    optional: true
-
   '@bufbuild/buf-darwin-arm64@1.62.1':
-    optional: true
-
-  '@bufbuild/buf-darwin-x64@1.55.1':
     optional: true
 
   '@bufbuild/buf-darwin-x64@1.62.1':
     optional: true
 
-  '@bufbuild/buf-linux-aarch64@1.55.1':
-    optional: true
-
   '@bufbuild/buf-linux-aarch64@1.62.1':
-    optional: true
-
-  '@bufbuild/buf-linux-armv7@1.55.1':
     optional: true
 
   '@bufbuild/buf-linux-armv7@1.62.1':
     optional: true
 
-  '@bufbuild/buf-linux-x64@1.55.1':
-    optional: true
-
   '@bufbuild/buf-linux-x64@1.62.1':
-    optional: true
-
-  '@bufbuild/buf-win32-arm64@1.55.1':
     optional: true
 
   '@bufbuild/buf-win32-arm64@1.62.1':
     optional: true
 
-  '@bufbuild/buf-win32-x64@1.55.1':
-    optional: true
-
   '@bufbuild/buf-win32-x64@1.62.1':
     optional: true
-
-  '@bufbuild/buf@1.55.1':
-    optionalDependencies:
-      '@bufbuild/buf-darwin-arm64': 1.55.1
-      '@bufbuild/buf-darwin-x64': 1.55.1
-      '@bufbuild/buf-linux-aarch64': 1.55.1
-      '@bufbuild/buf-linux-armv7': 1.55.1
-      '@bufbuild/buf-linux-x64': 1.55.1
-      '@bufbuild/buf-win32-arm64': 1.55.1
-      '@bufbuild/buf-win32-x64': 1.55.1
 
   '@bufbuild/buf@1.62.1':
     optionalDependencies:
@@ -16140,8 +16059,6 @@ snapshots:
       '@bufbuild/buf-win32-x64': 1.62.1
 
   '@bufbuild/protobuf@2.10.2': {}
-
-  '@bufbuild/protobuf@2.6.3': {}
 
   '@bufbuild/protocompile@0.0.1(@bufbuild/buf@1.62.1)':
     dependencies:
@@ -16347,19 +16264,19 @@ snapshots:
       '@bufbuild/protobuf': 2.10.2
       '@connectrpc/connect': 2.1.1(@bufbuild/protobuf@2.10.2)
 
-  '@connectrpc/connect-web@2.0.4(@bufbuild/protobuf@2.6.3)(@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.6.3))':
+  '@connectrpc/connect-web@2.0.4(@bufbuild/protobuf@2.10.2)(@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.10.2))':
     dependencies:
-      '@bufbuild/protobuf': 2.6.3
-      '@connectrpc/connect': 2.0.4(@bufbuild/protobuf@2.6.3)
+      '@bufbuild/protobuf': 2.10.2
+      '@connectrpc/connect': 2.0.4(@bufbuild/protobuf@2.10.2)
 
   '@connectrpc/connect-web@2.1.1(@bufbuild/protobuf@2.10.2)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.10.2))':
     dependencies:
       '@bufbuild/protobuf': 2.10.2
       '@connectrpc/connect': 2.1.1(@bufbuild/protobuf@2.10.2)
 
-  '@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.6.3)':
+  '@connectrpc/connect@2.0.4(@bufbuild/protobuf@2.10.2)':
     dependencies:
-      '@bufbuild/protobuf': 2.6.3
+      '@bufbuild/protobuf': 2.10.2
 
   '@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.10.2)':
     dependencies:
@@ -18782,7 +18699,7 @@ snapshots:
 
   '@npmcli/fs@4.0.0':
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   '@npmcli/git@6.0.3':
     dependencies:
@@ -18792,7 +18709,7 @@ snapshots:
       npm-pick-manifest: 10.0.0
       proc-log: 5.0.0
       promise-retry: 2.0.1
-      semver: 7.7.2
+      semver: 7.7.3
       which: 5.0.0
 
   '@npmcli/installed-package-contents@3.0.0':
@@ -18809,7 +18726,7 @@ snapshots:
       hosted-git-info: 8.1.0
       json-parse-even-better-errors: 4.0.0
       proc-log: 5.0.0
-      semver: 7.7.2
+      semver: 7.7.3
       validate-npm-package-license: 3.0.4
 
   '@npmcli/promise-spawn@8.0.3':
@@ -27631,7 +27548,7 @@ snapshots:
       make-fetch-happen: 14.0.3
       nopt: 8.1.0
       proc-log: 5.0.0
-      semver: 7.7.2
+      semver: 7.7.3
       tar: 7.5.2
       tinyglobby: 0.2.15
       which: 5.0.0
@@ -27685,7 +27602,7 @@ snapshots:
 
   npm-install-checks@7.1.2:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   npm-normalize-package-bin@4.0.0: {}
 
@@ -27693,7 +27610,7 @@ snapshots:
     dependencies:
       hosted-git-info: 8.1.0
       proc-log: 5.0.0
-      semver: 7.7.2
+      semver: 7.7.3
       validate-npm-package-name: 6.0.2
 
   npm-package-arg@13.0.0:
@@ -27713,7 +27630,7 @@ snapshots:
       npm-install-checks: 7.1.2
       npm-normalize-package-bin: 4.0.0
       npm-package-arg: 12.0.2
-      semver: 7.7.2
+      semver: 7.7.3
 
   npm-registry-fetch@18.0.2:
     dependencies:
