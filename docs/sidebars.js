@@ -591,6 +591,16 @@ module.exports = {
                 "self-hosting/manage/usage_control",
                 {
                   type: "category",
+                  label: "Metrics",
+                  collapsed: false,
+                  link: {
+                    type: "doc",
+                    id: "self-hosting/manage/metrics/overview",
+                  },
+                  items: ["self-hosting/manage/metrics/prometheus"],
+                },
+                {
+                  type: "category",
                   label: "Command Line Interface",
                   collapsed: false,
                   link: {
