@@ -461,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey)
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	allowDomainRunes = regexp.MustCompile("^[a-zA-Z0-9\\.\\-]+$")
+	allowDomainRunes = regexp.MustCompile(`^[a-zA-Z0-9\.\-]+$`)
 )
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
@@ -56,22 +56,35 @@ func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain 
 	}, nil
 }
 
-func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string, errorIfNotFound bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := removeInstanceDomain(instanceAgg, instanceDomain)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+
+	if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
+	}
+
+	//nolint: staticcheck
+	writeModel, err := getInstanceDomainWriteModel(ctx, c.eventstore.Filter, instanceDomain)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
+
+	if writeModel.State != domain.InstanceDomainStateActive {
+		if errorIfNotFound {
+			return nil, zerrors.ThrowNotFound(nil, "INSTANCE-8ls9f", "Errors.Instance.Domain.NotFound")
+		}
+		return nil, nil
+	}
+	if writeModel.Generated {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9hn3n", "Errors.Instance.Domain.GeneratedNotRemovable")
+	}
+	cmds := []eventstore.Command{instance.NewDomainRemovedEvent(ctx, &instanceAgg.Aggregate, instanceDomain)}
+
+	if err := c.pushAppendAndReduce(ctx, writeModel, cmds...); err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) ([]preparation.Validation, error) {
@@ -178,27 +191,6 @@ func setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) prep
 				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-9nkWf", "Errors.Instance.Domain.NotFound")
 			}
 			return []eventstore.Command{instance.NewDomainPrimarySetEvent(ctx, &a.Aggregate, instanceDomain)}, nil
-		}, nil
-	}
-}
-
-func removeInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
-			if err != nil {
-				return nil, err
-			}
-			if domainWriteModel.State != domain.InstanceDomainStateActive {
-				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-8ls9f", "Errors.Instance.Domain.NotFound")
-			}
-			if domainWriteModel.Generated {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9hn3n", "Errors.Instance.Domain.GeneratedNotRemovable")
-			}
-			return []eventstore.Command{instance.NewDomainRemovedEvent(ctx, &a.Aggregate, instanceDomain)}, nil
 		}, nil
 	}
 }

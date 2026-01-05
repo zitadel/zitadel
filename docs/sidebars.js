@@ -11,7 +11,6 @@ const sidebar_api_saml_service_v2 = require("./docs/apis/resources/saml_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
-const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
 const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
@@ -254,8 +253,8 @@ module.exports = {
               items: [
                 {
                   type: "link",
-                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
-                  label: "Login V2 [Beta]",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2",
+                  label: "Login V2",
                 },
               ],
             },
@@ -372,20 +371,23 @@ module.exports = {
           },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/azure-ad-oidc",
             "guides/integrate/identity-providers/azure-ad-saml",
+            "guides/integrate/identity-providers/generic-oidc",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
-            "guides/integrate/identity-providers/apple",
-            "guides/integrate/identity-providers/ldap",
-            "guides/integrate/identity-providers/openldap",
-            "guides/integrate/identity-providers/okta-oidc",
-            "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/jwt_idp",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/linkedin-oauth",
             "guides/integrate/identity-providers/mocksaml",
-            "guides/integrate/identity-providers/jwt_idp",
+            "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/onelogin-saml",
+            "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/pingfederate-saml",
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/additional-information",
           ],
@@ -507,10 +509,6 @@ module.exports = {
             },
             {
               type: "doc",
-              id: "guides/integrate/actions/testing-request-signature",
-            },
-            {
-              type: "doc",
               id: "guides/integrate/actions/testing-response",
             },
             {
@@ -528,6 +526,10 @@ module.exports = {
             {
               type: "doc",
               id: "guides/integrate/actions/testing-event",
+            },
+            {
+              type: "doc",
+              id: "guides/integrate/actions/testing-request-signature",
             },
             {
               type: "doc",
@@ -783,18 +785,6 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Organization Service Beta API",
-                slug: "/apis/resources/org_service/v2beta",
-                description:
-                  "This beta API is intended to manage organizations for ZITADEL. Expect breaking changes to occur. Please use the v2 version for a stable API. \n",
-              },
-              items: sidebar_api_org_service_v2beta,
-            },
-            {
-              type: "category",
               label: "Identity Provider",
               link: {
                 type: "generated-index",
@@ -821,22 +811,18 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Action (Beta)",
+              label: "Action",
               link: {
                 type: "generated-index",
-                title: "Action Service API (Beta)",
+                title: "Action Service API",
                 slug: "/apis/resources/action_service_v2",
                 description:
                   "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
                   "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
-                  "\n" +
                   "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
                   "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
                   "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n" +
-                  "\n" +
-                  "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
+                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users."
               },
               items: sidebar_api_actions_v2,
             },
@@ -1166,6 +1152,16 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
         "self-hosting/manage/service_ping",
+        {
+          type: "category",
+          label: "Metrics",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/metrics/overview",
+          },
+          items: ["self-hosting/manage/metrics/prometheus"],
+        },
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
