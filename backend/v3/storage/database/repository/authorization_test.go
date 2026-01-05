@@ -44,6 +44,8 @@ func TestCreateAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, existingAuthorization)
 	require.NoError(t, err)
@@ -66,6 +68,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: "random-id",
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -78,6 +82,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -90,6 +96,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      []string{"role3"},
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -103,6 +111,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -129,6 +139,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: existingAuthorization.InstanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: database.NewUniqueError("authorizations", "uq_authorizations_instance_id_id", nil),
 		},
@@ -140,6 +152,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: database.NewCheckError("authorizations", "", nil),
 		},
@@ -152,6 +166,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 		},
 		{
@@ -163,6 +179,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      []string{role1, role2},
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 		},
 		{
@@ -175,6 +193,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      []string{role1},
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 		},
 		{
@@ -187,6 +207,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      []string{role2},
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
@@ -200,6 +222,8 @@ func TestCreateAuthorization(t *testing.T) {
 				InstanceID: instanceID,
 				State:      domain.AuthorizationStateActive,
 				Roles:      nil,
+				CreatedAt:  time.Now(),
+				UpdatedAt:  time.Now(),
 			},
 		},
 	}
@@ -255,6 +279,8 @@ func TestGetAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1, role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser)
 	require.NoError(t, err)
@@ -267,6 +293,8 @@ func TestGetAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser)
 	require.NoError(t, err)
@@ -283,6 +311,8 @@ func TestGetAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithRoles)
 	require.NoError(t, err)
@@ -294,6 +324,8 @@ func TestGetAuthorization(t *testing.T) {
 		GrantID:    gu.Ptr(grantID),
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithoutRoles)
 	require.NoError(t, err)
@@ -443,6 +475,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project1Role1, project1Role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser1Project1)
 	require.NoError(t, err)
@@ -455,6 +489,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser1Project1)
 	require.NoError(t, err)
@@ -467,6 +503,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project2Role1, project2Role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser1Project2)
 	require.NoError(t, err)
@@ -480,6 +518,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser1Project2)
 	require.NoError(t, err)
@@ -493,6 +533,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project1Role1, project1Role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser2Project1)
 	require.NoError(t, err)
@@ -505,6 +547,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser2Project1)
 	require.NoError(t, err)
@@ -517,6 +561,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project2Role1, project2Role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithRolesUser2Project2)
 	require.NoError(t, err)
@@ -529,6 +575,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRolesUser2Project2)
 	require.NoError(t, err)
@@ -545,6 +593,8 @@ func TestListAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{project1Role1},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithRoles)
 	require.NoError(t, err)
@@ -556,6 +606,8 @@ func TestListAuthorization(t *testing.T) {
 		GrantID:    gu.Ptr(grantID),
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrantWithoutRoles)
 	require.NoError(t, err)
@@ -847,6 +899,8 @@ func TestUpdateAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, activeAuthorization)
 	require.NoError(t, err)
@@ -858,6 +912,8 @@ func TestUpdateAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateInactive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, inactiveAuthorization)
 	require.NoError(t, err)
@@ -964,6 +1020,8 @@ func TestAuthorizationUpdate_setRoles(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, authorization1)
 	require.NoError(t, err)
@@ -975,6 +1033,8 @@ func TestAuthorizationUpdate_setRoles(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role5, role6},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorization2)
 	require.NoError(t, err)
@@ -1081,6 +1141,8 @@ func TestDeleteAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1, role2},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err := authorizationRepo.Create(t.Context(), tx, authorizationWithRoles)
 	require.NoError(t, err)
@@ -1092,6 +1154,8 @@ func TestDeleteAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationWithoutRoles)
 	require.NoError(t, err)
@@ -1103,6 +1167,8 @@ func TestDeleteAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, deletedAuthorization)
 	require.NoError(t, err)
@@ -1122,6 +1188,8 @@ func TestDeleteAuthorization(t *testing.T) {
 		InstanceID: instanceID,
 		State:      domain.AuthorizationStateActive,
 		Roles:      []string{role1},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 	err = authorizationRepo.Create(t.Context(), tx, authorizationProjectGrant)
 	require.NoError(t, err)
