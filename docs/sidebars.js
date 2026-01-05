@@ -498,9 +498,67 @@ module.exports = {
               type: "category",
               label: "Self-Hosted",
               items: [
-                "self-hosting/deploy/overview",
-                "self-hosting/deploy/linux",
-                "self-hosting/deploy/macos",
+                {
+                  type: "category",
+                  label: "Deploy",
+                  collapsed: false,
+                  items: [
+                    "self-hosting/deploy/overview",
+                    "self-hosting/deploy/linux",
+                    "self-hosting/deploy/macos",
+                    "self-hosting/deploy/compose",
+                    "self-hosting/deploy/devcontainer",
+                    "self-hosting/deploy/kubernetes",
+                    "self-hosting/deploy/troubleshooting/troubleshooting",
+                  ],
+                },
+                {
+                  type: "category",
+                  label: "Manage",
+                  collapsed: false,
+                  items: [
+                    "self-hosting/manage/production",
+                    "self-hosting/manage/productionchecklist",
+                    "self-hosting/manage/login-client",
+                    "self-hosting/manage/configure/configure",
+                    {
+                      type: "category",
+                      collapsed: false,
+                      label: "Reverse Proxy",
+                      link: {
+                        type: "doc",
+                        id: "self-hosting/manage/reverseproxy/reverse_proxy",
+                      },
+                      items: [
+                        "self-hosting/manage/reverseproxy/traefik/traefik",
+                        "self-hosting/manage/reverseproxy/nginx/nginx",
+                        "self-hosting/manage/reverseproxy/caddy/caddy",
+                        "self-hosting/manage/reverseproxy/httpd/httpd",
+                        "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
+                        "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
+                        "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
+                      ],
+                    },
+                    "self-hosting/manage/custom-domain",
+                    "self-hosting/manage/http2",
+                    "self-hosting/manage/tls_modes",
+                    "self-hosting/manage/database/database",
+                    "self-hosting/manage/cache",
+                    "self-hosting/manage/service_ping",
+                    "self-hosting/manage/updating_scaling",
+                    "self-hosting/manage/usage_control",
+                    {
+                      type: "category",
+                      label: "Command Line Interface",
+                      collapsed: false,
+                      link: {
+                        type: "doc",
+                        id: "self-hosting/manage/cli/overview",
+                      },
+                      items: ["self-hosting/manage/cli/mirror"],
+                    },
+                  ],
+                },
               ],
             },
             {
@@ -1056,68 +1114,12 @@ module.exports = {
       ],
     },
   ],
-  selfHosting: [
-    {
-      type: "category",
-      label: "Deploy",
-      collapsed: false,
-      items: [
-        "self-hosting/deploy/overview",
-        "self-hosting/deploy/linux",
-        "self-hosting/deploy/macos",
-        "self-hosting/deploy/compose",
-        "self-hosting/deploy/devcontainer",
-        "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/troubleshooting/troubleshooting",
-      ],
-    },
-    {
-      type: "category",
-      label: "Manage",
-      collapsed: false,
-      items: [
-        "self-hosting/manage/production",
-        "self-hosting/manage/productionchecklist",
-        "self-hosting/manage/login-client",
-        "self-hosting/manage/configure/configure",
-        {
-          type: "category",
-          collapsed: false,
-          label: "Reverse Proxy",
-          link: {
-            type: "doc",
-            id: "self-hosting/manage/reverseproxy/reverse_proxy",
-          },
-          items: [
-            "self-hosting/manage/reverseproxy/traefik/traefik",
-            "self-hosting/manage/reverseproxy/nginx/nginx",
-            "self-hosting/manage/reverseproxy/caddy/caddy",
-            "self-hosting/manage/reverseproxy/httpd/httpd",
-            "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
-            "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
-            "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
-          ],
-        },
-        "self-hosting/manage/custom-domain",
-        "self-hosting/manage/http2",
-        "self-hosting/manage/tls_modes",
-        "self-hosting/manage/database/database",
-        "self-hosting/manage/cache",
-        "self-hosting/manage/service_ping",
-        "self-hosting/manage/updating_scaling",
-        "self-hosting/manage/usage_control",
-        {
-          type: "category",
-          label: "Command Line Interface",
-          collapsed: false,
-          link: {
-            type: "doc",
-            id: "self-hosting/manage/cli/overview",
-          },
-          items: ["self-hosting/manage/cli/mirror"],
-        },
-      ],
-    },
+  selfHosting: [{
+    type: "link",
+    label: "Self-Hosting Home",
+    href:
+      "/docs/self-hosting/deploy/overview"
+  }
   ],
   legal: [
     {
