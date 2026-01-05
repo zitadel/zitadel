@@ -237,7 +237,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			}
 
 			err := cmd.Validate(t.Context(), opts)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 
 			if tc.expectedError == nil {
 				assert.Equal(t, tc.expectedUser, cmd.FetchedUser)
@@ -694,7 +694,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 
 			err := cmd.Execute(t.Context(), opts)
 
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedSuccess, cmd.IsCheckSuccessful)
 			assert.Equal(t, tc.expectedLocked, cmd.IsUserLocked)
 		})

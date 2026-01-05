@@ -562,7 +562,7 @@ func TestOTPCheckCommand_Validate(t *testing.T) {
 			cmd := domain.NewOTPCheckCommand(tc.sessionID, tc.instanceID, nil, nil, nil, nil, tc.checkOTP, tc.requestType)
 			err := cmd.Validate(t.Context(), opts)
 
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.checkOTP != nil && tc.expectedError == nil {
 				assert.Equal(t, tc.expectedUser.ID, cmd.FetchedUser.ID)
 			}

@@ -397,7 +397,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 			err := cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedUser, cmd.FetchedUser)
 		})
 	}
@@ -405,6 +405,7 @@ func TestPasswordCheckCommand_Validate(t *testing.T) {
 
 func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 	t.Parallel()
+	otherErr := errors.New("some other error")
 
 	tt := []struct {
 		testName          string
@@ -435,7 +436,7 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 		},
 		{
 			testName: "when error is other error should return CheckTypeFailed with internal error",
-			inputErr: errors.New("some other error"),
+			inputErr: otherErr,
 			fetchedUser: domain.User{
 				Human: &domain.HumanUser{
 					Password: domain.HumanPassword{
@@ -444,7 +445,7 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 				},
 			},
 			expectedCheckType: &domain.CheckTypeFailed{},
-			expectedError:     zerrors.ThrowInternal(errors.New("some other error"), "DOM-xceNzI", "Errors.Internal"),
+			expectedError:     zerrors.ThrowInternal(otherErr, "DOM-xceNzI", "Errors.Internal"),
 		},
 	}
 
@@ -460,8 +461,8 @@ func TestPasswordCheckCommand_GetPasswordCheckAndError(t *testing.T) {
 
 			// Verify
 			assert.IsType(t, tc.expectedCheckType, checkType)
-			assert.Equal(t, tc.expectedError, err)
 			if tc.expectedError != nil {
+				assert.ErrorIs(t, err, tc.expectedError)
 				checkFailed := checkType.(*domain.CheckTypeFailed)
 				assert.NotZero(t, checkFailed.FailedAt)
 			} else {
@@ -552,7 +553,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			fetchedUser: domain.User{
 				OrganizationID: "org-1",
 			},
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, int64(0)), "DOM-mmsrCt", "unexpected number of rows returned"),
+			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 0), "DOM-mmsrCt", "unexpected number of rows returned"),
 		},
 		{
 			testName: "when check type failed and get lockout policy returns error should return error",
@@ -709,7 +710,7 @@ func TestPasswordCheckCommand_GetPasswordCheckChanges(t *testing.T) {
 			changes, err := cmd.GetPasswordCheckChanges(ctx, opts, tc.humanRepo(ctrl, cmd.CheckTime), tc.updatedHash, tc.checkType)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedHashedPsw, cmd.UpdatedHashedPsw)
 			assert.Equal(t, tc.expectedUserLocked, cmd.IsUserLocked)
 			assert.Len(t, changes, tc.expectedChanges)
@@ -1120,7 +1121,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.checkPassword != nil {
 				assert.Equal(t, tc.expectedValidated, cmd.IsValidated)
 				assert.Equal(t, tc.expectedValidationSuccess, cmd.IsValidationSuccessful)

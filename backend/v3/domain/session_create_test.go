@@ -75,7 +75,7 @@ func TestCreateSessionCommand_Validate(t *testing.T) {
 			err := sessionCreator.Validate(tc.inputCtx, nil)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedInstanceID, sessionCreator.InstanceID)
 		})
 	}
@@ -214,7 +214,7 @@ func TestCreateSessionCommand_Execute(t *testing.T) {
 			err := cmd.Execute(t.Context(), opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedSessionID, cmd.SessionID)
 		})
 	}
