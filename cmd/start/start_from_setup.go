@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -62,6 +63,8 @@ Requirements:
 			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},
 	}
+
+	cmd.SetErr(new_logging.CommandErrorWriter("start-from-setup"))
 
 	startFlags(cmd)
 	setup.Flags(cmd)

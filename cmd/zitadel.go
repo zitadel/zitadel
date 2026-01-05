@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/admin"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
@@ -61,6 +62,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		ready.New(),
 	)
 
+	cmd.SetErr(new_logging.CommandErrorWriter(""))
 	cmd.InitDefaultVersionFlag()
 
 	return cmd

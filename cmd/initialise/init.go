@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -49,7 +50,7 @@ The user provided by flags needs privileges to
 			InitAll(cmd.Context(), config)
 		},
 	}
-
+	cmd.SetErr(new_logging.CommandErrorWriter("init"))
 	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
 	return cmd
 }
