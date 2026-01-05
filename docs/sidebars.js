@@ -66,13 +66,12 @@ module.exports = {
             "guides/integrate/login/login-users",
             "guides/integrate/login/oidc/login-users",
             "guides/integrate/login/hosted-login",
-            "guides/integrate/login-ui/logout",
             "guides/integrate/login/oidc/logout",
           ],
         },
         {
           type: "category",
-          label: "Examples & SDKs",
+          label: "Sample Apps",
           items: [
             {
               type: "category",
@@ -315,13 +314,13 @@ module.exports = {
           type: "category",
           label: "OIDC & OAuth Flows",
           items: [
+            "guides/integrate/login/oidc/oauth-recommended-flows",
+            "apis/openidoauth/authn-methods",
             "apis/openidoauth/endpoints",
             "apis/openidoauth/scopes",
             "apis/openidoauth/claims",
-            "apis/openidoauth/authn-methods",
             "apis/openidoauth/grant-types",
             "apis/openidoauth/authrequest",
-            "guides/integrate/login/oidc/oauth-recommended-flows",
             "guides/integrate/login/oidc/device-authorization",
             "guides/integrate/login/oidc/webkeys",
             "guides/integrate/token-exchange",
@@ -363,19 +362,11 @@ module.exports = {
           type: "category",
           label: "SDKs",
           items: [
-            {
-              type: "category",
-              label: "Go",
-              items: [
-                "sdk-examples/go",
-                "sdk-examples/client-libraries/node",
-              ],
-            },
+            "sdk-examples/go",
             {
               type: "category",
               label: "JavaScript/TypeScript",
               items: [
-                "sdk-examples/react",
                 "sdk-examples/nextjs",
                 "sdk-examples/expressjs",
                 "sdk-examples/client-libraries/node",
@@ -385,8 +376,6 @@ module.exports = {
               type: "category",
               label: "Python",
               items: [
-                "sdk-examples/python-flask",
-                "sdk-examples/python-django",
                 "sdk-examples/client-libraries/python",
               ],
             },
@@ -394,7 +383,6 @@ module.exports = {
               type: "category",
               label: "Others",
               items: [
-                "sdk-examples/java",
                 "sdk-examples/client-libraries/java",
                 "sdk-examples/client-libraries/php",
                 "sdk-examples/client-libraries/ruby",
@@ -573,15 +561,6 @@ module.exports = {
             // TODO: File missing - Backup & Restore specific doc
           ],
         },
-        {
-          type: "category",
-          label: "Monitoring & Maintenance",
-          items: [
-            "apis/observability/metrics",
-            "apis/observability/health",
-            "self-hosting/manage/service_ping",
-          ],
-        },
       ],
     },
     {
@@ -599,13 +578,7 @@ module.exports = {
             // TODO: File missing - Data Flow Diagrams specific doc
           ],
         },
-        {
-          type: "category",
-          label: "Principles",
-          items: [
-            "concepts/principles",
-          ],
-        },
+        "concepts/principles",
         {
           type: "category",
           label: "Advanced Topics",
@@ -988,6 +961,15 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Observability",
+      collapsed: true,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
       ],
     },
     {
