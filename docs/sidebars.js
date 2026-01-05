@@ -58,11 +58,11 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Quickstart Apps",
+          label: "Example Applications",
           items: [
             {
               type: "category",
-              label: "Single Page Applications",
+              label: "Frontend (SPA)",
               items: [
                 {
                   type: "link",
@@ -72,13 +72,26 @@ module.exports = {
                 "examples/login/react",
                 "examples/login/angular",
                 "examples/login/vue",
-                "examples/login/nextjs",
+              ],
+            },
+            {
+              type: "category",
+              label: "Mobile & Native",
+              items: [
                 "examples/login/flutter",
               ],
             },
             {
               type: "category",
-              label: "Regular Web Applications",
+              label: "Full-Stack / SSR",
+              items: [
+                "examples/login/nextjs",
+                "examples/login/nextjs-b2b",
+              ],
+            },
+            {
+              type: "category",
+              label: "Web App (Server-Side)",
               items: [
                 "examples/login/symfony",
                 "examples/login/java-spring",
@@ -95,13 +108,6 @@ module.exports = {
                 "examples/secure-api/python-flask",
                 "examples/secure-api/nodejs-nestjs",
                 "examples/secure-api/pylon",
-              ],
-            },
-            {
-              type: "category",
-              label: "Hybrid / Full-Stack",
-              items: [
-                "examples/login/nextjs-b2b",
               ],
             },
           ],
@@ -274,87 +280,127 @@ module.exports = {
             "sdk-examples/introduction",
             {
               type: "category",
-              label: "Single Page Applications",
+              label: "Frontend (SPA)",
               items: [
                 "sdk-examples/react",
                 "sdk-examples/angular",
                 "sdk-examples/vue",
+              ],
+            },
+            {
+              type: "category",
+              label: "Mobile & Native",
+              items: [
+                {
+                  type: "link",
+                  label: "Dart / Flutter",
+                  href: "https://github.com/smartive/zitadel-dart",
+                },
+                {
+                  type: "link",
+                  label: ".NET (MAUI/Xamarin)",
+                  href: "https://github.com/smartive/zitadel-net",
+                },
+              ],
+            },
+            {
+              type: "category",
+              label: "Full-Stack / SSR",
+              items: [
                 "sdk-examples/nextjs",
                 "sdk-examples/nuxtjs",
                 "sdk-examples/sveltekit",
                 "sdk-examples/qwik",
                 "sdk-examples/solidstart",
                 "sdk-examples/astro",
-              ],
-            },
-            {
-              type: "category",
-              label: "Regular Web Applications",
-              items: [
-                "sdk-examples/expressjs",
-                "sdk-examples/fastify",
-                "sdk-examples/hono",
-                "sdk-examples/nestjs",
-                "sdk-examples/symfony",
-              ],
-            },
-            {
-              type: "category",
-              label: "APIs / Backend Services",
-              items: [
-                "sdk-examples/go",
-                "sdk-examples/java",
-                "sdk-examples/client-libraries/java",
-                "sdk-examples/python-flask",
-                "sdk-examples/python-django",
-                "sdk-examples/client-libraries/node",
-                "sdk-examples/client-libraries/python",
-                "sdk-examples/client-libraries/php",
-                "sdk-examples/client-libraries/ruby",
-                {
-                  type: "link",
-                  label: "Dart",
-                  href: "https://github.com/smartive/zitadel-dart",
-                },
-                {
-                  type: "link",
-                  label: "Elixir",
-                  href: "https://github.com/maennchen/zitadel_api",
-                },
-                {
-                  type: "link",
-                  label: "FastAPI",
-                  href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-                },
                 {
                   type: "link",
                   label: "NextAuth",
                   href: "https://next-auth.js.org/providers/zitadel",
                 },
+              ],
+            },
+            {
+              type: "category",
+              label: "Backend & API",
+              items: [
                 {
-                  type: "link",
+                  type: "category",
                   label: "Node.js",
-                  href: "https://www.npmjs.com/package/@zitadel/node",
+                  items: [
+                    "sdk-examples/client-libraries/node", // Generic Node SDK
+                    "sdk-examples/expressjs",
+                    "sdk-examples/fastify",
+                    "sdk-examples/hono",
+                    "sdk-examples/nestjs",
+                    {
+                      type: "link",
+                      label: "Passport.js",
+                      href: "https://github.com/buehler/node-passport-zitadel",
+                    },
+                    {
+                      type: "link",
+                      label: "Node.js (Community)",
+                      href: "https://www.npmjs.com/package/@zitadel/node",
+                    },
+                  ],
                 },
                 {
-                  type: "link",
-                  label: ".Net",
-                  href: "https://github.com/smartive/zitadel-net",
+                  type: "category",
+                  label: "Python",
+                  items: [
+                    "sdk-examples/client-libraries/python",
+                    "sdk-examples/python-flask",
+                    "sdk-examples/python-django",
+                    {
+                      type: "link",
+                      label: "FastAPI",
+                      href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
+                    },
+                  ],
                 },
                 {
-                  type: "link",
-                  label: "Passport.js",
-                  href: "https://github.com/buehler/node-passport-zitadel",
+                  type: "category",
+                  label: "Go",
+                  items: ["sdk-examples/go"],
                 },
                 {
-                  type: "link",
-                  label: "Rust",
-                  href: "https://github.com/smartive/zitadel-rust",
+                  type: "category",
+                  label: "Java",
+                  items: [
+                    "sdk-examples/java",
+                    "sdk-examples/client-libraries/java",
+                  ],
                 },
                 {
-                  type: "link",
-                  label: "Pylon",
-                  href: "https://github.com/getcronit/pylon",
+                  type: "category",
+                  label: "PHP",
+                  items: [
+                    "sdk-examples/symfony",
+                    "sdk-examples/client-libraries/php",
+                  ],
+                },
+                {
+                  type: "category",
+                  label: "Other Languages",
+                  items: [
+                    "sdk-examples/client-libraries/ruby",
+                    {
+                      type: "link",
+                      label: "Elixir",
+                      href: "https://github.com/maennchen/zitadel_api",
+                    },
+                    {
+                      type: "link",
+                      label: "Rust",
+                      href: "https://github.com/smartive/zitadel-rust",
+                    },
+                    {
+                      type: "link",
+                      label: "Pylon",
+                      href: "https://github.com/getcronit/pylon",
+                    },
+                  ],
                 },
               ],
             },
@@ -400,12 +446,52 @@ module.exports = {
                 "guides/integrate/services/auth0-saml",
                 "guides/integrate/services/auth0-oidc",
                 "guides/integrate/services/gitlab-self-hosted",
+                {
+                  type: "link",
+                  label: "Bold BI",
+                  href: "https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi",
+                },
+                {
+                  type: "link",
+                  label: "Cloudflare Workers",
+                  href: "https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers",
+                },
+                {
+                  type: "link",
+                  label: "Firezone",
+                  href: "https://www.firezone.dev/docs/authenticate/oidc/zitadel",
+                },
+                {
+                  type: "link",
+                  label: "Netbird",
+                  href: "https://docs.netbird.io/selfhosted/identity-providers",
+                },
+                {
+                  type: "link",
+                  label: "Nextcloud",
+                  href: "https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting",
+                },
+                {
+                  type: "link",
+                  label: "Psono",
+                  href: "https://doc.psono.com/admin/configuration/oidc-zitadel.html",
+                },
+                {
+                  type: "link",
+                  label: "Zoho Desk",
+                  href: "https://help.zoho.com/portal/en/kb/desk/user-management-and-security/data-security/articles/setting-up-saml-single-signon-for-help-center#Zitadel_IDP",
+                },
               ],
             },
             {
               type: "category",
               label: "Tools",
               items: [
+                {
+                  type: "link",
+                  label: "Argo CD",
+                  href: "https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/",
+                },
                 "guides/integrate/tools/apache2",
                 "guides/integrate/authenticated-mongodb-charts",
                 "examples/identity-proxy/oauth2-proxy",
@@ -515,6 +601,7 @@ module.exports = {
                 },
               ],
             },
+
           ],
         },
         {
