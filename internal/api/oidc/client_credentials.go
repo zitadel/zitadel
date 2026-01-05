@@ -34,18 +34,20 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 
 	s.command.MachineSecretCheckSucceeded(ctx, user.ID, user.ResourceOwner, updated)
 	return &clientCredentialsClient{
-		clientID:      user.Username,
-		userID:        user.ID,
-		resourceOwner: user.ResourceOwner,
-		tokenType:     user.Machine.AccessTokenType,
+		clientID:        user.Username,
+		userID:          user.ID,
+		resourceOwner:   user.ResourceOwner,
+		tokenType:       user.Machine.AccessTokenType,
+		idTokenLifeTime: s.defaultIdTokenLifetime,
 	}, nil
 }
 
 type clientCredentialsClient struct {
-	clientID      string
-	userID        string
-	resourceOwner string
-	tokenType     domain.OIDCTokenType
+	clientID        string
+	userID          string
+	resourceOwner   string
+	tokenType       domain.OIDCTokenType
+	idTokenLifeTime time.Duration
 }
 
 // AccessTokenType returns the AccessTokenType for the token to be created because of the client credentials request
@@ -97,9 +99,8 @@ func (c *clientCredentialsClient) LoginURL(_ string) string {
 	return ""
 }
 
-// IDTokenLifetime returns 0 as there is no id_token issued
 func (c *clientCredentialsClient) IDTokenLifetime() time.Duration {
-	return 0
+	return c.idTokenLifeTime
 }
 
 // DevMode returns false as there is no dev mode

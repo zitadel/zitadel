@@ -33,7 +33,7 @@ func (s *Server) CreateOrganization(ctx context.Context, request *connect.Reques
 
 func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return orgv2.UpdateOrganization(ctx, request)
+		return orgv2.UpdateOrganizationBeta(ctx, request)
 	}
 
 	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName())
@@ -70,7 +70,7 @@ func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request
 
 func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return orgv2.DeleteOrganization(ctx, request)
+		return orgv2.DeleteOrganizationBeta(ctx, request)
 	}
 
 	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
@@ -125,7 +125,7 @@ func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connec
 
 func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return orgv2.DeactivateOrganization(ctx, request)
+		return orgv2.DeactivateOrganizationBeta(ctx, request)
 	}
 
 	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId())
@@ -139,7 +139,7 @@ func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Re
 
 func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
 	if authz.GetFeatures(ctx).EnableRelationalTables {
-		return orgv2.ActivateOrganization(ctx, request)
+		return orgv2.ActivateOrganizationBeta(ctx, request)
 	}
 
 	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId())

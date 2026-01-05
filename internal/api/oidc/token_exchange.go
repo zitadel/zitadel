@@ -10,6 +10,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -317,7 +318,7 @@ func (s *Server) createExchangeJWT(
 	client *Client,
 	getUserInfo userInfoFunc,
 	roleAssertion bool,
-	getSigner SignerFunc,
+	getSigner sign.SignerFunc,
 	userID,
 	resourceOwner string,
 	audience,

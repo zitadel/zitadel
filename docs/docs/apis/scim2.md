@@ -300,7 +300,7 @@ curl -X POST "https://${DOMAIN}/scim/v2/${ORG_ID}/Users" \
 
 </details>
 <details>
-<summary>`GET /Users/{id}`: Retrive a known user</summary>
+<summary>`GET /Users/{id}`: Retrieve a known user</summary>
 
 ```bash
 curl -G "https://${DOMAIN}/scim/v2/${ORG_ID}/Users/${USER_ID}" \

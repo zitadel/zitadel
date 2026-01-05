@@ -339,7 +339,7 @@ module.exports = {
           },
           action_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/action/v2beta/action_service.swagger.json",
+              ".artifacts/openapi/zitadel/action/v2/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -470,6 +470,7 @@ module.exports = {
   ],
   markdown: {
     mermaid: true,
+    emoji: false
   },
   themes: [
     "docusaurus-theme-github-codeblock",
