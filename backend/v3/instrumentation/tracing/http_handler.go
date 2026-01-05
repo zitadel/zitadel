@@ -2,7 +2,6 @@ package tracing
 
 import (
 	"net/http"
-	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
@@ -20,5 +19,5 @@ func NewHandler(handler http.Handler, ignoredPrefix ...string) http.Handler {
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {
-	return strings.Split(r.RequestURI, "?")[0]
+	return r.URL.Path
 }
