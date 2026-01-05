@@ -26,7 +26,7 @@ module.exports = {
     {
       type: "category",
       label: "Get Started",
-      collapsed: false,
+      collapsed: true,
       items: [
         "guides/overview",
         "guides/start/quickstart",
@@ -559,7 +559,7 @@ module.exports = {
             {
               type: "category",
               label: "Manage",
-              collapsed: false,
+              collapsed: true,
               items: [
                 "self-hosting/manage/production",
                 "self-hosting/manage/productionchecklist",
@@ -567,7 +567,7 @@ module.exports = {
                 "self-hosting/manage/configure/configure",
                 {
                   type: "category",
-                  collapsed: false,
+                  collapsed: true,
                   label: "Reverse Proxy",
                   link: {
                     type: "doc",
@@ -594,7 +594,7 @@ module.exports = {
                 {
                   type: "category",
                   label: "Metrics",
-                  collapsed: false,
+                  collapsed: true,
                   link: {
                     type: "doc",
                     id: "self-hosting/manage/metrics/overview",
@@ -604,7 +604,7 @@ module.exports = {
                 {
                   type: "category",
                   label: "Command Line Interface",
-                  collapsed: false,
+                  collapsed: true,
                   link: {
                     type: "doc",
                     id: "self-hosting/manage/cli/overview",
@@ -782,7 +782,7 @@ module.exports = {
     {
       type: "category",
       label: "Core Resources",
-      collapsed: false,
+      collapsed: true,
       link: {
         type: "doc",
         id: "apis/apis/index",
@@ -791,7 +791,7 @@ module.exports = {
         {
           type: "category",
           label: "V2",
-          collapsed: false,
+          collapsed: true,
           link: {
             type: "doc",
             id: "apis/v2",
@@ -1010,7 +1010,7 @@ module.exports = {
         {
           type: "category",
           label: "V1",
-          collapsed: false,
+          collapsed: true,
           link: {
             type: "generated-index",
             title: "APIs V1 (GA)",
@@ -1098,7 +1098,7 @@ module.exports = {
     {
       type: "category",
       label: "Actions",
-      collapsed: false,
+      collapsed: true,
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
@@ -1123,7 +1123,7 @@ module.exports = {
     {
       type: "category",
       label: "Benchmarks",
-      collapsed: false,
+      collapsed: true,
       link: {
         type: "doc",
         id: "apis/benchmarks/index",
@@ -1198,7 +1198,7 @@ module.exports = {
     {
       type: "category",
       label: "Legal Agreements",
-      collapsed: false,
+      collapsed: true,
       link: {
         type: "generated-index",
         title: "Legal Agreements",
@@ -1214,7 +1214,7 @@ module.exports = {
         {
           type: "category",
           label: "Service Description",
-          collapsed: false,
+          collapsed: true,
           link: {
             type: "generated-index",
             title: "Service description",
@@ -1237,7 +1237,7 @@ module.exports = {
         {
           type: "category",
           label: "Policies",
-          collapsed: false,
+          collapsed: true,
           link: {
             type: "generated-index",
             title: "Policies",
