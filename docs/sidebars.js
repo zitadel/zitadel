@@ -200,18 +200,18 @@ module.exports = {
             },
           ],
         },
-      ],
-    },
-    {
-      type: "category",
-      label: "Migrate",
-      collapsed: true,
-      items: [
-        "guides/migrate/introduction",
-        "guides/migrate/users",
-        "guides/migrate/sources/zitadel",
-        "guides/migrate/sources/auth0",
-        "guides/migrate/sources/keycloak",
+        {
+          type: "category",
+          label: "Migrate",
+          collapsed: true,
+          items: [
+            "guides/migrate/introduction",
+            "guides/migrate/users",
+            "guides/migrate/sources/zitadel",
+            "guides/migrate/sources/auth0",
+            "guides/migrate/sources/keycloak",
+          ],
+        },
       ],
     },
     {
