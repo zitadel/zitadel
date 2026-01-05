@@ -31,37 +31,41 @@ type Metrics interface {
 	RegisterHistogram(name, description, unit string, buckets []float64) error
 }
 
-var M = sync.OnceValue(func() Metrics {
+var globalMeter = sync.OnceValue(func() Metrics {
 	return instrumentation.NewMeter(
 		instrumentation.Name,
 		metric.WithInstrumentationVersion(build.Version()),
 	)
 })
 
+func GlobalMeter() Metrics {
+	return globalMeter()
+}
+
 func GetExporter() http.Handler {
-	return M().GetExporter()
+	return globalMeter().GetExporter()
 }
 
 func RegisterCounter(name, description string) error {
-	return M().RegisterCounter(name, description)
+	return globalMeter().RegisterCounter(name, description)
 }
 
 func AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
-	return M().AddCount(ctx, name, value, labels)
+	return globalMeter().AddCount(ctx, name, value, labels)
 }
 
 func AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error {
-	return M().AddHistogramMeasurement(ctx, name, value, labels)
+	return globalMeter().AddHistogramMeasurement(ctx, name, value, labels)
 }
 
 func RegisterHistogram(name, description, unit string, buckets []float64) error {
-	return M().RegisterHistogram(name, description, unit, buckets)
+	return globalMeter().RegisterHistogram(name, description, unit, buckets)
 }
 
 func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error {
-	return M().RegisterUpDownSumObserver(name, description, callbackFunc)
+	return globalMeter().RegisterUpDownSumObserver(name, description, callbackFunc)
 }
 
 func RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error {
-	return M().RegisterValueObserver(name, description, callbackFunc)
+	return globalMeter().RegisterValueObserver(name, description, callbackFunc)
 }

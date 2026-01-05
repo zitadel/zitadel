@@ -23,7 +23,11 @@ type ProjectionMetrics struct {
 }
 
 func NewProjectionMetrics() *ProjectionMetrics {
-	projectionMetrics := &ProjectionMetrics{provider: (metrics.M())}
+	return newProjectionMetrics(metrics.GlobalMeter())
+}
+
+func newProjectionMetrics(m metrics.Metrics) *ProjectionMetrics {
+	projectionMetrics := &ProjectionMetrics{provider: m}
 
 	err := projectionMetrics.provider.RegisterCounter(
 		ProjectionEventsProcessed,
