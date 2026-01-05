@@ -152,6 +152,7 @@ Errors:
       NotSet: A felhasználó nem állított be jelszót
       NotChanged: Az új jelszó nem egyezhet meg a jelenlegi jelszóval
       NotSupported: 'A jelszó hash kódolása nem támogatott. További információ itt: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets'
+      NoVerificationTokenOrCurrentPassword: Jelszó nem módosítható ellenőrző token vagy aktuális jelszó nélkül
     PasswordComplexityPolicy:
       NotFound: A jelszó szabályzat nem található
       MinLength: A jelszó túl rövid
