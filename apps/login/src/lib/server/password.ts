@@ -283,7 +283,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   }
 
   // Regular flow (no requestId) - return URL for client-side navigation
-  console.log("Password auth: Regular flow with loginName:", session.factors.user.loginName);
+
   const result = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
@@ -291,7 +291,6 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     },
     loginSettings?.defaultRedirectUri,
   );
-  console.log("Password auth: Regular flow result:", result);
 
   // Safety net - ensure we always return a valid object
   if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {

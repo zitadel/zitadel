@@ -47,7 +47,6 @@ export async function isSessionValid({
 }): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
-    console.warn("Session has no user");
     return false;
   }
 
@@ -87,15 +86,6 @@ export async function isSessionValid({
       const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
       mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
-
-      if (!mfaValid) {
-        console.warn("Session has no valid MFA factor. Configured methods:", mfaMethods, "Session factors:", {
-          totp: session.factors.totp?.verifiedAt,
-          otpEmail: session.factors.otpEmail?.verifiedAt,
-          otpSms: session.factors.otpSms?.verifiedAt,
-          webAuthN: session.factors.webAuthN?.verifiedAt,
-        });
-      }
     } else {
       // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
       // (excluding IDP which should be handled separately)
@@ -106,9 +96,6 @@ export async function isSessionValid({
       // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
 
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
-      if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
-      }
     }
   }
 
@@ -118,7 +105,7 @@ export async function isSessionValid({
 
   if (!stillValid) {
     console.warn(
-      "Session is expired",
+      "[Session] Session is expired",
       session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
     );
     return false;
@@ -131,6 +118,7 @@ export async function isSessionValid({
   }
 
   if (!mfaValid) {
+    console.warn("[Session] MFA is required but not valid");
     return false;
   }
 
@@ -141,7 +129,7 @@ export async function isSessionValid({
     const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser && !humanUser.email?.isVerified) {
-      console.warn("Session invalid: Email not verified and EMAIL_VERIFICATION is enabled", session.factors.user.id);
+      console.warn("[Session] Email is not verified");
       return false;
     }
   }

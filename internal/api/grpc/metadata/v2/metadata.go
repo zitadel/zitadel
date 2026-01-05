@@ -45,3 +45,40 @@ func UserMetadataFilterToQuery(filter *meta_pb.MetadataSearchFilter) (query.Sear
 		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
+
+func OrgMetadataListToPb(dataList []*query.OrgMetadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
+	for i, data := range dataList {
+		mds[i] = OrgMetadataToPb(data)
+	}
+	return mds
+}
+
+func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
+		Key:          data.Key,
+		Value:        data.Value,
+		CreationDate: timestamppb.New(data.CreationDate),
+		ChangeDate:   timestamppb.New(data.ChangeDate),
+	}
+}
+
+func OrgMetadataQueriesToQuery(queries []*meta_pb.MetadataSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = OrgMetadataFilterToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func OrgMetadataFilterToQuery(filter *meta_pb.MetadataSearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *meta_pb.MetadataSearchFilter_KeyFilter:
+		return query.NewOrgMetadataKeySearchQuery(q.KeyFilter.Key, filter_v2.TextMethodPbToQuery(q.KeyFilter.Method))
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
+	}
+}
