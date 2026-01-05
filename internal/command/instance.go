@@ -76,7 +76,7 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		ForceMFALocalOnly          bool
 		HidePasswordReset          bool
-		IgnoreUnknownUsername      bool
+		IgnoreUnknownUsernames     bool
 		AllowDomainDiscovery       bool
 		DisableLoginWithEmail      bool
 		DisableLoginWithPhone      bool
@@ -403,7 +403,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.ForceMFALocalOnly,
 			setup.LoginPolicy.HidePasswordReset,
-			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.IgnoreUnknownUsernames,
 			setup.LoginPolicy.AllowDomainDiscovery,
 			setup.LoginPolicy.DisableLoginWithEmail,
 			setup.LoginPolicy.DisableLoginWithPhone,
