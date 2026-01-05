@@ -261,7 +261,7 @@ func TestListInstancesCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.ElementsMatch(t, tc.expectedInstances, cmd.Result())
 
 		})
@@ -321,7 +321,7 @@ func TestListInstancesCommand_Validate(t *testing.T) {
 			err := l.Validate(context.Background(), cmdOpts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 
 		})
 	}

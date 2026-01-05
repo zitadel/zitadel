@@ -281,7 +281,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			err := opts.Invoke(ctx, cmd)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedOldDomainName, cmd.OldDomainName)
 			assert.Equal(t, tc.expectedDomainVerified, cmd.IsOldDomainVerified)
 		})
@@ -389,7 +389,7 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 			}
 			err := cmd.Validate(ctx, opts)
 
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
