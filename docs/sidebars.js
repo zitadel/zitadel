@@ -53,11 +53,6 @@ module.exports = {
             "guides/integrate/login/login-users",
             "guides/integrate/login/oidc/login-users",
             "guides/integrate/login/hosted-login",
-            {
-              type: "link",
-              label: "OIDC Playground",
-              href: "https://zitadel.com/playgrounds/oidc",
-            },
             "guides/integrate/login-ui/logout",
             "guides/integrate/login/oidc/logout",
           ],
@@ -193,7 +188,6 @@ module.exports = {
             "guides/solution-scenarios/configurations",
             "guides/integrate/onboarding/b2b",
             "guides/integrate/onboarding/end-users",
-            "guides/manage/customize/branding",
             {
               type: "category",
               label: "Machine-to-Machine (M2M)",
@@ -344,9 +338,11 @@ module.exports = {
               type: "category",
               label: "REST APIs",
               items: [
-                "apis/openidoauth/endpoints",
-                "apis/saml/endpoints",
-                "apis/scim2",
+                {
+                  type: "link",
+                  label: "Zitadel APIs",
+                  href: "/docs/apis/introduction",
+                }
               ],
             },
           ],
@@ -429,7 +425,6 @@ module.exports = {
             "guides/integrate/actions/migrate-from-v1",
             "guides/integrate/actions/webhook-site-setup",
             "guides/integrate/scim-okta-guide",
-            "apis/scim2",
             "guides/integrate/token-introspection/index",
             "guides/integrate/token-introspection/basic-auth",
             "guides/integrate/token-introspection/private-key-jwt",
@@ -495,22 +490,12 @@ module.exports = {
           type: "category",
           label: "Common Issues",
           items: [
-            "support/troubleshooting",
             "guides/solution-scenarios/domain-discovery",
             "guides/solution-scenarios/restrict-console",
             // TODO: File missing - Token Errors specific doc
             // TODO: File missing - Integration Failures specific doc
           ],
-        },
-        {
-          type: "category",
-          label: "Debugging Guides",
-          items: [
-            "apis/observability/metrics",
-            "apis/observability/health",
-            "apis/statuscodes",
-          ],
-        },
+        }
       ],
     },
     {
@@ -593,7 +578,7 @@ module.exports = {
           label: "Monitoring & Maintenance",
           items: [
             "apis/observability/metrics",
-            "self-hosting/manage/updating_scaling",
+            "apis/observability/health",
             "self-hosting/manage/service_ping",
           ],
         },
@@ -621,7 +606,6 @@ module.exports = {
             "concepts/principles",
             "guides/solution-scenarios/saas",
             "apis/openidoauth/authrequest",
-            "guides/integrate/login/saml",
           ],
         },
         {
@@ -635,7 +619,6 @@ module.exports = {
             "guides/manage/customize/user-schema",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/notification-providers",
-            "guides/integrate/actions/usage",
             "concepts/features/actions",
             "concepts/features/actions_v2",
             "concepts/features/selfservice",
@@ -675,7 +658,6 @@ module.exports = {
               href: "https://zitadel.com/changelog",
             },
             "product/release-cycle",
-            "self-hosting/manage/updating_scaling",
           ],
         },
         {
@@ -1012,36 +994,6 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Sign In Users ",
-      collapsed: false,
-      items: [
-        {
-          type: "category",
-          label: "OpenID Connect & OAuth",
-          collapsed: true,
-          items: [
-            "apis/openidoauth/endpoints",
-            {
-              label: "OIDC Playground",
-              type: "link",
-              href: "https://zitadel.com/playgrounds/oidc",
-            },
-            "apis/openidoauth/scopes",
-            "apis/openidoauth/claims",
-            "apis/openidoauth/authn-methods",
-            "apis/openidoauth/grant-types",
-          ],
-        },
-        {
-          type: "category",
-          label: "SAML 2.0",
-          collapsed: true,
-          items: ["apis/saml/endpoints"],
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Provision Users",
       collapsed: true,
       items: ["apis/scim2"],
@@ -1065,12 +1017,6 @@ module.exports = {
       type: "doc",
       label: "gRPC Status Codes",
       id: "apis/statuscodes",
-    },
-    {
-      type: "category",
-      label: "Observability",
-      collapsed: false,
-      items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
       type: "link",
