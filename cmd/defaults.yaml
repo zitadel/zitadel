@@ -60,13 +60,13 @@ Instrumentation:
       #   - "stdErr": Exports OTEL logs to standard error
       #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
       #   - "http": Exports OTEL logs using the OTEL HTTP exporter
-      Type: "none" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_TYPE
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
-      Endpoint: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_ENDPOINT
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
-      Insecure: false # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_INSECURE
+      Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
       # Interval at which metrics are exported
-      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_BATCHDURATION
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
   Profile:
     Exporter:
       # The following profiler types are supported:

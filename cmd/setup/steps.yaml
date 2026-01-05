@@ -42,17 +42,17 @@ Instrumentation:
   # Structured logging can print logs on standard error and/or export them using OTEL.
   Log:
     # Log lines lower than this level are not emitted.
-    Level: "INFO" # ZITADEL_INSTRUMENTATION_SLOG_LEVEL
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
     # Enable printing structured logs to standard error in the specified format.
     # The following formats are supported:
     #   - "disabled": Disables logging to standard error
     #   - "text": Logs are printed as human-readable text
     #   - "json": Logs are printed as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging
-    StdErr: "text" # ZITADEL_INSTRUMENTATION_SLOG_STDERR
+    StdErr: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
-    AddSource: true # ZITADEL_INSTRUMENTATION_SLOG_ADDSOURCE
+    AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables log exporting
@@ -60,15 +60,15 @@ Instrumentation:
       #   - "stdErr": Exports logs to standard error
       #   - "grpc": Exports logs using the OTEL gRPC exporter (recommended)
       #   - "http": Exports logs using the OTEL HTTP exporter
-      Type: "none" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_TYPE
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
-      Endpoint: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_ENDPOINT
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable https for grpc and http exporters
-      Insecure: false # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_INSECURE
+      Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
       # Interval at which metrics are exported
-      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_BATCHDURATION
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
       # Project ID for Google Cloud Trace exporter
-      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_SLOG_EXPORTER_GOOGLEPROJECTID
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_GOOGLEPROJECTID
   Profile:
     # The following profiler types are supported:
     # "none": Disables profiling
