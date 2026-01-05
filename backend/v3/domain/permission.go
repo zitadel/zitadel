@@ -9,6 +9,7 @@ const (
 	DomainWritePermission       = "domain.write"
 	OrganizationReadPermission  = "organization.read"
 	OrganizationWritePermission = "organization.write"
+	SessionReadPermission       = "session.read"
 )
 
 // PermissionRepository is the interface that manages and checks Zitadel permissions.
