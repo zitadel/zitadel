@@ -54,8 +54,8 @@ module.exports = {
             "guides/manage/console/projects",
             "concepts/structure/applications",
             "guides/manage/console/applications",
-            "guides/manage/console/users",
             "concepts/structure/users",
+            "guides/manage/console/users",
             "concepts/structure/managers",
           ],
         },
@@ -279,7 +279,6 @@ module.exports = {
           label: "Policies",
           items: [
             "guides/manage/console/default-settings",
-            "guides/manage/customize/behavior",
             "concepts/structure/policies",
             // TODO: File missing - Password Policies specific doc
             // TODO: File missing - Lockout Policies specific doc
@@ -426,6 +425,7 @@ module.exports = {
             "guides/integrate/login/saml",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
+            "guides/manage/customize/behavior",
             "guides/integrate/actions/usage",
             "guides/integrate/actions/testing-request",
             "guides/integrate/actions/testing-request-manipulation",
@@ -604,8 +604,6 @@ module.exports = {
           label: "Principles",
           items: [
             "concepts/principles",
-            "guides/solution-scenarios/saas",
-            "apis/openidoauth/authrequest",
           ],
         },
         {
