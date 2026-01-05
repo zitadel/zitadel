@@ -133,14 +133,3 @@ func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
 	AddCount(r.Context(), ReturnCodeCounter, 1, labels)
 }
-
-func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
-	return func(r *http.Request) bool {
-		for _, endpoint := range endpoints {
-			if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
-				return false
-			}
-		}
-		return true
-	}
-}
