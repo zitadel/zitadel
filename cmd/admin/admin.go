@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
@@ -31,6 +30,6 @@ func New() *cobra.Command {
 		start.NewStartFromInit(nil),
 		key.New(),
 	)
-	adminCMD.SetErr(new_logging.CommandErrorWriter("admin"))
+
 	return adminCMD
 }

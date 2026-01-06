@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 )
 
@@ -71,8 +70,6 @@ Order of execution:
 			return nil
 		},
 	}
-
-	cmd.SetErr(new_logging.CommandErrorWriter("mirror"))
 
 	mirrorFlags(cmd)
 	cmd.Flags().BoolVar(&shouldIgnorePrevious, "ignore-previous", false, "ignores previous migrations of the events table")

@@ -27,7 +27,6 @@ import (
 	"golang.org/x/text/language"
 
 	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
-	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -148,7 +147,7 @@ Requirements:
 			return startZitadel(cmd.Context(), config, masterKey, server)
 		},
 	}
-	start.SetErr(new_logging.CommandErrorWriter("start"))
+
 	startFlags(start)
 
 	return start

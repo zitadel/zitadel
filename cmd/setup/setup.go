@@ -18,7 +18,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -97,7 +96,7 @@ Requirements:
 			return nil
 		},
 	}
-	cmd.SetErr(new_logging.CommandErrorWriter("setup"))
+
 	cmd.AddCommand(NewCleanup())
 
 	Flags(cmd)

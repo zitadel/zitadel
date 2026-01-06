@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/viper"
 	"sigs.k8s.io/yaml"
 
-	new_logging "github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
@@ -77,7 +76,6 @@ new -f keys.yaml key2=anotherkey`,
 			return storage.CreateKeys(cmd.Context(), keys...)
 		},
 	}
-	cmd.SetErr(new_logging.CommandErrorWriter("key"))
 	cmd.PersistentFlags().StringP(flagKeyFile, "f", "", "path to keys file")
 	return cmd
 }
