@@ -186,107 +186,107 @@ func (i *idpIntent) UserIDCondition(userID string) database.Condition {
 
 // AssertionColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) AssertionColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "assertion")
 }
 
 // CreatedAtColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) CreatedAtColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
 // ExpiresAtColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) ExpiresAtColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "expires_at")
 }
 
 // FailureURLColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) FailureURLColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "failure_url")
 }
 
 // IDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "id")
 }
 
 // IDPAccessTokenColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPAccessTokenColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_access_token")
 }
 
 // IDPArgumentsColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPArgumentsColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_arguments")
 }
 
 // IDPEntryAttributesColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPEntryAttributesColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_entry_attributes")
 }
 
 // IDPIDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPIDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_id")
 }
 
 // IDPUserColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPUserColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_user")
 }
 
 // IDPUserIDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPUserIDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_user_id")
 }
 
 // IDPUsernameColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) IDPUsernameColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "idp_username")
 }
 
 // InstanceIDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) InstanceIDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
 // MaxIDPIntentLifetimeColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) MaxIDPIntentLifetimeColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "max_idp_intent_lifetime")
 }
 
 // PrimaryKeyColumns implements [domain.IDPIntentRepository].
 func (i *idpIntent) PrimaryKeyColumns() []database.Column {
-	panic("unimplemented")
+	return []database.Column{i.IDColumn(), i.InstanceIDColumn()}
 }
 
 // RequestIDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) RequestIDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "request_id")
 }
 
 // StateColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) StateColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "state")
 }
 
 // SucceededAtColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) SucceededAtColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "succeeded_at")
 }
 
 // SuccessURLColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) SuccessURLColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "success_url")
 }
 
 // UpdatedAtColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) UpdatedAtColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 
 // UserIDColumn implements [domain.IDPIntentRepository].
 func (i *idpIntent) UserIDColumn() database.Column {
-	panic("unimplemented")
+	return database.NewColumn(i.unqualifiedTableName(), "user_id")
 }
 
 var _ domain.IDPIntentRepository = (*idpIntent)(nil)
