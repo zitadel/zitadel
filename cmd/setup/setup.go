@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -62,6 +63,12 @@ func New() *cobra.Command {
 Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel setup command failed", "err", err)
+				}
+			}()
+
 			err = tls.ModeFromFlag(cmd)
 			if err != nil {
 				return fmt.Errorf("invalid tlsMode: %w", err)

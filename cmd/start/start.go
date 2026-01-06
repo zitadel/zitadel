@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
+	"log/slog"
 	"math"
 	"net/http"
 	"os"
@@ -128,6 +129,12 @@ func New(server chan<- *Server) *cobra.Command {
 Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel start command failed", "err", err)
+				}
+			}()
+
 			err = cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err

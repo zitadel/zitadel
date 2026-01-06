@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -47,6 +48,12 @@ Order of execution:
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel mirror command failed", "err", err)
+				}
+			}()
+
 			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return fmt.Errorf("unable to create migration config: %w", err)

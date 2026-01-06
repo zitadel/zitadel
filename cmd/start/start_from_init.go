@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,6 +27,12 @@ Last ZITADEL starts.
 Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel start-from-init command failed", "err", err)
+				}
+			}()
+
 			err = tls.ModeFromFlag(cmd)
 			if err != nil {
 				return fmt.Errorf("invalid tlsMode: %w", err)
