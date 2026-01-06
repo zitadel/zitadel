@@ -58,67 +58,68 @@ func (i *idpIntent) LoadIdentityProvider() domain.IDPIntentRepository {
 
 // SetAssertion implements [domain.idpIntentChanges].
 func (i *idpIntent) SetAssertion(assertion string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.AssertionColumn(), assertion)
 }
 
 // SetFailureURL implements [domain.idpIntentChanges].
 func (i *idpIntent) SetFailureURL(failureURL url.URL) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.FailureURLColumn(), failureURL.String())
 }
 
 // SetIDPAccessToken implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPAccessToken(idpAccessToken string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.IDPAccessTokenColumn(), idpAccessToken)
 }
 
 // SetIDPArguments implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPArguments(idpArguments map[string]any) database.Change {
-	panic("unimplemented")
+func (i *idpIntent) SetIDPArguments(idpArguments string) database.Change {
+
+	return database.NewChange(i.IDPArgumentsColumn(), idpArguments)
 }
 
 // SetIDPEntryAttributes implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPEntryAttributes(idpEntryAttributes map[string][]string) database.Change {
-	panic("unimplemented")
+func (i *idpIntent) SetIDPEntryAttributes(idpEntryAttributes string) database.Change {
+	return database.NewChange(i.IDPEntryAttributesColumn(), idpEntryAttributes)
 }
 
 // SetIDPID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPID(idpID string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.IDPIDColumn(), idpID)
 }
 
 // SetIDPUser implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUser(idpUser []byte) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.IDPUserColumn(), idpUser)
 }
 
 // SetIDPUserID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUserID(idpUserID string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.IDPUserIDColumn(), idpUserID)
 }
 
 // SetIDPUsername implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUsername(idpUsername string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.IDPUsernameColumn(), idpUsername)
 }
 
 // SetRequestID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetRequestID(requestID string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.RequestIDColumn(), requestID)
 }
 
 // SetState implements [domain.idpIntentChanges].
 func (i *idpIntent) SetState(state domain.IDPIntentState) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.StateColumn(), state)
 }
 
 // SetSuccessURL implements [domain.idpIntentChanges].
 func (i *idpIntent) SetSuccessURL(successURL url.URL) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.SuccessURLColumn(), successURL.String())
 }
 
 // SetUserID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetUserID(userID string) database.Change {
-	panic("unimplemented")
+	return database.NewChange(i.UserIDColumn(), userID)
 }
 
 // -------------------------------------------------------------
