@@ -412,23 +412,6 @@ module.exports = {
           type: "category",
           label: "External Integrations",
           items: [
-            {
-              type: "category",
-              label: "Actions V2",
-              items: [
-                "guides/integrate/actions/usage",
-                "guides/integrate/actions/testing-request",
-                "guides/integrate/actions/testing-request-manipulation",
-                "guides/integrate/actions/testing-response",
-                "guides/integrate/actions/testing-response-manipulation",
-                "guides/integrate/actions/testing-function",
-                "guides/integrate/actions/testing-function-manipulation",
-                "guides/integrate/actions/testing-event",
-                "guides/integrate/actions/testing-request-signature",
-                "guides/integrate/actions/migrate-from-v1",
-                "guides/integrate/actions/webhook-site-setup",
-              ],
-            },
             "guides/integrate/scim-okta-guide",
             "guides/integrate/token-introspection/index",
             "guides/integrate/token-introspection/basic-auth",
@@ -519,6 +502,52 @@ module.exports = {
             "guides/integrate/login-ui/device-auth",
           ],
         },
+        {
+          type: "category",
+          label: "Actions",
+          items: [
+            {
+              type: "category",
+              label: "V1",
+              link: {
+                type: "doc",
+                id: "concepts/features/actions",
+              },
+              items: [
+                "apis/actions/introduction",
+                "apis/actions/modules",
+                "apis/actions/code-examples",
+                "apis/actions/internal-authentication",
+                "apis/actions/external-authentication",
+                "apis/actions/complement-token",
+                "apis/actions/customize-samlresponse",
+                "apis/actions/objects",
+                "guides/manage/customize/behavior",
+              ]
+            },
+            {
+              type: "category",
+              label: "V2",
+              link: {
+                type: "doc",
+                id: "concepts/features/actions_v2",
+              },
+              items: [
+                "guides/integrate/actions/usage",
+                "guides/integrate/actions/testing-request",
+                "guides/integrate/actions/testing-request-manipulation",
+                "guides/integrate/actions/testing-response",
+                "guides/integrate/actions/testing-response-manipulation",
+                "guides/integrate/actions/testing-function",
+                "guides/integrate/actions/testing-function-manipulation",
+                "guides/integrate/actions/testing-event",
+                "guides/integrate/actions/testing-request-signature",
+                "guides/integrate/actions/migrate-from-v1",
+                "guides/integrate/actions/webhook-site-setup",
+              ],
+            },
+          ],
+        },
       ],
     },
     {
@@ -537,8 +566,6 @@ module.exports = {
           items: [
             "guides/solution-scenarios/domain-discovery",
             "guides/solution-scenarios/restrict-console",
-            // TODO: File missing - Token Errors specific doc
-            // TODO: File missing - Integration Failures specific doc
           ],
         }
       ],
@@ -700,12 +727,9 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/restrictions",
-            "guides/manage/customize/behavior",
             "guides/manage/customize/user-schema",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/notification-providers",
-            "concepts/features/actions",
-            "concepts/features/actions_v2",
             "concepts/features/selfservice",
             "concepts/features/custom-domain",
             "concepts/features/account-linking",
@@ -1091,21 +1115,6 @@ module.exports = {
       label: "Provision Users",
       collapsed: true,
       items: ["apis/scim2"],
-    },
-    {
-      type: "category",
-      label: "Actions",
-      collapsed: true,
-      items: [
-        "apis/actions/introduction",
-        "apis/actions/modules",
-        "apis/actions/code-examples",
-        "apis/actions/internal-authentication",
-        "apis/actions/external-authentication",
-        "apis/actions/complement-token",
-        "apis/actions/customize-samlresponse",
-        "apis/actions/objects",
-      ],
     },
     {
       type: "doc",
