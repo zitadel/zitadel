@@ -317,6 +317,24 @@ describe("sendPassword", () => {
     expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
   });
 
+  test("should return generic error when session creation fails with unknown error and ignoreUnknownUsernames is true", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockListUsers.mockResolvedValue({
+      details: { totalResult: BigInt(1) },
+      result: [{ userId: "user123" }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    // Simulate an error that is NOT a failed attempt error (e.g. database error)
+    mockCreateSessionAndUpdateCookie.mockRejectedValue(new Error("Some internal error"));
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "correct" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+  });
+
   test("should return specific error with lockout info when password verification fails and ignoreUnknownUsernames is false", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
     mockListUsers.mockResolvedValue({

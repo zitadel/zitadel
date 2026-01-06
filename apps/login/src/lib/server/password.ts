@@ -168,6 +168,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
             }),
           };
         }
+        if (loginSettings?.ignoreUnknownUsernames) {
+          return { error: t("errors.failedToAuthenticateNoLimit") };
+        }
         return { error: t("errors.couldNotCreateSessionForUser") };
       }
     } else {
@@ -180,6 +183,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   }
 
   if (!session?.factors?.user?.id) {
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("errors.failedToAuthenticateNoLimit") };
+    }
     return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
@@ -199,6 +205,9 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("errors.failedToAuthenticateNoLimit") };
+    }
     return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
