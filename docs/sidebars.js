@@ -35,14 +35,18 @@ module.exports = {
           label: "Key Concepts",
           items: [
             "concepts/structure/instance",
-            "concepts/structure/organizations",
-            "guides/manage/console/organizations",
-            "concepts/structure/projects",
-            "guides/manage/console/projects",
-            "concepts/structure/applications",
-            "guides/manage/console/applications",
-            "concepts/structure/users",
-            "guides/manage/console/users",
+            //"concepts/structure/organizations",
+            //"guides/manage/console/organizations",
+            "guides/manage/console/organizations-overview",
+            //"concepts/structure/projects",
+            //"guides/manage/console/projects",
+            "guides/manage/console/projects-overview",
+            //"concepts/structure/applications",
+            //"guides/manage/console/applications",
+            "guides/manage/console/applications-overview",
+            //"concepts/structure/users",
+            //"guides/manage/console/users",
+            "guides/manage/console/users-overview",
             "concepts/structure/managers",
           ],
         },
@@ -285,8 +289,8 @@ module.exports = {
           type: "category",
           label: "SAML",
           items: [
-            "apis/saml/endpoints",
             "guides/integrate/login/saml",
+            "apis/saml/endpoints",
           ],
         },
         {
@@ -360,7 +364,7 @@ module.exports = {
                   type: "category",
                   label: "Node.js",
                   items: [
-                    "sdk-examples/client-libraries/node", // Generic Node SDK
+                    "sdk-examples/client-libraries/node",
                     "sdk-examples/expressjs",
                     "sdk-examples/fastify",
                     "sdk-examples/hono",
@@ -561,8 +565,9 @@ module.exports = {
                 id: "concepts/features/actions",
               },
               items: [
-                "guides/manage/console/actions",
-                "apis/actions/introduction",
+                //"guides/manage/console/actions",
+                //"apis/actions/introduction",
+                "guides/manage/console/actions-overview",
                 "apis/actions/modules",
                 "apis/actions/code-examples",
                 "apis/actions/internal-authentication",
@@ -615,8 +620,9 @@ module.exports = {
       label: "Deploy & Operate",
       collapsed: true,
       items: [
-        "concepts/features/console",
-        "guides/manage/console/overview",
+        //"concepts/features/console",
+        //"guides/manage/console/overview",
+        "guides/manage/console/console-overview",
         {
           type: "category",
           label: "Customer Portal",
@@ -823,10 +829,11 @@ module.exports = {
               label: "Zitadel Release Cycle",
               href: "https://help.zitadel.com/zitadel-software-release-cycle",
             },
-            // TODO: File missing - Community links doc
-            // TODO: File missing - FAQ doc
-            // TODO: File missing - Contact Support doc
-            // TODO: File missing - Contribute doc
+            {
+              type: "link",
+              label: "Knowledge Base",
+              href: "https://help.zitadel.com",
+            }
           ],
         },
         "guides/manage/cloud/support",
