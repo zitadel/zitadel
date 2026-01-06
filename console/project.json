@@ -1,56 +1,132 @@
 {
-    "$schema": "../node_modules/nx/schemas/project-schema.json",
-    "targets": {
-        "lint": {
-            "description": "Runs all linters",
-            "dependsOn": [
-                "lint-check-*"
-            ]
-        },
-        "lint-check-prettier": {
-            "description": "Checks code formatting with Prettier",
-            "cache": true,
-            "inputs": [
-                "default"
-            ]
-        },
-        "lint-check-ng": {
-            "description": "Runs Angular specific lint checks",
-            "cache": true,
-            "inputs": [
-                "default"
-            ]
-        },
-        "generate": {
-            "description": "Generates code from protobuf definitions for API v1 endpoints",
-            "inputs": [
-                "{workspaceRoot}/proto/**/*",
-                "{projectRoot}/buf.gen.yaml",
-                "{projectRoot}/package.json",
-                "{workspaceRoot}/pnpm-lock.yaml"
-            ],
-            "outputs": [
-                "{projectRoot}/src/app/proto/generated"
-            ]
-        },
-        "build": {
-            "description": "Builds the Console for production",
-            "inputs": [
-                "default",
-                "{workspaceRoot}/pnpm-lock.yaml",
-                "{workspaceRoot}/docs/frameworks.json"
-            ],
-            "outputs": [
-                "{projectRoot}/dist"
-            ]
-        },
-        "dev": {
-            "description": "Runs the Console in development mode with hot-reloading",
-            "continuous": true,
-            "dependsOn": [
-                "generate",
-                "^build"
-            ]
+  "name": "@zitadel/console",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "console/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/console",
+        "browser": "console/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "console/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "console/src/favicon.ico",
+          "console/src/assets",
+          "console/src/manifest.webmanifest",
+          {
+            "glob": "**/*",
+            "input": "docs/static/img/tech",
+            "output": "assets/docs/img/tech"
+          }
+        ],
+        "styles": ["console/src/styles.scss", "console/src/tailwind.css"],
+        "scripts": ["node_modules/tinycolor2/dist/tinycolor-min.js"],
+        "stylePreprocessorOptions": {
+          "sass": {
+            "silenceDeprecations": ["import", "mixed-decls"]
+          }
         }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "8mb",
+              "maximumError": "10mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "10kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": {
+        "prebundle": {
+          "exclude": [
+            "google-protobuf",
+            "google-protobuf/google/protobuf/timestamp_pb.js",
+            "google-protobuf/google/protobuf/descriptor_pb.js",
+            "google-protobuf/google/protobuf/struct_pb.js",
+            "google-protobuf/google/protobuf/duration_pb.js",
+            "i18n-iso-countries/langs/de.json",
+            "i18n-iso-countries/langs/en.json",
+            "i18n-iso-countries/langs/es.json",
+            "i18n-iso-countries/langs/fr.json",
+            "i18n-iso-countries/langs/id.json",
+            "i18n-iso-countries/langs/it.json",
+            "i18n-iso-countries/langs/ja.json",
+            "i18n-iso-countries/langs/pl.json",
+            "i18n-iso-countries/langs/zh.json",
+            "i18n-iso-countries/langs/bg.json",
+            "i18n-iso-countries/langs/pt.json",
+            "i18n-iso-countries/langs/mk.json",
+            "i18n-iso-countries/langs/ru.json",
+            "i18n-iso-countries/langs/cs.json",
+            "i18n-iso-countries/langs/nl.json",
+            "i18n-iso-countries/langs/sv.json",
+            "i18n-iso-countries/langs/hu.json",
+            "i18n-iso-countries/langs/ko.json",
+            "i18n-iso-countries/langs/ro.json",
+            "i18n-iso-countries/langs/tr.json",
+            "i18n-iso-countries/langs/uk.json"
+          ]
+        }
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "@zitadel/console:build:production"
+        },
+        "development": {
+          "buildTarget": "@zitadel/console:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular/build:extract-i18n",
+      "options": {
+        "buildTarget": "@zitadel/console:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/console"
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "@zitadel/console:build",
+        "port": 4200,
+        "staticFilePath": "dist/console",
+        "spa": true
+      }
     }
+  }
 }

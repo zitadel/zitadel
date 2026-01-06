@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { WebKeysService } from 'src/app/services/webkeys.service';
-import { defer, EMPTY, firstValueFrom, Observable, ObservedValueOf, of, shareReplay, Subject, switchMap } from 'rxjs';
-import { catchError, map, startWith, withLatestFrom } from 'rxjs/operators';
+import { firstValueFrom, Observable, ObservedValueOf, of, shareReplay, Subject, switchMap } from 'rxjs';
+import { catchError, map, startWith } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { OidcWebKeysCreateComponent } from './oidc-webkeys-create/oidc-webkeys-create.component';

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package zitadel.analytics.v2beta;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analytics";
+
+message DailyPrecision {}
+message MonthlyPrecision {}
+
+message ActiveUserRequest {
+  google.protobuf.Timestamp starting_date_inclusive = 1;
+  google.protobuf.Timestamp ending_date_inclusive = 2;
+  oneof precision {
+    DailyPrecision daily_precision = 3;
+    MonthlyPrecision monthly_precision = 4;
+  }
+}
+
+message ActiveUserEntry {
+  google.protobuf.Timestamp date = 1;
+  uint64 value = 2;
+}
+
+message ActiveUserResponse {
+  repeated ActiveUserEntry entries = 1;
+}
+
+service ActiveUserService {
+  rpc ListActiveUsers (ActiveUserRequest) returns (ActiveUserResponse);
+}

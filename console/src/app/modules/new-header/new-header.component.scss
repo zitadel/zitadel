@@ -1,6 +1,8 @@
+@use 'sass:map';
+
 @mixin new-header-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
 
   .new-header-wrapper {
     padding-left: 5px;
@@ -19,7 +21,7 @@
     border-radius: 6px;
     padding: 0 0.5rem;
     border: none;
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
     position: relative;
     font-size: 14px;
     text-align: left;

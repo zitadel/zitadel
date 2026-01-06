@@ -1,0 +1,19 @@
+<cnsl-active-user-card title="Daily" [chart]="chart()">
+  @if (start().getTime() && end().getTime()) {
+    <span description>
+      active users between {{ start().toLocaleDateString() }} - {{ end().toLocaleDateString() }}
+    </span>
+  }
+  <mat-button-toggle-group date-range-picker [(ngModel)]="state">
+    <mat-button-toggle [value]="7">7 days</mat-button-toggle>
+    <mat-button-toggle [value]="30">30 days</mat-button-toggle>
+    <mat-button-toggle value="custom" (click)="picker.open()">
+      Custom
+      <mat-date-range-input class="invisible w-0! h-0" [rangePicker]="picker">
+        <input matStartDate placeholder="Start date" [formControl]="form().controls.start">
+        <input matEndDate placeholder="End date" [formControl]="form().controls.end">
+      </mat-date-range-input>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</cnsl-active-user-card>

@@ -1,9 +1,11 @@
+@use 'sass:map';
+
 @mixin contact-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, default);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, default);
 
   .contact-method-col {
     display: flex;
@@ -79,7 +81,7 @@
         margin-right: 1rem;
 
         &:hover {
-          color: map-get($foreground, text);
+          color: map.get($foreground, text);
         }
       }
     }

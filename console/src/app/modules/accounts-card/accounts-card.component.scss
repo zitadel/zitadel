@@ -1,18 +1,20 @@
-@mixin accounts-card-theme($theme) {
-  $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $accent: map-get($theme, accent);
-  $primary-color: map-get($primary, 500);
-  $card-background-color: map-get($background, cards);
+@use 'sass:map';
 
-  $warn-color: map-get($warn, 500);
-  $accent-color: map-get($accent, 500);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
+@mixin accounts-card-theme($theme) {
+  $primary: map.get($theme, primary);
+  $warn: map.get($theme, warn);
+  $background: map.get($theme, background);
+  $accent: map.get($theme, accent);
+  $primary-color: map.get($primary, 500);
+  $card-background-color: map.get($background, cards);
+
+  $warn-color: map.get($warn, 500);
+  $accent-color: map.get($accent, 500);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $back: map.get($background, background);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $secondary-text: map-get($foreground, secondary-text);
+  $secondary-text: map.get($foreground, secondary-text);
 
   .accounts-card {
     border-radius: 0.5rem;
@@ -28,7 +30,7 @@
     align-items: center;
     padding: 1rem 0;
     position: relative;
-    color: map-get($foreground, text);
+    color: map.get($foreground, text);
 
     .avatar {
       font-size: 80px;

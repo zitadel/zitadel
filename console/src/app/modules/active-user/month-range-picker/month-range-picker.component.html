@@ -1,0 +1,51 @@
+@let state = this.state();
+
+@if (state) {
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="overlayOrigin"
+    [cdkConnectedOverlayOpen]="true"
+    (overlayOutsideClick)="toggle()"
+  >
+    <form class="picker-content flex flex-col justify-start p-2 min-w-72 gap-2 bg-(--mat-dialog-container-color)">
+      <span class="font-bold">Select {{ state.page === 'start' ? 'starting' : 'ending' }} month</span>
+
+      <button class="flex flex-row items-center gap-2" type="button" (click)="toggleSelector(state)">
+        @if (state.page === 'start') {
+          {{ state.startYear }}
+        }
+        @if (state.page === 'end') {
+          {{ state.endYear }}
+        }
+        <ng-icon strokeWidth="4" [class.rotate-180]="state.selector === 'year'" class="transition-transform duration-200" name="heroChevronDown"></ng-icon>
+      </button>
+
+      @if (state.page === 'start') {
+        @if (state.selector === 'month') {
+          <cnsl-month-selector [selectedMonth]="state.startMonth"
+                               (selectedMonthChange)="selectEnd(modifyStart(state, $event, state.startYear))"
+                               [notAfter]="state.startYear >= currentDate.getUTCFullYear() ? currentDate.getUTCMonth() : 11"
+          />
+          <!-- If we are in the current year make sure the month is not in the future -->
+        } @else {
+          <cnsl-year-selector [selectedYear]="state.startYear"
+                              (selectedYearChange)="toggleSelector(modifyStart(state, state.startMonth, $event))"
+          />
+        }
+      }
+      @if (state.page === 'end') {
+        @if (state.selector === 'month') {
+          <cnsl-month-selector [notBefore]="state.startYear >= state.endYear ? state.startMonth : -1"
+                               [selectedMonth]="state.endMonth" (selectedMonthChange)="apply(state, $event)"
+                               [notAfter]="state.endYear >= currentDate.getUTCFullYear() ? currentDate.getUTCMonth() : 11"
+          />
+          <!-- If we are in the current year make sure the month is not in the future -->
+        } @else {
+          <cnsl-year-selector [notBefore]="state.startYear" [selectedYear]="state.endYear"
+                              (selectedYearChange)="toggleSelector(modifyEnd(state, $event))"
+          />
+        }
+      }
+    </form>
+  </ng-template>
+}

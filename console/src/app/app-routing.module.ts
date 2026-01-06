@@ -145,6 +145,10 @@ const routes: Routes = [
     },
   },
   {
+    path: 'active-user',
+    loadChildren: () => import('./modules/active-user/active-user-routing.module'),
+  },
+  {
     path: '**',
     redirectTo: '/',
   },
