@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .context_card {
   border-radius: 0.5rem;
   box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
@@ -5,28 +7,28 @@
 }
 
 @mixin header-theme($theme) {
-  $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $accent: map-get($theme, accent);
-  $primary-color: map-get($primary, 500);
+  $primary: map.get($theme, primary);
+  $warn: map.get($theme, warn);
+  $background: map.get($theme, background);
+  $accent: map.get($theme, accent);
+  $primary-color: map.get($primary, 500);
 
-  $warn-color: map-get($warn, 500);
-  $accent-color: map-get($accent, 500);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
+  $warn-color: map.get($warn, 500);
+  $accent-color: map.get($accent, 500);
+  $foreground: map.get($theme, foreground);
+  $is-dark-theme: map.get($theme, is-dark);
+  $back: map.get($background, background);
 
   .filter-form {
     margin: 0 0.5rem;
-    color: map-get($foreground, text) !important;
+    color: map.get($foreground, text) !important;
   }
 
   .header-wrapper {
     padding: 0.5rem 2rem !important;
     height: 60px;
     box-sizing: border-box;
-    background-color: map-get($background, toolbar) !important;
+    background-color: map.get($background, toolbar) !important;
 
     @media only screen and (max-width: 500px) {
       padding: 0.5rem 1rem !important;
@@ -42,8 +44,8 @@
 
       .slash {
         flex-shrink: 0;
-        color: map-get($foreground, slash);
-        fill: map-get($foreground, slash);
+        color: map.get($foreground, slash);
+        fill: map.get($foreground, slash);
       }
 
       .org-context {
@@ -52,7 +54,7 @@
 
         .org-link {
           font-size: 14px;
-          color: map-get($foreground, text);
+          color: map.get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;
@@ -85,7 +87,7 @@
           .org-switch-button {
             font-weight: bold;
             border: none;
-            color: map-get($foreground, text);
+            color: map.get($foreground, text);
             border-radius: 6px;
             position: relative;
             font-size: 14px;
@@ -113,7 +115,7 @@
 
               svg {
                 opacity: 0.7;
-                fill: map-get($foreground, text);
+                fill: map.get($foreground, text);
                 height: 1.25rem;
                 width: 1.25rem;
               }
@@ -130,7 +132,7 @@
 
         .breadcrumb-link {
           font-size: 14px;
-          color: map-get($foreground, text);
+          color: map.get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;
@@ -284,7 +286,7 @@
 
           &:hover,
           &:focus {
-            border: 2px solid if($is-dark-theme, #fff, map-get($primary, 200));
+            border: 2px solid if($is-dark-theme, #fff, map.get($primary, 200));
           }
 
           .docs {

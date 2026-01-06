@@ -1,6 +1,8 @@
+@use 'sass:map';
+
 @mixin avatar-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
 
   .avatar-circle {
     border-radius: 50%;

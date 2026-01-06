@@ -1,0 +1,15 @@
+<cnsl-card>
+  <div class="flex flex-row flex-wrap justify-between items-center">
+    <h3 class="font-bold">{{ title() }}</h3>
+    <ng-content select="[date-range-picker]" />
+  </div>
+  <div class="w-full flex flex-col items-center">
+    @if (chart(); as chart) {
+      <ag-charts class="w-full" [options]="chart"></ag-charts>
+    }
+    @else {
+      <mat-spinner diameter="30"></mat-spinner>
+    }
+    <ng-content select="[description]"></ng-content>
+  </div>
+</cnsl-card>

@@ -1,15 +1,17 @@
+@use 'sass:map';
+
 @mixin filter-events-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $lighter-primary-color: map-get($primary, 300);
-  $darker-primary-color: map-get($primary, 700);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $lighter-primary-color: map.get($primary, 300);
+  $darker-primary-color: map.get($primary, 700);
 
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $secondary-text: map-get($foreground, secondary-text);
-  $is-dark-theme: map-get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $secondary-text: map.get($foreground, secondary-text);
+  $is-dark-theme: map.get($theme, is-dark);
 
-  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
+  $link-hover-color: if($is-dark-theme, map.get($primary, 200), $primary-color);
   $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
 
   .filter-events-wrapper {
@@ -23,8 +25,8 @@
     max-width: 450px;
     padding-bottom: 0.5rem;
     position: relative;
-    color: map-get($foreground, text);
-    background: map-get($background, cards);
+    color: map.get($foreground, text);
+    background: map.get($background, cards);
 
     .sp_wrapper {
       display: flex;
@@ -56,7 +58,7 @@
     }
 
     .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-      background-color: map-get($background, cards);
+      background-color: map.get($background, cards);
     }
 
     .datetime-input {

@@ -1,13 +1,15 @@
+@use 'sass:map';
+
 @mixin security-policy-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $background: map-get($theme, background);
-  $is-dark-theme: map-get($theme, is-dark);
-  $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
-  $divider-color: map-get($foreground, dividers);
-  $secondary-text: map-get($foreground, secondary-text);
+  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, background);
+  $is-dark-theme: map.get($theme, is-dark);
+  $warn: map.get($theme, warn);
+  $warn-color: map.get($warn, 500);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
+  $divider-color: map.get($foreground, dividers);
+  $secondary-text: map.get($foreground, secondary-text);
 
   .security-wrapper {
     max-width: 500px;
@@ -25,7 +27,7 @@
         margin: 0.5rem 0;
         padding: 0 0 0 0.75rem;
         border-radius: 4px;
-        background: map-get($background, infosection);
+        background: map.get($background, infosection);
         height: 30px;
         box-sizing: border-box;
 

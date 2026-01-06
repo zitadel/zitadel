@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 .cnsl-provider-next {
   .section {
     background-color: #8795a110;
@@ -54,9 +56,9 @@
 }
 
 @mixin provider-next-theme($theme) {
-  $foreground: map-get($theme, foreground);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $foreground: map.get($theme, foreground);
+  $button-text-color: map.get($foreground, text);
+  $button-disabled-text-color: map.get($foreground, disabled-button);
   .cnsl-provider-next {
     .section {
       color: $button-text-color;
