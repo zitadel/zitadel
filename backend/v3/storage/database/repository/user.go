@@ -55,14 +55,86 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+const queryUserStmt = `SELECT
+	u.instance_id
+	, u.organization_id
+	, u.id
+	, u.username
+	, u.state
+	, u.created_at
+	, u.updated_at
+	
+	, u.name AS machine.name
+	, u.description AS machine.description
+	, u.secret AS machine.secret
+	, u.access_token_type AS machine.access_token_type
+	
+	, u.first_name AS human.first_name
+	, u.last_name AS human.last_name
+	, u.nickname AS human.nickname
+	, u.display_name AS human.display_name
+	, u.preferred_language AS human.preferred_language
+	, u.gender AS human.gender
+	, u.avatar_key AS human.avatar_key
+	, u.multifactor_initialization_skipped_at AS human.multifactor_initialization_skipped_at
+	, u.password AS human.password
+	, u.password_change_required AS human.password_change_required
+	, u.password_verified_at AS human.password_verified_at
+	-- u.password_verification_id
+	u.failed_password_attempts AS human.failed_password_attempts,
+	, u.email AS human.email
+	, u.email_verified_at AS human.email_verified_at
+	-- , u.unverified_email_id 
+	, u.email_otp_enabled_at AS human.email_otp_enabled_at
+	, u.last_successful_email_otp_check AS human.last_successful_email_otp_check
+	-- , u.email_otp_verification_id
+
+	, u.phone AS human.phone
+	, u.phone_verified_at AS human.phone_verified_at
+	-- , u.unverified_phone_id
+	, u.sms_otp_enabled_at AS human.sms_otp_enabled_at
+	, u.last_successful_sms_otp_check AS human.last_successful_sms_otp_check
+	-- , u.sms_otp_verification_id
+
+	-- , totp_secret_id
+	, totp_verified_at AS human.totp_verified_at
+	-- , unverified_totp_id
+	, last_successful_totp_check AS human.last_successful_totp_check
+FROM zitadel.users u
+`
+
 // Get implements [domain.UserRepository.Get].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
-	panic("unimplemented")
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.instanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.instanceIDColumn())
+	}
+
+	builder := database.NewStatementBuilder(queryUserStmt)
+	options.Write(builder)
+
+	return scanUser(ctx, client, builder)
 }
 
 // List implements [domain.UserRepository.List].
 func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
-	panic("unimplemented")
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.instanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.instanceIDColumn())
+	}
+
+	builder := database.NewStatementBuilder(queryUserStmt)
+	options.Write(builder)
+
+	return scanUsers(ctx, client, builder)
 }
 
 // Update implements [domain.UserRepository.Update].
@@ -363,4 +435,30 @@ func (u user) LoadVerifications() domain.UserRepository {
 // Machine implements [domain.UserRepository.Machine].
 func (u user) Machine() domain.MachineUserRepository {
 	panic("unimplemented")
+}
+
+func scanUser(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &domain.User{}
+	if err = rows.(database.CollectableRows).CollectExactlyOneRow(user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func scanUsers(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*domain.User
+	if err = rows.(database.CollectableRows).Collect(&users); err != nil {
+		return nil, err
+	}
+	return users, nil
 }

@@ -44,11 +44,11 @@ type userConditions interface {
 	TypeCondition(userType UserType) database.Condition
 	LoginNameCondition(op database.TextOperation, loginName string) database.Condition
 
-	userMetadataConditions
+	ExistsMetadata(condition database.Condition) database.Condition
+	MetadataConditions() UserMetadataConditions
 }
 
-type userMetadataConditions interface {
-	ExistsMetadata(condition database.Condition) database.Condition
+type UserMetadataConditions interface {
 	MetadataKeyCondition(op database.TextOperation, key string) database.Condition
 	MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition
 }
