@@ -225,7 +225,6 @@ export async function createSessionForUserIdAndIdpIntent({
   };
   lifetime: Duration;
 }>) {
-  console.log("Creating session for userId and IDP intent", { userId, idpIntent, lifetime });
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();

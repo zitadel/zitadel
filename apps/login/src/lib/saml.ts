@@ -28,11 +28,7 @@ export async function loginWithSAMLAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    console.log(`Found session ${selectedSession.id}`);
-
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
-
-    console.log("Session is valid:", isValid);
 
     if (!isValid && selectedSession.factors?.user) {
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
