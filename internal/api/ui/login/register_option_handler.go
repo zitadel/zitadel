@@ -105,7 +105,7 @@ func (l *Login) passLoginHintToRegistration(r *http.Request, authReq *domain.Aut
 		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to search query for registration loginHint")
 		return data
 	}
-	domains, err := l.query.SearchOrgDomains(r.Context(), &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}}, false)
+	domains, err := l.query.SearchOrgDomains(r.Context(), &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}}, false, false)
 	if err != nil {
 		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to load domains for registration loginHint")
 		return data

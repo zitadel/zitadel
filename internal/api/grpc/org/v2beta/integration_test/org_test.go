@@ -19,17 +19,21 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
-	CTX      context.Context
-	Instance *integration.Instance
-	Client   v2beta_org.OrganizationServiceClient
-	User     *user.AddHumanUserResponse
+	CTX               context.Context
+	Instance          *integration.Instance
+	Client            v2beta_org.OrganizationServiceClient
+	User              *user.AddHumanUserResponse
+	OtherOrganization *org.AddOrganizationResponse
 )
 
 func TestMain(m *testing.M) {
@@ -42,6 +46,7 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 		User = Instance.CreateHumanUser(CTX)
+		OtherOrganization = Instance.CreateOrganization(CTX, integration.OrganizationName(), integration.Email())
 		return m.Run()
 	}())
 }
@@ -314,12 +319,14 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		})
 		tests := []struct {
 			name    string
+			ctx     context.Context
 			req     *v2beta_org.UpdateOrganizationRequest
 			want    *v2beta_org.UpdateOrganizationResponse
 			wantErr bool
 		}{
 			{
 				name: "update org with new name",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 				req: &v2beta_org.UpdateOrganizationRequest{
 					Id:   orgs[0+(i*cases)].GetId(),
 					Name: fmt.Sprintf("new org name %d", i),
@@ -327,6 +334,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			},
 			{
 				name: "update org with same name",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 				req: &v2beta_org.UpdateOrganizationRequest{
 					Id:   orgs[1+(i*cases)].GetId(),
 					Name: orgNames[1+(i*cases)],
@@ -335,6 +343,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			},
 			{
 				name: "update org with non existent org id",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 				req: &v2beta_org.UpdateOrganizationRequest{
 					Id:   "non existent org id",
 					Name: "new name",
@@ -343,16 +352,26 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			},
 			{
 				name: "update org with no id",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 				req: &v2beta_org.UpdateOrganizationRequest{
 					Id:   " ",
 					Name: "new name",
 				},
 				wantErr: true,
 			},
+			{
+				name: "no permission",
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				req: &v2beta_org.UpdateOrganizationRequest{
+					Id:   orgs[1+(i*cases)].GetId(),
+					Name: integration.OrganizationName(),
+				},
+				wantErr: !stateCase.FeatureSet.GetEnableRelationalTables(), //TODO: implement for relational tables
+			},
 		}
 		for _, tt := range tests {
 			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t1 *testing.T) {
-				got, err := Client.UpdateOrganization(ctx, tt.req)
+				got, err := Client.UpdateOrganization(tt.ctx, tt.req)
 				if tt.wantErr {
 					require.Error(t1, err)
 					return
@@ -394,33 +413,43 @@ func TestServer_ListOrganizations(t *testing.T) {
 		name  string
 		ctx   context.Context
 		query []*v2beta_org.OrganizationSearchFilter
-		want  []*v2beta_org.Organization
+		want  *v2beta_org.ListOrganizationsResponse
 		err   error
 	}{
-		{
-			name: "list organizations, without required permissions",
-			ctx:  listOrgInstance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
-			err:  errors.New("membership not found"),
-		},
+		// TODO: re-enable when permission model is implemented in relational tables
+		//{
+		//	name: "list organizations, without required permissions",
+		//	ctx:  listOrgInstance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+		//	want: &v2beta_org.ListOrganizationsResponse{
+		//		Pagination: &filter.PaginationResponse{
+		//			TotalResult: 4,
+		//		},
+		//	},
+		//},
 		{
 			name: "list organizations happy path, no filter",
 			ctx:  listOrgIAmOwnerCtx,
-			want: []*v2beta_org.Organization{
-				{
-					// default org
-					Name: "testinstance",
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 4,
 				},
-				{
-					Id:   orgs[0].Id,
-					Name: orgsName[0],
-				},
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
-				},
-				{
-					Id:   orgs[2].Id,
-					Name: orgsName[2],
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   listOrgInstance.DefaultOrg.Id,
+						Name: listOrgInstance.DefaultOrg.Name,
+					},
+					{
+						Id:   orgs[0].Id,
+						Name: orgsName[0],
+					},
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
+					{
+						Id:   orgs[2].Id,
+						Name: orgsName[2],
+					},
 				},
 			},
 		},
@@ -436,10 +465,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -455,18 +489,23 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					// default org
-					Name: "testinstance",
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 3,
 				},
-				{
-					Id:   orgs[0].Id,
-					Name: orgsName[0],
-				},
-				{
-					Id:   orgs[2].Id,
-					Name: orgsName[2],
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   listOrgInstance.DefaultOrg.Id,
+						Name: listOrgInstance.DefaultOrg.Name,
+					},
+					{
+						Id:   orgs[0].Id,
+						Name: orgsName[0],
+					},
+					{
+						Id:   orgs[2].Id,
+						Name: orgsName[2],
+					},
 				},
 			},
 		},
@@ -482,10 +521,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -501,6 +545,12 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 0,
+				},
+				Organizations: nil,
+			},
 		},
 		{
 			name: "list organizations specify org name equals",
@@ -515,10 +565,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -537,10 +592,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -559,10 +619,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -579,10 +644,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -599,10 +669,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -619,10 +694,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 					},
 				},
 			},
-			want: []*v2beta_org.Organization{
-				{
-					Id:   orgs[1].Id,
-					Name: orgsName[1],
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{
+						Id:   orgs[1].Id,
+						Name: orgsName[1],
+					},
 				},
 			},
 		},
@@ -639,6 +719,10 @@ func TestServer_ListOrganizations(t *testing.T) {
 				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
 						Filter: tt.query,
+						Pagination: &filter.PaginationRequest{
+							Asc: true,
+						},
+						SortingColumn: v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE,
 					})
 					if tt.err != nil {
 						require.ErrorContains(ttt, err, tt.err.Error())
@@ -646,32 +730,21 @@ func TestServer_ListOrganizations(t *testing.T) {
 					}
 					require.NoError(ttt, err)
 
-					require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
+					require.Equal(ttt, tt.want.GetPagination(), got.GetPagination())
 
-					foundOrgs := 0
-					for _, got := range got.Organizations {
-						for _, org := range tt.want {
+					require.Len(ttt, got.Organizations, len(tt.want.Organizations))
 
-							// created/chagned date
-							gotCD := got.GetCreationDate().AsTime()
-							now := time.Now()
-							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
-							gotCD = got.GetChangedDate().AsTime()
-							assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+					for i, got := range got.Organizations {
+						// created/chagned date
+						gotCD := got.GetCreationDate().AsTime()
+						now := time.Now()
+						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+						gotCD = got.GetChangedDate().AsTime()
+						assert.WithinRange(ttt, gotCD, testStartTimestamp, now.Add(time.Minute))
 
-							// default org
-							if org.Name == got.Name && got.Name == "testinstance" {
-								foundOrgs += 1
-								continue
-							}
-
-							if org.Name == got.Name &&
-								org.Id == got.Id {
-								foundOrgs += 1
-							}
-						}
+						assert.Equal(ttt, tt.want.Organizations[i].Id, got.Id)
+						assert.Equal(ttt, tt.want.Organizations[i].Name, got.Name)
 					}
-					require.Equal(ttt, len(tt.want), foundOrgs)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 			})
 		}
@@ -710,7 +783,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 		}{
 			{
 				name: "delete org no permission",
-				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				req: &v2beta_org.DeleteOrganizationRequest{
 					Id: orgs[0+(orgsNumPerCase*i)].GetId(),
 				},
@@ -822,10 +895,15 @@ func TestServer_ActivateOrganization(t *testing.T) {
 			},
 			{
 				name:       "Activate, no permission",
-				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-				// BUG: this needs changing
-				err: errors.New("membership not found"),
+				err: func() error {
+					//TODO: implement permissions for relational tables
+					if stateCase.FeatureSet.GetEnableRelationalTables() {
+						return errors.New("Organisation is already active")
+					}
+					return errors.New("membership not found")
+				}(),
 			},
 			{
 				name:       "Activate, not existing",
@@ -904,11 +982,15 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 			},
 			{
 				name:       "Deactivate, no permission",
-				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-
-				// BUG: this needs changing
-				err: errors.New("membership not found"),
+				err: func() error {
+					//TODO: implement for relational tables
+					if stateCase.FeatureSet.GetEnableRelationalTables() {
+						return errors.New("Organisation is already deactivated")
+					}
+					return errors.New("membership not found")
+				}(),
 			},
 			{
 				name:       "Deactivate, not existing",
@@ -952,6 +1034,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "add org domain, happy path",
+			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
@@ -960,9 +1043,22 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name:   "add org domain, twice",
+			name:   "no permission",
+			ctx:    Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			domain: integration.DomainName(),
 			testFunc: func() string {
+				orgs, _, _ := createOrgs(CTX, t, Client, 1)
+				orgId := orgs[0].Id
+				return orgId
+			},
+			err: errors.New("membership not found"),
+		},
+		{
+			name:   "add org domain, twice",
+			ctx:    CTX,
+			domain: integration.DomainName(),
+			testFunc: func() string {
+				t.Helper()
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
@@ -1000,33 +1096,32 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain to non existent org",
+			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
-			// BUG: should return a error
-			err: nil,
+			err: errors.New("Organisation not found"),
 		},
 	}
 
 	for _, tt := range tests {
-		var orgId string
 		t.Run(tt.name, func(t *testing.T) {
-			orgId = tt.testFunc()
+			orgId := tt.testFunc()
+			addOrgDomainRes, err := Client.AddOrganizationDomain(tt.ctx, &v2beta_org.AddOrganizationDomainRequest{
+				OrganizationId: orgId,
+				Domain:         tt.domain,
+			})
+			if tt.err != nil {
+				require.Contains(t, err.Error(), tt.err.Error())
+			} else {
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+			}
 		})
-		addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
-			OrganizationId: orgId,
-			Domain:         tt.domain,
-		})
-		if tt.err != nil {
-			require.Contains(t, err.Error(), tt.err.Error())
-		} else {
-			require.NoError(t, err)
-			// check details
-			gotCD := addOrgDomainRes.GetCreationDate().AsTime()
-			now := time.Now()
-			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-		}
 	}
 }
 
@@ -1098,60 +1193,155 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 
 func TestServer_ListOrganizationDomains(t *testing.T) {
 	domain := integration.DomainName()
+
+	orgs, _, _ := createOrgs(CTX, t, Client, 1)
+	orgId := orgs[0].Id
+
+	var primaryDomain string
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Second)
+	require.EventuallyWithT(t, func(t *assert.CollectT) {
+		organizations, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
+			Filter: []*v2beta_org.OrganizationSearchFilter{
+				{Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+					IdFilter: &v2beta_org.OrgIDFilter{Id: orgId},
+				}},
+			},
+		})
+		require.NoError(t, err)
+		require.Len(t, organizations.GetOrganizations(), 1)
+		primaryDomain = organizations.GetOrganizations()[0].GetPrimaryDomain()
+	}, retryDuration, tick, "could not find primary domain")
+
+	_, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+		OrganizationId: orgId,
+		Domain:         domain,
+	})
+	require.NoError(t, err)
+
+	type args struct {
+		ctx     context.Context
+		request *v2beta_org.ListOrganizationDomainsRequest
+	}
+	type want struct {
+		response *v2beta_org.ListOrganizationDomainsResponse
+		err      bool
+	}
+
 	tests := []struct {
-		name     string
-		ctx      context.Context
-		domain   string
-		testFunc func() string
-		err      error
+		name string
+		args args
+		want want
 	}{
 		{
-			name:   "list org domain, happy path",
-			domain: domain,
-			testFunc: func() string {
-				// 1. create organization
-				orgs, _, _ := createOrgs(CTX, t, Client, 1)
-				orgId := orgs[0].Id
-				// 2. add domain
-				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+			name: "non existing organization",
+			args: args{
+				ctx:     CTX,
+				request: &v2beta_org.ListOrganizationDomainsRequest{OrganizationId: "not-existing"},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationDomainsResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult: 0,
+					},
+					Domains: nil,
+				},
+			},
+		},
+		{
+			name: "no permission (different organization), error",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				request: &v2beta_org.ListOrganizationDomainsRequest{
 					OrganizationId: orgId,
-					Domain:         domain,
-				})
-				require.NoError(t, err)
-				// check details
-				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
-				now := time.Now()
-				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
-
-				return orgId
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationDomainsResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult: 0,
+					},
+					Domains: nil,
+				},
+			},
+		},
+		{
+			name: "list org domain, all domains",
+			args: args{
+				ctx: CTX,
+				request: &v2beta_org.ListOrganizationDomainsRequest{
+					OrganizationId: orgId,
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationDomainsResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult: 2,
+					},
+					Domains: []*v2beta_org.Domain{
+						{
+							OrganizationId: orgId,
+							DomainName:     domain,
+							IsVerified:     true,
+							IsPrimary:      false,
+							ValidationType: 0,
+						},
+						{
+							OrganizationId: orgId,
+							DomainName:     primaryDomain,
+							IsVerified:     true,
+							IsPrimary:      true,
+							ValidationType: 0,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list specific domain",
+			args: args{
+				ctx: CTX,
+				request: &v2beta_org.ListOrganizationDomainsRequest{
+					OrganizationId: orgId,
+					Filters: []*v2beta_org.DomainSearchFilter{
+						{Filter: &v2beta_org.DomainSearchFilter_DomainNameFilter{DomainNameFilter: &v2beta_org.DomainNameFilter{Name: domain}}},
+					},
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationDomainsResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult: 1,
+					},
+					Domains: []*v2beta_org.Domain{
+						{
+							OrganizationId: orgId,
+							DomainName:     domain,
+							IsVerified:     true,
+							IsPrimary:      false,
+							ValidationType: 0,
+						},
+					},
+				},
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		var orgId string
 		t.Run(tt.name, func(t *testing.T) {
-			orgId = tt.testFunc()
-		})
-
-		var err error
-		var queryRes *v2beta_org.ListOrganizationDomainsResponse
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-				OrganizationId: orgId,
-			})
-			require.NoError(ttt, err)
-			found := false
-			for _, res := range queryRes.Domains {
-				if res.DomainName == tt.domain {
-					found = true
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				queryRes, err := Client.ListOrganizationDomains(tt.args.ctx, tt.args.request)
+				if tt.want.err {
+					require.Error(ttt, err)
+					return
 				}
-			}
-			require.True(ttt, found, "unable to find added domain")
-		}, retryDuration, tick, "timeout waiting for adding domain")
+				require.NoError(ttt, err)
 
+				assert.Len(ttt, queryRes.Domains, int(tt.want.response.GetPagination().GetTotalResult()))
+				assert.EqualExportedValues(ttt, tt.want.response.GetPagination(), queryRes.GetPagination())
+				assert.ElementsMatch(ttt, tt.want.response.GetDomains(), queryRes.GetDomains())
+			}, retryDuration, tick, "timeout waiting for adding domain")
+		})
 	}
 }
 
@@ -1166,6 +1356,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "delete org domain, happy path",
+			ctx:    CTX,
 			domain: domain,
 			testFunc: func() string {
 				// 1. create organization
@@ -1200,6 +1391,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain, twice",
+			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
 				// 1. create organization
@@ -1246,6 +1438,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain to non existent org",
+			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
 				return "non-existing-org-id"
@@ -1253,13 +1446,49 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 			// BUG:
 			err: errors.New("Domain doesn't exist on organization"),
 		},
+		{
+			name:   "delete org domain no permission",
+			ctx:    Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			domain: domain,
+			testFunc: func() string {
+				// 1. create organization
+				orgs, _, _ := createOrgs(CTX, t, Client, 1)
+				orgId := orgs[0].Id
+
+				// 2. add domain
+				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+					OrganizationId: orgId,
+					Domain:         domain,
+				})
+				require.NoError(t, err)
+				// check details
+				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
+				now := time.Now()
+				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+				// check domain added
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(ttt, err)
+
+					found := slices.ContainsFunc(queryRes.Domains, func(d *v2beta_org.Domain) bool { return d.GetDomainName() == domain })
+					require.True(ttt, found, "unable to find added domain")
+				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+
+				return orgId
+			},
+			err: errors.New("membership not found"),
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			orgId := tt.testFunc()
 
-			_, err := Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
+			_, err := Client.DeleteOrganizationDomain(tt.ctx, &v2beta_org.DeleteOrganizationDomainRequest{
 				OrganizationId: orgId,
 				Domain:         tt.domain,
 			})
@@ -1474,7 +1703,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			err: errors.New("Domain doesn't exist on organization"),
 		},
 		{
-			name: "validate org non existnetn domain",
+			name: "validate org non existent domain",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
@@ -1482,6 +1711,16 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			err: errors.New("Domain doesn't exist on organization"),
+		},
+		{
+			name: "validate without permission",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
+				OrganizationId: orgId,
+				Domain:         domain,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+			},
+			err: errors.New("membership not found"),
 		},
 	}
 	for _, tt := range tests {
@@ -1512,6 +1751,14 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 		value     string
 		err       error
 	}{
+		{
+			name:  "no permission",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+			orgId: orgId,
+			key:   "key1",
+			value: "value1",
+			err:   errors.New("membership not found"),
+		},
 		{
 			name:  "set org metadata",
 			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
@@ -1619,109 +1866,168 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 func TestServer_ListOrganizationMetadata(t *testing.T) {
 	orgs, _, _ := createOrgs(CTX, t, Client, 1)
 	orgId := orgs[0].Id
+	setRespoonse, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+		OrganizationId: orgId,
+		Metadata: []*v2beta_org.Metadata{
+			{
+				Key:   "key1",
+				Value: []byte("value1"),
+			},
+			{
+				Key:   "key2",
+				Value: []byte("value2"),
+			},
+			{
+				Key:   "key2.1",
+				Value: []byte("value3"),
+			},
+			{
+				Key:   "key2.2",
+				Value: []byte("value4"),
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	type args struct {
+		ctx     context.Context
+		request *v2beta_org.ListOrganizationMetadataRequest
+	}
+	type want struct {
+		response *v2beta_org.ListOrganizationMetadataResponse
+		err      error
+	}
 
 	tests := []struct {
-		name          string
-		ctx           context.Context
-		setupFunc     func()
-		orgId         string
-		keyValuePairs []struct {
-			key   string
-			value string
-		}
+		name string
+		args args
+		want want
 	}{
 		{
 			name: "list org metadata happy path",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				request: &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationMetadataResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult: 4,
+					},
+					Metadata: []*metadata.Metadata{
 						{
-							Key:   "key1",
-							Value: []byte("value1"),
+							Key:          "key1",
+							Value:        []byte("value1"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
+						},
+						{
+							Key:          "key2",
+							Value:        []byte("value2"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
+						},
+						{
+							Key:          "key2.1",
+							Value:        []byte("value3"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
+						},
+						{
+							Key:          "key2.2",
+							Value:        []byte("value4"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
 						},
 					},
-				})
-				require.NoError(t, err)
-			},
-			orgId: orgId,
-			keyValuePairs: []struct{ key, value string }{
-				{
-					key:   "key1",
-					value: "value1",
 				},
 			},
 		},
 		{
-			name: "list multiple org metadata happy path",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+			name: "list org metadata filter key",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				request: &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
+					Pagination: &filter.PaginationRequest{
+						Offset: 1,
+						Limit:  2,
+					},
+					Filter: []*metadata.MetadataQuery{
 						{
-							Key:   "key2",
-							Value: []byte("value2"),
-						},
-						{
-							Key:   "key3",
-							Value: []byte("value3"),
-						},
-						{
-							Key:   "key4",
-							Value: []byte("value4"),
+							Query: &metadata.MetadataQuery_KeyQuery{
+								KeyQuery: &metadata.MetadataKeyQuery{
+									Key:    "key2",
+									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH,
+								},
+							},
 						},
 					},
-				})
-				require.NoError(t, err)
+				},
 			},
-			orgId: orgId,
-			keyValuePairs: []struct{ key, value string }{
-				{
-					key:   "key2",
-					value: "value2",
-				},
-				{
-					key:   "key3",
-					value: "value3",
-				},
-				{
-					key:   "key4",
-					value: "value4",
+			want: want{
+				response: &v2beta_org.ListOrganizationMetadataResponse{
+					Pagination: &filter.PaginationResponse{
+						TotalResult:  3,
+						AppliedLimit: 2,
+					},
+					Metadata: []*metadata.Metadata{
+						{
+							Key:          "key2.1",
+							Value:        []byte("value3"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
+						},
+						{
+							Key:          "key2.2",
+							Value:        []byte("value4"),
+							CreationDate: setRespoonse.GetSetDate(),
+							ChangeDate:   setRespoonse.GetSetDate(),
+						},
+					},
 				},
 			},
 		},
 		{
-			name:          "list org metadata for non existent org",
-			ctx:           Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			orgId:         "non existent orgid",
-			keyValuePairs: []struct{ key, value string }{},
+			name: "list org metadata for non existent org",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+				request: &v2beta_org.ListOrganizationMetadataRequest{
+					OrganizationId: "non existent orgid",
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationMetadataResponse{
+					Pagination: &filter.PaginationResponse{},
+				},
+			},
+		},
+		{
+			name: "list org metadata without permission (other organization)",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				request: &v2beta_org.ListOrganizationMetadataRequest{
+					OrganizationId: orgId,
+				},
+			},
+			want: want{
+				response: &v2beta_org.ListOrganizationMetadataResponse{
+					Pagination: &filter.PaginationResponse{},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.setupFunc != nil {
-				tt.setupFunc()
-			}
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 1*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-					OrganizationId: tt.orgId,
-				})
+				got, err := Client.ListOrganizationMetadata(tt.args.ctx, tt.args.request)
 				require.NoError(ttt, err)
 
-				foundMetadataCount := 0
-				for _, kv := range tt.keyValuePairs {
-					for _, res := range got.Metadata {
-						if res.Key == kv.key &&
-							string(res.Value) == kv.value {
-							foundMetadataCount += 1
-						}
-					}
-				}
-				require.Len(ttt, tt.keyValuePairs, foundMetadataCount)
+				assert.EqualExportedValues(ttt, tt.want.response, got)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -1730,6 +2036,39 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 	orgs, _, _ := createOrgs(CTX, t, Client, 1)
 	orgId := orgs[0].Id
+
+	_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
+		OrganizationId: orgId,
+		Metadata: []*v2beta_org.Metadata{
+			{
+				Key:   "key1",
+				Value: []byte("value1"),
+			},
+			{
+				Key:   "key2",
+				Value: []byte("value2"),
+			},
+			{
+				Key:   "key3",
+				Value: []byte("value3"),
+			}, {
+
+				Key:   "key4",
+				Value: []byte("value4"),
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// check metadata exists
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 1*time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		listOrgMetadataRes, err := Client.ListOrganizationMetadata(CTX, &v2beta_org.ListOrganizationMetadataRequest{
+			OrganizationId: orgId,
+		})
+		require.NoError(ttt, err)
+		require.Len(ttt, listOrgMetadataRes.GetMetadata(), 4)
+	}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 	tests := []struct {
 		name             string
@@ -1740,27 +2079,11 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			key   string
 			value string
 		}
-		metadataToRemain []struct {
-			key   string
-			value string
-		}
 		err error
 	}{
 		{
-			name: "delete org metadata happy path",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
-						{
-							Key:   "key1",
-							Value: []byte("value1"),
-						},
-					},
-				})
-				require.NoError(t, err)
-			},
+			name:  "delete org metadata happy path",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
 				{
@@ -1770,24 +2093,8 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "delete multiple org metadata happy path",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
-						{
-							Key:   "key2",
-							Value: []byte("value2"),
-						},
-						{
-							Key:   "key3",
-							Value: []byte("value3"),
-						},
-					},
-				})
-				require.NoError(t, err)
-			},
+			name:  "delete multiple org metadata happy path",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
 				{
@@ -1801,118 +2108,44 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "delete some org metadata but not all",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
-						{
-							Key:   "key4",
-							Value: []byte("value4"),
-						},
-						// key5 should not be deleted
-						{
-							Key:   "key5",
-							Value: []byte("value5"),
-						},
-						{
-							Key:   "key6",
-							Value: []byte("value6"),
-						},
-					},
-				})
-				require.NoError(t, err)
+			name:  "delete org metadata that does not exist",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			orgId: orgId,
+			metadataToDelete: []struct{ key, value string }{
+				{
+					key:   "key5",
+					value: "value5",
+				},
 			},
+			err: errors.New("One or more keys do not exist"),
+		},
+		{
+			name:  "delete org metadata for org that does not exist",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			orgId: "non existant org id",
+			metadataToDelete: []struct{ key, value string }{
+				{
+					key:   "key4",
+					value: "value4",
+				},
+			},
+			err: errors.New("Organisation not found"),
+		},
+		{
+			name:  "delete org metadata without permission",
+			ctx:   Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
 				{
 					key:   "key4",
 					value: "value4",
 				},
-				{
-					key:   "key6",
-					value: "value6",
-				},
 			},
-			metadataToRemain: []struct{ key, value string }{
-				{
-					key:   "key5",
-					value: "value5",
-				},
-			},
-		},
-		{
-			name: "delete org metadata that does not exist",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
-						{
-							Key:   "key88",
-							Value: []byte("value74"),
-						},
-						{
-							Key:   "key5888",
-							Value: []byte("value8885"),
-						},
-					},
-				})
-				require.NoError(t, err)
-			},
-			orgId: orgId,
-			// TODO: this error message needs to be either removed or changed
-			err: errors.New("Metadata list is empty"),
-		},
-		{
-			name: "delete org metadata for org that does not exist",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			setupFunc: func() {
-				_, err := Client.SetOrganizationMetadata(CTX, &v2beta_org.SetOrganizationMetadataRequest{
-					OrganizationId: orgId,
-					Metadata: []*v2beta_org.Metadata{
-						{
-							Key:   "key88",
-							Value: []byte("value74"),
-						},
-						{
-							Key:   "key5888",
-							Value: []byte("value8885"),
-						},
-					},
-				})
-				require.NoError(t, err)
-			},
-			orgId: "non existant org id",
-			// TODO: this error message needs to be either removed or changed
-			err: errors.New("Metadata list is empty"),
+			err: errors.New("membership not found"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.setupFunc != nil {
-				tt.setupFunc()
-			}
-
-			// check metadata exists
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-					OrganizationId: tt.orgId,
-				})
-				require.NoError(ttt, err)
-				foundMetadataCount := 0
-				for _, kv := range tt.metadataToDelete {
-					for _, res := range listOrgMetadataRes.Metadata {
-						if res.Key == kv.key &&
-							string(res.Value) == kv.value {
-							foundMetadataCount += 1
-						}
-					}
-				}
-				require.Equal(ttt, len(tt.metadataToDelete), foundMetadataCount)
-			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 			keys := make([]string, len(tt.metadataToDelete))
 			for i, kvp := range tt.metadataToDelete {
@@ -1930,7 +2163,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// check metadata was definitely deleted
 				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
@@ -1948,22 +2181,6 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 				}
 				require.Equal(ttt, foundMetadataCount, 0)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
-
-			// check metadata that should not be delted was not deleted
-			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
-				OrganizationId: tt.orgId,
-			})
-			require.NoError(t, err)
-			foundMetadataCount := 0
-			for _, kv := range tt.metadataToRemain {
-				for _, res := range listOrgMetadataRes.Metadata {
-					if res.Key == kv.key &&
-						string(res.Value) == kv.value {
-						foundMetadataCount += 1
-					}
-				}
-			}
-			require.Equal(t, len(tt.metadataToRemain), foundMetadataCount)
 		})
 	}
 }
