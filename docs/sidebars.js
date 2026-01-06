@@ -588,14 +588,6 @@ module.exports = {
           label: "OIDC Playground",
           href: "https://zitadel.com/playgrounds/oidc",
         },
-        {
-          type: "category",
-          label: "Common Issues",
-          items: [
-            "guides/solution-scenarios/domain-discovery",
-            "guides/solution-scenarios/restrict-console",
-          ],
-        }
       ],
     },
     {
@@ -765,6 +757,8 @@ module.exports = {
             "concepts/features/identity-brokering",
             "concepts/features/passkeys",
             "concepts/knowledge/opaque-tokens",
+            "guides/solution-scenarios/domain-discovery",
+            "guides/solution-scenarios/restrict-console",
           ],
         },
       ],
