@@ -161,6 +161,18 @@ func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGr
 	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
 }
 
+func (c *Commands) CheckPermissionOrganizationCreate(ctx context.Context, organizationID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionOrganizationWrite, org.AggregateType)(organizationID, organizationID)
+}
+
+func (c *Commands) CheckPermissionOrganizationWrite(ctx context.Context, organizationID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionOrganizationWrite, org.AggregateType)(organizationID, organizationID)
+}
+
+func (c *Commands) CheckPermissionOrganizationDelete(ctx context.Context, organizationID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionOrganizationDelete, org.AggregateType)(organizationID, organizationID)
+}
+
 func (c *Commands) checkPermissionCreateGroup(ctx context.Context, resourceOwner, groupID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionGroupCreate, group.AggregateType)(resourceOwner, groupID)
 }

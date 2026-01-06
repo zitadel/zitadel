@@ -27,7 +27,7 @@ import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
-import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 import { ActiveUserService } from '@zitadel/proto/zitadel/analytics/v2beta/active_user_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);

@@ -624,6 +624,14 @@
           "restAsync": "REST Async"
         },
         "TYPES_DESCRIPTION": "Webhook, the call handles the status code but response is irrelevant\nCall, the call handles the status code and response\nAsync, the call handles neither status code nor response, but can be called in parallel with other Targets",
+        "PAYLOAD_TYPE": "Payload Type",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Unspecified",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Encrypted JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON payload with an signature header for verification.\nJWT: Payload is sent as signed JWT. Verification is self-contained using the JWT signature.\nJWE: The JWT is additionally encrypted to prevent unauthorized access to payload information.",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
         "TIMEOUT": "Timeout",
@@ -2653,7 +2661,7 @@
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
       "IDTOKENROLEASSERTION": "User roles inside ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "When this option is enabled, the authenticated user's assigned roles will be added directly to their ID token. Ensure to enable the Project setting 'Assign user roles during authentication' or request via custom scope.",
-      "IDTOKENUSERINFOASSERTION": "Include user's roles in the ID Token",
+      "IDTOKENUSERINFOASSERTION": "Include user's profile info in the ID Token",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
       "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
       "RECOMMENDED": "recommended",
