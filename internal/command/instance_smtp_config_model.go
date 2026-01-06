@@ -27,13 +27,14 @@ type IAMSMTPConfigWriteModel struct {
 }
 
 type SMTPConfig struct {
-	TLS            bool
-	Host           string
-	SenderAddress  string
-	SenderName     string
-	ReplyToAddress string
-	PlainAuth      *instance.PlainAuth
-	XOAuth2Auth    *instance.XOAuth2Auth
+	TLS             bool
+	Host            string
+	SenderAddress   string
+	SenderName      string
+	ReplyToAddress  string
+	PlainAuth       *instance.PlainAuth
+	XOAuth2Auth     *instance.XOAuth2Auth
+	OAuthBearerAuth *instance.OAuthBearerAuth
 }
 
 func NewIAMSMTPConfigWriteModel(instanceID, id, domain string) *IAMSMTPConfigWriteModel {
@@ -173,6 +174,7 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	smtpHost string,
 	plainAuth *instance.PlainAuth,
 	xoauth2Auth *instance.XOAuth2Auth,
+	oauthBearerAuth *instance.OAuthBearerAuth,
 ) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
@@ -206,6 +208,9 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	}
 	if xoauth2Auth != nil {
 		changes = append(changes, smtpXOAuthChanges(wm, *xoauth2Auth)...)
+	}
+	if oauthBearerAuth != nil {
+		changes = append(changes, smtpOAuthBearerChanges(wm, *oauthBearerAuth)...)
 	}
 
 	if len(changes) == 0 {
@@ -241,6 +246,28 @@ func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) 
 	// problem here but it might be in other places?
 	if auth.Password != nil {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(auth.Password))
+	}
+
+	return changes
+}
+
+func smtpOAuthBearerChanges(wm *IAMSMTPConfigWriteModel, auth instance.OAuthBearerAuth) []instance.SMTPConfigChanges {
+	// if no auth is yet present, set both
+	if wm.SMTPConfig.OAuthBearerAuth == nil {
+		return []instance.SMTPConfigChanges{
+			instance.ChangeSMTPConfigOAuthBearerUser(auth.User),
+			instance.ChangeSMTPConfigOAuthBearerToken(auth.BearerToken),
+		}
+	}
+
+	// if auth is already present, add changes for the changed values
+	var changes []instance.SMTPConfigChanges
+
+	if wm.SMTPConfig.OAuthBearerAuth.User != auth.User {
+		changes = append(changes, instance.ChangeSMTPConfigOAuthBearerUser(auth.User))
+	}
+	if wm.SMTPConfig.OAuthBearerAuth.BearerToken != auth.BearerToken {
+		changes = append(changes, instance.ChangeSMTPConfigOAuthBearerToken(auth.BearerToken))
 	}
 
 	return changes
@@ -347,6 +374,12 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 			Scopes:        e.XOAuth2Auth.Scopes,
 		}
 	}
+	if e.OAuthBearerAuth != nil {
+		wm.SMTPConfig.OAuthBearerAuth = &instance.OAuthBearerAuth{
+			User:        e.OAuthBearerAuth.User,
+			BearerToken: e.OAuthBearerAuth.BearerToken,
+		}
+	}
 
 	wm.State = domain.SMTPConfigStateInactive
 	// If ID has empty value we're dealing with the old and unique smtp settings
@@ -432,6 +465,12 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	}
 	if e.XOAuth2Auth.Scopes != nil {
 		wm.SMTPConfig.XOAuth2Auth.Scopes = e.XOAuth2Auth.Scopes
+	}
+
+	if e.OAuthBearerAuth.User != nil {
+		wm.SMTPConfig.OAuthBearerAuth.User = *e.OAuthBearerAuth.User
+	} else if e.OAuthBearerAuth.BearerToken != nil {
+		wm.SMTPConfig.OAuthBearerAuth.BearerToken = e.OAuthBearerAuth.BearerToken
 	}
 
 	// If ID has empty value we're dealing with the old and unique smtp settings

@@ -144,6 +144,7 @@ message EmailProviderSMTP {
     SMTPNoAuth none = 9;
     SMTPPlainAuth plain = 10;
     SMTPXOAuth2Auth xoauth2 = 11;
+    SMTPOAuthBearerAuth oauth_bearer = 12;
   }
 }
 
@@ -176,6 +177,14 @@ message SMTPXOAuth2Auth {
   repeated string scopes = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"https://mail.example.com\"]";
+    }
+  ];
+}
+
+message SMTPOAuthBearerAuth {
+  string user = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
     }
   ];
 }

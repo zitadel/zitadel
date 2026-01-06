@@ -17,6 +17,12 @@ func XOAuth2Auth(config XOAuth2AuthConfig, host string) smtp.Auth {
 	}
 }
 
+//go:generate mockgen -typed -package mock -destination ../mock/oauth2.mock.go . TokenSource
+
+type TokenSource interface {
+	oauth2.TokenSource
+}
+
 type xoauth2Auth struct {
 	host        string
 	config      XOAuth2AuthConfig

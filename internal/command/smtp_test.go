@@ -147,6 +147,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								},
 							},
 							nil,
+							nil,
 						),
 					),
 				),
@@ -212,6 +213,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 									Crypted:    []byte("password"),
 								},
 							},
+							nil,
 							nil,
 						),
 					),
@@ -334,6 +336,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								},
 							},
 							nil,
+							nil,
 						),
 					),
 				),
@@ -394,6 +397,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								User: "user",
 							},
 							nil,
+							nil,
 						),
 					),
 				),
@@ -450,6 +454,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
+							nil,
 							nil,
 							nil,
 						),
@@ -518,6 +523,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								TokenEndpoint: "auth.example.com/token",
 								Scopes:        []string{"scope"},
 							},
+							nil,
 						),
 					),
 				),
@@ -539,6 +545,74 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						ClientSecret:  "password",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scope"},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add smtp config with oauth-bearer auth, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"configid",
+							"test",
+							true,
+							"from@domain.ch",
+							"name",
+							"replyto@domain.ch",
+							"host:587",
+							nil,
+							nil,
+							&instance.OAuthBearerAuth{
+								User: "user",
+								BearerToken: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
+							},
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				smtp: &AddSMTPConfig{
+					ResourceOwner:  "INSTANCE",
+					Description:    "test",
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "replyto@domain.ch",
+					Host:           "host:587",
+					OAuthBearerAuth: &smtp.OAuthBearerAuthConfig{
+						User:        "user",
+						BearerToken: "password",
 					},
 				},
 			},
@@ -697,6 +771,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -753,6 +828,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
+								nil,
 								nil,
 							),
 						),
@@ -813,6 +889,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -829,6 +906,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							&instance.PlainAuth{
 								User: "user2",
 							},
+							nil,
 							nil,
 						),
 					),
@@ -941,6 +1019,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -957,6 +1036,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							&instance.PlainAuth{
 								User: "user2",
 							},
+							nil,
 							nil,
 						),
 					),
@@ -1016,6 +1096,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									User: "user",
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -1042,6 +1123,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								TokenEndpoint: "auth.example.com/token",
 								Scopes:        []string{"scope"},
 							},
+							nil,
 						),
 					),
 				),
@@ -1177,6 +1259,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
+								nil,
 								nil,
 							),
 						),
@@ -1600,6 +1683,7 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -1643,6 +1727,7 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
+								nil,
 								nil,
 							),
 						),
@@ -1811,6 +1896,7 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
+								nil,
 							),
 						),
 						eventFromEventPusher(
@@ -1860,6 +1946,7 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
+								nil,
 								nil,
 							),
 						),
@@ -2042,6 +2129,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
+								nil,
 								nil,
 							),
 						),
@@ -2279,6 +2367,7 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 									},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -2336,6 +2425,32 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "valid new smtp config, wrong xoauth2 auth, ok",
+			fields: fields{
+				eventstore: expectEventstore(),
+				alg:        crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				email:      "email",
+				config: smtp.Config{
+					From:     "test@example.com",
+					FromName: "Test",
+					SMTP: smtp.SMTP{
+						OAuthBearerAuth: &smtp.OAuthBearerAuthConfig{
+							User:        "user",
+							BearerToken: "token",
+						},
+						Host: "mail.smtp2go.com:2525",
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
+		{
 			name: "valid smtp config using stored password, wrong auth, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -2364,6 +2479,7 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 									TokenEndpoint: "auth.example.com/token",
 									Scopes:        []string{"scope"},
 								},
+								nil,
 							),
 						),
 					),
@@ -2506,6 +2622,7 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 									},
 								},
 								nil,
+								nil,
 							),
 						),
 					),
@@ -2552,6 +2669,51 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 									TokenEndpoint: "auth.example.com/token",
 									Scopes:        []string{"scope"},
 								},
+								nil,
+							),
+						),
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:         "ID",
+				instanceID: "INSTANCE",
+				email:      "test@example.com",
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
+		{
+			name: "valid smtp config, wrong oauth-bearer auth, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								true,
+								"from",
+								"name",
+								"",
+								"mail.smtp2go.com:2525",
+								nil,
+								nil,
+								&instance.OAuthBearerAuth{
+									User: "user",
+									BearerToken: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("client-secret"),
+									},
+								},
 							),
 						),
 					),
@@ -2586,7 +2748,7 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls bool, fromAddress, fromName, replyTo, host string, plainAuth *instance.PlainAuth, xoauth2Auth *instance.XOAuth2Auth) *instance.SMTPConfigChangedEvent {
+func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls bool, fromAddress, fromName, replyTo, host string, plainAuth *instance.PlainAuth, xoauth2Auth *instance.XOAuth2Auth, oauthBearerAuth *instance.OAuthBearerAuth) *instance.SMTPConfigChangedEvent {
 	changes := []instance.SMTPConfigChanges{
 		instance.ChangeSMTPConfigDescription(description),
 		instance.ChangeSMTPConfigTLS(tls),
@@ -2608,6 +2770,12 @@ func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls 
 			instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret),
 			instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint),
 			instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes),
+		)
+	}
+	if oauthBearerAuth != nil {
+		changes = append(changes,
+			instance.ChangeSMTPConfigOAuthBearerUser(oauthBearerAuth.User),
+			instance.ChangeSMTPConfigOAuthBearerToken(oauthBearerAuth.BearerToken),
 		)
 	}
 	event, _ := instance.NewSMTPConfigChangeEvent(ctx,

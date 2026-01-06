@@ -4969,6 +4969,7 @@ message AddEmailProviderSMTPRequest {
         SMTPNoAuth none = 9;
         SMTPPlainAuth plain = 10;
         SMTPXOAuth2Auth xoauth2 = 11;
+        SMTPOAuthBearerAuth oauth_bearer = 12;
     }
 }
 
@@ -5033,6 +5034,27 @@ message SMTPXOAuth2Auth {
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://mail.example.com\"]";
+        }
+    ];
+}
+
+message SMTPOAuthBearerAuth{
+    string user = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string bearer_token = 2 [
+        (validate.rules).string = {min_len: 0, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"vF9dft4qmTc2Nvb3RlckBhbHRhdmlzdGEuY29tCg==\"";
+            min_length: 0;
+            max_length: 2048;
         }
     ];
 }
@@ -5103,6 +5125,7 @@ message UpdateEmailProviderSMTPRequest {
         SMTPNoAuth none = 10;
         SMTPPlainAuth plain = 11;
         SMTPXOAuth2Auth xoauth2 = 12;
+        SMTPOAuthBearerAuth oauth_bearer = 13;
     }
 }
 
@@ -5301,6 +5324,7 @@ message TestEmailProviderSMTPRequest {
         SMTPNoAuth none = 9;
         SMTPPlainAuth plain = 10;
         SMTPXOAuth2Auth xoauth2 = 11;
+        SMTPOAuthBearerAuth oauth_bearer = 12;
     }
 }
 

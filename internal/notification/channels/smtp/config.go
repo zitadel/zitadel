@@ -9,9 +9,10 @@ type Config struct {
 }
 
 type SMTP struct {
-	Host        string
-	PlainAuth   *PlainAuthConfig
-	XOAuth2Auth *XOAuth2AuthConfig
+	Host            string
+	PlainAuth       *PlainAuthConfig
+	XOAuth2Auth     *XOAuth2AuthConfig
+	OAuthBearerAuth *OAuthBearerAuthConfig
 }
 
 type ConfigHTTP struct {
