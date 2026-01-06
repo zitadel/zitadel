@@ -701,9 +701,9 @@ module.exports = {
                 },
               ],
             },
+            "self-hosting/deploy/troubleshooting/troubleshooting",
           ],
         },
-        "self-hosting/deploy/troubleshooting/troubleshooting",
         {
           type: "category",
           label: "Scaling & Performance",
