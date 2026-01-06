@@ -151,7 +151,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Branding",
+          label: "Branding & Customization",
           items: [
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
@@ -588,6 +588,7 @@ module.exports = {
       label: "Deploy & Operate",
       collapsed: true,
       items: [
+        "concepts/features/console",
         {
           type: "category",
           label: "Customer Portal",
@@ -630,7 +631,6 @@ module.exports = {
                   items: [
                     "self-hosting/manage/production",
                     "self-hosting/manage/productionchecklist",
-                    "self-hosting/manage/updating_scaling",
                     "self-hosting/manage/usage_control",
                   ],
                 },
@@ -666,11 +666,9 @@ module.exports = {
                 },
                 {
                   type: "category",
-                  label: "Infrastructure & Observability",
+                  label: "Observability",
                   collapsed: true,
                   items: [
-                    "self-hosting/manage/database/database",
-                    "self-hosting/manage/cache",
                     "self-hosting/manage/service_ping",
                     {
                       type: "category",
@@ -746,9 +744,7 @@ module.exports = {
               ]
             },
             "concepts/features/selfservice",
-
             "concepts/features/account-linking",
-            "concepts/features/console",
             "concepts/features/external-user-grant",
             "concepts/features/identity-brokering",
             "concepts/features/passkeys",
