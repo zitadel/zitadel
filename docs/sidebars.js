@@ -149,6 +149,19 @@ module.exports = {
             "guides/migrate/sources/keycloak",
           ],
         },
+        {
+          type: "category",
+          label: "Branding",
+          items: [
+            "guides/manage/customize/branding",
+            "guides/manage/customize/texts",
+            "guides/manage/customize/restrictions",
+            "guides/manage/customize/user-schema",
+            "guides/manage/customize/user-metadata",
+            "guides/manage/customize/notification-providers",
+            "concepts/features/custom-domain",
+          ]
+        },
       ],
     },
     {
@@ -724,22 +737,22 @@ module.exports = {
           type: "category",
           label: "Advanced Topics",
           items: [
-            "guides/manage/customize/branding",
-            "guides/manage/customize/texts",
-            "guides/manage/customize/restrictions",
-            "guides/manage/customize/user-schema",
-            "guides/manage/customize/user-metadata",
-            "guides/manage/customize/notification-providers",
+            {
+              type: "category",
+              label: "Event Store",
+              items: [
+                "concepts/eventstore/overview",
+                "concepts/eventstore/implementation",
+              ]
+            },
             "concepts/features/selfservice",
-            "concepts/features/custom-domain",
+
             "concepts/features/account-linking",
             "concepts/features/console",
             "concepts/features/external-user-grant",
             "concepts/features/identity-brokering",
             "concepts/features/passkeys",
             "concepts/knowledge/opaque-tokens",
-            "concepts/eventstore/overview",
-            "concepts/eventstore/implementation",
           ],
         },
       ],
