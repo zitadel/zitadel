@@ -170,42 +170,65 @@ module.exports = {
       items: [
         "guides/manage/user/reg-create-user",
         "guides/manage/terraform-provider",
-        {
+{
           type: "category",
           label: "Identity Providers",
+          link: {
+            type: "doc",
+            id: "guides/integrate/identity-providers/introduction",
+          },
           items: [
             {
               type: "category",
-              label: "External IDPs",
+              label: "Social Logins",
+              collapsed: true,
               items: [
-                "guides/integrate/identity-providers/introduction",
                 "guides/integrate/identity-providers/google",
-                "guides/integrate/identity-providers/azure-ad-oidc",
-                "guides/integrate/identity-providers/azure-ad-saml",
+                "guides/integrate/identity-providers/apple",
                 "guides/integrate/identity-providers/github",
                 "guides/integrate/identity-providers/gitlab",
-                "guides/integrate/identity-providers/apple",
+                "guides/integrate/identity-providers/linkedin-oauth",
+              ],
+            },
+            {
+              type: "category",
+              label: "Enterprise (SAML & OIDC)",
+              collapsed: true,
+              items: [
+                "guides/integrate/identity-providers/azure-ad-oidc",
+                "guides/integrate/identity-providers/azure-ad-saml",
                 "guides/integrate/identity-providers/okta-oidc",
                 "guides/integrate/identity-providers/okta-saml",
                 "guides/integrate/identity-providers/keycloak",
-                "guides/integrate/identity-providers/linkedin-oauth",
                 "guides/integrate/identity-providers/onelogin-saml",
                 "guides/integrate/identity-providers/pingfederate-saml",
               ],
             },
             {
               type: "category",
-              label: "Custom Providers",
+              label: "Legacy & Directory (LDAP)",
+              items: [
+                "guides/integrate/identity-providers/ldap",
+                "guides/integrate/identity-providers/openldap",
+              ],
+            },
+            {
+              type: "category",
+              label: "Custom & Generic",
               items: [
                 "guides/integrate/identity-providers/generic-oidc",
                 "guides/integrate/identity-providers/jwt_idp",
-                "guides/integrate/identity-providers/ldap",
-                "guides/integrate/identity-providers/openldap",
                 "guides/integrate/identity-providers/mocksaml",
-                "guides/integrate/identity-providers/migrate",
-                "guides/integrate/identity-providers/additional-information",
               ],
             },
+            {
+                type: "category",
+                label: "Guides",
+                items: [
+                    "guides/integrate/identity-providers/migrate",
+                    "guides/integrate/identity-providers/additional-information",
+                ]
+            }
           ],
         },
         {
@@ -214,9 +237,6 @@ module.exports = {
           items: [
             "guides/manage/console/default-settings",
             "concepts/structure/policies",
-            // TODO: File missing - Password Policies specific doc
-            // TODO: File missing - Lockout Policies specific doc
-            // TODO: File missing - Privacy Policies specific doc
           ],
         },
         {
