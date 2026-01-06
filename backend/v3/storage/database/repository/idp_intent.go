@@ -56,67 +56,67 @@ func (i *idpIntent) LoadIdentityProvider() domain.IDPIntentRepository {
 // changes
 // -------------------------------------------------------------
 
-// SetAssertion implements [domain.IDPIntentRepository].
+// SetAssertion implements [domain.idpIntentChanges].
 func (i *idpIntent) SetAssertion(assertion string) database.Change {
 	panic("unimplemented")
 }
 
-// SetFailureURL implements [domain.IDPIntentRepository].
+// SetFailureURL implements [domain.idpIntentChanges].
 func (i *idpIntent) SetFailureURL(failureURL url.URL) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPAccessToken implements [domain.IDPIntentRepository].
+// SetIDPAccessToken implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPAccessToken(idpAccessToken string) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPArguments implements [domain.IDPIntentRepository].
+// SetIDPArguments implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPArguments(idpArguments map[string]any) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPEntryAttributes implements [domain.IDPIntentRepository].
+// SetIDPEntryAttributes implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPEntryAttributes(idpEntryAttributes map[string][]string) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPID implements [domain.IDPIntentRepository].
+// SetIDPID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPID(idpID string) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPUser implements [domain.IDPIntentRepository].
+// SetIDPUser implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUser(idpUser []byte) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPUserID implements [domain.IDPIntentRepository].
+// SetIDPUserID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUserID(idpUserID string) database.Change {
 	panic("unimplemented")
 }
 
-// SetIDPUsername implements [domain.IDPIntentRepository].
+// SetIDPUsername implements [domain.idpIntentChanges].
 func (i *idpIntent) SetIDPUsername(idpUsername string) database.Change {
 	panic("unimplemented")
 }
 
-// SetRequestID implements [domain.IDPIntentRepository].
+// SetRequestID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetRequestID(requestID string) database.Change {
 	panic("unimplemented")
 }
 
-// SetState implements [domain.IDPIntentRepository].
+// SetState implements [domain.idpIntentChanges].
 func (i *idpIntent) SetState(state domain.IDPIntentState) database.Change {
 	panic("unimplemented")
 }
 
-// SetSuccessURL implements [domain.IDPIntentRepository].
+// SetSuccessURL implements [domain.idpIntentChanges].
 func (i *idpIntent) SetSuccessURL(successURL url.URL) database.Change {
 	panic("unimplemented")
 }
 
-// SetUserID implements [domain.IDPIntentRepository].
+// SetUserID implements [domain.idpIntentChanges].
 func (i *idpIntent) SetUserID(userID string) database.Change {
 	panic("unimplemented")
 }
@@ -125,131 +125,134 @@ func (i *idpIntent) SetUserID(userID string) database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// CreatedAtCondition implements [domain.IDPIntentRepository].
+// CreatedAtCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
-	panic("unimplemented")
+	return database.NewNumberCondition(i.CreatedAtColumn(), op, createdAt)
 }
 
-// IDCondition implements [domain.IDPIntentRepository].
+// IDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) IDCondition(id string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
 }
 
-// IDPIDCondition implements [domain.IDPIntentRepository].
+// IDPIDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) IDPIDCondition(idpID string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.IDPIDColumn(), database.TextOperationEqual, idpID)
 }
 
-// IDPUserIDCondition implements [domain.IDPIntentRepository].
+// IDPUserIDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) IDPUserIDCondition(idpUserID string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.IDPUserIDColumn(), database.TextOperationEqual, idpUserID)
 }
 
-// IDPUsernameCondition implements [domain.IDPIntentRepository].
+// IDPUsernameCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) IDPUsernameCondition(idpUsername string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.IDPUsernameColumn(), database.TextOperationEqual, idpUsername)
 }
 
-// InstanceIDCondition implements [domain.IDPIntentRepository].
+// InstanceIDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) InstanceIDCondition(instanceID string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-// PrimaryKeyCondition implements [domain.IDPIntentRepository].
-func (i *idpIntent) PrimaryKeyCondition(instanceID string, id string) database.Condition {
-	panic("unimplemented")
+// PrimaryKeyCondition implements [domain.idpIntentConditions].
+func (i *idpIntent) PrimaryKeyCondition(instanceID, id string) database.Condition {
+	return database.And(
+		i.InstanceIDCondition(instanceID),
+		i.IDCondition(id),
+	)
 }
 
-// RequestIDCondition implements [domain.IDPIntentRepository].
+// RequestIDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) RequestIDCondition(requestID string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.RequestIDColumn(), database.TextOperationEqual, requestID)
 }
 
-// StateCondition implements [domain.IDPIntentRepository].
+// StateCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) StateCondition(state domain.IDPIntentState) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.StateColumn(), database.TextOperationEqual, state.String())
 }
 
-// UpdatedAtCondition implements [domain.IDPIntentRepository].
+// UpdatedAtCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
-	panic("unimplemented")
+	return database.NewNumberCondition(i.UpdatedAtColumn(), op, updatedAt)
 }
 
-// UserIDCondition implements [domain.IDPIntentRepository].
+// UserIDCondition implements [domain.idpIntentConditions].
 func (i *idpIntent) UserIDCondition(userID string) database.Condition {
-	panic("unimplemented")
+	return database.NewTextCondition(i.UserIDColumn(), database.TextOperationEqual, userID)
 }
 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
 
-// AssertionColumn implements [domain.IDPIntentRepository].
+// AssertionColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) AssertionColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "assertion")
 }
 
-// CreatedAtColumn implements [domain.IDPIntentRepository].
+// CreatedAtColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) CreatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
-// ExpiresAtColumn implements [domain.IDPIntentRepository].
+// ExpiresAtColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) ExpiresAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "expires_at")
 }
 
-// FailureURLColumn implements [domain.IDPIntentRepository].
+// FailureURLColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) FailureURLColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "failure_url")
 }
 
-// IDColumn implements [domain.IDPIntentRepository].
+// IDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "id")
 }
 
-// IDPAccessTokenColumn implements [domain.IDPIntentRepository].
+// IDPAccessTokenColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPAccessTokenColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_access_token")
 }
 
-// IDPArgumentsColumn implements [domain.IDPIntentRepository].
+// IDPArgumentsColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPArgumentsColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_arguments")
 }
 
-// IDPEntryAttributesColumn implements [domain.IDPIntentRepository].
+// IDPEntryAttributesColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPEntryAttributesColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_entry_attributes")
 }
 
-// IDPIDColumn implements [domain.IDPIntentRepository].
+// IDPIDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_id")
 }
 
-// IDPUserColumn implements [domain.IDPIntentRepository].
+// IDPUserColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPUserColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_user")
 }
 
-// IDPUserIDColumn implements [domain.IDPIntentRepository].
+// IDPUserIDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPUserIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_user_id")
 }
 
-// IDPUsernameColumn implements [domain.IDPIntentRepository].
+// IDPUsernameColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) IDPUsernameColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_username")
 }
 
-// InstanceIDColumn implements [domain.IDPIntentRepository].
+// InstanceIDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) InstanceIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
-// MaxIDPIntentLifetimeColumn implements [domain.IDPIntentRepository].
+// MaxIDPIntentLifetimeColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) MaxIDPIntentLifetimeColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "max_idp_intent_lifetime")
 }
@@ -259,32 +262,32 @@ func (i *idpIntent) PrimaryKeyColumns() []database.Column {
 	return []database.Column{i.IDColumn(), i.InstanceIDColumn()}
 }
 
-// RequestIDColumn implements [domain.IDPIntentRepository].
+// RequestIDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) RequestIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "request_id")
 }
 
-// StateColumn implements [domain.IDPIntentRepository].
+// StateColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) StateColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "state")
 }
 
-// SucceededAtColumn implements [domain.IDPIntentRepository].
+// SucceededAtColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) SucceededAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "succeeded_at")
 }
 
-// SuccessURLColumn implements [domain.IDPIntentRepository].
+// SuccessURLColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) SuccessURLColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "success_url")
 }
 
-// UpdatedAtColumn implements [domain.IDPIntentRepository].
+// UpdatedAtColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) UpdatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 
-// UserIDColumn implements [domain.IDPIntentRepository].
+// UserIDColumn implements [domain.idpIntentColumns].
 func (i *idpIntent) UserIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "user_id")
 }
