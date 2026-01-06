@@ -90,7 +90,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	)
 
 	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
-	logger.Info("structered logger configured", "config_level", cfg.Level, "format", cfg.Format)
+	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
 	slog.SetDefault(logger)
 }
 
