@@ -441,11 +441,11 @@ module.exports = {
             "guides/integrate/token-introspection/private-key-jwt",
           ]
         },
+        "guides/integrate/back-channel-logout",
         {
           type: "category",
           label: "External Integrations",
           items: [
-            "guides/integrate/back-channel-logout",
             {
               type: "category",
               label: "Services",
