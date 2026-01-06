@@ -16,7 +16,7 @@
   [timestamp]="configsResult?.details?.viewTimestamp"
   [selection]="selection"
   [hideRefresh]="true"
->
+  >
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="activated">
@@ -24,12 +24,13 @@
           <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
         </th>
         <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
-          <i
-            matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
-            *ngIf="isActive(config.state)"
-            class="smtp-available las la-check-circle"
-            data-e2e="active-provider"
-          ></i>
+          @if (isActive(config.state)) {
+            <i
+              matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
+              class="smtp-available las la-check-circle"
+              data-e2e="active-provider"
+            ></i>
+          }
         </td>
       </ng-container>
 
@@ -45,8 +46,12 @@
           <span>TLS</span>
         </th>
         <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
-          <i *ngIf="config.tls" class="las la-lock"></i>
-          <i *ngIf="config.senderAddress && !config.tls" class="las la-unlock"></i>
+          @if (config.tls) {
+            <i class="las la-lock"></i>
+          }
+          @if (config.senderAddress && !config.tls) {
+            <i class="las la-unlock"></i>
+          }
         </td>
       </ng-container>
 
@@ -68,29 +73,31 @@
         <th class="smtp-table-actions" mat-header-cell *matHeaderCellDef></th>
         <td class="smtp-table-actions" mat-cell *matCellDef="let config">
           <cnsl-table-actions>
-            <button
-              actions
-              *ngIf="!isActive(config.state)"
-              [disabled]="(['iam.write'] | hasRole | async) === false"
-              mat-icon-button
-              matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
-              data-e2e="activate-provider-button"
-              (click)="activateSMTPConfig(config.id); $event.stopPropagation()"
-            >
-              <i class="las la-check-circle"></i>
-            </button>
+            @if (!isActive(config.state)) {
+              <button
+                actions
+                [disabled]="(['iam.write'] | hasRole | async) === false"
+                mat-icon-button
+                matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
+                data-e2e="activate-provider-button"
+                (click)="activateSMTPConfig(config.id); $event.stopPropagation()"
+                >
+                <i class="las la-check-circle"></i>
+              </button>
+            }
 
-            <button
-              actions
-              *ngIf="isActive(config.state)"
-              [disabled]="(['iam.write'] | hasRole | async) === false"
-              mat-icon-button
-              matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
-              data-e2e="deactivate-provider-button"
-              (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
-            >
-              <i class="las la-times-circle"></i>
-            </button>
+            @if (isActive(config.state)) {
+              <button
+                actions
+                [disabled]="(['iam.write'] | hasRole | async) === false"
+                mat-icon-button
+                matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
+                data-e2e="deactivate-provider-button"
+                (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
+                >
+                <i class="las la-times-circle"></i>
+              </button>
+            }
 
             <button
               actions
@@ -100,7 +107,7 @@
               matTooltip="{{ 'SMTP.LIST.TEST' | translate }}"
               data-e2e="test-provider-button"
               (click)="testSMTPConfig(config.id); $event.stopPropagation()"
-            >
+              >
               <i class="las la-flask"></i>
             </button>
 
@@ -112,7 +119,7 @@
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               data-e2e="delete-provider-button"
               (click)="deleteSMTPConfig(config.id, config.senderName); $event.stopPropagation()"
-            >
+              >
               <i class="las la-trash"></i>
             </button>
           </cnsl-table-actions>
@@ -124,10 +131,12 @@
     </table>
   </div>
 
-  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
-    <i class="las la-exclamation"></i>
-    <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
-  </div>
+  @if ((loading$ | async) === false && !dataSource.data.length) {
+    <div class="no-content-row">
+      <i class="las la-exclamation"></i>
+      <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
+    </div>
+  }
 
   <cnsl-paginator
     #paginator

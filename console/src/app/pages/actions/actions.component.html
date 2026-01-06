@@ -10,14 +10,14 @@
       [setting]="currentSetting$()"
       (settingChange)="currentSetting$.set($event)"
       [settingsList]="settingsList"
-    >
-      <ng-container *ngIf="currentSetting$().id === 'actions'">
+      >
+      @if (currentSetting$().id === 'actions') {
         <cnsl-actions-two-actions></cnsl-actions-two-actions>
-      </ng-container>
+      }
 
-      <ng-container *ngIf="currentSetting$().id === 'targets'">
+      @if (currentSetting$().id === 'targets') {
         <cnsl-actions-two-targets></cnsl-actions-two-targets>
-      </ng-container>
+      }
     </cnsl-sidenav>
   </div>
 </div>

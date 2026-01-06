@@ -8,19 +8,20 @@
   </div>
 
   <div class="footer">
-    <a
-      mat-raised-button
-      color="primary"
-      *ngIf="customerPortalLink$ | async as customerPortalLink"
-      class="portal-link external-link"
-      [href]="customerPortalLink"
-      target="_blank"
-      rel="noreferrer"
-    >
-      <div class="cnsl-action-button">
-        <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
-        <i class="las la-external-link-alt"></i>
-      </div>
-    </a>
+    @if (customerPortalLink$ | async; as customerPortalLink) {
+      <a
+        mat-raised-button
+        color="primary"
+        class="portal-link external-link"
+        [href]="customerPortalLink"
+        target="_blank"
+        rel="noreferrer"
+        >
+        <div class="cnsl-action-button">
+          <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
+          <i class="las la-external-link-alt"></i>
+        </div>
+      </a>
+    }
   </div>
 </div>

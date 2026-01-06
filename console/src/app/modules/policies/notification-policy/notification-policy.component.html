@@ -1,40 +1,45 @@
 <h2>{{ 'POLICY.NOTIFICATION.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.NOTIFICATION.DESCRIPTION' | translate }}</p>
 
-<div *ngIf="loading" class="spinner-wr">
-  <mat-spinner diameter="30" color="primary"></mat-spinner>
-</div>
+@if (loading) {
+  <div class="spinner-wr">
+    <mat-spinner diameter="30" color="primary"></mat-spinner>
+  </div>
+}
 
 <ng-template cnslHasRole [hasRole]="['policy.delete']">
-  <button
-    *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-    matTooltip="{{ 'POLICY.RESET' | translate }}"
-    color="warn"
-    (click)="removePolicy()"
-    mat-stroked-button
-  >
-    {{ 'POLICY.RESET' | translate }}
-  </button>
+  @if (serviceType === PolicyComponentServiceType.MGMT && !isDefault) {
+    <button
+      matTooltip="{{ 'POLICY.RESET' | translate }}"
+      color="warn"
+      (click)="removePolicy()"
+      mat-stroked-button
+      >
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  }
 </ng-template>
 
 <div class="notification-policy-card">
-  <cnsl-card *ngIf="notificationData">
-    <div class="notification-policy-content">
-      <div class="row">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasUppercase"
-          ngDefaultControl
-          data-e2e="notification-policy-checkbox"
-          [(ngModel)]="notificationData.passwordChange"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          {{ 'POLICY.NOTIFICATION.PASSWORDCHANGE' | translate }}
-        </mat-checkbox>
+  @if (notificationData) {
+    <cnsl-card>
+      <div class="notification-policy-content">
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasUppercase"
+            ngDefaultControl
+            data-e2e="notification-policy-checkbox"
+            [(ngModel)]="notificationData.passwordChange"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+            >
+            {{ 'POLICY.NOTIFICATION.PASSWORDCHANGE' | translate }}
+          </mat-checkbox>
+        </div>
       </div>
-    </div>
-  </cnsl-card>
+    </cnsl-card>
+  }
 </div>
 
 <div class="btn-container">
@@ -45,7 +50,7 @@
     type="submit"
     mat-raised-button
     data-e2e="save-notification-policy-button"
-  >
+    >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>

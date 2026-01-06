@@ -24,9 +24,11 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'ACTIONSTWO.EXECUTION.TABLE.TARGET' | translate }}</th>
         <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
           <div class="target-key">
-            <cnsl-project-role-chip *ngFor="let target of row.mappedTargets; trackBy: trackTarget" [roleName]="target.name">
-              {{ target.name }}
-            </cnsl-project-role-chip>
+            @for (target of row.mappedTargets; track trackTarget($index, target)) {
+              <cnsl-project-role-chip [roleName]="target.name">
+                {{ target.name }}
+              </cnsl-project-role-chip>
+            }
           </div>
         </td>
       </ng-container>
@@ -50,7 +52,7 @@
               color="warn"
               (click)="$event.stopPropagation(); delete.emit(row.execution)"
               mat-icon-button
-            >
+              >
               <i class="las la-trash"></i>
             </button>
           </cnsl-table-actions>

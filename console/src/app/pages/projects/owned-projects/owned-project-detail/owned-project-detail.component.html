@@ -7,97 +7,109 @@
   [hasContributors]="true"
   stateTooltip="{{ 'PROJECT.STATE.' + project?.state | translate }}"
   [hasActions]="['project.app.write:' + project?.id, 'project.app.write$'] | hasRole | async"
->
+  >
   <ng-template topActions cnslHasRole [hasRole]="['project.write:' + projectId, 'project.write']">
-    <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
-      {{ 'ACTIONS.RENAME' | translate }}
-    </button>
+    @if (isZitadel === false) {
+      <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name">
+        {{ 'ACTIONS.RENAME' | translate }}
+      </button>
+    }
 
-    <button
-      mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
-      *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
-      (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)"
-    >
-      {{ 'PROJECT.TABLE.DEACTIVATE' | translate }}
-    </button>
-
-    <button
-      mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
-      *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
-      (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)"
-    >
-      {{ 'PROJECT.TABLE.ACTIVATE' | translate }}
-    </button>
-
-    <ng-template cnslHasRole [hasRole]="['project.delete$', 'project.delete:' + projectId]">
+    @if (project?.state === ProjectState.PROJECT_STATE_ACTIVE) {
       <button
         mat-menu-item
-        matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-        (click)="deleteProject()"
-        aria-label="Edit project name"
-        *ngIf="isZitadel === false"
-      >
-        <span [style.color]="'var(--warn)'">{{ 'PROJECT.PAGES.DELETE' | translate }}</span>
+        [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
+        (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)"
+        >
+        {{ 'PROJECT.TABLE.DEACTIVATE' | translate }}
       </button>
+    }
+
+    @if (project?.state === ProjectState.PROJECT_STATE_INACTIVE) {
+      <button
+        mat-menu-item
+        [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
+        (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)"
+        >
+        {{ 'PROJECT.TABLE.ACTIVATE' | translate }}
+      </button>
+    }
+
+    <ng-template cnslHasRole [hasRole]="['project.delete$', 'project.delete:' + projectId]">
+      @if (isZitadel === false) {
+        <button
+          mat-menu-item
+          matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+          (click)="deleteProject()"
+          aria-label="Edit project name"
+          >
+          <span [style.color]="'var(--warn)'">{{ 'PROJECT.PAGES.DELETE' | translate }}</span>
+        </button>
+      }
     </ng-template>
   </ng-template>
-  <cnsl-contributors
-    topContributors
-    class="project-contributors"
-    *ngIf="project"
-    [loading]="loading$ | async"
-    [totalResult]="totalMemberResult"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['project.member.write$', 'project.member.write:' + project.id] | hasRole | async) === false"
-  >
-  </cnsl-contributors>
+  @if (project) {
+    <cnsl-contributors
+      topContributors
+      class="project-contributors"
+      [loading]="loading$ | async"
+      [totalResult]="totalMemberResult"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['project.member.write$', 'project.member.write:' + project.id] | hasRole | async) === false"
+      >
+    </cnsl-contributors>
+  }
 
-  <p topContent *ngIf="isZitadel" class="zitadel-warning">{{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}</p>
+  @if (isZitadel) {
+    <p topContent class="zitadel-warning">{{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}</p>
+  }
 
-  <cnsl-info-row topContent *ngIf="project" [project]="project"></cnsl-info-row>
+  @if (project) {
+    <cnsl-info-row topContent [project]="project"></cnsl-info-row>
+  }
 </cnsl-top-view>
 
 <div class="max-width-container">
   <cnsl-meta-layout>
     <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
-      <ng-container *ngIf="currentSetting.id === 'general' && project">
+      @if (currentSetting.id === 'general' && project) {
         <ng-template cnslHasRole [hasRole]="['project.app.read:' + project.id, 'project.app.read$']">
-          <cnsl-application-grid
-            *ngIf="grid"
-            [disabled]="isZitadel || (['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
-            (changeView)="grid = false"
-            [projectId]="projectId"
-          >
-          </cnsl-application-grid>
-          <cnsl-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
-            <div class="card-actions" card-actions>
-              <button mat-icon-button (click)="grid = true">
-                <i matTooltip="show grid view" class="las la-th-large"></i>
-              </button>
-            </div>
-            <cnsl-applications
+          @if (grid) {
+            <cnsl-application-grid
+              [disabled]="isZitadel || (['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
+              (changeView)="grid = false"
+              [projectId]="projectId"
+              >
+            </cnsl-application-grid>
+          }
+          @if (!grid) {
+            <cnsl-card title="{{ 'PROJECT.APP.TITLE' | translate }}">
+              <div class="card-actions" card-actions>
+                <button mat-icon-button (click)="grid = true">
+                  <i matTooltip="show grid view" class="las la-th-large"></i>
+                </button>
+              </div>
+              <cnsl-applications
               [disabled]="
                 isZitadel || (['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false
               "
-              [projectId]="projectId"
-            ></cnsl-applications>
-          </cnsl-card>
+                [projectId]="projectId"
+              ></cnsl-applications>
+            </cnsl-card>
+          }
         </ng-template>
-
-        <ng-container *ngIf="!isZitadel">
+        @if (!isZitadel) {
           <ng-template cnslHasRole [hasRole]="['project.role.read:' + project.id, 'project.role.read']">
             <cnsl-card
               id="roles"
               title="{{ 'PROJECT.SETTINGS.TITLE' | translate }}"
               description="{{ 'PROJECT.SETTINGS.DESCRIPTION' | translate }}"
-            >
+              >
               <div class="project-detail-privatelabel-info">
                 <h2 class="setting-title">{{ 'PROJECT.PAGES.PRIVATELABEL.TITLE' | translate }}</h2>
                 <p class="setting-desc">
@@ -109,7 +121,7 @@
                     [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
                     (click)="openPrivateLabelingDialog()"
                     mat-icon-button
-                  >
+                    >
                     <i class="las la-pen"></i>
                   </button>
                 </p>
@@ -118,85 +130,84 @@
                 [(ngModel)]="project.projectRoleAssertion"
                 [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
                 color="primary"
-              >
-                {{ 'PROJECT.ROLE.ASSERTION' | translate }}</mat-checkbox
-              >
-              <cnsl-info-section class="desc cnsl-secondary-text">{{
-                'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate
-              }}</cnsl-info-section>
-              <mat-checkbox
-                [(ngModel)]="project.projectRoleCheck"
-                [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
-                color="primary"
-              >
-                {{ 'PROJECT.ROLE.CHECK' | translate }}</mat-checkbox
-              >
-              <cnsl-info-section class="desc cnsl-secondary-text">{{
-                'PROJECT.ROLE.CHECK_DESCRIPTION' | translate
-              }}</cnsl-info-section>
-              <mat-checkbox
-                [(ngModel)]="project.hasProjectCheck"
-                [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
-                color="primary"
-              >
-                {{ 'PROJECT.HAS_PROJECT' | translate }}</mat-checkbox
-              >
-              <cnsl-info-section class="desc cnsl-secondary-text">{{
-                'PROJECT.HAS_PROJECT_DESCRIPTION' | translate
-              }}</cnsl-info-section>
-
-              <div class="project-detail-btn-container">
-                <button
-                  mat-raised-button
-                  [disabled]="(['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
-                  color="primary"
-                  (click)="saveProject()"
                 >
-                  {{ 'ACTIONS.SAVE' | translate }}
-                </button>
-              </div>
-            </cnsl-card>
-          </ng-template>
-        </ng-container>
-      </ng-container>
+                {{ 'PROJECT.ROLE.ASSERTION' | translate }}</mat-checkbox
+                >
+                <cnsl-info-section class="desc cnsl-secondary-text">{{
+                  'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate
+                }}</cnsl-info-section>
+                <mat-checkbox
+                  [(ngModel)]="project.projectRoleCheck"
+                  [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
+                  color="primary"
+                  >
+                  {{ 'PROJECT.ROLE.CHECK' | translate }}</mat-checkbox
+                  >
+                  <cnsl-info-section class="desc cnsl-secondary-text">{{
+                    'PROJECT.ROLE.CHECK_DESCRIPTION' | translate
+                  }}</cnsl-info-section>
+                  <mat-checkbox
+                    [(ngModel)]="project.hasProjectCheck"
+                    [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
+                    color="primary"
+                    >
+                    {{ 'PROJECT.HAS_PROJECT' | translate }}</mat-checkbox
+                    >
+                    <cnsl-info-section class="desc cnsl-secondary-text">{{
+                      'PROJECT.HAS_PROJECT_DESCRIPTION' | translate
+                    }}</cnsl-info-section>
+                    <div class="project-detail-btn-container">
+                      <button
+                        mat-raised-button
+                        [disabled]="(['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
+                        color="primary"
+                        (click)="saveProject()"
+                        >
+                        {{ 'ACTIONS.SAVE' | translate }}
+                      </button>
+                    </div>
+                  </cnsl-card>
+                </ng-template>
+              }
+            }
 
-      <ng-container *ngIf="currentSetting.id === 'roles'">
-        <h2 class="section-h2">{{ 'PROJECT.ROLE.TITLE' | translate }}</h2>
-        <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}</p>
-
-        <cnsl-project-roles-table
-          class="project-roles"
-          [disabled]="(['project.role.write$', 'project.role.write:' + projectId] | hasRole | async) === false"
-          [actionsVisible]="true"
-          [projectId]="projectId"
-        >
-        </cnsl-project-roles-table>
-      </ng-container>
-      <ng-container *ngIf="currentSetting.id === 'projectgrants'">
-        <h2 class="section-h2">{{ 'PROJECT.GRANT.TITLE' | translate }}</h2>
-        <p class="desc cnsl-secondary-text">{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}</p>
-        <cnsl-project-grants [projectId]="projectId"></cnsl-project-grants>
-      </ng-container>
-      <ng-container *ngIf="currentSetting.id === 'grants'">
-        <h2 class="section-h2">{{ 'GRANTS.TITLE' | translate }}</h2>
-        <p class="desc cnsl-secondary-text">{{ 'GRANTS.DESC' | translate }}</p>
-
-        <!-- 'org',
-          'projectId',
-          'type', are hidden -->
-        <cnsl-user-grants
-          [context]="UserGrantContext.OWNED_PROJECT"
-          [projectId]="projectId"
-          [displayedColumns]="['select', 'user', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
-          [refreshOnPreviousRoutes]="['/grant-create/project/' + projectId]"
-          [disableWrite]="(['user.grant.write$', 'user.grant.write:' + projectId] | hasRole | async) === false"
-          [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + projectId] | hasRole | async) === false"
-        >
-        </cnsl-user-grants>
-      </ng-container>
-    </cnsl-sidenav>
-    <div metainfo>
-      <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="projectId"></cnsl-changes>
-    </div>
-  </cnsl-meta-layout>
-</div>
+            @if (currentSetting.id === 'roles') {
+              <h2 class="section-h2">{{ 'PROJECT.ROLE.TITLE' | translate }}</h2>
+              <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}</p>
+              <cnsl-project-roles-table
+                class="project-roles"
+                [disabled]="(['project.role.write$', 'project.role.write:' + projectId] | hasRole | async) === false"
+                [actionsVisible]="true"
+                [projectId]="projectId"
+                >
+              </cnsl-project-roles-table>
+            }
+            @if (currentSetting.id === 'projectgrants') {
+              <h2 class="section-h2">{{ 'PROJECT.GRANT.TITLE' | translate }}</h2>
+              <p class="desc cnsl-secondary-text">{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}</p>
+              <cnsl-project-grants [projectId]="projectId"></cnsl-project-grants>
+            }
+            @if (currentSetting.id === 'grants') {
+              <h2 class="section-h2">{{ 'GRANTS.TITLE' | translate }}</h2>
+              <p class="desc cnsl-secondary-text">{{ 'GRANTS.DESC' | translate }}</p>
+              <!-- 'org',
+              'projectId',
+              'type', are hidden -->
+              <cnsl-user-grants
+                [context]="UserGrantContext.OWNED_PROJECT"
+                [projectId]="projectId"
+                [displayedColumns]="['select', 'user', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
+                [refreshOnPreviousRoutes]="['/grant-create/project/' + projectId]"
+                [disableWrite]="(['user.grant.write$', 'user.grant.write:' + projectId] | hasRole | async) === false"
+                [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + projectId] | hasRole | async) === false"
+                >
+              </cnsl-user-grants>
+            }
+          </cnsl-sidenav>
+          <div metainfo>
+            @if (project) {
+              <cnsl-changes [changeType]="ChangeType.PROJECT" [id]="projectId"></cnsl-changes>
+            }
+          </div>
+        </cnsl-meta-layout>
+      </div>

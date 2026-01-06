@@ -3,36 +3,48 @@
 </h1>
 
 <div mat-dialog-content>
-  <div class="icon-wrapper" *ngIf="data.icon">
-    <i class="icon {{ data.icon }}"></i>
-  </div>
+  @if (data.icon) {
+    <div class="icon-wrapper">
+      <i class="icon {{ data.icon }}"></i>
+    </div>
+  }
   <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate: data.descriptionParam }}</p>
 
-  <cnsl-info-section *ngIf="data.warnSectionKey" [type]="InfoSectionType.WARN">
-    {{ data.warnSectionKey | translate }}
-  </cnsl-info-section>
+  @if (data.warnSectionKey) {
+    <cnsl-info-section [type]="InfoSectionType.WARN">
+      {{ data.warnSectionKey | translate }}
+    </cnsl-info-section>
+  }
 
-  <p *ngIf="data.hintKey" class="desc cnsl-secondary-text">{{ data.hintKey | translate: { value: data.confirmation } }}</p>
+  @if (data.hintKey) {
+    <p class="desc cnsl-secondary-text">{{ data.hintKey | translate: { value: data.confirmation } }}</p>
+  }
 
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ data.emailKey | translate }}</cnsl-label>
     <input cnslInput [(ngModel)]="email" data-e2e="email-test-dialog-input" />
   </cnsl-form-field>
 
-  <div class="is-loading" *ngIf="isLoading()">
-    <mat-spinner diameter="50"></mat-spinner>
-  </div>
+  @if (isLoading()) {
+    <div class="is-loading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
 
-  <cnsl-form-field class="formfield" *ngIf="testResult">
-    <cnsl-label>{{ data.testResultKey | translate }}</cnsl-label>
-    <textarea cnslInput class="{{ resultClass }}" [(ngModel)]="testResult"></textarea>
-  </cnsl-form-field>
+  @if (testResult) {
+    <cnsl-form-field class="formfield">
+      <cnsl-label>{{ data.testResultKey | translate }}</cnsl-label>
+      <textarea cnslInput class="{{ resultClass }}" [(ngModel)]="testResult"></textarea>
+    </cnsl-form-field>
+  }
 </div>
 
 <div class="action" mat-dialog-actions>
-  <button *ngIf="data.cancelKey" mat-stroked-button (click)="closeDialog()">
-    {{ data.cancelKey | translate }}
-  </button>
+  @if (data.cancelKey) {
+    <button mat-stroked-button (click)="closeDialog()">
+      {{ data.cancelKey | translate }}
+    </button>
+  }
   <span class="fill-space"></span>
   <button
     color="primary"
@@ -41,7 +53,7 @@
     class="ok-button"
     (click)="testEmailConfiguration()"
     data-e2e="test-email-button"
-  >
+    >
     {{ data.confirmKey | translate }}
   </button>
 </div>

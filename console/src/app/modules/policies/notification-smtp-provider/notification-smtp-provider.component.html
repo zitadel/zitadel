@@ -9,29 +9,32 @@
 <p class="cnsl-secondary-text">{{ 'SMTP.CREATE.DESCRIPTION' | translate }}</p>
 
 <div class="new-smtp-wrapper">
-  <div *ngFor="let provider of providers">
-    <a
-      class="item card"
-      [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
-      *ngIf="provider.name !== 'generic'"
-    >
-      <img class="smtp-logo" src="{{ provider.image }}" alt="{{ provider.name }}" />
-      <div class="text-container">
-        <span class="title">{{ provider.name | titlecase }} </span>
-      </div>
-    </a>
-
-    <a
-      class="item card"
-      [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
-      *ngIf="provider.name === 'generic'"
-    >
-      <div class="smtp-icon">
-        <mat-icon class="icon" svgIcon="mdi_smtp" />
-      </div>
-      <div class="text-container">
-        <span class="title">Generic SMTP</span>
-      </div>
-    </a>
-  </div>
+  @for (provider of providers; track provider) {
+    <div>
+      @if (provider.name !== 'generic') {
+        <a
+          class="item card"
+          [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
+          >
+          <img class="smtp-logo" src="{{ provider.image }}" alt="{{ provider.name }}" />
+          <div class="text-container">
+            <span class="title">{{ provider.name | titlecase }} </span>
+          </div>
+        </a>
+      }
+      @if (provider.name === 'generic') {
+        <a
+          class="item card"
+          [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
+          >
+          <div class="smtp-icon">
+            <mat-icon class="icon" svgIcon="mdi_smtp" />
+          </div>
+          <div class="text-container">
+            <span class="title">Generic SMTP</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
 </div>

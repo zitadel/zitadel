@@ -5,13 +5,15 @@
         <mat-icon>close</mat-icon>
       </button>
       <span class="abort">{{ title }}</span
-      ><span class="abort-2" *ngIf="createSteps > 1"
-        >{{ 'ACTIONS.STEP' | translate }} {{ currentCreateStep }} {{ 'ACTIONS.OF' | translate }} {{ createSteps }}</span
-      >
-    </div>
+        >@if (createSteps > 1) {
+        <span class="abort-2"
+          >{{ 'ACTIONS.STEP' | translate }} {{ currentCreateStep }} {{ 'ACTIONS.OF' | translate }} {{ createSteps }}</span
+          >
+        }
+      </div>
 
-    <div class="create-layout-content">
-      <ng-content></ng-content>
+      <div class="create-layout-content">
+        <ng-content></ng-content>
+      </div>
     </div>
   </div>
-</div>

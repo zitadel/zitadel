@@ -28,27 +28,34 @@
       </div>
       <span class="fill-space"></span>
       <button class="grid-btn" (click)="grid = !grid" mat-icon-button data-e2e="toggle-grid">
-        <i *ngIf="grid" class="show list view las la-th-list"></i>
-        <i *ngIf="!grid" class="las la-border-all"></i>
+        @if (grid) {
+          <i class="show list view las la-th-list"></i>
+        }
+        @if (!grid) {
+          <i class="las la-border-all"></i>
+        }
       </button>
     </div>
     <p class="sub cnsl-secondary-text max-width-description">
       {{
-        ((projectType$ | async) === ProjectType.PROJECTTYPE_OWNED
-          ? 'DESCRIPTIONS.PROJECTS.OWNED.DESCRIPTION'
-          : 'DESCRIPTIONS.PROJECTS.GRANTED.DESCRIPTION'
-        ) | translate
+      ((projectType$ | async) === ProjectType.PROJECTTYPE_OWNED
+      ? 'DESCRIPTIONS.PROJECTS.OWNED.DESCRIPTION'
+      : 'DESCRIPTIONS.PROJECTS.GRANTED.DESCRIPTION'
+      ) | translate
       }}
     </p>
-    <cnsl-project-grid
-      *ngIf="grid"
-      [projectType$]="projectType$"
-      [zitadelProjectId]="zitadelProjectId"
-      (emitAddProject)="addProject()"
-    >
-    </cnsl-project-grid>
+    @if (grid) {
+      <cnsl-project-grid
+        [projectType$]="projectType$"
+        [zitadelProjectId]="zitadelProjectId"
+        (emitAddProject)="addProject()"
+        >
+      </cnsl-project-grid>
+    }
 
-    <cnsl-project-list *ngIf="!grid" [projectType$]="projectType$" [zitadelProjectId]="zitadelProjectId">
-    </cnsl-project-list>
+    @if (!grid) {
+      <cnsl-project-list [projectType$]="projectType$" [zitadelProjectId]="zitadelProjectId">
+      </cnsl-project-list>
+    }
   </div>
 </div>

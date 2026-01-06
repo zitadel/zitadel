@@ -1,47 +1,50 @@
-<ng-container *ngIf="orgQuery.data() as org">
-  <cnsl-top-view
-    *ngIf="['org.write:' + org.id, 'org.write$'] | hasRole as hasWrite$"
-    [hasBackButton]="false"
-    title="{{ org.name }}"
-    [isActive]="org.state === OrganizationState.ACTIVE"
-    [isInactive]="org.state === OrganizationState.INACTIVE"
-    [hasContributors]="true"
-    stateTooltip="{{ 'ORG.STATE.' + org.state | translate }}"
-    [hasActions]="hasWrite$ | async"
-  >
-    <ng-container topActions *ngIf="hasWrite$ | async">
-      <button mat-menu-item *ngIf="org.state === OrganizationState.ACTIVE" (click)="changeState(OrganizationState.INACTIVE)">
-        {{ 'ORG.PAGES.DEACTIVATE' | translate }}
-      </button>
-
-      <button mat-menu-item *ngIf="org.state === OrganizationState.INACTIVE" (click)="changeState(OrganizationState.ACTIVE)">
-        {{ 'ORG.PAGES.REACTIVATE' | translate }}
-      </button>
-
-      <button data-e2e="rename" mat-menu-item (click)="renameOrg(org)">
-        {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
-      </button>
-
-      <button data-e2e="delete" mat-menu-item (click)="deleteOrg(org)">
-        {{ 'ORG.PAGES.DELETE' | translate }}
-      </button>
-    </ng-container>
-    <cnsl-contributors
-      topContributors
-      [totalResult]="totalMemberResult"
-      [loading]="loading$ | async"
-      [membersSubject]="membersSubject"
-      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-      (addClicked)="openAddMember()"
-      (showDetailClicked)="showDetail()"
-      (refreshClicked)="loadMembers()"
-      [disabled]="(['org.member.write'] | hasRole | async) === false"
-    >
-    </cnsl-contributors>
-
-    <cnsl-info-row topContent [org]="org"></cnsl-info-row>
-  </cnsl-top-view>
+@if (orgQuery.data(); as org) {
+  @if (['org.write:' + org.id, 'org.write$'] | hasRole; as hasWrite$) {
+    <cnsl-top-view
+      [hasBackButton]="false"
+      title="{{ org.name }}"
+      [isActive]="org.state === OrganizationState.ACTIVE"
+      [isInactive]="org.state === OrganizationState.INACTIVE"
+      [hasContributors]="true"
+      stateTooltip="{{ 'ORG.STATE.' + org.state | translate }}"
+      [hasActions]="hasWrite$ | async"
+      >
+      @if (hasWrite$ | async) {
+        <ng-container topActions>
+          @if (org.state === OrganizationState.ACTIVE) {
+            <button mat-menu-item (click)="changeState(OrganizationState.INACTIVE)">
+              {{ 'ORG.PAGES.DEACTIVATE' | translate }}
+            </button>
+          }
+          @if (org.state === OrganizationState.INACTIVE) {
+            <button mat-menu-item (click)="changeState(OrganizationState.ACTIVE)">
+              {{ 'ORG.PAGES.REACTIVATE' | translate }}
+            </button>
+          }
+          <button data-e2e="rename" mat-menu-item (click)="renameOrg(org)">
+            {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
+          </button>
+          <button data-e2e="delete" mat-menu-item (click)="deleteOrg(org)">
+            {{ 'ORG.PAGES.DELETE' | translate }}
+          </button>
+        </ng-container>
+      }
+      <cnsl-contributors
+        topContributors
+        [totalResult]="totalMemberResult"
+        [loading]="loading$ | async"
+        [membersSubject]="membersSubject"
+        title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+        (addClicked)="openAddMember()"
+        (showDetailClicked)="showDetail()"
+        (refreshClicked)="loadMembers()"
+        [disabled]="(['org.member.write'] | hasRole | async) === false"
+        >
+      </cnsl-contributors>
+      <cnsl-info-row topContent [org]="org"></cnsl-info-row>
+    </cnsl-top-view>
+  }
   <div class="max-width-container">
     <cnsl-meta-layout>
       <cnsl-metadata
@@ -51,10 +54,11 @@
         (editClicked)="editMetadata()"
         (refresh)="loadMetadata()"
       ></cnsl-metadata>
-
       <div metainfo>
-        <cnsl-changes *ngIf="org && reloadChanges()" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
+        @if (org && reloadChanges()) {
+          <cnsl-changes [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
+        }
       </div>
     </cnsl-meta-layout>
   </div>
-</ng-container>
+}

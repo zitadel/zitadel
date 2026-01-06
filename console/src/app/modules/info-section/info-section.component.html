@@ -6,10 +6,16 @@
     alert: type === infoSectionType.ALERT,
     fit: fitWidth,
   }"
->
-  <i *ngIf="type === infoSectionType.INFO" class="icon las la-info"></i>
-  <i *ngIf="type === infoSectionType.WARN" class="icon las la-exclamation"></i>
-  <i *ngIf="type === infoSectionType.ALERT" class="icon las la-exclamation"></i>
+  >
+  @if (type === infoSectionType.INFO) {
+    <i class="icon las la-info"></i>
+  }
+  @if (type === infoSectionType.WARN) {
+    <i class="icon las la-exclamation"></i>
+  }
+  @if (type === infoSectionType.ALERT) {
+    <i class="icon las la-exclamation"></i>
+  }
 
   <div class="info-section-content">
     <ng-content></ng-content>

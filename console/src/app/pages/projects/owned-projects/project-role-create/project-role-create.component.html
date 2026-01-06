@@ -3,38 +3,41 @@
   [createSteps]="1"
   [currentCreateStep]="1"
   (closed)="close()"
->
+  >
   <h1>{{ 'PROJECT.ROLE.ADDDESCRIPTION' | translate }}</h1>
 
   <form @list (ngSubmit)="addRole()">
-    <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="newrole-content">
-      <ng-container [formGroup]="$any(formGroup)">
-        <div class="newrole">
-          <cnsl-form-field class="formfield">
-            <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
-            <input cnslInput formControlName="key" data-e2e="role-key-input" />
-          </cnsl-form-field>
-          <cnsl-form-field class="formfield">
-            <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
-            <input cnslInput formControlName="displayName" data-e2e="role-display-name-input" />
-          </cnsl-form-field>
-          <cnsl-form-field class="formfield">
-            <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
-            <input cnslInput formControlName="group" data-e2e="role-group-input" />
-          </cnsl-form-field>
-        </div>
-        <button
-          *ngIf="i !== 0"
-          mat-icon-button
-          (click)="removeEntry(i)"
-          type="button"
-          color="warn"
-          matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-        >
-          <i class="las la-trash"></i>
-        </button>
-      </ng-container>
-    </div>
+    @for (formGroup of formArray.controls; track formGroup; let i = $index) {
+      <div @animate class="newrole-content">
+        <ng-container [formGroup]="$any(formGroup)">
+          <div class="newrole">
+            <cnsl-form-field class="formfield">
+              <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
+              <input cnslInput formControlName="key" data-e2e="role-key-input" />
+            </cnsl-form-field>
+            <cnsl-form-field class="formfield">
+              <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
+              <input cnslInput formControlName="displayName" data-e2e="role-display-name-input" />
+            </cnsl-form-field>
+            <cnsl-form-field class="formfield">
+              <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
+              <input cnslInput formControlName="group" data-e2e="role-group-input" />
+            </cnsl-form-field>
+          </div>
+          @if (i !== 0) {
+            <button
+              mat-icon-button
+              (click)="removeEntry(i)"
+              type="button"
+              color="warn"
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              >
+              <i class="las la-trash"></i>
+            </button>
+          }
+        </ng-container>
+      </div>
+    }
 
     <button
       class="add-line-btn"
@@ -43,7 +46,7 @@
       data-e2e="new-project-role-button"
       mat-stroked-button
       (click)="addEntry()"
-    >
+      >
       {{ 'PROJECT.ROLE.ADDNEWLINE' | translate }}
     </button>
 
@@ -54,7 +57,7 @@
       [disabled]="formArray.invalid"
       type="submit"
       data-e2e="save-button"
-    >
+      >
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </form>

@@ -1,22 +1,22 @@
-<cnsl-detail-layout
-  *ngIf="project"
-  [hasBackButton]="true"
-  title="{{ projectName }} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
->
-  <p class="subinfo" sub>
-    <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
-    <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/managers" target="_blank">
-      <mat-icon class="icon">info_outline</mat-icon>
-    </a>
-  </p>
-  <cnsl-members-table
-    *ngIf="project"
-    [dataSource]="dataSource"
-    [memberRoleOptions]="memberRoleOptions"
-    (updateRoles)="updateRoles($event.member, $event.change)"
-    [factoryLoadFunc]="changePageFactory"
-    (changedSelection)="selection = $event"
-    [refreshTrigger]="changePage"
+@if (project) {
+  <cnsl-detail-layout
+    [hasBackButton]="true"
+    title="{{ projectName }} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    >
+    <p class="subinfo" sub>
+      <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
+      <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/managers" target="_blank">
+        <mat-icon class="icon">info_outline</mat-icon>
+      </a>
+    </p>
+    @if (project) {
+      <cnsl-members-table
+        [dataSource]="dataSource"
+        [memberRoleOptions]="memberRoleOptions"
+        (updateRoles)="updateRoles($event.member, $event.change)"
+        [factoryLoadFunc]="changePageFactory"
+        (changedSelection)="selection = $event"
+        [refreshTrigger]="changePage"
     [canWrite]="
       [
         'project.member.write$',
@@ -41,11 +41,11 @@
         | hasRole
         | async
     "
-    (deleteMember)="removeProjectMember($event)"
-  >
-    <ng-template
-      cnslHasRole
-      selectactions
+        (deleteMember)="removeProjectMember($event)"
+        >
+        <ng-template
+          cnslHasRole
+          selectactions
       [hasRole]="[
         'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
@@ -54,22 +54,22 @@
             : '',
         'project.member.delete',
       ]"
-    >
-      <button
-        (click)="removeProjectMemberSelection()"
-        color="warn"
-        matTooltip="{{ 'ORG_DETAIL.TABLE.DELETE' | translate }}"
-        mat-raised-button
-      >
-        <i class="las la-trash"></i>
-        <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
-        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
-        </cnsl-action-keys>
-      </button>
-    </ng-template>
-    <ng-template
-      cnslHasRole
-      writeactions
+          >
+          <button
+            (click)="removeProjectMemberSelection()"
+            color="warn"
+            matTooltip="{{ 'ORG_DETAIL.TABLE.DELETE' | translate }}"
+            mat-raised-button
+            >
+            <i class="las la-trash"></i>
+            <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
+            <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+            </cnsl-action-keys>
+          </button>
+        </ng-template>
+        <ng-template
+          cnslHasRole
+          writeactions
       [hasRole]="[
         'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
@@ -78,12 +78,14 @@
             : '',
         'project.member.write',
       ]"
-    >
-      <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
-        <mat-icon class="icon">add</mat-icon>
-        <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
-      </button>
-    </ng-template>
-  </cnsl-members-table>
-</cnsl-detail-layout>
+          >
+          <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+            <mat-icon class="icon">add</mat-icon>
+            <span>{{ 'ACTIONS.NEW' | translate }}</span>
+            <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+          </button>
+        </ng-template>
+      </cnsl-members-table>
+    }
+  </cnsl-detail-layout>
+}

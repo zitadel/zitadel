@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -25,7 +25,7 @@ export type Framework = FrameworkDefinition & {
   selector: 'cnsl-oidc-app-configuration',
   templateUrl: './oidc-configuration.component.html',
   styleUrls: ['./oidc-configuration.component.scss'],
-  imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
+  imports: [TranslateModule, RouterModule, MatButtonModule],
 })
 export class OIDCConfigurationComponent {
   @Input() public name?: string;

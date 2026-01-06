@@ -1,43 +1,46 @@
 <div class="title-row">
   <h1 class="metadata-title" mat-dialog-title>{{ 'METADATA.TITLE' | translate }}</h1>
   <span class="fill-space"></span>
-  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
+  @if (ts) {
+    <p class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
+  }
 </div>
 <div mat-dialog-content class="metadata-dialog-content">
-  <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)">
-    <div class="content">
-      <cnsl-form-field #key id="key{{ i }}" class="formfield">
-        <cnsl-label>{{ 'METADATA.KEY' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="md.key" [ngModelOptions]="{ standalone: true }" />
-      </cnsl-form-field>
-      <cnsl-form-field #value id="value{{ i }}" class="formfield">
-        <cnsl-label>{{ 'METADATA.VALUE' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="md.value" [ngModelOptions]="{ standalone: true }" />
-      </cnsl-form-field>
-
-      <button
-        mat-icon-button
-        [disabled]="!(md.key && md.value)"
-        class="set-button"
-        type="submit"
-        color="primary"
-        matTooltip="{{ 'ACTIONS.SAVE' | translate }}"
-      >
-        <i class="las la-save"></i>
-      </button>
-      <button
-        mat-icon-button
-        (click)="removeEntry(i)"
-        [disabled]="metadata.length < 2 && i === 0 && !md.key"
-        class="rm-button"
-        type="button"
-        color="warn"
-        matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-      >
-        <i class="las la-trash"></i>
-      </button>
-    </div>
-  </form>
+  @for (md of metadata; track md; let i = $index) {
+    <form (ngSubmit)="saveElement(i)">
+      <div class="content">
+        <cnsl-form-field #key id="key{{ i }}" class="formfield">
+          <cnsl-label>{{ 'METADATA.KEY' | translate }}</cnsl-label>
+          <input cnslInput [(ngModel)]="md.key" [ngModelOptions]="{ standalone: true }" />
+        </cnsl-form-field>
+        <cnsl-form-field #value id="value{{ i }}" class="formfield">
+          <cnsl-label>{{ 'METADATA.VALUE' | translate }}</cnsl-label>
+          <input cnslInput [(ngModel)]="md.value" [ngModelOptions]="{ standalone: true }" />
+        </cnsl-form-field>
+        <button
+          mat-icon-button
+          [disabled]="!(md.key && md.value)"
+          class="set-button"
+          type="submit"
+          color="primary"
+          matTooltip="{{ 'ACTIONS.SAVE' | translate }}"
+          >
+          <i class="las la-save"></i>
+        </button>
+        <button
+          mat-icon-button
+          (click)="removeEntry(i)"
+          [disabled]="metadata.length < 2 && i === 0 && !md.key"
+          class="rm-button"
+          type="button"
+          color="warn"
+          matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+          >
+          <i class="las la-trash"></i>
+        </button>
+      </div>
+    </form>
+  }
   <button (click)="addEntry()" mat-stroked-button type="button">
     <div class="cnsl-action-button">
       <mat-icon>add</mat-icon>

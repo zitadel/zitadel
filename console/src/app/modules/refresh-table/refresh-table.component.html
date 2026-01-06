@@ -1,39 +1,43 @@
 <div class="refresh-table-header-row" [ngClass]="{ 'border-bottom': showBorder }">
-  <div class="refresh-table-row" *ngIf="selection.hasValue(); else leftActions">
-    <div>
-      <span class="count">{{ selection.selected.length }}</span>
-      <span class="count-desc">{{ 'ORG_DETAIL.TABLE.SELECTION' | translate }}</span>
-    </div>
-
-    <span class="count-slash">|</span>
-    <a mat-stroked-button (click)="selection.clear()">
-      <div [ngClass]="{ 'cnsl-action-button': showSelectionActionButton }">
-        <span>{{ 'ORG_DETAIL.TABLE.CLEAR' | translate }}</span>
-        <cnsl-action-keys
-          *ngIf="showSelectionActionButton"
-          [doNotUseContrast]="true"
-          [type]="ActionKeysType.CLEAR"
-          (actionTriggered)="selection.clear()"
-        >
-        </cnsl-action-keys>
+  @if (selection.hasValue()) {
+    <div class="refresh-table-row">
+      <div>
+        <span class="count">{{ selection.selected.length }}</span>
+        <span class="count-desc">{{ 'ORG_DETAIL.TABLE.SELECTION' | translate }}</span>
       </div>
-    </a>
-  </div>
-  <ng-template #leftActions>
+      <span class="count-slash">|</span>
+      <a mat-stroked-button (click)="selection.clear()">
+        <div [ngClass]="{ 'cnsl-action-button': showSelectionActionButton }">
+          <span>{{ 'ORG_DETAIL.TABLE.CLEAR' | translate }}</span>
+          @if (showSelectionActionButton) {
+            <cnsl-action-keys
+              [doNotUseContrast]="true"
+              [type]="ActionKeysType.CLEAR"
+              (actionTriggered)="selection.clear()"
+              >
+            </cnsl-action-keys>
+          }
+        </div>
+      </a>
+    </div>
+  } @else {
     <ng-content select="[leftActions]"></ng-content>
-  </ng-template>
+  }
   <span class="fill-space"></span>
-  <mat-spinner class="refresh-table-spinner" *ngIf="loading" diameter="20"></mat-spinner>
+  @if (loading) {
+    <mat-spinner class="refresh-table-spinner" diameter="20"></mat-spinner>
+  }
 
-  <button
-    *ngIf="!hideRefresh"
-    mat-icon-button
-    (click)="emitRefresh()"
-    class="refresh-table-icon-button"
-    matTooltip="{{ 'ACTIONS.REFRESH' | translate }}"
-  >
-    <mat-icon class="icon">refresh</mat-icon>
-  </button>
+  @if (!hideRefresh) {
+    <button
+      mat-icon-button
+      (click)="emitRefresh()"
+      class="refresh-table-icon-button"
+      matTooltip="{{ 'ACTIONS.REFRESH' | translate }}"
+      >
+      <mat-icon class="icon">refresh</mat-icon>
+    </button>
+  }
 
   <ng-content select="[actions]"></ng-content>
 </div>

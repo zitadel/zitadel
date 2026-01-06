@@ -3,39 +3,44 @@
   [createSteps]="1"
   [currentCreateStep]="1"
   (closed)="close()"
->
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+  >
+  @if (loading) {
+    <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+  }
 
   <div class="machine-create-main-content">
-    <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="machine-create-form">
-      <div class="machine-create-content">
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
-          <input cnslInput formControlName="userName" required />
-        </cnsl-form-field>
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
-          <input cnslInput formControlName="name" required />
-        </cnsl-form-field>
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
-          <input cnslInput formControlName="description" />
-        </cnsl-form-field>
-
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.ACCESSTOKENTYPE' | translate }}</cnsl-label>
-          <mat-select formControlName="accessTokenType" required>
-            <mat-option *ngFor="let aTT of accessTokenTypes" [value]="aTT">
-              {{ 'USER.MACHINE.ACCESSTOKENTYPES.' + aTT | translate }}
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
-      </div>
-      <div class="machine-btn-container">
-        <button color="primary" data-e2e="create-button" [disabled]="userForm.invalid" type="submit" mat-raised-button>
-          {{ 'ACTIONS.CREATE' | translate }}
-        </button>
-      </div>
-    </form>
+    @if (userForm) {
+      <form [formGroup]="userForm" (ngSubmit)="createUser()" class="machine-create-form">
+        <div class="machine-create-content">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="userName" required />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="name" required />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
+            <input cnslInput formControlName="description" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.ACCESSTOKENTYPE' | translate }}</cnsl-label>
+            <mat-select formControlName="accessTokenType" required>
+              @for (aTT of accessTokenTypes; track aTT) {
+                <mat-option [value]="aTT">
+                  {{ 'USER.MACHINE.ACCESSTOKENTYPES.' + aTT | translate }}
+                </mat-option>
+              }
+            </mat-select>
+          </cnsl-form-field>
+        </div>
+        <div class="machine-btn-container">
+          <button color="primary" data-e2e="create-button" [disabled]="userForm.invalid" type="submit" mat-raised-button>
+            {{ 'ACTIONS.CREATE' | translate }}
+          </button>
+        </div>
+      </form>
+    }
   </div>
 </cnsl-create-layout>

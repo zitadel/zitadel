@@ -2,21 +2,24 @@
 <div mat-dialog-content>
   <p class="desc cnsl-secondary-text">{{ 'USER.PROFILE.AVATAR.CURRENT' | translate }}</p>
   <div class="current-pic-wrapper">
-    <img class="pic" [src]="data.profilePic" *ngIf="data.profilePic" />
+    @if (data.profilePic) {
+      <img class="pic" [src]="data.profilePic" />
+    }
     <span class="fill-space"></span>
     <input #selectedFile style="display: none" class="file-input" type="file" (change)="onDrop($event)" />
     <button class="btn" mat-raised-button color="primary" type="button" (click)="selectedFile.click()">
       {{ 'USER.PROFILE.AVATAR.UPLOADBTN' | translate }}
     </button>
-    <button
-      *ngIf="data.profilePic"
-      matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-      color="warn"
-      (click)="deletePic()"
-      mat-icon-button
-    >
-      <i class="las la-minus-circle"></i>
-    </button>
+    @if (data.profilePic) {
+      <button
+        matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+        color="warn"
+        (click)="deletePic()"
+        mat-icon-button
+        >
+        <i class="las la-minus-circle"></i>
+      </button>
+    }
   </div>
 </div>
 <div mat-dialog-actions class="action">

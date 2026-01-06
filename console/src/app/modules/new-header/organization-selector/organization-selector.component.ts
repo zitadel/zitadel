@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { injectInfiniteQuery, injectMutation, keepPreviousData, QueryClient } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ListOrganizationsRequestSchema, ListOrganizationsResponse } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
@@ -50,8 +50,6 @@ const QUERY_LIMIT = 20;
   styleUrls: ['./organization-selector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NgForOf,
-    NgIf,
     ReactiveFormsModule,
     A11yModule,
     MatButtonModule,
@@ -61,8 +59,8 @@ const QUERY_LIMIT = 20;
     MatOptionModule,
     NgIconComponent,
     HasRolePipeModule,
-    AsyncPipe,
-  ],
+    AsyncPipe
+],
   providers: [provideIcons({ heroCheck, heroMagnifyingGlass, heroArrowLeftCircleSolid })],
 })
 export class OrganizationSelectorComponent {

@@ -2,7 +2,9 @@
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.SECURITY.DESCRIPTION' | translate }}</p>
 
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  @if (loading) {
+    <mat-spinner diameter="30" color="primary"></mat-spinner>
+  }
 </div>
 
 <div class="security-wrapper">
@@ -16,7 +18,7 @@
     (change)="iframeEnabledChanged($event)"
     [(ngModel)]="iframeEnabled"
     [disabled]="(['iam.policy.write'] | hasRole | async) === false"
-  >
+    >
     {{ 'SETTING.SECURITY.IFRAMEENABLED' | translate }}
   </mat-checkbox>
   <cnsl-info-section [type]="InfoSectionType.ALERT">{{
@@ -34,20 +36,21 @@
       type="submit"
       mat-icon-button
       [disabled]="!iframeEnabled || originsControl.invalid || (['iam.policy.write'] | hasRole | async) === false"
-    >
+      >
       <mat-icon>add</mat-icon>
     </button>
   </form>
 
   <div class="security-allowed-uris-list">
-    <div *ngFor="let uri of originsList" class="uri-line" [ngClass]="{ disabled: !iframeEnabled }">
-      <span class="uri">{{ uri }}</span>
-      <span class="fill-space"></span>
-
-      <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(uri)" class="icon-button">
-        <mat-icon class="icon">cancel</mat-icon>
-      </button>
-    </div>
+    @for (uri of originsList; track uri) {
+      <div class="uri-line" [ngClass]="{ disabled: !iframeEnabled }">
+        <span class="uri">{{ uri }}</span>
+        <span class="fill-space"></span>
+        <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(uri)" class="icon-button">
+          <mat-icon class="icon">cancel</mat-icon>
+        </button>
+      </div>
+    }
   </div>
 
   <h3>{{ 'SETTING.SECURITY.IMPERSONATIONTITLE' | translate }}</h3>
@@ -58,7 +61,7 @@
     ngDefaultControl
     [(ngModel)]="impersonationEnabled"
     [disabled]="(['iam.policy.write'] | hasRole | async) === false"
-  >
+    >
     {{ 'SETTING.SECURITY.IMPERSONATIONENABLED' | translate }}
   </mat-checkbox>
   <cnsl-info-section [type]="InfoSectionType.INFO">{{
@@ -74,7 +77,7 @@
     type="submit"
     mat-raised-button
     [disabled]="(['iam.policy.write'] | hasRole | async) === false"
-  >
+    >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>

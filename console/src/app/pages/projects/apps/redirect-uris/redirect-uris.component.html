@@ -9,38 +9,41 @@
     type="submit"
     mat-icon-button
     [disabled]="redirectControl.invalid || redirectControl.disabled"
-  >
+    >
     <mat-icon>add</mat-icon>
   </button>
 </form>
 
 <div class="redirect-uris-list">
-  <div *ngFor="let uri of value" class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect: isNative) }">
-    <span
-      class="uri"
-      [ngClass]="{ green: !devMode && uri?.startsWith('https://'), red: !devMode && !uri?.startsWith('https://') }"
-      >{{ uri }}</span
-    >
-    <span class="fill-space"></span>
-    <i
-      class="alerticon las la-exclamation red"
+  @for (uri of value; track uri) {
+    <div class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect: isNative) }">
+      <span
+        class="uri"
+        [ngClass]="{ green: !devMode && uri?.startsWith('https://'), red: !devMode && !uri?.startsWith('https://') }"
+        >{{ uri }}</span
+        >
+        <span class="fill-space"></span>
+        <i
+          class="alerticon las la-exclamation red"
       [matTooltip]="
         isNative ? ('APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate) : ('APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate)
       "
-    ></i>
-
-    <button
-      type="button"
-      matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-      mat-icon-button
-      (click)="remove(uri)"
-      class="icon-button"
-    >
-      <mat-icon class="icon">cancel</mat-icon>
-    </button>
+        ></i>
+        <button
+          type="button"
+          matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+          mat-icon-button
+          (click)="remove(uri)"
+          class="icon-button"
+          >
+          <mat-icon class="icon">cancel</mat-icon>
+        </button>
+      </div>
+    }
   </div>
-</div>
 
-<p *ngIf="redirectControl.value && redirectControl.invalid" class="redirect-uris-error">
-  {{ 'APP.OIDC.REDIRECTNOTVALID' | translate }}
-</p>
+  @if (redirectControl.value && redirectControl.invalid) {
+    <p class="redirect-uris-error">
+      {{ 'APP.OIDC.REDIRECTNOTVALID' | translate }}
+    </p>
+  }

@@ -2,16 +2,17 @@
   <div class="cnsl-table-action">
     <ng-content select="[hoverActions]"></ng-content>
     <ng-content select="[actions]"></ng-content>
-    <button
-      (click)="$event.stopPropagation()"
-      *ngIf="hasActions"
-      mat-icon-button
-      class="more-button"
-      [matMenuTriggerFor]="actions"
-      data-e2e="table-actions-button"
-    >
-      <mat-icon>more_vert</mat-icon>
-    </button>
+    @if (hasActions) {
+      <button
+        (click)="$event.stopPropagation()"
+        mat-icon-button
+        class="more-button"
+        [matMenuTriggerFor]="actions"
+        data-e2e="table-actions-button"
+        >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    }
 
     <mat-menu #actions="matMenu" xPosition="before" class="table-actions-menu">
       <ng-content select="[menuActions]"></ng-content>

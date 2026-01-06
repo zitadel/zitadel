@@ -3,83 +3,93 @@
     <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.EMAIL' | translate }}</span>
       <span class="name">{{ human.email?.email }}</span>
-      <span *ngIf="isEmailVerified" class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
-      <div *ngIf="!isEmailVerified" class="block">
-        <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
+      @if (isEmailVerified) {
+        <span class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
+      }
+      @if (!isEmailVerified) {
+        <div class="block">
+          <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
+          @if (human.email) {
+            @if (canWrite) {
+              <a
+                class="verify cnsl-secondary-text"
+                matTooltip="{{ 'USER.LOGINMETHODS.EMAIL.RESEND' | translate }}"
+                (click)="emitEmailVerification()"
+                >{{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
+                >
+              }
+            }
+          </div>
+        }
 
-        <ng-container *ngIf="human.email">
-          <a
-            *ngIf="canWrite"
-            class="verify cnsl-secondary-text"
-            matTooltip="{{ 'USER.LOGINMETHODS.EMAIL.RESEND' | translate }}"
-            (click)="emitEmailVerification()"
-            >{{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
-          >
-        </ng-container>
+        <ng-content select="[emailAction]"></ng-content>
       </div>
 
-      <ng-content select="[emailAction]"></ng-content>
-    </div>
-
-    <div class="right">
-      <button
-        matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
-        [disabled]="!canWrite"
-        (click)="openEditDialog(EditDialogType.EMAIL)"
-        mat-icon-button
-      >
-        <i class="las la-pen"></i>
-      </button>
-    </div>
-  </div>
-
-  <div class="contact-method-row">
-    <div class="left">
-      <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
-      <cnsl-phone-detail [phone]="human.phone?.phone"></cnsl-phone-detail>
-      <span *ngIf="isPhoneVerified" class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
-      <div *ngIf="human.phone?.phone && !isPhoneVerified" class="block">
-        <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
-
-        <ng-container *ngIf="human.phone?.phone">
-          <a
-            *ngIf="!disablePhoneCode && canWrite"
-            class="verify cnsl-secondary-text"
-            matTooltip="{{ 'USER.LOGINMETHODS.ENTERCODE_DESC' | translate }}"
-            (click)="enterCode()"
-            >{{ 'USER.LOGINMETHODS.ENTERCODE' | translate }}</a
+      <div class="right">
+        <button
+          matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
+          [disabled]="!canWrite"
+          (click)="openEditDialog(EditDialogType.EMAIL)"
+          mat-icon-button
           >
-          <a
-            *ngIf="canWrite"
-            class="verify cnsl-secondary-text"
-            matTooltip="{{ 'USER.LOGINMETHODS.PHONE.RESEND' | translate }}"
-            (click)="emitPhoneVerification()"
-            >{{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
-          >
-        </ng-container>
+          <i class="las la-pen"></i>
+        </button>
       </div>
-
-      <ng-content select="[phoneAction]"></ng-content>
     </div>
 
-    <div class="right">
-      <button
-        matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-        *ngIf="human && human.phone?.phone"
-        color="warn"
-        (click)="emitDeletePhone()"
-        mat-icon-button
-      >
-        <i class="las la-trash"></i>
-      </button>
-      <button
-        matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
-        [disabled]="!canWrite"
-        (click)="openEditDialog(EditDialogType.PHONE)"
-        mat-icon-button
-      >
-        <i class="las la-pen"></i>
-      </button>
-    </div>
-  </div>
-</div>
+    <div class="contact-method-row">
+      <div class="left">
+        <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
+        <cnsl-phone-detail [phone]="human.phone?.phone"></cnsl-phone-detail>
+        @if (isPhoneVerified) {
+          <span class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
+        }
+        @if (human.phone?.phone && !isPhoneVerified) {
+          <div class="block">
+            <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>
+            @if (human.phone?.phone) {
+              @if (!disablePhoneCode && canWrite) {
+                <a
+                  class="verify cnsl-secondary-text"
+                  matTooltip="{{ 'USER.LOGINMETHODS.ENTERCODE_DESC' | translate }}"
+                  (click)="enterCode()"
+                  >{{ 'USER.LOGINMETHODS.ENTERCODE' | translate }}</a
+                  >
+                }
+                @if (canWrite) {
+                  <a
+                    class="verify cnsl-secondary-text"
+                    matTooltip="{{ 'USER.LOGINMETHODS.PHONE.RESEND' | translate }}"
+                    (click)="emitPhoneVerification()"
+                    >{{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
+                    >
+                  }
+                }
+              </div>
+            }
+
+            <ng-content select="[phoneAction]"></ng-content>
+          </div>
+
+          <div class="right">
+            @if (human && human.phone?.phone) {
+              <button
+                matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                color="warn"
+                (click)="emitDeletePhone()"
+                mat-icon-button
+                >
+                <i class="las la-trash"></i>
+              </button>
+            }
+            <button
+              matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
+              [disabled]="!canWrite"
+              (click)="openEditDialog(EditDialogType.PHONE)"
+              mat-icon-button
+              >
+              <i class="las la-pen"></i>
+            </button>
+          </div>
+        </div>
+      </div>

@@ -7,15 +7,17 @@
   <cnsl-form-field class="form-field" label="Access Code" required="true">
     <cnsl-label>{{ 'MFA.TYPE' | translate }}</cnsl-label>
     <mat-select [(ngModel)]="newMfaType">
-      <mat-option *ngFor="let mfa of availableMfaTypes" [value]="mfa">
-        {{
+      @for (mfa of availableMfaTypes; track mfa) {
+        <mat-option [value]="mfa">
+          {{
           (data.componentType === LoginMethodComponentType.SecondFactor
-            ? 'MFA.SECONDFACTORTYPES.'
-            : LoginMethodComponentType.MultiFactor
-              ? 'MFA.MULTIFACTORTYPES.'
-              : '') + mfa | translate
-        }}
-      </mat-option>
+          ? 'MFA.SECONDFACTORTYPES.'
+          : LoginMethodComponentType.MultiFactor
+          ? 'MFA.MULTIFACTORTYPES.'
+          : '') + mfa | translate
+          }}
+        </mat-option>
+      }
     </mat-select>
   </cnsl-form-field>
 </div>

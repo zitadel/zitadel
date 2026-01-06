@@ -1,51 +1,58 @@
-<div class="accounts-card" *ngIf="user$ | async as user">
-  <cnsl-avatar
-    (click)="editUserProfile()"
-    class="avatar"
-    [ngClass]="{ 'iam-user': iamuser }"
-    [forColor]="user.preferredLoginName"
-    [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-    [name]="user.human?.profile?.displayName ?? ''"
-    [size]="80"
-  >
-  </cnsl-avatar>
-
-  <span class="u-name">{{ user?.human?.profile?.displayName ? user?.human?.profile?.displayName : 'A' }}</span>
-  <span class="u-email" *ngIf="user?.preferredLoginName">{{ user?.preferredLoginName }}</span>
-
-  <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
-  <div class="l-accounts">
-    <mat-progress-bar *ngIf="(sessions$ | async) === null" color="primary" mode="indeterminate"></mat-progress-bar>
-    <a class="row" *ngFor="let session of sessions$ | async" (click)="selectAccount(session.loginName)">
-      <cnsl-avatar
-        *ngIf="session && session.displayName"
-        class="small-avatar"
-        [avatarUrl]="session.avatarUrl || ''"
-        [name]="session.displayName"
-        [forColor]="session.loginName"
-        [size]="32"
+@if (user$ | async; as user) {
+  <div class="accounts-card">
+    <cnsl-avatar
+      (click)="editUserProfile()"
+      class="avatar"
+      [ngClass]="{ 'iam-user': iamuser }"
+      [forColor]="user.preferredLoginName"
+      [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+      [name]="user.human?.profile?.displayName ?? ''"
+      [size]="80"
       >
-      </cnsl-avatar>
-
-      <div class="col">
-        <span class="user-title">{{ session.displayName ? session.displayName : session.userName }} </span>
-        <span class="loginname">{{ session.loginName }}</span>
-        <span class="state inactive" *ngIf="$any(session.authState) === UserState.USER_STATE_INACTIVE">{{
-          'USER.STATE.' + session.authState | translate
-        }}</span>
-      </div>
-      <mat-icon>keyboard_arrow_right</mat-icon>
-    </a>
-    <a class="row" (click)="selectNewAccount()">
-      <div class="icon-wrapper">
-        <i class="las la-user-plus"></i>
-      </div>
-      <span class="col">
-        <span class="user-title">{{ 'USER.ADDACCOUNT' | translate }}</span>
-      </span>
-      <mat-icon>keyboard_arrow_right</mat-icon>
-    </a>
+    </cnsl-avatar>
+    <span class="u-name">{{ user?.human?.profile?.displayName ? user?.human?.profile?.displayName : 'A' }}</span>
+    @if (user?.preferredLoginName) {
+      <span class="u-email">{{ user?.preferredLoginName }}</span>
+    }
+    <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
+    <div class="l-accounts">
+      @if ((sessions$ | async) === null) {
+        <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+      }
+      @for (session of sessions$ | async; track session) {
+        <a class="row" (click)="selectAccount(session.loginName)">
+          @if (session && session.displayName) {
+            <cnsl-avatar
+              class="small-avatar"
+              [avatarUrl]="session.avatarUrl || ''"
+              [name]="session.displayName"
+              [forColor]="session.loginName"
+              [size]="32"
+              >
+            </cnsl-avatar>
+          }
+          <div class="col">
+            <span class="user-title">{{ session.displayName ? session.displayName : session.userName }} </span>
+            <span class="loginname">{{ session.loginName }}</span>
+            @if ($any(session.authState) === UserState.USER_STATE_INACTIVE) {
+              <span class="state inactive">{{
+                'USER.STATE.' + session.authState | translate
+              }}</span>
+            }
+          </div>
+          <mat-icon>keyboard_arrow_right</mat-icon>
+        </a>
+      }
+      <a class="row" (click)="selectNewAccount()">
+        <div class="icon-wrapper">
+          <i class="las la-user-plus"></i>
+        </div>
+        <span class="col">
+          <span class="user-title">{{ 'USER.ADDACCOUNT' | translate }}</span>
+        </span>
+        <mat-icon>keyboard_arrow_right</mat-icon>
+      </a>
+    </div>
+    <button (click)="logout()" color="warn" mat-stroked-button>{{ 'MENU.LOGOUT' | translate }}</button>
   </div>
-
-  <button (click)="logout()" color="warn" mat-stroked-button>{{ 'MENU.LOGOUT' | translate }}</button>
-</div>
+}

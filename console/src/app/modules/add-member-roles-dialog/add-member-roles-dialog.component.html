@@ -2,19 +2,20 @@
 <div mat-dialog-content>
   <p class="desc">{{ 'MEMBER.EDITFOR' | translate: { value: data.user } }}</p>
   <div class="roles-selection">
-    <mat-checkbox
-      class="role-cb"
-      *ngFor="let role of allRoles"
-      color="primary"
-      (change)="toggleRole(role)"
-      [checked]="selectedRoles.includes(role)"
-    >
-      <div class="role-cb-content">
-        <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-        <span>{{ role | roletransform }}</span>
-        <i class="info-hover las la-question-circle" matTooltip="{{ 'MEMBERROLES.' + role | translate }}"></i>
-      </div>
-    </mat-checkbox>
+    @for (role of allRoles; track role) {
+      <mat-checkbox
+        class="role-cb"
+        color="primary"
+        (change)="toggleRole(role)"
+        [checked]="selectedRoles.includes(role)"
+        >
+        <div class="role-cb-content">
+          <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+          <span>{{ role | roletransform }}</span>
+          <i class="info-hover las la-question-circle" matTooltip="{{ 'MEMBERROLES.' + role | translate }}"></i>
+        </div>
+      </mat-checkbox>
+    }
   </div>
 </div>
 <div mat-dialog-actions class="action">

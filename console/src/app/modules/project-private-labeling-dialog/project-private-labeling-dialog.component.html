@@ -4,9 +4,11 @@
   <p class="desc cnsl-secondary-text">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.DESCRIPTION' | translate }}</p>
 
   <mat-radio-group class="project-radio-group" [(ngModel)]="setting">
-    <mat-radio-button class="radio-button" *ngFor="let selection of settings" [value]="selection">
-      <span class="label">{{ 'PROJECT.PAGES.PRIVATELABEL.' + selection + '.TITLE' | translate }}</span>
-    </mat-radio-button>
+    @for (selection of settings; track selection) {
+      <mat-radio-button class="radio-button" [value]="selection">
+        <span class="label">{{ 'PROJECT.PAGES.PRIVATELABEL.' + selection + '.TITLE' | translate }}</span>
+      </mat-radio-button>
+    }
   </mat-radio-group>
   <cnsl-info-section class="info">{{ 'PROJECT.PAGES.PRIVATELABEL.' + setting + '.DESC' | translate }}</cnsl-info-section>
 </div>
@@ -21,7 +23,7 @@
     color="primary"
     mat-raised-button
     (click)="closeDialog(setting)"
-  >
+    >
     {{ 'ACTIONS.OK' | translate }}
   </button>
 </div>

@@ -9,7 +9,7 @@ import {
   ConditionType,
 } from './actions-two-add-action-condition/actions-two-add-action-condition.component';
 import { ActionsTwoAddActionTargetComponent } from './actions-two-add-action-target/actions-two-add-action-target.component';
-import { CommonModule } from '@angular/common';
+
 import { Condition, Execution } from '@zitadel/proto/zitadel/action/v2/execution_pb';
 import { Subject } from 'rxjs';
 import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
@@ -54,14 +54,13 @@ export type ActionTwoAddActionDialogResult = MessageInitShape<typeof SetExecutio
   templateUrl: './actions-two-add-action-dialog.component.html',
   styleUrls: ['./actions-two-add-action-dialog.component.scss'],
   imports: [
-    CommonModule,
     MatButtonModule,
     MatDialogModule,
     TranslateModule,
     ActionsTwoAddActionTypeComponent,
     ActionsTwoAddActionConditionComponent,
-    ActionsTwoAddActionTargetComponent,
-  ],
+    ActionsTwoAddActionTargetComponent
+],
 })
 export class ActionTwoAddActionDialogComponent {
   protected readonly Page = Page;

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -27,7 +27,7 @@ export type Framework = FrameworkDefinition & {
   selector: 'cnsl-quickstart',
   templateUrl: './quickstart.component.html',
   styleUrls: ['./quickstart.component.scss'],
-  imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
+  imports: [TranslateModule, RouterModule, MatButtonModule],
 })
 export class QuickstartComponent {
   public frameworks: FrameworkDefinition[] = frameworkDefinition

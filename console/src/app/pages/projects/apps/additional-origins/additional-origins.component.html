@@ -9,24 +9,27 @@
     type="submit"
     mat-icon-button
     [disabled]="redirectControl.invalid || !canWrite"
-  >
+    >
     <mat-icon>add</mat-icon>
   </button>
 </form>
 
 <div class="uri-list">
-  <div *ngFor="let uri of urisList" class="uri-line">
-    <span class="uri" [ngClass]="{ green: uri?.startsWith('https://'), red: !uri?.startsWith('https://') }">{{ uri }}</span>
-    <span class="fill-space"></span>
-    <!-- TODO add regex later -->
-    <!-- <i *ngIf="!(uri | origin)" class="las la-exclamation red" [matTooltip]="'APP.NOTANORIGIN' | translate"></i> -->
-
-    <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(uri)" class="icon-button">
-      <mat-icon class="icon">cancel</mat-icon>
-    </button>
-  </div>
+  @for (uri of urisList; track uri) {
+    <div class="uri-line">
+      <span class="uri" [ngClass]="{ green: uri?.startsWith('https://'), red: !uri?.startsWith('https://') }">{{ uri }}</span>
+      <span class="fill-space"></span>
+      <!-- TODO add regex later -->
+      <!-- <i *ngIf="!(uri | origin)" class="las la-exclamation red" [matTooltip]="'APP.NOTANORIGIN' | translate"></i> -->
+      <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(uri)" class="icon-button">
+        <mat-icon class="icon">cancel</mat-icon>
+      </button>
+    </div>
+  }
 </div>
 
-<p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
-  {{ 'APP.OIDC.REDIRECTNOTVALID' | translate }}
-</p>
+@if (redirectControl.value && redirectControl.invalid) {
+  <p class="error">
+    {{ 'APP.OIDC.REDIRECTNOTVALID' | translate }}
+  </p>
+}

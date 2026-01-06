@@ -4,12 +4,11 @@
   <div class="home-wrapper enlarged-container">
     <cnsl-quickstart></cnsl-quickstart>
 
-    <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
+    @if (['iam.read$'] | hasRole | async) {
       <cnsl-onboarding />
-    </ng-container>
-    <ng-template #defaultHome>
+    } @else {
       <cnsl-shortcuts />
-    </ng-template>
+    }
 
     <span class="fill-space"></span>
     <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
@@ -21,14 +20,14 @@
           [ngStyle]="{
             background: (themeService.isDarkTheme | async) ? greendark + 50 : greenlight + 50,
           }"
-        >
+          >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? greendark : greenlight,
               color: (themeService.isDarkTheme | async) ? greenlight : greendark,
             }"
-          >
+            >
             <i class="las la-play"></i>
           </div>
         </div>
@@ -45,14 +44,14 @@
           [ngStyle]="{
             background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50,
           }"
-        >
+          >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? bluedark : bluelight,
               color: (themeService.isDarkTheme | async) ? bluelight : bluedark,
             }"
-          >
+            >
             <i class="las la-file-alt"></i>
           </div>
         </div>
@@ -69,14 +68,14 @@
           [ngStyle]="{
             background: (themeService.isDarkTheme | async) ? cyandark + 50 : cyanlight + 50,
           }"
-        >
+          >
           <div
             class="inner"
             [ngStyle]="{
               background: (themeService.isDarkTheme | async) ? cyandark : cyanlight,
               color: (themeService.isDarkTheme | async) ? cyanlight : cyandark,
             }"
-          >
+            >
             <i class="las la-play"></i>
           </div>
         </div>

@@ -18,53 +18,63 @@
     aria-label="Views"
     matSort
     (matSortChange)="sortChange($event)"
-  >
+    >
     <ng-container matColumnDef="editor">
       <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | toobject as event">
-          <div class="editor-row" *ngIf="event.editor as editor">
-            <!-- <cnsl-avatar
+        @if (event | toobject; as event) {
+          @if (event.editor; as editor) {
+            <div class="editor-row">
+              <!-- <cnsl-avatar
               *ngIf="editor && editor.displayName; else cog"
               class="avatar"
               [name]="editor.displayName"
               [avatarUrl]="editor.avatarUrl || ''"
               [forColor]="editor.preferredLoginName ?? editor.displayName"
               [size]="32"
-            >
+              >
             </cnsl-avatar>
             <ng-template #cog>
               <cnsl-avatar [forColor]="editor?.preferredLoginName ?? 'franz'" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar> </ng-template
-            > -->
-            <span class="name" *ngIf="editor.displayName">{{ editor.displayName }}</span>
-            <span class="state" *ngIf="editor.service">{{ editor.service }}</span>
-          </div>
-        </ng-container>
+              > -->
+              @if (editor.displayName) {
+                <span class="name">{{ editor.displayName }}</span>
+              }
+              @if (editor.service) {
+                <span class="state">{{ editor.service }}</span>
+              }
+            </div>
+          }
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="aggregate">
       <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.AGGREGATE' | translate }}</th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | toobject as event">
+        @if (event | toobject; as event) {
           <div class="aggregate-row">
             <span class="id">{{ event.aggregate.id }}</span
-            ><span class="state" *ngIf="event.aggregate?.type?.localized?.localizedMessage">{{
-              event.aggregate.type.localized.localizedMessage
-            }}</span>
+              >@if (event.aggregate?.type?.localized?.localizedMessage) {
+              <span class="state">{{
+                event.aggregate.type.localized.localizedMessage
+              }}</span>
+            }
           </div>
-        </ng-container>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="resourceOwner">
       <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.RESOURCEOWNER' | translate }}</th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | toobject as event">
-          <span *ngIf="event.aggregate.resourceOwner">{{ event.aggregate.resourceOwner }}</span>
-        </ng-container>
+        @if (event | toobject; as event) {
+          @if (event.aggregate.resourceOwner) {
+            <span>{{ event.aggregate.resourceOwner }}</span>
+          }
+        }
       </td>
     </ng-container>
 
@@ -73,9 +83,9 @@
         {{ 'IAM.EVENTS.SEQUENCE' | translate }}
       </th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | toobject as event">
+        @if (event | toobject; as event) {
           {{ event.sequence }}
-        </ng-container>
+        }
       </td>
     </ng-container>
 
@@ -84,32 +94,34 @@
         {{ 'IAM.EVENTS.CREATIONDATE' | translate }}
       </th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | toobject as event">
+        @if (event | toobject; as event) {
           <span>{{ event?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm:ss' }}</span>
-        </ng-container>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="type">
       <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.TYPE' | translate }}</th>
       <td mat-cell *matCellDef="let event" data-e2e="event-type-cell">
-        <ng-container *ngIf="event | toobject as event">
-          <span *ngIf="event.type?.localized?.localizedMessage">{{ event.type.localized.localizedMessage }}</span>
-        </ng-container>
+        @if (event | toobject; as event) {
+          @if (event.type?.localized?.localizedMessage) {
+            <span>{{ event.type.localized.localizedMessage }}</span>
+          }
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="payload">
       <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.PAYLOAD' | translate }}</th>
       <td mat-cell *matCellDef="let event">
-        <ng-container *ngIf="event | topayload as payload">
+        @if (event | topayload; as payload) {
           <span>{{ payload | json }}</span>
           <div class="btn-wrapper">
             <button class="open-in-dialog-btn" mat-icon-button (click)="openDialog(event)">
               <mat-icon svgIcon="mdi_arrow_expand"></mat-icon>
             </button>
           </div>
-        </ng-container>
+        }
       </td>
     </ng-container>
 
@@ -124,6 +136,6 @@
     [disableShowMore]="_done | async"
     (moreRequested)="more()"
     [length]="dataSource.data.length"
-  >
+    >
   </cnsl-paginator>
 </cnsl-refresh-table>

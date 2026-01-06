@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, Pipe, PipeTransform } from '@angular/core';
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { LabelModule } from 'src/app/modules/label/label.module';
@@ -39,10 +39,8 @@ class Filter implements PipeTransform {
     MatOptionModule,
     MatProgressSpinnerModule,
     TranslateModule,
-    NgIf,
-    NgForOf,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule
+],
 })
 export class ActionsTwoAddActionAutocompleteInputComponent {
   @Input({ required: true })

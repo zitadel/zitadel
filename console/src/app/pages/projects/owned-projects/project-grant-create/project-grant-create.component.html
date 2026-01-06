@@ -3,28 +3,31 @@
   [createSteps]="createSteps"
   [currentCreateStep]="currentCreateStep"
   (closed)="close()"
->
-  <ng-container *ngIf="currentCreateStep === 1">
+  >
+  @if (currentCreateStep === 1) {
     <h1>{{ 'PROJECT.GRANT.CREATE.SEL_ORG' | translate }}</h1>
     <cnsl-search-org-autocomplete class="block" (selectionChanged)="selectOrg($event)"> </cnsl-search-org-autocomplete>
-    <span *ngIf="org"> {{ 'PROJECT.GRANT.CREATE.FOR_ORG' | translate }} {{ org.name }} - {{ org.primaryDomain }} </span>
-  </ng-container>
+    @if (org) {
+      <span> {{ 'PROJECT.GRANT.CREATE.FOR_ORG' | translate }} {{ org.name }} - {{ org.primaryDomain }} </span>
+    }
+  }
 
-  <ng-container *ngIf="currentCreateStep === 2">
+  @if (currentCreateStep === 2) {
     <h1>{{ 'PROJECT.GRANT.CREATE.SEL_ROLES' | translate }}</h1>
-
-    <cnsl-card *ngIf="projectId">
-      <cnsl-project-roles-table
-        [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'changeDate']"
-        (changedSelection)="selectRoles($event)"
-        [projectId]="projectId"
-      >
-      </cnsl-project-roles-table>
-    </cnsl-card>
-  </ng-container>
+    @if (projectId) {
+      <cnsl-card>
+        <cnsl-project-roles-table
+          [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'changeDate']"
+          (changedSelection)="selectRoles($event)"
+          [projectId]="projectId"
+          >
+        </cnsl-project-roles-table>
+      </cnsl-card>
+    }
+  }
 
   <div class="btn-container">
-    <ng-container *ngIf="currentCreateStep === 1">
+    @if (currentCreateStep === 1) {
       <button
         [disabled]="!org"
         (click)="next()"
@@ -33,12 +36,12 @@
         class="big-button"
         cdkFocusInitial
         data-e2e="project-grant-continue"
-      >
+        >
         {{ 'ACTIONS.CONTINUE' | translate }}
       </button>
-    </ng-container>
+    }
 
-    <ng-container *ngIf="currentCreateStep === createSteps">
+    @if (currentCreateStep === createSteps) {
       <button (click)="previous()" mat-stroked-button class="small-button">
         {{ 'ACTIONS.BACK' | translate }}
       </button>
@@ -50,9 +53,9 @@
         class="big-button"
         cdkFocusInitial
         data-e2e="save-project-grant-button"
-      >
+        >
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
-    </ng-container>
+    }
   </div>
 </cnsl-create-layout>

@@ -1,7 +1,7 @@
 <h2>{{ 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.DESCRIPTION' | translate }}</p>
 
-<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
+@if (serviceType === PolicyComponentServiceType.MGMT && !isDefault) {
   <ng-template cnslHasRole [hasRole]="['policy.delete']">
     <button
       color="primary"
@@ -10,56 +10,52 @@
       (click)="resetDefault()"
       mat-stroked-button
       data-e2e="reset-button"
-    >
+      >
       {{ 'POLICY.RESET' | translate }}
     </button>
   </ng-template>
-</ng-container>
+}
 
 <!-- <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section> -->
 
 <div>
-  <form *ngIf="form" [formGroup]="form" class="policy-content">
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.TOSLINK' | translate }}</cnsl-label>
-      <input cnslInput name="tosLink" formControlName="tosLink" />
-      <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'tosLink' }"></template>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.POLICYLINK' | translate }}</cnsl-label>
-      <input cnslInput name="privacyLink" formControlName="privacyLink" />
-      <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'privacyLink' }"></template>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.HELPLINK' | translate }}</cnsl-label>
-      <input cnslInput name="helpLink" formControlName="helpLink" />
-      <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'helpLink' }"></template>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.SUPPORTEMAIL' | translate }}</cnsl-label>
-      <input cnslInput name="supportEmail" formControlName="supportEmail" />
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.CUSTOMLINK' | translate }}</cnsl-label>
-      <input cnslInput name="customLink" formControlName="customLink" />
-      <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'customLink' }"></template>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.CUSTOMLINKTEXT' | translate }}</cnsl-label>
-      <input cnslInput name="customLinkText" formControlName="customLinkText" />
-    </cnsl-form-field>
-
-    <cnsl-form-field class="privacy-policy-formfield">
-      <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.DOCSLINK' | translate }}</cnsl-label>
-      <input cnslInput name="docsLink" formControlName="docsLink" />
-      <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'docsLink' }"></template>
-    </cnsl-form-field>
-  </form>
+  @if (form) {
+    <form [formGroup]="form" class="policy-content">
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.TOSLINK' | translate }}</cnsl-label>
+        <input cnslInput name="tosLink" formControlName="tosLink" />
+        <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'tosLink' }"></template>
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.POLICYLINK' | translate }}</cnsl-label>
+        <input cnslInput name="privacyLink" formControlName="privacyLink" />
+        <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'privacyLink' }"></template>
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.HELPLINK' | translate }}</cnsl-label>
+        <input cnslInput name="helpLink" formControlName="helpLink" />
+        <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'helpLink' }"></template>
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.SUPPORTEMAIL' | translate }}</cnsl-label>
+        <input cnslInput name="supportEmail" formControlName="supportEmail" />
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.CUSTOMLINK' | translate }}</cnsl-label>
+        <input cnslInput name="customLink" formControlName="customLink" />
+        <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'customLink' }"></template>
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.CUSTOMLINKTEXT' | translate }}</cnsl-label>
+        <input cnslInput name="customLinkText" formControlName="customLinkText" />
+      </cnsl-form-field>
+      <cnsl-form-field class="privacy-policy-formfield">
+        <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.DOCSLINK' | translate }}</cnsl-label>
+        <input cnslInput name="docsLink" formControlName="docsLink" />
+        <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{ key: 'docsLink' }"></template>
+      </cnsl-form-field>
+    </form>
+  }
 </div>
 
 <div class="policy-actions">
@@ -71,7 +67,7 @@
     type="submit"
     mat-raised-button
     data-e2e="save-button"
-  >
+    >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>
@@ -84,10 +80,14 @@
       [valueToCopy]="LANGPLACEHOLDER"
       (copiedValue)="copied = $event"
       (click)="addChip(key, LANGPLACEHOLDER)"
-    >
+      >
       <span class="key">{{ LANGPLACEHOLDER }}</span>
-      <i *ngIf="copied !== LANGPLACEHOLDER" class="las la-clipboard"></i>
-      <i *ngIf="copied === LANGPLACEHOLDER" class="las la-clipboard-check"></i>
+      @if (copied !== LANGPLACEHOLDER) {
+        <i class="las la-clipboard"></i>
+      }
+      @if (copied === LANGPLACEHOLDER) {
+        <i class="las la-clipboard-check"></i>
+      }
     </div>
   </div>
 </ng-template>

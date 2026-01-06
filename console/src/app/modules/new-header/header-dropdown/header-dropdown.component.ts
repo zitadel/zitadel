@@ -16,7 +16,7 @@ import { CdkConnectedOverlay, CdkOverlayOrigin, FlexibleConnectedPositionStrateg
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ReplaySubject } from 'rxjs';
 
 @Component({
@@ -24,7 +24,7 @@ import { ReplaySubject } from 'rxjs';
   templateUrl: './header-dropdown.component.html',
   styleUrls: ['./header-dropdown.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CdkConnectedOverlay, NgIf, AsyncPipe],
+  imports: [CdkConnectedOverlay, AsyncPipe],
 })
 export class HeaderDropdownComponent implements OnInit {
   @Input({ required: true })

@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { InputModule } from '../../input/input.module';
@@ -21,15 +21,14 @@ type TargetTypes = ActionTwoAddTargetDialogComponent['targetTypes'][number];
   templateUrl: './actions-two-add-target-dialog.component.html',
   styleUrls: ['./actions-two-add-target-dialog.component.scss'],
   imports: [
-    CommonModule,
     MatButtonModule,
     MatDialogModule,
     ReactiveFormsModule,
     TranslateModule,
     InputModule,
     MatCheckboxModule,
-    MatSelectModule,
-  ],
+    MatSelectModule
+],
 })
 export class ActionTwoAddTargetDialogComponent {
   protected readonly targetTypes = ['restCall', 'restWebhook', 'restAsync'] as const;

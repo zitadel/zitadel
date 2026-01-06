@@ -6,7 +6,7 @@
   [isInactive]="instance?.state === State.STATE_STOPPED || instance?.state === State.STATE_STOPPING"
   [hasContributors]="true"
   stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
->
+  >
   <div topContributors class="instance-action-wrapper">
     <cnsl-contributors
       [totalResult]="totalMemberResult"
@@ -18,18 +18,20 @@
       (showDetailClicked)="showDetail()"
       (refreshClicked)="loadMembers()"
       [disabled]="(['iam.member.write'] | hasRole | async) === false"
-    >
+      >
     </cnsl-contributors>
   </div>
-  <cnsl-info-row topContent *ngIf="instance" [instance]="instance"></cnsl-info-row>
+  @if (instance) {
+    <cnsl-info-row topContent [instance]="instance"></cnsl-info-row>
+  }
 </cnsl-top-view>
 
 <div class="max-width-container">
   <div class="instance-settings-wrapper">
-    <ng-container *ngIf="settingsList$ | async as list">
+    @if (settingsList$ | async; as list) {
       <cnsl-settings-list [selectedId]="id" [serviceType]="PolicyComponentServiceType.ADMIN" [settingsList]="list">
         <router-outlet />
       </cnsl-settings-list>
-    </ng-container>
+    }
   </div>
 </div>

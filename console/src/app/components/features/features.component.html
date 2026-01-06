@@ -6,7 +6,7 @@
       href="https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service"
       rel="noreferrer"
       target="_blank"
-    >
+      >
       <mat-icon class="icon">info_outline</mat-icon>
     </a>
   </div>
@@ -18,15 +18,18 @@
     </button>
   </ng-template>
 
-  <cnsl-card *ngIf="toggleStates$ | async as toggleStates">
-    <div class="features">
-      <cnsl-feature-toggle
-        *ngFor="let key of FEATURE_KEYS"
-        [toggleStateKey]="key"
-        [toggleState]="toggleStates[key]"
-        (toggleChange)="saveFeature(key, $event)"
-      ></cnsl-feature-toggle>
-      <cnsl-login-v2-feature-toggle [toggleState]="toggleStates.loginV2" (toggleChanged)="saveFeature('loginV2', $event)" />
-    </div>
-  </cnsl-card>
+  @if (toggleStates$ | async; as toggleStates) {
+    <cnsl-card>
+      <div class="features">
+        @for (key of FEATURE_KEYS; track key) {
+          <cnsl-feature-toggle
+            [toggleStateKey]="key"
+            [toggleState]="toggleStates[key]"
+            (toggleChange)="saveFeature(key, $event)"
+          ></cnsl-feature-toggle>
+        }
+        <cnsl-login-v2-feature-toggle [toggleState]="toggleStates.loginV2" (toggleChanged)="saveFeature('loginV2', $event)" />
+      </div>
+    </cnsl-card>
+  }
 </div>

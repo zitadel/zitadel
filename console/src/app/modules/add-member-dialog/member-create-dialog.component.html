@@ -5,17 +5,18 @@
 <div mat-dialog-content>
   <p class="desc cnsl-secondary-text">{{ 'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate }}</p>
 
-  <ng-container *ngIf="showCreationTypeSelector">
+  @if (showCreationTypeSelector) {
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
       <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
-        <mat-option *ngFor="let type of creationTypes" [value]="type.type" [disabled]="(type.disabled$ | async) === false">
-          {{ 'MEMBER.CREATIONTYPES.' + type.type | translate }}
-        </mat-option>
+        @for (type of creationTypes; track type) {
+          <mat-option [value]="type.type" [disabled]="(type.disabled$ | async) === false">
+            {{ 'MEMBER.CREATIONTYPES.' + type.type | translate }}
+          </mat-option>
+        }
       </mat-select>
     </cnsl-form-field>
-
-    <ng-container *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED">
+    @if (creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED) {
       <p>{{ 'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate }}</p>
       <cnsl-search-project-autocomplete
         class="block"
@@ -27,28 +28,29 @@
               ? ProjectAutocompleteType.PROJECT_GRANTED
               : undefined
         "
-      >
+        >
       </cnsl-search-project-autocomplete>
-    </ng-container>
-  </ng-container>
+    }
+  }
 
   <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
   </cnsl-search-user-autocomplete>
 
   <div class="roles-selection">
-    <mat-checkbox
-      class="role-cb"
-      *ngFor="let role of memberRoleOptions"
-      color="primary"
-      (change)="toggleRole(role)"
-      [checked]="roles.includes(role)"
-    >
-      <div class="role-cb-content">
-        <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-        <span data-e2e="role-checkbox">{{ role | roletransform }}</span>
-        <i class="info-hover las la-question-circle" matTooltip="{{ 'MEMBERROLES.' + role | translate }}"></i>
-      </div>
-    </mat-checkbox>
+    @for (role of memberRoleOptions; track role) {
+      <mat-checkbox
+        class="role-cb"
+        color="primary"
+        (change)="toggleRole(role)"
+        [checked]="roles.includes(role)"
+        >
+        <div class="role-cb-content">
+          <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+          <span data-e2e="role-checkbox">{{ role | roletransform }}</span>
+          <i class="info-hover las la-question-circle" matTooltip="{{ 'MEMBERROLES.' + role | translate }}"></i>
+        </div>
+      </mat-checkbox>
+    }
   </div>
 </div>
 <div mat-dialog-actions class="action">
@@ -63,7 +65,7 @@
     class="ok-button"
     (click)="closeDialogWithSuccess()"
     data-e2e="confirm-add-member-button"
-  >
+    >
     {{ 'ACTIONS.ADD' | translate }}
   </button>
 </div>

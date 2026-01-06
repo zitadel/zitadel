@@ -1,4 +1,6 @@
 <span class="name">
-  <span *ngIf="country" class="fi fi-{{ country | lowercase }} margin-right"></span>
+  @if (country) {
+    <span class="fi fi-{{ country | lowercase }} margin-right"></span>
+  }
   {{ phone ? phone : ('USER.PHONEEMPTY' | translate) }}
 </span>

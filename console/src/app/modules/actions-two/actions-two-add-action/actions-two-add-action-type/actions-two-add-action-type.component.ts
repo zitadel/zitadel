@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -20,7 +20,7 @@ import { ConditionType } from '../actions-two-add-action-condition/actions-two-a
   selector: 'cnsl-actions-two-add-action-type',
   templateUrl: './actions-two-add-action-type.component.html',
   styleUrls: ['./actions-two-add-action-type.component.scss'],
-  imports: [TranslateModule, MatRadioModule, RouterModule, ReactiveFormsModule, FormsModule, CommonModule, MatButtonModule],
+  imports: [TranslateModule, MatRadioModule, RouterModule, ReactiveFormsModule, FormsModule, MatButtonModule],
 })
 export class ActionsTwoAddActionTypeComponent {
   protected readonly typeForm: ReturnType<typeof this.buildActionTypeForm> = this.buildActionTypeForm();

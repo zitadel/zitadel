@@ -1,5 +1,9 @@
-<span *ngIf="!id" class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.ADD.TITLE' | translate }}</span>
-<span *ngIf="id" class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.UPDATE.TITLE' | translate }}</span>
+@if (!id) {
+  <span class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.ADD.TITLE' | translate }}</span>
+}
+@if (id) {
+  <span class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.UPDATE.TITLE' | translate }}</span>
+}
 
 <div mat-dialog-content>
   <form [formGroup]="form">
@@ -10,15 +14,16 @@
 
     <cnsl-info-section>{{ 'FLOWS.DIALOG.ABOUTNAME' | translate }}</cnsl-info-section>
 
-    <ngx-codemirror
-      *ngIf="opened$ | async"
-      formControlName="script"
+    @if (opened$ | async) {
+      <ngx-codemirror
+        formControlName="script"
       [options]="{
         lineNumbers: true,
         theme: 'material',
         mode: 'javascript',
       }"
-    ></ngx-codemirror>
+      ></ngx-codemirror>
+    }
 
     <cnsl-form-field class="form-field">
       <cnsl-label>{{ 'FLOWS.TIMEOUTINSEC' | translate }}</cnsl-label>
@@ -29,9 +34,11 @@
   </form>
 </div>
 <div mat-dialog-actions class="action">
-  <button *ngIf="id" mat-stroked-button color="warn" (click)="deleteAndCloseDialog()">
-    {{ 'ACTIONS.DELETE' | translate }}
-  </button>
+  @if (id) {
+    <button mat-stroked-button color="warn" (click)="deleteAndCloseDialog()">
+      {{ 'ACTIONS.DELETE' | translate }}
+    </button>
+  }
 
   <span class="fill-space"></span>
 
@@ -40,7 +47,11 @@
   </button>
 
   <button color="primary" mat-raised-button class="ok-button" [disabled]="false" (click)="closeDialogWithSuccess()">
-    <span *ngIf="!id">{{ 'ACTIONS.ADD' | translate }}</span>
-    <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+    @if (!id) {
+      <span>{{ 'ACTIONS.ADD' | translate }}</span>
+    }
+    @if (id) {
+      <span>{{ 'ACTIONS.SAVE' | translate }}</span>
+    }
   </button>
 </div>

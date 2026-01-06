@@ -1,162 +1,162 @@
-<cnsl-refresh-table
-  *ngIf="dataSource"
-  (refreshed)="changePage()"
-  [timestamp]="dataSource.viewTimestamp"
-  [selection]="selection"
-  [loading]="dataSource.loading$ | async"
->
-  <ng-container actions *ngIf="selection.hasValue()">
-    <ng-content select="[selectactions]"></ng-content>
-  </ng-container>
-
-  <div actions *ngIf="!selection.hasValue()">
-    <ng-content select="[writeactions]"></ng-content>
-  </div>
-
-  <div class="table-wrapper">
-    <table
-      *ngIf="displayedColumns$ | async as displayedColumns"
-      mat-table
-      class="table"
-      aria-label="Elements"
-      [dataSource]="dataSource"
-    >
-      <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="selection">
-            <mat-checkbox
-              [disabled]="(canWrite$ | async) === false"
-              color="primary"
-              (change)="$event ? masterToggle() : null"
-              [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
-            </mat-checkbox>
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let row">
-          <div class="selection">
-            <mat-checkbox
-              [disabled]="(canWrite$ | async) === false"
-              color="primary"
-              (click)="$event.stopPropagation()"
-              (change)="$event ? selection.toggle(row) : null"
-              [checked]="selection.isSelected(row)"
-            >
-              <cnsl-avatar
-                *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
-                class="avatar"
-                [name]="row.displayName"
-                [avatarUrl]="row.avatarUrl || ''"
-                [avatarUrl]="row.avatarUrl || ''"
-                [forColor]="row?.preferredLoginName"
-                [size]="32"
-              >
-              </cnsl-avatar>
-              <ng-template #cog>
-                <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
-                  <i class="las la-robot"></i>
-                </cnsl-avatar>
-              </ng-template>
-            </mat-checkbox>
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="userId">
-        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.USERID' | translate }}</th>
-        <td mat-cell *matCellDef="let member">
-          {{ member.userId }}
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="displayName">
-        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.DISPLAYNAME' | translate }}</th>
-        <td mat-cell *matCellDef="let member">
-          {{ member.displayName }}
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="loginname">
-        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.LOGINNAME' | translate }}</th>
-        <td mat-cell *matCellDef="let member">
-          {{ member.preferredLoginName }}
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.EMAIL' | translate }}</th>
-        <td mat-cell *matCellDef="let member">
-          {{ member.email }}
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="actions" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let member" class="member-action-tr">
-          <cnsl-table-actions [hasActions]="true">
-            <button
-              actions
-              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              color="warn"
-              (click)="$event.stopPropagation(); triggerDeleteMember(member)"
-              mat-icon-button
-              [disabled]="(canDelete$ | async) === false"
-              data-e2e="remove-member-button"
-            >
-              <i class="las la-trash"></i>
-            </button>
-
-            <button menuActions mat-menu-item [routerLink]="['/users', member.userId]">
-              {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: member.displayName } }}
-            </button>
-          </cnsl-table-actions>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="roles">
-        <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
-        <td mat-cell *matCellDef="let member" class="role-row">
-          <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
-            <mat-chip-option
-              [selectable]="false"
-              class="cnsl-chip"
-              *ngFor="let role of member.rolesList"
-              [removable]="canWrite$ | async"
-              (removed)="removeRole(member, role)"
-              data-e2e="role"
-            >
-              <div class="cnsl-chip-content">
-                <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-                <span>{{ role | roletransform }}</span>
-                <button *ngIf="canWrite$ | async" matChipRemove data-e2e="remove-role-button">
-                  <mat-icon>cancel</mat-icon>
-                </button>
-              </div>
-            </mat-chip-option>
-          </mat-chip-listbox>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr
-        class="highlight"
-        [ngClass]="{ pointer: canWrite$ | async }"
-        (click)="addRole(member)"
-        mat-row
-        *matRowDef="let member; columns: displayedColumns"
-      ></tr>
-    </table>
-  </div>
-  <cnsl-paginator
-    *ngIf="dataSource"
-    class="paginator"
-    #paginator
+@if (dataSource) {
+  <cnsl-refresh-table
+    (refreshed)="changePage()"
     [timestamp]="dataSource.viewTimestamp"
-    [pageSize]="INITIALPAGESIZE"
-    [length]="dataSource.totalResult"
-    [pageSizeOptions]="[25, 50, 100, 250]"
-    (page)="changePage($event)"
-  >
-  </cnsl-paginator>
-</cnsl-refresh-table>
+    [selection]="selection"
+    [loading]="dataSource.loading$ | async"
+    >
+    @if (selection.hasValue()) {
+      <ng-container actions>
+        <ng-content select="[selectactions]"></ng-content>
+      </ng-container>
+    }
+    @if (!selection.hasValue()) {
+      <div actions>
+        <ng-content select="[writeactions]"></ng-content>
+      </div>
+    }
+    <div class="table-wrapper">
+      @if (displayedColumns$ | async; as displayedColumns) {
+        <table
+          mat-table
+          class="table"
+          aria-label="Elements"
+          [dataSource]="dataSource"
+          >
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="selection">
+                <mat-checkbox
+                  [disabled]="(canWrite$ | async) === false"
+                  color="primary"
+                  (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()"
+                  >
+                </mat-checkbox>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <div class="selection">
+                <mat-checkbox
+                  [disabled]="(canWrite$ | async) === false"
+                  color="primary"
+                  (click)="$event.stopPropagation()"
+                  (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)"
+                  >
+                  @if (row?.userType === UserType.TYPE_HUMAN) {
+                    <cnsl-avatar
+                      class="avatar"
+                      [name]="row.displayName"
+                      [avatarUrl]="row.avatarUrl || ''"
+                      [avatarUrl]="row.avatarUrl || ''"
+                      [forColor]="row?.preferredLoginName"
+                      [size]="32"
+                      >
+                    </cnsl-avatar>
+                  } @else {
+                    <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
+                      <i class="las la-robot"></i>
+                    </cnsl-avatar>
+                  }
+                </mat-checkbox>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="userId">
+            <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.USERID' | translate }}</th>
+            <td mat-cell *matCellDef="let member">
+              {{ member.userId }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="displayName">
+            <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.DISPLAYNAME' | translate }}</th>
+            <td mat-cell *matCellDef="let member">
+              {{ member.displayName }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="loginname">
+            <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.LOGINNAME' | translate }}</th>
+            <td mat-cell *matCellDef="let member">
+              {{ member.preferredLoginName }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.EMAIL' | translate }}</th>
+            <td mat-cell *matCellDef="let member">
+              {{ member.email }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions" stickyEnd>
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let member" class="member-action-tr">
+              <cnsl-table-actions [hasActions]="true">
+                <button
+                  actions
+                  matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                  color="warn"
+                  (click)="$event.stopPropagation(); triggerDeleteMember(member)"
+                  mat-icon-button
+                  [disabled]="(canDelete$ | async) === false"
+                  data-e2e="remove-member-button"
+                  >
+                  <i class="las la-trash"></i>
+                </button>
+                <button menuActions mat-menu-item [routerLink]="['/users', member.userId]">
+                  {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: member.displayName } }}
+                </button>
+              </cnsl-table-actions>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="roles">
+            <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
+            <td mat-cell *matCellDef="let member" class="role-row">
+              <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
+                @for (role of member.rolesList; track role) {
+                  <mat-chip-option
+                    [selectable]="false"
+                    class="cnsl-chip"
+                    [removable]="canWrite$ | async"
+                    (removed)="removeRole(member, role)"
+                    data-e2e="role"
+                    >
+                    <div class="cnsl-chip-content">
+                      <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+                      <span>{{ role | roletransform }}</span>
+                      @if (canWrite$ | async) {
+                        <button matChipRemove data-e2e="remove-role-button">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      }
+                    </div>
+                  </mat-chip-option>
+                }
+              </mat-chip-listbox>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            class="highlight"
+            [ngClass]="{ pointer: canWrite$ | async }"
+            (click)="addRole(member)"
+            mat-row
+            *matRowDef="let member; columns: displayedColumns"
+          ></tr>
+        </table>
+      }
+    </div>
+    @if (dataSource) {
+      <cnsl-paginator
+        class="paginator"
+        #paginator
+        [timestamp]="dataSource.viewTimestamp"
+        [pageSize]="INITIALPAGESIZE"
+        [length]="dataSource.totalResult"
+        [pageSizeOptions]="[25, 50, 100, 250]"
+        (page)="changePage($event)"
+        >
+      </cnsl-paginator>
+    }
+  </cnsl-refresh-table>
+}

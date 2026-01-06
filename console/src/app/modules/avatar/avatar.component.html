@@ -12,12 +12,13 @@
     color: (themeService.isDarkTheme | async) ? color[200] : color[900],
   }"
   [ngClass]="{ active: active }"
->
-  <ng-container *ngIf="isMachine; else human">
+  >
+  @if (isMachine) {
     <i class="machine-icon las la-robot"></i>
-  </ng-container>
-  <ng-template #human>
+  } @else {
     <span class="dontcloseonclick">{{ credentials }}</span>
-    <img class="dontcloseonclick" *ngIf="avatarUrl" [src]="avatarUrl" (error)="errorHandler($event)" />
-  </ng-template>
+    @if (avatarUrl) {
+      <img class="dontcloseonclick" [src]="avatarUrl" (error)="errorHandler($event)" />
+    }
+  }
 </div>

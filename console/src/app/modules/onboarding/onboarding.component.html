@@ -1,94 +1,98 @@
 <div class="onboarding-header">
   <h2 class="desc">{{ 'ONBOARDING.DESCRIPTION' | translate }}</h2>
 
-  <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
+  @if (!adminService.hideOnboarding && (adminService.progressAllDone | async) === false) {
     <div class="onboarding-progress-bar-wrapper">
       <mat-progress-bar
         class="progress"
         mode="determinate"
         [value]="adminService.progressPercentage | async"
       ></mat-progress-bar>
-
       <div class="prog-desc cnsl-secondary-text">
         {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
         {{ 'ONBOARDING.COMPLETED' | translate }}
       </div>
-
-      <mat-spinner diameter="20" *ngIf="adminService.onboardingLoading | async"></mat-spinner>
+      @if (adminService.onboardingLoading | async) {
+        <mat-spinner diameter="20"></mat-spinner>
+      }
     </div>
-  </ng-container>
+  }
 
   <div
     class="action-card-wrapper"
     [ngClass]="{ alldone: adminService.hideOnboarding || (adminService.progressAllDone | async) }"
-  >
-    <ng-container *ngFor="let action of actions | async">
-      <a
-        *ngIf="!action[1].externalLink"
-        [routerLink]="action[1].link"
-        [queryParams]="{ id: action[1].fragment }"
-        class="action-card card"
-        [ngClass]="{ done: action[1].reached !== undefined }"
-      >
-        <ng-template
-          [ngTemplateOutlet]="onboardingContent"
-          [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
-        >
-        </ng-template>
-      </a>
-      <a
-        *ngIf="action[1].externalLink"
-        [href]="action[1].link"
-        class="action-card card"
-        [ngClass]="{ done: action[1].reached !== undefined }"
-      >
-        <ng-template
-          [ngTemplateOutlet]="onboardingContent"
-          [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
-        >
-        </ng-template>
-      </a>
-    </ng-container>
+    >
+    @for (action of actions | async; track action) {
+      @if (!action[1].externalLink) {
+        <a
+          [routerLink]="action[1].link"
+          [queryParams]="{ id: action[1].fragment }"
+          class="action-card card"
+          [ngClass]="{ done: action[1].reached !== undefined }"
+          >
+          <ng-template
+            [ngTemplateOutlet]="onboardingContent"
+            [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
+            >
+          </ng-template>
+        </a>
+      }
+      @if (action[1].externalLink) {
+        <a
+          [href]="action[1].link"
+          class="action-card card"
+          [ngClass]="{ done: action[1].reached !== undefined }"
+          >
+          <ng-template
+            [ngTemplateOutlet]="onboardingContent"
+            [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
+            >
+          </ng-template>
+        </a>
+      }
+    }
   </div>
 </div>
 
 <ng-template #onboardingContent let-action="action" let-title="title">
   <div class="state-circle">
-    <mat-icon *ngIf="action?.reached !== undefined" matTooltip="{{ action.reached | milestone }}" class="success-icon"
-      >check_circle</mat-icon
-    >
-  </div>
+    @if (action?.reached !== undefined) {
+      <mat-icon matTooltip="{{ action.reached | milestone }}" class="success-icon"
+        >check_circle</mat-icon
+        >
+      }
+    </div>
 
-  <div class="action-content">
-    <div class="action-content-row">
-      <div
-        class="icon-wrapper"
+    <div class="action-content">
+      <div class="action-content-row">
+        <div
+          class="icon-wrapper"
         [ngStyle]="{
           background: (themeService.isDarkTheme | async) ? action.darkcolor + 50 : action.lightcolor + 50,
         }"
-      >
-        <div
-          class="inner"
+          >
+          <div
+            class="inner"
           [ngStyle]="{
             background: (themeService.isDarkTheme | async) ? action.darkcolor : action.lightcolor,
             color: (themeService.isDarkTheme | async) ? action.lightcolor : action.darkcolor,
           }"
-        >
-          <i class="{{ action.iconClasses }}"></i>
+            >
+            <i class="{{ action.iconClasses }}"></i>
+          </div>
+        </div>
+        <div class="text-block">
+          <span class="name">{{ 'ONBOARDING.MILESTONES.' + title + '.title' | translate }}</span>
+          <span class="cnsl-secondary-text description">{{
+            'ONBOARDING.MILESTONES.' + title + '.description' | translate
+          }}</span>
         </div>
       </div>
-      <div class="text-block">
-        <span class="name">{{ 'ONBOARDING.MILESTONES.' + title + '.title' | translate }}</span>
-        <span class="cnsl-secondary-text description">{{
-          'ONBOARDING.MILESTONES.' + title + '.description' | translate
-        }}</span>
+
+      <span class="fill-space"></span>
+      <div class="action-row">
+        <span>{{ 'ONBOARDING.MILESTONES.' + title + '.action' | translate }}</span>
+        <mat-icon class="icon">keyboard_arrow_right</mat-icon>
       </div>
     </div>
-
-    <span class="fill-space"></span>
-    <div class="action-row">
-      <span>{{ 'ONBOARDING.MILESTONES.' + title + '.action' | translate }}</span>
-      <mat-icon class="icon">keyboard_arrow_right</mat-icon>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>

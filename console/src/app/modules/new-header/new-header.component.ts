@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, Signal, signal } 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NewOrganizationService } from '../../services/new-organization.service';
 import { ToastService } from '../../services/toast.service';
-import { AsyncPipe, NgForOf, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { OrganizationSelectorComponent } from './organization-selector/organization-selector.component';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
@@ -31,7 +31,6 @@ import { MatRippleModule } from '@angular/material/core';
     OrganizationSelectorComponent,
     CdkOverlayOrigin,
     MatSelectModule,
-    NgIf,
     InputModule,
     HeaderButtonComponent,
     HeaderDropdownComponent,
@@ -40,9 +39,8 @@ import { MatRippleModule } from '@angular/material/core';
     AsyncPipe,
     HasRolePipeModule,
     RouterLink,
-    NgForOf,
-    MatRippleModule,
-  ],
+    MatRippleModule
+],
 })
 export class NewHeaderComponent {
   protected readonly listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();

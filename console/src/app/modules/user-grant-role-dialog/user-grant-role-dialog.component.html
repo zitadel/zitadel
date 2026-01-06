@@ -1,17 +1,18 @@
 <span class="title" mat-dialog-title>{{ data.i18nTitle | translate }}</span>
 <div mat-dialog-content>
   <div class="dialog-table-wrapper">
-    <cnsl-project-roles-table
-      class="role-table"
-      *ngIf="projectId"
-      [displayedColumns]="['select', 'key', 'displayname', 'group']"
-      (changedSelection)="selectRoles($event)"
-      [projectId]="projectId"
-      [grantId]="grantId"
-      [selectedKeys]="selectedRoleKeysList"
-      [showSelectionActionButton]="false"
-    >
-    </cnsl-project-roles-table>
+    @if (projectId) {
+      <cnsl-project-roles-table
+        class="role-table"
+        [displayedColumns]="['select', 'key', 'displayname', 'group']"
+        (changedSelection)="selectRoles($event)"
+        [projectId]="projectId"
+        [grantId]="grantId"
+        [selectedKeys]="selectedRoleKeysList"
+        [showSelectionActionButton]="false"
+        >
+      </cnsl-project-roles-table>
+    }
   </div>
 </div>
 <div mat-dialog-actions class="action">

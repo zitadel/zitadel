@@ -1,10 +1,12 @@
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  @if (loading) {
+    <mat-spinner diameter="30" color="primary"></mat-spinner>
+  }
 </div>
 
 <h2>{{ 'SETTINGS.LIST.LOGIN' | translate }}</h2>
 
-<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
+@if (serviceType === PolicyComponentServiceType.MGMT && !isDefault) {
   <ng-template cnslHasRole [hasRole]="['policy.delete']">
     <button
       color="primary"
@@ -13,22 +15,23 @@
       color="warn"
       (click)="removePolicy()"
       mat-stroked-button
-    >
+      >
       {{ 'POLICY.RESET' | translate }}
     </button>
   </ng-template>
-</ng-container>
+}
 
 <br />
 
 <h3>{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
 
-<div class="login-policy-row" *ngIf="loginData">
-  <cnsl-form-field class="passwordless-allowed" label="Access Code" required="true">
-    <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
-    <mat-select
-      [(ngModel)]="loginData.passwordlessType"
+@if (loginData) {
+  <div class="login-policy-row">
+    <cnsl-form-field class="passwordless-allowed" label="Access Code" required="true">
+      <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
+      <mat-select
+        [(ngModel)]="loginData.passwordlessType"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -40,23 +43,27 @@
           | hasRole
           | async) === false
       "
-    >
-      <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
-        {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
-</div>
+        >
+        @for (pt of passwordlessTypes; track pt) {
+          <mat-option [value]="pt">
+            {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
+          </mat-option>
+        }
+      </mat-select>
+    </cnsl-form-field>
+  </div>
+}
 
-<cnsl-card class="max-card-width" *ngIf="loginData">
-  <cnsl-factor-table
-    [service]="service"
-    [serviceType]="serviceType"
-    [componentType]="LoginMethodComponentType.MultiFactor"
-    [list]="loginData.multiFactorsList"
-    (typeRemoved)="removeFactor($event)"
-    (beforeTypeAdd)="beforeAddFactor($event)"
-    (typeAdded)="addFactor($event)"
+@if (loginData) {
+  <cnsl-card class="max-card-width">
+    <cnsl-factor-table
+      [service]="service"
+      [serviceType]="serviceType"
+      [componentType]="LoginMethodComponentType.MultiFactor"
+      [list]="loginData.multiFactorsList"
+      (typeRemoved)="removeFactor($event)"
+      (beforeTypeAdd)="beforeAddFactor($event)"
+      (typeAdded)="addFactor($event)"
     [disabled]="
       loginData.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
       ([
@@ -69,22 +76,24 @@
         | hasRole
         | async) === false
     "
-  >
-  </cnsl-factor-table>
-</cnsl-card>
+      >
+    </cnsl-factor-table>
+  </cnsl-card>
+}
 
 <br />
 
 <h3>{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
 
-<div *ngIf="loginData" class="login-policy-row">
-  <mat-checkbox
-    card-actions
-    class="login-policy-toggle"
-    color="primary"
-    ngDefaultControl
-    [(ngModel)]="loginData.forceMfa"
+@if (loginData) {
+  <div class="login-policy-row">
+    <mat-checkbox
+      card-actions
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.forceMfa"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN
@@ -96,17 +105,19 @@
         | hasRole
         | async) === false
     "
-  >
-    {{ 'POLICY.DATA.FORCEMFA' | translate }}
-  </mat-checkbox>
-</div>
-<div *ngIf="loginData" class="login-policy-row">
-  <mat-checkbox
-    card-actions
-    class="login-policy-toggle"
-    color="primary"
-    ngDefaultControl
-    [(ngModel)]="loginData.forceMfaLocalOnly"
+      >
+      {{ 'POLICY.DATA.FORCEMFA' | translate }}
+    </mat-checkbox>
+  </div>
+}
+@if (loginData) {
+  <div class="login-policy-row">
+    <mat-checkbox
+      card-actions
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.forceMfaLocalOnly"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN
@@ -118,19 +129,21 @@
         | hasRole
         | async) === false
     "
-  >
-    {{ 'POLICY.DATA.FORCEMFALOCALONLY' | translate }}
-  </mat-checkbox>
-</div>
-<cnsl-card class="max-card-width" *ngIf="loginData">
-  <cnsl-factor-table
-    [service]="service"
-    [serviceType]="serviceType"
-    [componentType]="LoginMethodComponentType.SecondFactor"
-    [list]="loginData.secondFactorsList"
-    (typeRemoved)="removeFactor($event)"
-    (beforeTypeAdd)="beforeAddFactor($event)"
-    (typeAdded)="addFactor($event)"
+      >
+      {{ 'POLICY.DATA.FORCEMFALOCALONLY' | translate }}
+    </mat-checkbox>
+  </div>
+}
+@if (loginData) {
+  <cnsl-card class="max-card-width">
+    <cnsl-factor-table
+      [service]="service"
+      [serviceType]="serviceType"
+      [componentType]="LoginMethodComponentType.SecondFactor"
+      [list]="loginData.secondFactorsList"
+      (typeRemoved)="removeFactor($event)"
+      (beforeTypeAdd)="beforeAddFactor($event)"
+      (typeAdded)="addFactor($event)"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN
@@ -142,9 +155,10 @@
         | hasRole
         | async) === false
     "
-  >
-  </cnsl-factor-table>
-</cnsl-card>
+      >
+    </cnsl-factor-table>
+  </cnsl-card>
+}
 
 <br />
 
@@ -154,7 +168,7 @@
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.PW_CHECK.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.PW_CHECK.DESCRIPTION' | translate"
-  >
+    >
     <cnsl-form-field class="lifetime-form-field" label="Password Check Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
       <input cnslInput type="number" name="passwordCheckLifetime" formControlName="passwordCheckLifetime" min="1" step="1" />
@@ -163,7 +177,7 @@
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.EXT_LOGIN_CHECK.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.EXT_LOGIN_CHECK.DESCRIPTION' | translate"
-  >
+    >
     <cnsl-form-field class="lifetime-form-field" label="external Login Check Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
       <input
@@ -173,13 +187,13 @@
         formControlName="externalLoginCheckLifetime"
         min="1"
         step="1"
-      />
+        />
     </cnsl-form-field>
   </cnsl-card>
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_INIT.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_INIT.DESCRIPTION' | translate"
-  >
+    >
     <cnsl-form-field class="lifetime-form-field" label="MFA Init Skip Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
       <input cnslInput type="number" name="mfaInitSkipLifetime" formControlName="mfaInitSkipLifetime" min="0" step="1" />
@@ -188,7 +202,7 @@
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.SECOND_FACTOR_CHECK.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.SECOND_FACTOR_CHECK.DESCRIPTION' | translate"
-  >
+    >
     <cnsl-form-field class="lifetime-form-field" label="Second Factor Check Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
       <input
@@ -198,13 +212,13 @@
         formControlName="secondFactorCheckLifetime"
         min="1"
         step="1"
-      />
+        />
     </cnsl-form-field>
   </cnsl-card>
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_CHECK.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_CHECK.DESCRIPTION' | translate"
-  >
+    >
     <cnsl-form-field class="lifetime-form-field" label="Multi-factor Check Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
       <input
@@ -214,7 +228,7 @@
         formControlName="multiFactorCheckLifetime"
         min="1"
         step="1"
-      />
+        />
     </cnsl-form-field>
   </cnsl-card>
 </form>
@@ -224,14 +238,15 @@
 <h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.TITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DESCRIPTION' | translate }}</p>
 
-<div class="max-card-width login-policy-content" *ngIf="loginData">
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.DESCRIPTION' | translate }}"
-      ngDefaultControl
-      [(ngModel)]="loginData.allowUsernamePassword"
+@if (loginData) {
+  <div class="max-card-width login-policy-content">
+    <div class="login-policy-row">
+      <mat-checkbox
+        class="login-policy-toggle"
+        color="primary"
+        matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.DESCRIPTION' | translate }}"
+        ngDefaultControl
+        [(ngModel)]="loginData.allowUsernamePassword"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -243,11 +258,10 @@
           | hasRole
           | async) === false
       "
-    >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.TITLE' | translate }}
-    </mat-checkbox>
-
-    <!-- <cnsl-info-section class="info">
+        >
+        {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.TITLE' | translate }}
+      </mat-checkbox>
+      <!-- <cnsl-info-section class="info">
       {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate }}
     </cnsl-info-section> -->
   </div>
@@ -269,22 +283,23 @@
           | hasRole
           | async) === false
       "
-    >
+      >
       {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USER_REGISTRATION_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
   </div>
   <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.DESCRIPTION' | translate }}"
-      [(ngModel)]="allowOrgRegistration"
-      *ngIf="serviceType === PolicyComponentServiceType.ADMIN"
-      [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
-    >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.TITLE' | translate }}
-    </mat-checkbox>
+    @if (serviceType === PolicyComponentServiceType.ADMIN) {
+      <mat-checkbox
+        class="login-policy-toggle"
+        color="primary"
+        ngDefaultControl
+        matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.DESCRIPTION' | translate }}"
+        [(ngModel)]="allowOrgRegistration"
+        [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
+        >
+        {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.TITLE' | translate }}
+      </mat-checkbox>
+    }
   </div>
   <div class="login-policy-row">
     <mat-checkbox
@@ -304,24 +319,22 @@
           | hasRole
           | async) === false
       "
-    >
+      >
       {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.EXTERNAL_LOGIN_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
-
     <!-- <ng-template #idpInfo>
-      <cnsl-info-section class="info">
-        {{ 'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate }}
-      </cnsl-info-section>
-    </ng-template> -->
-  </div>
-
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.hidePasswordReset"
+    <cnsl-info-section class="info">
+      {{ 'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate }}
+    </cnsl-info-section>
+  </ng-template> -->
+</div>
+<div class="login-policy-row">
+  <mat-checkbox
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.DESCRIPTION' | translate }}"
+    [(ngModel)]="loginData.hidePasswordReset"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -334,23 +347,21 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.TITLE' | translate }}
-    </mat-checkbox>
-
-    <!-- <ng-template #passwordResetInfo>
-      <cnsl-info-section class="info">
-        {{ 'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate }}
-      </cnsl-info-section>
-    </ng-template> -->
-  </div>
-
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.allowDomainDiscovery"
+    {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.TITLE' | translate }}
+  </mat-checkbox>
+  <!-- <ng-template #passwordResetInfo>
+  <cnsl-info-section class="info">
+    {{ 'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate }}
+  </cnsl-info-section>
+</ng-template> -->
+</div>
+<div class="login-policy-row">
+  <mat-checkbox
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.DESCRIPTION' | translate }}"
+    [(ngModel)]="loginData.allowDomainDiscovery"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -363,17 +374,16 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.TITLE' | translate }}
-    </mat-checkbox>
-  </div>
-
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.ignoreUnknownUsernames"
+    {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<div class="login-policy-row">
+  <mat-checkbox
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.DESCRIPTION' | translate }}"
+    [(ngModel)]="loginData.ignoreUnknownUsernames"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -386,17 +396,16 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.TITLE' | translate }}
-    </mat-checkbox>
-  </div>
-
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.disableLoginWithEmail"
+    {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<div class="login-policy-row">
+  <mat-checkbox
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.DESCRIPTION' | translate }}"
+    [(ngModel)]="loginData.disableLoginWithEmail"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -409,17 +418,16 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.TITLE' | translate }}
-    </mat-checkbox>
-  </div>
-
-  <div class="login-policy-row">
-    <mat-checkbox
-      class="login-policy-toggle"
-      color="primary"
-      ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.disableLoginWithPhone"
+    {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<div class="login-policy-row">
+  <mat-checkbox
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.DESCRIPTION' | translate }}"
+    [(ngModel)]="loginData.disableLoginWithPhone"
       [disabled]="
         ([
           serviceType === PolicyComponentServiceType.ADMIN
@@ -432,17 +440,16 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.TITLE' | translate }}
-    </mat-checkbox>
-  </div>
-
-  <div class="login-policy-row">
-    <cnsl-form-field class="form-field" label="Access Code" required="true">
-      <cnsl-label>{{ 'POLICY.DATA.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
-      <input
-        cnslInput
-        placeholder="https://"
-        [(ngModel)]="loginData.defaultRedirectUri"
+    {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.TITLE' | translate }}
+  </mat-checkbox>
+</div>
+<div class="login-policy-row">
+  <cnsl-form-field class="form-field" label="Access Code" required="true">
+    <cnsl-label>{{ 'POLICY.DATA.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
+    <input
+      cnslInput
+      placeholder="https://"
+      [(ngModel)]="loginData.defaultRedirectUri"
         [disabled]="
           ([
             serviceType === PolicyComponentServiceType.ADMIN
@@ -455,9 +462,10 @@
             | async) === false
         "
       />
-    </cnsl-form-field>
-  </div>
+  </cnsl-form-field>
 </div>
+</div>
+}
 
 <br />
 
@@ -480,7 +488,7 @@
         | hasRole
         | async) === false
     "
-  >
+    >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>

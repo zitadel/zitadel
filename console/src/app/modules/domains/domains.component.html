@@ -1,4 +1,4 @@
-<ng-container *ngIf="['org.write$'] | hasRole as canwrite$">
+@if (['org.write$'] | hasRole; as canwrite$) {
   <div class="domain-top-view">
     <div>
       <div class="domain-title-row">
@@ -8,14 +8,13 @@
           href="https://zitadel.com/docs/guides/manage/console/organizations#how-zitadel-handles-usernames"
           rel="noreferrer"
           target="_blank"
-        >
+          >
           <mat-icon class="icon">info_outline</mat-icon>
         </a>
       </div>
       <p class="domain-desc cnsl-secondary-text">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
     </div>
     <span class="fill-space"></span>
-
     <button
       [disabled]="(canwrite$ | async) === false"
       matTooltip="Add domain"
@@ -23,7 +22,7 @@
       color="primary"
       class="cnsl-action-button"
       (click)="addNewDomain()"
-    >
+      >
       <div class="cnsl-action-button">
         <mat-icon>add</mat-icon>
         <span>{{ 'ACTIONS.NEW' | translate }}</span>
@@ -31,39 +30,44 @@
       </div>
     </button>
   </div>
-
-  <cnsl-card *ngFor="let domain of domains" class="domain-card">
-    <div class="domain">
-      <span class="title">{{ domain.domainName }}</span>
-
-      <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
-      <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
-      <a
-        *ngIf="domain.isVerified && !domain.isPrimary && (canwrite$ | async)"
-        class="primaryset"
-        (click)="setPrimary(domain)"
-        >{{ 'ORG.DOMAINS.SETPRIMARY' | translate }}</a
-      >
-
-      <span class="fill-space"></span>
-      <button
-        mat-icon-button
-        [disabled]="(canwrite$ | async) === false || domain.isVerified"
-        *ngIf="verifyOrgDomains"
-        (click)="verifyDomain(domain)"
-      >
-        <i class="las la-pen"></i>
-      </button>
-      <button
-        class="domain-rem-button"
-        [disabled]="(canwrite$ | async) === false || domain.isPrimary"
-        matTooltip="Remove domain"
-        color="warn"
-        mat-icon-button
-        (click)="removeDomain(domain.domainName)"
-      >
-        <i class="las la-trash"></i>
-      </button>
-    </div>
-  </cnsl-card>
-</ng-container>
+  @for (domain of domains; track domain) {
+    <cnsl-card class="domain-card">
+      <div class="domain">
+        <span class="title">{{ domain.domainName }}</span>
+        @if (domain.isVerified) {
+          <i matTooltip="verified" class="verified las la-check-circle"></i>
+        }
+        @if (domain.isPrimary) {
+          <i matTooltip="primary" class="primary las la-star"></i>
+        }
+        @if (domain.isVerified && !domain.isPrimary && (canwrite$ | async)) {
+          <a
+            class="primaryset"
+            (click)="setPrimary(domain)"
+            >{{ 'ORG.DOMAINS.SETPRIMARY' | translate }}</a
+            >
+          }
+          <span class="fill-space"></span>
+          @if (verifyOrgDomains) {
+            <button
+              mat-icon-button
+              [disabled]="(canwrite$ | async) === false || domain.isVerified"
+              (click)="verifyDomain(domain)"
+              >
+              <i class="las la-pen"></i>
+            </button>
+          }
+          <button
+            class="domain-rem-button"
+            [disabled]="(canwrite$ | async) === false || domain.isPrimary"
+            matTooltip="Remove domain"
+            color="warn"
+            mat-icon-button
+            (click)="removeDomain(domain.domainName)"
+            >
+            <i class="las la-trash"></i>
+          </button>
+        </div>
+      </cnsl-card>
+    }
+  }

@@ -23,7 +23,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
 export class ProjectGrantDetailComponent {
   public INITIALPAGESIZE: number = 25;
 
-  public grant!: GrantedProject.AsObject;
+  public grant: GrantedProject.AsObject | undefined;
   public projectid: string = '';
   public grantid: string = '';
 
@@ -95,13 +95,13 @@ export class ProjectGrantDetailComponent {
     });
   }
 
-  public changeState(newState: ProjectGrantState): void {
+  public changeState(grant: GrantedProject.AsObject, newState: ProjectGrantState): void {
     if (newState === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE) {
       this.mgmtService
         .reactivateProjectGrant(this.grantid, this.projectid)
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-          this.grant.state = newState;
+          grant.state = newState;
         })
         .catch((error) => {
           this.toast.showError(error);
@@ -111,7 +111,7 @@ export class ProjectGrantDetailComponent {
         .deactivateProjectGrant(this.grantid, this.projectid)
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-          this.grant.state = newState;
+          grant.state = newState;
           setTimeout(() => {
             this.changePage.emit();
           }, 1000);
@@ -140,26 +140,11 @@ export class ProjectGrantDetailComponent {
       });
   }
 
-  updateRoles(selectionChange: string[]): void {
-    this.mgmtService
-      .updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange)
-      .then(() => {
-        this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
-        setTimeout(() => {
-          this.changePage.emit();
-        }, 1000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.changePage.emit();
-      });
-  }
-
-  public removeProjectMemberSelection(): void {
+  public removeProjectMemberSelection(grant: GrantedProject.AsObject): void {
     Promise.all(
       this.selection.map((member) => {
         return this.mgmtService
-          .removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
+          .removeProjectGrantMember(grant.projectId, grant.grantId, member.userId)
           .then(() => {
             this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
             setTimeout(() => {
@@ -174,9 +159,9 @@ export class ProjectGrantDetailComponent {
     );
   }
 
-  public removeProjectMember(member: Member.AsObject): void {
+  public removeProjectMember(grant: GrantedProject.AsObject, member: Member.AsObject): void {
     this.mgmtService
-      .removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
+      .removeProjectGrantMember(grant.projectId, grant.grantId, member.userId)
       .then(() => {
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
         setTimeout(() => {
@@ -189,7 +174,7 @@ export class ProjectGrantDetailComponent {
       });
   }
 
-  public async openAddMember(): Promise<any> {
+  public async openAddMember(grant: GrantedProject.AsObject): Promise<any> {
     const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
       data: {
         creationType: CreationType.PROJECT_GRANTED,
@@ -206,7 +191,7 @@ export class ProjectGrantDetailComponent {
           const userIds = users.map((user) => user.id);
           Promise.all(
             userIds.map((userid: string) => {
-              return this.mgmtService.addProjectGrantMember(this.grant.projectId, this.grant.grantId, userid, resp.roles);
+              return this.mgmtService.addProjectGrantMember(grant.projectId, grant.grantId, userid, resp.roles);
             }),
           )
             .then(() => {
@@ -224,9 +209,9 @@ export class ProjectGrantDetailComponent {
     });
   }
 
-  updateMemberRoles(member: Member.AsObject, selectionChange: string[]): void {
+  updateMemberRoles(grant: GrantedProject.AsObject, member: Member.AsObject, selectionChange: string[]): void {
     this.mgmtService
-      .updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange)
+      .updateProjectGrantMember(grant.projectId, grant.grantId, member.userId, selectionChange)
       .then(() => {
         setTimeout(() => {
           this.changePage.emit();
@@ -239,13 +224,13 @@ export class ProjectGrantDetailComponent {
       });
   }
 
-  removeRole(role: string): void {
-    const index = this.grant.grantedRoleKeysList.findIndex((r) => r === role);
+  removeRole(grant: GrantedProject.AsObject, role: string): void {
+    const index = grant.grantedRoleKeysList.findIndex((r) => r === role);
     if (index > -1) {
-      this.grant.grantedRoleKeysList.splice(index, 1);
+      grant.grantedRoleKeysList.splice(index, 1);
 
       this.mgmtService
-        .updateProjectGrant(this.grant.grantId, this.grant.projectId, this.grant.grantedRoleKeysList)
+        .updateProjectGrant(grant.grantId, grant.projectId, grant.grantedRoleKeysList)
         .then(() => {
           setTimeout(() => {
             this.changePage.emit();
@@ -259,11 +244,11 @@ export class ProjectGrantDetailComponent {
     }
   }
 
-  public editRoles(): void {
+  public editRoles(grant: GrantedProject.AsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
-        projectId: this.grant.projectId,
-        selectedRoleKeysList: this.grant.grantedRoleKeysList,
+        projectId: grant.projectId,
+        selectedRoleKeysList: grant.grantedRoleKeysList,
         i18nTitle: 'PROJECT.GRANT.EDITTITLE',
       },
       width: '600px',
@@ -272,10 +257,10 @@ export class ProjectGrantDetailComponent {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp && resp.roles) {
         this.mgmtService
-          .updateProjectGrant(this.grant.grantId, this.grant.projectId, resp.roles)
+          .updateProjectGrant(grant.grantId, grant.projectId, resp.roles)
           .then(() => {
             this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
-            this.grant.grantedRoleKeysList = resp.roles;
+            grant.grantedRoleKeysList = resp.roles;
             setTimeout(() => {
               this.changePage.emit();
             }, 1000);

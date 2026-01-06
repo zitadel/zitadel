@@ -35,7 +35,7 @@
             "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["import", "mixed-decls"]
+                "silenceDeprecations": ["import"]
               },
               "includePaths": [
                 "node_modules",

@@ -3,7 +3,7 @@ import { FeatureToggleComponent } from '../feature-toggle.component';
 import { ToggleStates } from 'src/app/components/features/features.component';
 import { distinctUntilKeyChanged, ReplaySubject } from 'rxjs';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -17,14 +17,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   imports: [
     FeatureToggleComponent,
     AsyncPipe,
-    NgIf,
     ReactiveFormsModule,
     InputModule,
     HasRolePipeModule,
     MatButtonModule,
     TranslateModule,
-    MatTooltipModule,
-  ],
+    MatTooltipModule
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginV2FeatureToggleComponent {

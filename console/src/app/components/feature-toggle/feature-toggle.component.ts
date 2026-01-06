@@ -1,4 +1,4 @@
-import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
+import { AsyncPipe, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -22,9 +22,8 @@ import { map } from 'rxjs/operators';
     FormsModule,
     MatTooltipModule,
     InfoSectionModule,
-    AsyncPipe,
-    NgIf,
-  ],
+    AsyncPipe
+],
 })
 export class FeatureToggleComponent<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]> {
   @Input({ required: true }) toggleStateKey!: TKey;

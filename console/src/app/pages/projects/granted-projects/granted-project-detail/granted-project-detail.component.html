@@ -7,41 +7,46 @@
   [isInactive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
   stateTooltip="{{ 'ORG.STATE.' + project?.state | translate }}"
   [hasContributors]="true"
->
-  <p topContent *ngIf="isZitadel" class="granted-project-sub zitadel-warning">
-    {{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}
-  </p>
-  <cnsl-contributors
-    topContributors
-    class="project-contributors"
-    *ngIf="project"
-    [loading]="loading$ | async"
-    [totalResult]="totalMemberResult"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['project.member.write$', 'project.member.write:' + project.projectId] | hasRole | async) === false"
   >
-  </cnsl-contributors>
-  <cnsl-info-row topContent *ngIf="project" [grantedProject]="project"></cnsl-info-row>
+  @if (isZitadel) {
+    <p topContent class="granted-project-sub zitadel-warning">
+      {{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}
+    </p>
+  }
+  @if (project) {
+    <cnsl-contributors
+      topContributors
+      class="project-contributors"
+      [loading]="loading$ | async"
+      [totalResult]="totalMemberResult"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['project.member.write$', 'project.member.write:' + project.projectId] | hasRole | async) === false"
+      >
+    </cnsl-contributors>
+  }
+  @if (project) {
+    <cnsl-info-row topContent [grantedProject]="project"></cnsl-info-row>
+  }
 </cnsl-top-view>
 
 <div class="max-width-container">
   <cnsl-meta-layout>
     <ng-template cnslHasRole [hasRole]="['user.grant.read', 'user.grant.read:' + grantId]">
-      <cnsl-card
-        *ngIf="project?.projectId"
-        title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
-        description="{{ 'GRANTS.PROJECT.DESCRIPTION' | translate }}"
-      >
-        <cnsl-user-grants
-          *ngIf="projectId && grantId"
-          [context]="UserGrantContext.GRANTED_PROJECT"
-          [projectId]="projectId"
-          [grantId]="grantId"
+      @if (project?.projectId) {
+        <cnsl-card
+          title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
+          description="{{ 'GRANTS.PROJECT.DESCRIPTION' | translate }}"
+          >
+          @if (projectId && grantId) {
+            <cnsl-user-grants
+              [context]="UserGrantContext.GRANTED_PROJECT"
+              [projectId]="projectId"
+              [grantId]="grantId"
           [displayedColumns]="[
             'select',
             'user',
@@ -52,21 +57,24 @@
             'roleNamesList',
             'actions',
           ]"
-          [disableWrite]="(['user.grant.write$', 'user.grant.write:' + grantId] | hasRole | async) === false"
-          [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + grantId] | hasRole | async) === false"
-          [refreshOnPreviousRoutes]="['/grant-create/project/{{projectId}}/grant/{{grantId}}']"
-        >
-        </cnsl-user-grants>
-      </cnsl-card>
+              [disableWrite]="(['user.grant.write$', 'user.grant.write:' + grantId] | hasRole | async) === false"
+              [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + grantId] | hasRole | async) === false"
+              [refreshOnPreviousRoutes]="['/grant-create/project/{{projectId}}/grant/{{grantId}}']"
+              >
+            </cnsl-user-grants>
+          }
+        </cnsl-card>
+      }
     </ng-template>
 
     <div metainfo>
-      <cnsl-changes
-        *ngIf="project"
-        [changeType]="ChangeType.PROJECT_GRANT"
-        [id]="project.projectId"
-        [secId]="project.grantId"
-      ></cnsl-changes>
+      @if (project) {
+        <cnsl-changes
+          [changeType]="ChangeType.PROJECT_GRANT"
+          [id]="project.projectId"
+          [secId]="project.grantId"
+        ></cnsl-changes>
+      }
     </div>
   </cnsl-meta-layout>
 </div>

@@ -1,30 +1,35 @@
 <div class="sp_wrapper">
-  <mat-spinner diameter="30" *ngIf="loading$ | async"></mat-spinner>
+  @if (loading$ | async) {
+    <mat-spinner diameter="30"></mat-spinner>
+  }
 </div>
 
 <div class="login-policy-mfa-list">
-  <div class="mfa" *ngFor="let mfa of list">
-    <span>
-      {{
+  @for (mfa of list; track mfa) {
+    <div class="mfa">
+      <span>
+        {{
         (componentType === LoginMethodComponentType.SecondFactor
-          ? 'MFA.SECONDFACTORTYPES.'
-          : LoginMethodComponentType.MultiFactor
-            ? 'MFA.MULTIFACTORTYPES.'
-            : '') + mfa | translate
-      }}
-    </span>
-
-    <button color="warn" *ngIf="!disabled" mat-icon-button (click)="removeMfa(mfa)" class="rm">
-      <i matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" class="las la-times-circle"></i>
-    </button>
-  </div>
+        ? 'MFA.SECONDFACTORTYPES.'
+        : LoginMethodComponentType.MultiFactor
+        ? 'MFA.MULTIFACTORTYPES.'
+        : '') + mfa | translate
+        }}
+      </span>
+      @if (!disabled) {
+        <button color="warn" mat-icon-button (click)="removeMfa(mfa)" class="rm">
+          <i matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" class="las la-times-circle"></i>
+        </button>
+      }
+    </div>
+  }
   <div class="mfa-list-btns">
     <button
       mat-stroked-button
       class="new-mfa"
       [disabled]="disabled || availableSelection.length === 0"
       (click)="!disabled ? addMfa() : null"
-    >
+      >
       <div class="cnsl-action-button">
         <mat-icon class="icon">add</mat-icon>
         <span>{{ 'ACTIONS.ADD' | translate }}</span>

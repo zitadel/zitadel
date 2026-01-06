@@ -2,7 +2,9 @@
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LANGUAGES.DESCRIPTION' | translate }}</p>
 
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  @if (loading) {
+    <mat-spinner diameter="30" color="primary"></mat-spinner>
+  }
 </div>
 
 <div>
@@ -15,7 +17,7 @@
         [cdkDropListConnectedTo]="['notallowed']"
         (cdkDropListDropped)="drop($event)"
         [cdkDropListData]="(localState$ | async)!.allowed"
-      >
+        >
         <div class="languages-top-row">
           <span class="label">{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</span>
           <button
@@ -23,50 +25,52 @@
             [disabled]="(canWriteRestrictions$ | async) === false"
             (click)="allowAll()"
             mat-stroked-button
-          >
+            >
             <div class="cnsl-action-button">
               <i class="las la-object-group"></i><span>{{ 'SETTING.LANGUAGES.ALLOW_ALL' | translate }}</span>
             </div>
           </button>
         </div>
         <div class="languages-drop-target">
-          <div
-            class="card languages-box"
-            *ngFor="let lang of (localState$ | async)!.allowed; index as i"
-            [cdkDragData]="lang"
-            cdkDrag
-            [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
-            mat-list-item
-          >
-            <span class="index">{{ i + 1 }}</span>
-            <span class="locale">{{ lang }}</span>
-            <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
-            <span *ngIf="lang === (defaultLang$ | async)" class="state orgdefaultlabel">{{
-              'SETTING.LANGUAGES.DEFAULT' | translate
-            }}</span>
-
-            <button
-              (click)="$event.stopPropagation()"
-              *ngIf="lang !== (defaultLang$ | async) && (isRemotelyAllowed$(lang) | async) === true"
-              mat-icon-button
-              class="more-button"
-              [matMenuTriggerFor]="actions"
-              data-e2e="table-actions-button"
-            >
-              <mat-icon>more_vert</mat-icon>
-            </button>
-
-            <mat-menu #actions="matMenu" xPosition="before" class="language-actions-menu">
-              <button
-                menuActions
-                mat-menu-item
-                (click)="setDefaultLang(lang)"
-                [disabled]="(canWriteDefaultLanguage$ | async) === false"
+          @for (lang of (localState$ | async)!.allowed; track lang; let i = $index) {
+            <div
+              class="card languages-box"
+              [cdkDragData]="lang"
+              cdkDrag
+              [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
+              mat-list-item
               >
-                {{ 'SETTING.LANGUAGES.SETASDEFAULT' | translate }}
-              </button>
-            </mat-menu>
-          </div>
+              <span class="index">{{ i + 1 }}</span>
+              <span class="locale">{{ lang }}</span>
+              <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+              @if (lang === (defaultLang$ | async)) {
+                <span class="state orgdefaultlabel">{{
+                  'SETTING.LANGUAGES.DEFAULT' | translate
+                }}</span>
+              }
+              @if (lang !== (defaultLang$ | async) && (isRemotelyAllowed$(lang) | async) === true) {
+                <button
+                  (click)="$event.stopPropagation()"
+                  mat-icon-button
+                  class="more-button"
+                  [matMenuTriggerFor]="actions"
+                  data-e2e="table-actions-button"
+                  >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              }
+              <mat-menu #actions="matMenu" xPosition="before" class="language-actions-menu">
+                <button
+                  menuActions
+                  mat-menu-item
+                  (click)="setDefaultLang(lang)"
+                  [disabled]="(canWriteDefaultLanguage$ | async) === false"
+                  >
+                  {{ 'SETTING.LANGUAGES.SETASDEFAULT' | translate }}
+                </button>
+              </mat-menu>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -80,7 +84,7 @@
         [cdkDropListData]="(localState$ | async)!.notAllowed"
         [cdkDropListEnterPredicate]="defaultLangPredicate"
         cdkDropListSortingDisabled
-      >
+        >
         <div class="languages-top-row">
           <span class="label">{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</span>
           <button
@@ -88,24 +92,25 @@
             [disabled]="(canWriteRestrictions$ | async) === false"
             (click)="disallowAll()"
             mat-stroked-button
-          >
+            >
             <div class="cnsl-action-button">
               <i class="las la-object-group"></i><span>{{ 'SETTING.LANGUAGES.DISALLOW_ALL' | translate }}</span>
             </div>
           </button>
         </div>
         <div class="languages-drop-target">
-          <div
-            class="card languages-box"
-            *ngFor="let lang of (localState$ | async)!.notAllowed"
-            [cdkDragData]="lang"
-            cdkDrag
-            [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
-            mat-list-item
-          >
-            <span class="locale">{{ lang }}</span>
-            <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
-          </div>
+          @for (lang of (localState$ | async)!.notAllowed; track lang) {
+            <div
+              class="card languages-box"
+              [cdkDragData]="lang"
+              cdkDrag
+              [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
+              mat-list-item
+              >
+              <span class="locale">{{ lang }}</span>
+              <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -116,7 +121,7 @@
         (click)="discard()"
         color="message-text-warn"
         mat-stroked-button
-      >
+        >
         <div class="cnsl-action-button">
           <i class="las la-history"></i><span>{{ 'ACTIONS.UNSAVED.DIALOG.DISCARD' | translate }}</span>
         </div>
@@ -128,7 +133,7 @@
         (click)="submit()"
         mat-raised-button
         [disabled]="(canWriteRestrictions$ | async) === false"
-      >
+        >
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
     </div>

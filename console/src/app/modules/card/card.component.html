@@ -1,19 +1,31 @@
 <div class="card" [ngClass]="{ nomargin: nomargin, warn: warn }" data-e2e="app-card">
-  <div *ngIf="title || description" class="header" [ngClass]="{ 'bottom-margin': expanded }">
-    <div *ngIf="title" class="row">
-      <h2 class="title" data-e2e="app-card-title">{{ title }}</h2>
-      <span class="fill-space"></span>
-      <ng-content select="[card-actions]"></ng-content>
-      <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button (click)="expanded = !expanded">
-        <mat-icon *ngIf="!expanded">keyboard_arrow_down</mat-icon>
-        <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
-      </button>
+  @if (title || description) {
+    <div class="header" [ngClass]="{ 'bottom-margin': expanded }">
+      @if (title) {
+        <div class="row">
+          <h2 class="title" data-e2e="app-card-title">{{ title }}</h2>
+          <span class="fill-space"></span>
+          <ng-content select="[card-actions]"></ng-content>
+          <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button (click)="expanded = !expanded">
+            @if (!expanded) {
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            }
+            @if (expanded) {
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            }
+          </button>
+        </div>
+      }
+      @if (description) {
+        <p class="desc cnsl-secondary-text">
+          {{ description }}
+        </p>
+      }
     </div>
-    <p *ngIf="description" class="desc cnsl-secondary-text">
-      {{ description }}
-    </p>
-  </div>
-  <div class="card-content" *ngIf="expanded">
-    <ng-content></ng-content>
-  </div>
+  }
+  @if (expanded) {
+    <div class="card-content">
+      <ng-content></ng-content>
+    </div>
+  }
 </div>
