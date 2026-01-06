@@ -44,7 +44,6 @@ module.exports = {
             "concepts/structure/users",
             "guides/manage/console/users",
             "concepts/structure/managers",
-            "guides/manage/console/actions"
           ],
         },
         {
@@ -169,7 +168,6 @@ module.exports = {
       label: "Configure Identity & Policies",
       collapsed: true,
       items: [
-        "guides/manage/console/overview",
         "guides/manage/user/reg-create-user",
         "guides/manage/terraform-provider",
         {
@@ -543,6 +541,7 @@ module.exports = {
                 id: "concepts/features/actions",
               },
               items: [
+                "guides/manage/console/actions",
                 "apis/actions/introduction",
                 "apis/actions/modules",
                 "apis/actions/code-examples",
@@ -605,6 +604,7 @@ module.exports = {
       collapsed: true,
       items: [
         "concepts/features/console",
+        "guides/manage/console/overview",
         {
           type: "category",
           label: "Customer Portal",
