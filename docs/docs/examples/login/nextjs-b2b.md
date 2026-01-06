@@ -135,7 +135,7 @@ Let's call this new organization `Demo-Customer`.
 
 ### Users
 
-Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users#create-user) in this organization.
+Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users-overview#create-user) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
 ### Manager Role
@@ -152,7 +152,7 @@ Login with your user on the customer organization to validate the setup.
 ### Organization Grant
 
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
-[Grant all roles of the Project](/guides/manage/console/projects#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
+[Grant all roles of the Project](/guides/manage/console/projects-overview#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
 
 ### Authorization
 
