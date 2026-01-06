@@ -171,7 +171,6 @@ module.exports = {
       items: [
         "guides/manage/console/overview",
         "guides/manage/user/reg-create-user",
-        "guides/manage/user/scim2",
         "guides/manage/terraform-provider",
         {
           type: "category",
@@ -423,12 +422,29 @@ module.exports = {
         },
         {
           type: "category",
-          label: "External Integrations",
+          label: "SCIM",
+          link: {
+            type: "doc",
+            id: "guides/manage/user/scim2",
+          },
+          items: ["guides/integrate/scim-okta-guide"]
+        },
+        {
+          type: "category",
+          label: "Token Introspection",
+          link: {
+            type: "doc",
+            id: "guides/integrate/token-introspection/index",
+          },
           items: [
-            "guides/integrate/scim-okta-guide",
-            "guides/integrate/token-introspection/index",
             "guides/integrate/token-introspection/basic-auth",
             "guides/integrate/token-introspection/private-key-jwt",
+          ]
+        },
+        {
+          type: "category",
+          label: "External Integrations",
+          items: [
             "guides/integrate/back-channel-logout",
             {
               type: "category",
