@@ -10,7 +10,10 @@ test.describe("Analytics tests", () => {
     // we would usually use the clock api https://playwright.dev/docs/clock
     // but this messes with token expiration in the console so the test
     // has to be dynamic over the current date
-    const currentMonth = new Date().toLocaleString("en-us", {
+    const now = new Date();
+    now.setMonth(now.getMonth() - 1);
+
+    const currentMonth = now.toLocaleString("en-us", {
       month: "long",
     });
 
@@ -25,10 +28,10 @@ test.describe("Analytics tests", () => {
 
     await page.keyboard.press("Escape");
 
-    const start = new Date();
+    const start = new Date(now);
     start.setDate(4);
 
-    const end = new Date();
+    const end = new Date(now);
     end.setDate(21);
 
     await expect(
