@@ -121,13 +121,13 @@ module.exports = {
           type: "category",
           label: "Use Cases",
           items: [
+            "guides/solution-scenarios/configurations",
+            "guides/solution-scenarios/saas",
             "guides/solution-scenarios/b2b",
             "guides/solution-scenarios/b2c",
-            "guides/solution-scenarios/saas",
-            "guides/solution-scenarios/frontend-calling-backend-API",
-            "guides/solution-scenarios/configurations",
             "guides/integrate/onboarding/b2b",
             "guides/integrate/onboarding/end-users",
+            "guides/solution-scenarios/frontend-calling-backend-API",
             {
               type: "category",
               label: "Machine-to-Machine (M2M)",
