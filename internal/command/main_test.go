@@ -255,6 +255,17 @@ func newMockProjectPermissionCheckSAMLNotAllowed() domain.ProjectPermissionCheck
 	}
 }
 
+func newMockOrganizationPermissionCheckNotAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "", "Errors.PermissionDenied")
+	}
+}
+func newMockOrganizationPermissionCheckAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return nil
+	}
+}
+
 func newMockTokenVerifierValid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 		return nil
