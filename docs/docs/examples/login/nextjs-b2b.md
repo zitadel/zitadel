@@ -152,7 +152,7 @@ Login with your user on the customer organization to validate the setup.
 ### Organization Grant
 
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
-[Grant all roles of the Project](/guides/manage/console/projects-overview#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
+[Grant all roles of the Project](/guides/manage/console/projects-overview#granted-projects-b2b) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
 
 ### Authorization
 
