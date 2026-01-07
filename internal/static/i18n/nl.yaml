@@ -575,6 +575,10 @@ Errors:
     NoTimeout: Doel heeft geen time-out
     InvalidURL: Doel heeft een ongeldige URL
     NotFound: Doel niet gevonden
+    InvalidExpirationDate: De vervaldatum van de sleutel moet in de toekomst liggen
+    PublicKeyExpired: Doelpublieke sleutel is verlopen
+    PublicKeyActive: Actieve doelpublieke sleutel kan niet worden verwijderd
+    InvalidPublicKey: De openbare sleutel is ongeldig. Moet een PEM-gecodeerde RSA- of ECDSA\-openbare sleutel in PKCS#8\-formaat zijn
   Execution:
     ConditionInvalid: Uitvoeringsvoorwaarde is ongeldig
     Invalid: Uitvoering is ongeldig
@@ -583,6 +587,7 @@ Errors:
     NoTargets: Geen doelstellingen gedefinieerd
     Failed: Uitvoering mislukt
     ResponseIsNotValidJSON: Reactie is geen geldige JSON
+    MissingEncryptionKey: Ontbrekende encryptiesleutel voor uitvoering
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:

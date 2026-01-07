@@ -11,9 +11,9 @@ status: stable
 
 ## Overview
 
-[Spring Boot](https://spring.io/projects/spring-boot) is a powerful, production-ready framework for building Java applications. This example shows how to integrate **ZITADEL** into a Spring Boot web application using **OpenID Connect (OIDC)** and the **Authorization Code Flow + PKCE**.
+[Spring Boot](https://spring.io/projects/spring-boot) is a powerful, production-ready framework for building Java applications. This example shows how to integrate **Zitadel** into a Spring Boot web application using **OpenID Connect (OIDC)** and the **Authorization Code Flow + PKCE**.
 
-It demonstrates a common web app pattern: users start on a public landing page, authenticate with ZITADEL via a login button, and are then redirected to a protected profile page that displays user information. Logout is also implemented to end both the local session and the ZITADEL session.
+It demonstrates a common web app pattern: users start on a public landing page, authenticate with Zitadel via a login button, and are then redirected to a protected profile page that displays user information. Logout is also implemented to end both the local session and the Zitadel session.
 
 #### Auth library
 
@@ -26,11 +26,11 @@ This example uses **[Spring Security](https://spring.io/projects/spring-security
 This example shows a complete authentication implementation using Spring Security’s OAuth 2.0 / OIDC support:
 
 - **Public landing page** (`/`) accessible without authentication.
-- **Sign-in with ZITADEL** via Spring Security’s OAuth2 login entrypoint.
+- **Sign-in with Zitadel** via Spring Security’s OAuth2 login entrypoint.
 - **Route protection** so authenticated access is required for protected routes (e.g. `/profile`).
 - **Profile page** that renders the authenticated user’s OIDC claims.
 - **Server-side session management** handled by the servlet container + Spring Security.
-- **Federated logout** that clears the local session and triggers RP-initiated logout against ZITADEL, returning the user to a post-logout callback route.
+- **Federated logout** that clears the local session and triggers RP-initiated logout against Zitadel, returning the user to a post-logout callback route.
 
 ---
 
@@ -47,9 +47,9 @@ Before you begin, ensure you have the following:
 
 #### Account Setup
 
-You’ll need a ZITADEL account and an application configured for a Web app using Authorization Code + PKCE.
+You’ll need a Zitadel account and an application configured for a Web app using Authorization Code + PKCE.
 
-> **Important:** Configure the following URLs in your ZITADEL application settings:
+> **Important:** Configure the following URLs in your Zitadel application settings:
 >
 > - **Redirect URIs:** `http://localhost:3000/auth/callback`
 > - **Post Logout Redirect URIs:** `http://localhost:3000/auth/logout/callback`
@@ -59,7 +59,7 @@ You’ll need a ZITADEL account and an application configured for a Web app usin
 ### Run the example
 
 1. Clone the repository.
-2. Copy `.env.example` to `.env` and fill in your ZITADEL details.
+2. Copy `.env.example` to `.env` and fill in your Zitadel details.
 
 ```dotenv
 # Port number where your Spring Boot server will listen for incoming HTTP requests.
@@ -69,10 +69,10 @@ PORT=3000
 # duration of inactivity. 3600 seconds = 1 hour.
 SESSION_DURATION=3600
 
-# Your ZITADEL instance domain URL. Include the full https:// URL.
+# Your Zitadel instance domain URL. Include the full https:// URL.
 ZITADEL_DOMAIN="https://your-zitadel-domain"
 
-# Application Client ID from your ZITADEL application settings.
+# Application Client ID from your Zitadel application settings.
 ZITADEL_CLIENT_ID="your-client-id"
 
 # Provide a randomly generated string here.
@@ -99,10 +99,9 @@ mvn spring-boot:run
 
 ## Learn more and resources
 
-* **PKCE concept:** [https://zitadel.com/docs/concepts/pkce](https://zitadel.com/docs/concepts/pkce)
-* **PKCE application setup:** [https://zitadel.com/docs/guides/integrate/login/oidc/pkce-setup](https://zitadel.com/docs/guides/integrate/login/oidc/pkce-setup)
-* **Federated logout:** https://zitadel.com/docs/guides/integrate/login/oidc/logout
-* **OIDC integration guide:** https://zitadel.com/docs/guides/integrate/login/oidc/
-* **Spring Boot documentation:** https://spring.io/projects/spring-boot
-* **Spring Security documentation:** https://spring.io/projects/spring-security
-* **Example repository:** https://github.com/zitadel/example-auth-spring
+* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [Spring Boot documentation](https://spring.io/projects/spring-boot)
+* [Spring Security documentation](https://spring.io/projects/spring-security)
+* [Example repository](https://github.com/zitadel/example-auth-spring)

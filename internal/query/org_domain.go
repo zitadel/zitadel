@@ -55,7 +55,7 @@ func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
 	return NewBoolQuery(OrgDomainIsVerifiedCol, verified)
 }
 
-func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved bool) (domains *Domains, err error) {
+func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved, withPermissionCheck bool) (domains *Domains, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -63,6 +63,11 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	eq := sq.Eq{OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[OrgDomainOwnerRemovedCol.identifier()] = false
+	}
+	if withPermissionCheck {
+		// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
+		// in this case and using the old checks only adds more latency, but no benefit.
+		query = orgDomainPermissionCheckV2(ctx, query, queries)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -176,3 +181,13 @@ var (
 		table: orgDomainsTable,
 	}
 )
+
+func orgDomainPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, queries *OrgDomainSearchQueries) sq.SelectBuilder {
+	join, args := PermissionClause(
+		ctx,
+		OrgDomainOrgIDCol,
+		domain.PermissionOrgRead,
+		SingleOrgPermissionOption(queries.Queries),
+	)
+	return query.JoinClause(join, args...)
+}

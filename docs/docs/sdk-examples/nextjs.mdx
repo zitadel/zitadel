@@ -11,7 +11,7 @@ status: stable
 
 ## Overview
 
-[Next.js](https://nextjs.org) is a React framework for building full-stack web applications. This example demonstrates how to integrate **ZITADEL** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Next.js application.
+[Next.js](https://nextjs.org) is a React framework for building full-stack web applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Next.js application.
 
 #### Auth library
 
@@ -21,11 +21,11 @@ This example uses **[next-auth](https://www.npmjs.com/package/next-auth)** with 
 
 ## What this example demonstrates
 
-This Next.js application demonstrates a secure authentication flow using ZITADEL with the industry-standard [PKCE flow](/docs/concepts/pkce). Users start on a public landing page, initiate login via the ZITADEL authorization server, and after successful authentication are redirected back to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This Next.js application demonstrates a secure authentication flow using Zitadel with the industry-standard [PKCE flow](/docs/concepts/pkce). Users start on a public landing page, initiate login via the Zitadel authorization server, and after successful authentication are redirected back to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
-The application implements session management using NextAuth.js with a JWT-based session strategy. It includes automatic callback handling with secure token exchange, route protection for authenticated-only pages, and an example of requesting additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) (including `offline_access` for refresh tokens and ZITADEL-specific scopes for metadata and roles).
+The application implements session management using NextAuth.js with a JWT-based session strategy. It includes automatic callback handling with secure token exchange, route protection for authenticated-only pages, and an example of requesting additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) (including `offline_access` for refresh tokens and Zitadel-specific scopes for metadata and roles).
 
-The logout flow implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** via the end-session endpoint, terminating both the local session and the ZITADEL session before redirecting the user back to the application. It also demonstrates automatic token refresh to maintain long-lived sessions without requiring users to re-authenticate.
+The logout flow implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** via the end-session endpoint, terminating both the local session and the Zitadel session before redirecting the user back to the application. It also demonstrates automatic token refresh to maintain long-lived sessions without requiring users to re-authenticate.
 
 ---
 
@@ -33,23 +33,23 @@ The logout flow implements **[federated logout](https://zitadel.com/docs/guides/
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
 
-1. Create a new Web application in your [ZITADEL project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
 3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 6. Optionally enable [refresh tokens](https://zitadel.com/docs/concepts/tokens) in Token Settings for long-lived sessions
 
-> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production deployments, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production deployments, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [ZITADEL application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-nextjs).
-2. Create a `.env.local` file (copy from `.env.example`) and configure it with the values from your [ZITADEL application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
+2. Create a `.env.local` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
    ```
    NODE_ENV=development
    PORT=3000
@@ -64,7 +64,7 @@ Once you have your [ZITADEL application configured](https://zitadel.com/docs/gui
    NEXTAUTH_URL=http://localhost:3000
    ```
    Replace these values with:
-	- Your actual [ZITADEL instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **ZITADEL_DOMAIN**)
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **ZITADEL_DOMAIN**)
 	- The **Client ID** you copied when creating the application
 	- A randomly generated **SESSION_SECRET** using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 	- A randomly generated **ZITADEL_CLIENT_SECRET** (required by Auth.js / NextAuth.js even though PKCE doesn't require it)
@@ -75,10 +75,9 @@ Once you have your [ZITADEL application configured](https://zitadel.com/docs/gui
 
 ## Learn more and resources
 
-* **PKCE concept:** [https://zitadel.com/docs/concepts/pkce](https://zitadel.com/docs/concepts/pkce)
-* **PKCE application setup:** [https://zitadel.com/docs/guides/integrate/login/oidc/pkce-setup](https://zitadel.com/docs/guides/integrate/login/oidc/pkce-setup)
-* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
-* **Next.js documentation:** https://nextjs.org
-* **NextAuth.js documentation:** https://next-auth.js.org/
-* **Example repository:** https://github.com/zitadel/example-auth-nextjs
+* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [Next.js documentation](https://nextjs.org)
+* [NextAuth.js documentation](https://next-auth.js.org/)
+* [Example repository](https://github.com/zitadel/example-auth-nextjs)
