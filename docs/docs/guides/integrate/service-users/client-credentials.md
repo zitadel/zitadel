@@ -4,7 +4,7 @@ sidebar_label: Client credential authentication
 sidebar_position: 3
 ---
 
-This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/guides/manage/console/users-overview) and client applications within ZITADEL.
+This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/guides/manage/console/users-overview#service-users-machine-accounts) and client applications within ZITADEL.
 
 In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](../service-users/authenticate-service-users).
 
