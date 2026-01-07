@@ -537,9 +537,16 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Build Custom Login UI",
+          label: "Build your own Login UI",
+          link: {
+            type: "generated-index",
+            title: "Build your own Login UI",
+            slug: "/guides/integrate/login-ui",
+            description:
+              "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown.",
+          },
+          collapsed: true,
           items: [
-            "guides/integrate/login-ui/login-app",
             "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
@@ -551,6 +558,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {
