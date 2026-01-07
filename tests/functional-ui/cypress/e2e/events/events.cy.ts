@@ -12,7 +12,7 @@ describe('events', () => {
     cy.get('mat-select[id="eventTypesList"]').click();
     cy.contains('mat-option', eventTypeEnglish).click();
     cy.get('body').type('{esc}');
-    cy.contains('mat-select', 'Descending').click();
+    cy.contains('mat-select[id="isAsc"]', 'Descending').click({ force: true });
     cy.contains('mat-option', 'Descending').click();
     cy.get('[data-e2e="filter-finish-button"]').click();
     cy.get('[data-e2e="event-type-cell"]').should('have.length', 1);
