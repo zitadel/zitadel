@@ -28,7 +28,7 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) (*admin_pb.RemoveOrgResponse, error) {
-	details, err := s.command.RemoveOrg(ctx, req.OrgId)
+	details, err := s.command.RemoveOrg(ctx, req.OrgId, nil, true)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 				Roles: req.Roles,
 			},
 		},
-	}, true, userIDs...)
+	}, true, nil, userIDs...)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,6 @@ const sidebar_api_saml_service_v2 = require("./docs/apis/resources/saml_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
-const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
 const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
@@ -386,6 +385,7 @@ module.exports = {
             "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/okta-oidc",
             "guides/integrate/identity-providers/okta-saml",
+            "guides/integrate/identity-providers/onelogin-saml",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/pingfederate-saml",
             "guides/integrate/identity-providers/migrate",
@@ -785,18 +785,6 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Organization Service Beta API",
-                slug: "/apis/resources/org_service/v2beta",
-                description:
-                  "This beta API is intended to manage organizations for ZITADEL. Expect breaking changes to occur. Please use the v2 version for a stable API. \n",
-              },
-              items: sidebar_api_org_service_v2beta,
-            },
-            {
-              type: "category",
               label: "Identity Provider",
               link: {
                 type: "generated-index",
@@ -1164,6 +1152,16 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
         "self-hosting/manage/service_ping",
+        {
+          type: "category",
+          label: "Metrics",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/metrics/overview",
+          },
+          items: ["self-hosting/manage/metrics/prometheus"],
+        },
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
