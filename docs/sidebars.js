@@ -806,7 +806,6 @@ module.exports = {
           label: "Product Features",
           items: [
             "product/roadmap",
-            // TODO: File missing - Pricing & Tiers specific doc
           ],
         },
         {
@@ -843,6 +842,16 @@ module.exports = {
               href: "https://help.zitadel.com",
             }
           ],
+        },
+        {
+          type: "link",
+          label: "Pricing",
+          href: "https://zitadel.com/pricing",
+        },
+        {
+          type: "link",
+          label: "Contact Us",
+          href: "https://zitadel.com/contact",
         },
         "guides/manage/cloud/support",
       ],
