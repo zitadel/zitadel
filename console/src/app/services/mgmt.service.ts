@@ -547,8 +547,6 @@ import {
 } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 
-export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
-
 @Injectable({
   providedIn: 'root',
 })

@@ -435,7 +435,8 @@
     "TOS": "Ketentuan Layanan",
     "OPENSHORTCUTSTOOLTIP": "Jenis ? untuk menampilkan pintasan keyboard",
     "SETTINGS": "Pengaturan",
-    "CUSTOMERPORTAL": "Portal Pelanggan"
+    "CUSTOMERPORTAL": "Portal Pelanggan",
+    "TARGETS": "Target"
   },
   "QUICKSTART": {
     "TITLE": "Integrasikan ZITADEL ke dalam aplikasi Anda",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Pengaturan keamanan",
       "EVENTS": "Acara",
       "FAILEDEVENTS": "Acara Gagal",
-      "VIEWS": "Tampilan"
+      "VIEWS": "Tampilan",
+      "ACTIONS": "Tindakan",
+      "TARGETS": "Target"
     },
     "GROUPS": {
       "GENERAL": "Informasi Umum",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Teks dan Bahasa",
       "APPEARANCE": "Penampilan",
       "OTHER": "Lainnya",
-      "STORAGE": "Penyimpanan"
+      "STORAGE": "Penyimpanan",
+      "ACTIONS": "Tindakan"
     },
     "BETA": "BETA"
   },
@@ -1662,7 +1666,10 @@
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
       "LOGINV2_BASEURI": "URI dasar",
       "ENABLERELATIONALTABLES": "Tabel Relasional",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session Termination",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Jika flag diaktifkan, Anda dapat mengakhiri sesi tunggal dari UI login dengan memberikan id_token dengan klaim `sid` sebagai id_token_hint di endpoint end_session."
     },
     "DIALOG": {
       "RESET": {
@@ -2180,7 +2187,8 @@
       "UPDATED": "Proyek berubah.",
       "GRANTUPDATED": "Hibah berubah.",
       "DELETED": "Proyek dihapus."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Klik untuk mengedit nama proyek"
   },
   "ROLES": {
     "DIALOG": {
@@ -2565,7 +2573,22 @@
           "DESC": "Baca dokumentasi kami tentang pembuatan aplikasi atau hubungi dukungan kami"
         },
         "TITLE": "Langkah Selanjutnya"
-      }
+      },
+      "CREATE_PROJECT_AUTO": "Buat proyek secara otomatis",
+      "CREATE_PROJECT_AUTO_DESC": "Disarankan jika Anda baru mengenal ZITADEL. Kami akan menangani pengaturan proyek untuk Anda.",
+      "QUICK_CREATE_DESC": "Buat aplikasi dalam tiga langkah mudah.",
+      "QUICK_CREATE_FRAMEWORK": "Pilih kerangka kerja Anda",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Kami memberikan konfigurasi yang disarankan untuk aplikasi Anda. Pilih kerangka kerja yang Anda gunakan atau akan gunakan.",
+      "QUICK_CREATE_NAME": "Beri nama aplikasi Anda",
+      "QUICK_CREATE_TITLE": "Buat Aplikasi",
+      "CUSTOM_APP_TITLE": "Aplikasi Kustom",
+      "CUSTOM_APP_DESC": "Kami akan membuat proyek dan aplikasi Anda dengan konfigurasi yang Anda pilih di bawah ini.",
+      "CUSTOM_APP_NAME": "Nama Aplikasi",
+      "CUSTOM_APP_NAME_LABEL": "Nama",
+      "CUSTOM_APP_TYPE": "Jenis Aplikasi",
+      "CUSTOM_APP_AUTH_METHOD": "Metode Autentikasi",
+      "CUSTOM_APP_CANCEL": "Batal",
+      "CUSTOM_APP_CREATE": "Buat Aplikasi"
     },
     "NAMEDIALOG": {
       "TITLE": "Ganti Nama Aplikasi",
@@ -2758,6 +2781,90 @@
     "LOGINV2": {
       "USEV2": "Gunakan UI Login baru",
       "BASEURL": "URL dasar kustom untuk UI Login baru"
+    },
+    "QUICKSTART": "Mulai Cepat",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Mulai Cepat",
+      "DESCRIPTION": "Jalankan aplikasi Anda dengan autentikasi ZITADEL.",
+      "GETSTARTED": "Mulai dengan aplikasi Anda",
+      "GETSTARTED_DESC": "Panduan ini akan membantu Anda mengintegrasikan autentikasi ZITADEL ke aplikasi Anda dengan cepat dan mudah.",
+      "FRAMEWORK": "Kerangka kerja",
+      "VIEWDOCS": "Lihat Dokumentasi",
+      "VIEWEXAMPLE": "Lihat Contoh",
+      "ENVVARS": "Variabel Lingkungan",
+      "ENVVARS_DESC": "Tambahkan variabel lingkungan berikut ke aplikasi Anda:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Dari mana Anda ingin memulai?",
+      "QUICKSTART_SUBTITLE": "Pilih opsi yang paling sesuai dengan situasi Anda:",
+      "OPTION1": "Opsi 1: Clone Aplikasi Contoh",
+      "OPTION1_DESC": "Mulai dengan cepat menggunakan aplikasi contoh yang sudah berjalan:",
+      "OPTION1_NOTE": "Setelah meng-clone, perbarui variabel lingkungan dengan detail aplikasi Anda.",
+      "OPTION2": "Opsi 2: Integrasikan Aplikasi yang Ada",
+      "OPTION2_DESC": "Integrasikan autentikasi ZITADEL ke aplikasi Anda yang sudah ada:",
+      "STEP1": "Pasang SDK ZITADEL untuk kerangka kerja Anda",
+      "STEP2": "Konfigurasikan variabel lingkungan Anda",
+      "STEP3": "Tambahkan autentikasi ke aplikasi Anda",
+      "STEP4": "Uji integrasi",
+      "GENERIC": "Integrasi Umum",
+      "GENERIC_DESC": "Pilih dari contoh dan panduan kami yang lengkap:",
+      "ALLEXAMPLES": "Semua Contoh",
+      "INTEGRATION_GUIDE": "Panduan Integrasi",
+      "NEXTSTEPS": "Langkah Selanjutnya",
+      "CONFIGURE": "Konfigurasikan Pengaturan",
+      "CONFIGURE_DESC": "Sesuaikan konfigurasi OIDC aplikasi Anda",
+      "REDIRECTS": "Siapkan Redirect",
+      "REDIRECTS_DESC": "Konfigurasikan URL redirect dan logout",
+      "URLS_DESC": "Lihat URL penting untuk integrasi",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Saya ingin membuat aplikasi baru",
+      "SCENARIO_NEW_DESC": "Sempurna! Kami akan membantu Anda memulai dengan cepat menggunakan contoh yang sudah memiliki autentikasi ZITADEL.",
+      "SCENARIO_NEW_TOGGLE": "Saya belum memiliki aplikasi",
+      "SCENARIO_EXISTING_TITLE": "Saya ingin mengintegrasikan ke aplikasi yang ada",
+      "SCENARIO_EXISTING_DESC": "Bagus! Kami akan membimbing Anda menambahkan autentikasi ZITADEL langkah demi langkah.",
+      "SCENARIO_EXISTING_TOGGLE": "Saya memiliki aplikasi yang ada",
+      "CLONE_EXAMPLE": "Clone Contoh",
+      "CLONE_NOTE": "Setelah meng-clone, perbarui file .env dengan detail aplikasi Anda dan Anda siap!",
+      "BROWSE_EXAMPLES": "Telusuri Semua Contoh",
+      "GENERIC_NEW_NOTE": "Pilih contoh yang sesuai dengan tumpukan teknologi Anda dan clone untuk memulai dengan cepat.",
+      "EXISTING_STEP1_TITLE": "Pasang SDK",
+      "EXISTING_STEP1_DESC": "Tambahkan SDK ke proyek Anda",
+      "EXISTING_STEP2_TITLE": "Tambahkan konfigurasi Anda",
+      "EXISTING_STEP2_DESC": "Salin dan tempel variabel lingkungan ini ke file konfigurasi aplikasi Anda",
+      "EXISTING_STEP3_TITLE": "Siapkan autentikasi",
+      "EXISTING_STEP3_DESC": "Ikuti panduan integrasi langkah demi langkah untuk menambahkan autentikasi",
+      "VIEW_SDKS": "Lihat Dokumentasi SDK",
+      "AUTH_STATUS_CHECKING": "Memeriksa status autentikasi...",
+      "AUTH_STATUS_SUCCESS": "Aplikasi Anda telah diautentikasi dengan ZITADEL.",
+      "AUTH_STATUS_PENDING": "Menunggu autentikasi pengguna pertama.",
+      "AUTH_STATUS_PENDING_DESC": "Ikuti panduan integrasi di bawah ini untuk mengatur autentikasi.",
+      "SUCCESS_TITLE": "🎉 Hebat! Aplikasi Anda berhasil terhubung",
+      "SUCCESS_DESC": "Aplikasi Anda berhasil diautentikasi dengan ZITADEL. Sekarang Anda dapat menggunakan variabel lingkungan di bawah ini untuk integrasi Anda.",
+      "ENVVARS_AUTHENTICATED_DESC": "Gunakan variabel lingkungan ini di aplikasi Anda:",
+      "INTEGRATION_ENVVARS_TITLE": "Konfigurasi Aplikasi Anda",
+      "INTEGRATION_ENVVARS_DESC": "Tambahkan variabel lingkungan ini ke aplikasi Anda untuk terhubung dengan ZITADEL:",
+      "NEW_STEP1_TITLE": "Clone aplikasi contoh",
+      "NEW_STEP1_DESC": "Mulai dengan cepat menggunakan contoh yang sudah memiliki autentikasi ZITADEL.",
+      "NEW_STEP2_TITLE": "Konfigurasikan variabel lingkungan Anda",
+      "NEW_STEP2_DESC": "Tambahkan variabel lingkungan ini ke aplikasi Anda. Tempel ke file .env di root proyek, atau unduh file .env dan simpan.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Perbarui file .env.example dengan nilai ini, lalu ubah namanya menjadi .env.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "Ganti 'your-client-secret' dengan client secret Anda yang sebenarnya. Jika Anda belum menyimpannya saat membuat aplikasi, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "buat yang baru di sini",
+      "NEW_STEP3_TITLE": "Jalankan dan uji aplikasi Anda",
+      "NEW_STEP3_DESC": "Pasang dependensi.",
+      "NEW_STEP3_DESC2": "Mulai aplikasi Anda dan uji alur autentikasi.",
+      "NEW_STEP4_TITLE": "Lihat dokumentasi",
+      "NEW_STEP4_DESC": "Ikuti panduan kami tentang cara menyesuaikan dan memperluas aplikasi Anda dengan ZITADEL.",
+      "STEP4_ACTION": "Lihat Dokumen",
+      "GENERIC_NEW_TITLE": "Pilih titik awal Anda",
+      "GENERIC_EXISTING_TITLE": "Pilih pendekatan integrasi Anda",
+      "GENERIC_EXISTING_NOTE": "Karena tidak ada SDK spesifik untuk kerangka kerja Anda, Anda dapat menggunakan panduan integrasi umum atau langsung menggunakan endpoint OIDC/OAuth2.",
+      "API_DOCS": "Dokumentasi API",
+      "NEW_STEP_DOCS_TITLE": "Lihat dokumentasi lengkap",
+      "NEW_STEP_DOCS_DESC": "Pelajari lebih lanjut tentang opsi konfigurasi lanjutan dan praktik terbaik untuk kerangka kerja Anda.",
+      "EXISTING_STEP_DOCS_TITLE": "Pelajari lebih lanjut tentang integrasi",
+      "EXISTING_STEP_DOCS_DESC": "Telusuri dokumentasi mendetail kami untuk konfigurasi lanjutan dan pemecahan masalah.",
+      "SELECT_FRAMEWORK": "Pilih kerangka kerja Anda",
+      "SELECT_FRAMEWORK_DESC": "Pilih kerangka kerja yang Anda gunakan untuk mendapatkan panduan integrasi dan contoh yang disesuaikan."
     }
   },
   "GENDERS": {
