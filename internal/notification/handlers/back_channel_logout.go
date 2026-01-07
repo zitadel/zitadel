@@ -12,7 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	zoidc "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/command"
 	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -147,7 +147,7 @@ func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id str
 		return err
 	}
 
-	getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey)
+	getSigner := sign.GetSignerOnce(u.queries.GetActiveSigningWebKey)
 
 	var wg sync.WaitGroup
 	wg.Add(len(sessions.sessions))
@@ -170,7 +170,7 @@ func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id str
 	return errors.Join(errs...)
 }
 
-func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner zoidc.SignerFunc) error {
+func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner sign.SignerFunc) error {
 	token, err := u.logoutToken(ctx, oidcSession, getSigner)
 	if err != nil {
 		return err
@@ -182,7 +182,7 @@ func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSes
 	return nil
 }
 
-func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner zoidc.SignerFunc) (string, error) {
+func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner sign.SignerFunc) (string, error) {
 	jwtID, err := u.idGenerator.Next()
 	if err != nil {
 		return "", err

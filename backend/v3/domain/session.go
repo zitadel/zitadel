@@ -8,18 +8,19 @@ import (
 )
 
 type Session struct {
-	InstanceID string            `json:"instance_id,omitempty" db:"instance_id"`
-	ID         string            `json:"id,omitempty" db:"id"`
-	TokenID    string            `json:"token_id,omitempty" db:"token_id"`
-	Lifetime   time.Duration     `json:"lifetime,omitempty" db:"lifetime"`
-	Expiration time.Time         `json:"expiration,omitzero" db:"expiration"`
-	UserID     string            `json:"user_id,omitempty" db:"user_id"`
-	CreatedAt  time.Time         `json:"created_at,omitzero" db:"created_at"`
-	UpdatedAt  time.Time         `json:"updated_at,omitzero" db:"updated_at"`
-	Factors    SessionFactors    `json:"factors,omitempty"`
-	Challenges SessionChallenges `json:"challenges,omitempty"`
-	Metadata   []SessionMetadata `json:"metadata,omitempty"`
-	UserAgent  *SessionUserAgent `json:"user_agent,omitempty"`
+	InstanceID string             `json:"instanceId,omitempty" db:"instance_id"`
+	ID         string             `json:"id,omitempty" db:"id"`
+	TokenID    string             `json:"tokenId,omitempty" db:"token_id"`
+	Lifetime   time.Duration      `json:"lifetime,omitempty" db:"lifetime"`
+	Expiration time.Time          `json:"expiration,omitzero" db:"expiration"`
+	UserID     string             `json:"userId,omitempty" db:"user_id"`
+	CreatorID  string             `json:"creatorId,omitempty" db:"creator_id"`
+	CreatedAt  time.Time          `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time          `json:"updatedAt,omitzero" db:"updated_at"`
+	Factors    SessionFactors     `json:"factors,omitempty"`
+	Challenges SessionChallenges  `json:"challenges,omitempty"`
+	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
+	UserAgent  *SessionUserAgent  `json:"userAgent,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
@@ -50,8 +51,8 @@ type sessionColumns interface {
 	InstanceIDColumn() database.Column
 	// IDColumn returns the column for the id field.
 	IDColumn() database.Column
-	// TokenColumn returns the column for the token field.
-	TokenColumn() database.Column
+	// TokenIDColumn returns the column for the token id field.
+	TokenIDColumn() database.Column
 	// LifetimeColumn returns the column for the lifetime field.
 	LifetimeColumn() database.Column
 	// ExpirationColumn returns the column for the expiration field.
@@ -62,13 +63,6 @@ type sessionColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
-
-	// FactorColumns returns the columns for the factors fields.
-	FactorColumns() SessionFactorColumns
-	// MetadataColumns returns the columns for the metadata fields.
-	MetadataColumns() SessionMetadataColumns
-	// UserAgentColumns returns the columns for the user agent fields.
-	UserAgentColumns() SessionUserAgentColumns
 }
 
 // sessionConditions define all the conditions for the session table.
@@ -83,17 +77,22 @@ type sessionConditions interface {
 	UserAgentIDCondition(userAgentID string) database.Condition
 	// UserIDCondition returns an equal filter on the user id field.
 	UserIDCondition(userID string) database.Condition
+	// CreatorIDCondition returns an equal filter on the creator id field.
+	CreatorIDCondition(creatorID string) database.Condition
+	// ExpirationCondition returns a filter on the expiration field.
+	ExpirationCondition(op database.NumberOperation, expiration time.Time) database.Condition
 	// CreatedAtCondition returns a filter on the created at field.
 	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
 	// UpdatedAtCondition returns a filter on the updated at field.
 	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
-
+	// ExistsFactor returns a filter on the session's factors.
+	ExistsFactor(condition database.Condition) database.Condition
 	// FactorConditions returns the conditions for the factors fields.
 	FactorConditions() SessionFactorConditions
+	// ExistsMetadata returns a filter on the session's metadata.
+	ExistsMetadata(condition database.Condition) database.Condition
 	// MetadataConditions returns the conditions for the metadata fields.
 	MetadataConditions() SessionMetadataConditions
-	// UserAgentConditions returns the conditions for the user agent fields.
-	UserAgentConditions() SessionUserAgentConditions
 }
 
 type sessionChanges interface {
@@ -101,7 +100,7 @@ type sessionChanges interface {
 	// Only use this when reducing events,
 	// during regular updates the DB sets this column automatically.
 	SetUpdatedAt(updatedAt time.Time) database.Change
-	// SetToken sets the token field of the session.
+	// SetToken sets the token id field of the session.
 	SetToken(token string) database.Change
 	// SetLifetime sets the lifetime field of the session and will update the computed expiration field.
 	SetLifetime(lifetime time.Duration) database.Change
@@ -110,10 +109,8 @@ type sessionChanges interface {
 	SetChallenge(challenge SessionChallenge) database.Change
 	// SetFactor adds or updates the factor of the corresponding type.
 	SetFactor(factor SessionFactor) database.Change
-	// ClearFactor resets the factor of the corresponding type.
+	// ClearFactor resets the factor's verification.
 	ClearFactor(factor SessionFactorType) database.Change
 	// SetMetadata adds or updates the metadata of the session.
-	SetMetadata(metadata []SessionMetadata) database.Change
-	// SetUserAgent adds or updates the user agent of the session.
-	SetUserAgent(userAgent SessionUserAgent) database.Change
+	SetMetadata(metadata []*SessionMetadata) database.Change
 }
