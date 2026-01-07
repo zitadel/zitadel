@@ -1,9 +1,9 @@
 import { GrpcService } from './grpc.service';
 import { inject, Injectable } from '@angular/core';
-import { NewOrganizationService } from './new-organization.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { CreateAuthorizationRequestSchema } from '@zitadel/proto/zitadel/authorization/v2beta/authorization_service_pb';
 import { mutationOptions } from '@tanstack/angular-query-experimental';
+import { StorageKey, StorageLocation, StorageService } from './storage.service';
 
 type CreateAuthorizationRequest = Omit<
   Exclude<MessageInitShape<typeof CreateAuthorizationRequestSchema>, { ['$typeName']: string }>,
@@ -15,10 +15,11 @@ type CreateAuthorizationRequest = Omit<
 })
 export class AuthorizationService {
   private readonly grpcService = inject(GrpcService);
-  private readonly orgId = inject(NewOrganizationService).getOrgId();
+  private readonly storageService = inject(StorageService);
 
   private createAuthorization(request: CreateAuthorizationRequest) {
-    return this.grpcService.authorization.createAuthorization({ ...request, organizationId: this.orgId() });
+    const organizationId = this.storageService.getItem(StorageKey.organizationId, StorageLocation.session) ?? undefined;
+    return this.grpcService.authorization.createAuthorization({ ...request, organizationId });
   }
 
   public createAuthorizationMutationOptions = () =>

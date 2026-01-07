@@ -5,8 +5,8 @@ import {
   AddProjectRoleRequestSchema,
   CreateProjectRequestSchema,
 } from '@zitadel/proto/zitadel/project/v2beta/project_service_pb';
-import { NewOrganizationService } from './new-organization.service';
 import { mutationOptions } from '@tanstack/angular-query-experimental';
+import { StorageKey, StorageLocation, StorageService } from './storage.service';
 
 type CreateProjectRequest = Omit<
   Exclude<MessageInitShape<typeof CreateProjectRequestSchema>, { ['$typeName']: string }>,
@@ -18,10 +18,11 @@ type CreateProjectRequest = Omit<
 })
 export class ProjectService {
   private readonly grpcService = inject(GrpcService);
-  private readonly orgId = inject(NewOrganizationService).getOrgId();
+  private readonly storageService = inject(StorageService);
 
   private createProject(request: CreateProjectRequest) {
-    return this.grpcService.project.createProject({ ...request, organizationId: this.orgId() });
+    const organizationId = this.storageService.getItem(StorageKey.organizationId, StorageLocation.session) ?? undefined;
+    return this.grpcService.project.createProject({ ...request, organizationId });
   }
 
   public createProjectMutationOptions = () =>
