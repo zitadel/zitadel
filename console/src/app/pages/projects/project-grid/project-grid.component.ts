@@ -7,7 +7,6 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
