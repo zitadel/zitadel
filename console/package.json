@@ -77,7 +77,7 @@
     "@types/opentype.js": "^1.3.8",
     "@types/qrcode": "^1.5.6",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "@zitadel/client": "workspace:*",
     "@zitadel/proto": "workspace:*",
