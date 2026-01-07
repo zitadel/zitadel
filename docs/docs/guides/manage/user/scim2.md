@@ -1,40 +1,43 @@
 ---
-title: SCIM v2.0 (Preview)
+title: SCIM v2.0
 ---
 
-The Zitadel [SCIM v2](https://scim.cloud/) service provider interface enables seamless integration of identity and
-access management (IAM) systems with Zitadel,
-following the System for Cross-domain Identity Management (SCIM) v2.0 specification.
-This interface allows standardized management of IAM resources, making it easier to automate user provisioning and
-deprovisioning.
+Zitadel’s **[SCIM v2](https://scim.cloud/) service provider interface** enables standardized provisioning and lifecycle management of users and other IAM resources.  
+By implementing the official *System for Cross-domain Identity Management (SCIM) v2.0* specification, Zitadel allows seamless and automated user creation, updates, deactivation, and deprovisioning across systems.
 
 ## API
 
-To learn more about Zitadel's SCIM API, see the API documentation [here](/apis/scim2).
+For full reference details of Zitadel’s SCIM API, consult the API documentation [here](/apis/scim2).
 
 ## Provisioning domain
 
-A provisioning domain refers to an administrative domain that exists outside the domain of a service provider due to
-legal or technical reasons.
-For more details, refer to the [definitions](https://datatracker.ietf.org/doc/html/rfc7643#section-1.2)
-of [RFC7643](https://datatracker.ietf.org/doc/html/rfc7643).
+A **provisioning domain** represents an external administrative domain—separate from the service provider—typically introduced for legal, organizational, or technical reasons.  
+Refer to the SCIM specification definitions in **RFC7643**:  
+https://datatracker.ietf.org/doc/html/rfc7643#section-1.2
 
-The `externalId` of a user is scoped to the provisioning domain.
-To set a provisioning domain for a machine user,
-add a metadata entry with the key `urn:zitadel:scim:provisioningDomain` and assign its value to the corresponding
-provisioning domain.
+Zitadel uses provisioning domains to scope the handling of the SCIM **`externalId`**, ensuring that different customers or systems provisioning users do not conflict with each other.
 
-When a machine user has a `urn:zitadel:scim:provisioningDomain` metadata set,
-the `externalId` of all users provisioned or queried by that machine user is stored in the users' metadata.
-The key format is `urn:zitadel:scim:{provisioningDomain}:externalId`,
-where `{provisioningDomain}` is replaced with the machine user's provisioning domain.
-If the machine user does not have a provisioning domain set,
-a simplified metadata key `urn:zitadel:scim:externalId` is used to store and retrieve the `externalId` of users.
+### Setting a provisioning domain
+
+A provisioning domain can be assigned to a **machine user** by adding the following metadata entry:
+
+- **Key:** `urn:zitadel:scim:provisioningDomain`
+- **Value:** the name of the provisioning domain
+
+### How Zitadel stores `externalId`
+
+If a machine user has a provisioning domain set, any SCIM `externalId` provided during user provisioning or lookup is stored under:
+`urn:zitadel:scim:{provisioningDomain}:externalId`
+
+If *no* provisioning domain is configured, Zitadel falls back to a simplified metadata key:
+`urn:zitadel:scim:externalId`
+
+This ensures that different provisioning sources remain isolated, and the correct `externalId` is returned when queried through SCIM.
 
 ## Mapping
 
-The table below outlines how supported SCIM attributes in the user schema map to corresponding Zitadel user attributes.
-Some attributes are directly mapped to Zitadel user attributes, while others are stored in the user's metadata.
+The following table describes how Zitadel maps SCIM User attributes to Zitadel user fields.  
+Attributes without a direct Zitadel equivalent are stored in **user metadata**. 
 For more information about user metadata, see [here](../customize/user-metadata).
 
 | SCIM                   | Zitadel                                                                                                   | Remarks                                                                                                                                                                                                                                        |
@@ -68,8 +71,13 @@ For more information about user metadata, see [here](../customize/user-metadata)
 
 This section provides details on the runtime configuration of the SCIM interface of Zitadel.
 
-By default, Zitadel's SCIM interface assumes that email addresses and phone numbers are verified.  
-The bulk endpoint supports up to 100 operations per request, with a maximum request body size of 1 MB.  
+### Defaults
+
+- Emails from SCIM are treated as **verified**
+- Phone numbers from SCIM are treated as **verified**
+- Bulk SCIM operations can include up to **100 operations**
+- Maximum SCIM request body size is **1 MB**
+
 This behavior can be adjusted through the Zitadel runtime configuration settings:
 
 ```yaml
@@ -83,17 +91,16 @@ SCIM:
 
 ## Limitations
 
-This section outlines the known limitations of the Zitadel SCIM implementation,
-including unsupported features, partial compliance with the SCIM specification,
-and any potential edge cases to consider during integration.
+Zitadel’s SCIM implementation follows the core SCIM specification but includes the following limitations.
 
 ### Supported schemas
 
-Only the users schema `urn:ietf:params:scim:schemas:core:2.0:User` is supported.
+Zitadel currently supports only the SCIM User schema: `urn:ietf:params:scim:schemas:core:2.0:User` 
+Group provisioning and other extended schemas are not supported.
 
 ### Required attributes
 
-The following SCIM user attributes are required, in addition to those required by the SCIM standard:
+In addition to SCIM-standard required fields, Zitadel requires:
 
 * `name.familyName`
 * `name.givenName`
@@ -103,8 +110,7 @@ The following SCIM user attributes are required, in addition to those required b
 
 The SCIM user attributes `name.formatted` and `displayName` are both mapped to the `profile.displayName` attribute in
 Zitadel.
-When a user is provisioned with different values for these attributes, `displayName` takes precedence.
-Only the value of `displayName` is stored and returned in subsequent queries.
+If both are provided, `displayName` always takes precedence and is the value that will be stored and returned in future SCIM queries.
 
 ## Resources
 
