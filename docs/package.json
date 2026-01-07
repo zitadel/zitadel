@@ -21,30 +21,30 @@
     "clean": "rm -rf node_modules .artifacts .docusaurus protoc-gen-connect-openapi docs/apis/resources"
   },
   "dependencies": {
-    "@bufbuild/buf": "^1.14.0",
+    "@bufbuild/buf": "^1.62.1",
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/faster": "^3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",
-    "@docusaurus/theme-search-algolia": "^3.8.1",
-    "@headlessui/react": "^1.7.4",
-    "@heroicons/react": "^2.0.13",
-    "@inkeep/cxkit-docusaurus": "^0.5.89",
-    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.0",
-    "autoprefixer": "^10.4.13",
+    "@docusaurus/theme-search-algolia": "^3.9.2",
+    "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
+    "@inkeep/cxkit-docusaurus": "^0.5.112",
+    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.2",
+    "autoprefixer": "^10.4.23",
     "clsx": "^1.2.1",
     "docusaurus-plugin-image-zoom": "^3.0.1",
-    "docusaurus-plugin-openapi-docs": "4.4.0",
+    "docusaurus-plugin-openapi-docs": "^4.5.1",
     "docusaurus-theme-github-codeblock": "^2.0.2",
-    "docusaurus-theme-openapi-docs": "4.4.0",
-    "mdx-mermaid": "^2.0.0",
-    "postcss": "^8.4.31",
+    "docusaurus-theme-openapi-docs": "^4.5.1",
+    "mdx-mermaid": "^2.0.3",
+    "postcss": "^8.5.6",
     "raw-loader": "^4.0.2",
-    "react": "^18.2.0",
+    "react": "^19.2.3",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.2.3",
     "react-google-charts": "^5.2.1",
-    "react-player": "^2.15.1",
+    "react-player": "^2.16.1",
     "unicode-property-aliases-ecmascript": "^2.2.0"
   },
   "browserslist": {
@@ -60,9 +60,9 @@
     ]
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.8.1",
-    "@docusaurus/types": "^3.8.1",
-    "tailwindcss": "^3.2.4",
+    "@docusaurus/module-type-aliases": "^3.9.2",
+    "@docusaurus/types": "^3.9.2",
+    "tailwindcss": "^3.4.19",
     "yaml-loader": "^0.8.1"
   }
 }

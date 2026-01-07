@@ -593,6 +593,10 @@ Errors:
     NoTimeout: Целта няма време за изчакване
     InvalidURL: Целта има невалиден URL адрес
     NotFound: Целта не е намерена
+    InvalidExpirationDate: Срокът за изтичане на ключа трябва да бъде в бъдещето
+    PublicKeyExpired: Публичният ключ на целта е изтекъл
+    PublicKeyActive: Не може да се изтрие активен публичен ключ на целта
+    InvalidPublicKey: Публичният ключ е невалиден. Трябва да е PEM-кодиран RSA или ECDSA публичен ключ в PKCS#8 формат
   Execution:
     ConditionInvalid: Условието за изпълнение е невалидно
     Invalid: Изпълнението е невалидно
@@ -601,6 +605,7 @@ Errors:
     NoTargets: Няма определени цели
     Failed: неуспешно изпълнение
     ResponseIsNotValidJSON: Отговорът не е валиден JSON
+    MissingEncryptionKey: Липсващ ключ за шифроване
   UserSchema:
     NotEnabled: Функцията „Потребителска схема“ не е активирана
     Type:

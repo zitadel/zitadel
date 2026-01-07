@@ -3,20 +3,26 @@ package execution_test
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -111,7 +117,7 @@ func Test_Call(t *testing.T) {
 			respBody, err := testServer(t,
 				&callTestServer{
 					method:      tt.args.method,
-					expectBody:  tt.args.body,
+					expectBody:  validateJSONPayload(tt.args.body),
 					timeout:     tt.args.sleep,
 					statusCode:  tt.args.statusCode,
 					respondBody: tt.args.respBody,
@@ -135,6 +141,7 @@ func Test_CallTarget(t *testing.T) {
 		info   *middleware.ContextInfoRequest
 		server *callTestServer
 		target target_domain.Target
+		signer func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
 	}
 	type res struct {
 		body    []byte
@@ -152,7 +159,7 @@ func Test_CallTarget(t *testing.T) {
 				info: requestContextInfo1,
 				server: &callTestServer{
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					timeout:     time.Second,
 					statusCode:  http.StatusInternalServerError,
@@ -173,7 +180,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
@@ -194,7 +201,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
@@ -215,7 +222,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
@@ -242,7 +249,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
@@ -263,7 +270,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
@@ -284,7 +291,7 @@ func Test_CallTarget(t *testing.T) {
 				server: &callTestServer{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  []byte("{\"request\":{\"content\":\"request1\"}}"),
+					expectBody:  validateJSONPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
@@ -303,10 +310,103 @@ func Test_CallTarget(t *testing.T) {
 				body: []byte("{\"content\":\"request2\"}"),
 			},
 		},
+		{
+			"webhook, JWT, ok",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				server: &callTestServer{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJWTPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
+					respondBody: []byte("{\"content\":\"request2\"}"),
+					statusCode:  http.StatusOK,
+					signingKey:  "signingkey",
+				},
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
+					Timeout:    time.Minute,
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
+					PayloadType: target_domain.PayloadTypeJWT,
+				},
+				signer: mockSigner,
+			},
+			res{
+				body: nil,
+			},
+		},
+		{
+			"webhook, JWE, ok",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				server: &callTestServer{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJWEPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
+					respondBody: []byte("{\"content\":\"request2\"}"),
+					statusCode:  http.StatusOK,
+					signingKey:  "signingkey",
+				},
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
+					Timeout:    time.Minute,
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
+					PayloadType:     target_domain.PayloadTypeJWE,
+					EncryptionKey:   encryptionKey,
+					EncryptionKeyID: encryptionKeyID,
+				},
+				signer: mockSigner,
+			},
+			res{
+				body: nil,
+			},
+		},
+		{
+			"webhook, JWE no encryption key, error",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				server: &callTestServer{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJWEPayload([]byte("{\"request\":{\"content\":\"request1\"}}")),
+					respondBody: []byte("{\"content\":\"request2\"}"),
+					statusCode:  http.StatusOK,
+					signingKey:  "signingkey",
+				},
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
+					Timeout:    time.Minute,
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
+					PayloadType: target_domain.PayloadTypeJWE,
+				},
+				signer: mockSigner,
+			},
+			res{
+				wantErr: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t))))
+			respBody, err := testServer(
+				t,
+				tt.args.server,
+				testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.signer, &sync.Map{}),
+			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -319,10 +419,11 @@ func Test_CallTarget(t *testing.T) {
 
 func Test_CallTargets(t *testing.T) {
 	type args struct {
-		ctx     context.Context
-		info    *middleware.ContextInfoRequest
-		servers []*callTestServer
-		targets []target_domain.Target
+		ctx                    context.Context
+		info                   *middleware.ContextInfoRequest
+		servers                []*callTestServer
+		targets                []target_domain.Target
+		getActiveSigningWebKey func(*int32) execution.GetActiveSigningWebKey
 	}
 	type res struct {
 		ret     interface{}
@@ -341,13 +442,13 @@ func Test_CallTargets(t *testing.T) {
 				servers: []*callTestServer{{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}, {
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}},
@@ -368,13 +469,13 @@ func Test_CallTargets(t *testing.T) {
 				servers: []*callTestServer{{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}, {
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}},
@@ -395,13 +496,13 @@ func Test_CallTargets(t *testing.T) {
 				servers: []*callTestServer{{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusOK,
 				}, {
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: []byte("just a string, not json"),
 					statusCode:  http.StatusOK,
 				}},
@@ -422,13 +523,13 @@ func Test_CallTargets(t *testing.T) {
 				servers: []*callTestServer{{
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusOK,
 				}, {
 					timeout:     time.Second,
 					method:      http.MethodPost,
-					expectBody:  requestContextInfoBody1,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
 					respondBody: []byte("just a string, not json"),
 					statusCode:  http.StatusOK,
 				}},
@@ -440,12 +541,53 @@ func Test_CallTargets(t *testing.T) {
 				ret: requestContextInfo1.GetContent(),
 			},
 		},
+		{
+			"multiple JWT/JWE targets, ok",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				servers: []*callTestServer{{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJWTPayload(requestContextInfoBody1),
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusOK,
+				}, {
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusOK,
+				}},
+				targets: []target_domain.Target{
+					{
+						TargetType:  target_domain.TargetTypeWebhook,
+						PayloadType: target_domain.PayloadTypeJWT,
+						Timeout:     time.Minute,
+					},
+					{
+						TargetType:  target_domain.TargetTypeWebhook,
+						PayloadType: target_domain.PayloadTypeJWE,
+						Timeout:     time.Minute,
+					},
+				},
+				getActiveSigningWebKey: testActiveSingingWebKey,
+			},
+			res{
+				ret: requestContextInfo1.GetContent(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			var getWebKeyCalls int32
+			var getActiveSigningWebKey execution.GetActiveSigningWebKey
+			if tt.args.getActiveSigningWebKey != nil {
+				getActiveSigningWebKey = tt.args.getActiveSigningWebKey(&getWebKeyCalls)
+			}
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
+				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), getActiveSigningWebKey),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -453,17 +595,27 @@ func Test_CallTargets(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Equal(t, tt.res.ret, respBody)
+			var expectedCalls int32
+			if tt.args.getActiveSigningWebKey != nil {
+				expectedCalls = 1
+			}
+			assert.Equal(t, expectedCalls, atomic.LoadInt32(&getWebKeyCalls))
 		})
 	}
 }
 
 type callTestServer struct {
 	method      string
-	expectBody  []byte
+	expectBody  func(*testing.T, []byte) bool
 	timeout     time.Duration
 	statusCode  int
 	respondBody []byte
 	signingKey  string
+	called      bool
+}
+
+func (s *callTestServer) Called() bool {
+	return s.called
 }
 
 func testServers(
@@ -473,8 +625,8 @@ func testServers(
 ) (interface{}, error) {
 	urls := make([]string, len(c))
 	for i := range c {
-		url, close := listen(t, c[i])
-		defer close()
+		url, closeF, _ := listen(t, c[i])
+		defer closeF()
 		urls[i] = url
 	}
 	return call(urls)
@@ -485,16 +637,17 @@ func testServer(
 	c *callTestServer,
 	call func(string) ([]byte, error),
 ) ([]byte, error) {
-	url, close := listen(t, c)
-	defer close()
+	url, closeF, _ := listen(t, c)
+	defer closeF()
 	return call(url)
 }
 
 func listen(
 	t *testing.T,
 	c *callTestServer,
-) (url string, close func()) {
+) (url string, close func(), called func() bool) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		c.called = true
 		checkRequest(t, r, c.method, c.expectBody, c.signingKey)
 
 		if c.statusCode != http.StatusOK {
@@ -511,13 +664,15 @@ func listen(
 		}
 	}
 	server := httptest.NewServer(http.HandlerFunc(handler))
-	return server.URL, server.Close
+	return server.URL, server.Close, c.Called
 }
 
-func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody []byte, signingKey string) {
+func checkRequest(t *testing.T, sent *http.Request, method string, checkExpectedBody func(*testing.T, []byte) bool, signingKey string) {
 	sentBody, err := io.ReadAll(sent.Body)
 	require.NoError(t, err)
-	require.Equal(t, expectedBody, sentBody)
+	if !checkExpectedBody(t, sentBody) {
+		return
+	}
 	require.Equal(t, method, sent.Method)
 	if signingKey != "" {
 		require.NoError(t, actions.ValidatePayload(sentBody, sent.Header.Get(actions.SigningHeader), signingKey))
@@ -534,17 +689,20 @@ func testCallTarget(ctx context.Context,
 	info *middleware.ContextInfoRequest,
 	target target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
+	signerOnce sign.SignerFunc,
+	encrypters *sync.Map,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info, alg)
+		return execution.CallTarget(ctx, target, info, alg, signerOnce, encrypters)
 	}
 }
 
 func testCallTargets(ctx context.Context,
-	info *middleware.ContextInfoRequest,
+	info execution.ContextInfo,
 	target []target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
+	activeSigningKey execution.GetActiveSigningWebKey,
 ) func([]string) (interface{}, error) {
 	return func(urls []string) (interface{}, error) {
 		targets := make([]target_domain.Target, len(target))
@@ -552,7 +710,7 @@ func testCallTargets(ctx context.Context,
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info, alg)
+		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey)
 	}
 }
 
@@ -716,4 +874,68 @@ func Test_handleResponse(t *testing.T) {
 		})
 	}
 
+}
+
+var (
+	privateKey = func() *rsa.PrivateKey {
+		privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+		return privateKey
+	}()
+	encryptionKey = func() []byte {
+		data, _ := crypto.PublicKeyToBytes(&privateKey.PublicKey)
+		return data
+	}()
+	encryptionKeyID  = "encryption-key-id"
+	signingAlgorithm = jose.RS256
+)
+
+func mockSigner(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error) {
+	return sign.GetSignerOnce(mockGetActiveSigningWebKey)(ctx)
+}
+
+func mockGetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error) {
+	return &jose.JSONWebKey{
+		Key:       privateKey,
+		Algorithm: string(signingAlgorithm),
+		Use:       "sig",
+	}, nil
+}
+
+func testActiveSingingWebKey(getWebKeyCalls *int32) execution.GetActiveSigningWebKey {
+	return func(ctx context.Context) (*jose.JSONWebKey, error) {
+		atomic.AddInt32(getWebKeyCalls, 1)
+		return mockGetActiveSigningWebKey(ctx)
+	}
+}
+
+func validateJSONPayload(expected []byte) func(*testing.T, []byte) bool {
+	return func(t *testing.T, actual []byte) bool {
+		require.Equal(t, expected, actual)
+		return false
+	}
+}
+
+func validateJWTPayload(expected []byte) func(*testing.T, []byte) bool {
+	return func(t *testing.T, actual []byte) bool {
+		jws, err := jose.ParseSigned(string(actual), []jose.SignatureAlgorithm{jose.RS256})
+		require.NoError(t, err)
+		payload, err := jws.Verify(privateKey.Public())
+		require.NoError(t, err)
+		return bytes.Equal(expected, payload)
+	}
+}
+
+func validateJWEPayload(expected []byte) func(*testing.T, []byte) bool {
+	return func(t *testing.T, actual []byte) bool {
+		parsedJWE, err := jose.ParseEncrypted(string(actual), []jose.KeyAlgorithm{jose.RSA_OAEP_256, jose.ECDH_ES_A256KW}, []jose.ContentEncryption{jose.A256GCM})
+		if err != nil {
+			return false
+		}
+		require.Equal(t, encryptionKeyID, parsedJWE.Header.KeyID)
+		require.Equal(t, "JWT", parsedJWE.Header.ExtraHeaders[jose.HeaderContentType].(string))
+
+		decryptedJWS, err := parsedJWE.Decrypt(privateKey)
+		require.NoError(t, err)
+		return validateJWTPayload(expected)(t, decryptedJWS)
+	}
 }
