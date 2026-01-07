@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs5"
+	SMTPConfigProjectionTable = "projections.smtp_configs6"
 	SMTPConfigTable           = SMTPConfigProjectionTable + "_" + smtpConfigSMTPTableSuffix
 	SMTPConfigHTTPTable       = SMTPConfigProjectionTable + "_" + smtpConfigHTTPTableSuffix
 

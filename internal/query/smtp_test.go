@@ -14,63 +14,63 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs5.creation_date,` +
-		` projections.smtp_configs5.change_date,` +
-		` projections.smtp_configs5.resource_owner,` +
-		` projections.smtp_configs5.sequence,` +
-		` projections.smtp_configs5.id,` +
-		` projections.smtp_configs5.state,` +
-		` projections.smtp_configs5.description,` +
-		` projections.smtp_configs5_smtp.id,` +
-		` projections.smtp_configs5_smtp.tls,` +
-		` projections.smtp_configs5_smtp.sender_address,` +
-		` projections.smtp_configs5_smtp.sender_name,` +
-		` projections.smtp_configs5_smtp.reply_to_address,` +
-		` projections.smtp_configs5_smtp.host,` +
-		` projections.smtp_configs5_smtp.username,` +
-		` projections.smtp_configs5_smtp.password,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_user,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_client_id,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_client_secret,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_token_endpoint,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_scope,` +
-		` projections.smtp_configs5_smtp.oauthbearerauth_user,` +
-		` projections.smtp_configs5_smtp.oauthbearerauth_bearer_token,` +
-		` projections.smtp_configs5_http.id,` +
-		` projections.smtp_configs5_http.endpoint,` +
-		` projections.smtp_configs5_http.signing_key` +
-		` FROM projections.smtp_configs5` +
-		` LEFT JOIN projections.smtp_configs5_smtp ON projections.smtp_configs5.id = projections.smtp_configs5_smtp.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_smtp.instance_id` +
-		` LEFT JOIN projections.smtp_configs5_http ON projections.smtp_configs5.id = projections.smtp_configs5_http.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_http.instance_id`
-	prepareSMTPConfigsStmt = `SELECT projections.smtp_configs5.creation_date,` +
-		` projections.smtp_configs5.change_date,` +
-		` projections.smtp_configs5.resource_owner,` +
-		` projections.smtp_configs5.sequence,` +
-		` projections.smtp_configs5.id,` +
-		` projections.smtp_configs5.state,` +
-		` projections.smtp_configs5.description,` +
-		` projections.smtp_configs5_smtp.id,` +
-		` projections.smtp_configs5_smtp.tls,` +
-		` projections.smtp_configs5_smtp.sender_address,` +
-		` projections.smtp_configs5_smtp.sender_name,` +
-		` projections.smtp_configs5_smtp.reply_to_address,` +
-		` projections.smtp_configs5_smtp.host,` +
-		` projections.smtp_configs5_smtp.username,` +
-		` projections.smtp_configs5_smtp.password,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_user,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_client_id,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_client_secret,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_token_endpoint,` +
-		` projections.smtp_configs5_smtp.xoauth2auth_scope,` +
-		` projections.smtp_configs5_smtp.oauthbearerauth_user,` +
-		` projections.smtp_configs5_smtp.oauthbearerauth_bearer_token,` +
-		` projections.smtp_configs5_http.id,` +
-		` projections.smtp_configs5_http.endpoint,` +
-		` projections.smtp_configs5_http.signing_key,` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs6.creation_date,` +
+		` projections.smtp_configs6.change_date,` +
+		` projections.smtp_configs6.resource_owner,` +
+		` projections.smtp_configs6.sequence,` +
+		` projections.smtp_configs6.id,` +
+		` projections.smtp_configs6.state,` +
+		` projections.smtp_configs6.description,` +
+		` projections.smtp_configs6_smtp.id,` +
+		` projections.smtp_configs6_smtp.tls,` +
+		` projections.smtp_configs6_smtp.sender_address,` +
+		` projections.smtp_configs6_smtp.sender_name,` +
+		` projections.smtp_configs6_smtp.reply_to_address,` +
+		` projections.smtp_configs6_smtp.host,` +
+		` projections.smtp_configs6_smtp.username,` +
+		` projections.smtp_configs6_smtp.password,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_user,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_id,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
+		` projections.smtp_configs6_smtp.oauthbearerauth_user,` +
+		` projections.smtp_configs6_smtp.oauthbearerauth_bearer_token,` +
+		` projections.smtp_configs6_http.id,` +
+		` projections.smtp_configs6_http.endpoint,` +
+		` projections.smtp_configs6_http.signing_key` +
+		` FROM projections.smtp_configs6` +
+		` LEFT JOIN projections.smtp_configs6_smtp ON projections.smtp_configs6.id = projections.smtp_configs6_smtp.id AND projections.smtp_configs6.instance_id = projections.smtp_configs6_smtp.instance_id` +
+		` LEFT JOIN projections.smtp_configs6_http ON projections.smtp_configs6.id = projections.smtp_configs6_http.id AND projections.smtp_configs6.instance_id = projections.smtp_configs6_http.instance_id`
+	prepareSMTPConfigsStmt = `SELECT projections.smtp_configs6.creation_date,` +
+		` projections.smtp_configs6.change_date,` +
+		` projections.smtp_configs6.resource_owner,` +
+		` projections.smtp_configs6.sequence,` +
+		` projections.smtp_configs6.id,` +
+		` projections.smtp_configs6.state,` +
+		` projections.smtp_configs6.description,` +
+		` projections.smtp_configs6_smtp.id,` +
+		` projections.smtp_configs6_smtp.tls,` +
+		` projections.smtp_configs6_smtp.sender_address,` +
+		` projections.smtp_configs6_smtp.sender_name,` +
+		` projections.smtp_configs6_smtp.reply_to_address,` +
+		` projections.smtp_configs6_smtp.host,` +
+		` projections.smtp_configs6_smtp.username,` +
+		` projections.smtp_configs6_smtp.password,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_user,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_id,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
+		` projections.smtp_configs6_smtp.oauthbearerauth_user,` +
+		` projections.smtp_configs6_smtp.oauthbearerauth_bearer_token,` +
+		` projections.smtp_configs6_http.id,` +
+		` projections.smtp_configs6_http.endpoint,` +
+		` projections.smtp_configs6_http.signing_key,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.smtp_configs5` +
-		` LEFT JOIN projections.smtp_configs5_smtp ON projections.smtp_configs5.id = projections.smtp_configs5_smtp.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_smtp.instance_id` +
-		` LEFT JOIN projections.smtp_configs5_http ON projections.smtp_configs5.id = projections.smtp_configs5_http.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_http.instance_id`
+		` FROM projections.smtp_configs6` +
+		` LEFT JOIN projections.smtp_configs6_smtp ON projections.smtp_configs6.id = projections.smtp_configs6_smtp.id AND projections.smtp_configs6.instance_id = projections.smtp_configs6_smtp.instance_id` +
+		` LEFT JOIN projections.smtp_configs6_http ON projections.smtp_configs6.id = projections.smtp_configs6_http.id AND projections.smtp_configs6.instance_id = projections.smtp_configs6_http.instance_id`
 
 	prepareSMTPConfigCols = []string{
 		"creation_date",
