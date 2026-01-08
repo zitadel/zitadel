@@ -8,6 +8,7 @@ import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
+  getDefaultOrg,
   getLoginSettings,
   getPasswordComplexitySettings,
   getUserByID,
@@ -15,11 +16,10 @@ import {
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { create } from "@zitadel/client";
-import { LoginSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("password");
@@ -34,6 +34,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
+
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
@@ -46,14 +54,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceConfig,
-    organization: organization ?? session?.factors?.user?.organizationId,
+    organization: organization ?? session?.factors?.user?.organizationId ?? defaultOrganization,
   });
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization });
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: organization ?? session?.factors?.user?.organizationId ?? defaultOrganization,
+  });
 
   if (!loginSettings) {
     return (

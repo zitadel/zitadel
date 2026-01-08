@@ -47,8 +47,14 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
+  });
+  const loginSettings = await getLoginSettings({
+    serviceConfig,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>
