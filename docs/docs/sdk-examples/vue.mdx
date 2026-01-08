@@ -33,7 +33,7 @@ The example includes secure sign-out functionality implementing **[federated log
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[Application Setup guide](/docs/concepts/structure/applications)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
 2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
@@ -58,7 +58,7 @@ VITE_POST_LOGIN_URL=/profile
    ```
 Replace these values with:
 - Your actual [Zitadel instance URL](https://zitadel.com/docs) (the **Issuer**)
-- The **Client ID** you copied when creating the application in the [PKCE setup](/docs/guides/integrate/login/oidc/pkce-setup)
+- The **Client ID** you copied when creating the application in the [PKCE setup](/docs/concepts/structure/applications)
 - The **redirect URI** you configured (must match exactly)
 - The **post-logout redirect URI** for [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
@@ -73,7 +73,7 @@ npm run dev
 
 * **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
 * **PKCE concept:** [/docs/guides/integrate/login/oidc/login-users#pkce](/docs/guides/integrate/login/oidc/login-users#pkce)
-* **PKCE application setup:** [/docs/guides/integrate/login/oidc/pkce-setup](/docs/guides/integrate/login/oidc/pkce-setup)
+* **PKCE application setup:** [/docs/concepts/structure/applications](/docs/concepts/structure/applications)
 * **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
 * **Vue.js documentation:** [https://vuejs.org](https://vuejs.org)
