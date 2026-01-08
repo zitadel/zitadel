@@ -15,7 +15,7 @@ import {
   searchUsers,
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -79,14 +79,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   let user: User | undefined;
-  let displayName: string | undefined;
   if (userId) {
     const userResponse = await getUserByID({ serviceConfig, userId });
     user = userResponse.user;
-
-    if (user?.type.case === "human") {
-      displayName = (user.type.value as HumanUser).profile?.displayName;
-    }
   } else if (loginName) {
     const users = await searchUsers({
       serviceConfig,
@@ -99,9 +94,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       const foundUser = users.result[0];
       userId = foundUser.userId;
       user = foundUser;
-      if (user.type.case === "human") {
-        displayName = (user.type.value as HumanUser).profile?.displayName;
-      }
     } else if (loginSettings?.ignoreUnknownUsernames) {
       // Prevent enumeration by pretending we found a user
       userId = UNKNOWN_USER_ID;
