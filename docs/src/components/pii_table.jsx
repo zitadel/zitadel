@@ -69,7 +69,7 @@ export function PiiTable() {
       subjects: "Customers who use our services."
     },
     {
-      type: "Usage meta data",
+      type: "Usage metadata",
       examples: [
         'User agent',
         'IP addresses',
