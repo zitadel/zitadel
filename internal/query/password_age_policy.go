@@ -175,7 +175,7 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-ShCWRnWJfH", "Errors.IAM.PasswordAgePolicy.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-ShCWRnWJfH", "Instance.PasswordAgePolicy.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-6nj7Bm4fxT", "Errors.Internal")
 			}

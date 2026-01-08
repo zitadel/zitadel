@@ -19,7 +19,7 @@ func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string
 			return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument")
 		}
 		if len(domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Instance.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, "", false); err != nil || !exists {
@@ -105,10 +105,10 @@ type ChangeInstanceMember struct {
 
 func (i *ChangeInstanceMember) IsValid(zitadelRoles []authz.RoleMapping) error {
 	if i.InstanceID == "" || i.UserID == "" || len(i.Roles) == 0 {
-		return zerrors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
+		return zerrors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Instance.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(i.Roles, domain.IAMRolePrefix, zitadelRoles)) > 0 {
-		return zerrors.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
+		return zerrors.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Instance.MemberInvalid")
 	}
 	return nil
 }

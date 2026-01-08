@@ -105,7 +105,7 @@ func TestGetInstance(t *testing.T) {
 				inputContext:      ctxWithSysAuthZ,
 				inputInstanceID:   "invalid",
 				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "Errors.IAM.NotFound (QUERY-n0wng)",
+				expectedErrorMsg:  "Instance.NotFound (QUERY-n0wng)",
 			},
 		}
 

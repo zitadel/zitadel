@@ -22,7 +22,7 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0K9dq", "Instance.LabelPolicy.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
@@ -41,7 +41,7 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		policy.DisableWatermark,
 		policy.ThemeMode)
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-28fHe", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-28fHe", "Instance.LabelPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
@@ -75,7 +75,7 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Qw0pd", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Qw0pd", "Instance.LabelPolicy.NotFound")
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Xc8Kf", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Xc8Kf", "Instance.LabelPolicy.NotFound")
 	}
 
 	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LogoKey)
@@ -126,7 +126,7 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-1yMx0", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-1yMx0", "Instance.LabelPolicy.NotFound")
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
@@ -151,7 +151,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-4M0qw", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-4M0qw", "Instance.LabelPolicy.NotFound")
 	}
 	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.IconKey)
 	if err != nil {

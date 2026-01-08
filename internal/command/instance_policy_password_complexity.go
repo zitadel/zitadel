@@ -35,13 +35,13 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, po
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Instance.PasswordComplexityPolicy.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.IAM.PasswordComplexityPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Instance.PasswordComplexityPolicy.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -99,7 +99,7 @@ func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*dom
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-M0gsf", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-M0gsf", "Instance.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToPasswordComplexityPolicy(&policyWriteModel.PasswordComplexityPolicyWriteModel)
 	policy.Default = true

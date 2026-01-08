@@ -447,7 +447,7 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 				})
 			}
 			if instance.ID == "" {
-				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Instance.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
@@ -538,7 +538,7 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 		return nil
 	}
 	if !slices.Contains(i.TrustedDomains, publicDomain) {
-		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Instance.NotFound")
 	}
 	return nil
 }
@@ -585,7 +585,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&executionTargetsBytes,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
-			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
+			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Instance.NotFound")
 		}
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")

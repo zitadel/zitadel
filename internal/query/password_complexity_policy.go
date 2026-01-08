@@ -197,7 +197,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-hgA9vuM0qg", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-hgA9vuM0qg", "Instance.PasswordComplexityPolicy.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-TvvW9Uij7M", "Errors.Internal")
 			}

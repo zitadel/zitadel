@@ -30,7 +30,7 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *ChangeL
 
 func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if !idpProvider.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-9nf88", "Errors.IAM.LoginPolicy.IDP.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-9nf88", "Instance.LoginPolicy.IDP.Invalid")
 	}
 	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
@@ -38,7 +38,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-GVDfe", "Instance.LoginPolicy.NotFound")
 	}
 
 	exists, err := ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
@@ -51,7 +51,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 		return nil, err
 	}
 	if idpModel.State == domain.IdentityProviderStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-2B0ps", "Errors.IAM.LoginPolicy.IDP.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-2B0ps", "Instance.LoginPolicy.IDP.AlreadyExists")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&idpModel.WriteModel)
@@ -68,7 +68,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 
 func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.ObjectDetails, error) {
 	if !idpProvider.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-66m9s", "Instance.LoginPolicy.IDP.Invalid")
 	}
 	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
@@ -76,7 +76,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Dfg4t", "Errors.IAM.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-Dfg4t", "Instance.LoginPolicy.NotFound")
 	}
 
 	idpModel := NewInstanceIdentityProviderWriteModel(ctx, idpProvider.IDPConfigID)
@@ -85,7 +85,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, err
 	}
 	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-39fjs", "Errors.IAM.LoginPolicy.IDP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-39fjs", "Instance.LoginPolicy.IDP.NotExisting")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
@@ -135,7 +135,7 @@ func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, seco
 
 func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (*domain.ObjectDetails, error) {
 	if !secondFactor.Valid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-55n8s", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-55n8s", "Instance.LoginPolicy.MFA.Unspecified")
 	}
 	secondFactorModel := NewInstanceSecondFactorWriteModel(ctx, secondFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
@@ -143,7 +143,7 @@ func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context,
 		return nil, err
 	}
 	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9od", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9od", "Instance.LoginPolicy.MFA.NotExisting")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLoginPolicySecondFactorRemovedEvent(ctx, instanceAgg, secondFactor))
@@ -172,7 +172,7 @@ func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multi
 
 func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (*domain.ObjectDetails, error) {
 	if !multiFactor.Valid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-33m9F", "Errors.IAM.LoginPolicy.MFA.Unspecified")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-33m9F", "Instance.LoginPolicy.MFA.Unspecified")
 	}
 	multiFactorModel := NewInstanceMultiFactorWriteModel(ctx, multiFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
@@ -180,7 +180,7 @@ func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, err
 	}
 	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9df", "Errors.IAM.LoginPolicy.MFA.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9df", "Instance.LoginPolicy.MFA.NotExisting")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLoginPolicyMultiFactorRemovedEvent(ctx, instanceAgg, multiFactor))
@@ -215,7 +215,7 @@ func (c *Commands) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPoli
 func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
-			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-SFdqd", "Instance.LoginPolicy.RedirectURIInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewInstanceLoginPolicyWriteModel(ctx)
@@ -223,7 +223,7 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 				return nil, err
 			}
 			if !wm.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-M0sif", "Errors.IAM.LoginPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-M0sif", "Instance.LoginPolicy.NotFound")
 			}
 			changedEvent, hasChanged := wm.NewChangedEvent(ctx, &a.Aggregate,
 				policy.AllowUsernamePassword,
@@ -244,7 +244,7 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime)
 			if !hasChanged {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Instance.LoginPolicy.NotChanged")
 			}
 			return []eventstore.Command{changedEvent}, nil
 		}, nil

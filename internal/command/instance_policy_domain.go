@@ -49,7 +49,7 @@ func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPo
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Instance.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToDomainPolicy(policyWriteModel)
 	policy.Default = true
