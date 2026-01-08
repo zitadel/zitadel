@@ -66,31 +66,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
   });
 
-  let user: User | undefined;
-  let human: HumanUser | undefined;
-
-  let loginSettings;
-  if (!sessionFactors && loginName) {
-    loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
-
-    if (loginSettings) {
-      const users = await searchUsers({
-        serviceConfig,
-        searchValue: loginName,
-        loginSettings: loginSettings,
-        organizationId: organization,
-      });
-
-      if (users.result && users.result.length === 1) {
-        const foundUser = users.result[0];
-        user = foundUser;
-        if (user.type.case === "human") {
-          human = user.type.value as HumanUser;
-        }
-      }
-    }
-  }
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
