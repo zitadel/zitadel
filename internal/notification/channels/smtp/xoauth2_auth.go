@@ -12,7 +12,6 @@ import (
 
 func XOAuth2Auth(config XOAuth2AuthConfig, host string) smtp.Auth {
 	return &xoauth2Auth{
-		host:   host,
 		config: config,
 	}
 }
@@ -38,7 +37,7 @@ type XOAuth2AuthConfig struct {
 }
 
 func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
-	if server.Name != a.host {
+	if a.host != "" && server.Name != a.host {
 		return "", nil, zerrors.ThrowInternal(nil, "SMTP-eRJLyi", "wrong host name")
 	}
 
@@ -49,6 +48,7 @@ func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 			Scopes:       a.config.Scopes,
 			TokenURL:     a.config.TokenEndpoint,
 		}
+		a.host = server.Name
 		a.tokenSource = config.TokenSource(context.Background())
 	}
 

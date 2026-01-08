@@ -192,11 +192,11 @@ func TestConfiguration(cfg *Config, testEmail string) error {
 	}
 
 	if err := client.Mail(cfg.From); err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s3is3", "Errors.SMTP.CouldNotSetSender")
+		return zerrors.ThrowInternal(err, "EMAIL-s5is5", "Errors.SMTP.CouldNotSetSender")
 	}
 
 	if err := client.Rcpt(testEmail); err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s4is4", "Errors.SMTP.CouldNotSetRecipient")
+		return zerrors.ThrowInternal(err, "EMAIL-s6is6", "Errors.SMTP.CouldNotSetRecipient")
 	}
 
 	// Open data connection
