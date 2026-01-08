@@ -23,6 +23,7 @@ func init() {
 	if err != nil {
 		logging.WithError(err).Warn("could not parse build date, using current time instead")
 		dateTime = time.Now()
+		date = dateTime.Format(time.RFC3339)
 	}
 	if version == "" {
 		logging.Warn("no build version set, using timestamp as version")
