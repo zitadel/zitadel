@@ -32,6 +32,13 @@ module.exports = {
         {
           type: "category",
           label: "Key Concepts",
+          link: {
+            type: "generated-index",
+            title: "Key Concepts",
+            slug: "concepts",
+            description:
+              "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+          },
           items: [
             "concepts/structure/instance",
             //"concepts/structure/organizations",
@@ -52,6 +59,13 @@ module.exports = {
         {
           type: "category",
           label: "Authenticate Users",
+          link: {
+            type: "generated-index",
+            title: "Login users with ZITADEL",
+            slug: "guides/integrate/login",
+            description:
+              "Sign-in users and application with ZITADEL. In this section you will find resources on how to authenticate your users by using the hosted login via OpenID Connect and SAML. Follow our dedicated guides to build your custom login user interface, if you want to customize the login behavior further.",
+          },
           items: [
             "guides/integrate/login/login-users",
             "guides/integrate/login/hosted-login",
@@ -118,13 +132,18 @@ module.exports = {
         {
           type: "category",
           label: "Use Cases",
+          link: {
+            type: "generated-index",
+            title: "Use Cases",
+            slug: "guides/solution-scenarios/introduction",
+            description:
+              "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
+          },
           items: [
             "guides/solution-scenarios/b2b",
-            "guides/integrate/onboarding/b2b",
             "guides/solution-scenarios/configurations",
             "guides/solution-scenarios/saas",
             "guides/solution-scenarios/b2c",
-            "guides/integrate/onboarding/end-users",
             "guides/solution-scenarios/frontend-calling-backend-API",
             {
               type: "category",
@@ -136,6 +155,23 @@ module.exports = {
                 "guides/integrate/service-users/personal-access-token",
               ],
             },
+          ],
+        },
+        {
+          type: "category",
+          label: "Onboard Customers and Users",
+          link: {
+            type: "generated-index",
+            title: "Onboard Customers and Users",
+            slug: "/guides/integrate/onboarding",
+            description:
+              "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+              "These guides will explain the built-in solution for onboarding new tenants, customers, and users and how you can handle more advanced onboarding use cases. ",
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/onboarding/b2b",
+            "guides/integrate/onboarding/end-users",
           ],
         },
         {
@@ -161,6 +197,13 @@ module.exports = {
         {
           type: "category",
           label: "OIDC & OAuth Flows",
+          link: {
+            type: "generated-index",
+            title: "Authenticate users with OpenID Connect (OIDC)",
+            slug: "guides/integrate/login/oidc",
+            description:
+              "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+          },
           items: [
             "guides/integrate/login/oidc/oauth-recommended-flows",
             "guides/integrate/login/oidc/login-users",
