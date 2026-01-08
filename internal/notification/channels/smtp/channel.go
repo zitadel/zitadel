@@ -99,7 +99,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		return nil, err
 	}
 
-	err = smtpConfig.smtpAuth(client)
+	err = smtpConfig.smtpAuth(client, host)
 	if err != nil {
 		return nil, err
 	}
@@ -147,9 +147,9 @@ func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
+func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	if smtpConfig.XOAuth2Auth != nil {
-		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, smtpConfig.Host))
+		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, host))
 		if err != nil {
 			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotXOAuth2")
 		}
@@ -157,7 +157,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
 	}
 
 	if smtpConfig.OAuthBearerAuth != nil {
-		err := client.Auth(OAuthBearerAuth(*smtpConfig.OAuthBearerAuth, smtpConfig.Host))
+		err := client.Auth(OAuthBearerAuth(*smtpConfig.OAuthBearerAuth, host))
 		if err != nil {
 			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotOAuthBearerAuth")
 		}
@@ -165,7 +165,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
 	}
 
 	if smtpConfig.PlainAuth != nil {
-		err := client.Auth(PlainOrLoginAuth(smtpConfig.PlainAuth.User, smtpConfig.PlainAuth.Password, smtpConfig.Host))
+		err := client.Auth(PlainOrLoginAuth(smtpConfig.PlainAuth.User, smtpConfig.PlainAuth.Password, host))
 		if err != nil {
 			return zerrors.ThrowInternal(err, "EMAIL-s9kfs", "Errors.SMTP.CouldNotAuth")
 		}
