@@ -132,13 +132,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        ) : user || loginName ? (
-          <UserAvatar
-            loginName={loginName ?? user?.preferredLoginName}
-            displayName={!loginSettings?.ignoreUnknownUsernames ? displayName : (loginName ?? user?.preferredLoginName)}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
+        ) : loginName ? (
+          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
         ) : null}
       </div>
 

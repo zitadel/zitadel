@@ -109,19 +109,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        ) : (
-          (user || loginName) && (
-            <UserAvatar
-              loginName={loginName ?? user?.preferredLoginName}
-              displayName={
-                !loginSettings?.ignoreUnknownUsernames
-                  ? human?.profile?.displayName
-                  : (loginName ?? user?.preferredLoginName)
-              }
-              showDropdown={false}
-            />
-          )
-        )}
+        ) : loginName ? (
+          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
+        ) : null}
       </div>
 
       <div className="w-full">
