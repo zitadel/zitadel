@@ -93,6 +93,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             loginName={loginName}
             requestId={requestId}
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+            defaultOrganization={defaultOrganization}
             loginSettings={loginSettings}
           />
         )}

@@ -158,6 +158,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             loginName={loginName ?? (user?.preferredLoginName as string)}
             requestId={requestId}
             organization={organization}
+            defaultOrganization={defaultOrganization}
             passwordComplexitySettings={passwordComplexity}
             codeRequired={!(initial === "true")}
           />

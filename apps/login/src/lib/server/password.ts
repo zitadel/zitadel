@@ -37,6 +37,7 @@ import { getTranslations } from "next-intl/server";
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
 };
 
@@ -52,8 +53,12 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
 
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
-    const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    const loginSettings = await getLoginSettings({
+      serviceConfig,
+      organization: command.organization ?? command.defaultOrganization,
+    });
     if (loginSettings?.ignoreUnknownUsernames) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return {};
     }
     return { error: t("errors.couldNotSendResetLink") };
@@ -74,6 +79,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
 export type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   checks: Checks;
   requestId?: string;
 };
@@ -129,7 +135,10 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   if (!sessionCookie) {
     const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
     if (!loginSettings) {
-      loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+      loginSettings = await getLoginSettings({
+        serviceConfig,
+        organization: command.organization ?? command.defaultOrganization,
+      });
     }
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
@@ -200,7 +209,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceConfig,
-      organization: command.organization ?? session.factors?.user?.organizationId,
+      organization: command.organization ?? session.factors?.user?.organizationId ?? command.defaultOrganization,
     });
   }
 

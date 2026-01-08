@@ -12,8 +12,6 @@ import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
-
-import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
@@ -33,6 +31,7 @@ type Props = {
   loginName: string;
   userId: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
 };
@@ -40,6 +39,7 @@ type Props = {
 export function SetPasswordForm({
   passwordComplexitySettings,
   organization,
+  defaultOrganization,
   requestId,
   loginName,
   userId,
@@ -64,16 +64,10 @@ export function SetPasswordForm({
     setError("");
     setLoading(true);
 
-    // do not send code for dummy userid that is set to prevent user enumeration
-    if (userId === UNKNOWN_USER_ID) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setLoading(false);
-      return;
-    }
-
     const response = await resetPassword({
       loginName,
       organization,
+      defaultOrganization,
       requestId,
     })
       .catch(() => {
@@ -92,6 +86,7 @@ export function SetPasswordForm({
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
+
     let payload: { userId: string; password: string; code?: string; organization?: string } = {
       userId: userId,
       password: values.password,
