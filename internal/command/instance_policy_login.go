@@ -215,7 +215,7 @@ func (c *Commands) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPoli
 func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
-			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-SFdqd", "Instance.LoginPolicy.RedirectURIInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-SFdqd", "Instance.LoginPolicy.RedirectURIInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewInstanceLoginPolicyWriteModel(ctx)
