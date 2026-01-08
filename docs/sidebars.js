@@ -166,104 +166,7 @@ module.exports = {
         },
       ],
     },
-    {
-      type: "category",
-      label: "Configure Identity & Policies",
-      collapsed: true,
-      items: [
-        "guides/manage/user/reg-create-user",
-        "guides/manage/terraform-provider",
         {
-          type: "category",
-          label: "Identity Providers",
-          link: {
-            type: "doc",
-            id: "guides/integrate/identity-providers/introduction",
-          },
-          items: [
-            {
-              type: "category",
-              label: "Social Logins",
-              collapsed: true,
-              items: [
-                "guides/integrate/identity-providers/google",
-                "guides/integrate/identity-providers/apple",
-                "guides/integrate/identity-providers/github",
-                "guides/integrate/identity-providers/gitlab",
-                "guides/integrate/identity-providers/linkedin-oauth",
-              ],
-            },
-            {
-              type: "category",
-              label: "Enterprise (SAML & OIDC)",
-              collapsed: true,
-              items: [
-                "guides/integrate/identity-providers/azure-ad-oidc",
-                "guides/integrate/identity-providers/azure-ad-saml",
-                "guides/integrate/identity-providers/okta-oidc",
-                "guides/integrate/identity-providers/okta-saml",
-                "guides/integrate/identity-providers/keycloak",
-                "guides/integrate/identity-providers/onelogin-saml",
-                "guides/integrate/identity-providers/pingfederate-saml",
-              ],
-            },
-            {
-              type: "category",
-              label: "Legacy & Directory (LDAP)",
-              items: [
-                "guides/integrate/identity-providers/ldap",
-                "guides/integrate/identity-providers/openldap",
-              ],
-            },
-            {
-              type: "category",
-              label: "Custom & Generic",
-              items: [
-                "guides/integrate/identity-providers/generic-oidc",
-                "guides/integrate/identity-providers/jwt_idp",
-                "guides/integrate/identity-providers/mocksaml",
-              ],
-            },
-            {
-              type: "category",
-              label: "Guides",
-              items: [
-                "guides/integrate/identity-providers/migrate",
-                "guides/integrate/identity-providers/additional-information",
-              ]
-            }
-          ],
-        },
-        {
-          type: "category",
-          label: "Policies",
-          items: [
-            "guides/manage/console/default-settings",
-            "concepts/structure/policies",
-          ],
-        },
-        {
-          type: "category",
-          label: "Roles & Permissions",
-          items: [
-            "guides/manage/console/roles",
-            "guides/integrate/retrieve-user-roles",
-            "concepts/structure/granted_projects",
-            "guides/manage/console/managers",
-          ],
-        },
-        {
-          type: "category",
-          label: "Compliance & Security",
-          items: [
-            "concepts/features/audit-trail",
-            "guides/integrate/external-audit-log",
-            // TODO: File missing - Certifications specific doc
-          ],
-        },
-      ],
-    },
-    {
       type: "category",
       label: "Integrate & Authenticate",
       collapsed: true,
@@ -606,6 +509,103 @@ module.exports = {
                 "guides/integrate/actions/webhook-site-setup",
               ],
             },
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Configure Identity & Policies",
+      collapsed: true,
+      items: [
+        "guides/manage/user/reg-create-user",
+        "guides/manage/terraform-provider",
+        {
+          type: "category",
+          label: "Identity Providers",
+          link: {
+            type: "doc",
+            id: "guides/integrate/identity-providers/introduction",
+          },
+          items: [
+            {
+              type: "category",
+              label: "Social Logins",
+              collapsed: true,
+              items: [
+                "guides/integrate/identity-providers/google",
+                "guides/integrate/identity-providers/apple",
+                "guides/integrate/identity-providers/github",
+                "guides/integrate/identity-providers/gitlab",
+                "guides/integrate/identity-providers/linkedin-oauth",
+              ],
+            },
+            {
+              type: "category",
+              label: "Enterprise (SAML & OIDC)",
+              collapsed: true,
+              items: [
+                "guides/integrate/identity-providers/azure-ad-oidc",
+                "guides/integrate/identity-providers/azure-ad-saml",
+                "guides/integrate/identity-providers/okta-oidc",
+                "guides/integrate/identity-providers/okta-saml",
+                "guides/integrate/identity-providers/keycloak",
+                "guides/integrate/identity-providers/onelogin-saml",
+                "guides/integrate/identity-providers/pingfederate-saml",
+              ],
+            },
+            {
+              type: "category",
+              label: "Legacy & Directory (LDAP)",
+              items: [
+                "guides/integrate/identity-providers/ldap",
+                "guides/integrate/identity-providers/openldap",
+              ],
+            },
+            {
+              type: "category",
+              label: "Custom & Generic",
+              items: [
+                "guides/integrate/identity-providers/generic-oidc",
+                "guides/integrate/identity-providers/jwt_idp",
+                "guides/integrate/identity-providers/mocksaml",
+              ],
+            },
+            {
+              type: "category",
+              label: "Guides",
+              items: [
+                "guides/integrate/identity-providers/migrate",
+                "guides/integrate/identity-providers/additional-information",
+              ]
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Policies",
+          items: [
+            "guides/manage/console/default-settings",
+            "concepts/structure/policies",
+          ],
+        },
+        {
+          type: "category",
+          label: "Roles & Permissions",
+          items: [
+            "guides/manage/console/roles",
+            "guides/integrate/retrieve-user-roles",
+            "concepts/structure/granted_projects",
+            "guides/manage/console/managers",
+          ],
+        },
+        {
+          type: "category",
+          label: "Compliance & Security",
+          items: [
+            "concepts/features/audit-trail",
+            "guides/integrate/external-audit-log",
+            // TODO: File missing - Certifications specific doc
           ],
         },
       ],
