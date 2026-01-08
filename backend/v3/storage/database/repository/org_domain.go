@@ -16,8 +16,8 @@ func OrganizationDomainRepository() domain.OrganizationDomainRepository {
 	return new(orgDomain)
 }
 
-func (orgDomain) qualifiedTableName() string {
-	return "zitadel.org_domains"
+func (o orgDomain) qualifiedTableName() string {
+	return "zitadel." + o.unqualifiedTableName()
 }
 
 func (orgDomain) unqualifiedTableName() string {
@@ -28,62 +28,32 @@ func (orgDomain) unqualifiedTableName() string {
 // repository
 // -------------------------------------------------------------
 
-const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
-	`FROM zitadel.org_domains`
-
 // Get implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
 func (o orgDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
+	builder, err := o.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationDomainStmt)
-	options.Write(&builder)
-
-	return scanOrganizationDomain(ctx, client, &builder)
+	return get[domain.OrganizationDomain](ctx, client, builder)
 }
 
 // List implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
 func (o orgDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
+	builder, err := o.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	if !options.Condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationDomainStmt)
-	options.Write(&builder)
-
-	return scanOrganizationDomains(ctx, client, &builder)
+	return list[domain.OrganizationDomain](ctx, client, builder)
 }
 
 // Add implements [domain.OrganizationDomainRepository].
 func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddOrganizationDomain) error {
-	var (
-		builder              database.StatementBuilder
-		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
-	)
-	if !domain.CreatedAt.IsZero() {
-		createdAt = domain.CreatedAt
-	}
-	if !domain.UpdatedAt.IsZero() {
-		updatedAt = domain.UpdatedAt
-	}
-
-	builder.WriteString(`INSERT INTO zitadel.org_domains (instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, createdAt, updatedAt)
+	builder := database.NewStatementBuilder(`INSERT INTO `)
+	builder.WriteString(o.qualifiedTableName())
+	builder.WriteString(` (instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(domain.InstanceID, domain.OrganizationID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, defaultTimestamp(domain.CreatedAt), defaultTimestamp(domain.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
@@ -92,44 +62,15 @@ func (o orgDomain) Add(ctx context.Context, client database.QueryExecutor, domai
 // Update implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
 func (o orgDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
-	}
-	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(o.OrgIDColumn())
-	}
-	if !database.Changes(changes).IsOnColumn(o.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(o.UpdatedAtColumn(), database.NullInstruction))
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`UPDATE zitadel.org_domains SET `)
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
-	writeCondition(&builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return update(ctx, client, o, condition, changes...)
 }
 
 // Remove implements [domain.OrganizationDomainRepository].
 func (o orgDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.IsRestrictingColumn(o.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	if err := checkRestrictingColumns(condition, o.InstanceIDColumn(), o.OrgIDColumn()); err != nil {
+		return 0, err
 	}
-	if !condition.IsRestrictingColumn(o.OrgIDColumn()) {
-		return 0, database.NewMissingConditionError(o.OrgIDColumn())
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.org_domains `)
-	writeCondition(&builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return delete(ctx, client, o, condition)
 }
 
 // -------------------------------------------------------------
@@ -235,7 +176,7 @@ func (o orgDomain) IsVerifiedColumn() database.Column {
 
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
 func (o orgDomain) OrgIDColumn() database.Column {
-	return database.NewColumn(o.unqualifiedTableName(), "org_id")
+	return database.NewColumn(o.unqualifiedTableName(), "organization_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
@@ -249,31 +190,22 @@ func (o orgDomain) ValidationTypeColumn() database.Column {
 }
 
 // -------------------------------------------------------------
-// scanners
+// helpers
 // -------------------------------------------------------------
 
-func scanOrganizationDomain(ctx context.Context, client database.Querier, builder *database.StatementBuilder) (*domain.OrganizationDomain, error) {
-	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
+const queryOrganizationDomainStmt = `SELECT instance_id, organization_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
+	`FROM `
 
-	domain := &domain.OrganizationDomain{}
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(domain); err != nil {
+func (o orgDomain) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	if err := checkRestrictingColumns(options.Condition, o.InstanceIDColumn()); err != nil {
 		return nil, err
 	}
-	return domain, nil
-}
+	builder := database.NewStatementBuilder(queryOrganizationDomainStmt + o.qualifiedTableName())
+	options.Write(builder)
 
-func scanOrganizationDomains(ctx context.Context, client database.Querier, builder *database.StatementBuilder) ([]*domain.OrganizationDomain, error) {
-	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
-	var domains []*domain.OrganizationDomain
-	if err := rows.(database.CollectableRows).Collect(&domains); err != nil {
-		return nil, err
-	}
-	return domains, nil
+	return builder, nil
 }

@@ -28,52 +28,30 @@ func (instanceDomain) unqualifiedTableName() string {
 // repository
 // -------------------------------------------------------------
 
-const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_domains.domain, instance_domains.is_primary, instance_domains.created_at, instance_domains.updated_at ` +
-	`FROM zitadel.instance_domains`
-
 // Get implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
+	builder, err := i.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryInstanceDomainStmt)
-	options.Write(&builder)
-
-	return scanInstanceDomain(ctx, client, &builder)
+	return scanInstanceDomain(ctx, client, builder)
 }
 
 // List implements [domain.InstanceDomainRepository].
 func (i instanceDomain) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
-	options := new(database.QueryOpts)
-	for _, opt := range opts {
-		opt(options)
+	builder, err := i.prepareQuery(opts)
+	if err != nil {
+		return nil, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(queryInstanceDomainStmt)
-	options.Write(&builder)
-
-	return scanInstanceDomains(ctx, client, &builder)
+	return scanInstanceDomains(ctx, client, builder)
 }
 
 // Add implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, domain *domain.AddInstanceDomain) error {
-	var (
-		builder              database.StatementBuilder
-		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
-	)
-	if !domain.CreatedAt.IsZero() {
-		createdAt = domain.CreatedAt
-	}
-	if !domain.UpdatedAt.IsZero() {
-		updatedAt = domain.UpdatedAt
-	}
-
-	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_primary, is_generated, type, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsPrimary, domain.IsGenerated, domain.Type, createdAt, updatedAt)
+	builder := database.NewStatementBuilder(`INSERT INTO `)
+	builder.WriteString(i.qualifiedTableName())
+	builder.WriteString(` (instance_id, domain, is_primary, is_generated, type, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsPrimary, domain.IsGenerated, domain.Type, defaultTimestamp(domain.CreatedAt), defaultTimestamp(domain.UpdatedAt))
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
@@ -81,39 +59,15 @@ func (i instanceDomain) Add(ctx context.Context, client database.QueryExecutor, 
 
 // Update implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
-	}
-	if len(changes) == 0 {
-		return 0, database.ErrNoChanges
-	}
-	if !database.Changes(changes).IsOnColumn(i.UpdatedAtColumn()) {
-		changes = append(changes, database.NewChange(i.UpdatedAtColumn(), database.NullInstruction))
-	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
-	err := database.Changes(changes).Write(&builder)
-	if err != nil {
-		return 0, err
-	}
-
-	writeCondition(&builder, condition)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return update(ctx, client, i, condition, changes...)
 }
 
 // Remove implements [domain.InstanceDomainRepository].
 func (i instanceDomain) Remove(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	if !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	if err := checkRestrictingColumns(condition, i.InstanceIDColumn()); err != nil {
+		return 0, err
 	}
-
-	var builder database.StatementBuilder
-	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
-	condition.Write(&builder)
-
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	return delete(ctx, client, i, condition)
 }
 
 // -------------------------------------------------------------
@@ -243,4 +197,22 @@ func scanInstanceDomain(ctx context.Context, querier database.Querier, builder *
 	}
 
 	return domain, nil
+}
+
+// -------------------------------------------------------------
+// helpers
+// -------------------------------------------------------------
+
+const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_domains.domain, instance_domains.is_primary, instance_domains.created_at, instance_domains.updated_at ` +
+	`FROM `
+
+func (i instanceDomain) prepareQuery(opts []database.QueryOption) (*database.StatementBuilder, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	builder := database.NewStatementBuilder(queryInstanceDomainStmt + i.qualifiedTableName())
+	options.Write(builder)
+
+	return builder, nil
 }

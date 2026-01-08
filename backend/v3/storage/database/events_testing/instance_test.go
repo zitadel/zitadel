@@ -57,7 +57,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			// event instance.iam.project.set
 			assert.NotNil(t, instance.IAMProjectID)
 			// event instance.iam.console.set
-			assert.NotNil(t, instance.ConsoleAppID)
+			assert.NotNil(t, instance.ConsoleApplicationID)
 			// event instance.default.language.set
 			assert.NotNil(t, instance.DefaultLanguage)
 			// event instance.added

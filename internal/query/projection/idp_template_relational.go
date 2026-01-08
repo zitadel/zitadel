@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	internal_domain "github.com/zitadel/zitadel/internal/domain"
@@ -560,7 +561,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
 		}
 
-		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.IDPConfigID)))
 		if err != nil {
 			return err
 		}
@@ -667,7 +668,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 			return zerrors.ThrowInternal(nil, "HANDL-sh6Lp", "unable to cast to tx executer")
 		}
 
-		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
+		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.IDPConfigID)))
 		if err != nil {
 			return err
 		}
@@ -782,7 +783,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		oauth, err := p.idpRepo.GetOAuth(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		oauth, err := p.idpRepo.GetOAuth(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -879,7 +880,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-L8CQt", "unable to cast to tx executer")
 		}
-		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		oidc, err := p.idpRepo.GetOIDC(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1091,7 +1092,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		jwt, err := p.idpRepo.GetJWT(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1200,7 +1201,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		azure, err := p.idpRepo.GetAzureAD(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		azure, err := p.idpRepo.GetAzureAD(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1307,7 +1308,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		github, err := p.idpRepo.GetGithub(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		github, err := p.idpRepo.GetGithub(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1413,7 +1414,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		githubEnterprise, err := p.idpRepo.GetGithubEnterprise(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		githubEnterprise, err := p.idpRepo.GetGithubEnterprise(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1516,7 +1517,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		gitlab, err := p.idpRepo.GetGitlab(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		gitlab, err := p.idpRepo.GetGitlab(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1620,7 +1621,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1723,7 +1724,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		google, err := p.idpRepo.GetGoogle(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		google, err := p.idpRepo.GetGoogle(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1847,7 +1848,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		ldap, err := p.idpRepo.GetLDAP(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		ldap, err := p.idpRepo.GetLDAP(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -1952,7 +1953,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		apple, err := p.idpRepo.GetApple(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		apple, err := p.idpRepo.GetApple(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}
@@ -2060,7 +2061,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		if !ok {
 			return zerrors.ThrowInternal(nil, "HANDL-HX6ed", "unable to cast to tx executer")
 		}
-		saml, err := p.idpRepo.GetSAML(ctx, v3_sql.SQLTx(tx), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+		saml, err := p.idpRepo.GetSAML(ctx, v3_sql.SQLTx(tx), database.WithCondition(p.idpRepo.PrimaryKeyCondition(idpEvent.Agg.InstanceID, idpEvent.ID)))
 		if err != nil {
 			return err
 		}

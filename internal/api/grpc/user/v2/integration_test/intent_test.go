@@ -631,7 +631,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						DisplayName:       gu.Ptr("displayname"),
 					},
 					Email: &user.SetHumanEmail{
-						Email: "email@email.com",
+						Email:        "email@email.com",
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
