@@ -234,9 +234,9 @@ func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) 
 		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(auth.User))
 	}
 
-	// TODO (wim): clarify: this check does nothing does it? If append happened with a nil password the change event
+	// TODO(wim): clarify: this check does nothing does it? If append happened with a nil password the change event
 	// would carry the a nil password, which is ignored in the reducer.
-	// TODO (wim): clarify: if above statement is true, do we mis data to handle this correctrly? When someone tries to
+	// TODO(wim): clarify: if above statement is true, do we mis data to handle this correctrly? When someone tries to
 	// remove the password from the config, it will always result in the previous password. Not sure whether that is a
 	// problem here but it might be in other places?
 	if auth.Password != nil {
