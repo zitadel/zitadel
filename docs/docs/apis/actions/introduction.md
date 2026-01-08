@@ -49,7 +49,7 @@ Currently ZITADEL provides the following flows:
 - [Internal Authentication](./internal-authentication)
 - [External Authentication](./external-authentication)
 - [Complement Token](./complement-token)
-- [Customize SAML Response](./customize-samlresponse)
+- [Complement SAML Response](./customize-samlresponse)
 
 ## Available Modules inside Javascript
 
