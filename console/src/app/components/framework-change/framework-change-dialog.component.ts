@@ -1,17 +1,12 @@
-import { Component, Inject, signal } from '@angular/core';
+import { Component, inject, linkedSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogModule,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FrameworkAutocompleteComponent } from '../framework-autocomplete/framework-autocomplete.component';
-import { Framework } from '../quickstart/quickstart.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { frameworks } from 'src/app/utils/framework';
+
+export type FrameworkChangeDialogData = (typeof frameworks)[number] | null;
+export type FrameworkChangeDialogResult = FrameworkChangeDialogData;
 
 @Component({
   selector: 'cnsl-framework-change-dialog',
@@ -20,18 +15,15 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [MatButtonModule, MatDialogModule, TranslateModule, FrameworkAutocompleteComponent],
 })
 export class FrameworkChangeDialogComponent {
-  public framework = signal<Framework | undefined>(undefined);
+  protected readonly frameworks = frameworks;
+  private readonly dialogRef = inject(MatDialogRef<FrameworkChangeDialogComponent>);
+  private readonly data = inject<FrameworkChangeDialogData>(MAT_DIALOG_DATA);
 
-  constructor(
-    public dialogRef: MatDialogRef<FrameworkChangeDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
-    this.framework.set(data.framework);
-  }
+  protected framework = linkedSignal(() => this.data);
 
-  public findFramework(id: string) {
-    const temp = this.data.frameworks.find((f: Framework) => f.id === id);
-    this.framework.set(temp);
+  public findFramework(frameworkId: string) {
+    const framework = frameworks.find((f) => f.id === frameworkId);
+    this.framework.set(framework ?? null);
   }
 
   public close() {
