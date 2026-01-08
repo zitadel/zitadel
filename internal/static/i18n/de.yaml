@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
-  IAM:
+  Instance:
     NotFound: Instanz nicht gefunden. Stelle sicher, dass Du die richtige Domain hast. Schau unter https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen wurden nicht verändert

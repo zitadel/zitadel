@@ -349,7 +349,7 @@ Errors:
       HasNotExistingRole: Projede bulunmayan bir rol var
       NotActive: Proje yetkisi aktif değil
       NotInactive: Proje yetkisi pasif değil
-  IAM:
+  Instance:
     NotFound: Instance bulunamadı. Domain'in doğru olduğundan emin olun. Kontrol edin https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roller değişmedi

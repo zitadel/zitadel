@@ -349,7 +349,7 @@ Errors:
       HasNotExistingRole: One role doesn't exist on project
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
-  IAM:
+  Instance:
     NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roles have not been changed

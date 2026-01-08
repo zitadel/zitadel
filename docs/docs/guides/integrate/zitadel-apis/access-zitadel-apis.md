@@ -67,7 +67,7 @@ Via APIs:
 ZITADEL Managers are Users who have permission to manage ZITADEL itself.
 There are some different levels for managers.
 
-- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole instance.
+- **Instance Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole instance.
 - **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
 - **Project Managers**: At this level, the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.

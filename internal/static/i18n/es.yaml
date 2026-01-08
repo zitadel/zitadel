@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Un rol no existe en el proyecto
       NotActive: La concesión del proyecto no está activa
       NotInactive: La concesión del proyecto no está inactiva
-  IAM:
+  Instance:
     NotFound: Instancia no encontrada. Asegúrate de que tienes el dominio correcto. Consulta https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Los roles no han cambiado

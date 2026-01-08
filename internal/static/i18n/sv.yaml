@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: En roll existerar inte i projektet
       NotActive: Projektets medgivande är inte aktivt
       NotInactive: Projektets medgivande är inte inaktivt
-  IAM:
+  Instance:
     NotFound: Instansen hittades inte. Se till att du har rätt domän. Kolla https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roller har inte ändrats

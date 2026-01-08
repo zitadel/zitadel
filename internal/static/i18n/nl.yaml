@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Een rol bestaat niet op project
       NotActive: Projecttoekenning is niet actief
       NotInactive: Projecttoekenning is niet gedeactiveerd
-  IAM:
+  Instance:
     NotFound: IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen zijn niet veranderd

@@ -226,7 +226,7 @@ message MachineUser {
   ];
   string description = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"The one and only IAM\"";
+      example: "\"The one and only instance\"";
     }
   ];
   bool has_secret = 3 [

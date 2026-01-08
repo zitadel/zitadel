@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Jedna z rolí v projektu neexistuje
       NotActive: Grant projektu není aktivní
       NotInactive: Grant projektu není neaktivní
-  IAM:
+  Instance:
     NotFound: Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nebyly změněny

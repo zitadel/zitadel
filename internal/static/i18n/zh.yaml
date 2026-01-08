@@ -349,7 +349,7 @@ Errors:
       HasNotExistingRole: 角色不存在与项目中
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
-  IAM:
+  Instance:
     NotFound: IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: 角色没有改变

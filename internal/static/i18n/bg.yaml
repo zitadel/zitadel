@@ -350,7 +350,7 @@ Errors:
       HasNotExistingRole: Една роля не съществува в проекта
       NotActive: Грантът по проекта не е активен
       NotInactive: Грантът по проекта не е неактивен
-  IAM:
+  Instance:
     NotFound: IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Ролите не са сменени

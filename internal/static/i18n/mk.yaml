@@ -347,7 +347,7 @@ Errors:
       HasNotExistingRole: Една улога не постои на проектот
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
-  IAM:
+  Instance:
     NotFound: IAM не е пронајден. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Улогите не се променети

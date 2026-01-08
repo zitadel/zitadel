@@ -342,7 +342,7 @@ Errors:
       HasNotExistingRole: В проекте не существует ни одной роли
       NotActive: Допуск проекта неактивен
       NotInactive: Допуск проекта не является неактивным
-  IAM:
+  Instance:
     NotFound: Экземпляр не найден
     Member:
       RolesNotChanged: Роли не изменены

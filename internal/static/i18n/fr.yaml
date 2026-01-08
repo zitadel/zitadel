@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Un rôle n'existe pas sur le projet
       NotActive: La subvention de projet n'est pas active
       NotInactive: La subvention du projet n'est pas inactive
-  IAM:
+  Instance:
     NotFound: IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations
     Member:
       RolesNotChanged: Les rôles n'ont pas été modifiés

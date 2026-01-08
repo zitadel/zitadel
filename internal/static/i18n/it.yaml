@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Uno dei ruoli assegnati non è esistente nel progetto
       NotActive: Grant del progetto non è attivo
       NotInactive: Grant del progetto non è inattivo
-  IAM:
+  Instance:
     NotFound: IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: I ruoli non sono stati cambiati
@@ -917,7 +917,7 @@ EventTypes:
       removed: Membro dell'organizzazione rimosso
       cascade:
         removed: Cascata di membri dell'organizzazione rimossa
-    iam:
+    Instance:
       policy:
         added: Impostazioni IAM aggiunti
         changed: Impostazioni IAM cambiate

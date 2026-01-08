@@ -349,7 +349,7 @@ Errors:
       HasNotExistingRole: Un rol nu există în proiect
       NotActive: Acordarea proiectului nu este activă
       NotInactive: Acordarea proiectului nu este inactivă
-  IAM:
+  Instance:
     NotFound: Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rolurile nu au fost schimbate

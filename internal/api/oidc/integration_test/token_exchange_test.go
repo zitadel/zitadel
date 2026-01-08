@@ -157,7 +157,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	teResp, err = tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
-	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
+	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:instance:user:metadata", "urn:zitadel:instance:user:resourceowner"}
 
 	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
 	require.NoError(t, err)
@@ -378,7 +378,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	teResp, err := tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
-	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
+	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:instance:user:metadata", "urn:zitadel:instance:user:resourceowner"}
 
 	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
 	require.NoError(t, err)
@@ -433,7 +433,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "IAM IMPERSONATION: subject: userID, actor: access token, success",
+			name: "Instance IMPERSONATION: subject: userID, actor: access token, success",
 			args: args{
 				SubjectToken:       userResp.GetUserId(),
 				SubjectTokenType:   oidc_api.UserIDTokenType,
@@ -599,7 +599,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "IAM_ADMIN_IMPERSONATOR")
 	iamOwner := instance.Users.Get(integration.UserTypeIAMOwner)
 
-	// impersonating the IAM owner!
+	// impersonating the instance owner!
 	resp, err := tokenexchange.ExchangeToken(ctx, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 	accessTokenVerifier(ctx, resourceServer, iamOwner.ID, iamUserID)

@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Satu peran tidak ada di proyek
       NotActive: Hibah proyek tidak aktif
       NotInactive: Hibah proyek bukannya tidak aktif
-  IAM:
+  Instance:
     NotFound: 'Contoh tidak ditemukan. '
     Member:
       RolesNotChanged: Peran belum diubah

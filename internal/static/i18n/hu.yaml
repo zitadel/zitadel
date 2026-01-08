@@ -348,7 +348,7 @@ Errors:
       HasNotExistingRole: Egy szerepkör nem létezik a projektben
       NotActive: A projekt engedélye nem aktív
       NotInactive: A projekt engedélye nem inaktív
-  IAM:
+  Instance:
     NotFound: 'Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains'
     Member:
       RolesNotChanged: A szerepkörök nem változtak

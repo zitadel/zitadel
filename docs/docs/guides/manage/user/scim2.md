@@ -2,7 +2,7 @@
 title: SCIM v2.0
 ---
 
-Zitadel’s **[SCIM v2](https://scim.cloud/) service provider interface** enables standardized provisioning and lifecycle management of users and other IAM resources.  
+Zitadel’s **[SCIM v2](https://scim.cloud/) service provider interface** enables standardized provisioning and lifecycle management of users and other instance resources.  
 By implementing the official *System for Cross-domain Identity Management (SCIM) v2.0* specification, Zitadel allows seamless and automated user creation, updates, deactivation, and deprovisioning across systems.
 
 ## API
