@@ -887,44 +887,6 @@ func (c *MockIDPIntentRepositoryInstanceIDConditionCall) DoAndReturn(f func(stri
 	return c
 }
 
-// LoadIdentityProvider mocks base method.
-func (m *MockIDPIntentRepository) LoadIdentityProvider() domain.IDPIntentRepository {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadIdentityProvider")
-	ret0, _ := ret[0].(domain.IDPIntentRepository)
-	return ret0
-}
-
-// LoadIdentityProvider indicates an expected call of LoadIdentityProvider.
-func (mr *MockIDPIntentRepositoryMockRecorder) LoadIdentityProvider() *MockIDPIntentRepositoryLoadIdentityProviderCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadIdentityProvider", reflect.TypeOf((*MockIDPIntentRepository)(nil).LoadIdentityProvider))
-	return &MockIDPIntentRepositoryLoadIdentityProviderCall{Call: call}
-}
-
-// MockIDPIntentRepositoryLoadIdentityProviderCall wrap *gomock.Call
-type MockIDPIntentRepositoryLoadIdentityProviderCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockIDPIntentRepositoryLoadIdentityProviderCall) Return(arg0 domain.IDPIntentRepository) *MockIDPIntentRepositoryLoadIdentityProviderCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockIDPIntentRepositoryLoadIdentityProviderCall) Do(f func() domain.IDPIntentRepository) *MockIDPIntentRepositoryLoadIdentityProviderCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDPIntentRepositoryLoadIdentityProviderCall) DoAndReturn(f func() domain.IDPIntentRepository) *MockIDPIntentRepositoryLoadIdentityProviderCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
 // MaxIDPIntentLifetimeColumn mocks base method.
 func (m *MockIDPIntentRepository) MaxIDPIntentLifetimeColumn() database.Column {
 	m.ctrl.T.Helper()

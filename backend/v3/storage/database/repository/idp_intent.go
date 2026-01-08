@@ -2,53 +2,144 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
+
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-// -------------------------------------------------------------
-// repository
-// -------------------------------------------------------------
+type idpIntentRepository struct{}
 
-type idpIntent struct{}
-
-func (i idpIntent) qualifiedTableName() string {
+func (i idpIntentRepository) qualifiedTableName() string {
 	return "zitadel.identity_provider_intents"
 }
 
-func (i idpIntent) unqualifiedTableName() string {
+func (i idpIntentRepository) unqualifiedTableName() string {
 	return "identity_provider_intents"
 }
 
 func IDPIntentRepository() domain.IDPIntentRepository {
-	return new(idpIntent)
+	return new(idpIntentRepository)
 }
 
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
+
+const queryIDPIntentStmt = `
+SELECT
+	identity_provider_intents.instance_id
+	, identity_provider_intents.id
+	, identity_provider_intents.state
+	, identity_provider_intents.success_url
+	, identity_provider_intents.failure_url
+	, identity_provider_intents.created_at
+	, identity_provider_intents.updated_at
+	, identity_provider_intents.idp_id
+	, identity_provider_intents.idp_arguments
+	, identity_provider_intents.idp_user
+	, identity_provider_intents.idp_user_id
+	, identity_provider_intents.idp_username
+	, identity_provider_intents.user_id
+	, identity_provider_intents.idp_access_token
+	, identity_provider_intents.idp_entry_attributes
+	, identity_provider_intents.request_id
+	, identity_provider_intents.assertion
+	, identity_provider_intents.succeeded_at
+	, identity_provider_intents.expires_at
+	, identity_provider_intents.max_idp_intent_lifetime
+FROM
+	zitadel.identity_provider_intents
+`
+
 // Create implements [domain.IDPIntentRepository].
-func (i *idpIntent) Create(ctx context.Context, client database.QueryExecutor, intent *domain.IDPIntent) error {
-	panic("unimplemented")
+func (i idpIntentRepository) Create(ctx context.Context, client database.QueryExecutor, intent *domain.IDPIntent) error {
+	var createdAt any = database.DefaultInstruction
+	if !intent.CreatedAt.IsZero() {
+		createdAt = intent.CreatedAt
+	}
+	var updatedAt = createdAt
+	if !intent.UpdatedAt.IsZero() {
+		updatedAt = intent.UpdatedAt
+	}
+
+	builder := new(database.StatementBuilder)
+	builder.WriteString(`INSERT INTO ` + i.qualifiedTableName() + ` (instance_id, id, success_url, failure_url, max_idp_intent_lifetime, idp_id, idp_arguments, created_at, updated_at) VALUES ( `)
+	builder.WriteArgs(intent.InstanceID, intent.ID, intent.SuccessURL.String(), intent.FailureURL.String(), intent.MaxIDPIntentLifetime, intent.IDPID, intent.IDPArguments, createdAt, updatedAt)
+	builder.WriteString(` ) RETURNING created_at, updated_at`)
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&intent.CreatedAt, &intent.UpdatedAt)
 }
 
 // Delete implements [domain.IDPIntentRepository].
-func (i *idpIntent) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (i idpIntentRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	panic("unimplemented")
 }
 
 // Get implements [domain.IDPIntentRepository].
-func (i *idpIntent) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPIntent, error) {
-	panic("unimplemented")
+func (i idpIntentRepository) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.IDPIntent, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if options.Condition == nil || !options.Condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryIDPIntentStmt)
+	options.Write(&builder)
+	fmt.Println(builder.String())
+
+	return scanIDPIntent(ctx, client, &builder)
+}
+
+type rawIDPIntent struct {
+	*domain.IDPIntent
+	SuccessURL     string  `json:"success_url,omitempty" db:"success_url"`
+	FailureURL     string  `json:"failure_url,omitempty" db:"failure_url"`
+	IDPUserID      *string `json:"idp_user_id,omitempty" db:"idp_user_id"`
+	IDPUsername    *string `json:"idp_username,omitempty" db:"idp_username"`
+	UserID         *string `json:"user_id,omitempty" db:"user_id"`
+	IDPAccessToken *string `json:"idp_access_token,omitempty" db:"idp_access_token"`
+	RequestID      *string `json:"request_id,omitempty" db:"request_id"`
+	Assertion      *string `json:"assertion,omitempty" db:"assertion"`
+}
+
+func scanIDPIntent(ctx context.Context, querier database.QueryExecutor, builder *database.StatementBuilder) (*domain.IDPIntent, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	raw := new(rawIDPIntent)
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(raw); err != nil {
+		return nil, err
+	}
+	return rawIDPIntentToDomain(raw)
+}
+
+func rawIDPIntentToDomain(raw *rawIDPIntent) (*domain.IDPIntent, error) {
+	successURL, _ := url.Parse(raw.SuccessURL)
+	failureURL, _ := url.Parse(raw.FailureURL)
+	raw.IDPIntent.SuccessURL = successURL
+	raw.IDPIntent.FailureURL = failureURL
+	raw.IDPIntent.IDPUserID = gu.Value(raw.IDPUserID)
+	raw.IDPIntent.IDPUsername = gu.Value(raw.IDPUsername)
+	raw.IDPIntent.UserID = gu.Value(raw.UserID)
+	raw.IDPIntent.IDPAccessToken = gu.Value(raw.IDPAccessToken)
+	raw.IDPIntent.RequestID = gu.Value(raw.RequestID)
+	raw.IDPIntent.Assertion = gu.Value(raw.Assertion)
+
+	return raw.IDPIntent, nil
 }
 
 // Update implements [domain.IDPIntentRepository].
-func (i *idpIntent) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	panic("unimplemented")
-}
-
-// LoadIdentityProvider implements [domain.IDPIntentRepository].
-func (i *idpIntent) LoadIdentityProvider() domain.IDPIntentRepository {
+func (i idpIntentRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	panic("unimplemented")
 }
 
@@ -57,68 +148,67 @@ func (i *idpIntent) LoadIdentityProvider() domain.IDPIntentRepository {
 // -------------------------------------------------------------
 
 // SetAssertion implements [domain.idpIntentChanges].
-func (i *idpIntent) SetAssertion(assertion string) database.Change {
+func (i idpIntentRepository) SetAssertion(assertion string) database.Change {
 	return database.NewChange(i.AssertionColumn(), assertion)
 }
 
 // SetFailureURL implements [domain.idpIntentChanges].
-func (i *idpIntent) SetFailureURL(failureURL url.URL) database.Change {
+func (i idpIntentRepository) SetFailureURL(failureURL url.URL) database.Change {
 	return database.NewChange(i.FailureURLColumn(), failureURL.String())
 }
 
 // SetIDPAccessToken implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPAccessToken(idpAccessToken string) database.Change {
+func (i idpIntentRepository) SetIDPAccessToken(idpAccessToken string) database.Change {
 	return database.NewChange(i.IDPAccessTokenColumn(), idpAccessToken)
 }
 
 // SetIDPArguments implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPArguments(idpArguments string) database.Change {
-
+func (i idpIntentRepository) SetIDPArguments(idpArguments string) database.Change {
 	return database.NewChange(i.IDPArgumentsColumn(), idpArguments)
 }
 
 // SetIDPEntryAttributes implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPEntryAttributes(idpEntryAttributes string) database.Change {
+func (i idpIntentRepository) SetIDPEntryAttributes(idpEntryAttributes string) database.Change {
 	return database.NewChange(i.IDPEntryAttributesColumn(), idpEntryAttributes)
 }
 
 // SetIDPID implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPID(idpID string) database.Change {
+func (i idpIntentRepository) SetIDPID(idpID string) database.Change {
 	return database.NewChange(i.IDPIDColumn(), idpID)
 }
 
 // SetIDPUser implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPUser(idpUser []byte) database.Change {
+func (i idpIntentRepository) SetIDPUser(idpUser []byte) database.Change {
 	return database.NewChange(i.IDPUserColumn(), idpUser)
 }
 
 // SetIDPUserID implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPUserID(idpUserID string) database.Change {
+func (i idpIntentRepository) SetIDPUserID(idpUserID string) database.Change {
 	return database.NewChange(i.IDPUserIDColumn(), idpUserID)
 }
 
 // SetIDPUsername implements [domain.idpIntentChanges].
-func (i *idpIntent) SetIDPUsername(idpUsername string) database.Change {
+func (i idpIntentRepository) SetIDPUsername(idpUsername string) database.Change {
 	return database.NewChange(i.IDPUsernameColumn(), idpUsername)
 }
 
 // SetRequestID implements [domain.idpIntentChanges].
-func (i *idpIntent) SetRequestID(requestID string) database.Change {
+func (i idpIntentRepository) SetRequestID(requestID string) database.Change {
 	return database.NewChange(i.RequestIDColumn(), requestID)
 }
 
 // SetState implements [domain.idpIntentChanges].
-func (i *idpIntent) SetState(state domain.IDPIntentState) database.Change {
+func (i idpIntentRepository) SetState(state domain.IDPIntentState) database.Change {
 	return database.NewChange(i.StateColumn(), state)
 }
 
 // SetSuccessURL implements [domain.idpIntentChanges].
-func (i *idpIntent) SetSuccessURL(successURL url.URL) database.Change {
+func (i idpIntentRepository) SetSuccessURL(successURL url.URL) database.Change {
 	return database.NewChange(i.SuccessURLColumn(), successURL.String())
 }
 
 // SetUserID implements [domain.idpIntentChanges].
-func (i *idpIntent) SetUserID(userID string) database.Change {
+func (i idpIntentRepository) SetUserID(userID string) database.Change {
 	return database.NewChange(i.UserIDColumn(), userID)
 }
 
@@ -127,37 +217,37 @@ func (i *idpIntent) SetUserID(userID string) database.Change {
 // -------------------------------------------------------------
 
 // CreatedAtCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
+func (i idpIntentRepository) CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition {
 	return database.NewNumberCondition(i.CreatedAtColumn(), op, createdAt)
 }
 
 // IDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) IDCondition(id string) database.Condition {
+func (i idpIntentRepository) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
 }
 
 // IDPIDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) IDPIDCondition(idpID string) database.Condition {
+func (i idpIntentRepository) IDPIDCondition(idpID string) database.Condition {
 	return database.NewTextCondition(i.IDPIDColumn(), database.TextOperationEqual, idpID)
 }
 
 // IDPUserIDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) IDPUserIDCondition(idpUserID string) database.Condition {
+func (i idpIntentRepository) IDPUserIDCondition(idpUserID string) database.Condition {
 	return database.NewTextCondition(i.IDPUserIDColumn(), database.TextOperationEqual, idpUserID)
 }
 
 // IDPUsernameCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) IDPUsernameCondition(idpUsername string) database.Condition {
+func (i idpIntentRepository) IDPUsernameCondition(idpUsername string) database.Condition {
 	return database.NewTextCondition(i.IDPUsernameColumn(), database.TextOperationEqual, idpUsername)
 }
 
 // InstanceIDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) InstanceIDCondition(instanceID string) database.Condition {
+func (i idpIntentRepository) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // PrimaryKeyCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) PrimaryKeyCondition(instanceID, id string) database.Condition {
+func (i idpIntentRepository) PrimaryKeyCondition(instanceID, id string) database.Condition {
 	return database.And(
 		i.InstanceIDCondition(instanceID),
 		i.IDCondition(id),
@@ -165,22 +255,22 @@ func (i *idpIntent) PrimaryKeyCondition(instanceID, id string) database.Conditio
 }
 
 // RequestIDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) RequestIDCondition(requestID string) database.Condition {
+func (i idpIntentRepository) RequestIDCondition(requestID string) database.Condition {
 	return database.NewTextCondition(i.RequestIDColumn(), database.TextOperationEqual, requestID)
 }
 
 // StateCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) StateCondition(state domain.IDPIntentState) database.Condition {
+func (i idpIntentRepository) StateCondition(state domain.IDPIntentState) database.Condition {
 	return database.NewTextCondition(i.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 // UpdatedAtCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
+func (i idpIntentRepository) UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition {
 	return database.NewNumberCondition(i.UpdatedAtColumn(), op, updatedAt)
 }
 
 // UserIDCondition implements [domain.idpIntentConditions].
-func (i *idpIntent) UserIDCondition(userID string) database.Condition {
+func (i idpIntentRepository) UserIDCondition(userID string) database.Condition {
 	return database.NewTextCondition(i.UserIDColumn(), database.TextOperationEqual, userID)
 }
 
@@ -189,108 +279,108 @@ func (i *idpIntent) UserIDCondition(userID string) database.Condition {
 // -------------------------------------------------------------
 
 // AssertionColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) AssertionColumn() database.Column {
+func (i idpIntentRepository) AssertionColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "assertion")
 }
 
 // CreatedAtColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) CreatedAtColumn() database.Column {
+func (i idpIntentRepository) CreatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "created_at")
 }
 
 // ExpiresAtColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) ExpiresAtColumn() database.Column {
+func (i idpIntentRepository) ExpiresAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "expires_at")
 }
 
 // FailureURLColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) FailureURLColumn() database.Column {
+func (i idpIntentRepository) FailureURLColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "failure_url")
 }
 
 // IDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDColumn() database.Column {
+func (i idpIntentRepository) IDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "id")
 }
 
 // IDPAccessTokenColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPAccessTokenColumn() database.Column {
+func (i idpIntentRepository) IDPAccessTokenColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_access_token")
 }
 
 // IDPArgumentsColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPArgumentsColumn() database.Column {
+func (i idpIntentRepository) IDPArgumentsColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_arguments")
 }
 
 // IDPEntryAttributesColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPEntryAttributesColumn() database.Column {
+func (i idpIntentRepository) IDPEntryAttributesColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_entry_attributes")
 }
 
 // IDPIDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPIDColumn() database.Column {
+func (i idpIntentRepository) IDPIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_id")
 }
 
 // IDPUserColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPUserColumn() database.Column {
+func (i idpIntentRepository) IDPUserColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_user")
 }
 
 // IDPUserIDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPUserIDColumn() database.Column {
+func (i idpIntentRepository) IDPUserIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_user_id")
 }
 
 // IDPUsernameColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) IDPUsernameColumn() database.Column {
+func (i idpIntentRepository) IDPUsernameColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_username")
 }
 
 // InstanceIDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) InstanceIDColumn() database.Column {
+func (i idpIntentRepository) InstanceIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
 }
 
 // MaxIDPIntentLifetimeColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) MaxIDPIntentLifetimeColumn() database.Column {
+func (i idpIntentRepository) MaxIDPIntentLifetimeColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "max_idp_intent_lifetime")
 }
 
 // PrimaryKeyColumns implements [domain.IDPIntentRepository].
-func (i *idpIntent) PrimaryKeyColumns() []database.Column {
+func (i idpIntentRepository) PrimaryKeyColumns() []database.Column {
 	return []database.Column{i.IDColumn(), i.InstanceIDColumn()}
 }
 
 // RequestIDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) RequestIDColumn() database.Column {
+func (i idpIntentRepository) RequestIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "request_id")
 }
 
 // StateColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) StateColumn() database.Column {
+func (i idpIntentRepository) StateColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "state")
 }
 
 // SucceededAtColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) SucceededAtColumn() database.Column {
+func (i idpIntentRepository) SucceededAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "succeeded_at")
 }
 
 // SuccessURLColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) SuccessURLColumn() database.Column {
+func (i idpIntentRepository) SuccessURLColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "success_url")
 }
 
 // UpdatedAtColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) UpdatedAtColumn() database.Column {
+func (i idpIntentRepository) UpdatedAtColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "updated_at")
 }
 
 // UserIDColumn implements [domain.idpIntentColumns].
-func (i *idpIntent) UserIDColumn() database.Column {
+func (i idpIntentRepository) UserIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "user_id")
 }
 
-var _ domain.IDPIntentRepository = (*idpIntent)(nil)
+var _ domain.IDPIntentRepository = (*idpIntentRepository)(nil)

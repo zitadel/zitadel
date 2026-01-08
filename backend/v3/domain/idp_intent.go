@@ -12,10 +12,10 @@ import (
 type IDPIntentState uint8
 
 const (
-	Started IDPIntentState = iota
-	Succeeded
-	Failed
-	Consumed
+	IDPIntentStateStarted IDPIntentState = iota
+	IDPIntentStateSucceeded
+	IDPIntentStateFailed
+	IDPIntentStateConsumed
 )
 
 type IDPIntent struct {

@@ -25,23 +25,23 @@ func (i IDPIntentState) String() string {
 // Re-run the stringer command to generate them again.
 func _IDPIntentStateNoOp() {
 	var x [1]struct{}
-	_ = x[Started-(0)]
-	_ = x[Succeeded-(1)]
-	_ = x[Failed-(2)]
-	_ = x[Consumed-(3)]
+	_ = x[IDPIntentStateStarted-(0)]
+	_ = x[IDPIntentStateSucceeded-(1)]
+	_ = x[IDPIntentStateFailed-(2)]
+	_ = x[IDPIntentStateConsumed-(3)]
 }
 
-var _IDPIntentStateValues = []IDPIntentState{Started, Succeeded, Failed, Consumed}
+var _IDPIntentStateValues = []IDPIntentState{IDPIntentStateStarted, IDPIntentStateSucceeded, IDPIntentStateFailed, IDPIntentStateConsumed}
 
 var _IDPIntentStateNameToValueMap = map[string]IDPIntentState{
-	_IDPIntentStateName[0:7]:        Started,
-	_IDPIntentStateLowerName[0:7]:   Started,
-	_IDPIntentStateName[7:16]:       Succeeded,
-	_IDPIntentStateLowerName[7:16]:  Succeeded,
-	_IDPIntentStateName[16:22]:      Failed,
-	_IDPIntentStateLowerName[16:22]: Failed,
-	_IDPIntentStateName[22:30]:      Consumed,
-	_IDPIntentStateLowerName[22:30]: Consumed,
+	_IDPIntentStateName[0:7]:        IDPIntentStateStarted,
+	_IDPIntentStateLowerName[0:7]:   IDPIntentStateStarted,
+	_IDPIntentStateName[7:16]:       IDPIntentStateSucceeded,
+	_IDPIntentStateLowerName[7:16]:  IDPIntentStateSucceeded,
+	_IDPIntentStateName[16:22]:      IDPIntentStateFailed,
+	_IDPIntentStateLowerName[16:22]: IDPIntentStateFailed,
+	_IDPIntentStateName[22:30]:      IDPIntentStateConsumed,
+	_IDPIntentStateLowerName[22:30]: IDPIntentStateConsumed,
 }
 
 var _IDPIntentStateNames = []string{
