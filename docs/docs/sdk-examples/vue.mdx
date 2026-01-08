@@ -11,17 +11,17 @@ status: stable
 
 ## Overview
 
-[Vue.js](https://vuejs.org) is a progressive JavaScript framework for building user interfaces with reactive data binding, component composition, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your Vue.js application.
+[Vue.js](https://vuejs.org) is a progressive JavaScript framework for building user interfaces with reactive data binding, component composition, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/guides/integrate/login/oidc/login-users#pkce)** to authenticate users securely and maintain sessions across your Vue.js application.
 
 #### Auth library
 
-This example uses **[vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context)**, a Vue 3 wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**, which implements the [OpenID Connect](https://openid.net/connect/) (OIDC) flow. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library manages [PKCE](/docs/concepts/pkce), performs [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), and exposes helpers for [session state](https://zitadel.com/docs/concepts/tokens) management.
+This example uses **[vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context)**, a Vue 3 wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**, which implements the [OpenID Connect](https://openid.net/connect/) (OIDC) flow. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library manages [PKCE](/docs/guides/integrate/login/oidc/login-users#pkce), performs [token exchange](https://zitadel.com/docs/apis/openidoauth/endpoints), and exposes helpers for [session state](https://zitadel.com/docs/concepts/tokens) management.
 
 ---
 
 ## What this example demonstrates
 
-This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with [PKCE](/docs/concepts/pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This [Vue.js](https://vuejs.org) application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with [PKCE](/docs/guides/integrate/login/oidc/login-users#pkce). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the [OAuth callback](https://zitadel.com/docs/apis/openidoauth/endpoints) and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The application uses [vue-oidc-context](https://www.npmjs.com/package/vue-oidc-context) to wrap authentication logic around [Vue Router](https://router.vuejs.org) navigation guards, automatically protecting routes and ensuring only authenticated users can access sensitive areas. The [withAuthenticationRequired](https://github.com/authts/vue-oidc-context#protecting-routes) higher-order component secures individual routes by checking [session state](https://zitadel.com/docs/concepts/tokens) before rendering protected views.
 
@@ -36,7 +36,7 @@ The example includes secure sign-out functionality implementing **[federated log
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs
 5. Copy your **Client ID** for use in the next steps
@@ -72,7 +72,7 @@ npm run dev
 ## Learn more and resources
 
 * **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
-* **PKCE concept:** [/docs/concepts/pkce](/docs/concepts/pkce)
+* **PKCE concept:** [/docs/guides/integrate/login/oidc/login-users#pkce](/docs/guides/integrate/login/oidc/login-users#pkce)
 * **PKCE application setup:** [/docs/guides/integrate/login/oidc/pkce-setup](/docs/guides/integrate/login/oidc/pkce-setup)
 * **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)

@@ -11,17 +11,17 @@ status: stable
 
 ## Overview
 
-[Express.js](https://expressjs.com) is a fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org) that provides a robust set of features for building web and mobile applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your Express application.
+[Express.js](https://expressjs.com) is a fast, unopinionated, minimalist web framework for [Node.js](https://nodejs.org) that provides a robust set of features for building web and mobile applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/guides/integrate/login/oidc/login-users#pkce)** to authenticate users securely and maintain sessions across your Express application.
 
 #### Auth library
 
-This example uses **[@auth/express](https://www.npmjs.com/package/@auth/express)** ([GitHub](https://github.com/nextauthjs/next-auth)), the Express.js adapter for [Auth.js](https://authjs.dev). This library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol with [PKCE](/docs/concepts/pkce) support, manages [token exchange](https://zitadel.com/docs/apis/openidoauth/grant-types), performs automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token), and provides [session management](https://zitadel.com/docs/concepts/sessions) with secure cookie-based storage.
+This example uses **[@auth/express](https://www.npmjs.com/package/@auth/express)** ([GitHub](https://github.com/nextauthjs/next-auth)), the Express.js adapter for [Auth.js](https://authjs.dev). This library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol with [PKCE](/docs/guides/integrate/login/oidc/login-users#pkce) support, manages [token exchange](https://zitadel.com/docs/apis/openidoauth/grant-types), performs automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token), and provides [session management](https://zitadel.com/docs/concepts/sessions) with secure cookie-based storage.
 
 ---
 
 ## What this example demonstrates
 
-This Express.js example provides a complete authentication implementation using [Zitadel](https://zitadel.com/docs) as the identity provider. The application starts with a public landing page featuring a login button that initiates the [PKCE authentication flow](/docs/concepts/pkce). When users click login, [@auth/express](https://www.npmjs.com/package/@auth/express) generates a cryptographic code verifier and challenge, then redirects to Zitadel's authorization endpoint. After successful authentication at Zitadel, users return to the application's [callback URL](https://zitadel.com/docs/guides/integrate/login/oidc/) where the authorization code is exchanged for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints) and an [ID token](https://zitadel.com/docs/apis/openidoauth/claims).
+This Express.js example provides a complete authentication implementation using [Zitadel](https://zitadel.com/docs) as the identity provider. The application starts with a public landing page featuring a login button that initiates the [PKCE authentication flow](/docs/guides/integrate/login/oidc/login-users#pkce). When users click login, [@auth/express](https://www.npmjs.com/package/@auth/express) generates a cryptographic code verifier and challenge, then redirects to Zitadel's authorization endpoint. After successful authentication at Zitadel, users return to the application's [callback URL](https://zitadel.com/docs/guides/integrate/login/oidc/) where the authorization code is exchanged for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints) and an [ID token](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The example includes protected routes using [Express middleware](https://expressjs.com/en/guide/using-middleware.html) that automatically verify [session state](https://zitadel.com/docs/concepts/sessions) and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://zitadel.com/docs/apis/openidoauth/claims) from Zitadel. The application maintains long-lived sessions through automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) using [refresh tokens](https://zitadel.com/docs/concepts/tokens), ensuring users remain authenticated without repeated logins.
 
@@ -36,7 +36,7 @@ Sign-out functionality implements **[federated logout](https://zitadel.com/docs/
 Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/overview)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
@@ -80,7 +80,7 @@ The application will be running at `http://localhost:3000`.
 ## Learn more and resources
 
 * **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
-* **PKCE concept:** /docs/concepts/pkce
+* **PKCE concept:** /docs/guides/integrate/login/oidc/login-users#pkce
 * **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
 * **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
