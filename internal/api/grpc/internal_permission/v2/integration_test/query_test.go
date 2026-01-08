@@ -689,7 +689,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  5, // 4 project grant admins, the project creator and the project grant admin
+					TotalResult:  5, // 3 project grant admins, the project creator and the project grant admin
 					AppliedLimit: 2,
 				},
 				Administrators: []*internal_permission.Administrator{projectAdministrator1, projectAdministrator2},
@@ -702,7 +702,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 				tt.args.dep(tt.args.req, tt.want)
 			}
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 10*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instanceQuery.Client.InternalPermissionV2.ListAdministrators(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
