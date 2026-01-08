@@ -141,18 +141,6 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Migrate",
-          collapsed: true,
-          items: [
-            "guides/migrate/introduction",
-            "guides/migrate/users",
-            "guides/migrate/sources/zitadel",
-            "guides/migrate/sources/auth0",
-            "guides/migrate/sources/keycloak",
-          ],
-        },
-        {
-          type: "category",
           label: "Branding & Customization",
           items: [
             "guides/manage/customize/branding",
@@ -166,7 +154,7 @@ module.exports = {
         },
       ],
     },
-        {
+    {
       type: "category",
       label: "Integrate & Authenticate",
       collapsed: true,
@@ -509,6 +497,18 @@ module.exports = {
                 "guides/integrate/actions/webhook-site-setup",
               ],
             },
+          ],
+        },
+        {
+          type: "category",
+          label: "Migrate",
+          collapsed: true,
+          items: [
+            "guides/migrate/introduction",
+            "guides/migrate/users",
+            "guides/migrate/sources/zitadel",
+            "guides/migrate/sources/auth0",
+            "guides/migrate/sources/keycloak",
           ],
         },
       ],
