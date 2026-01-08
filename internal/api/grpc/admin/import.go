@@ -504,6 +504,25 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 				logging.Debugf("successful user otp: %s", user.GetUserId())
 			}
 		}
+
+		if len(user.User.RecoveryCodes) > 0 {
+			logging.Debugf("import user recovery codes: %s", user.GetUserId())
+			recoveryCodes := make([]domain.ImportHumanRecoveryCode, len(user.User.RecoveryCodes))
+			for i, code := range user.User.RecoveryCodes {
+				recoveryCodes[i] = domain.ImportHumanRecoveryCode{
+					RawCode:    code.GetRaw(),
+					HashedCode: code.GetHash(),
+				}
+			}
+			if err := s.command.ImportHumanRecoveryCodes(ctx, user.UserId, org.GetOrgId(), recoveryCodes); err != nil {
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_recovery_codes", Id: user.GetUserId(), Message: err.Error()})
+				if isCtxTimeout(ctx) {
+					return err
+				}
+			} else {
+				logging.Debugf("successful user recovery codes: %s", user.GetUserId())
+			}
+		}
 	}
 	return nil
 }
@@ -866,7 +885,7 @@ func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 			Verified: domainR.IsVerified,
 			Primary:  domainR.IsPrimary,
 		}
-		_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{})
+		_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{}, nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {

@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekt",
-      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
+      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapp och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
       "OWNED": {
         "TITLE": "Ägda projekt",
         "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynkron"
         },
         "TYPES_DESCRIPTION": "Webhook, anropet hanterar statuskoden men svaret är irrelevant\nCall, anropet hanterar statuskoden och svaret\nAsync, anropet hanterar varken statuskod eller svar men kan anropas parallellt med andra mål",
+        "PAYLOAD_TYPE": "Payload-typ",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Ej angiven",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Krypterad JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON-payload med en signatur-header för verifiering.\nJWT: Payload skickas som en signerad JWT. Verifiering sker via JWT-signaturen.\nJWE: JWT är dessutom krypterad för att förhindra obehörig åtkomst till payload-information.",
         "ENDPOINT": "Slutpunkt",
         "ENDPOINT_DESCRIPTION": "Ange slutpunkten där din kod finns. Se till att den är tillgänglig för oss!",
         "TIMEOUT": "Tidsgräns",
@@ -1550,7 +1558,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1800,7 +1809,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2426,7 +2436,8 @@
       "1": "Engångslösenord via autentiseringsapp (TOTP)",
       "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
       "3": "Engångslösenord via e-post (E-post OTP)",
-      "4": "Engångslösenord via SMS (SMS OTP)"
+      "4": "Engångslösenord via SMS (SMS OTP)",
+      "5": "Återställningskoder"
     }
   },
   "LOGINPOLICY": {
@@ -2780,7 +2791,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

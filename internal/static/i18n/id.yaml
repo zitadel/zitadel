@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kode Inisialisasi tidak ditemukan
     UsernameNotChanged: Nama pengguna tidak diubah
     InvalidURLTemplate: Templat URL tidak valid
+    Locked: Pengguna dikunci
     Profile:
       NotFound: Profil tidak ditemukan
       NotChanged: Profil tidak berubah
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F tidak ada
       Passwordless:
         NotExisting: Tanpa kata sandi tidak ada
+      RecoveryCodes:
+        InvalidCode: Kode pemulihan yang tidak valid disediakan
+        MaxCountExceeded: Jumlah maksimum kode pemulihan terlampaui
+        NotReady: Kode pemulihan tidak siap untuk digunakan
+        ConfigInvalid: Konfigurasi kode pemulihan tidak valid
     WebAuthN:
       NotFound: Token WebAuthN tidak dapat ditemukan
       BeginRegisterFailed: Pendaftaran awal WebAuthN gagal
@@ -569,6 +575,10 @@ Errors:
     NoTimeout: Target tidak memiliki batas waktu
     InvalidURL: Target memiliki URL yang tidak valid
     NotFound: Sasaran tidak ditemukan
+    InvalidExpirationDate: Tanggal kadaluwarsa kunci harus di masa depan
+    PublicKeyExpired: Kunci publik target telah kedaluwarsa
+    PublicKeyActive: Tidak dapat menghapus kunci publik target yang aktif
+    InvalidPublicKey: Kunci publik tidak valid. Harus merupakan kunci publik RSA atau ECDSA yang dikodekan PEM dalam format PKCS#8
   Execution:
     ConditionInvalid: Kondisi eksekusi tidak valid
     Invalid: Eksekusi tidak valid
@@ -577,6 +587,7 @@ Errors:
     NoTargets: Tidak ada target yang ditentukan
     Failed: Eksekusi gagal
     ResponseIsNotValidJSON: Responsnya bukan JSON yang valid
+    MissingEncryptionKey: Kunci enkripsi hilang
   UserSchema:
     NotEnabled: Fitur "Skema Pengguna" tidak diaktifkan
     Type:

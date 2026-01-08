@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: Başlatma Kodu bulunamadı
     UsernameNotChanged: Kullanıcı adı değişmedi
     InvalidURLTemplate: URL Şablonu geçersiz
+    Locked: Kullanıcı kilitli
     Profile:
       NotFound: Profil bulunamadı
       NotChanged: Profil değişmedi
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F mevcut değil
       Passwordless:
         NotExisting: Şifresiz giriş mevcut değil
+      RecoveryCodes:
+        InvalidCode: Geçersiz kurtarma kodu sağlandı
+        MaxCountExceeded: Maksimum kurtarma kodu sayısı aşıldı
+        NotReady: Kurtarma kodları kullanıma hazır değil
+        ConfigInvalid: Kurtarma kodları yapılandırması geçersiz
     WebAuthN:
       NotFound: WebAuthN Token bulunamadı
       BeginRegisterFailed: WebAuthN kayıt başlatma başarısız
@@ -570,6 +576,10 @@ Errors:
     NoTimeout: Hedefin zaman aşımı yok
     InvalidURL: Hedefin geçersiz URL'si var
     NotFound: Hedef bulunamadı
+    InvalidExpirationDate: Anahtarın sona erme tarihi gelecekte olmalıdır
+    PublicKeyExpired: Hedefin açık anahtarı süresi doldu
+    PublicKeyActive: Etkin hedef açık anahtarı silinemez
+    InvalidPublicKey: Açık anahtar geçersiz. PEM kodlu PKCS#8 formatında RSA veya ECDSA açık anahtarı olmalıdır
   Execution:
     ConditionInvalid: Yürütme koşulu geçersiz
     Invalid: Yürütme geçersiz
@@ -578,6 +588,7 @@ Errors:
     NoTargets: Hedef tanımlanmamış
     Failed: Yürütme başarısız
     ResponseIsNotValidJSON: Yanıt geçerli JSON değil
+    MissingEncryptionKey: Şifreleme anahtarı eksik
   UserSchema:
     NotEnabled: '"User Schema" özelliği etkin değil'
     Type:

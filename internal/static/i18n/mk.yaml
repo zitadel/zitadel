@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Кодот за иницијализација не е пронајден
     UsernameNotChanged: Корисничкото име не е променето
     InvalidURLTemplate: Шаблонот за URL е невалиден
+    Locked: Корисникот е заклучен
     Profile:
       NotFound: Профилот не е пронајден
       NotChanged: Профилот не е променет
@@ -176,6 +177,11 @@ Errors:
         NotExisting: U2F не постои
       Passwordless:
         NotExisting: Најава без лозинка не постои
+      RecoveryCodes:
+        InvalidCode: Невалиден код за опоравување
+        MaxCountExceeded: Максималниот број на кодови за опоравување е надминат
+        NotReady: Кодовите за опоравување не се готови за употреба
+        ConfigInvalid: Конфигурацијата за кодовите за опоравување е невалидна
     WebAuthN:
       NotFound: WebAuthN токенот не може да биде пронајден
       BeginRegisterFailed: Почетокот на регистрацијата на WebAuthN не успеа
@@ -568,6 +574,10 @@ Errors:
     NoTimeout: Целта нема тајмаут
     InvalidURL: Целта има неважечка URL-адреса
     NotFound: Целта не е пронајдена
+    InvalidExpirationDate: Датумот на истекување на клучот мора да е во иднината
+    PublicKeyExpired: Јавниот клуч на целта е истечен
+    PublicKeyActive: Не може да се избрише активниот јавен клуч на целта
+    InvalidPublicKey: Јавниот клуч е неважечок. Мора да биде PEM-кодиран RSA или ECDSA јавен клуч во PKCS#8 формат
   Execution:
     ConditionInvalid: Условот за извршување е неважечки
     Invalid: Извршувањето е неважечко
@@ -576,6 +586,7 @@ Errors:
     NoTargets: Не се дефинирани цели
     Failed: Извршувањето не успеа
     ResponseIsNotValidJSON: Одговорот не е валиден JSON
+    MissingEncryptionKey: Недостасува клуч за шифрирање
   UserSchema:
     NotEnabled: Функцијата „Корисничка шема“ не е овозможена
     Type:

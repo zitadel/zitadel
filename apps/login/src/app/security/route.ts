@@ -1,5 +1,5 @@
 import { createServiceForHost } from "@/lib/service";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { Client } from "@zitadel/client";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { headers } from "next/headers";
@@ -7,10 +7,10 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
+    await createServiceForHost(SettingsService, serviceConfig);
 
   const settings = await settingsService
     .getSecuritySettings({})

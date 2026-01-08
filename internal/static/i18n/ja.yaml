@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: 初期化コードが見つかりません
     UsernameNotChanged: ユーザー名は変更されていません
     InvalidURLTemplate: URLテンプレートが無効です
+    Locked: ユーザーがロックされています
     Profile:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2Fは存在しません
       Passwordless:
         NotExisting: パスワードレスは存在しません
+      RecoveryCodes:
+        InvalidCode: 無効なリカバリーコードが提供されました
+        MaxCountExceeded: リカバリーコードの最大数を超過しました
+        NotReady: リカバリーコードの使用準備ができていません
+        ConfigInvalid: リカバリーコードの設定が無効です
     WebAuthN:
       NotFound: WebAuthNトークンが見つかりませんでした
       BeginRegisterFailed: WebAuthN登録の開始に失敗しました
@@ -570,6 +576,10 @@ Errors:
     NoTimeout: ターゲットにはタイムアウトがありません
     InvalidURL: ターゲットに無効な URL があります
     NotFound: ターゲットが見つかりません
+    InvalidExpirationDate: キーの有効期限は将来の日付でなければなりません
+    PublicKeyExpired: 対象の公開鍵は期限切れです
+    PublicKeyActive: アクティブな対象の公開鍵は削除できません
+    InvalidPublicKey: 公開鍵が無効です。PKCS#8形式のPEMエンコードされたRSAまたはECDSA公開鍵である必要があります
   Execution:
     ConditionInvalid: 実行条件が不正です
     Invalid: 実行は無効です
@@ -578,6 +588,7 @@ Errors:
     NoTargets: ターゲットが定義されていません
     Failed: 実行に失敗しました
     ResponseIsNotValidJSON: 応答は有効な JSON ではありません
+    MissingEncryptionKey: 暗号化キーがありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { processIDPCallback } from "./idp-intent";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import crypto from "crypto";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -9,10 +10,20 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn((schema: any, data: any) => data),
+  ConnectError: class extends Error {
+    code: any;
+    constructor(message: string, code: any) {
+      super(message);
+      this.code = code;
+    }
+  },
+  Code: {
+    AlreadyExists: 6,
+  },
 }));
 
 vi.mock("../service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(),
+  getServiceConfig: vi.fn(),
 }));
 
 vi.mock("../zitadel", () => ({
@@ -24,14 +35,26 @@ vi.mock("../zitadel", () => ({
   addHuman: vi.fn(),
   getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
+  getActiveIdentityProviders: vi.fn(),
+  getUserByID: vi.fn(),
+  getDefaultOrg: vi.fn(),
+  getSession: vi.fn(),
 }));
 
 vi.mock("./idp", () => ({
   createNewSessionFromIdpIntent: vi.fn(),
 }));
 
+vi.mock("@/lib/cookies", () => ({
+  getSessionCookieById: vi.fn(),
+}));
+
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
+}));
+
+vi.mock("../fingerprint", () => ({
+  getFingerprintIdCookie: vi.fn(),
 }));
 
 describe("processIDPCallback", () => {
@@ -46,7 +69,13 @@ describe("processIDPCallback", () => {
   let mockAddHuman: any;
   let mockGetLoginSettings: any;
   let mockGetOrgsByDomain: any;
+  let mockGetActiveIdentityProviders: any;
+  let mockGetUserByID: any;
+  let mockGetDefaultOrg: any;
+  let mockGetSession: any;
   let mockCreateNewSessionFromIdpIntent: any;
+  let mockGetSessionCookieById: any;
+  let mockGetFingerprintIdCookie: any;
 
   const defaultParams = {
     provider: "google",
@@ -74,6 +103,17 @@ describe("processIDPCallback", () => {
         email: "test@example.com",
       },
     },
+    updateHumanUser: {
+      username: "testuser",
+      profile: {
+        givenName: "Test",
+        familyName: "User 1",
+        displayName: "Test User 1",
+      },
+      email: {
+        email: "test@example.com",
+      },
+    },
   };
 
   const defaultIdp = {
@@ -94,7 +134,7 @@ describe("processIDPCallback", () => {
 
     // Import mocked modules
     const { headers } = await import("next/headers");
-    const { getServiceUrlFromHeaders } = await import("../service-url");
+    const { getServiceConfig } = await import("../service-url");
     const {
       retrieveIDPIntent,
       getIDPByID,
@@ -104,12 +144,18 @@ describe("processIDPCallback", () => {
       addHuman,
       getLoginSettings,
       getOrgsByDomain,
+      getActiveIdentityProviders,
+      getUserByID,
+      getDefaultOrg,
+      getSession,
     } = await import("../zitadel");
     const { createNewSessionFromIdpIntent } = await import("./idp");
+    const { getSessionCookieById } = await import("@/lib/cookies");
+    const { getFingerprintIdCookie } = await import("../fingerprint");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
-    mockGetServiceUrlFromHeaders = vi.mocked(getServiceUrlFromHeaders);
+    mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
     mockRetrieveIDPIntent = vi.mocked(retrieveIDPIntent);
     mockGetIDPByID = vi.mocked(getIDPByID);
     mockUpdateHuman = vi.mocked(updateHuman);
@@ -118,17 +164,38 @@ describe("processIDPCallback", () => {
     mockAddHuman = vi.mocked(addHuman);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
+    mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
+    mockGetUserByID = vi.mocked(getUserByID);
+    mockGetDefaultOrg = vi.mocked(getDefaultOrg);
+    mockGetSession = vi.mocked(getSession);
+
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
+    mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
     mockGetServiceUrlFromHeaders.mockReturnValue({
-      serviceUrl: "https://api.example.com",
+      serviceConfig: { baseUrl: "https://api.example.com" },
     });
     mockRetrieveIDPIntent.mockResolvedValue(defaultIntent);
     mockGetIDPByID.mockResolvedValue(defaultIdp);
     mockCreateNewSessionFromIdpIntent.mockResolvedValue({
       redirect: "https://app.example.com/success",
+    });
+
+    // Default mocks for validation functions
+    mockGetUserByID.mockResolvedValue({
+      userId: "user123",
+      details: {
+        resourceOwner: "org123",
+      },
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowExternalIdp: true,
+    });
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp123", name: "Test IDP" }],
     });
   });
 
@@ -220,7 +287,7 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(mockRetrieveIDPIntent).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         id: "intent123",
         token: "token123",
       });
@@ -250,11 +317,11 @@ describe("processIDPCallback", () => {
       await processIDPCallback(defaultParams);
 
       expect(mockUpdateHuman).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
           userId: "user123",
-          profile: defaultIntent.addHumanUser.profile,
-          email: defaultIntent.addHumanUser.email,
+          profile: defaultIntent.updateHumanUser.profile,
+          email: defaultIntent.updateHumanUser.email,
         }),
       });
     });
@@ -297,10 +364,36 @@ describe("processIDPCallback", () => {
   });
 
   describe("CASE 2: Link IDP to existing user", () => {
+    const sessionId = "session123";
+    const fingerprintValue = "fp123";
+    const linkFingerprint = crypto
+      .createHash("sha256")
+      .update(sessionId + fingerprintValue)
+      .digest("hex");
+
     const linkParams = {
       ...defaultParams,
-      link: "true",
+      sessionId,
+      linkFingerprint,
     };
+
+    beforeEach(() => {
+      mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: fingerprintValue });
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+      });
+      mockGetSessionCookieById.mockResolvedValue({ id: sessionId, token: "token123" });
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: {
+              id: "user123",
+            },
+          },
+        },
+      });
+    });
 
     test("should link IDP and create session when linking is allowed", async () => {
       mockGetIDPByID.mockResolvedValue({
@@ -315,8 +408,10 @@ describe("processIDPCallback", () => {
 
       const result = await processIDPCallback(linkParams);
 
+      expect(mockGetSessionCookieById).toHaveBeenCalledWith({ sessionId: "session123" });
+
       expect(mockAddIDPLink).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         idp: {
           id: "idp123",
           userId: "user123",
@@ -385,13 +480,19 @@ describe("processIDPCallback", () => {
           options: {
             ...defaultIdp.config.options,
             autoLinking: AutoLinkingOption.EMAIL,
+            isLinkingAllowed: true,
           },
         },
       });
     });
 
     test("should auto-link user by email and create session", async () => {
-      const foundUser = { userId: "found123" };
+      const foundUser = {
+        userId: "found123",
+        details: {
+          resourceOwner: "org123",
+        },
+      };
       mockListUsers.mockResolvedValue({
         result: [foundUser],
       });
@@ -399,12 +500,12 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(mockListUsers).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         email: "test@example.com",
         organizationId: "org123",
       });
       expect(mockAddIDPLink).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         idp: {
           id: "idp123",
           userId: "user123",
@@ -459,6 +560,7 @@ describe("processIDPCallback", () => {
           options: {
             ...defaultIdp.config.options,
             autoLinking: AutoLinkingOption.USERNAME,
+            isLinkingAllowed: true,
           },
         },
       });
@@ -466,13 +568,20 @@ describe("processIDPCallback", () => {
 
     test("should auto-link user by username", async () => {
       mockListUsers.mockResolvedValue({
-        result: [{ userId: "found123" }],
+        result: [
+          {
+            userId: "found123",
+            details: {
+              resourceOwner: "org123",
+            },
+          },
+        ],
       });
 
       const result = await processIDPCallback(defaultParams);
 
       expect(mockListUsers).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         userName: "testuser",
         organizationId: "org123",
       });
@@ -506,7 +615,7 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(mockAddHuman).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
           username: "testuser",
           profile: defaultIntent.addHumanUser.profile,
@@ -551,11 +660,11 @@ describe("processIDPCallback", () => {
       });
 
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         domain: "example.com",
       });
       expect(mockAddHuman).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
+        serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
           organization: expect.objectContaining({
             org: { case: "orgId", value: "org-from-domain" },
@@ -564,7 +673,8 @@ describe("processIDPCallback", () => {
       });
     });
 
-    test("should create user without organization when not resolved", async () => {
+    test("should fallback to default organization when not resolved", async () => {
+      mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
       mockAddHuman.mockResolvedValue({ userId: "newuser123" });
 
       await processIDPCallback({
@@ -572,12 +682,31 @@ describe("processIDPCallback", () => {
         organization: undefined,
       });
 
+      expect(mockGetDefaultOrg).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+      });
       expect(mockAddHuman).toHaveBeenCalledWith({
-        serviceUrl: "https://api.example.com",
-        request: expect.not.objectContaining({
-          organization: expect.anything(),
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        request: expect.objectContaining({
+          organization: expect.objectContaining({
+            org: { case: "orgId", value: "default-org" },
+          }),
         }),
       });
+    });
+
+    test("should return error when no organization context can be determined", async () => {
+      mockGetDefaultOrg.mockResolvedValue(null);
+
+      const result = await processIDPCallback({
+        ...defaultParams,
+        organization: undefined,
+      });
+
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
+      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(result.redirect).toContain("error=no_organization_context");
     });
 
     test("should return error redirect when user creation fails", async () => {
@@ -634,12 +763,28 @@ describe("processIDPCallback", () => {
       expect(result.redirect).toContain("email=test%40example.com");
     });
 
-    test("should redirect to registration failed when organization cannot be resolved", async () => {
+    test("should fallback to default organization for registration", async () => {
+      mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
+
       const result = await processIDPCallback({
         ...defaultParams,
         organization: undefined,
       });
 
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/complete-registration");
+      expect(result.redirect).toContain("organization=default-org");
+    });
+
+    test("should redirect to registration failed when no organization context available", async () => {
+      mockGetDefaultOrg.mockResolvedValue(null);
+
+      const result = await processIDPCallback({
+        ...defaultParams,
+        organization: undefined,
+      });
+
+      expect(mockGetDefaultOrg).toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/registration-failed");
       expect(result.redirect).toContain("id=intent123");
     });
@@ -721,12 +866,20 @@ describe("processIDPCallback", () => {
           options: {
             ...defaultIdp.config.options,
             autoLinking: AutoLinkingOption.EMAIL,
+            isLinkingAllowed: true,
             isAutoCreation: true,
           },
         },
       });
       mockListUsers.mockResolvedValue({
-        result: [{ userId: "found123" }],
+        result: [
+          {
+            userId: "found123",
+            details: {
+              resourceOwner: "org123",
+            },
+          },
+        ],
       });
 
       await processIDPCallback(defaultParams);
@@ -774,6 +927,231 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(paramsWithError);
 
       expect(result.redirect).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
+    });
+  });
+});
+
+describe("validateIDPLinkingPermissions", () => {
+  let mockGetLoginSettings: any;
+  let mockGetActiveIdentityProviders: any;
+  let validateIDPLinkingPermissions: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    // Import mocked modules
+    const { getLoginSettings, getActiveIdentityProviders } = await import("../zitadel");
+    const { validateIDPLinkingPermissions: validate } = await import("./idp-intent");
+
+    mockGetLoginSettings = vi.mocked(getLoginSettings);
+    mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
+    validateIDPLinkingPermissions = validate;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("Organization login settings validation", () => {
+    test("should return false when allowExternalIdp is false", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: false,
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+      expect(mockGetLoginSettings).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        organization: "org123",
+      });
+      expect(mockGetActiveIdentityProviders).not.toHaveBeenCalled();
+    });
+
+    test("should return false when login settings are undefined", async () => {
+      mockGetLoginSettings.mockResolvedValue(undefined);
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+    });
+
+    test("should return false when allowExternalIdp is missing", async () => {
+      mockGetLoginSettings.mockResolvedValue({});
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("Active IDP validation", () => {
+    test("should return false when IDP is not in active list", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [
+          { id: "idp456", name: "Other IDP" },
+          { id: "idp789", name: "Another IDP" },
+        ],
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "org123",
+        linking_allowed: true,
+      });
+    });
+
+    test("should return false when identityProviders list is empty", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [],
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+    });
+
+    test("should return false when identityProviders is undefined", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({});
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("Successful validation", () => {
+    test("should return true when all validations pass", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [
+          { id: "idp123", name: "Target IDP" },
+          { id: "idp456", name: "Other IDP" },
+        ],
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(true);
+      expect(mockGetLoginSettings).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        organization: "org123",
+      });
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "org123",
+        linking_allowed: true,
+      });
+    });
+
+    test("should find IDP in middle of list", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [
+          { id: "idp111", name: "IDP 1" },
+          { id: "idp222", name: "IDP 2" },
+          { id: "idp123", name: "Target IDP" },
+          { id: "idp333", name: "IDP 3" },
+        ],
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("Edge cases", () => {
+    test("should handle getLoginSettings throwing an error", async () => {
+      mockGetLoginSettings.mockRejectedValue(new Error("Network error"));
+
+      await expect(
+        validateIDPLinkingPermissions({
+          serviceConfig: { baseUrl: "https://api.example.com" },
+          userOrganizationId: "org123",
+          idpId: "idp123",
+        }),
+      ).rejects.toThrow("Network error");
+    });
+
+    test("should handle getActiveIdentityProviders throwing an error", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockRejectedValue(new Error("Network error"));
+
+      await expect(
+        validateIDPLinkingPermissions({
+          serviceConfig: { baseUrl: "https://api.example.com" },
+          userOrganizationId: "org123",
+          idpId: "idp123",
+        }),
+      ).rejects.toThrow("Network error");
+    });
+
+    test("should perform case-sensitive IDP ID comparison", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowExternalIdp: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "IDP123", name: "Target IDP" }],
+      });
+
+      const result = await validateIDPLinkingPermissions({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        userOrganizationId: "org123",
+        idpId: "idp123",
+      });
+
+      expect(result).toBe(false);
     });
   });
 });

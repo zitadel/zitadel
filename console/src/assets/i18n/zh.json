@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "项目",
-      "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
+      "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。例如，你可能有一个包含3个应用的项目；一个用于你的Web前端，一个用于你的移动应用，一个用于你的后端。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
       "OWNED": {
         "TITLE": "所拥有的项目",
         "DESCRIPTION": "这些是你拥有的项目。你可以管理这些项目的设置、权限和应用。"
@@ -623,6 +623,14 @@
           "restAsync": "REST 异步"
         },
         "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
+        "PAYLOAD_TYPE": "有效负载类型",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "加密的 JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 用于验证的签名头的标准 JSON 有效负载。\nJWT: 有效负载作为已签名的 JWT 发送。验证通过 JWT 签名完成。\nJWE: JWT 另外被加密，以防止对有效负载信息的未授权访问。",
         "ENDPOINT": "端点",
         "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
         "TIMEOUT": "超时",
@@ -1549,7 +1557,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1799,7 +1808,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2430,7 +2440,8 @@
       "1": "身份验证应用程序的一次性密码（TOTP）",
       "2": "指纹、安全密钥、Face ID 等",
       "3": "电子邮件一次性密码（email OTP）",
-      "4": "短信一次性密码（SMS OTP）"
+      "4": "短信一次性密码（SMS OTP）",
+      "5": "恢复码"
     }
   },
   "LOGINPOLICY": {
@@ -2784,7 +2795,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "添加管理者",

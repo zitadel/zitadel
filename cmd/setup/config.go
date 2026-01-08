@@ -162,6 +162,9 @@ type Steps struct {
 	s63AlterResourceCounts                  *AlterResourceCounts
 	s64ChangePushPosition                   *ChangePushPosition
 	s65FixUserMetadata5Index                *FixUserMetadata5Index
+	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
+	s67SyncMemberRoleFields                 *SyncMemberRoleFields
+	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projets",
-      "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
+      "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pourriez avoir un seul projet avec 3 applications : une pour votre frontend web, une pour votre application mobile et une pour votre backend. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
       "OWNED": {
         "TITLE": "Projets Possédés",
         "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les autorisations et les applications."
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchrone"
         },
         "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
+        "PAYLOAD_TYPE": "Type de charge utile",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Non spécifié",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token chiffré (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Charge utile JSON standard avec un en‑tête de signature pour la vérification.\nJWT: La charge utile est envoyée sous forme de JWT signé. La vérification se fait via la signature du JWT.\nJWE: Le JWT est en plus chiffré pour empêcher l'accès non autorisé aux informations de la charge utile.",
         "ENDPOINT": "Point de terminaison",
         "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
         "TIMEOUT": "Délai d'attente",
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1796,7 +1805,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -2402,7 +2412,8 @@
       "1": "One Time Password via une application d'authentification (TOTP)",
       "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "3": "One Time Password par e-mail (E-mail OTP)",
-      "4": "One Time Password par SMS (SMS OTP)"
+      "4": "One Time Password par SMS (SMS OTP)",
+      "5": "Codes de récupération"
     }
   },
   "LOGINPOLICY": {
@@ -2752,7 +2763,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

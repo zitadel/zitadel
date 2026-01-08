@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
     InvalidURLTemplate: URL Template ist ungültig
+    Locked: Benutzer ist gesperrt
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profil nicht verändert
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F existiert nicht
       Passwordless:
         NotExisting: Passwortlos existiert nicht
+      RecoveryCodes:
+        InvalidCode: Ungültiger Wiederherstellungscode angegeben
+        MaxCountExceeded: Maximale Anzahl von Wiederherstellungscodes überschritten
+        NotReady: Wiederherstellungscodes sind nicht bereit für die Verwendung
+        ConfigInvalid: Wiederherstellungscodes-Konfiguration ist ungültig
     WebAuthN:
       NotFound: WebAuthN Token konnte nicht gefunden werden
       BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten
@@ -569,6 +575,10 @@ Errors:
     NoTimeout: Ziel hat keinen Timeout
     InvalidURL: Ziel hat eine ungültige URL
     NotFound: Ziel nicht gefunden
+    InvalidExpirationDate: Ablaufdatum des Schlüssels muss in der Zukunft liegen
+    PublicKeyExpired: Öffentlicher Schlüssel des Ziels ist abgelaufen
+    PublicKeyActive: Aktiven öffentlichen Zielschlüssel kann nicht gelöscht werden
+    InvalidPublicKey: Der öffentliche Schlüssel ist ungültig. Muss ein PEM-kodierter RSA- oder ECDSA-öffentlicher Schlüssel im PKCS#8-Format sein
   Execution:
     ConditionInvalid: Die Ausführungsbedingung ist ungültig
     Invalid: Die Ausführung ist ungültig
@@ -577,6 +587,7 @@ Errors:
     NoTargets: Keine Ziele definiert
     Failed: Ausführung fehlgeschlagen
     ResponseIsNotValidJSON: Antwort ist kein gültiges JSON
+    MissingEncryptionKey: Fehlender Verschlüsselungsschlüssel für die Ausführung
   UserSchema:
     NotEnabled: Funktion Benutzerschema ist nicht aktiviert
     Type:

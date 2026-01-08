@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekty",
-      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
+      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Například můžete mít jeden projekt se 3 aplikacemi; jednu pro váš webový frontend, jednu pro vaši mobilní aplikaci a jednu pro váš backend. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
       "OWNED": {
         "TITLE": "Vlastněné projekty",
         "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, oprávnění a aplikace."
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchronní"
         },
         "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
+        "PAYLOAD_TYPE": "Typ obsahu",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Neurčeno",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifrovaný JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardní JSON payload s hlavičkou pro podpis a ověření.\nJWT: Payload je odeslán jako podepsané JWT. Ověření probíhá pomocí podpisu JWT.\nJWE: JWT je navíc zašifrován, aby se předešlo neoprávněnému přístupu k informacím v payloadu.",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1796,7 +1805,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2410,7 +2420,8 @@
       "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
       "2": "Otisk prstu, bezpečnostní klíče, Face ID a další",
       "3": "Jednorázové heslo e-mailem (Email OTP)",
-      "4": "Jednorázové heslo SMS (SMS OTP)"
+      "4": "Jednorázové heslo SMS (SMS OTP)",
+      "5": "Obnovovací kódy"
     }
   },
   "LOGINPOLICY": {
@@ -2760,7 +2771,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

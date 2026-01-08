@@ -6,6 +6,7 @@
         "sources": [
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go"
@@ -211,6 +212,9 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
+            "inputs": [
+                "{workspaceRoot}/console/dist/console/**/*"
+            ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]

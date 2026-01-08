@@ -1,5 +1,5 @@
 {
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.26.0",
   "private": true,
   "name": "@zitadel/zitadel",
   "scripts": {
@@ -7,9 +7,9 @@
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5",
+    "@changesets/cli": "^2.29.8",
     "nx": "21.6.1",
-    "sass": "^1.64.1",
-    "wait-on": "^9.0.1"
+    "sass": "^1.97.1",
+    "wait-on": "^9.0.3"
   }
 }

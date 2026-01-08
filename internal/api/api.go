@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"connectrpc.com/grpcreflect"
+	"connectrpc.com/otelconnect"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
@@ -54,6 +55,7 @@ type API struct {
 
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 	translator                *i18n.Translator
+	connectOTELInterceptor    *otelconnect.Interceptor
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -129,6 +131,10 @@ func New(
 	if err != nil {
 		return nil, err
 	}
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor()
+	if err != nil {
+		return nil, err
+	}
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
@@ -191,6 +197,7 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 func (a *API) registerConnectServer(service server.ConnectServer) {
 	prefix, handler := service.RegisterConnectServer(
 		connect_middleware.CallDurationHandler(),
+		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
 		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName, instance_pb.InstanceService_ServiceDesc.ServiceName),
@@ -200,7 +207,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),
