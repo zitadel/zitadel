@@ -823,7 +823,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, projectID, userResp, userEmail, userPhone)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
@@ -901,7 +901,7 @@ func getAccessTokenClaims(ctx context.Context, t *testing.T, instance *integrati
 	return claims
 }
 
-func contextInfoForUserOIDC(instance *integration.Instance, function string, clientID string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
+func contextInfoForUserOIDC(instance *integration.Instance, function string, clientID, projectID string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
 	return &oidc_api.ContextInfo{
 		Function: function,
 		UserInfo: &oidc.UserInfo{
@@ -935,7 +935,8 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 		},
 		UserMetadata: nil,
 		Application: &oidc_api.ContextInfoApplication{
-			ClientID: clientID,
+			ClientID:  clientID,
+			ProjectID: projectID,
 		},
 		Org: &query.UserInfoOrg{
 			ID:            instance.DefaultOrg.GetId(),
@@ -952,7 +953,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
+	client, projectID, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -1119,7 +1120,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	}
 }
 
-func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
+func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID, projectID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := integration.Email()
 	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
@@ -1131,7 +1132,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", clientID, userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", clientID, projectID, userResp, userEmail, userPhone)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 

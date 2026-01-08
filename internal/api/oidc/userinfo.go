@@ -122,7 +122,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, projectID)
 	}
 }
 
@@ -310,7 +310,7 @@ func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserI
 }
 
 //nolint:gocognit
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
+func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID, projectID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -457,7 +457,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		User:         qu.User,
 		UserMetadata: qu.Metadata,
 		Org:          qu.Org,
-		Application:  &ContextInfoApplication{ClientID: clientID},
+		Application:  &ContextInfoApplication{ClientID: clientID, ProjectID: projectID},
 		UserGrants:   qu.UserGrants,
 	}
 
@@ -504,7 +504,8 @@ type ContextInfo struct {
 	Response     *ContextInfoResponse    `json:"response,omitempty"`
 }
 type ContextInfoApplication struct {
-	ClientID string `json:"client_id,omitempty"`
+	ClientID  string `json:"client_id,omitempty"`
+	ProjectID string `json:"project_id,omitempty"`
 }
 
 type ContextInfoResponse struct {
