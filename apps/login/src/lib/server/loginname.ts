@@ -29,6 +29,7 @@ export type SendLoginnameCommand = {
   loginName: string;
   requestId?: string;
   organization?: string;
+  defaultOrganization?: string;
   suffix?: string;
 };
 
@@ -455,6 +456,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // user not found, perform organization discovery if no org context provided
   let discoveredOrganization = command.organization;
   let effectiveLoginSettings = loginSettingsByContext;
+
+  if (!command.organization && command.defaultOrganization) {
+    const defaultLoginSettings = await getLoginSettings({ serviceConfig, organization: command.defaultOrganization });
+    if (defaultLoginSettings) {
+      effectiveLoginSettings = defaultLoginSettings;
+    }
+  }
 
   if (!discoveredOrganization && command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);

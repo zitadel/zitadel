@@ -22,6 +22,7 @@ type Props = {
   requestId: string | undefined;
   loginSettings: LoginSettings | undefined;
   organization?: string;
+  defaultOrganization?: string;
   suffix?: string;
   submit: boolean;
   allowRegister: boolean;
@@ -31,6 +32,7 @@ export function UsernameForm({
   loginName,
   requestId,
   organization,
+  defaultOrganization,
   suffix,
   loginSettings,
   submit,
@@ -56,6 +58,7 @@ export function UsernameForm({
     const res = await sendLoginname({
       loginName: values.loginName,
       organization,
+      defaultOrganization,
       requestId,
       suffix,
     })
@@ -87,10 +90,7 @@ export function UsernameForm({
   }, []);
 
   let inputLabel = t("labels.loginname");
-  if (
-    loginSettings?.disableLoginWithEmail &&
-    loginSettings?.disableLoginWithPhone
-  ) {
+  if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {
     inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
     inputLabel = t("labels.usernameOrPhoneNumber");
