@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { roleGuard } from 'src/app/guards/role-guard';
 
 import { ProjectsComponent } from './projects.component';
+import { AppQuickCreateComponent } from '../app-quick-create/app-quick-create.component';
 
 const routes: Routes = [
   {
@@ -26,7 +27,7 @@ const routes: Routes = [
       animation: 'AddPage',
       roles: ['project.app.write'],
     },
-    loadChildren: () => import('../app-create/app-create.module'),
+    loadComponent: () => import('../app-quick-create/app-quick-create.component').then((m) => m.AppQuickCreateComponent),
   },
   {
     path: ':projectid',

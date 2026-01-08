@@ -435,7 +435,8 @@
     "TOS": "Hizmet Şartları",
     "OPENSHORTCUTSTOOLTIP": "Klavye kısayollarını göstermek için ? yazın",
     "SETTINGS": "Ayarlar",
-    "CUSTOMERPORTAL": "Müşteri Portalı"
+    "CUSTOMERPORTAL": "Müşteri Portalı",
+    "TARGETS": "Hedefler"
   },
   "QUICKSTART": {
     "TITLE": "ZITADEL'i uygulamanıza entegre edin",
@@ -706,9 +707,9 @@
     "PROJECTNAME": "Proje Adı",
     "RESOURCEOWNER": "Kaynak Sahibi",
     "METHODS": {
+      "1": "eşittir",
       "5": "içerir",
-      "7": "ile biter",
-      "1": "eşittir"
+      "7": "ile biter"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1982,7 +1983,6 @@
         "GRANTED_SINGULAR": "{{name}} tarafından Yetkilendirilmiş Proje"
       },
       "PRIVATELABEL": {
-        "TITLE": "Marka Ayarı",
         "0": {
           "TITLE": "Belirtilmemiş",
           "DESC": "Kullanıcı tanımlandığında, sistem varsayılanı gösterilmeden önce tanımlanan kullanıcının organizasyonunun markası gösterilecektir."
@@ -1995,6 +1995,7 @@
           "TITLE": "Kullanıcı Organizasyonu ayarını kullan",
           "DESC": "Projenin organizasyonunun markası gösterilecektir, ancak kullanıcı tanımlandığında, tanımlanan kullanıcının organizasyonunun ayarı gösterilecektir."
         },
+        "TITLE": "Marka Ayarı",
         "DIALOG": {
           "TITLE": "Marka Ayarı",
           "DESCRIPTION": "Projeyi kullanırken giriş davranışını seçin."
@@ -2026,16 +2027,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Durum",
       "0": "Tanımlı değil",
       "1": "Aktif",
-      "2": "Pasif"
+      "2": "Pasif",
+      "TITLE": "Durum"
     },
     "TYPE": {
-      "TITLE": "Tür",
       "0": "Bilinmeyen tür",
       "1": "Sahip olunan",
-      "2": "Yetkilendirilmiş"
+      "2": "Yetkilendirilmiş",
+      "TITLE": "Tür"
     },
     "NAME": "Ad",
     "NAMEDIALOG": {
@@ -2185,7 +2186,8 @@
       "UPDATED": "Proje değiştirildi.",
       "GRANTUPDATED": "Yetki değiştirildi.",
       "DELETED": "Proje silindi."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "Proje adını düzenlemek için tıklayın"
   },
   "ROLES": {
     "DIALOG": {
@@ -2285,10 +2287,10 @@
       "2": "pasif"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Kiracı ID",
       "0": "Ortak",
       "1": "Organizasyonlar",
-      "2": "Tüketiciler"
+      "2": "Tüketiciler",
+      "3": "Kiracı ID"
     },
     "AZUREADTENANTTYPE": "Kiracı Türü",
     "AZUREADTENANTID": "Kiracı ID",
@@ -2557,7 +2559,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Sonraki Adımlar",
         "0": {
           "TITLE": "Roller ekle",
           "DESC": "Proje rollerinizi girin"
@@ -2569,8 +2570,24 @@
         "2": {
           "TITLE": "Yardım ve Destek",
           "DESC": "Uygulama oluşturma hakkındaki belgelerimizi okuyun veya desteğimizle iletişime geçin"
-        }
-      }
+        },
+        "TITLE": "Sonraki Adımlar"
+      },
+      "CREATE_PROJECT_AUTO": "Projeyi otomatik oluştur",
+      "CREATE_PROJECT_AUTO_DESC": "ZITADEL'de yeniyseniz önerilir. Proje kurulumunu sizin için biz hallederiz.",
+      "QUICK_CREATE_DESC": "Üç basit adımda bir uygulama oluşturun.",
+      "QUICK_CREATE_FRAMEWORK": "Framework seçin",
+      "QUICK_CREATE_FRAMEWORK_DESC": "Uygulamanız için önerilen yapılandırmayı sağlıyoruz. Kullandığınız veya kullanmayı planladığınız framework'ü seçin.",
+      "QUICK_CREATE_NAME": "Uygulamanızı adlandırın",
+      "QUICK_CREATE_TITLE": "Uygulama Oluştur",
+      "CUSTOM_APP_TITLE": "Özel Uygulama",
+      "CUSTOM_APP_DESC": "Aşağıda seçtiğiniz yapılandırma ile projenizi ve uygulamanızı oluşturacağız.",
+      "CUSTOM_APP_NAME": "Uygulama Adı",
+      "CUSTOM_APP_NAME_LABEL": "Ad",
+      "CUSTOM_APP_TYPE": "Uygulama Türü",
+      "CUSTOM_APP_AUTH_METHOD": "Kimlik Doğrulama Yöntemi",
+      "CUSTOM_APP_CANCEL": "İptal",
+      "CUSTOM_APP_CREATE": "Uygulama Oluştur"
     },
     "NAMEDIALOG": {
       "TITLE": "Uygulamayı Yeniden Adlandır",
@@ -2763,6 +2780,90 @@
     "LOGINV2": {
       "USEV2": "Yeni Giriş UI'sını kullan",
       "BASEURL": "Yeni Giriş UI'sı için özel base URL"
+    },
+    "QUICKSTART": "Hızlı Başlangıç",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "Hızlı Başlangıç",
+      "DESCRIPTION": "Uygulamanızı ZITADEL kimlik doğrulama ile çalışır duruma getirin.",
+      "GETSTARTED": "Uygulamanızla Başlayın",
+      "GETSTARTED_DESC": "Bu rehber, ZITADEL kimlik doğrulamasını uygulamanıza hızlı ve kolay bir şekilde entegre etmenize yardımcı olacaktır.",
+      "FRAMEWORK": "Framework",
+      "VIEWDOCS": "Dokümantasyonu Görüntüle",
+      "VIEWEXAMPLE": "Örneği Görüntüle",
+      "ENVVARS": "Ortam Değişkenleri",
+      "ENVVARS_DESC": "Bu ortam değişkenlerini uygulamanıza ekleyin:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "Başlangıç noktanız nedir?",
+      "QUICKSTART_SUBTITLE": "Durumunuzu en iyi tanımlayan seçeneği seçin:",
+      "OPTION1": "Seçenek 1: Örnek Uygulamayı Klonla",
+      "OPTION1_DESC": "Çalışan bir örnek uygulama ile hızlıca başlayın:",
+      "OPTION1_NOTE": "Klonladıktan sonra, ortam değişkenlerini uygulama bilgilerinizle güncelleyin.",
+      "OPTION2": "Seçenek 2: Mevcut Uygulamayı Entegre Et",
+      "OPTION2_DESC": "Mevcut uygulamanıza ZITADEL kimlik doğrulamasını entegre edin:",
+      "STEP1": "Framework'ünüz için ZITADEL SDK'yı kurun",
+      "STEP2": "Ortam değişkenlerinizi yapılandırın",
+      "STEP3": "Uygulamanıza kimlik doğrulamayı ekleyin",
+      "STEP4": "Entegrasyonu test edin",
+      "GENERIC": "Genel Entegrasyon",
+      "GENERIC_DESC": "Kapsamlı örneklerimiz ve rehberlerimizden seçim yapın:",
+      "ALLEXAMPLES": "Tüm Örnekler",
+      "INTEGRATION_GUIDE": "Entegrasyon Rehberi",
+      "NEXTSTEPS": "Sonraki Adımlar",
+      "CONFIGURE": "Ayarları Yapılandır",
+      "CONFIGURE_DESC": "Uygulamanızın OIDC yapılandırmasını özelleştirin",
+      "REDIRECTS": "Yönlendirmeleri Ayarla",
+      "REDIRECTS_DESC": "Yönlendirme ve çıkış URL'lerini yapılandırın",
+      "URLS_DESC": "Entegrasyon için önemli URL'leri görüntüleyin",
+      "TERMINAL": "Terminal",
+      "SCENARIO_NEW_TITLE": "Yepyeni bir uygulama oluşturmak istiyorum",
+      "SCENARIO_NEW_DESC": "Harika! ZITADEL kimlik doğrulamasını içeren çalışan bir örnekle hızlı bir şekilde başlamanıza yardımcı olacağız.",
+      "SCENARIO_NEW_TOGGLE": "Henüz bir uygulamam yok",
+      "SCENARIO_EXISTING_TITLE": "Mevcut bir uygulamaya entegre etmek istiyorum",
+      "SCENARIO_EXISTING_DESC": "Harika! Mevcut uygulamanıza ZITADEL kimlik doğrulamasını adım adım eklemeniz için sizi yönlendireceğiz.",
+      "SCENARIO_EXISTING_TOGGLE": "Mevcut bir uygulamam var",
+      "CLONE_EXAMPLE": "Örneği Klonla",
+      "CLONE_NOTE": "Klonladıktan sonra, .env dosyasını uygulama bilgilerinizle güncelleyin ve hazırsınız!",
+      "BROWSE_EXAMPLES": "Tüm Örnekleri Gözat",
+      "GENERIC_NEW_NOTE": "Teknoloji yığınına uygun bir örnek seçin ve hızlıca başlamak için klonlayın.",
+      "EXISTING_STEP1_TITLE": "SDK'yı Kur",
+      "EXISTING_STEP1_DESC": "SDK'yı projenize ekleyin",
+      "EXISTING_STEP2_TITLE": "Yapılandırmanızı Ekleyin",
+      "EXISTING_STEP2_DESC": "Bu ortam değişkenlerini uygulamanızın yapılandırma dosyasına kopyalayıp yapıştırın",
+      "EXISTING_STEP3_TITLE": "Kimlik doğrulamayı ayarlayın",
+      "EXISTING_STEP3_DESC": "Uygulamanıza kimlik doğrulama eklemek için adım adım entegrasyon rehberimizi takip edin",
+      "VIEW_SDKS": "SDK Dokümantasyonunu Görüntüle",
+      "AUTH_STATUS_CHECKING": "Kimlik doğrulama durumu kontrol ediliyor...",
+      "AUTH_STATUS_SUCCESS": "Uygulamanız ZITADEL ile doğrulandı.",
+      "AUTH_STATUS_PENDING": "İlk kullanıcı kimlik doğrulaması bekleniyor.",
+      "AUTH_STATUS_PENDING_DESC": "Kimlik doğrulamayı ayarlamak için aşağıdaki entegrasyon kılavuzunu takip edin.",
+      "SUCCESS_TITLE": "🎉 Harika! Uygulamanız başarıyla bağlandı",
+      "SUCCESS_DESC": "Uygulamanız ZITADEL ile başarıyla doğrulandı. Artık entegrasyonunuz için aşağıdaki ortam değişkenlerini kullanabilirsiniz.",
+      "ENVVARS_AUTHENTICATED_DESC": "Bu ortam değişkenlerini uygulamanızda kullanın:",
+      "INTEGRATION_ENVVARS_TITLE": "Uygulama Yapılandırmanız",
+      "INTEGRATION_ENVVARS_DESC": "ZITADEL ile bağlantı kurmak için bu ortam değişkenlerini uygulamanıza ekleyin:",
+      "NEW_STEP1_TITLE": "Örnek uygulamayı klonlayın",
+      "NEW_STEP1_DESC": "ZITADEL kimlik doğrulamasını içeren çalışan bir örnekle hızlıca başlayın.",
+      "NEW_STEP2_TITLE": "Ortam değişkenlerinizi yapılandırın",
+      "NEW_STEP2_DESC": "Bu ortam değişkenlerini uygulamanıza ekleyin. Proje kök dizininde bir .env dosyasına yapıştırın veya .env dosyasını indirin ve kaydedin.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "Örnek .env.example dosyasını bu değerlerle güncelleyin ve ardından .env olarak yeniden adlandırın.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "'your-client-secret' değerini gerçek istemci sırınızla değiştirin. Eğer uygulama oluştururken kaydetmediyseniz, ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "buradan yeni bir tane oluşturun",
+      "NEW_STEP3_TITLE": "Uygulamanızı çalıştırın ve test edin",
+      "NEW_STEP3_DESC": "Bağımlılıkları yükleyin.",
+      "NEW_STEP3_DESC2": "Uygulamanızı başlatın ve kimlik doğrulama akışını test edin.",
+      "NEW_STEP4_TITLE": "Dokümantasyonu Görüntüle",
+      "NEW_STEP4_DESC": "Uygulamanızı ZITADEL ile özelleştirme ve genişletme hakkında rehberimizi takip edin.",
+      "STEP4_ACTION": "Dokümanı Görüntüle",
+      "GENERIC_NEW_TITLE": "Başlangıç noktanızı seçin",
+      "GENERIC_EXISTING_TITLE": "Entegrasyon yaklaşımınızı seçin",
+      "GENERIC_EXISTING_NOTE": "Framework’ünüz için özel bir SDK bulunmadığından, genel entegrasyon rehberlerimizi kullanabilir veya doğrudan OIDC/OAuth2 uç noktalarıyla çalışabilirsiniz.",
+      "API_DOCS": "API Dokümantasyonu",
+      "NEW_STEP_DOCS_TITLE": "Kapsamlı dokümantasyonu görüntüle",
+      "NEW_STEP_DOCS_DESC": "Framework’ünüz için gelişmiş yapılandırma seçenekleri ve en iyi uygulamalar hakkında daha fazla bilgi edinin.",
+      "EXISTING_STEP_DOCS_TITLE": "Entegrasyon hakkında daha fazla bilgi edinin",
+      "EXISTING_STEP_DOCS_DESC": "Gelişmiş yapılandırma ve sorun giderme için ayrıntılı dokümantasyonumuzu keşfedin.",
+      "SELECT_FRAMEWORK": "Framework’ünüzü seçin",
+      "SELECT_FRAMEWORK_DESC": "Kullandığınız framework’ü seçin ve özel entegrasyon rehberleri ile örnekler alın."
     }
   },
   "GENDERS": {
@@ -2798,10 +2899,10 @@
     "ADD": "Yönetici Ekle",
     "CREATIONTYPE": "Oluşturma Türü",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "Organizasyon",
       "0": "Sahip Olunan Proje",
       "1": "Verilen Proje",
+      "2": "Organizasyon",
+      "3": "IAM",
       "4": "Proje"
     },
     "EDITROLE": "Rolleri düzenle",

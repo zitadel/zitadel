@@ -435,7 +435,8 @@
     "TOS": "利用規約",
     "OPENSHORTCUTSTOOLTIP": "「?」と入力し、キーボードショートカットを表示する",
     "SETTINGS": "設定",
-    "CUSTOMERPORTAL": "カスタマーポータル"
+    "CUSTOMERPORTAL": "カスタマーポータル",
+    "TARGETS": "ターゲット"
   },
   "QUICKSTART": {
     "TITLE": "ZITADELをアプリケーションに統合する",
@@ -1510,7 +1511,9 @@
       "SECURITY": "セキュリティ設定",
       "EVENTS": "イベント",
       "FAILEDEVENTS": "失敗したイベント",
-      "VIEWS": "ビュー"
+      "VIEWS": "ビュー",
+      "ACTIONS": "アクション",
+      "TARGETS": "ターゲット"
     },
     "GROUPS": {
       "GENERAL": "一般",
@@ -1520,7 +1523,8 @@
       "TEXTS": "テキストと言語",
       "APPEARANCE": "設定",
       "OTHER": "その他",
-      "STORAGE": "ストレージ"
+      "STORAGE": "ストレージ",
+      "ACTIONS": "アクション"
     },
     "BETA": "ベータ"
   },
@@ -1979,7 +1983,6 @@
         "GRANTED_SINGULAR": "{{name}}に付与されたプロジェクト"
       },
       "PRIVATELABEL": {
-        "TITLE": "ブランディング設定",
         "0": {
           "TITLE": "未定義",
           "DESC": "ユーザーが特定されると同時に、システムデフォルトが表示される前に、特定されたユーザーの所属する組織のブランディングが表示されます。"
@@ -1992,6 +1995,7 @@
           "TITLE": "ユーザー組織設定の使用",
           "DESC": "プロジェクトの組織のブランディングが表示されますが、ユーザーが特定されると同時に、特定されたユーザーの組織の設定が表示されます。"
         },
+        "TITLE": "ブランディング設定",
         "DIALOG": {
           "TITLE": "ブランディング設定",
           "DESCRIPTION": "プロジェクト利用時のログイン時の動作を選択します。"
@@ -2023,16 +2027,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "ステータス",
       "0": "未定義",
       "1": "アクティブ",
-      "2": "非アクティブ"
+      "2": "非アクティブ",
+      "TITLE": "ステータス"
     },
     "TYPE": {
-      "TITLE": "タイプ",
       "0": "不明",
       "1": "所有",
-      "2": "グラント"
+      "2": "グラント",
+      "TITLE": "タイプ"
     },
     "NAME": "名前",
     "NAMEDIALOG": {
@@ -2182,7 +2186,8 @@
       "UPDATED": "プロジェクトが変更されました。",
       "GRANTUPDATED": "グラントが変更されました。",
       "DELETED": "プロジェクトが削除されました。"
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "クリックしてプロジェクト名を編集"
   },
   "ROLES": {
     "DIALOG": {
@@ -2282,10 +2287,10 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Consumers"
+      "2": "Consumers",
+      "3": "Tenant ID"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",
@@ -2554,7 +2559,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "次のステップ",
         "0": {
           "TITLE": "ロールの追加",
           "DESC": "プロジェクトのロールを入力してください"
@@ -2566,8 +2570,24 @@
         "2": {
           "TITLE": "ヘルプサポート",
           "DESC": "アプリケーションの作成に関するドキュメントを読むか、サポートにお問い合わせください"
-        }
-      }
+        },
+        "TITLE": "次のステップ"
+      },
+      "CREATE_PROJECT_AUTO": "プロジェクトを自動的に作成",
+      "CREATE_PROJECT_AUTO_DESC": "ZITADELが初めての場合に推奨されます。プロジェクトのセットアップは私たちが処理します。",
+      "QUICK_CREATE_DESC": "3つの簡単なステップでアプリケーションを作成します。",
+      "QUICK_CREATE_FRAMEWORK": "フレームワークを選択",
+      "QUICK_CREATE_FRAMEWORK_DESC": "アプリケーションの推奨構成を提供します。使用している、または使用する予定のフレームワークを選択してください。",
+      "QUICK_CREATE_NAME": "アプリケーションに名前を付ける",
+      "QUICK_CREATE_TITLE": "アプリケーションを作成",
+      "CUSTOM_APP_TITLE": "カスタムアプリケーション",
+      "CUSTOM_APP_DESC": "以下で選択した構成でプロジェクトとアプリケーションを作成します。",
+      "CUSTOM_APP_NAME": "アプリケーション名",
+      "CUSTOM_APP_NAME_LABEL": "名前",
+      "CUSTOM_APP_TYPE": "アプリケーションタイプ",
+      "CUSTOM_APP_AUTH_METHOD": "認証方法",
+      "CUSTOM_APP_CANCEL": "キャンセル",
+      "CUSTOM_APP_CREATE": "アプリを作成"
     },
     "NAMEDIALOG": {
       "TITLE": "アプリ名の変更",
@@ -2760,6 +2780,90 @@
     "LOGINV2": {
       "USEV2": "新しいログインUIを使用する",
       "BASEURL": "新しいログインUIのカスタムベースURL"
+    },
+    "QUICKSTART": "クイックスタート",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "クイックスタート",
+      "DESCRIPTION": "ZITADEL 認証を使ってアプリケーションをすぐに起動しましょう。",
+      "GETSTARTED": "アプリケーションを始める",
+      "GETSTARTED_DESC": "このガイドでは、ZITADEL 認証をあなたのアプリケーションに迅速かつ簡単に統合する方法を紹介します。",
+      "FRAMEWORK": "フレームワーク",
+      "VIEWDOCS": "ドキュメントを見る",
+      "VIEWEXAMPLE": "例を見る",
+      "ENVVARS": "環境変数",
+      "ENVVARS_DESC": "以下の環境変数をアプリケーションに追加してください:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "まず何から始めますか？",
+      "QUICKSTART_SUBTITLE": "あなたの状況に最も合ったオプションを選択してください:",
+      "OPTION1": "オプション 1: サンプルアプリケーションをクローンする",
+      "OPTION1_DESC": "動作するサンプルアプリケーションですぐに始めましょう:",
+      "OPTION1_NOTE": "クローン後、アプリケーション情報に合わせて環境変数を更新してください。",
+      "OPTION2": "オプション 2: 既存のアプリケーションに統合する",
+      "OPTION2_DESC": "既存のアプリケーションに ZITADEL 認証を統合します:",
+      "STEP1": "フレームワーク用の ZITADEL SDK をインストールする",
+      "STEP2": "環境変数を設定する",
+      "STEP3": "アプリケーションに認証を追加する",
+      "STEP4": "統合をテストする",
+      "GENERIC": "一般的な統合",
+      "GENERIC_DESC": "充実した例やガイドをご覧ください:",
+      "ALLEXAMPLES": "すべての例",
+      "INTEGRATION_GUIDE": "統合ガイド",
+      "NEXTSTEPS": "次のステップ",
+      "CONFIGURE": "設定を構成する",
+      "CONFIGURE_DESC": "アプリの OIDC 設定をカスタマイズ",
+      "REDIRECTS": "リダイレクトを設定",
+      "REDIRECTS_DESC": "リダイレクト URL とログアウト URL を設定します",
+      "URLS_DESC": "統合に必要な重要な URL を確認する",
+      "TERMINAL": "ターミナル",
+      "SCENARIO_NEW_TITLE": "新しいアプリケーションを作成したい",
+      "SCENARIO_NEW_DESC": "素晴らしい！ZITADEL 認証が組み込まれたサンプルで素早く開始できるようサポートします。",
+      "SCENARIO_NEW_TOGGLE": "アプリケーションをまだ持っていません",
+      "SCENARIO_EXISTING_TITLE": "既存のアプリケーションに統合したい",
+      "SCENARIO_EXISTING_DESC": "了解です！ZITADEL 認証を追加する手順をステップごとに案内します。",
+      "SCENARIO_EXISTING_TOGGLE": "既存のアプリケーションがあります",
+      "CLONE_EXAMPLE": "サンプルをクローン",
+      "CLONE_NOTE": "クローン後、上記の値で .env ファイルを更新するだけで準備完了です！",
+      "BROWSE_EXAMPLES": "すべての例を見る",
+      "GENERIC_NEW_NOTE": "お使いの技術スタックに合った例を選び、クローンしてすぐに開始できます。",
+      "EXISTING_STEP1_TITLE": "SDK をインストール",
+      "EXISTING_STEP1_DESC": "プロジェクトに SDK を追加します",
+      "EXISTING_STEP2_TITLE": "設定を追加",
+      "EXISTING_STEP2_DESC": "以下の環境変数をアプリケーションの設定ファイルにコピー＆ペーストしてください",
+      "EXISTING_STEP3_TITLE": "認証をセットアップ",
+      "EXISTING_STEP3_DESC": "認証を追加する手順をガイドに従って進めてください",
+      "VIEW_SDKS": "SDK ドキュメントを見る",
+      "AUTH_STATUS_CHECKING": "認証状態を確認中...",
+      "AUTH_STATUS_SUCCESS": "アプリは正常に ZITADEL に認証されました。",
+      "AUTH_STATUS_PENDING": "最初のユーザー認証を待っています。",
+      "AUTH_STATUS_PENDING_DESC": "認証を設定するには、以下の統合ガイドに従ってください。",
+      "SUCCESS_TITLE": "🎉 完了！アプリが正常に接続されました",
+      "SUCCESS_DESC": "アプリケーションは ZITADEL との認証に成功しました。以下の環境変数を統合に使用できます。",
+      "ENVVARS_AUTHENTICATED_DESC": "これらの環境変数をアプリケーションで使用してください:",
+      "INTEGRATION_ENVVARS_TITLE": "アプリケーション設定",
+      "INTEGRATION_ENVVARS_DESC": "ZITADEL と接続するために以下の環境変数をアプリケーションに追加してください:",
+      "NEW_STEP1_TITLE": "サンプルアプリケーションをクローンする",
+      "NEW_STEP1_DESC": "ZITADEL 認証が組み込まれた動作サンプルで素早く開始できます。",
+      "NEW_STEP2_TITLE": "環境変数を設定する",
+      "NEW_STEP2_DESC": "以下の環境変数をアプリケーションに追加してください。プロジェクトのルートに .env ファイルを作成して貼り付けるか、.env ファイルをダウンロードしてください。",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": "サンプルの .env.example をこれらの値で更新し、.env にリネームしてください。",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "'your-client-secret' を実際のクライアントシークレットに置き換えてください。作成時に保存していない場合は、",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "こちらで新しく生成できます",
+      "NEW_STEP3_TITLE": "アプリケーションを実行してテストする",
+      "NEW_STEP3_DESC": "依存関係をインストールします。",
+      "NEW_STEP3_DESC2": "アプリケーションを起動し、認証フローをテストしてください。",
+      "NEW_STEP4_TITLE": "ドキュメントを見る",
+      "NEW_STEP4_DESC": "ZITADEL でアプリケーションをカスタマイズおよび拡張する方法をガイドで確認できます。",
+      "STEP4_ACTION": "ドキュメントを見る",
+      "GENERIC_NEW_TITLE": "開始ポイントを選択",
+      "GENERIC_EXISTING_TITLE": "統合方法を選択",
+      "GENERIC_EXISTING_NOTE": "使用中のフレームワークに特定の SDK がない場合は、一般的な統合ガイドを使用するか、OIDC/OAuth2 エンドポイントを直接利用できます。",
+      "API_DOCS": "API ドキュメント",
+      "NEW_STEP_DOCS_TITLE": "詳細ドキュメントを見る",
+      "NEW_STEP_DOCS_DESC": "フレームワークの高度な設定やベストプラクティスについて学びましょう。",
+      "EXISTING_STEP_DOCS_TITLE": "統合について詳しく学ぶ",
+      "EXISTING_STEP_DOCS_DESC": "高度な設定やトラブルシューティングのための詳細なドキュメントを参照してください。",
+      "SELECT_FRAMEWORK": "フレームワークを選択",
+      "SELECT_FRAMEWORK_DESC": "使用しているフレームワークを選択すると、適切な統合ガイドと例が表示されます。"
     }
   },
   "GENDERS": {
