@@ -464,25 +464,6 @@ func Test_smtpToPb(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "oauth-bearer auth must map to oauth-bearer",
-			args: args{
-				req: &query.SMTP{
-					OAuthBearerAuth: &query.OAuthBearerAuth{
-						User: "oauth bearer user",
-					},
-				},
-			},
-			res: &settings_pb.EmailProvider_Smtp{
-				Smtp: &settings_pb.EmailProviderSMTP{
-					Auth: &settings_pb.EmailProviderSMTP_OauthBearer{
-						OauthBearer: &settings_pb.SMTPOAuthBearerAuth{
-							User: "oauth bearer user",
-						},
-					},
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -593,27 +574,6 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 					ClientSecret:  "some-secret",
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
-				},
-			},
-		},
-		{
-			name: "oauth-bearer auth should map to oauth-bearer",
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance"),
-				req: &admin_pb.AddEmailProviderSMTPRequest{
-					Auth: &admin_pb.AddEmailProviderSMTPRequest_OauthBearer{
-						OauthBearer: &admin_pb.SMTPOAuthBearerAuth{
-							User:        "xoauth2-user",
-							BearerToken: "token",
-						},
-					},
-				},
-			},
-			res: &command.AddSMTPConfig{
-				ResourceOwner: "instance",
-				OAuthBearerAuth: &smtp.OAuthBearerAuthConfig{
-					User:        "xoauth2-user",
-					BearerToken: "token",
 				},
 			},
 		},
@@ -735,29 +695,6 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 					ClientSecret:  "some-secret",
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
-				},
-			},
-		},
-		{
-			name: "oauth-bearer auth should map to oauth-bearer",
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance"),
-				req: &admin_pb.UpdateEmailProviderSMTPRequest{
-					Id: "id",
-					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_OauthBearer{
-						OauthBearer: &admin_pb.SMTPOAuthBearerAuth{
-							User:        "xoauth2-user",
-							BearerToken: "token",
-						},
-					},
-				},
-			},
-			res: &command.ChangeSMTPConfig{
-				ResourceOwner: "instance",
-				ID:            "id",
-				OAuthBearerAuth: &smtp.OAuthBearerAuthConfig{
-					User:        "xoauth2-user",
-					BearerToken: "token",
 				},
 			},
 		},
@@ -943,28 +880,6 @@ func Test_testEmailProviderSMTPToConfig(t *testing.T) {
 						ClientSecret:  "some-secret",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scopes"},
-					},
-				},
-			},
-		},
-		{
-			name: "oauth-bearer auth should map to oauth-bearer",
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance"),
-				req: &admin_pb.TestEmailProviderSMTPRequest{
-					Auth: &admin_pb.TestEmailProviderSMTPRequest_OauthBearer{
-						OauthBearer: &admin_pb.SMTPOAuthBearerAuth{
-							User:        "xoauth2-user",
-							BearerToken: "token",
-						},
-					},
-				},
-			},
-			res: &smtp.Config{
-				SMTP: smtp.SMTP{
-					OAuthBearerAuth: &smtp.OAuthBearerAuthConfig{
-						User:        "xoauth2-user",
-						BearerToken: "token",
 					},
 				},
 			},

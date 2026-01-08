@@ -70,15 +70,6 @@ func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto cryp
 		}
 	}
 
-	if qs.OAuthBearerAuth != nil {
-		config.SMTPConfig.SMTP.OAuthBearerAuth = &smtp.OAuthBearerAuthConfig{}
-		token, err := crypto.DecryptString(qs.OAuthBearerAuth.BearerToken, passCrypto)
-		if err != nil {
-			return nil, err
-		}
-		config.SMTPConfig.SMTP.OAuthBearerAuth.BearerToken = token
-	}
-
 	if qs.PlainAuth != nil {
 		config.SMTPConfig.SMTP.PlainAuth = &smtp.PlainAuthConfig{
 			User: qs.PlainAuth.User,

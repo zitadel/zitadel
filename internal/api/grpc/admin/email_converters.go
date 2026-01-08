@@ -103,13 +103,6 @@ func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 			},
 		}
 	}
-	if config.OAuthBearerAuth != nil {
-		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_OauthBearer{
-			OauthBearer: &settings_pb.SMTPOAuthBearerAuth{
-				User: config.OAuthBearerAuth.User,
-			},
-		}
-	}
 
 	return ret
 }
@@ -140,11 +133,6 @@ func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 			ClientSecret:  v.Xoauth2.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
-		}
-	case *admin_pb.AddEmailProviderSMTPRequest_OauthBearer:
-		cmd.OAuthBearerAuth = &smtp.OAuthBearerAuthConfig{
-			User:        v.OauthBearer.User,
-			BearerToken: v.OauthBearer.BearerToken,
 		}
 	default:
 		// ensure backwards compatibility
@@ -186,11 +174,6 @@ func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 			ClientSecret:  v.Xoauth2.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
-		}
-	case *admin_pb.UpdateEmailProviderSMTPRequest_OauthBearer:
-		cmd.OAuthBearerAuth = &smtp.OAuthBearerAuthConfig{
-			User:        v.OauthBearer.User,
-			BearerToken: v.OauthBearer.BearerToken,
 		}
 	default:
 		// ensure backwards compatibility
@@ -250,11 +233,6 @@ func testEmailProviderSMTPToConfig(req *admin_pb.TestEmailProviderSMTPRequest) *
 			ClientSecret:  v.Xoauth2.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
-		}
-	case *admin_pb.TestEmailProviderSMTPRequest_OauthBearer:
-		cfg.SMTP.OAuthBearerAuth = &smtp.OAuthBearerAuthConfig{
-			User:        v.OauthBearer.User,
-			BearerToken: v.OauthBearer.BearerToken,
 		}
 	default:
 		// ensure backwards compatibility

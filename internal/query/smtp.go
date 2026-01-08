@@ -125,14 +125,6 @@ var (
 		name:  projection.SMTPConfigSMTPColumnXOAuth2AuthScope,
 		table: smtpConfigsSMTPTable,
 	}
-	SMTPConfigSMTPColumnOAuthBearerAuthUser = Column{
-		name:  projection.SMTPConfigSMTPColumnOAuthBearerAuthUser,
-		table: smtpConfigsSMTPTable,
-	}
-	SMTPConfigSMTPColumnOAuthBearerAuthBearerToken = Column{
-		name:  projection.SMTPConfigSMTPColumnOAuthBearerAuthBearerToken,
-		table: smtpConfigsSMTPTable,
-	}
 
 	smtpConfigsHTTPTable = table{
 		name:          projection.SMTPConfigHTTPTable,
@@ -179,14 +171,13 @@ func (h *SMTPConfig) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
 }
 
 type SMTP struct {
-	TLS             bool
-	SenderAddress   string
-	SenderName      string
-	ReplyToAddress  string
-	Host            string
-	PlainAuth       *PlainAuth
-	XOAuth2Auth     *XOAuth2Auth
-	OAuthBearerAuth *OAuthBearerAuth
+	TLS            bool
+	SenderAddress  string
+	SenderName     string
+	ReplyToAddress string
+	Host           string
+	PlainAuth      *PlainAuth
+	XOAuth2Auth    *XOAuth2Auth
 }
 
 type PlainAuth struct {
@@ -208,15 +199,6 @@ type XOAuth2Auth struct {
 
 func (a XOAuth2Auth) isEmpty() bool {
 	return a.User == "" && a.ClientId == "" && a.ClientSecret == nil && a.TokenEndpoint == "" && len(a.Scopes) != 0
-}
-
-type OAuthBearerAuth struct {
-	User        string
-	BearerToken *crypto.CryptoValue
-}
-
-func (a OAuthBearerAuth) isEmpty() bool {
-	return a.User == "" && a.BearerToken == nil
 }
 
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
@@ -295,8 +277,6 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigSMTPColumnXOAuth2AuthClientSecret.identifier(),
 			SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint.identifier(),
 			SMTPConfigSMTPColumnXOAuth2AuthScope.identifier(),
-			SMTPConfigSMTPColumnOAuthBearerAuthUser.identifier(),
-			SMTPConfigSMTPColumnOAuthBearerAuthBearerToken.identifier(),
 
 			SMTPConfigHTTPColumnID.identifier(),
 			SMTPConfigHTTPColumnEndpoint.identifier(),
@@ -333,8 +313,6 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				&smtpConfig.xoauth2AuthClientSecret,
 				&smtpConfig.xoauth2AuthTokenEndpoint,
 				&smtpConfig.xoauth2AuthScope,
-				&smtpConfig.oauthBearerAuthUser,
-				&smtpConfig.oauthBearerAuthBearerToken,
 				&httpConfig.id,
 				&httpConfig.endpoint,
 				&httpConfig.signingKey,
@@ -376,8 +354,6 @@ func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs,
 			SMTPConfigSMTPColumnXOAuth2AuthClientSecret.identifier(),
 			SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint.identifier(),
 			SMTPConfigSMTPColumnXOAuth2AuthScope.identifier(),
-			SMTPConfigSMTPColumnOAuthBearerAuthUser.identifier(),
-			SMTPConfigSMTPColumnOAuthBearerAuthBearerToken.identifier(),
 
 			SMTPConfigHTTPColumnID.identifier(),
 			SMTPConfigHTTPColumnEndpoint.identifier(),
@@ -417,8 +393,6 @@ func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs,
 					&smtpConfig.xoauth2AuthClientSecret,
 					&smtpConfig.xoauth2AuthTokenEndpoint,
 					&smtpConfig.xoauth2AuthScope,
-					&smtpConfig.oauthBearerAuthUser,
-					&smtpConfig.oauthBearerAuthBearerToken,
 					&httpConfig.id,
 					&httpConfig.endpoint,
 					&httpConfig.signingKey,
@@ -467,21 +441,19 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 }
 
 type sqlSmtpConfig struct {
-	id                         sql.NullString
-	tls                        sql.NullBool
-	senderAddress              sql.NullString
-	senderName                 sql.NullString
-	replyToAddress             sql.NullString
-	host                       sql.NullString
-	plainAuthUser              sql.NullString
-	plainAuthPassword          *crypto.CryptoValue
-	xoauth2AuthUser            sql.NullString
-	xoauth2AuthClientId        sql.NullString
-	xoauth2AuthClientSecret    *crypto.CryptoValue
-	xoauth2AuthTokenEndpoint   sql.NullString
-	xoauth2AuthScope           sql.NullString
-	oauthBearerAuthUser        sql.NullString
-	oauthBearerAuthBearerToken *crypto.CryptoValue
+	id                       sql.NullString
+	tls                      sql.NullBool
+	senderAddress            sql.NullString
+	senderName               sql.NullString
+	replyToAddress           sql.NullString
+	host                     sql.NullString
+	plainAuthUser            sql.NullString
+	plainAuthPassword        *crypto.CryptoValue
+	xoauth2AuthUser          sql.NullString
+	xoauth2AuthClientId      sql.NullString
+	xoauth2AuthClientSecret  *crypto.CryptoValue
+	xoauth2AuthTokenEndpoint sql.NullString
+	xoauth2AuthScope         sql.NullString
 }
 
 func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
@@ -512,23 +484,14 @@ func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
 		xoauth2Auth = nil
 	}
 
-	oauthBearerAuth := &OAuthBearerAuth{
-		User:        c.oauthBearerAuthUser.String,
-		BearerToken: c.oauthBearerAuthBearerToken,
-	}
-	if oauthBearerAuth.isEmpty() {
-		oauthBearerAuth = nil
-	}
-
 	smtpConfig.SMTPConfig = &SMTP{
-		TLS:             c.tls.Bool,
-		SenderAddress:   c.senderAddress.String,
-		SenderName:      c.senderName.String,
-		ReplyToAddress:  c.replyToAddress.String,
-		Host:            c.host.String,
-		PlainAuth:       plainAuth,
-		XOAuth2Auth:     xoauth2Auth,
-		OAuthBearerAuth: oauthBearerAuth,
+		TLS:            c.tls.Bool,
+		SenderAddress:  c.senderAddress.String,
+		SenderName:     c.senderName.String,
+		ReplyToAddress: c.replyToAddress.String,
+		Host:           c.host.String,
+		PlainAuth:      plainAuth,
+		XOAuth2Auth:    xoauth2Auth,
 	}
 }
 

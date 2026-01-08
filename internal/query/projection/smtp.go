@@ -25,23 +25,21 @@ const (
 	SMTPConfigColumnState         = "state"
 	SMTPConfigColumnDescription   = "description"
 
-	smtpConfigSMTPTableSuffix                      = "smtp"
-	SMTPConfigSMTPColumnInstanceID                 = "instance_id"
-	SMTPConfigSMTPColumnID                         = "id"
-	SMTPConfigSMTPColumnTLS                        = "tls"
-	SMTPConfigSMTPColumnSenderAddress              = "sender_address"
-	SMTPConfigSMTPColumnSenderName                 = "sender_name"
-	SMTPConfigSMTPColumnReplyToAddress             = "reply_to_address"
-	SMTPConfigSMTPColumnHost                       = "host"
-	SMTPConfigSMTPColumnPlainAuthUser              = "username"
-	SMTPConfigSMTPColumnPlainAuthPassword          = "password"
-	SMTPConfigSMTPColumnXOAuth2AuthUser            = "xoauth2auth_user"
-	SMTPConfigSMTPColumnXOAuth2AuthClientId        = "xoauth2auth_client_id"
-	SMTPConfigSMTPColumnXOAuth2AuthClientSecret    = "xoauth2auth_client_secret"
-	SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint   = "xoauth2auth_token_endpoint"
-	SMTPConfigSMTPColumnXOAuth2AuthScope           = "xoauth2auth_scope"
-	SMTPConfigSMTPColumnOAuthBearerAuthUser        = "oauthbearerauth_user"
-	SMTPConfigSMTPColumnOAuthBearerAuthBearerToken = "oauthbearerauth_bearer_token"
+	smtpConfigSMTPTableSuffix                    = "smtp"
+	SMTPConfigSMTPColumnInstanceID               = "instance_id"
+	SMTPConfigSMTPColumnID                       = "id"
+	SMTPConfigSMTPColumnTLS                      = "tls"
+	SMTPConfigSMTPColumnSenderAddress            = "sender_address"
+	SMTPConfigSMTPColumnSenderName               = "sender_name"
+	SMTPConfigSMTPColumnReplyToAddress           = "reply_to_address"
+	SMTPConfigSMTPColumnHost                     = "host"
+	SMTPConfigSMTPColumnPlainAuthUser            = "username"
+	SMTPConfigSMTPColumnPlainAuthPassword        = "password"
+	SMTPConfigSMTPColumnXOAuth2AuthUser          = "xoauth2auth_user"
+	SMTPConfigSMTPColumnXOAuth2AuthClientId      = "xoauth2auth_client_id"
+	SMTPConfigSMTPColumnXOAuth2AuthClientSecret  = "xoauth2auth_client_secret"
+	SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint = "xoauth2auth_token_endpoint"
+	SMTPConfigSMTPColumnXOAuth2AuthScope         = "xoauth2auth_scope"
 
 	smtpConfigHTTPTableSuffix      = "http"
 	SMTPConfigHTTPColumnInstanceID = "instance_id"
@@ -89,9 +87,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientId, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthScope, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(SMTPConfigSMTPColumnOAuthBearerAuthUser, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(SMTPConfigSMTPColumnOAuthBearerAuthBearerToken, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthScope, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SMTPConfigSMTPColumnInstanceID, SMTPConfigSMTPColumnID),
 			smtpConfigSMTPTableSuffix,
@@ -197,12 +193,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, e.XOAuth2Auth.ClientSecret),
 			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
 			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
-		)
-	}
-	if e.OAuthBearerAuth != nil {
-		columns = append(columns,
-			handler.NewCol(SMTPConfigSMTPColumnOAuthBearerAuthUser, e.OAuthBearerAuth.User),
-			handler.NewCol(SMTPConfigSMTPColumnOAuthBearerAuthBearerToken, e.OAuthBearerAuth.BearerToken),
 		)
 	}
 

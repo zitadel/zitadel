@@ -34,8 +34,6 @@ var (
 		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
-		` projections.smtp_configs6_smtp.oauthbearerauth_user,` +
-		` projections.smtp_configs6_smtp.oauthbearerauth_bearer_token,` +
 		` projections.smtp_configs6_http.id,` +
 		` projections.smtp_configs6_http.endpoint,` +
 		` projections.smtp_configs6_http.signing_key` +
@@ -62,8 +60,6 @@ var (
 		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
-		` projections.smtp_configs6_smtp.oauthbearerauth_user,` +
-		` projections.smtp_configs6_smtp.oauthbearerauth_bearer_token,` +
 		` projections.smtp_configs6_http.id,` +
 		` projections.smtp_configs6_http.endpoint,` +
 		` projections.smtp_configs6_http.signing_key,` +
@@ -93,8 +89,6 @@ var (
 		"xoauth2auth_client_secret",
 		"xoauth2auth_token_endpoint",
 		"xoauth2auth_scope",
-		"oauthbearerauth_user",
-		"oauthbearerauth_bearer_token",
 		"id",
 		"endpoint",
 		"signing_key",
@@ -162,8 +156,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						nil,
-						nil,
 					},
 				),
 			},
@@ -204,8 +196,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						"2232323",
 						domain.SMTPConfigStateActive,
 						"test",
-						nil,
-						nil,
 						nil,
 						nil,
 						nil,
@@ -280,8 +270,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						nil,
-						nil,
 					},
 				),
 			},
@@ -330,8 +318,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						"host3",
 						"user3",
 						&crypto.CryptoValue{},
-						nil,
-						nil,
 						nil,
 						nil,
 						nil,
@@ -446,8 +432,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							nil,
-							nil,
 						},
 					},
 				),
@@ -510,8 +494,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							nil,
-							nil,
 							"2232323",
 							"endpoint",
 							&crypto.CryptoValue{
@@ -545,8 +527,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							nil,
-							nil,
 						},
 						{
 							testNow,
@@ -564,8 +544,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							"host3",
 							"user3",
 							&crypto.CryptoValue{},
-							nil,
-							nil,
 							nil,
 							nil,
 							nil,

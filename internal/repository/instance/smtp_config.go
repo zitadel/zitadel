@@ -24,18 +24,17 @@ const (
 type SMTPConfigAddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID              string              `json:"id,omitempty"`
-	Description     string              `json:"description,omitempty"`
-	SenderAddress   string              `json:"senderAddress,omitempty"`
-	SenderName      string              `json:"senderName,omitempty"`
-	ReplyToAddress  string              `json:"replyToAddress,omitempty"`
-	TLS             bool                `json:"tls,omitempty"`
-	Host            string              `json:"host,omitempty"`
-	User            string              `json:"user,omitempty"`
-	Password        *crypto.CryptoValue `json:"password,omitempty"`
-	PlainAuth       *PlainAuth          `json:"plainAuth,omitempty"`
-	XOAuth2Auth     *XOAuth2Auth        `json:"xoauth2Auth,omitempty"`
-	OAuthBearerAuth *OAuthBearerAuth    `json:"oauthBearerAuth,omitempty"`
+	ID             string              `json:"id,omitempty"`
+	Description    string              `json:"description,omitempty"`
+	SenderAddress  string              `json:"senderAddress,omitempty"`
+	SenderName     string              `json:"senderName,omitempty"`
+	ReplyToAddress string              `json:"replyToAddress,omitempty"`
+	TLS            bool                `json:"tls,omitempty"`
+	Host           string              `json:"host,omitempty"`
+	User           string              `json:"user,omitempty"`
+	Password       *crypto.CryptoValue `json:"password,omitempty"`
+	PlainAuth      *PlainAuth          `json:"plainAuth,omitempty"`
+	XOAuth2Auth    *XOAuth2Auth        `json:"xoauth2Auth,omitempty"`
 }
 
 type XOAuth2Auth struct {
@@ -44,11 +43,6 @@ type XOAuth2Auth struct {
 	ClientSecret  *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	TokenEndpoint string              `json:"tokenEndpoint,omitempty"`
 	Scopes        []string            `json:"scopes,omitempty"`
-}
-
-type OAuthBearerAuth struct {
-	User        string              `json:"user,omitempty"`
-	BearerToken *crypto.CryptoValue `json:"bearerToken,omitempty"`
 }
 
 type PlainAuth struct {
@@ -67,7 +61,6 @@ func NewSMTPConfigAddedEvent(
 	host string,
 	plainAuth *PlainAuth,
 	xoauth2Auth *XOAuth2Auth,
-	oauthBearerAuth *OAuthBearerAuth,
 ) *SMTPConfigAddedEvent {
 	return &SMTPConfigAddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -75,16 +68,15 @@ func NewSMTPConfigAddedEvent(
 			aggregate,
 			SMTPConfigAddedEventType,
 		),
-		ID:              id,
-		Description:     description,
-		TLS:             tls,
-		SenderAddress:   senderAddress,
-		SenderName:      senderName,
-		ReplyToAddress:  replyToAddress,
-		Host:            host,
-		PlainAuth:       plainAuth,
-		XOAuth2Auth:     xoauth2Auth,
-		OAuthBearerAuth: oauthBearerAuth,
+		ID:             id,
+		Description:    description,
+		TLS:            tls,
+		SenderAddress:  senderAddress,
+		SenderName:     senderName,
+		ReplyToAddress: replyToAddress,
+		Host:           host,
+		PlainAuth:      plainAuth,
+		XOAuth2Auth:    xoauth2Auth,
 	}
 }
 
@@ -113,7 +105,6 @@ type SMTPConfigChangedEvent struct {
 	Password              *crypto.CryptoValue `json:"password,omitempty"`
 	PlainAuth             PlainAuthChanged    `json:"plainAuth,omitempty"`
 	XOAuth2Auth           XOAuth2AuthChanged  `json:"xoauth2Auth,omitempty"`
-	OAuthBearerAuth       OAuthBearerChanged  `json:"oauthBearerAuth,omitempty"`
 }
 
 type XOAuth2AuthChanged struct {
@@ -122,11 +113,6 @@ type XOAuth2AuthChanged struct {
 	ClientSecret  *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	TokenEndpoint *string             `json:"tokenEndpoint,omitempty"`
 	Scopes        []string            `json:"scopes,omitempty"`
-}
-
-type OAuthBearerChanged struct {
-	User        *string             `json:"user,omitempty"`
-	BearerToken *crypto.CryptoValue `json:"bearerToken,omitempty"`
 }
 
 type PlainAuthChanged struct {
@@ -254,18 +240,6 @@ func ChangeSMTPConfigXOAuth2TokenEndpoint(tokenEndpoint string) func(event *SMTP
 func ChangeSMTPConfigXOAuth2Scopes(scopes []string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.XOAuth2Auth.Scopes = scopes
-	}
-}
-
-func ChangeSMTPConfigOAuthBearerUser(user string) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.OAuthBearerAuth.User = &user
-	}
-}
-
-func ChangeSMTPConfigOAuthBearerToken(bearerToken *crypto.CryptoValue) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.OAuthBearerAuth.BearerToken = bearerToken
 	}
 }
 
