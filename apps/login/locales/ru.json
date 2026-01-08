@@ -148,8 +148,8 @@
       "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
       "failedPrecondition": "Нарушено предварительное условие",
       "sessionNotValid": "Сессия недействительна",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationMissing": "Отсутствует проверка пароля.",
+      "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
     }
   },
   "idp": {

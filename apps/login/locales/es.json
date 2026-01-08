@@ -148,8 +148,8 @@
       "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
       "failedPrecondition": "Precondición fallida",
       "sessionNotValid": "La sesión no es válida",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationMissing": "Falta la verificación de la contraseña.",
+      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
     }
   },
   "idp": {

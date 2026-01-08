@@ -148,8 +148,8 @@
       "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
       "failedPrecondition": "Nie spełniono warunków wstępnych",
       "sessionNotValid": "Sesja jest nieważna",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationMissing": "Brak weryfikacji hasła.",
+      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
     }
   },
   "idp": {

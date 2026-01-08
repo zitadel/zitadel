@@ -55,6 +55,18 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
 
+  if (!loginSettings) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="mx-auto flex max-w-sm flex-col space-y-4 pt-4">
+          <Alert>
+            <Translated i18nKey="errors.couldNotGetLoginSettings" namespace="loginname" />
+          </Alert>
+        </div>
+      </DynamicTheme>
+    );
+  }
+
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
@@ -68,18 +80,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     const users = await searchUsers({
       serviceConfig,
       searchValue: loginName,
-      loginSettings:
-        loginSettings ??
-        create(LoginSettingsSchema, {
-          ignoreUnknownUsernames: true,
-          disableLoginWithEmail: false,
-          disableLoginWithPhone: false,
-          allowUsernamePassword: true,
-          allowRegister: true,
-          allowExternalIdp: true,
-          forceMfa: false,
-          hidePasswordReset: false,
-        }), // Default settings if null
+      loginSettings: loginSettings,
       organizationId: organization,
     });
 

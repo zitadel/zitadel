@@ -148,8 +148,8 @@
       "couldNotLoadAuthMethods": "无法加载验证方法",
       "failedPrecondition": "前置条件失败",
       "sessionNotValid": "会话无效",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationMissing": "缺少密码验证。",
+      "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
     }
   },
   "idp": {
