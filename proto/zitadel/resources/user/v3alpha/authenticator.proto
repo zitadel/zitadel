@@ -318,7 +318,7 @@ message SetPassword {
 
 message SendPasswordResetEmail {
   // Optionally set a url_template, which will be used in the password reset mail
-  // sent by ZITADEL to guide the user to your password changed page.
+  // sent by ZITADEL to guide the user to your password change page.
   // If no template is set, the default ZITADEL url will be used.
   optional string url_template = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
