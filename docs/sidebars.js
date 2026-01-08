@@ -120,11 +120,11 @@ module.exports = {
           type: "category",
           label: "Use Cases",
           items: [
+            "guides/solution-scenarios/b2b",
+            "guides/integrate/onboarding/b2b",
             "guides/solution-scenarios/configurations",
             "guides/solution-scenarios/saas",
-            "guides/solution-scenarios/b2b",
             "guides/solution-scenarios/b2c",
-            "guides/integrate/onboarding/b2b",
             "guides/integrate/onboarding/end-users",
             "guides/solution-scenarios/frontend-calling-backend-API",
             {
