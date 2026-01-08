@@ -594,7 +594,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
+	client, projectID, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -619,7 +619,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "added", Value: "value"},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), projectID, req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -644,7 +644,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						"addedLog",
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), projectID, req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -669,7 +669,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "key", Value: []byte("value")},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), projectID, req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -706,7 +706,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "added3", Value: "value3"},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), projectID, req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -769,7 +769,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	}
 }
 
-func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
+func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID, projectID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := integration.Email()
 	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
@@ -781,7 +781,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, projectID, userResp, userEmail, userPhone)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
