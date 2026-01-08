@@ -156,6 +156,14 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client) error {
 		return nil
 	}
 
+	if smtpConfig.OAuthBearerAuth != nil {
+		err := client.Auth(OAuthBearerAuth(*smtpConfig.OAuthBearerAuth, smtpConfig.Host))
+		if err != nil {
+			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotOAuthBearerAuth")
+		}
+		return nil
+	}
+
 	if smtpConfig.PlainAuth != nil {
 		err := client.Auth(PlainOrLoginAuth(smtpConfig.PlainAuth.User, smtpConfig.PlainAuth.Password, smtpConfig.Host))
 		if err != nil {
