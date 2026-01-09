@@ -351,29 +351,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          if (userLoginSettings?.ignoreUnknownUsernames) {
-            // if ignoreUnknownUsernames is set, we want to redirect with the loginName processing the same way as not found users
-            // this is to prevent user enumeration
-            const paramsPassword = new URLSearchParams({
-              loginName: command.loginName,
-            });
-
-            if (command.requestId) {
-              paramsPassword.append("requestId", command.requestId);
-            }
-
-            if (organization) {
-              paramsPassword.append("organization", organization);
-            }
-
-            return { redirect: "/password?" + paramsPassword };
-          }
-
           const paramsPassword = new URLSearchParams({
-            loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
+            loginName: userLoginSettings?.ignoreUnknownUsernames
+              ? command.loginName
+              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
           });
-
-          // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
           if (organization) {
             paramsPassword.append("organization", organization);
