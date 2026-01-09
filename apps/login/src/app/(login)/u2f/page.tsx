@@ -24,19 +24,20 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-      });
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session) {
         return response.session;
       }

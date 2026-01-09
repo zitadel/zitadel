@@ -157,7 +157,7 @@ export async function removeSessionFromCookie<T>({
   }
 }
 
-export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
+export async function getMostRecentSessionCookie<T>(): Promise<Cookie | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -170,7 +170,7 @@ export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
 
     return latest;
   } else {
-    return Promise.reject("no session cookie found");
+    return undefined;
   }
 }
 
@@ -180,7 +180,7 @@ export async function getSessionCookieById<T>({
 }: {
   sessionId: string;
   organization?: string;
-}): Promise<SessionCookie<T>> {
+}): Promise<SessionCookie<T> | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -193,10 +193,10 @@ export async function getSessionCookieById<T>({
     if (found) {
       return found;
     } else {
-      return Promise.reject();
+      return undefined;
     }
   } else {
-    return Promise.reject();
+    return undefined;
   }
 }
 
@@ -206,23 +206,18 @@ export async function getSessionCookieByLoginName<T>({
 }: {
   loginName?: string;
   organization?: string;
-}): Promise<SessionCookie<T>> {
+}): Promise<SessionCookie<T> | undefined> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-    const found = sessions.find((s) =>
-      organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
-    );
-    if (found) {
-      return found;
-    } else {
-      return Promise.reject("no cookie found with loginName: " + loginName);
-    }
-  } else {
-    return Promise.reject("no session cookie found");
+  if (!stringifiedCookie?.value) {
+    return undefined;
   }
+
+  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+  return sessions.find((s) =>
+    organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
+  );
 }
 
 /**
@@ -234,22 +229,22 @@ export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promi
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-
-    if (cleanup) {
-      const now = new Date();
-      return sessions
-        .filter((session) =>
-          session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-        )
-        .map((session) => session.id);
-    } else {
-      return sessions.map((session) => session.id);
-    }
-  } else {
+  if (!stringifiedCookie?.value) {
     return [];
   }
+
+  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+
+  if (cleanup) {
+    const now = new Date();
+    return sessions
+      .filter((session) =>
+        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
+      )
+      .map((session) => session.id);
+  }
+
+  return sessions.map((session) => session.id);
 }
 
 /**
@@ -261,21 +256,21 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-
-    if (cleanup) {
-      const now = new Date();
-      return sessions.filter((session) =>
-        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-      );
-    } else {
-      return sessions;
-    }
-  } else {
+  if (!stringifiedCookie?.value) {
     console.log("getAllSessions: No session cookie found, returning empty array");
     return [];
   }
+
+  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+
+  if (cleanup) {
+    const now = new Date();
+    return sessions.filter((session) =>
+      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
+    );
+  }
+
+  return sessions;
 }
 
 /**
@@ -294,31 +289,27 @@ export async function getMostRecentCookieWithLoginname<T>({
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-    let filtered = sessions.filter((cookie) => {
-      return loginName ? cookie.loginName === loginName : true;
-    });
-
-    if (organization) {
-      filtered = filtered.filter((cookie) => {
-        return cookie.organization === organization;
-      });
-    }
-
-    const latest =
-      filtered && filtered.length
-        ? filtered.reduce((prev, current) => {
-            return prev.changeTs > current.changeTs ? prev : current;
-          })
-        : undefined;
-
-    if (latest) {
-      return latest;
-    } else {
-      return Promise.reject("Could not get the context or retrieve a session");
-    }
-  } else {
-    return Promise.reject("Could not read session cookie");
+  if (!stringifiedCookie?.value) {
+    return undefined;
   }
+
+  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+
+  let filtered = sessions;
+
+  if (loginName) {
+    filtered = filtered.filter((cookie) => cookie.loginName === loginName);
+  }
+
+  if (organization) {
+    filtered = filtered.filter((cookie) => cookie.organization === organization);
+  }
+
+  if (!filtered || !filtered.length) {
+    return undefined;
+  }
+
+  return filtered.reduce((prev, current) => {
+    return prev.changeTs > current.changeTs ? prev : current;
+  });
 }

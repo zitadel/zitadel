@@ -6,7 +6,8 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, getSession } from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -24,23 +25,44 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(serviceConfig.baseUrl, sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-      });
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
 
-  async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
+
+  let sessionFactors = sessionId ? await loadSessionById(sessionId, organization) : undefined;
+
+  if (!sessionFactors && !sessionId) {
+    sessionFactors = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: { loginName, organization },
+    }).catch(() => {
+      // ignore error
+      return undefined;
+    });
+  }
+
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({ serviceConfig, sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session) {
         return response.session;
       }
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
   });
 
   return (
@@ -54,14 +76,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="verify.description" namespace="passkey" />
         </p>
 
-        {sessionFactors && (
+        {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        )}
+        ) : loginName ? (
+          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
+        ) : null}
       </div>
 
       <div className="w-full">

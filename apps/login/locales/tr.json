@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Oturum yüklenemedi",
       "couldNotLoadAuthMethods": "Kimlik doğrulama yöntemleri yüklenemedi",
       "failedPrecondition": "Ön koşul başarısız",
-      "sessionNotValid": "Oturum geçerli değil"
+      "sessionNotValid": "Oturum geçerli değil",
+      "passwordVerificationMissing": "Şifre doğrulaması eksik.",
+      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
     }
   },
   "idp": {
@@ -159,18 +161,6 @@
     "signInWithAzureAD": "AzureAD ile Giriş",
     "signInWithGithub": "GitHub ile Giriş",
     "signInWithGitlab": "GitLab ile Giriş",
-    "loginSuccess": {
-      "title": "Giriş başarılı",
-      "description": "Başarıyla giriş yaptınız!"
-    },
-    "linkingSuccess": {
-      "title": "Hesap bağlandı",
-      "description": "Hesabınızı başarıyla bağladınız!"
-    },
-    "registerSuccess": {
-      "title": "Kayıt başarılı",
-      "description": "Başarıyla kayıt oldunuz!"
-    },
     "loginError": {
       "title": "Giriş başarısız",
       "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
@@ -194,6 +184,23 @@
       "description": "Kayıt işlemini tamamlayamadık.",
       "info": "Kayıt için organizasyon belirlenemedi. Lütfen yardım için yöneticinizle iletişime geçin.",
       "backToLogin": "Girişe Dön"
+    },
+    "processing": {
+      "message": "Kimlik doğrulama işleniyor...",
+      "noRedirect": "Sunucudan yönlendirme veya hata dönmedi",
+      "unexpectedError": "Beklenmeyen bir hata oluştu"
+    },
+    "errors": {
+      "missingParameters": "Eksik gerekli parametreler",
+      "missingIdpInfo": "IDP bilgisi eksik",
+      "idpNotFound": "Kimlik sağlayıcı bulunamadı",
+      "linkingNotAllowed": "Bu kimlik sağlayıcı için bağlantıya izin verilmiyor",
+      "linkingFailed": "Kimlik sağlayıcı hesaba bağlanamadı",
+      "autoLinkingFailed": "Hesap otomatik olarak bağlanamadı",
+      "userCreationFailed": "Kullanıcı hesabı oluşturulamadı",
+      "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
+      "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
+      "unknownError": "Bilinmeyen bir hata oluştu"
     }
   },
   "ldap": {
@@ -257,7 +264,20 @@
       "title": "Passkey ile kimlik doğrulama",
       "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
       "usePassword": "Şifre kullan",
-      "submit": "Devam"
+      "submit": "Devam",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey meydan okuması istenemedi",
+        "couldNotVerifyPasskey": "Passkey doğrulanamadı",
+        "noResponseReceived": "Passkey doğrulaması başarısız - yanıt alınamadı",
+        "noRedirectProvided": "Passkey doğrulaması tamamlandı ancak yönlendirme sağlanmadı",
+        "couldNotRetrievePasskey": "Passkey alınırken bir hata oluştu",
+        "verificationCancelled": "Passkey doğrulaması iptal edildi",
+        "verificationFailed": "Passkey doğrulaması sırasında bir hata oluştu",
+        "couldNotFindSession": "Oturum bulunamadı",
+        "couldNotUpdateSession": "Oturum güncellenemedi",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+      }
     },
     "set": {
       "title": "Passkey kur",
@@ -386,7 +406,10 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "noHostFound": "Host bulunamadı",
       "userAlreadyVerified": "Kullanıcı zaten doğrulanmış!",
-      "couldNotResendInvite": "Davet yeniden gönderilemedi"
+      "couldNotResendInvite": "Davet yeniden gönderilemedi",
+      "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
+      "inviteSendFailed": "Davet e-postası gönderilemedi",
+      "emailSendFailed": "Doğrulama e-postası gönderilemedi"
     }
   },
   "authenticator": {
@@ -428,6 +451,7 @@
     "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
     "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
-    "tryagain": "Tekrar Dene"
+    "tryagain": "Tekrar Dene",
+    "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
   }
 }

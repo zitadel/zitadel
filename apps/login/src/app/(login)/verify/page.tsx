@@ -3,12 +3,14 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
+import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -32,6 +34,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let user: User | undefined;
   let human: HumanUser | undefined;
   let id: string | undefined;
+  let loginSettings: LoginSettings | undefined;
 
   let error: string | undefined;
 
@@ -72,6 +75,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         loginName,
         organization,
       },
+    }).catch(async (error) => {
+      loginSettings = await getLoginSettings({ serviceConfig, organization });
+      if (!loginSettings?.ignoreUnknownUsernames) {
+        console.error("loadMostRecentSession failed", error);
+      }
+      // ignore error, as we might not have a session yet
+      return undefined;
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
@@ -93,8 +103,39 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
-  if (!id) {
-    throw Error("Failed to get user id");
+  if (!id && loginName) {
+    if (!loginSettings) {
+      loginSettings = await getLoginSettings({ serviceConfig, organization });
+    }
+
+    if (!loginSettings) {
+      console.error("loginSettings not found");
+      return;
+    }
+
+    const users = await searchUsers({
+      serviceConfig,
+      searchValue: loginName,
+      loginSettings: loginSettings,
+      organizationId: organization,
+    });
+
+    if (users.result && users.result.length === 1) {
+      const foundUser = users.result[0];
+      id = foundUser.userId;
+      user = foundUser;
+      if (user.type.case === "human") {
+        human = user.type.value as HumanUser;
+      }
+
+      // If we found the user and need to send email, do it now
+      if (doSend && id) {
+        await sendEmail(id);
+      }
+    } else if (loginSettings?.ignoreUnknownUsernames) {
+      // Prevent enumeration by pretending we found a user
+      id = UNKNOWN_USER_ID;
+    }
   }
 
   const params = new URLSearchParams({
@@ -132,8 +173,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
-          user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+          (user || loginName) && (
+            <UserAvatar
+              loginName={loginName ?? user?.preferredLoginName}
+              displayName={
+                !loginSettings?.ignoreUnknownUsernames
+                  ? human?.profile?.displayName
+                  : (loginName ?? user?.preferredLoginName)
+              }
+              showDropdown={false}
+            />
           )
         )}
       </div>
@@ -163,14 +212,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </div>
         )}
 
-        <VerifyForm
-          loginName={loginName}
-          organization={organization}
-          userId={id}
-          code={code}
-          isInvite={invite === "true"}
-          requestId={requestId}
-        />
+        {id && (
+          <VerifyForm
+            loginName={loginName}
+            organization={organization}
+            userId={id}
+            code={code}
+            isInvite={invite === "true"}
+            requestId={requestId}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

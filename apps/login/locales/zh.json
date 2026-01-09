@@ -147,7 +147,9 @@
       "couldNotLoadSession": "无法加载会话",
       "couldNotLoadAuthMethods": "无法加载验证方法",
       "failedPrecondition": "前置条件失败",
-      "sessionNotValid": "会话无效"
+      "sessionNotValid": "会话无效",
+      "passwordVerificationMissing": "缺少密码验证。",
+      "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "找不到会话",
         "couldNotUpdateSession": "无法更新会话",
         "userNotFound": "系统中未找到用户",
-        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
-        "couldNotSetSession": "无法设置会话",
-        "couldNotGetUser": "无法检索用户数据",
-        "couldNotRetrieveSessionCookie": "无法检索会话Cookie"
+        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
       }
     },
     "set": {
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "用户已验证！",
       "couldNotResendInvite": "无法重新发送邀请",
       "inviteSendFailed": "发送邀请邮件失败",
-      "emailSendFailed": "发送验证邮件失败"
+      "emailSendFailed": "发送验证邮件失败",
+      "contextMissing": "发生错误。请重试。"
     }
   },
   "authenticator": {

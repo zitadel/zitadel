@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Не удалось загрузить сессию",
       "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
       "failedPrecondition": "Нарушено предварительное условие",
-      "sessionNotValid": "Сессия недействительна"
+      "sessionNotValid": "Сессия недействительна",
+      "passwordVerificationMissing": "Отсутствует проверка пароля.",
+      "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Не удалось найти сеанс",
         "couldNotUpdateSession": "Не удалось обновить сеанс",
         "userNotFound": "Пользователь не найден в системе",
-        "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей",
-        "couldNotSetSession": "Не удалось установить сеанс",
-        "couldNotGetUser": "Не удалось получить данные пользователя",
-        "couldNotRetrieveSessionCookie": "Не удалось получить cookie сеанса"
+        "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей"
       }
     },
     "set": {
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "Пользователь уже подтверждён!",
       "couldNotResendInvite": "Не удалось повторно отправить приглашение",
       "inviteSendFailed": "Не удалось отправить письмо с приглашением",
-      "emailSendFailed": "Не удалось отправить письмо с подтверждением"
+      "emailSendFailed": "Не удалось отправить письмо с подтверждением",
+      "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз."
     }
   },
   "authenticator": {

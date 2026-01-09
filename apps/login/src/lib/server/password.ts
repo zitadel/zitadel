@@ -14,12 +14,12 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { ConnectError, create, Duration } from "@zitadel/client";
+import { ConnectError, create, Duration, timestampDate } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -37,6 +37,7 @@ import { getTranslations } from "next-intl/server";
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
 };
 
@@ -52,6 +53,14 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
 
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
+    const loginSettings = await getLoginSettings({
+      serviceConfig,
+      organization: command.organization ?? command.defaultOrganization,
+    });
+    if (loginSettings?.ignoreUnknownUsernames) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return {};
+    }
     return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = users.result[0].userId;
@@ -70,6 +79,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
 export type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   checks: Checks;
   requestId?: string;
 };
@@ -82,16 +92,54 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error);
   });
 
   let session;
-  let user: User;
+  let user: User | undefined;
   let loginSettings: LoginSettings | undefined;
+
+  if (sessionCookie) {
+    try {
+      loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
+
+      if (loginSettings) {
+        let lifetime = loginSettings.passwordCheckLifetime;
+
+        if (!lifetime || !lifetime.seconds) {
+          console.warn("No password lifetime provided, defaulting to 24 hours");
+          lifetime = {
+            seconds: BigInt(60 * 60 * 24), // default to 24 hours
+            nanos: 0,
+          } as Duration;
+        }
+
+        session = await setSessionAndUpdateCookie({
+          recentCookie: sessionCookie,
+          checks: command.checks,
+          requestId: command.requestId,
+          lifetime,
+        });
+      } else {
+        // Force fallback if settings can't be loaded
+        throw new Error("Could not load login settings");
+      }
+    } catch {
+      console.warn("[Password] Could not update session");
+      // If the session was terminated or any other error occurred during update,
+      // we fall back to creating a new session.
+      sessionCookie = undefined;
+      session = undefined;
+    }
+  }
 
   if (!sessionCookie) {
     const users = await listUsers({ serviceConfig, loginName: command.loginName, organizationId: command.organization });
+    if (!loginSettings) {
+      loginSettings = await getLoginSettings({
+        serviceConfig,
+        organization: command.organization ?? command.defaultOrganization,
+      });
+    }
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
       user = users.result[0];
@@ -101,16 +149,19 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         password: { password: command.checks.password?.password },
       });
 
-      loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
-
       try {
-        session = await createSessionAndUpdateCookie({
+        const result = await createSessionAndUpdateCookie({
           checks,
           requestId: command.requestId,
           lifetime: loginSettings?.passwordCheckLifetime,
         });
+        session = result.session;
+        sessionCookie = result.sessionCookie;
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
+          if (loginSettings?.ignoreUnknownUsernames) {
+            return { error: t("errors.failedToAuthenticateNoLimit") };
+          }
           const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
 
           const hasLimit =
@@ -126,80 +177,46 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
             }),
           };
         }
+        if (loginSettings?.ignoreUnknownUsernames) {
+          return { error: t("errors.failedToAuthenticateNoLimit") };
+        }
         return { error: t("errors.couldNotCreateSessionForUser") };
       }
     } else {
       // this is a fake error message to hide that the user does not even exist
-      return { error: "Could not verify password" };
-    }
-
-    // this is a fake error message to hide that the user does not even exist
-    return { error: t("errors.couldNotVerifyPassword") };
-  } else {
-    loginSettings = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
-
-    if (!loginSettings) {
-      return { error: "Could not load login settings" };
-    }
-
-    let lifetime = loginSettings.passwordCheckLifetime;
-
-    if (!lifetime || !lifetime.seconds) {
-      console.warn("No password lifetime provided, defaulting to 24 hours");
-      lifetime = {
-        seconds: BigInt(60 * 60 * 24), // default to 24 hours
-        nanos: 0,
-      } as Duration;
-    }
-
-    try {
-      session = await setSessionAndUpdateCookie({
-        recentCookie: sessionCookie,
-        checks: command.checks,
-        requestId: command.requestId,
-        lifetime,
-      });
-    } catch (error: any) {
-      if ("failedAttempts" in error && error.failedAttempts) {
-        const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
-
-        const hasLimit =
-          lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-        const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-        const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
-
-        return {
-          error: t(messageKey, {
-            failedAttempts: error.failedAttempts,
-            maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
-            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-          }),
-        };
+      if (loginSettings?.ignoreUnknownUsernames) {
+        return { error: t("errors.failedToAuthenticateNoLimit") };
       }
-      throw error;
+      return { error: t("errors.couldNotVerifyPassword") };
     }
+  }
 
-    if (!session?.factors?.user?.id) {
-      return { error: t("errors.couldNotCreateSessionForUser") };
+  if (!session?.factors?.user?.id) {
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("errors.failedToAuthenticateNoLimit") };
     }
+    return { error: t("errors.couldNotCreateSessionForUser") };
+  }
 
+  if (!user) {
     const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
-
     if (!userResponse.user) {
       return { error: t("errors.userNotFound") };
     }
-
     user = userResponse.user;
   }
 
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceConfig,
-      organization: command.organization ?? session.factors?.user?.organizationId,
+      organization: command.organization ?? session.factors?.user?.organizationId ?? command.defaultOrganization,
     });
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("errors.failedToAuthenticateNoLimit") };
+    }
     return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
@@ -303,7 +320,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 }
 
 // this function lets users with code set a password or users with valid User Verification Check
-export async function changePassword(command: { code?: string; userId: string; password: string }) {
+export async function changePassword(command: { code?: string; userId: string; password: string; organization?: string }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
@@ -312,6 +329,10 @@ export async function changePassword(command: { code?: string; userId: string; p
   const { user } = await getUserByID({ serviceConfig, userId: command.userId });
 
   if (!user || user.userId !== command.userId) {
+    const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+    if (loginSettings?.ignoreUnknownUsernames) {
+      return { error: t("set.errors.couldNotSetPassword") };
+    }
     return { error: t("errors.couldNotSendResetLink") };
   }
   const userId = user.userId;
@@ -352,11 +373,9 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
 
-  let sessionCookie;
-  try {
-    sessionCookie = await getSessionCookieById({ sessionId });
-  } catch (error) {
-    console.error("Error getting session cookie:", error);
+  const sessionCookie = await getSessionCookieById({ sessionId });
+
+  if (!sessionCookie) {
     return { error: "Could not load session cookie" };
   }
 
@@ -407,8 +426,38 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
 
   const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
 
+  const mfaFactors = authmethods.authMethodTypes.filter(
+    (m) =>
+      m === AuthenticationMethodType.TOTP ||
+      m === AuthenticationMethodType.OTP_SMS ||
+      m === AuthenticationMethodType.OTP_EMAIL ||
+      m === AuthenticationMethodType.U2F,
+  );
+
+  const hasMfa = mfaFactors.length > 0;
+  const mfaVerified =
+    !!session.factors?.totp?.verifiedAt ||
+    !!session.factors?.otpSms?.verifiedAt ||
+    !!session.factors?.otpEmail?.verifiedAt ||
+    !!session.factors?.webAuthN?.verifiedAt;
+
+  // check if the password factor is set and not older than 5 minutes
+  const passwordVerifiedAt = session.factors?.password?.verifiedAt;
+  if (!passwordVerifiedAt) {
+    return { error: t("errors.passwordVerificationMissing") };
+  }
+
+  const passwordVerifiedDate = timestampDate(passwordVerifiedAt);
+  const now = new Date();
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+  if (passwordVerifiedDate < fiveMinutesAgo) {
+    return { error: t("errors.passwordVerificationTooOld") };
+  }
+
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa) {
+  // also if the user has no MFA but it is not verified, we use the service account
+  if (forceMfa || (hasMfa && !mfaVerified)) {
     console.log("Set password using service account due to enforced MFA without existing MFA methods");
     return setPassword({ serviceConfig, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
