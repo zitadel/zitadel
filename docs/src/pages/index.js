@@ -49,7 +49,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/guides/manage/console/overview"
+              link="/docs/guides/manage/console/console-overview"
               type={ICONTYPE.LOGIN}
               title="Manage"
               description="All about Console"
@@ -183,7 +183,7 @@ const features = [
             description=""
           />
           <ListElement
-            link="/docs/apis/actions/introduction"
+            link="/docs/guides/manage/console/actions-overview"
             type={ICONTYPE.APIS}
             title="Actions"
             description="Customize and integrate ZITADEL into your landscape"
