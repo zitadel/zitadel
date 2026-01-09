@@ -21,6 +21,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -897,23 +898,49 @@ func TestServer_SetSession_expired(t *testing.T) {
 }
 
 func TestServer_DeleteSession_token(t *testing.T) {
-	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
-	require.NoError(t, err)
-
-	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: gu.Ptr("invalid"),
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
 	})
-	require.Error(t, err)
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: gu.Ptr(createResp.GetSessionToken()),
-	})
-	require.NoError(t, err)
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
+		t.Run(stateCase.State, func(t *testing.T) {
+			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
+			require.NoError(t, err)
+
+			_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+				SessionId:    createResp.GetSessionId(),
+				SessionToken: gu.Ptr("invalid"),
+			})
+			require.Error(t, err)
+
+			_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+				SessionId:    createResp.GetSessionId(),
+				SessionToken: gu.Ptr(createResp.GetSessionToken()),
+			})
+			require.NoError(t, err)
+		})
+	}
 }
 
 func TestServer_DeleteSession_own_session(t *testing.T) {
+	//TODO: can only be tested when permission checks are implemented for relational tables
+	// t.Cleanup(func() {
+	//	_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
+	//	require.NoError(t, err)
+	// })
+	// relTableState := integration.RelationalTablesEnableMatrix()
+	//
+	// for _, stateCase := range relTableState {
+	//	integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+	//		assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+	//	})
+	//	t.Run(stateCase.State, func(t *testing.T) {
+
 	// create two users for the test and a session each to get tokens for authorization
 	user1 := Instance.CreateHumanUser(CTX)
 	Instance.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
@@ -946,46 +973,74 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 		SessionId: createResp.GetSessionId(),
 	})
 	require.NoError(t, err)
+	//	})
+	// }
 }
 
 func TestServer_DeleteSession_with_permission(t *testing.T) {
-	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{
-					UserId: User.GetUserId(),
-				},
-			},
-		},
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
 	})
-	require.NoError(t, err)
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-	// delete the new session by ORG_OWNER
-	_, err = Client.DeleteSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
-		SessionId: createResp.GetSessionId(),
-	})
-	require.NoError(t, err)
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
+		t.Run(stateCase.State, func(t *testing.T) {
+			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: User.GetUserId(),
+						},
+					},
+				},
+			})
+			require.NoError(t, err)
+
+			// delete the new session by ORG_OWNER
+			_, err = Client.DeleteSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+				SessionId: createResp.GetSessionId(),
+			})
+			require.NoError(t, err)
+		})
+	}
 }
 
 func TestServer_DeleteSession_expired(t *testing.T) {
-	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
-		Lifetime: durationpb.New(5 * time.Second),
+	t.Cleanup(func() {
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IAMOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
+		require.NoError(t, err)
 	})
-	require.NoError(t, err)
+	relTableState := integration.RelationalTablesEnableMatrix()
 
-	// wait until the token expires
-	time.Sleep(10 * time.Second)
-	_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: gu.Ptr(createResp.GetSessionToken()),
-	})
-	require.NoError(t, err)
+	for _, stateCase := range relTableState {
+		integration.EnsureInstanceFeature(t, IAMOwnerCTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
+		})
+		t.Run(stateCase.State, func(t *testing.T) {
+			createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+				Lifetime: durationpb.New(5 * time.Second),
+			})
+			require.NoError(t, err)
 
-	// get session should return an error
-	sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
-		&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
-	require.Error(t, err)
-	require.Nil(t, sessionResp)
+			// wait until the token expires
+			time.Sleep(10 * time.Second)
+			_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+				SessionId:    createResp.GetSessionId(),
+				SessionToken: gu.Ptr(createResp.GetSessionToken()),
+			})
+			require.NoError(t, err)
+
+			// get session should return an error
+			sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+				&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+			require.Error(t, err)
+			require.Nil(t, sessionResp)
+		})
+	}
 }
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {

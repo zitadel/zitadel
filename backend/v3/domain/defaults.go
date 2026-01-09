@@ -10,10 +10,11 @@ import (
 )
 
 var (
-	pool             database.Pool
-	tracer           tracing.Tracer
-	logger           logging.Logger = *logging.NewLogger(slog.Default())
-	legacyEventstore eventstore.LegacyEventstore
+	pool                 database.Pool
+	tracer               tracing.Tracer
+	logger               logging.Logger = *logging.NewLogger(slog.Default())
+	legacyEventstore     eventstore.LegacyEventstore
+	sessionTokenVerifier SessionTokenVerifier
 )
 
 func SetPool(p database.Pool) {
@@ -30,4 +31,8 @@ func SetLogger(l logging.Logger) {
 
 func SetLegacyEventstore(es eventstore.LegacyEventstore) {
 	legacyEventstore = es
+}
+
+func SetSessionTokenVerifier(verifier SessionTokenVerifier) {
+	sessionTokenVerifier = verifier
 }

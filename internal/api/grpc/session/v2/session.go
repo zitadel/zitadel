@@ -10,6 +10,8 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	sessionv2 "github.com/zitadel/zitadel/backend/v3/api/session/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -63,6 +65,10 @@ func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.Se
 }
 
 func (s *Server) DeleteSession(ctx context.Context, req *connect.Request[session.DeleteSessionRequest]) (*connect.Response[session.DeleteSessionResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return sessionv2.DeleteSession(ctx, req)
+	}
+
 	details, err := s.command.TerminateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken())
 	if err != nil {
 		return nil, err

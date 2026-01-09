@@ -16,6 +16,8 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	zdomain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -342,6 +344,16 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 
 	// V2:
 	// Terminate the v2 session of the id_token_hint
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		if err := zdomain.Invoke(
+			ctx,
+			zdomain.NewDeleteSessionCommand(endSessionRequest.IDTokenHintClaims.SessionID, "", false),
+			zdomain.WithSessionRepo(repository.SessionRepository()),
+		); err != nil {
+			return "", err
+		}
+		return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
+	}
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err
