@@ -49,7 +49,7 @@ The following resources are counted:
 - Password Complexity Policies
 - Password Expiry Policies
 - Lockout Policies
-- Notification Policies with option "Password change" enabled
+- Notification Policies with option "Password changed" enabled
 
 The list might be extended in the future to include more resources.
 

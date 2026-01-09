@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Determines on which changes, notifications will be sent.",
-      "PASSWORDCHANGE": "Password change"
+      "PASSWORDCHANGE": "Password changed"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",

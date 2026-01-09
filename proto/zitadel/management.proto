@@ -6881,7 +6881,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Password Change Message Text";
+            summary: "Get Custom Password Changed Message Text";
             description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {
@@ -6905,7 +6905,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Password Change Message Text";
+            summary: "Get Default Password Changed Message Text";
             description: "Get the default text of the password-changed message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {
