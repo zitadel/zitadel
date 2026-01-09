@@ -935,5 +935,47 @@ describe("sendLoginname", () => {
       expect(result?.redirect).toContain("organization=custom-org");
       expect(result?.redirect).toContain("requestId=req123");
     });
+
+    test("should redirect to password with INPUT loginName when ignoreUnknownUsernames is true, even if user preferredLoginName is different", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "user@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: {
+          user: {
+            id: "user123",
+            loginName: "user@example.com",
+            organizationId: "org123",
+          },
+        },
+      };
+
+      mockGetLoginSettings.mockResolvedValue({
+        allowUsernamePassword: true,
+        ignoreUnknownUsernames: true,
+      });
+      // Mock search result returns a user with resolved/different loginName
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockCreate.mockReturnValue({});
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      // INPUT login name is just "user"
+      const result = await sendLoginname({
+        loginName: "user",
+      });
+
+      expect(result).toHaveProperty("redirect");
+      // Expect redirect to contain input "user" not resolved "user@example.com"
+      expect((result as any).redirect).toContain("loginName=user");
+      expect((result as any).redirect).not.toContain("loginName=user%40example.com");
+    });
   });
 });
