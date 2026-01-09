@@ -137,7 +137,11 @@ The information sent to the Endpoint is structured as JSON:
       "projectId": "",
       "projectName": ""
     }
-  ]
+  ],
+  "application": {
+    "client_id": "The client ID of the application",
+    "project_id": "The project ID the application belongs to"
+  }
 }
 ```
 
@@ -231,7 +235,11 @@ The information sent to the Endpoint is structured as JSON:
       "projectId": "",
       "projectName": ""
     }
-  ]
+  ],
+  "application": {
+    "client_id": "The client ID of the application",
+    "project_id": "The project ID the application belongs to"
+  }
 }
 ```
 

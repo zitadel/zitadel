@@ -133,7 +133,7 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 	return client, err
 }
 
-func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
+func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, string, error) {
 	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
 
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
@@ -157,9 +157,9 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 		LoginVersion:             loginVersion,
 	})
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	return resp, await(func() error {
+	return resp, project.GetId(), await(func() error {
 		_, err := i.Client.Mgmt.GetProjectByID(ctx, &management.GetProjectByIDRequest{
 			Id: project.GetId(),
 		})
