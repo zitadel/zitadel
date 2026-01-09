@@ -56,7 +56,7 @@ func (u userHuman) AddPasskey(passkey *domain.Passkey) database.Change {
 			}.WriteUnqualified(builder)
 			builder.WriteString(") SELECT ")
 			database.Columns{
-				existingHumanUser.instanceIDColumn(),
+				existingHumanUser.InstanceIDColumn(),
 				existingHumanUser.idColumn(),
 			}.WriteQualified(builder)
 			builder.WriteString(", ")
@@ -90,7 +90,7 @@ func (u userHuman) RemovePasskey(condition database.Condition) database.Change {
 			builder.WriteString(" USING ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.passkeyInstanceIDColumn()),
 				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
 				condition,
 			))
@@ -157,7 +157,7 @@ func (u userHuman) UpdatePasskey(condition database.Condition, changes ...databa
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.passkeyInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.passkeyInstanceIDColumn()),
 				database.NewColumnCondition(existingHumanUser.idColumn(), u.passkeyUserIDColumn()),
 				condition,
 			))

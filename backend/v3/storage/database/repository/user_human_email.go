@@ -24,7 +24,7 @@ func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
 				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
 			))
 		}, nil)
@@ -51,7 +51,7 @@ func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
 					expiry = *typ.Expiry
 				}
 				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, code, created_at, expiry) SELECT ")
-				existingHumanUser.instanceIDColumn().WriteQualified(builder)
+				existingHumanUser.InstanceIDColumn().WriteQualified(builder)
 				builder.WriteString(", ")
 				builder.WriteArgs(typ.Code, createdAt, expiry)
 				builder.WriteString(" FROM ")
@@ -104,7 +104,7 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
 				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
 			))
 		}, nil)
@@ -129,7 +129,7 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
 				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailVerificationIDColumn()),
 			))
 		}, nil)

@@ -38,7 +38,7 @@ CREATE TABLE zitadel.users(
     , avatar_key TEXT CHECK (type = 'human')
     , multi_factor_initialization_skipped_at TIMESTAMPTZ CHECK (type = 'human')
 
-    , password BYTES CHECK (type = 'human')
+    , password BYTEA CHECK (type = 'human')
     , password_change_required BOOLEAN CHECK (type = 'human')
     , password_verified_at TIMESTAMPTZ CHECK (type = 'human')
     , unverified_password_id TEXT CHECK (type = 'human')
@@ -67,19 +67,13 @@ CREATE TABLE zitadel.users(
     , FOREIGN KEY (instance_id, unverified_email_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_email_id)
     , FOREIGN KEY (instance_id, unverified_phone_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_phone_id)
     , FOREIGN KEY (instance_id, email_otp_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (email_otp_verification_id)
-    , FOREIGN KEY (instance_id, phone_otp_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (phone_otp_verification_id)
-
-    , UNIQUE (password_verification_id) WHERE password_verification_id IS NOT NULL
-    , UNIQUE (email_verification_id) WHERE email_verification_id IS NOT NULL
-    , UNIQUE (phone_verification_id) WHERE phone_verification_id IS NOT NULL
-    , UNIQUE (email_otp_verification_id) WHERE email_otp_verification_id IS NOT NULL
-    , UNIQUE (phone_otp_verification_id) WHERE phone_otp_verification_id IS NOT NULL
+    , FOREIGN KEY (instance_id, sms_otp_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (sms_otp_verification_id)
 
     -- machine
     
     , name TEXT CHECK (name <> '' AND type = 'machine')
     , description TEXT CHECK (type = 'machine')
-    , secret BYTES CHECK (type = 'machine')
+    , secret BYTEA CHECK (type = 'machine')
     , access_token_type SMALLINT CHECK (type = 'machine')
 );
 
@@ -93,6 +87,14 @@ CREATE INDEX idx_human_email ON zitadel.users (email);
 CREATE INDEX idx_human_email_lower ON zitadel.users (lower(email));
 CREATE INDEX idx_human_phone ON zitadel.users (phone);
 CREATE INDEX idx_human_phone_lower ON zitadel.users (lower(phone));
+
+-- human
+
+CREATE UNIQUE INDEX ON zitadel.users(unverified_password_id) WHERE unverified_password_id IS NOT NULL;
+CREATE UNIQUE INDEX ON zitadel.users(unverified_email_id) WHERE unverified_email_id IS NOT NULL;
+CREATE UNIQUE INDEX ON zitadel.users(unverified_phone_id) WHERE unverified_phone_id IS NOT NULL;
+CREATE UNIQUE INDEX ON zitadel.users(email_otp_verification_id) WHERE email_otp_verification_id IS NOT NULL;
+CREATE UNIQUE INDEX ON zitadel.users(sms_otp_verification_id) WHERE sms_otp_verification_id IS NOT NULL;
 
 CREATE FUNCTION zitadel.validate_human_user()
 RETURNS TRIGGER AS $$
@@ -234,7 +236,7 @@ CREATE TABLE zitadel.machine_keys(
     , expires_at TIMESTAMPTZ
 
     , type SMALLINT NOT NULL CHECK (type >= 0)
-    , public_key BYTES NOT NULL
+    , public_key BYTEA NOT NULL
 
     , PRIMARY KEY (instance_id, id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
@@ -264,10 +266,10 @@ CREATE TABLE zitadel.human_passkeys(
     , type zitadel.passkey_type NOT NULL
     , name TEXT NOT NULL CHECK (name <> '')
     , sign_count INT NOT NULL DEFAULT 0 CHECK (sign_count >= 0)
-    , challenge BYTES NOT NULL
-    , public_key BYTES NOT NULL
+    , challenge BYTEA NOT NULL
+    , public_key BYTEA NOT NULL
     , attestation_type TEXT NOT NULL CHECK (attestation_type <> '')
-    , authenticator_attestation_guid BYTES NOT NULL
+    , authenticator_attestation_guid BYTEA NOT NULL
     , relying_party_id TEXT NOT NULL CHECK (relying_party_id <> '')
 
     , PRIMARY KEY (instance_id, token_id)
@@ -292,7 +294,7 @@ CREATE TABLE zitadel.human_identity_provider_links(
 
     , PRIMARY KEY (instance_id, identity_provider_id, provided_user_id)
 
-    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.human_users(instance_id, id) ON DELETE CASCADE
+    , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, identity_provider_id) REFERENCES zitadel.identity_providers(instance_id, id) ON DELETE CASCADE
 
     , UNIQUE (instance_id, user_id, provided_user_id)

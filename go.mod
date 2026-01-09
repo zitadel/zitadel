@@ -30,7 +30,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v1.2.1
 	github.com/fatih/color v1.18.0
-	github.com/fergusstrange/embedded-postgres v1.30.0
+	github.com/fergusstrange/embedded-postgres v1.33.0
 	github.com/gabriel-vasile/mimetype v1.4.11
 	github.com/georgysavva/scany/v2 v2.1.4
 	github.com/go-chi/chi/v5 v5.2.3

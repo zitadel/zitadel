@@ -110,8 +110,8 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 		opt(options)
 	}
 
-	if !options.Condition.IsRestrictingColumn(u.instanceIDColumn()) {
-		return nil, database.NewMissingConditionError(u.instanceIDColumn())
+	if !options.Condition.IsRestrictingColumn(u.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.InstanceIDColumn())
 	}
 
 	builder := database.NewStatementBuilder(queryUserStmt)
@@ -127,8 +127,8 @@ func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...d
 		opt(options)
 	}
 
-	if !options.Condition.IsRestrictingColumn(u.instanceIDColumn()) {
-		return nil, database.NewMissingConditionError(u.instanceIDColumn())
+	if !options.Condition.IsRestrictingColumn(u.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.InstanceIDColumn())
 	}
 
 	builder := database.NewStatementBuilder(queryUserStmt)
@@ -171,7 +171,7 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	builder.WriteString(" FROM existing_user")
 	writeCondition(builder, database.And(
 		database.NewColumnCondition(u.idColumn(), existingUser.idColumn()),
-		database.NewColumnCondition(u.instanceIDColumn(), existingUser.instanceIDColumn()),
+		database.NewColumnCondition(u.InstanceIDColumn(), existingUser.InstanceIDColumn()),
 	))
 
 	return client.Exec(ctx, builder.String(), builder.Args()...)
@@ -235,7 +235,7 @@ func (u user) RemoveMetadata(condition database.Condition) database.Change {
 			builder.WriteString("DELETE FROM zitadel.user_metadata USING ")
 			builder.WriteString(existingUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingUser.instanceIDColumn(), u.metadataInstanceIDColumn()),
+				database.NewColumnCondition(existingUser.InstanceIDColumn(), u.metadataInstanceIDColumn()),
 				database.NewColumnCondition(existingUser.idColumn(), u.metadataUserIDColumn()),
 				condition,
 			))
@@ -279,7 +279,7 @@ func (u user) IDCondition(userID string) database.Condition {
 
 // InstanceIDCondition implements [domain.UserRepository.InstanceIDCondition].
 func (u user) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(u.instanceIDColumn(), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // LoginNameCondition implements [domain.UserRepository.LoginNameCondition].
@@ -287,14 +287,8 @@ func (u user) LoginNameCondition(op database.TextOperation, loginName string) da
 	panic("unimplemented")
 }
 
-// MetadataKeyCondition implements [domain.UserRepository.MetadataKeyCondition].
-func (u user) MetadataKeyCondition(op database.TextOperation, key string) database.Condition {
-	return database.NewTextCondition(u.metadataKeyColumn(), op, key)
-}
-
-// MetadataValueCondition implements [domain.UserRepository.MetadataValueCondition].
-func (u user) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
-	return database.NewBytesCondition[[]byte](database.SHA256Column(u.metadataValueColumn()), op, database.SHA256Value(value))
+func (u user) MetadataConditions() domain.UserMetadataConditions {
+	return userMetadataConditions{user: u}
 }
 
 // OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
@@ -332,7 +326,7 @@ func (u user) UsernameCondition(op database.TextOperation, username string) data
 // PrimaryKeyColumns implements [domain.UserRepository.PrimaryKeyColumns].
 func (u user) PrimaryKeyColumns() []database.Column {
 	return database.Columns{
-		u.instanceIDColumn(),
+		u.InstanceIDColumn(),
 		u.idColumn(),
 	}
 }
@@ -361,7 +355,7 @@ func (u user) idColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "id")
 }
 
-func (u user) instanceIDColumn() database.Column {
+func (u user) InstanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
 }
 

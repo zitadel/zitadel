@@ -1517,7 +1517,7 @@ func (p *userRelationalProjection) reduceMetadataRemoved(event eventstore.Event)
 		repo := repository.UserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.RemoveMetadata(repo.MetadataKeyCondition(database.TextOperationEqual, e.Key)),
+			repo.RemoveMetadata(repo.MetadataConditions().MetadataKeyCondition(database.TextOperationEqual, e.Key)),
 		)
 		return err
 	}), nil
@@ -1894,6 +1894,7 @@ func (p *userRelationalProjection) reduceIDPLinkUserIDMigrated(event eventstore.
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
+				nil, // TODO(adlerhurst): set correct condition
 				repo.SetIdentityProviderLinkProvidedID(e.IDPConfigID, e.PreviousID, e.NewID),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1916,6 +1917,7 @@ func (p *userRelationalProjection) reduceIDPLinkUsernameChanged(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.UpdateIdentityProviderLink(
+				nil, // TODO(adlerhurst): set correct condition
 				repo.SetIdentityProviderLinkUsername(e.IDPConfigID, e.ExternalUserID, e.ExternalUsername),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),

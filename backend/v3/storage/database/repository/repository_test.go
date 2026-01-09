@@ -32,7 +32,14 @@ func runTests(m *testing.M) int {
 		log.Printf("error with embedded postgres database: %v", err)
 		return 1
 	}
-	defer stop()
+	defer func() {
+		r := recover()
+		pool.Close(ctx)
+		stop()
+		if r != nil {
+			panic(r)
+		}
+	}()
 
 	return m.Run()
 }

@@ -3,7 +3,7 @@ CREATE TABLE zitadel.verifications(
     , id TEXT NOT NULL
 
     , value TEXT
-    , code BYTES
+    , code BYTEA
 
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , expiry INTERVAL

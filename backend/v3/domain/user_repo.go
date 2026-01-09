@@ -74,6 +74,7 @@ type userChanges interface {
 
 type userColumns interface {
 	PrimaryKeyColumns() []database.Column
+	InstanceIDColumn() database.Column
 	UsernameColumn() database.Column
 	StateColumn() database.Column
 	TypeColumn() database.Column

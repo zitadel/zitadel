@@ -36,7 +36,7 @@ func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 					builder.WriteString(" FROM ")
 					builder.WriteString(existingHumanUser.unqualifiedTableName())
 					writeCondition(builder, database.And(
-						database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+						database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
 						database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.totpSecretIDColumn()),
 					))
 				},
@@ -69,7 +69,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 			database.NewCTEChange(func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, value, code, created_at, expiry) SELECT")
 				builder.WriteArgs(
-					existingHumanUser.instanceIDColumn(),
+					existingHumanUser.InstanceIDColumn(),
 					existingHumanUser.idColumn(),
 					typ.Value,
 					typ.Code,
@@ -89,7 +89,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 							builder.WriteString(" FROM ")
 							builder.WriteString(name)
 							writeCondition(builder, database.And(
-								database.NewColumnCondition(u.instanceIDColumn(), database.NewColumn(name, "instance_id")),
+								database.NewColumnCondition(u.InstanceIDColumn(), database.NewColumn(name, "instance_id")),
 								database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
 							))
 						},
@@ -126,7 +126,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.instanceIDColumn()),
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
 				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.unverifiedTOTPIDColumn()),
 			))
 		}, nil)
@@ -148,7 +148,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 					u.verification.CreationDateColumn(),
 				}.WriteUnqualified(builder)
 				builder.WriteString(") SELECT ")
-				existingHumanUser.instanceIDColumn().WriteQualified(builder)
+				existingHumanUser.InstanceIDColumn().WriteQualified(builder)
 				builder.WriteString(", ")
 				builder.WriteArgs(typ.Value, skippedAt)
 				builder.WriteString(" FROM ")

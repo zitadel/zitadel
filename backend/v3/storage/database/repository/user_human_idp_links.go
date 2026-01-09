@@ -32,7 +32,7 @@ func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) da
 			builder.WriteString(u.qualifiedIDPLinksTableName())
 			builder.WriteString("(instance_id, user_id, provided_user_id, provided_username, provider_id, created_at, updated_at) SELECT ")
 			database.Columns{
-				existingHumanUser.instanceIDColumn(),
+				existingHumanUser.InstanceIDColumn(),
 				existingHumanUser.idColumn(),
 			}.WriteQualified(builder)
 			builder.WriteArgs(
@@ -59,7 +59,7 @@ func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID 
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
 				database.NewColumnCondition(
-					existingHumanUser.instanceIDColumn(),
+					existingHumanUser.InstanceIDColumn(),
 					u.linkedIdentityProviderInstanceIDColumn(),
 				),
 				database.NewColumnCondition(
@@ -98,7 +98,7 @@ func (u userHuman) UpdateIdentityProviderLink(condition database.Condition, chan
 			builder.WriteString("UPDATE zitadel.human_identity_provider_links SET ")
 			database.Changes(changes).Write(builder)
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.instanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
 				database.NewColumnCondition(existingHumanUser.idColumn(), u.linkedIdentityProviderInstanceIDColumn()),
 				condition,
 			))
