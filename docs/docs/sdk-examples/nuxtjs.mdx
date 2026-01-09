@@ -31,9 +31,9 @@ The example implements secure [session management](https://zitadel.com/docs/conc
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the **[Application Setup guide](/docs/concepts/structure/applications)** to:
+Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](/docs/guides/manage/console/console-overview). Follow the **[Application Setup guide](/guides/manage/console/applications-overview)** to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+1. Create a new Web application in your [Zitadel Project](/guides/manage/console/projects-overview)
 2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/`)
@@ -46,7 +46,7 @@ Before running this example, you need to create and configure a PKCE application
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-nuxtjs).
-2. Create a `.env` file and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/overview). **Use these exact environment variable names:**
+2. Create a `.env` file and configure it with the values from your [Zitadel Application](/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
 ```
    PORT=3000
    SESSION_DURATION=3600
@@ -78,7 +78,7 @@ The application will be running at `http://localhost:3000` where you can test th
 
 * [Zitadel documentation](https://zitadel.com/docs)
 * [PKCE concept](/docs/guides/integrate/login/oidc/login-users#pkce)
-* [PKCE application setup](/docs/concepts/structure/applications)
+* [PKCE application setup](/guides/manage/console/applications-overview)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
 * [Framework docs](https://nuxt.com)
