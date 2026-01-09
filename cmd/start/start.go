@@ -144,7 +144,7 @@ Requirements:
 				return err
 			}
 			defer func() {
-				err = shutdown(cmd.Context())
+				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
 
 			masterKey, err := key.MasterKey(cmd)
