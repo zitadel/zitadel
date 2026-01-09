@@ -36,8 +36,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
-  const contextLoginSettings = await getLoginSettings({ serviceConfig, organization });
-
   const identityProviders = await getActiveIdentityProviders({
     serviceConfig,
     orgId: organization ?? defaultOrganization,
