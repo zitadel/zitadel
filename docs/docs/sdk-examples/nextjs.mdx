@@ -15,13 +15,13 @@ status: stable
 
 #### Auth library
 
-This example uses **[next-auth](https://www.npmjs.com/package/next-auth)** with **[openid-client](https://www.npmjs.com/package/openid-client)** to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](/docs/concepts/pkce) code challenge generation, perform secure token exchange, and provide session management helpers.
+This example uses **[next-auth](https://www.npmjs.com/package/next-auth)** with **[openid-client](https://www.npmjs.com/package/openid-client)** to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](https://oauth.net/2/pkce/) code challenge generation, perform secure token exchange, and provide session management helpers.
 
 ---
 
 ## What this example demonstrates
 
-This Next.js application demonstrates a secure authentication flow using Zitadel with the industry-standard [PKCE flow](/docs/concepts/pkce). Users start on a public landing page, initiate login via the Zitadel authorization server, and after successful authentication are redirected back to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This Next.js application demonstrates a secure authentication flow using Zitadel with the industry-standard [PKCE flow](https://oauth.net/2/pkce/). Users start on a public landing page, initiate login via the Zitadel authorization server, and after successful authentication are redirected back to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
 The application implements session management using NextAuth.js with a JWT-based session strategy. It includes automatic callback handling with secure token exchange, route protection for authenticated-only pages, and an example of requesting additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) (including `offline_access` for refresh tokens and Zitadel-specific scopes for metadata and roles).
 
@@ -40,13 +40,13 @@ Before running this example, you need to create and configure a PKCE application
 3. Set up your redirect URIs (e.g., `http://localhost:3000/api/auth/callback/zitadel` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/api/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
-6. Optionally enable [refresh tokens](https://zitadel.com/docs/concepts/tokens) in Token Settings for long-lived sessions
+6. Optionally enable [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) in Token Settings for long-lived sessions
 
 > **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production deployments, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
-Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/login-users):
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-nextjs).
 2. Create a `.env.local` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
@@ -75,9 +75,9 @@ Once you have your [Zitadel application configured](https://zitadel.com/docs/gui
 
 ## Learn more and resources
 
-* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [PKCE concept](https://oauth.net/2/pkce/)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
 * [Next.js documentation](https://nextjs.org)
 * [NextAuth.js documentation](https://next-auth.js.org/)
 * [Example repository](https://github.com/zitadel/example-auth-nextjs)

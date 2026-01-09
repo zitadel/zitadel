@@ -15,17 +15,17 @@ status: stable
 
 #### Auth library
 
-This example uses **[Auth.js](https://authjs.dev)** (specifically the **[@auth/core](https://www.npmjs.com/package/@auth/core)** package and **[auth-astro](https://www.npmjs.com/package/auth-astro)** adapter), a comprehensive authentication library that implements the [OpenID Connect](https://openid.net/connect/) protocol. Auth.js handles [PKCE](/docs/concepts/pkce) code generation and verification, token exchange, session management, and automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived user sessions.
+This example uses **[Auth.js](https://authjs.dev)** (specifically the **[@auth/core](https://www.npmjs.com/package/@auth/core)** package and **[auth-astro](https://www.npmjs.com/package/auth-astro)** adapter), a comprehensive authentication library that implements the [OpenID Connect](https://openid.net/connect/) protocol. Auth.js handles [PKCE](https://oauth.net/2/pkce/) code generation and verification, token exchange, session management, and automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived user sessions.
 
 ---
 
 ## What this example demonstrates
 
-This Astro application showcases a complete authentication workflow with [Zitadel](https://zitadel.com/docs) using [Auth.js](https://authjs.dev). Users start on a public landing page and click a login button to authenticate through Zitadel's [authorization endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints) using the secure [PKCE flow](/docs/concepts/pkce). After successful authentication, users are redirected to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims) retrieved from the [ID token](https://zitadel.com/docs/concepts/tokens).
+This Astro application showcases a complete authentication workflow with [Zitadel](https://zitadel.com/docs) using [Auth.js](https://authjs.dev). Users start on a public landing page and click a login button to authenticate through Zitadel's [authorization endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints) using the secure [PKCE flow](https://oauth.net/2/pkce/). After successful authentication, users are redirected to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims) retrieved from the [ID token](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint).
 
-The example implements server-side session management with encrypted [JWT tokens](https://zitadel.com/docs/concepts/tokens), ensuring secure authentication state across Astro's [server-rendered pages](https://docs.astro.build/en/core-concepts/astro-pages/). Protected routes automatically redirect unauthenticated users to the login flow using [Astro's middleware](https://docs.astro.build/en/guides/middleware/), preventing unauthorized access to sensitive areas.
+The example implements server-side session management with encrypted [JWT tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint), ensuring secure authentication state across Astro's [server-rendered pages](https://docs.astro.build/en/core-concepts/astro-pages/). Protected routes automatically redirect unauthenticated users to the login flow using [Astro's middleware](https://docs.astro.build/en/guides/middleware/), preventing unauthorized access to sensitive areas.
 
-The application includes complete [logout functionality](https://zitadel.com/docs/guides/integrate/login/oidc/logout) that performs [federated single sign-out](https://zitadel.com/docs/guides/integrate/login/oidc/logout), terminating both the local session and the remote Zitadel session through the [end-session endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints). It demonstrates [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities using [refresh tokens](https://zitadel.com/docs/concepts/tokens) with the `offline_access` [scope](https://zitadel.com/docs/apis/openidoauth/scopes), allowing users to maintain authenticated sessions without repeated logins. The example also shows how to request additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `profile`, `email`, and Zitadel-specific scopes for [user metadata](https://zitadel.com/docs/guides/manage/customize/user-metadata), [organization information](https://zitadel.com/docs/guides/manage/organizations/), and [role assignments](https://zitadel.com/docs/guides/manage/console/roles).
+The application includes complete [logout functionality](https://zitadel.com/docs/guides/integrate/login/oidc/logout) that performs [federated single sign-out](https://zitadel.com/docs/guides/integrate/login/oidc/logout), terminating both the local session and the remote Zitadel session through the [end-session endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints). It demonstrates [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint) with the `offline_access` [scope](https://zitadel.com/docs/apis/openidoauth/scopes), allowing users to maintain authenticated sessions without repeated logins. The example also shows how to request additional [OIDC scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `profile`, `email`, and Zitadel-specific scopes for [user metadata](https://zitadel.com/docs/guides/manage/customize/user-metadata), [organization information](https://zitadel.com/docs/guides/manage/console/organizations), and [role assignments](https://zitadel.com/docs/guides/manage/console/roles).
 
 ---
 
@@ -45,7 +45,7 @@ Before running this example, you need to create and configure a PKCE application
 
 ### Run the example
 
-Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/):
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/login-users):
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-astro).
 2. Create a `.env` file based on `.env.example` and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
@@ -73,9 +73,9 @@ Once you have your [Zitadel application configured](https://zitadel.com/docs/gui
 
 ## Learn more and resources
 
-* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [PKCE concept](https://oauth.net/2/pkce/)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
 * [Astro documentation](https://astro.build)
 * [Auth.js documentation](https://authjs.dev)
 * [@auth/core package](https://www.npmjs.com/package/@auth/core)

@@ -15,17 +15,17 @@ status: stable
 
 #### Auth library
 
-This example uses **[Symfony Security](https://symfony.com/doc/current/security.html)**, the standard authentication component for Symfony applications. Symfony Security implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow through a custom authenticator, manages [PKCE](/docs/concepts/pkce), performs secure token exchange, and provides session management through Symfony's firewall system.
+This example uses **[Symfony Security](https://symfony.com/doc/current/security.html)**, the standard authentication component for Symfony applications. Symfony Security implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow through a custom authenticator, manages [PKCE](https://oauth.net/2/pkce/), performs secure token exchange, and provides session management through Symfony's firewall system.
 
 ---
 
 ## What this example demonstrates
 
-This example shows a complete authentication implementation using [Symfony](https://symfony.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](/docs/concepts/pkce), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
+This example shows a complete authentication implementation using [Symfony](https://symfony.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](https://oauth.net/2/pkce/), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
 
-The application implements server-side session management with Symfony's security system, storing authentication state securely through the framework's user provider pattern. Protected routes use Symfony Security's firewall configuration to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/concepts/tokens).
+The application implements server-side session management with Symfony's security system, storing authentication state securely through the framework's user provider pattern. Protected routes use Symfony Security's firewall configuration to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint).
 
-The application demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with Zitadel's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/concepts/tokens) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [Zitadel-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
+The application demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with Zitadel's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [Zitadel-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
 
 ---
 
@@ -40,7 +40,7 @@ Before running this example, you need to create and configure a PKCE application
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
-6. Optionally enable [refresh tokens](https://zitadel.com/docs/concepts/tokens) in Token Settings for long-lived sessions
+6. Optionally enable [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) in Token Settings for long-lived sessions
 
 > **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
@@ -71,9 +71,9 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/
 
 ## Learn more and resources
 
-* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [PKCE concept](https://oauth.net/2/pkce/)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
 * [Symfony documentation](https://symfony.com/doc)
 * [Symfony Security documentation](https://symfony.com/doc/current/security.html)
 * [Example repository](https://github.com/zitadel/example-auth-symfony)

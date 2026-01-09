@@ -15,13 +15,13 @@ status: stable
 
 #### Auth library
 
-This example uses **[@auth/qwik](https://www.npmjs.com/package/@auth/qwik)**, a Qwik adapter for **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js/NextAuth.js), which implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow, manages [PKCE](/docs/concepts/pkce), performs token exchange, and exposes helpers for session state. The core library handles authentication across multiple frameworks and provides secure [token storage](https://zitadel.com/docs/concepts/tokens) with automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities.
+This example uses **[@auth/qwik](https://www.npmjs.com/package/@auth/qwik)**, a Qwik adapter for **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly Auth.js/NextAuth.js), which implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) flow, manages [PKCE](https://oauth.net/2/pkce/), performs token exchange, and exposes helpers for session state. The core library handles authentication across multiple frameworks and provides secure [token storage](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint) with automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) capabilities.
 
 ---
 
 ## What this example demonstrates
 
-This [Qwik](https://qwik.dev) application showcases a complete authentication implementation using [Zitadel](https://zitadel.com/docs) with the [Authorization Code Flow with PKCE](/docs/concepts/pkce). The example includes secure sign-in functionality that redirects users to Zitadel's hosted login page, handles the OAuth callback to exchange authorization codes for [access tokens](https://zitadel.com/docs/concepts/tokens), and manages sessions with [JWT tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#json-web-token-jwt-profile) stored in encrypted server-side cookies.
+This [Qwik](https://qwik.dev) application showcases a complete authentication implementation using [Zitadel](https://zitadel.com/docs) with the [Authorization Code Flow with PKCE](https://oauth.net/2/pkce/). The example includes secure sign-in functionality that redirects users to Zitadel's hosted login page, handles the OAuth callback to exchange authorization codes for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint), and manages sessions with [JWT tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token-jwt-response) stored in encrypted server-side cookies.
 
 Route protection is implemented using [Qwik City's](https://qwik.dev/docs/qwikcity) `onRequest` handler, which performs server-side authentication checks before rendering protected pages. Unauthenticated users attempting to access secured routes are automatically redirected to the login page with a callback URL to return them to their intended destination after successful authentication. The application displays comprehensive user profile information including standard [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) like name and email, as well as Zitadel-specific claims such as [organization membership](https://zitadel.com/docs/guides/manage/console/organizations) and [project roles](https://zitadel.com/docs/guides/manage/console/projects).
 
@@ -60,7 +60,7 @@ Once you have your [Zitadel application](https://zitadel.com/docs/guides/manage/
    VITE_ZITADEL_POST_LOGOUT_URL=http://localhost:3000/api/auth/logout/callback
    ```
    Replace these values with:
-	- Your actual Zitadel instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/))
+	- Your actual Zitadel instance URL (the **Issuer** from your [application settings](https://zitadel.com/docs/guides/integrate/login/oidc/login-users))
 	- The **Client ID** you copied when creating the application
 	- A randomly generated session secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 	- A randomly generated client secret value (Auth.js requires this for internal configuration)
@@ -78,9 +78,9 @@ The application will be available at `http://localhost:3000`.
 
 ## Learn more and resources
 
-* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [PKCE concept](https://oauth.net/2/pkce/)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
 * [Framework docs](https://qwik.dev)
 * [Auth library (@auth/core)](https://www.npmjs.com/package/@auth/core)
 * [Qwik adapter (@auth/qwik)](https://www.npmjs.com/package/@auth/qwik)

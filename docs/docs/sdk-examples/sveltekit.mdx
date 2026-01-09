@@ -15,15 +15,15 @@ status: stable
 
 #### Auth library
 
-This example uses **[@auth/sveltekit](https://www.npmjs.com/package/@auth/sveltekit)**, the SvelteKit integration of **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly NextAuth.js). Auth.js provides a complete authentication solution that handles the [OpenID Connect](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manages [PKCE](/docs/concepts/pkce) code generation and verification, performs secure token exchange, and provides session management utilities across your SvelteKit application.
+This example uses **[@auth/sveltekit](https://www.npmjs.com/package/@auth/sveltekit)**, the SvelteKit integration of **[@auth/core](https://www.npmjs.com/package/@auth/core)** (formerly NextAuth.js). Auth.js provides a complete authentication solution that handles the [OpenID Connect](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manages [PKCE](https://oauth.net/2/pkce/) code generation and verification, performs secure token exchange, and provides session management utilities across your SvelteKit application.
 
 ---
 
 ## What this example demonstrates
 
-This example provides a complete authentication implementation showing how to secure a [SvelteKit](https://kit.svelte.dev) application with [Zitadel](https://zitadel.com/docs). Users start on a public landing page and click a login button to authenticate through Zitadel's [authorization server](https://zitadel.com/docs/apis/openidoauth/endpoints) using the **[PKCE flow](/docs/concepts/pkce)**. After successful authentication, they're redirected to a protected profile page that displays their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
+This example provides a complete authentication implementation showing how to secure a [SvelteKit](https://kit.svelte.dev) application with [Zitadel](https://zitadel.com/docs). Users start on a public landing page and click a login button to authenticate through Zitadel's [authorization server](https://zitadel.com/docs/apis/openidoauth/endpoints) using the **[PKCE flow](https://oauth.net/2/pkce/)**. After successful authentication, they're redirected to a protected profile page that displays their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
-The example demonstrates route protection using [SvelteKit's server-side load functions](https://kit.svelte.dev/docs/load) that verify [session state](https://zitadel.com/docs/concepts/tokens) before rendering protected pages. Authentication state is managed through [@auth/sveltekit hooks](https://www.npmjs.com/package/@auth/sveltekit), which integrate with [SvelteKit's hooks system](https://kit.svelte.dev/docs/hooks) to provide session data throughout your application. The implementation includes automatic [access token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate.
+The example demonstrates route protection using [SvelteKit's server-side load functions](https://kit.svelte.dev/docs/load) that verify [session state](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint) before rendering protected pages. Authentication state is managed through [@auth/sveltekit hooks](https://www.npmjs.com/package/@auth/sveltekit), which integrate with [SvelteKit's hooks system](https://kit.svelte.dev/docs/hooks) to provide session data throughout your application. The implementation includes automatic [access token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate.
 
 The logout flow implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** with proper CSRF protection, terminating both the local application session and the Zitadel session before redirecting users back to your application. Custom error pages provide user-friendly messages for authentication failures, and the example includes comprehensive security headers configured through [SvelteKit's hooks](https://kit.svelte.dev/docs/hooks).
 
@@ -77,9 +77,9 @@ Once you have your Zitadel application configured:
 
 ## Learn more and resources
 
-* [PKCE concept](https://zitadel.com/docs/concepts/pkce)
+* [PKCE concept](https://oauth.net/2/pkce/)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
 * [SvelteKit documentation](https://kit.svelte.dev)
 * [Auth.js (SvelteKit)](https://www.npmjs.com/package/@auth/sveltekit)
 * [Auth.js Core](https://www.npmjs.com/package/@auth/core)
