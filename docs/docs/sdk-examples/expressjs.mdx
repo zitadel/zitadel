@@ -62,7 +62,7 @@ Once you have your [Zitadel application configured](https://zitadel.com/docs/gui
    ZITADEL_POST_LOGOUT_URL=http://localhost:3000
    ```
    Replace these values with:
-	- Your actual Zitadel instance URL (the **Issuer** from the [PKCE setup guide](/guides/manage/console/applications-overview))
+	- Your actual Zitadel instance URL (the **Issuer** from the [PKCE setup guide](/docs/guides/manage/console/applications-overview))
 	- The **Client ID** you copied when creating the application
 	- A randomly generated client secret (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 	- The **redirect URI** you configured in the PKCE setup (must match exactly)
@@ -81,7 +81,7 @@ The application will be running at `http://localhost:3000`.
 
 * [Zitadel documentation](https://zitadel.com/docs)
 * [PKCE concept](/docs/guides/integrate/login/oidc/login-users#pkce)
-* [PKCE application setup](/guides/manage/console/applications-overview)
+* [PKCE application setup](/docs/guides/manage/console/applications-overview)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
 * [Framework docs](https://expressjs.com)

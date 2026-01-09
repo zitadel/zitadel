@@ -62,7 +62,7 @@ Once you have your [Zitadel Application](/docs/guides/manage/console/application
    ```
    Replace these values with:
 	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/instance-settings) (the **Issuer**)
-	- The **Client ID** you copied when [creating the application](/guides/manage/console/applications-overview)
+	- The **Client ID** you copied when [creating the application](/docs/guides/manage/console/applications-overview)
 	- The **redirect URIs** you configured in the PKCE setup (must match exactly)
 	- A secure random string for `SESSION_SECRET` (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 	- A secure random string for `ZITADEL_CLIENT_SECRET` for [Auth.js](https://authjs.dev) configuration compatibility
@@ -78,7 +78,7 @@ Once you have your [Zitadel Application](/docs/guides/manage/console/application
 
 * [Zitadel documentation](https://zitadel.com/docs)
 * [PKCE concept](/docs/guides/integrate/login/oidc/login-users#pkce)
-* [PKCE application setup](/guides/manage/console/applications-overview)
+* [PKCE application setup](/docs/guides/manage/console/applications-overview)
 * [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
 * [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
 * [SolidStart documentation](https://start.solidjs.com)
