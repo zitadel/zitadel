@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -24,191 +23,361 @@ import (
 func TestDeleteSessionCommand_Validate(t *testing.T) {
 	t.Parallel()
 	ctx := authz.NewMockContext("inst-1", "org-1", gofakeit.UUID())
-	getErr := errors.New("get error")
-	validationErr := errors.New("validation error")
+	permissionErr := errors.New("permission error")
 
 	type args struct {
-		sessionID    string
-		sessionToken *string
+		sessionID      string
+		sessionToken   string
+		mustCheckToken bool
+	}
+	type fields struct {
+		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
+		sessionTokenVerifier domain.SessionTokenVerifier
+		permissionCheck      func(ctrl *gomock.Controller) domain.PermissionChecker
 	}
 	tt := []struct {
-		testName             string
-		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
-		args                 args
-		inputSessionVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
-		expectedError        error
+		name          string
+		args          args
+		fields        fields
+		expectedError error
 	}{
 		{
-			testName: "validate delete session, without token verifier, success",
-			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-				repo := domainmock.NewMockSessionRepository(ctrl)
-				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
-
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						repo.PrimaryKeyCondition("inst-1", "session-1"),
-					))).
-					Times(1).
-					Return(&domain.Session{
-						InstanceID: "inst-1",
-						ID:         "session-1",
-						TokenID:    "token-1",
-						Lifetime:   0,
-						Expiration: time.Time{},
-						UserID:     "",
-						CreatedAt:  time.Time{},
-						UpdatedAt:  time.Time{},
-						Factors:    nil,
-						Challenges: nil,
-						Metadata:   nil,
-						UserAgent:  nil,
-					}, nil)
-				return repo
-			},
+			name: "when sessionID is empty should return invalid argument error",
 			args: args{
-				sessionID:    "session-1",
-				sessionToken: nil,
+				sessionID: "",
+			},
+			fields:        fields{},
+			expectedError: zerrors.ThrowInvalidArgument(nil, "SESS-3n9fs", "Errors.IDMissing"),
+		},
+		{
+			name: "when user without permission deletes own session without token should validate successfully",
+			args: args{
+				sessionID:      "session-1",
+				sessionToken:   "",
+				mustCheckToken: true,
+			},
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+							repo.PrimaryKeyCondition("inst-1", "session-1"),
+						))).
+						Times(1).
+						Return(&domain.Session{
+							InstanceID: "inst-1",
+							ID:         "session-1",
+							TokenID:    "token-1",
+							Lifetime:   0,
+							Expiration: time.Time{},
+							UserID:     "",
+							CreatedAt:  time.Time{},
+							UpdatedAt:  time.Time{},
+							Factors:    nil,
+							Challenges: nil,
+							Metadata:   nil,
+							UserAgent:  nil,
+						}, nil)
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
 			},
 			expectedError: nil,
 		},
 		{
-			testName: "validate delete session, without session, error",
-			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-				repo := domainmock.NewMockSessionRepository(ctrl)
-				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
-
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						repo.PrimaryKeyCondition("inst-1", "session-1"),
-					))).
-					Times(1).
-					Return(nil, database.NewNoRowFoundError(getErr))
-				return repo
-			},
+			name: "when user without permission deletes own session, which does not exist anymore, should validate successfully",
 			args: args{
-				sessionID:    "session-1",
-				sessionToken: nil,
+				sessionID:      "session-1",
+				sessionToken:   "",
+				mustCheckToken: true,
 			},
-			inputSessionVerifier: mockSessionVerification(nil),
-			expectedError:        zerrors.ThrowNotFound(database.NewNoRowFoundError(getErr), "DOM-8KYOH3", "Errors.Session.NotFound"),
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(nil, database.NewNoRowFoundError(nil))
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(permissionErr)
+
+					return permChecker
+				},
+			},
+			expectedError: nil,
 		},
 		{
-			testName: "validate delete session, without token, success",
-			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-				repo := domainmock.NewMockSessionRepository(ctrl)
-				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
-
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						repo.PrimaryKeyCondition("inst-1", "session-1"),
-					))).
-					Times(1).
-					Return(&domain.Session{
-						InstanceID: "inst-1",
-						ID:         "session-1",
-						TokenID:    "token-1",
-						Lifetime:   0,
-						Expiration: time.Time{},
-						UserID:     "",
-						CreatedAt:  time.Time{},
-						UpdatedAt:  time.Time{},
-						Factors:    nil,
-						Challenges: nil,
-						Metadata:   nil,
-						UserAgent:  nil,
-					}, nil)
-				return repo
-			},
+			name: "when user without permission deletes other / non existing session, should result in permission error",
 			args: args{
-				sessionID:    "session-1",
-				sessionToken: nil,
+				sessionID:      "session-1",
+				mustCheckToken: true,
 			},
-			inputSessionVerifier: mockSessionVerification(nil),
-			expectedError:        nil,
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(nil, database.NewNoRowFoundError(nil))
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(permissionErr)
+
+					return permChecker
+				},
+			},
+			expectedError: permissionErr,
 		},
 		{
-			testName: "validate delete session, with token, success",
-			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-				repo := domainmock.NewMockSessionRepository(ctrl)
-				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
-
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						repo.PrimaryKeyCondition("inst-1", "session-1"),
-					))).
-					Times(1).
-					Return(&domain.Session{
-						InstanceID: "inst-1",
-						ID:         "session-1",
-						TokenID:    "token-1",
-						Lifetime:   0,
-						Expiration: time.Time{},
-						UserID:     "",
-						CreatedAt:  time.Time{},
-						UpdatedAt:  time.Time{},
-						Factors:    nil,
-						Challenges: nil,
-						Metadata:   nil,
-						UserAgent:  nil,
-					}, nil)
-				return repo
-			},
+			name: "when user with permission deletes session, should validate successfully",
 			args: args{
-				sessionID:    "session-1",
-				sessionToken: gu.Ptr("token"),
+				sessionID:      "session-1",
+				mustCheckToken: true,
 			},
-			inputSessionVerifier: mockSessionVerification(nil),
-			expectedError:        nil,
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(&domain.Session{
+							InstanceID: "inst-1",
+							ID:         "session-1",
+							TokenID:    "token-1",
+							Lifetime:   0,
+							Expiration: time.Time{},
+							UserID:     "user-2",
+							CreatedAt:  time.Time{},
+							UpdatedAt:  time.Time{},
+							Factors:    nil,
+							Challenges: nil,
+							Metadata:   nil,
+							UserAgent:  nil,
+						}, nil)
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(nil)
+
+					return permChecker
+				},
+			},
+			expectedError: nil,
 		},
 		{
-			testName: "validate delete session, with token, failure",
-			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
-				repo := domainmock.NewMockSessionRepository(ctrl)
-				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
-
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
-						repo.PrimaryKeyCondition("inst-1", "session-1"),
-					))).
-					Times(1).
-					Return(&domain.Session{
-						InstanceID: "inst-1",
-						ID:         "session-1",
-						TokenID:    "token-1",
-						Lifetime:   0,
-						Expiration: time.Time{},
-						UserID:     "",
-						CreatedAt:  time.Time{},
-						UpdatedAt:  time.Time{},
-						Factors:    nil,
-						Challenges: nil,
-						Metadata:   nil,
-						UserAgent:  nil,
-					}, nil)
-				return repo
-			},
+			name: "when user with permission deletes session, which does not exist anymore, should validate successfully",
 			args: args{
-				sessionID:    "session-1",
-				sessionToken: gu.Ptr("token-1"),
+				sessionID:      "session-1",
+				mustCheckToken: true,
 			},
-			inputSessionVerifier: mockSessionVerification(validationErr),
-			expectedError:        validationErr,
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(nil, database.NewNoRowFoundError(nil))
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(nil)
+
+					return permChecker
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name: "when user with permission deletes other session (different org), should result in permission error",
+			args: args{
+				sessionID:      "session-1",
+				mustCheckToken: true,
+			},
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(&domain.Session{
+							InstanceID: "inst-1",
+							ID:         "session-1",
+							TokenID:    "token-1",
+							Lifetime:   0,
+							Expiration: time.Time{},
+							UserID:     "user-2",
+							CreatedAt:  time.Time{},
+							UpdatedAt:  time.Time{},
+							Factors:    nil,
+							Challenges: nil,
+							Metadata:   nil,
+							UserAgent:  nil,
+						}, nil)
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(permissionErr)
+
+					return permChecker
+				},
+			},
+			expectedError: permissionErr,
+		},
+		{
+			name: "when user with permission deletes non existing session, should result in permission error",
+			args: args{
+				sessionID:      "session-1",
+				mustCheckToken: true,
+			},
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(),
+							dbmock.QueryOptions(database.WithCondition(
+								repo.PrimaryKeyCondition("inst-1", "session-1"),
+							)),
+						).
+						Times(1).
+						Return(nil, database.NewNoRowFoundError(nil))
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+				permissionCheck: func(ctrl *gomock.Controller) domain.PermissionChecker {
+					permChecker := domainmock.NewMockPermissionChecker(ctrl)
+
+					permChecker.EXPECT().
+						CheckOrganizationPermission(gomock.Any(), domain.SessionDeletePermission, "").
+						Times(1).
+						Return(permissionErr)
+
+					return permChecker
+				},
+			},
+			expectedError: permissionErr,
+		},
+		{
+			name: "when deleting session with valid token, should validate successfully",
+			args: args{
+				sessionID:      "session-1",
+				sessionToken:   "valid-token",
+				mustCheckToken: true,
+			},
+			fields: fields{
+				sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+					repo := domainmock.NewMockSessionRepository(ctrl)
+					sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
+
+					repo.EXPECT().
+						Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(
+							repo.PrimaryKeyCondition("inst-1", "session-1"),
+						))).
+						Times(1).
+						Return(&domain.Session{
+							InstanceID: "inst-1",
+							ID:         "session-1",
+							TokenID:    "token-1",
+							Lifetime:   0,
+							Expiration: time.Time{},
+							UserID:     "",
+							CreatedAt:  time.Time{},
+							UpdatedAt:  time.Time{},
+							Factors:    nil,
+							Challenges: nil,
+							Metadata:   nil,
+							UserAgent:  nil,
+						}, nil)
+					return repo
+				},
+				sessionTokenVerifier: mockSessionVerification(nil),
+			},
+			expectedError: nil,
 		},
 	}
 	for _, tc := range tt {
-		t.Run(tc.testName, func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			d := domain.NewDeleteSessionCommand(tc.args.sessionID, tc.args.sessionToken)
+			d := domain.NewDeleteSessionCommand(tc.args.sessionID, tc.args.sessionToken, tc.args.mustCheckToken)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{}
+			opts := domain.DefaultOpts(nil)
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 
-			if tc.sessionRepo != nil {
-				domain.WithSessionRepo(tc.sessionRepo(ctrl))(opts)
+			if tc.fields.sessionRepo != nil {
+				domain.WithSessionRepo(tc.fields.sessionRepo(ctrl))(opts)
 			}
-			if tc.inputSessionVerifier != nil {
-				domain.WithSessionTokenVerifier(tc.inputSessionVerifier)(opts)
+			if tc.fields.sessionTokenVerifier != nil {
+				domain.WithSessionTokenVerifier(tc.fields.sessionTokenVerifier)(opts)
+			}
+			if tc.fields.permissionCheck != nil {
+				domain.WithPermissionCheck(tc.fields.permissionCheck(ctrl))(opts)
 			}
 
 			// Test
@@ -239,7 +408,8 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 
 		inputSessionID string
 
-		expectedError error
+		expectedError   error
+		expectDeletedAt bool
 	}{
 		{
 			testName: "when delete session fails should return error",
@@ -276,7 +446,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			expectedError:  zerrors.ThrowInternalf(nil, "DOM-wv33rsKpRw", "expecting 1 row deleted, got %d", 2),
 		},
 		{
-			testName: "when no rows deleted should return not found error",
+			testName: "when no rows deleted should execute successfully",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				sessionRepositoryPrimaryKey(repo, "inst-1", "session-1")
@@ -290,10 +460,10 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				return repo
 			},
 			inputSessionID: "session-1",
-			expectedError:  zerrors.ThrowNotFound(nil, "DOM-g1lDb1qs1f", "session not found"),
+			expectedError:  nil,
 		},
 		{
-			testName: "when one row deleted should execute successfully",
+			testName: "when one row deleted should execute successfully and set DeletedAt",
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewMockSessionRepository(ctrl)
 				// for the expected call
@@ -307,16 +477,17 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			inputSessionID: "session-1",
+			inputSessionID:  "session-1",
+			expectDeletedAt: true,
 		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 			// Given
-			cmd := domain.NewDeleteSessionCommand(tc.inputSessionID, nil)
+			cmd := domain.NewDeleteSessionCommand(tc.inputSessionID, "", false)
 			ctrl := gomock.NewController(t)
-			opts := &domain.InvokeOpts{}
+			opts := domain.DefaultOpts(nil)
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tc.mockTx != nil {
 				domain.WithQueryExecutor(tc.mockTx(ctrl))(opts)
@@ -326,16 +497,17 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 			}
 
 			// Test
-			err := opts.Invoke(ctx, cmd)
+			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectDeletedAt, !cmd.DeletedAt.IsZero())
 		})
 	}
 }
 
 func sessionRepositoryPrimaryKey(repo *domainmock.MockSessionRepository, instanceID, sessionID string) {
-	repo.EXPECT().PrimaryKeyCondition(instanceID, sessionID).Times(2).Return(
+	repo.EXPECT().PrimaryKeyCondition(instanceID, sessionID).MaxTimes(4).Return(
 		database.And(
 			database.NewTextCondition(
 				database.NewColumn("zitadel.sessions", "instance_id"),

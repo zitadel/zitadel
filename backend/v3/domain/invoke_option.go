@@ -72,6 +72,15 @@ func WithSessionTokenVerifier(verifier SessionTokenVerifier) InvokeOpt {
 	}
 }
 
+// WithPermissionCheck sets the permission check used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithPermissionCheck(permissionCheck PermissionChecker) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.Permissions = permissionCheck
+	}
+}
+
 // InvokeOpts are passed to each command
 type InvokeOpts struct {
 	// db is the database client.
@@ -122,6 +131,6 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 	return &InvokeOpts{
 		Invoker:              invoker,
 		Permissions:          &noopPermissionChecker{}, // prevent panics for now
-		sessionTokenVerifier: noopSessionTokenVerifier(),
+		sessionTokenVerifier: sessionTokenVerifier,
 	}
 }
