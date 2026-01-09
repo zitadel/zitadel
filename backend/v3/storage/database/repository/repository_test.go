@@ -4,10 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -160,4 +163,51 @@ func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grant
 	require.NoError(t, err)
 
 	return projectGrant.ID
+}
+
+func createIdentityProvider(t *testing.T, tx database.Transaction, instanceID, orgID string) string {
+	t.Helper()
+	idp := domain.IdentityProvider{
+		InstanceID:        instanceID,
+		OrgID:             &orgID,
+		ID:                gofakeit.UUID(),
+		State:             domain.IDPStateActive,
+		Name:              gofakeit.Name(),
+		Type:              gu.Ptr(domain.IDPTypeOIDC),
+		AllowCreation:     true,
+		AllowAutoCreation: true,
+		AllowAutoUpdate:   true,
+		AllowLinking:      true,
+		StylingType:       &stylingType,
+		Payload:           []byte("{}"),
+	}
+	idpRepo := repository.IDProviderRepository()
+	err := idpRepo.Create(t.Context(), tx, &idp)
+	require.NoError(t, err)
+
+	return idp.ID
+}
+
+func createIDPIntent(t *testing.T, tx database.Transaction, instanceID, idpID string) string {
+	t.Helper()
+	successURL, err := url.Parse("https://example.com/success")
+	require.NoError(t, err)
+	failURL, err := url.Parse("https://example.com/fail")
+	require.NoError(t, err)
+
+	intent := domain.IDPIntent{
+		ID:                   gofakeit.UUID(),
+		InstanceID:           instanceID,
+		SuccessURL:           successURL,
+		FailureURL:           failURL,
+		IDPID:                idpID,
+		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		MaxIDPIntentLifetime: time.Hour * 2,
+		CreatedAt:            time.Now(),
+	}
+	idpIntentRepo := repository.IDPIntentRepository()
+	err = idpIntentRepo.Create(t.Context(), tx, &intent)
+	require.NoError(t, err)
+
+	return intent.ID
 }

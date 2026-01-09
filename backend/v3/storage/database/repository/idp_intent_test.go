@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -24,52 +23,9 @@ func TestCreateIDPIntent(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	// create instance
-	instanceId := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
-
-	// create org
-	orgId := gofakeit.UUID()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
-
-	// create idp
-	idpID := gofakeit.UUID()
-	idp := domain.IdentityProvider{
-		InstanceID:        instanceId,
-		OrgID:             &orgId,
-		ID:                idpID,
-		State:             domain.IDPStateActive,
-		Name:              gofakeit.Name(),
-		Type:              gu.Ptr(domain.IDPTypeOIDC),
-		AllowCreation:     true,
-		AllowAutoCreation: true,
-		AllowAutoUpdate:   true,
-		AllowLinking:      true,
-		StylingType:       &stylingType,
-		Payload:           []byte("{}"),
-	}
-	idpRepo := repository.IDProviderRepository()
-	err = idpRepo.Create(t.Context(), tx, &idp)
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	idpID := createIdentityProvider(t, tx, instanceID, orgID)
 
 	successURL, err := url.Parse("https://example.com/success")
 	require.NoError(t, err)
@@ -98,7 +54,7 @@ func TestCreateIDPIntent(t *testing.T) {
 		{
 			testName:        "create and update timestamps not set / empty fail url / should generate timestamps and retrieve successfully",
 			inputID:         intentID,
-			inputInstanceID: instanceId,
+			inputInstanceID: instanceID,
 			inputSuccessURL: successURL,
 			inputFailureURL: emptyURL,
 			inputIDPID:      idpID,
@@ -113,7 +69,7 @@ func TestCreateIDPIntent(t *testing.T) {
 		{
 			testName:         "all set / should retrieve successfully",
 			inputID:          intentID,
-			inputInstanceID:  instanceId,
+			inputInstanceID:  instanceID,
 			inputSuccessURL:  successURL,
 			inputFailureURL:  failURL,
 			inputIDPID:       idpID,
@@ -126,7 +82,7 @@ func TestCreateIDPIntent(t *testing.T) {
 			testName:        "id not set / should return check error",
 			inputCreatedAt:  time.Now(),
 			inputUpdateddAt: time.Now(),
-			inputInstanceID: instanceId,
+			inputInstanceID: instanceID,
 			inputSuccessURL: successURL,
 			inputFailureURL: emptyURL,
 			inputIDPID:      idpID,
@@ -147,7 +103,7 @@ func TestCreateIDPIntent(t *testing.T) {
 		{
 			testName:        "idp id not found / should return foreign key error",
 			inputID:         intentID,
-			inputInstanceID: instanceId,
+			inputInstanceID: instanceID,
 			inputCreatedAt:  time.Now(),
 			inputUpdateddAt: time.Now(),
 			inputSuccessURL: successURL,
@@ -188,7 +144,7 @@ func TestCreateIDPIntent(t *testing.T) {
 			// Verify
 			assert.ErrorIs(t, createErr, tc.expectedError)
 			if tc.expectedError == nil {
-				retrieved, getErr := idpIntentRepo.Get(t.Context(), tx, database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceId, intentID)))
+				retrieved, getErr := idpIntentRepo.Get(t.Context(), tx, database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceID, intentID)))
 				require.NoError(t, getErr)
 				require.NotNil(t, retrieved)
 
@@ -219,87 +175,14 @@ func TestGetIDPIntent(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	// create instance
-	instanceId := gofakeit.UUID()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository()
-	err = instanceRepo.Create(t.Context(), tx, &instance)
-	require.NoError(t, err)
-
-	// create org
-	orgId := gofakeit.UUID()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
-	}
-	organizationRepo := repository.OrganizationRepository()
-	err = organizationRepo.Create(t.Context(), tx, &org)
-	require.NoError(t, err)
-
-	// create idp
-	idpID := gofakeit.UUID()
-	idp := domain.IdentityProvider{
-		InstanceID:        instanceId,
-		OrgID:             &orgId,
-		ID:                idpID,
-		State:             domain.IDPStateActive,
-		Name:              gofakeit.Name(),
-		Type:              gu.Ptr(domain.IDPTypeOIDC),
-		AllowCreation:     true,
-		AllowAutoCreation: true,
-		AllowAutoUpdate:   true,
-		AllowLinking:      true,
-		StylingType:       &stylingType,
-		Payload:           []byte("{}"),
-	}
-	idpRepo := repository.IDProviderRepository()
-	err = idpRepo.Create(t.Context(), tx, &idp)
-	require.NoError(t, err)
-
-	successURL, err := url.Parse("https://example.com/success")
-	require.NoError(t, err)
-	failURL, err := url.Parse("https://example.com/fail")
-	require.NoError(t, err)
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	idpID := createIdentityProvider(t, tx, instanceID, orgID)
 
 	idpIntentRepo := repository.IDPIntentRepository()
-	intentID1 := "intent1"
-	intent1 := domain.IDPIntent{
-		ID:                   intentID1,
-		InstanceID:           instanceId,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now(),
-	}
 
-	intentID2 := "intent2"
-	intent2 := domain.IDPIntent{
-		ID:                   intentID2,
-		InstanceID:           instanceId,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now().AddDate(0, 0, 1),
-	}
-
-	err = idpIntentRepo.Create(t.Context(), tx, &intent1)
-	require.NoError(t, err)
-	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
-	require.NoError(t, err)
+	intentID1 := createIDPIntent(t, tx, instanceID, idpID)
+	intentID2 := createIDPIntent(t, tx, instanceID, idpID)
 
 	tt := []struct {
 		testName         string
@@ -321,7 +204,7 @@ func TestGetIDPIntent(t *testing.T) {
 		{
 			testName: "when primary key condition set should return matching intent",
 			inputQueryOpts: []database.QueryOption{
-				database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceId, intentID1)),
+				database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1)),
 			},
 			expectedIntentID: intentID1,
 		},
@@ -329,7 +212,7 @@ func TestGetIDPIntent(t *testing.T) {
 			testName: "when filtering by state should return matching intent with lowest PK",
 			inputQueryOpts: []database.QueryOption{
 				database.WithCondition(database.And(
-					idpIntentRepo.InstanceIDCondition(instanceId),
+					idpIntentRepo.InstanceIDCondition(instanceID),
 					idpIntentRepo.StateCondition(domain.IDPIntentStateStarted),
 				)),
 				database.WithLimit(1),
@@ -340,7 +223,7 @@ func TestGetIDPIntent(t *testing.T) {
 			testName: "when filtering by creation date descending should return matching intent with highest PK",
 			inputQueryOpts: []database.QueryOption{
 				database.WithCondition(database.And(
-					idpIntentRepo.InstanceIDCondition(instanceId),
+					idpIntentRepo.InstanceIDCondition(instanceID),
 				)),
 				database.WithOrderByDescending(idpIntentRepo.CreatedAtColumn()),
 				database.WithLimit(1),
@@ -351,7 +234,7 @@ func TestGetIDPIntent(t *testing.T) {
 			testName: "when filtering by non-existent PK should return no row found error",
 			inputQueryOpts: []database.QueryOption{
 				database.WithCondition(database.And(
-					idpIntentRepo.InstanceIDCondition(instanceId),
+					idpIntentRepo.InstanceIDCondition(instanceID),
 					idpIntentRepo.IDCondition("not existing"),
 				)),
 			},
@@ -368,8 +251,8 @@ func TestGetIDPIntent(t *testing.T) {
 			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.expectedError == nil {
 				assert.Equal(t, tc.expectedIntentID, retrieved.ID)
-				assert.Equal(t, successURL, retrieved.SuccessURL)
-				assert.Equal(t, failURL, retrieved.FailureURL)
+				assert.Equal(t, "https://example.com/success", retrieved.SuccessURL.String())
+				assert.Equal(t, "https://example.com/fail", retrieved.FailureURL.String())
 			}
 		})
 	}
