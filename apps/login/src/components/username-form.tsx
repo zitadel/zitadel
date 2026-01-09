@@ -61,6 +61,7 @@ export function UsernameForm({
       defaultOrganization,
       requestId,
       suffix,
+      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
     })
       .catch(() => {
         setError(t("errors.internalError"));
