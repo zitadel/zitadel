@@ -264,6 +264,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -309,6 +310,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -383,6 +385,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
