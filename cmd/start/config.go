@@ -55,9 +55,6 @@ type Config struct {
 	WebAuthNName        string
 	Database            database.Config
 	Caches              *connector.CachesConfig
-	Tracing             *instrumentation.LegacyTraceConfig
-	Metrics             *instrumentation.LegacyMetricConfig
-	Profiler            *instrumentation.LegacyProfileConfig
 	Projections         projection.Config
 	Notifications       handlers.WorkerConfig
 	Executions          execution.WorkerConfig
@@ -101,9 +98,6 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 		return nil, nil, fmt.Errorf("unable to read config: %w", err)
 	}
 
-	config.Instrumentation.Trace.SetLegacyConfig(config.Tracing)
-	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
-	config.Instrumentation.Profile.SetLegacyConfig(config.Profiler)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
