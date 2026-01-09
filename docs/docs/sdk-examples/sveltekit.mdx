@@ -33,22 +33,22 @@ The logout flow implements **[federated logout](https://zitadel.com/docs/guides/
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](/docs/guides/manage/console/console-overview). Follow the **[Application Setup guide](/docs/guides/manage/console/applications-overview)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](/docs/guides/manage/console/console-overview). Follow the **[Application Setup guide](/docs/guides/manage/console/applications-overview)** to:
 
-1. Create a new Web application in your [Zitadel Project](/docs/guides/manage/console/projects-overview)
+1. Create a new Web application in your [ZITADEL Project](/docs/guides/manage/console/projects-overview)
 2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-sveltekit).
-2. Create a `.env.local` file in the project root and configure it with the values from your [Zitadel Application](/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
+2. Create a `.env.local` file in the project root and configure it with the values from your [ZITADEL Application](/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
    ```
    SESSION_SECRET=your-very-secret-and-strong-session-key
    SESSION_DURATION=3600
