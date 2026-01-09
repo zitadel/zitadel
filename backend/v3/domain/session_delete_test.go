@@ -535,9 +535,17 @@ func TestDeleteSessionCommand_Events(t *testing.T) {
 		{
 			testName: "should create session removed event",
 			command: &domain.DeleteSessionCommand{
-				ID: "session-1",
+				ID:        "session-1",
+				DeletedAt: time.Now(),
 			},
 			expectedCount: 1,
+		},
+		{
+			testName: "should not create session removed event",
+			command: &domain.DeleteSessionCommand{
+				ID: "session-1",
+			},
+			expectedCount: 0,
 		},
 	}
 

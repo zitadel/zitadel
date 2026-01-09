@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -39,6 +40,9 @@ func (cmd *DeleteSessionCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
 func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+	if cmd.DeletedAt.IsZero() {
+		return nil, nil
+	}
 	return []eventstore.Command{
 		session.NewTerminateEvent(ctx, &session.NewAggregate(cmd.ID, authz.GetInstance(ctx).InstanceID()).Aggregate),
 	}, nil
@@ -91,7 +95,7 @@ func (*DeleteSessionCommand) String() string {
 
 // Validate implements [Commander].
 func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if cmd.ID == "" {
+	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SESS-3n9fs", "Errors.IDMissing")
 	}
 	if !cmd.MustCheckPermission {
