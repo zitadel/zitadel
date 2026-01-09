@@ -41,17 +41,9 @@ module.exports = {
           },
           items: [
             "concepts/structure/instance",
-            //"concepts/structure/organizations",
-            //"guides/manage/console/organizations",
             "guides/manage/console/organizations-overview",
-            //"concepts/structure/projects",
-            //"guides/manage/console/projects",
             "guides/manage/console/projects-overview",
-            //"concepts/structure/applications",
-            //"guides/manage/console/applications",
             "guides/manage/console/applications-overview",
-            //"concepts/structure/users",
-            //"guides/manage/console/users",
             "guides/manage/console/users-overview",
             "concepts/structure/managers",
           ],
@@ -506,8 +498,6 @@ module.exports = {
                 id: "concepts/features/actions",
               },
               items: [
-                //"guides/manage/console/actions",
-                //"apis/actions/introduction",
                 "guides/manage/console/actions-overview",
                 "apis/actions/modules",
                 "apis/actions/code-examples",
@@ -670,8 +660,6 @@ module.exports = {
       label: "Deploy & Operate",
       collapsed: true,
       items: [
-        //"concepts/features/console",
-        //"guides/manage/console/overview",
         "guides/manage/console/console-overview",
         {
           type: "category",
