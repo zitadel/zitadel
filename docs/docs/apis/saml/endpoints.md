@@ -64,6 +64,6 @@ spec** [Assertions and Protocols for the OASIS Security Assertion Markup Languag
 Custom attributes are being inserted into SAML response if not already present.
 Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
 
-You can add custom attributes using the [complement SAMLresponse](/docs/apis/actions/customize-samlresponse) of the [actions feature](/docs/apis/actions/introduction).
+You can add custom attributes using the [complement SAMLresponse](/docs/apis/actions/customize-samlresponse) of the [actions feature](/docs/guides/manage/console/actions-overview).
 
 Examples of Actions that result in custom attributes can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
