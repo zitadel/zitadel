@@ -638,7 +638,6 @@ module.exports = {
           items: [
             "concepts/features/audit-trail",
             "guides/integrate/external-audit-log",
-            // TODO: File missing - Certifications specific doc
           ],
         },
       ],
@@ -798,7 +797,6 @@ module.exports = {
             "concepts/architecture/solution",
             "concepts/architecture/software",
             "concepts/architecture/secrets",
-            // TODO: File missing - Data Flow Diagrams specific doc
           ],
         },
         "concepts/principles",
