@@ -97,7 +97,7 @@ Some use-cases:
 - Add metadata to user through function on `preaccesstoken`, [Action Function Example](./testing-function)
 - Add logs to the log claim through function on `preaccesstoken`, [Action Function Example](./testing-function)
 
-## Customize SAML Response
+## Complement SAML Response
 
 These are executed before the return of the SAML Response.
 
