@@ -46,7 +46,7 @@ export function RegisterForm({
   idpCount = 0,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstName: firstname ?? "",
@@ -70,24 +70,24 @@ export function RegisterForm({
       lastName: values.lastname,
       organization: organization,
       requestId: requestId,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotRegisterUser"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("errors.couldNotRegisterUser"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Keep loading state true during redirect
       return router.push(response.redirect);
     }
 
+    setLoading(false);
     return response;
   }
 

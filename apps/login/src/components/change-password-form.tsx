@@ -50,7 +50,7 @@ export function ChangePasswordForm({
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       password: "",
       comfirmPassword: "",
@@ -68,14 +68,11 @@ export function ChangePasswordForm({
     const changeResponse = checkSessionAndSetPassword({
       sessionId,
       password: values.password,
-    })
-      .catch(() => {
-        setError(t("change.errors.couldNotChangePassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
+      return;
+    });
 
     if (changeResponse && "error" in changeResponse && changeResponse.error) {
       setError(
@@ -83,11 +80,13 @@ export function ChangePasswordForm({
           ? changeResponse.error
           : t("change.errors.unknownError")
       );
+      setLoading(false);
       return;
     }
 
     if (!changeResponse) {
       setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
       return;
     }
 
@@ -100,14 +99,11 @@ export function ChangePasswordForm({
         password: { password: values.password },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("change.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotVerifyPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (
       passwordResponse &&
@@ -115,6 +111,7 @@ export function ChangePasswordForm({
       passwordResponse.error
     ) {
       setError(passwordResponse.error);
+      setLoading(false);
       return;
     }
 
@@ -123,9 +120,11 @@ export function ChangePasswordForm({
       "redirect" in passwordResponse &&
       passwordResponse.redirect
     ) {
+      // Keep loading state true during redirect
       return router.push(passwordResponse.redirect);
     }
 
+    setLoading(false);
     return;
   }
 

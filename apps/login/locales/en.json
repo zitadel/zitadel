@@ -248,6 +248,8 @@
       "smsDescription": "Enter your phone number to receive a code via SMS.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "emailOtpAdded": "Code via email was successfully added.",
+      "smsOtpAdded": "Code via SMS was successfully added.",
       "submit": "Continue",
       "labels": {
         "code": "Code"
@@ -380,7 +382,7 @@
     "successDescription": "The user has been verified successfully.",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
-      "title": "Verify user",
+      "title": "Verify email",
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
@@ -395,18 +397,27 @@
     },
     "errors": {
       "couldNotResendEmail": "Could not resend email",
+      "couldNotResendPhone": "Could not resend phone code",
       "couldNotVerifyUser": "Could not verify user",
       "couldNotVerifyInvite": "Could not verify invite",
       "couldNotVerifyEmail": "Could not verify email",
+      "couldNotVerifyPhone": "Could not verify phone",
       "couldNotVerify": "Could not verify",
       "couldNotLoadUser": "Could not load user",
       "couldNotLoadAuthenticators": "Could not load possible authenticators",
       "couldNotCreateSession": "Could not create session",
       "noHostFound": "No host found",
       "userAlreadyVerified": "User is already verified!",
+      "phoneAlreadyVerified": "Phone is already verified!",
       "couldNotResendInvite": "Could not resend invite",
       "inviteSendFailed": "Failed to send invitation email",
-      "emailSendFailed": "Failed to send verification email"
+      "emailSendFailed": "Failed to send verification email",
+      "phoneSendFailed": "Failed to send phone verification code"
+    },
+    "verifyPhone": {
+      "title": "Verify phone",
+      "description": "Enter the Code provided in the verification SMS.",
+      "codeSent": "A code has just been sent to your phone number."
     }
   },
   "authenticator": {

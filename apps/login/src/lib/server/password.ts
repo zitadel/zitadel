@@ -27,6 +27,7 @@ import { getServiceConfig } from "../service-url";
 import { getPublicHostWithProtocol } from "./host";
 import {
   checkEmailVerification,
+  checkPhoneVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
   checkUserVerification,
@@ -228,11 +229,18 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
     return { error: t("errors.initialUserNotSupported") };
   }
 
-  // check to see if user was verified
+  // check to see if user email was verified
   const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
+  }
+
+  // check to see if user phone was verified (if user has a phone)
+  const phoneVerificationCheck = checkPhoneVerification(session, humanUser, command.organization, command.requestId);
+
+  if (phoneVerificationCheck?.redirect) {
+    return phoneVerificationCheck;
   }
 
   // if password, check if user has MFA methods

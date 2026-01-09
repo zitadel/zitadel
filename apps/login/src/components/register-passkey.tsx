@@ -25,7 +25,7 @@ type Props = {
 
 export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code, codeId }: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const [error, setError] = useState<string>("");

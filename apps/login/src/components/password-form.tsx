@@ -28,7 +28,7 @@ type Props = {
 
 export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("password");
@@ -51,23 +51,24 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
         password: { password: values.password },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("verify.errors.couldNotVerifyPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Keep loading state true during redirect
       return router.push(response.redirect);
     }
+
+    setLoading(false);
   }
 
   async function resetPasswordAndContinue() {
@@ -79,21 +80,20 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       loginName,
       organization,
       requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotResetPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("verify.errors.couldNotResetPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     setInfo(t("verify.info.passwordResetSent"));
+    setLoading(false);
 
     const params = new URLSearchParams({
       loginName: loginName,

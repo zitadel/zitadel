@@ -45,7 +45,7 @@ export function SetRegisterPasswordForm({
   requestId,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstname: firstname ?? "",
@@ -69,23 +69,24 @@ export function SetRegisterPasswordForm({
       organization: organization,
       requestId: requestId,
       password: values.password,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotRegisterUser"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("errors.couldNotRegisterUser"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      setLoading(false);
       return;
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Keep loading state true during redirect
       return router.push(response.redirect);
     }
+
+    setLoading(false);
   }
 
   const { errors } = formState;
