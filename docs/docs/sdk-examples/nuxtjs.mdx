@@ -59,7 +59,7 @@ Once you have your Zitadel application configured:
    AUTH_ORIGIN=http://localhost:3000
 ```
 Replace these values with:
-   - Your actual Zitadel instance URL (the **Issuer** from your [ZITADEL instance settings](https://zitadel.com/docs/guides/manage/console/overview))
+   - Your actual Zitadel instance URL (the **Issuer** from your [ZITADEL instance settings](/docs/guides/manage/console/console-overview#overview))
    - The **Client ID** you copied when creating the application
    - A randomly generated **NUXT_AUTH_SECRET** for session encryption (generate using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
    - The **callback URI** you configured in the PKCE setup (must match exactly)
