@@ -46,10 +46,12 @@ SELECT
 	, identity_provider_intents.idp_username
 	, identity_provider_intents.user_id
 	, identity_provider_intents.idp_access_token
+	, identity_provider_intents.idp_id_token
 	, identity_provider_intents.idp_entry_attributes
 	, identity_provider_intents.request_id
 	, identity_provider_intents.assertion
 	, identity_provider_intents.succeeded_at
+	, identity_provider_intents.fail_reason
 	, identity_provider_intents.expires_at
 	, identity_provider_intents.max_idp_intent_lifetime
 FROM
@@ -106,8 +108,10 @@ type rawIDPIntent struct {
 	IDPUsername    *string `json:"idp_username,omitempty" db:"idp_username"`
 	UserID         *string `json:"user_id,omitempty" db:"user_id"`
 	IDPAccessToken *string `json:"idp_access_token,omitempty" db:"idp_access_token"`
+	IDPIDToken     *string `json:"idp_id_token,omitempty" db:"idp_id_token"`
 	RequestID      *string `json:"request_id,omitempty" db:"request_id"`
 	Assertion      *string `json:"assertion,omitempty" db:"assertion"`
+	FailReason     *string `json:"fail_reason,omitempty" db:"fail_reason"`
 }
 
 func scanIDPIntent(ctx context.Context, querier database.QueryExecutor, builder *database.StatementBuilder) (*domain.IDPIntent, error) {
@@ -132,8 +136,10 @@ func rawIDPIntentToDomain(raw *rawIDPIntent) (*domain.IDPIntent, error) {
 	raw.IDPIntent.IDPUsername = gu.Value(raw.IDPUsername)
 	raw.IDPIntent.UserID = gu.Value(raw.UserID)
 	raw.IDPIntent.IDPAccessToken = gu.Value(raw.IDPAccessToken)
+	raw.IDPIntent.IDPIDToken = gu.Value(raw.IDPIDToken)
 	raw.IDPIntent.RequestID = gu.Value(raw.RequestID)
 	raw.IDPIntent.Assertion = gu.Value(raw.Assertion)
+	raw.IDPIntent.FailReason = gu.Value(raw.FailReason)
 
 	return raw.IDPIntent, nil
 }
@@ -162,13 +168,18 @@ func (i idpIntentRepository) SetIDPAccessToken(idpAccessToken string) database.C
 	return database.NewChange(i.IDPAccessTokenColumn(), idpAccessToken)
 }
 
+// SetIDPIDToken implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) SetIDPIDToken(idpIDToken string) database.Change {
+	return database.NewChange(i.IDPIDTokenColumn(), idpIDToken)
+}
+
 // SetIDPArguments implements [domain.idpIntentChanges].
 func (i idpIntentRepository) SetIDPArguments(idpArguments string) database.Change {
 	return database.NewChange(i.IDPArgumentsColumn(), idpArguments)
 }
 
 // SetIDPEntryAttributes implements [domain.idpIntentChanges].
-func (i idpIntentRepository) SetIDPEntryAttributes(idpEntryAttributes string) database.Change {
+func (i idpIntentRepository) SetIDPEntryAttributes(idpEntryAttributes []byte) database.Change {
 	return database.NewChange(i.IDPEntryAttributesColumn(), idpEntryAttributes)
 }
 
@@ -210,6 +221,21 @@ func (i idpIntentRepository) SetSuccessURL(successURL url.URL) database.Change {
 // SetUserID implements [domain.idpIntentChanges].
 func (i idpIntentRepository) SetUserID(userID string) database.Change {
 	return database.NewChange(i.UserIDColumn(), userID)
+}
+
+// SetExpiresAt implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) SetExpiresAt(expiration time.Time) database.Change {
+	return database.NewChange(i.ExpiresAtColumn(), expiration)
+}
+
+// SetSucceededAt implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) SetSucceededAt(succeededAt time.Time) database.Change {
+	return database.NewChange(i.SucceededAtColumn(), succeededAt)
+}
+
+// SetFailReason implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) SetFailReason(reason string) database.Change {
+	return database.NewChange(i.FailReasonColumn(), reason)
 }
 
 // -------------------------------------------------------------
@@ -308,6 +334,11 @@ func (i idpIntentRepository) IDPAccessTokenColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_access_token")
 }
 
+// IDPIDTokenColumn implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) IDPIDTokenColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "idp_id_token")
+}
+
 // IDPArgumentsColumn implements [domain.idpIntentColumns].
 func (i idpIntentRepository) IDPArgumentsColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "idp_arguments")
@@ -371,6 +402,11 @@ func (i idpIntentRepository) SucceededAtColumn() database.Column {
 // SuccessURLColumn implements [domain.idpIntentColumns].
 func (i idpIntentRepository) SuccessURLColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "success_url")
+}
+
+// FailReasonColumn implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) FailReasonColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "fail_reason")
 }
 
 // UpdatedAtColumn implements [domain.idpIntentColumns].

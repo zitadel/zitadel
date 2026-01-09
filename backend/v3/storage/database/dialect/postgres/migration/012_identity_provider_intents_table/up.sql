@@ -21,10 +21,12 @@ CREATE TABLE zitadel.identity_provider_intents
     idp_username            TEXT,
     user_id                 TEXT,
     idp_access_token        TEXT,
+    idp_id_token            TEXT,
     idp_entry_attributes    JSONB,
     request_id              TEXT,
     assertion               TEXT,
     succeeded_at            TIMESTAMPTZ,
+    fail_reason             TEXT,
     expires_at              TIMESTAMPTZ,
     max_idp_intent_lifetime INTERVAL,
 

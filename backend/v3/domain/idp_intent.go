@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
 	"time"
 
@@ -19,26 +20,39 @@ const (
 )
 
 type IDPIntent struct {
-	ID                   string              `json:"id,omitempty" db:"id"`
-	InstanceID           string              `json:"instance_id,omitempty" db:"instance_id"`
-	State                IDPIntentState      `json:"state" db:"state"`
-	SuccessURL           *url.URL            `json:"success_url,omitempty" db:"success_url"`
-	FailureURL           *url.URL            `json:"failure_url,omitempty" db:"failure_url"`
-	CreatedAt            time.Time           `json:"created_at,omitzero" db:"created_at"`
-	UpdatedAt            time.Time           `json:"updated_at,omitzero" db:"updated_at"`
-	IDPID                string              `json:"idp_id,omitempty" db:"idp_id"`
-	IDPArguments         map[string]any      `json:"idp_arguments,omitempty" db:"idp_arguments"`
-	IDPUser              []byte              `json:"idp_user,omitempty" db:"idp_user"`
-	IDPUserID            string              `json:"idp_user_id,omitempty" db:"idp_user_id"`
-	IDPUsername          string              `json:"idp_username,omitempty" db:"idp_username"`
-	UserID               string              `json:"user_id,omitempty" db:"user_id"`
-	IDPAccessToken       string              `json:"idp_access_token,omitempty" db:"idp_access_token"`
-	IDPEntryAttributes   map[string][]string `json:"idp_entry_attributes,omitempty" db:"idp_entry_attributes"`
-	RequestID            string              `json:"request_id,omitempty" db:"request_id"`
-	Assertion            string              `json:"assertion,omitempty" db:"assertion"`
-	SucceededAt          *time.Time          `json:"succeeded_at,omitzero" db:"succeeded_at"`
-	ExpiresAt            *time.Time          `json:"expires_at,omitzero" db:"expires_at"`
-	MaxIDPIntentLifetime time.Duration       `json:"max_idp_intent_lifetime,omitempty" db:"max_idp_intent_lifetime"`
+	ID                   string             `json:"id,omitempty" db:"id"`
+	InstanceID           string             `json:"instance_id,omitempty" db:"instance_id"`
+	State                IDPIntentState     `json:"state" db:"state"`
+	SuccessURL           *url.URL           `json:"success_url,omitempty" db:"success_url"`
+	FailureURL           *url.URL           `json:"failure_url,omitempty" db:"failure_url"`
+	CreatedAt            time.Time          `json:"created_at,omitzero" db:"created_at"`
+	UpdatedAt            time.Time          `json:"updated_at,omitzero" db:"updated_at"`
+	IDPID                string             `json:"idp_id,omitempty" db:"idp_id"`
+	IDPArguments         map[string]any     `json:"idp_arguments,omitempty" db:"idp_arguments"`
+	IDPUser              []byte             `json:"idp_user,omitempty" db:"idp_user"`
+	IDPUserID            string             `json:"idp_user_id,omitempty" db:"idp_user_id"`
+	IDPUsername          string             `json:"idp_username,omitempty" db:"idp_username"`
+	UserID               string             `json:"user_id,omitempty" db:"user_id"`
+	IDPAccessToken       string             `json:"idp_access_token,omitempty" db:"idp_access_token"`
+	IDPIDToken           string             `json:"idp_id_token,omitempty" db:"idp_id_token"`
+	EntryAttributes      IDPEntryAttributes `json:"idp_entry_attributes,omitempty" db:"idp_entry_attributes"`
+	RequestID            string             `json:"request_id,omitempty" db:"request_id"`
+	Assertion            string             `json:"assertion,omitempty" db:"assertion"`
+	SucceededAt          *time.Time         `json:"succeeded_at,omitzero" db:"succeeded_at"`
+	FailReason           string             `json:"fail_reason,omitempty" db:"fail_reason"`
+	ExpiresAt            *time.Time         `json:"expires_at,omitzero" db:"expires_at"`
+	MaxIDPIntentLifetime time.Duration      `json:"max_idp_intent_lifetime,omitempty" db:"max_idp_intent_lifetime"`
+}
+
+type IDPEntryAttributes map[string][]string
+
+func NewIDPEntryAttributes(attrs map[string][]string) *IDPEntryAttributes {
+	cast := IDPEntryAttributes(attrs)
+	return &cast
+}
+
+func (iea *IDPEntryAttributes) String() ([]byte, error) {
+	return json.Marshal(iea)
 }
 
 // idpIntentColumns defines all the columns of the identity_provider_intents table.
@@ -71,6 +85,8 @@ type idpIntentColumns interface {
 	UserIDColumn() database.Column
 	// IDPAccessTokenColumn returns the column for the field idp_access_token
 	IDPAccessTokenColumn() database.Column
+	// IDPIDTokenColumn returns the column for the field idp_id_token
+	IDPIDTokenColumn() database.Column
 	// IDPEntryAttributesColumn returns the column for the field idp_entry_attributes
 	IDPEntryAttributesColumn() database.Column
 	// RequestIDColumn returns the column for the field request_id
@@ -79,6 +95,8 @@ type idpIntentColumns interface {
 	AssertionColumn() database.Column
 	// SucceededAtColumn returns the column for the field succeeded_at
 	SucceededAtColumn() database.Column
+	// FailReasonColumn returns the column for the field fail_reason
+	FailReasonColumn() database.Column
 	// ExpiresAtColumn returns the column for the field expires_at
 	ExpiresAtColumn() database.Column
 	// MaxIDPIntentLifetimeColumn returns the column for the field max_idp_intent_lifetime
@@ -131,12 +149,20 @@ type idpIntentChanges interface {
 	SetUserID(userID string) database.Change
 	// SetIDPAccessToken sets the idpAccessToken of the IDP intent
 	SetIDPAccessToken(idpAccessToken string) database.Change
+	// SetIDPIDToken sets the idpIDToken of the IDP intent
+	SetIDPIDToken(idpIDToken string) database.Change
 	// SetIDPEntryAttributes sets the idpEntryAttributes of the IDP intent
-	SetIDPEntryAttributes(idpEntryAttributes string) database.Change
+	SetIDPEntryAttributes(idpEntryAttributes []byte) database.Change
 	// SetRequestID sets the requestID of the IDP intent
 	SetRequestID(requestID string) database.Change
 	// SetAssertion sets the assertion of the IDP intent
 	SetAssertion(assertion string) database.Change
+	// SetFailReason sets the fail reason of the IDP intent
+	SetFailReason(reason string) database.Change
+	// SetExpiresAt sets the expiration of the IDP intent
+	SetExpiresAt(expiration time.Time) database.Change
+	// SetSucceededAt sets the succededAt time of the IDP intent
+	SetSucceededAt(succeededAt time.Time) database.Change
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/idp_intent.mock.go . IDPIntentRepository

@@ -273,6 +273,44 @@ func (c *MockIDPIntentRepositoryExpiresAtColumnCall) DoAndReturn(f func() databa
 	return c
 }
 
+// FailReasonColumn mocks base method.
+func (m *MockIDPIntentRepository) FailReasonColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FailReasonColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// FailReasonColumn indicates an expected call of FailReasonColumn.
+func (mr *MockIDPIntentRepositoryMockRecorder) FailReasonColumn() *MockIDPIntentRepositoryFailReasonColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FailReasonColumn", reflect.TypeOf((*MockIDPIntentRepository)(nil).FailReasonColumn))
+	return &MockIDPIntentRepositoryFailReasonColumnCall{Call: call}
+}
+
+// MockIDPIntentRepositoryFailReasonColumnCall wrap *gomock.Call
+type MockIDPIntentRepositoryFailReasonColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositoryFailReasonColumnCall) Return(arg0 database.Column) *MockIDPIntentRepositoryFailReasonColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositoryFailReasonColumnCall) Do(f func() database.Column) *MockIDPIntentRepositoryFailReasonColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositoryFailReasonColumnCall) DoAndReturn(f func() database.Column) *MockIDPIntentRepositoryFailReasonColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // FailureURLColumn mocks base method.
 func (m *MockIDPIntentRepository) FailureURLColumn() database.Column {
 	m.ctrl.T.Helper()
@@ -617,6 +655,44 @@ func (c *MockIDPIntentRepositoryIDPIDConditionCall) Do(f func(string) database.C
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIDPIntentRepositoryIDPIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockIDPIntentRepositoryIDPIDConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// IDPIDTokenColumn mocks base method.
+func (m *MockIDPIntentRepository) IDPIDTokenColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IDPIDTokenColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// IDPIDTokenColumn indicates an expected call of IDPIDTokenColumn.
+func (mr *MockIDPIntentRepositoryMockRecorder) IDPIDTokenColumn() *MockIDPIntentRepositoryIDPIDTokenColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDPIDTokenColumn", reflect.TypeOf((*MockIDPIntentRepository)(nil).IDPIDTokenColumn))
+	return &MockIDPIntentRepositoryIDPIDTokenColumnCall{Call: call}
+}
+
+// MockIDPIntentRepositoryIDPIDTokenColumnCall wrap *gomock.Call
+type MockIDPIntentRepositoryIDPIDTokenColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositoryIDPIDTokenColumnCall) Return(arg0 database.Column) *MockIDPIntentRepositoryIDPIDTokenColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositoryIDPIDTokenColumnCall) Do(f func() database.Column) *MockIDPIntentRepositoryIDPIDTokenColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositoryIDPIDTokenColumnCall) DoAndReturn(f func() database.Column) *MockIDPIntentRepositoryIDPIDTokenColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1115,6 +1191,82 @@ func (c *MockIDPIntentRepositorySetAssertionCall) DoAndReturn(f func(string) dat
 	return c
 }
 
+// SetExpiresAt mocks base method.
+func (m *MockIDPIntentRepository) SetExpiresAt(expiration time.Time) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetExpiresAt", expiration)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetExpiresAt indicates an expected call of SetExpiresAt.
+func (mr *MockIDPIntentRepositoryMockRecorder) SetExpiresAt(expiration any) *MockIDPIntentRepositorySetExpiresAtCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExpiresAt", reflect.TypeOf((*MockIDPIntentRepository)(nil).SetExpiresAt), expiration)
+	return &MockIDPIntentRepositorySetExpiresAtCall{Call: call}
+}
+
+// MockIDPIntentRepositorySetExpiresAtCall wrap *gomock.Call
+type MockIDPIntentRepositorySetExpiresAtCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositorySetExpiresAtCall) Return(arg0 database.Change) *MockIDPIntentRepositorySetExpiresAtCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositorySetExpiresAtCall) Do(f func(time.Time) database.Change) *MockIDPIntentRepositorySetExpiresAtCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositorySetExpiresAtCall) DoAndReturn(f func(time.Time) database.Change) *MockIDPIntentRepositorySetExpiresAtCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetFailReason mocks base method.
+func (m *MockIDPIntentRepository) SetFailReason(reason string) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetFailReason", reason)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetFailReason indicates an expected call of SetFailReason.
+func (mr *MockIDPIntentRepositoryMockRecorder) SetFailReason(reason any) *MockIDPIntentRepositorySetFailReasonCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFailReason", reflect.TypeOf((*MockIDPIntentRepository)(nil).SetFailReason), reason)
+	return &MockIDPIntentRepositorySetFailReasonCall{Call: call}
+}
+
+// MockIDPIntentRepositorySetFailReasonCall wrap *gomock.Call
+type MockIDPIntentRepositorySetFailReasonCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositorySetFailReasonCall) Return(arg0 database.Change) *MockIDPIntentRepositorySetFailReasonCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositorySetFailReasonCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetFailReasonCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositorySetFailReasonCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetFailReasonCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SetFailureURL mocks base method.
 func (m *MockIDPIntentRepository) SetFailureURL(failureURL url.URL) database.Change {
 	m.ctrl.T.Helper()
@@ -1230,7 +1382,7 @@ func (c *MockIDPIntentRepositorySetIDPArgumentsCall) DoAndReturn(f func(string) 
 }
 
 // SetIDPEntryAttributes mocks base method.
-func (m *MockIDPIntentRepository) SetIDPEntryAttributes(idpEntryAttributes string) database.Change {
+func (m *MockIDPIntentRepository) SetIDPEntryAttributes(idpEntryAttributes []byte) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetIDPEntryAttributes", idpEntryAttributes)
 	ret0, _ := ret[0].(database.Change)
@@ -1256,13 +1408,13 @@ func (c *MockIDPIntentRepositorySetIDPEntryAttributesCall) Return(arg0 database.
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDPIntentRepositorySetIDPEntryAttributesCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetIDPEntryAttributesCall {
+func (c *MockIDPIntentRepositorySetIDPEntryAttributesCall) Do(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPEntryAttributesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDPIntentRepositorySetIDPEntryAttributesCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetIDPEntryAttributesCall {
+func (c *MockIDPIntentRepositorySetIDPEntryAttributesCall) DoAndReturn(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPEntryAttributesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1301,6 +1453,44 @@ func (c *MockIDPIntentRepositorySetIDPIDCall) Do(f func(string) database.Change)
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIDPIntentRepositorySetIDPIDCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetIDPIDCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetIDPIDToken mocks base method.
+func (m *MockIDPIntentRepository) SetIDPIDToken(idpIDToken string) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetIDPIDToken", idpIDToken)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetIDPIDToken indicates an expected call of SetIDPIDToken.
+func (mr *MockIDPIntentRepositoryMockRecorder) SetIDPIDToken(idpIDToken any) *MockIDPIntentRepositorySetIDPIDTokenCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIDPIDToken", reflect.TypeOf((*MockIDPIntentRepository)(nil).SetIDPIDToken), idpIDToken)
+	return &MockIDPIntentRepositorySetIDPIDTokenCall{Call: call}
+}
+
+// MockIDPIntentRepositorySetIDPIDTokenCall wrap *gomock.Call
+type MockIDPIntentRepositorySetIDPIDTokenCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositorySetIDPIDTokenCall) Return(arg0 database.Change) *MockIDPIntentRepositorySetIDPIDTokenCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositorySetIDPIDTokenCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetIDPIDTokenCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositorySetIDPIDTokenCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetIDPIDTokenCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1491,6 +1681,44 @@ func (c *MockIDPIntentRepositorySetStateCall) Do(f func(domain.IDPIntentState) d
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockIDPIntentRepositorySetStateCall) DoAndReturn(f func(domain.IDPIntentState) database.Change) *MockIDPIntentRepositorySetStateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetSucceededAt mocks base method.
+func (m *MockIDPIntentRepository) SetSucceededAt(succeededAt time.Time) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSucceededAt", succeededAt)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetSucceededAt indicates an expected call of SetSucceededAt.
+func (mr *MockIDPIntentRepositoryMockRecorder) SetSucceededAt(succeededAt any) *MockIDPIntentRepositorySetSucceededAtCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSucceededAt", reflect.TypeOf((*MockIDPIntentRepository)(nil).SetSucceededAt), succeededAt)
+	return &MockIDPIntentRepositorySetSucceededAtCall{Call: call}
+}
+
+// MockIDPIntentRepositorySetSucceededAtCall wrap *gomock.Call
+type MockIDPIntentRepositorySetSucceededAtCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIDPIntentRepositorySetSucceededAtCall) Return(arg0 database.Change) *MockIDPIntentRepositorySetSucceededAtCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIDPIntentRepositorySetSucceededAtCall) Do(f func(time.Time) database.Change) *MockIDPIntentRepositorySetSucceededAtCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIDPIntentRepositorySetSucceededAtCall) DoAndReturn(f func(time.Time) database.Change) *MockIDPIntentRepositorySetSucceededAtCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
