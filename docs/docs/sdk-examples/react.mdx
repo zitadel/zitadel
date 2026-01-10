@@ -11,17 +11,17 @@ status: stable
 
 ## Overview
 
-[React](https://react.dev) is a JavaScript library for building user interfaces with component composition, declarative views, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/concepts/pkce)** to authenticate users securely and maintain sessions across your React application.
+[React](https://react.dev) is a JavaScript library for building user interfaces with component composition, declarative views, and a rich ecosystem. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](/docs/guides/integrate/login/oidc/login-users#pkce)** to authenticate users securely and maintain sessions across your React application.
 
 #### Auth library
 
-This example uses **[react-oidc-context](https://www.npmjs.com/package/react-oidc-context)**, a React wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manages [PKCE](/docs/concepts/pkce) code challenge generation, performs secure [token exchange](https://zitadel.com/docs/concepts/tokens), and exposes React hooks for managing authentication state throughout your application.
+This example uses **[react-oidc-context](https://www.npmjs.com/package/react-oidc-context)**, a React wrapper around **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**. The underlying [oidc-client-ts](https://github.com/authts/oidc-client-ts) library implements the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manages [PKCE](/docs/guides/integrate/login/oidc/login-users#pkce) code challenge generation, performs secure [token exchange](https://zitadel.com/docs/concepts/tokens), and exposes React hooks for managing authentication state throughout your application.
 
 ---
 
 ## What this example demonstrates
 
-This [React](https://react.dev) application showcases a complete authentication flow using [Zitadel](https://zitadel.com/docs) with the secure [PKCE](/docs/concepts/pkce) standard. Users begin on a public landing page where they can initiate login through [react-oidc-context](https://www.npmjs.com/package/react-oidc-context), which redirects them to [Zitadel's authorization endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints) for authentication. After successful authentication, the application handles the OAuth callback, exchanges the authorization code for [access tokens](https://zitadel.com/docs/concepts/tokens), and establishes a secure [session](https://zitadel.com/docs/apis/openidoauth/endpoints).
+This [React](https://react.dev) application showcases a complete authentication flow using [Zitadel](https://zitadel.com/docs) with the secure [PKCE](/docs/guides/integrate/login/oidc/login-users#pkce) standard. Users begin on a public landing page where they can initiate login through [react-oidc-context](https://www.npmjs.com/package/react-oidc-context), which redirects them to [Zitadel's authorization endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints) for authentication. After successful authentication, the application handles the OAuth callback, exchanges the authorization code for [access tokens](https://zitadel.com/docs/concepts/tokens), and establishes a secure [session](https://zitadel.com/docs/apis/openidoauth/endpoints).
 
 Protected routes are secured using [react-oidc-context's](https://www.npmjs.com/package/react-oidc-context) `withAuthenticationRequired` higher-order component, which automatically redirects unauthenticated users to the login flow. The profile page displays user information retrieved from [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims), including profile details, email, and metadata. The application implements complete [federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout) functionality, properly terminating both the local session and the Zitadel session through the end-session endpoint.
 
@@ -33,22 +33,22 @@ The example leverages [React Router](https://reactrouter.com) for client-side na
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/console-overview). Follow the **[PKCE Application Setup guide](/docs/guides/integrate/login/oidc/pkce-setup)** to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Console](/docs/guides/manage/console/console-overview). Follow the **[Application Setup guide](/docs/guides/manage/console/applications-overview)** to:
 
-1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/integrate/login/oidc/)
-2. Configure it to use the [PKCE authentication method](/docs/concepts/pkce)
+1. Create a new Web application in your [ZITADEL Project](/docs/guides/manage/console/projects-overview)
+2. Configure it to use the [PKCE authentication method](/docs/guides/integrate/login/oidc/login-users#pkce)
 3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Console](/docs/guides/manage/console/console-overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 
 Once you have your Zitadel application configured:
 
 1. Clone the [repository](https://github.com/zitadel/example-auth-react).
-2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/console-overview). **Use these exact environment variable names:**
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [ZITADEL Application](/docs/guides/manage/console/applications-overview). **Use these exact environment variable names:**
 ```
 VITE_ZITADEL_DOMAIN=https://your-instance.zitadel.cloud
 VITE_ZITADEL_CLIENT_ID=your_client_id_from_console
@@ -60,7 +60,7 @@ VITE_PORT=3000
 Replace these values with:
 - Your actual Zitadel instance URL (the **Issuer** from your [Zitadel application settings](https://zitadel.com/docs/guides/integrate/login/oidc/))
 - The **Client ID** you copied when creating the application
-- The **redirect URI** you configured in the [PKCE setup](/docs/guides/integrate/login/oidc/pkce-setup) (must match exactly)
+- The **redirect URI** you configured in the [PKCE setup](/docs/guides/manage/console/applications-overview) (must match exactly)
 - The **post-logout redirect URI** you configured
 3. Install dependencies using [npm](https://www.npmjs.com) and start the development server:
 ```bash
@@ -74,14 +74,14 @@ The application will be running at `http://localhost:3000` where you can test th
 
 ## Learn more and resources
 
-* **Zitadel documentation:** [https://zitadel.com/docs](https://zitadel.com/docs)
-* **PKCE concept:** /docs/concepts/pkce
-* **PKCE application setup:** /docs/guides/integrate/login/oidc/pkce-setup
-* **Federated logout:** [https://zitadel.com/docs/guides/integrate/login/oidc/logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
-* **OIDC integration guide:** [https://zitadel.com/docs/guides/integrate/login/oidc/](https://zitadel.com/docs/guides/integrate/login/oidc/)
-* **React documentation:** https://react.dev
-* **react-oidc-context:** https://www.npmjs.com/package/react-oidc-context
-* **oidc-client-ts:** https://www.npmjs.com/package/oidc-client-ts
-* **React Router:** https://reactrouter.com
-* **Example repository:** https://github.com/zitadel/example-auth-react
-* **All framework examples:** /docs/examples
+* [Zitadel documentation](https://zitadel.com/docs)
+* [PKCE concept](/docs/guides/integrate/login/oidc/login-users#pkce)
+* [PKCE application setup](/docs/guides/manage/console/applications-overview)
+* [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/)
+* [React documentation](https://react.dev)
+* [react-oidc-context](https://www.npmjs.com/package/react-oidc-context)
+* [oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)
+* [React Router](https://reactrouter.com)
+* [Example repository](https://github.com/zitadel/example-auth-react)
+* [All framework examples](/docs/sdk-examples/introduction)
