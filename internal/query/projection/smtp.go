@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs5"
+	SMTPConfigProjectionTable = "projections.smtp_configs6"
 	SMTPConfigTable           = SMTPConfigProjectionTable + "_" + smtpConfigSMTPTableSuffix
 	SMTPConfigHTTPTable       = SMTPConfigProjectionTable + "_" + smtpConfigHTTPTableSuffix
 
@@ -25,16 +25,21 @@ const (
 	SMTPConfigColumnState         = "state"
 	SMTPConfigColumnDescription   = "description"
 
-	smtpConfigSMTPTableSuffix          = "smtp"
-	SMTPConfigSMTPColumnInstanceID     = "instance_id"
-	SMTPConfigSMTPColumnID             = "id"
-	SMTPConfigSMTPColumnTLS            = "tls"
-	SMTPConfigSMTPColumnSenderAddress  = "sender_address"
-	SMTPConfigSMTPColumnSenderName     = "sender_name"
-	SMTPConfigSMTPColumnReplyToAddress = "reply_to_address"
-	SMTPConfigSMTPColumnHost           = "host"
-	SMTPConfigSMTPColumnUser           = "username"
-	SMTPConfigSMTPColumnPassword       = "password"
+	smtpConfigSMTPTableSuffix                    = "smtp"
+	SMTPConfigSMTPColumnInstanceID               = "instance_id"
+	SMTPConfigSMTPColumnID                       = "id"
+	SMTPConfigSMTPColumnTLS                      = "tls"
+	SMTPConfigSMTPColumnSenderAddress            = "sender_address"
+	SMTPConfigSMTPColumnSenderName               = "sender_name"
+	SMTPConfigSMTPColumnReplyToAddress           = "reply_to_address"
+	SMTPConfigSMTPColumnHost                     = "host"
+	SMTPConfigSMTPColumnPlainAuthUser            = "username"
+	SMTPConfigSMTPColumnPlainAuthPassword        = "password"
+	SMTPConfigSMTPColumnXOAuth2AuthUser          = "xoauth2auth_user"
+	SMTPConfigSMTPColumnXOAuth2AuthClientId      = "xoauth2auth_client_id"
+	SMTPConfigSMTPColumnXOAuth2AuthClientSecret  = "xoauth2auth_client_secret"
+	SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint = "xoauth2auth_token_endpoint"
+	SMTPConfigSMTPColumnXOAuth2AuthScope         = "xoauth2auth_scope"
 
 	smtpConfigHTTPTableSuffix      = "http"
 	SMTPConfigHTTPColumnInstanceID = "instance_id"
@@ -76,8 +81,13 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigSMTPColumnSenderName, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigSMTPColumnReplyToAddress, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigSMTPColumnHost, handler.ColumnTypeText),
-			handler.NewColumn(SMTPConfigSMTPColumnUser, handler.ColumnTypeText),
-			handler.NewColumn(SMTPConfigSMTPColumnPassword, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnPlainAuthUser, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigSMTPColumnPlainAuthPassword, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthUser, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientId, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthScope, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SMTPConfigSMTPColumnInstanceID, SMTPConfigSMTPColumnID),
 			smtpConfigSMTPTableSuffix,
@@ -155,6 +165,37 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		state = domain.SMTPConfigStateActive
 	}
 
+	columns := []handler.Column{
+		handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
+		handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
+		handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
+		handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
+		handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, e.ReplyToAddress),
+		handler.NewCol(SMTPConfigSMTPColumnHost, e.Host),
+	}
+
+	if e.PlainAuth != nil {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.PlainAuth.User),
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
+		)
+	} else {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.User),
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password),
+		)
+	}
+	if e.XOAuth2Auth != nil {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthUser, e.XOAuth2Auth.User),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientId, e.XOAuth2Auth.ClientId),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, e.XOAuth2Auth.ClientSecret),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
+		)
+	}
+
 	return handler.NewMultiStatement(
 		e,
 		handler.AddCreateStatement(
@@ -171,17 +212,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			},
 		),
 		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
-				handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
-				handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
-				handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
-				handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, e.ReplyToAddress),
-				handler.NewCol(SMTPConfigSMTPColumnHost, e.Host),
-				handler.NewCol(SMTPConfigSMTPColumnUser, e.User),
-				handler.NewCol(SMTPConfigSMTPColumnPassword, e.Password),
-			},
+			columns,
 			handler.WithTableSuffix(smtpConfigSMTPTableSuffix),
 		),
 	), nil
@@ -304,10 +335,10 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnHost, *e.Host))
 	}
 	if e.User != nil {
-		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnUser, *e.User))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, *e.User))
 	}
 	if e.Password != nil {
-		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPassword, *e.Password))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
 	}
 	if len(smtpColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(
@@ -333,7 +364,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(SMTPConfigSMTPColumnPassword, e.Password),
+				handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password),
 			},
 			[]handler.Condition{
 				handler.NewCond(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),

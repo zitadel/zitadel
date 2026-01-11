@@ -16,14 +16,18 @@ ZITADEL integrates with Twilio as SMS provider.
 
 ## SMTP providers
 
-Integration with most SMTP providers is possible through a generic SMTP provider template that allows you to configure custom SMTP providers.
-Additionally, integration templates are available for:
+For easy configuration, there are some integration templates available such as:
 
 - Amazon SES
 - Mailgun
 - Mailjet
-- Postmark
-- Sendgrid
+- SendGrid
+- ...
+
+Aside from those, it is also possible to configure a generic SMTP provider. With a generic SMTP provider you specify what
+the SMTP server, username and what kind of auth method you want to use. Currently, the Console only supports plain auth.
+However, with [the API's](https://zitadel.com/docs/apis/resources/admin/admin-service-add-email-provider-smtp) you can
+configure XOAUTH2 as well.
 
 :::info Default Provider ZITADEL Cloud
 A default SMTP provider is configured for ZITADEL Cloud customers.
@@ -46,7 +50,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/http' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer <TOKEN>' \
+    -H 'Authorization: Bearer {TOKEN}' \
     -d '{
       "endpoint": "http://relay.example.com/provider",
       "description": "provider description"
@@ -63,7 +67,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/:id/_activate' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer <TOKEN>' \
+    -H 'Authorization: Bearer {TOKEN}' \
     -d '{}'
   ```
 
@@ -80,7 +84,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/http' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer <TOKEN>' \
+    -H 'Authorization: Bearer {TOKEN}' \
     -d '{
       "endpoint": "http://relay.example.com/provider",
       "description": "provider description"
@@ -97,7 +101,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/:id/_activate' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer <TOKEN>' \
+    -H 'Authorization: Bearer {TOKEN}' \
     -d '{}'
   ```
 

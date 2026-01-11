@@ -140,6 +140,44 @@ message EmailProviderSMTP {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
+  oneof Auth {
+    SMTPNoAuth none = 9;
+    SMTPPlainAuth plain = 10;
+    SMTPXOAuth2Auth xoauth2 = 11;
+  }
+}
+
+message SMTPNoAuth {}
+
+message SMTPPlainAuth {
+  string user = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+}
+
+message SMTPXOAuth2Auth {
+  string user = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+  string client_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+  string token_endpoint = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"http://auth.example.com/token\"";
+    }
+  ];
+  repeated string scopes = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"https://mail.example.com\"]";
+    }
+  ];
 }
 
 message EmailProviderHTTP {
