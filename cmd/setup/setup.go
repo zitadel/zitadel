@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -61,23 +62,45 @@ func New() *cobra.Command {
 		Long: `sets up data to start ZITADEL.
 Requirements:
 - postgreSQL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel setup command failed", "err", err)
+				}
+			}()
+
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return fmt.Errorf("invalid tlsMode: %w", err)
+			}
 
 			err = BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
+			}
 
 			err = bindForMirror(cmd)
-			logging.OnError(err).Fatal("unable to bind \"for-mirror\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"for-mirror\" flag: %w", err)
+			}
 
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			steps := MustNewSteps(viper.New())
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return fmt.Errorf("no master key provided: %w", err)
+			}
 
 			Setup(cmd.Context(), config, steps, masterKey)
+			return nil
 		},
 	}
 

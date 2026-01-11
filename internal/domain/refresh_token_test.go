@@ -122,8 +122,7 @@ func FuzzFromRefreshToken(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, refreshToken string) {
 		gotUserID, gotTokenID, gotToken, err := FromRefreshToken(refreshToken, algorithm)
-		target := zerrors.InvalidArgumentError{ZitadelError: new(zerrors.ZitadelError)}
 		t.Log(gotUserID, gotTokenID, gotToken)
-		require.ErrorAs(t, err, &target)
+		require.True(t, zerrors.IsErrorInvalidArgument(err))
 	})
 }

@@ -3,13 +3,14 @@ package main
 import (
 	"os"
 
-	"github.com/spf13/cobra"
-
 	"github.com/zitadel/zitadel/cmd"
 )
 
 func main() {
 	args := os.Args[1:]
 	rootCmd := cmd.New(os.Stdout, os.Stdin, args, nil)
-	cobra.CheckErr(rootCmd.Execute())
+	if err := rootCmd.Execute(); err != nil {
+		// error is logged by the command itself
+		os.Exit(1)
+	}
 }
