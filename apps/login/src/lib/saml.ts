@@ -1,4 +1,4 @@
-import { Cookie } from "@/lib/cookies";
+import { Cookie, secureSessionCookiesUsed } from "@/lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
@@ -31,7 +31,7 @@ export async function setSAMLFormCookie(value: string): Promise<string> {
       name: uid,
       value: value,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Required for HTTPS in production
+      secure: await secureSessionCookiesUsed(), // Required for HTTPS in production
       sameSite: "lax", // Allows cookies with top-level navigation (needed for SAML redirects)
       path: "/",
       maxAge: 5 * 60, // 5 minutes
