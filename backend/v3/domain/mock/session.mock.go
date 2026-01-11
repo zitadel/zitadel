@@ -1081,40 +1081,40 @@ func (c *MockSessionRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) da
 	return c
 }
 
-// TokenColumn mocks base method.
-func (m *MockSessionRepository) TokenColumn() database.Column {
+// TokenIDColumn mocks base method.
+func (m *MockSessionRepository) TokenIDColumn() database.Column {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TokenColumn")
+	ret := m.ctrl.Call(m, "TokenIDColumn")
 	ret0, _ := ret[0].(database.Column)
 	return ret0
 }
 
-// TokenColumn indicates an expected call of TokenColumn.
-func (mr *MockSessionRepositoryMockRecorder) TokenColumn() *MockSessionRepositoryTokenColumnCall {
+// TokenIDColumn indicates an expected call of TokenIDColumn.
+func (mr *MockSessionRepositoryMockRecorder) TokenIDColumn() *MockSessionRepositoryTokenIDColumnCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TokenColumn", reflect.TypeOf((*MockSessionRepository)(nil).TokenColumn))
-	return &MockSessionRepositoryTokenColumnCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TokenIDColumn", reflect.TypeOf((*MockSessionRepository)(nil).TokenIDColumn))
+	return &MockSessionRepositoryTokenIDColumnCall{Call: call}
 }
 
-// MockSessionRepositoryTokenColumnCall wrap *gomock.Call
-type MockSessionRepositoryTokenColumnCall struct {
+// MockSessionRepositoryTokenIDColumnCall wrap *gomock.Call
+type MockSessionRepositoryTokenIDColumnCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockSessionRepositoryTokenColumnCall) Return(arg0 database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) Return(arg0 database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockSessionRepositoryTokenColumnCall) Do(f func() database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) Do(f func() database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockSessionRepositoryTokenColumnCall) DoAndReturn(f func() database.Column) *MockSessionRepositoryTokenColumnCall {
+func (c *MockSessionRepositoryTokenIDColumnCall) DoAndReturn(f func() database.Column) *MockSessionRepositoryTokenIDColumnCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

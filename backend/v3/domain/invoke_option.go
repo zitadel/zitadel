@@ -39,6 +39,12 @@ func WithInstanceDomainRepo(repo InstanceDomainRepository) InvokeOpt {
 	}
 }
 
+func WithSessionRepo(repo SessionRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionRepo = repo
+	}
+}
+
 // WithQueryExecutor sets the database client to be used by the command.
 // If not set, the default pool will be used.
 // This is mainly used for testing.
@@ -57,6 +63,24 @@ func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
 	}
 }
 
+// WithSessionTokenVerifier sets the verifier for session tokens used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithSessionTokenVerifier(verifier SessionTokenVerifier) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionTokenVerifier = verifier
+	}
+}
+
+// WithPermissionCheck sets the permission check used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithPermissionCheck(permissionCheck PermissionChecker) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.Permissions = permissionCheck
+	}
+}
+
 // InvokeOpts are passed to each command
 type InvokeOpts struct {
 	// db is the database client.
@@ -68,11 +92,13 @@ type InvokeOpts struct {
 	legacyEventstore       eventstore.LegacyEventstore
 	Invoker                Invoker
 	Permissions            PermissionChecker
+	sessionTokenVerifier   SessionTokenVerifier
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
 	instanceRepo           InstanceRepository
 	instanceDomainRepo     InstanceDomainRepository
+	sessionRepo            SessionRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
@@ -103,7 +129,8 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		invoker = &noopInvoker{}
 	}
 	return &InvokeOpts{
-		Invoker:     invoker,
-		Permissions: &noopPermissionChecker{}, // prevent panics for now
+		Invoker:              invoker,
+		Permissions:          &noopPermissionChecker{}, // prevent panics for now
+		sessionTokenVerifier: sessionTokenVerifier,
 	}
 }
