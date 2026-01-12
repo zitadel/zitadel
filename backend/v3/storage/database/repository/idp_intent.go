@@ -146,7 +146,26 @@ func rawIDPIntentToDomain(raw *rawIDPIntent) (*domain.IDPIntent, error) {
 
 // Update implements [domain.IDPIntentRepository].
 func (i idpIntentRepository) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	panic("unimplemented")
+	if changes == nil {
+		return 0, database.ErrNoChanges
+	}
+	if condition == nil || !condition.IsRestrictingColumn(i.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(i.InstanceIDColumn())
+	}
+	if !database.Changes(changes).IsOnColumn(i.UpdatedAtColumn()) {
+		changes = append(changes, database.NewChange(i.UpdatedAtColumn(), database.DefaultInstruction))
+	}
+
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE zitadel.identity_provider_intents SET `)
+
+	err := database.Changes(changes).Write(&builder)
+	if err != nil {
+		return 0, err
+	}
+	writeCondition(&builder, condition)
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------

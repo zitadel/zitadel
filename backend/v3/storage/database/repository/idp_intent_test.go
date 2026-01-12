@@ -257,3 +257,266 @@ func TestGetIDPIntent(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateIDPIntent(t *testing.T) {
+	beforeUpdate := time.Now()
+
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		require.NoError(t, err)
+	}()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	idpID := createIdentityProvider(t, tx, instanceID, orgID)
+
+	idpIntentRepo := repository.IDPIntentRepository()
+
+	successURL, err := url.Parse("https://example.com/success")
+	require.NoError(t, err)
+	failURL, err := url.Parse("https://example.com/fail")
+	require.NoError(t, err)
+
+	intentID1 := gofakeit.UUID()
+	intent1 := domain.IDPIntent{
+		ID:                   intentID1,
+		InstanceID:           instanceID,
+		SuccessURL:           successURL,
+		FailureURL:           failURL,
+		IDPID:                idpID,
+		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}, "arg2": []int32{1}},
+		MaxIDPIntentLifetime: time.Hour * 2,
+		CreatedAt:            time.Now(),
+	}
+	err = idpIntentRepo.Create(t.Context(), tx, &intent1)
+	require.NoError(t, err)
+
+	entryAttrs := domain.NewIDPEntryAttributes(map[string][]string{
+		"attr1": {"1", "2"},
+		"attr2": {"3", "4"},
+	})
+	marshalledAttrs, marshallErr := entryAttrs.String()
+	require.NoError(t, marshallErr)
+
+	intentID2 := gofakeit.UUID()
+	intent2 := domain.IDPIntent{
+		ID:                   intentID2,
+		InstanceID:           instanceID,
+		SuccessURL:           successURL,
+		FailureURL:           failURL,
+		IDPID:                idpID,
+		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		MaxIDPIntentLifetime: time.Hour * 2,
+		CreatedAt:            time.Now(),
+	}
+	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
+	require.NoError(t, err)
+
+	now := time.Now()
+	tomorrow := now.AddDate(0, 0, 1)
+	tt := []struct {
+		testName               string
+		inputConditions        database.Condition
+		inputChanges           []database.Change
+		expectedError          error
+		expectedUpdatedRecords func() []*domain.IDPIntent
+		expectedUpdatedRows    int64
+	}{
+		{
+			testName:      "when no changes should return no changes error",
+			expectedError: database.ErrNoChanges,
+		},
+		{
+			testName: "when no condition set should return missing condition error",
+			inputChanges: database.Changes{
+				idpIntentRepo.SetIDPUser([]byte("not a user")),
+			},
+			expectedError: database.NewMissingConditionError(idpIntentRepo.InstanceIDColumn()),
+		},
+		{
+			testName:        "when simulating SucceededEvent should update fields accordingly",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateSucceeded),
+				idpIntentRepo.SetIDPUser([]byte("update user")),
+				idpIntentRepo.SetIDPUserID("idp user id updated"),
+				idpIntentRepo.SetIDPUsername("idp username updated"),
+				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetIDPAccessToken("g1g4 s3cr3t 4cc3ss t0k3n"),
+				idpIntentRepo.SetIDPIDToken("idp id token"),
+				idpIntentRepo.SetSucceededAt(now),
+				idpIntentRepo.SetExpiresAt(tomorrow),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.IDPUser = []byte("update user")
+				toReturn.IDPUserID = "idp user id updated"
+				toReturn.IDPUsername = "idp username updated"
+				toReturn.UserID = "some-user-id"
+				toReturn.IDPAccessToken = "g1g4 s3cr3t 4cc3ss t0k3n"
+				toReturn.IDPIDToken = "idp id token"
+				toReturn.SucceededAt = &now
+				toReturn.ExpiresAt = &tomorrow
+				toReturn.State = domain.IDPIntentStateSucceeded
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName:        "when simulating SAMLSucceededEvent should update fields accordingly",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateSucceeded),
+				idpIntentRepo.SetIDPUser([]byte("update user")),
+				idpIntentRepo.SetIDPUserID("idp user id updated"),
+				idpIntentRepo.SetIDPUsername("idp username updated"),
+				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetAssertion("assertion"),
+				idpIntentRepo.SetSucceededAt(now),
+				idpIntentRepo.SetExpiresAt(tomorrow),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.IDPUser = []byte("update user")
+				toReturn.IDPUserID = "idp user id updated"
+				toReturn.IDPUsername = "idp username updated"
+				toReturn.UserID = "some-user-id"
+				toReturn.Assertion = "assertion"
+				toReturn.SucceededAt = &now
+				toReturn.ExpiresAt = &tomorrow
+				toReturn.State = domain.IDPIntentStateSucceeded
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName:        "when simulating LDAPSucceededEvent should update fields accordingly",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateSucceeded),
+				idpIntentRepo.SetIDPUser([]byte("update user")),
+				idpIntentRepo.SetIDPUserID("idp user id updated"),
+				idpIntentRepo.SetIDPUsername("idp username updated"),
+				idpIntentRepo.SetUserID("some-user-id"),
+				idpIntentRepo.SetIDPEntryAttributes(marshalledAttrs),
+				idpIntentRepo.SetSucceededAt(now),
+				idpIntentRepo.SetExpiresAt(tomorrow),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.IDPUser = []byte("update user")
+				toReturn.IDPUserID = "idp user id updated"
+				toReturn.IDPUsername = "idp username updated"
+				toReturn.UserID = "some-user-id"
+				toReturn.EntryAttributes = *entryAttrs
+				toReturn.SucceededAt = &now
+				toReturn.ExpiresAt = &tomorrow
+				toReturn.State = domain.IDPIntentStateSucceeded
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName:        "when simulating FailedEvent should update reason and state",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateFailed),
+				idpIntentRepo.SetFailReason("mock failure"),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.FailReason = "mock failure"
+				toReturn.State = domain.IDPIntentStateFailed
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName:        "when simulating SAMLRequestEvent should update request ID and state",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
+				idpIntentRepo.SetRequestID("req-123"),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.State = domain.IDPIntentStateConsumed
+				toReturn.RequestID = "req-123"
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName: "when updating multiple records should return updated records",
+			inputConditions: database.Or(
+				idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+				idpIntentRepo.PrimaryKeyCondition(instanceID, intentID2),
+			),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
+				idpIntentRepo.SetRequestID("req-123"),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn1, toReturn2 := intent1, intent2
+				toReturn1.State = domain.IDPIntentStateConsumed
+				toReturn1.RequestID = "req-123"
+				toReturn2.State = domain.IDPIntentStateConsumed
+				toReturn2.RequestID = "req-123"
+				return []*domain.IDPIntent{&toReturn1, &toReturn2}
+			},
+			expectedUpdatedRows: 2,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			savePoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err := savePoint.Rollback(t.Context())
+				require.NoError(t, err)
+			}()
+
+			// Test
+			updatedCount, err := idpIntentRepo.Update(t.Context(), savePoint, tc.inputConditions, tc.inputChanges...)
+			afterUpdate := time.Now()
+
+			// Verify
+			assert.ErrorIs(t, err, tc.expectedError)
+			require.Equal(t, tc.expectedUpdatedRows, updatedCount)
+			if tc.expectedError == nil {
+				for _, expectedIntent := range tc.expectedUpdatedRecords() {
+					retrievedIntent, err := idpIntentRepo.Get(t.Context(), savePoint, database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceID, expectedIntent.ID)))
+					require.NoError(t, err)
+					assert.Equal(t, expectedIntent.ID, retrievedIntent.ID)
+					assert.Equal(t, expectedIntent.InstanceID, retrievedIntent.InstanceID)
+					assert.Equal(t, expectedIntent.State, retrievedIntent.State)
+					assert.Equal(t, expectedIntent.SuccessURL, retrievedIntent.SuccessURL)
+					assert.Equal(t, expectedIntent.FailureURL, retrievedIntent.FailureURL)
+					assert.Equal(t, expectedIntent.CreatedAt, retrievedIntent.CreatedAt)
+					assert.WithinRange(t, retrievedIntent.UpdatedAt, beforeUpdate, afterUpdate)
+					assert.Equal(t, expectedIntent.IDPID, retrievedIntent.IDPID)
+					assert.Equal(t, expectedIntent.IDPUser, retrievedIntent.IDPUser)
+					assert.Equal(t, expectedIntent.IDPUserID, retrievedIntent.IDPUserID)
+					assert.Equal(t, expectedIntent.IDPUsername, retrievedIntent.IDPUsername)
+					assert.Equal(t, expectedIntent.UserID, retrievedIntent.UserID)
+					assert.Equal(t, expectedIntent.IDPAccessToken, retrievedIntent.IDPAccessToken)
+					assert.Equal(t, expectedIntent.IDPIDToken, retrievedIntent.IDPIDToken)
+					assert.Equal(t, expectedIntent.EntryAttributes, retrievedIntent.EntryAttributes)
+					assert.Equal(t, expectedIntent.RequestID, retrievedIntent.RequestID)
+					assert.Equal(t, expectedIntent.Assertion, retrievedIntent.Assertion)
+					if expectedIntent.State == domain.IDPIntentStateSucceeded {
+						require.NotNil(t, retrievedIntent.SucceededAt)
+						assert.WithinRange(t, *retrievedIntent.SucceededAt, beforeUpdate, afterUpdate)
+						require.NotNil(t, retrievedIntent.ExpiresAt)
+						assert.Equal(t, expectedIntent.ExpiresAt, retrievedIntent.ExpiresAt)
+					}
+					assert.Equal(t, expectedIntent.FailReason, retrievedIntent.FailReason)
+					assert.Equal(t, expectedIntent.MaxIDPIntentLifetime, retrievedIntent.MaxIDPIntentLifetime)
+				}
+			}
+		})
+	}
+}
