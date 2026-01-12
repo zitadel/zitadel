@@ -39,7 +39,7 @@ export function SetEnvironment() {
   return (
     <div>
       <div className={styles.inputwrapper}>
-        <label className={styles.label}>Your custom domain</label>
+        <label className={styles.label}>Your omain</label>
         <input
           className={styles.input}
           id="instance"

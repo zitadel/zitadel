@@ -109,7 +109,7 @@ A sample request will look like this
 
 ```bash {5}
 curl --request POST \
-  --url $CUSTOM-DOMAIN/oauth/v2/token \
+  --url $CUSTOM_DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile urn:zitadel:iam:org:project:id:zitadel:aud' \
@@ -140,7 +140,7 @@ In the following example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url $CUSTOM_DOMAIN/management/v1/orgs/me \
   --header 'Authorization: Bearer ${TOKEN}' 
 ```
 
@@ -181,7 +181,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash {6}
 curl --request POST \
-  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --url https://$CUSTOM_DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -212,7 +212,7 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url $CUSTOM_DOMAIN/management/v1/orgs/me \
   --header 'Authorization: Bearer ${TOKEN}' 
 ```
 
@@ -225,7 +225,7 @@ In this example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url $CUSTOM_DOMAIN/management/v1/orgs/me \
   --header 'Authorization: Bearer {PAT}' 
 ```
 

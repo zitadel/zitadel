@@ -91,7 +91,7 @@ To determine the roles assigned to a user, you have two options:
 
 ### Retrieve roles from the userinfo endpoint
 
-The user info endpoint is  **`${CUSTOM_DOMAIN}`/oidc/v1/userinfo**.
+The user info endpoint is  **`$CUSTOM_DOMAIN`/oidc/v1/userinfo**.
 
 This endpoint will return information about the authenticated user.
 Send the access token of the user as `Bearer Token` in the `Authorization` header:
@@ -99,7 +99,7 @@ Send the access token of the user as `Bearer Token` in the `Authorization` heade
 **cURL Request:**
 ```bash
 curl --request GET \
- --url ${CUSTOM_DOMAIN}/oidc/v1/userinfo
+ --url $CUSTOM_DOMAIN/oidc/v1/userinfo
  --header 'Authorization: Bearer <TOKEN>'
 ```
 
@@ -216,7 +216,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 ### Retrieve roles using the auth API
 
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
-The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
+The base URL is: **https://`$CUSTOM_DOMAIN`/auth/v1**
 
 Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
 
@@ -227,11 +227,11 @@ Let’s start with a user who has multiple roles in different organizations in a
 
 Returns a list of roles for the authenticated user and for the requesting project (based on the token).
 
-**URL: https://`${CUSTOM_DOMAIN}`/auth/v1/permissions/me/_search**
+**URL: https://`$CUSTOM_DOMAIN`/auth/v1/permissions/me/_search**
 
 **cURL request:** 
 ```bash
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
+curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/permissions/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -252,12 +252,12 @@ Returns a list of permissions the authenticated user has in ZITADEL based on the
 
 This request can be used if you are building a management UI. For instance, if the UI is managing users, you can show the management functionality based on the permissions the user has. Here’s an example: if the user has `user.read` and `user.write` permission you can show the edit buttons, if the user only has `user.read` permission, you can hide the edit buttons.
 
-**URL: https://`${CUSTOM_DOMAIN}`/auth/v1/permissions/zitadel/me/_search**
+**URL: https://`$CUSTOM_DOMAIN`/auth/v1/permissions/zitadel/me/_search**
 
 **cURL Request:** 
 
 ```bash
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/zitadel/me/_search' \
+curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/permissions/zitadel/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -303,7 +303,7 @@ Returns a list of user grants the authenticated user has. User grants consist of
 **cURL request:**
 
 ```bash
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/usergrants/me/_search' \
+curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/usergrants/me/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -400,7 +400,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/usergrants/me/_search' \
 ### Retrieve roles using the management API
 Now we will use the management API to retrieve user roles under an admin user. 
 
-The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
+The base URL is: **https://`$CUSTOM_DOMAIN`/management/v1**
 
 In [APIs listed under user grants in the management API](/docs/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
@@ -410,12 +410,12 @@ In [APIs listed under user grants in the management API](/docs/apis/resources/mg
 
 Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
 
-**URL: https://`${CUSTOM_DOMAIN}`/management/v1/users/grants/_search**
+**URL: https://`$CUSTOM_DOMAIN`/management/v1/users/grants/_search**
 
 **cURL request:** 
 
 ```bash
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/management/v1/users/grants/_search' \
+curl -L -X POST 'https://$CUSTOM_DOMAIN/management/v1/users/grants/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -479,12 +479,12 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/management/v1/users/grants/_search' \
 
 Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
 
-**URL: https://`${CUSTOM_DOMAIN}`/management/v1/users/:userId/grants/:grantId**
+**URL: https://`$CUSTOM_DOMAIN`/management/v1/users/:userId/grants/:grantId**
 
 **cURL request:**
 
 ```bash 
-curl -L -X GET 'https://${CUSTOM_DOMAIN}/management/v1/users/:userId/grants/:grantId' \
+curl -L -X GET 'https://$CUSTOM_DOMAIN/management/v1/users/:userId/grants/:grantId' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```

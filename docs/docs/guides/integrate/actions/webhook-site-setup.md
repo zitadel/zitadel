@@ -80,7 +80,7 @@ As shown in the example above, the target is created with HTTP and port '8090'. 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information. Notice that the `endpoint` is your Webhook.site URL.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
+curl -L -X POST 'https://$CUSTOM_DOMAIN/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -117,7 +117,7 @@ See [Set an execution](/apis/resources/action_service_v2/action-service-set-exec
 Here, `<TargetID returned>` is the `id` from the previous step.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
+curl -L -X PUT 'https://$CUSTOM_DOMAIN/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -142,7 +142,7 @@ Now that you have set up the target and execution, you can test it by creating a
 Here, we are creating a user via the API:
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X PUT 'https://$CUSTOM_DOMAIN/v2/users/human' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

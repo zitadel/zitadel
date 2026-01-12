@@ -87,7 +87,7 @@ You can configure on which changes the users will be notified. The text of the m
 
 ### SMTP
 
-On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a custom domain on your instance.
+On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a Custom Domain on your instance.
 
 You can configure many SMTP providers using templates for popular providers. The templates will add known settings like host, port or default user and will suggest values for user and/or password.
 
@@ -102,7 +102,7 @@ Email delivery through this service may be **delayed or temporarily unstable**.
 For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
 :::
 
-Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
+Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a Custom Domain.
 
 To configure your custom SMTP please fill the following fields:
 
@@ -156,7 +156,7 @@ The Login Policy defines how the login process should look like and which authen
 The Default Redirect URI will be used, if a user calls the login page directly.
 More specifically, typically a client will initiate login with an auth request.
 The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
-If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
+If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://$CUSTOM_DOMAIN/ui/console/`
 
 Reasons why ZITADEL doesn't have a redirect URI:
 
@@ -165,7 +165,7 @@ Reasons why ZITADEL doesn't have a redirect URI:
 
 We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
 
-Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
+Change default redirect url of instance: `https://$CUSTOM_DOMAIN/ui/console/instance?id=login`
 
 <img
   src="/docs//img/guides/solution-scenarios/console-default-redirect.png"
@@ -277,7 +277,7 @@ If it is set to false, all registered domain will automatically be created as ve
 
 ### SMTP Sender Address matches Custom Domain
 
-If enabled, the SMTP server address must match the instance's primary custom domain.
+If enabled, the SMTP server address must match the instance's primary Custom Domain.
 With that you can ensure that users receive notifications from the same domain that is used for login.
 
 ### Use email as username
