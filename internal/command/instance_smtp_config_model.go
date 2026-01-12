@@ -272,7 +272,7 @@ func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) [
 		changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
 	} else {
 		for _, s := range auth.Scopes {
-			if !slices.Contains(auth.Scopes, s) {
+			if !slices.Contains(wm.SMTPConfig.XOAuth2Auth.Scopes, s) {
 				changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
 				break
 			}
