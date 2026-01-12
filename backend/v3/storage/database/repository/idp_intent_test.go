@@ -125,13 +125,12 @@ func TestCreateIDPIntent(t *testing.T) {
 
 			idpIntentRepo := repository.IDPIntentRepository()
 			intent := domain.IDPIntent{
-				ID:                   tc.inputID,
-				InstanceID:           tc.inputInstanceID,
-				SuccessURL:           tc.inputSuccessURL,
-				FailureURL:           tc.inputFailureURL,
-				IDPID:                tc.inputIDPID,
-				IDPArguments:         tc.inputIDPArgs,
-				MaxIDPIntentLifetime: tc.inputMaxLifetime,
+				ID:           tc.inputID,
+				InstanceID:   tc.inputInstanceID,
+				SuccessURL:   tc.inputSuccessURL,
+				FailureURL:   tc.inputFailureURL,
+				IDPID:        tc.inputIDPID,
+				IDPArguments: tc.inputIDPArgs,
 
 				State:     domain.IDPIntentStateConsumed, // Should disregard
 				IDPUserID: "should disregard",
@@ -159,7 +158,6 @@ func TestCreateIDPIntent(t *testing.T) {
 				assert.Equal(t, tc.inputFailureURL, retrieved.FailureURL)
 				assert.Equal(t, tc.inputIDPID, retrieved.IDPID)
 				assert.NotZero(t, retrieved.IDPArguments)
-				assert.Equal(t, tc.inputMaxLifetime, retrieved.MaxIDPIntentLifetime)
 				assert.Equal(t, domain.IDPIntentStateStarted, retrieved.State)
 				assert.Zero(t, retrieved.IDPUserID)
 			}
@@ -188,14 +186,13 @@ func TestGetIDPIntent(t *testing.T) {
 	require.NoError(t, err)
 
 	intent2 := domain.IDPIntent{
-		ID:                   gofakeit.UUID(),
-		InstanceID:           instanceID,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now().AddDate(0, 0, 1),
+		ID:           gofakeit.UUID(),
+		InstanceID:   instanceID,
+		SuccessURL:   successURL,
+		FailureURL:   failURL,
+		IDPID:        idpID,
+		IDPArguments: map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		CreatedAt:    time.Now().AddDate(0, 0, 1),
 	}
 	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
 	require.NoError(t, err)
@@ -286,14 +283,13 @@ func TestUpdateIDPIntent(t *testing.T) {
 
 	intentID1 := gofakeit.UUID()
 	intent1 := domain.IDPIntent{
-		ID:                   intentID1,
-		InstanceID:           instanceID,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}, "arg2": []int32{1}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now(),
+		ID:           intentID1,
+		InstanceID:   instanceID,
+		SuccessURL:   successURL,
+		FailureURL:   failURL,
+		IDPID:        idpID,
+		IDPArguments: map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}, "arg2": []int32{1}},
+		CreatedAt:    time.Now(),
 	}
 	err = idpIntentRepo.Create(t.Context(), tx, &intent1)
 	require.NoError(t, err)
@@ -307,14 +303,13 @@ func TestUpdateIDPIntent(t *testing.T) {
 
 	intentID2 := gofakeit.UUID()
 	intent2 := domain.IDPIntent{
-		ID:                   intentID2,
-		InstanceID:           instanceID,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now(),
+		ID:           intentID2,
+		InstanceID:   instanceID,
+		SuccessURL:   successURL,
+		FailureURL:   failURL,
+		IDPID:        idpID,
+		IDPArguments: map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		CreatedAt:    time.Now(),
 	}
 	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
 	require.NoError(t, err)
@@ -519,7 +514,6 @@ func TestUpdateIDPIntent(t *testing.T) {
 						assert.Equal(t, expectedIntent.ExpiresAt, retrievedIntent.ExpiresAt)
 					}
 					assert.Equal(t, expectedIntent.FailReason, retrievedIntent.FailReason)
-					assert.Equal(t, expectedIntent.MaxIDPIntentLifetime, retrievedIntent.MaxIDPIntentLifetime)
 				}
 			}
 		})

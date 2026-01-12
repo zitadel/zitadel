@@ -53,7 +53,6 @@ SELECT
 	, identity_provider_intents.succeeded_at
 	, identity_provider_intents.fail_reason
 	, identity_provider_intents.expires_at
-	, identity_provider_intents.max_idp_intent_lifetime
 FROM
 	zitadel.identity_provider_intents
 `
@@ -70,8 +69,8 @@ func (i idpIntentRepository) Create(ctx context.Context, client database.QueryEx
 	}
 
 	builder := new(database.StatementBuilder)
-	builder.WriteString(`INSERT INTO ` + i.qualifiedTableName() + ` (instance_id, id, success_url, failure_url, max_idp_intent_lifetime, idp_id, idp_arguments, created_at, updated_at) VALUES ( `)
-	builder.WriteArgs(intent.InstanceID, intent.ID, intent.SuccessURL.String(), intent.FailureURL.String(), intent.MaxIDPIntentLifetime, intent.IDPID, intent.IDPArguments, createdAt, updatedAt)
+	builder.WriteString(`INSERT INTO ` + i.qualifiedTableName() + ` (instance_id, id, success_url, failure_url, idp_id, idp_arguments, created_at, updated_at) VALUES ( `)
+	builder.WriteArgs(intent.InstanceID, intent.ID, intent.SuccessURL.String(), intent.FailureURL.String(), intent.IDPID, intent.IDPArguments, createdAt, updatedAt)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&intent.CreatedAt, &intent.UpdatedAt)
 }
@@ -391,11 +390,6 @@ func (i idpIntentRepository) IDPUsernameColumn() database.Column {
 // InstanceIDColumn implements [domain.idpIntentColumns].
 func (i idpIntentRepository) InstanceIDColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "instance_id")
-}
-
-// MaxIDPIntentLifetimeColumn implements [domain.idpIntentColumns].
-func (i idpIntentRepository) MaxIDPIntentLifetimeColumn() database.Column {
-	return database.NewColumn(i.unqualifiedTableName(), "max_idp_intent_lifetime")
 }
 
 // PrimaryKeyColumns implements [domain.IDPIntentRepository].

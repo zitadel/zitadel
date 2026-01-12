@@ -196,14 +196,13 @@ func createIDPIntent(t *testing.T, tx database.Transaction, instanceID, idpID st
 	require.NoError(t, err)
 
 	intent := domain.IDPIntent{
-		ID:                   gofakeit.UUID(),
-		InstanceID:           instanceID,
-		SuccessURL:           successURL,
-		FailureURL:           failURL,
-		IDPID:                idpID,
-		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
-		MaxIDPIntentLifetime: time.Hour * 2,
-		CreatedAt:            time.Now(),
+		ID:           gofakeit.UUID(),
+		InstanceID:   instanceID,
+		SuccessURL:   successURL,
+		FailureURL:   failURL,
+		IDPID:        idpID,
+		IDPArguments: map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		CreatedAt:    time.Now(),
 	}
 	idpIntentRepo := repository.IDPIntentRepository()
 	err = idpIntentRepo.Create(t.Context(), tx, &intent)
