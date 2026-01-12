@@ -434,16 +434,27 @@ func TestUpdateIDPIntent(t *testing.T) {
 			expectedUpdatedRows: 1,
 		},
 		{
-			testName:        "when simulating SAMLRequestEvent should update request ID and state",
+			testName:        "when simulating SAMLRequestEvent should update request ID",
 			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
 			inputChanges: database.Changes{
-				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
 				idpIntentRepo.SetRequestID("req-123"),
 			},
 			expectedUpdatedRecords: func() []*domain.IDPIntent {
 				toReturn := intent1
-				toReturn.State = domain.IDPIntentStateConsumed
 				toReturn.RequestID = "req-123"
+				return []*domain.IDPIntent{&toReturn}
+			},
+			expectedUpdatedRows: 1,
+		},
+		{
+			testName:        "when simulating ConsumedEvent should update state",
+			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
+			inputChanges: database.Changes{
+				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
+			},
+			expectedUpdatedRecords: func() []*domain.IDPIntent {
+				toReturn := intent1
+				toReturn.State = domain.IDPIntentStateConsumed
 				return []*domain.IDPIntent{&toReturn}
 			},
 			expectedUpdatedRows: 1,
