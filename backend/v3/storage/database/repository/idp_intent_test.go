@@ -520,3 +520,65 @@ func TestUpdateIDPIntent(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteIDPIntent(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	defer func() {
+		err := tx.Rollback(t.Context())
+		require.NoError(t, err)
+	}()
+
+	instanceID := createInstance(t, tx)
+	orgID := createOrganization(t, tx, instanceID)
+	idpID := createIdentityProvider(t, tx, instanceID, orgID)
+	intentID := createIDPIntent(t, tx, instanceID, idpID)
+	otherIntentID := createIDPIntent(t, tx, instanceID, idpID)
+	createIDPIntent(t, tx, instanceID, idpID)
+	idpIntentRepo := repository.IDPIntentRepository()
+
+	tt := []struct {
+		testName             string
+		inputConditions      database.Condition
+		expectedError        error
+		expectedDeletedCount int64
+	}{
+		{
+			testName:        "when PK condition not set should return missing condition error",
+			inputConditions: idpIntentRepo.StateCondition(domain.IDPIntentStateConsumed),
+			expectedError:   database.NewMissingConditionError(nil),
+		},
+		{
+			testName:             "when condition matches record should delete matching record",
+			inputConditions:      idpIntentRepo.PrimaryKeyCondition(instanceID, intentID),
+			expectedDeletedCount: 1,
+		},
+		{
+			testName: "when conditions matches record should delete matching records",
+			inputConditions: database.Or(
+				idpIntentRepo.PrimaryKeyCondition(instanceID, intentID),
+				idpIntentRepo.PrimaryKeyCondition(instanceID, otherIntentID),
+			),
+			expectedDeletedCount: 2,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			savePoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			defer func() {
+				err := savePoint.Rollback(t.Context())
+				require.NoError(t, err)
+			}()
+
+			// Test
+			deleteCount, err := idpIntentRepo.Delete(t.Context(), savePoint, tc.inputConditions)
+
+			// Verify
+			assert.ErrorIs(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedDeletedCount, deleteCount)
+
+		})
+	}
+}

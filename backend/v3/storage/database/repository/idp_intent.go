@@ -78,7 +78,7 @@ func (i idpIntentRepository) Create(ctx context.Context, client database.QueryEx
 
 // Delete implements [domain.IDPIntentRepository].
 func (i idpIntentRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	panic("unimplemented")
+	return deleteOne(ctx, client, i, condition)
 }
 
 // Get implements [domain.IDPIntentRepository].
