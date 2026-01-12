@@ -1,81 +1,43 @@
+// Package tracing acts as a shim to [tracing],
+// so we can migrate the tracing package without changing all imports at once.
 package tracing
 
 import (
 	"context"
 	"net/http"
 
-	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
-	api_trace "go.opentelemetry.io/otel/trace"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 )
 
-type Tracer interface {
-	NewSpan(ctx context.Context, caller string) (context.Context, *Span)
-	NewClientSpan(ctx context.Context, caller string) (context.Context, *Span)
-	NewServerSpan(ctx context.Context, caller string) (context.Context, *Span)
-	NewClientInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
-	NewServerInterceptorSpan(ctx context.Context, name string) (context.Context, *Span)
-	NewSpanHTTP(r *http.Request, caller string) (*http.Request, *Span)
-	Sampler() sdk_trace.Sampler
+func NewSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
-var T Tracer
-
-func Sampler() sdk_trace.Sampler {
-	if T == nil {
-		return sdk_trace.NeverSample()
-	}
-	return T.Sampler()
+func NewNamedSpan(ctx context.Context, name string) (context.Context, *instrumentation.Span) {
+	return tracing.NewNamedSpan(ctx, name)
 }
 
-func NewSpan(ctx context.Context) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewSpan(ctx, GetCaller())
+func NewClientSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewClientSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
-func NewNamedSpan(ctx context.Context, name string) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewSpan(ctx, name)
+func NewServerSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewServerSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
-func NewClientSpan(ctx context.Context) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewClientSpan(ctx, GetCaller())
+func NewClientInterceptorSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewClientInterceptorSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
-func NewServerSpan(ctx context.Context) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewServerSpan(ctx, GetCaller())
+func NewServerInterceptorSpan(ctx context.Context) (context.Context, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewServerInterceptorSpan(ctx, instrumentation.GetCallingFunc(1))
 }
 
-func NewClientInterceptorSpan(ctx context.Context) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewClientInterceptorSpan(ctx, GetCaller())
-}
-
-func NewServerInterceptorSpan(ctx context.Context) (context.Context, *Span) {
-	if T == nil {
-		return ctx, CreateSpan(nil)
-	}
-	return T.NewServerInterceptorSpan(ctx, GetCaller())
-}
-
-func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {
-	if T == nil {
-		return r, CreateSpan(nil)
-	}
-	return T.NewSpanHTTP(r, GetCaller())
+func NewSpanHTTP(r *http.Request) (*http.Request, *instrumentation.Span) {
+	return tracing.GlobalTracer().NewSpanHTTP(r, instrumentation.GetCallingFunc(1))
 }
 
 func TraceIDFromCtx(ctx context.Context) string {
-	return api_trace.SpanFromContext(ctx).SpanContext().TraceID().String()
+	return tracing.TraceIDFromCtx(ctx)
 }
