@@ -325,7 +325,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 			err := cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -688,7 +688,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.checkPasskey != nil && tc.expectedError == nil {
 				assert.NotZero(t, cmd.LastVeriedAt)
 			}

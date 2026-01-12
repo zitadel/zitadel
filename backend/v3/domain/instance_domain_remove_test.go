@@ -214,7 +214,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			}
 
 			err := cmd.Validate(ctx, opts)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -374,7 +374,7 @@ func TestRemoveInstanceDomainCommand_Execute(t *testing.T) {
 			}
 
 			err := cmd.Execute(ctx, opts)
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectsDeleteTime, cmd.DeleteTime != nil && !cmd.DeleteTime.IsZero())
 		})
 	}

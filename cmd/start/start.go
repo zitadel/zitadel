@@ -342,6 +342,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Executions,
 		q,
 		keys.Target,
+		queries.GetActiveSigningWebKey,
 	)
 	execution.Start(ctx)
 

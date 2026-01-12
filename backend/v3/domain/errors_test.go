@@ -42,6 +42,7 @@ func TestUnexpectedQueryTypeError_Error(t *testing.T) {
 
 func TestHandleUpdateError(t *testing.T) {
 	t.Parallel()
+	dbErr := errors.New("db error")
 
 	tt := []struct {
 		name             string
@@ -63,12 +64,12 @@ func TestHandleUpdateError(t *testing.T) {
 		},
 		{
 			name:             "input error provided",
-			inputErr:         errors.New("db error"),
+			inputErr:         dbErr,
 			expectedRowCount: 1,
 			actualRowCount:   1,
 			errorID:          "test-002",
 			objectType:       "session",
-			expectedErr:      zerrors.ThrowInternalf(errors.New("db error"), "test-002", "Errors.Update.%s", "session"),
+			expectedErr:      zerrors.ThrowInternalf(dbErr, "test-002", "Errors.Update.%s", "session"),
 		},
 		{
 			name:             "no rows affected",
@@ -104,7 +105,7 @@ func TestHandleUpdateError(t *testing.T) {
 			t.Parallel()
 
 			err := handleUpdateError(tc.inputErr, tc.expectedRowCount, tc.actualRowCount, tc.errorID, tc.objectType)
-			assert.Equal(t, tc.expectedErr, err)
+			assert.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
 }

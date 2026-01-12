@@ -206,7 +206,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			err := cmd.Validate(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }
@@ -698,7 +698,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			if tc.expectedError == nil && tc.checkUser != nil {
 				assert.NotZero(t, cmd.UserCheckedAt)
 				assert.Equal(t, tc.expectedPreferredLanguage, cmd.PreferredUserLanguage)
@@ -763,7 +763,7 @@ func TestUserCheckCommand_Events(t *testing.T) {
 			events, err := cmd.Events(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
+			assert.ErrorIs(t, err, tc.expectedError)
 			require.Len(t, events, tc.expectedEventLen)
 			if tc.expectedEventLen != 0 {
 				usrCheckedEvent, ok := events[0].(*session.UserCheckedEvent)

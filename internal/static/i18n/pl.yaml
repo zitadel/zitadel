@@ -575,6 +575,10 @@ Errors:
     NoTimeout: Cel nie ma limitu czasu
     InvalidURL: Cel ma nieprawidłowy adres URL
     NotFound: Nie znaleziono celu
+    InvalidExpirationDate: Data wygaśnięcia klucza musi być w przyszłości
+    PublicKeyExpired: Publiczny klucz docelowy wygasł
+    PublicKeyActive: Nie można usunąć aktywnego publicznego klucza docelowego
+    InvalidPublicKey: Klucz publiczny jest nieprawidłowy. Musi być to klucz publiczny RSA lub ECDSA zakodowany w PEM w formacie PKCS#8
   Execution:
     ConditionInvalid: Warunek wykonania jest nieprawidłowy
     Invalid: Wykonanie jest nieprawidłowe
@@ -583,6 +587,7 @@ Errors:
     NoTargets: Nie zdefiniowano celów
     Failed: Wykonanie nie powiodło się
     ResponseIsNotValidJSON: Odpowiedź nie jest prawidłowym JSON-em
+    MissingEncryptionKey: Brak klucza szyfrowania dla wykonania
   UserSchema:
     NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
     Type:
