@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 	"slices"
 
@@ -20,9 +21,16 @@ func verifyCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "verify",
 		Short: "counts if source and dest have the same amount of entries",
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			verifyMigration(cmd.Context(), config)
+			return nil
 		},
 	}
 }

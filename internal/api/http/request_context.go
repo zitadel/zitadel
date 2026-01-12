@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/url"
 )
@@ -65,6 +66,22 @@ func (r *DomainCtx) Origin() string {
 		host = r.InstanceHost
 	}
 	return fmt.Sprintf("%s://%s", r.Protocol, host)
+}
+
+var _ slog.LogValuer = (*DomainCtx)(nil)
+
+func (r *DomainCtx) LogValue() slog.Value {
+	values := make([]slog.Attr, 0, 3)
+	if r.InstanceHost != "" {
+		values = append(values, slog.String("instance_host", r.InstanceHost))
+	}
+	if r.PublicHost != "" {
+		values = append(values, slog.String("public_host", r.PublicHost))
+	}
+	if r.Protocol != "" {
+		values = append(values, slog.String("protocol", r.Protocol))
+	}
+	return slog.GroupValue(values...)
 }
 
 func DomainContext(ctx context.Context) *DomainCtx {

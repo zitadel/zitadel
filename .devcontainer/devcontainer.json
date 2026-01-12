@@ -43,6 +43,10 @@
 	"containerEnv": {
 		"DEVCONTAINER_LOCAL_WORKSPACE_ROOT": "${localWorkspaceFolder}"
 	},
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/workspaces/zitadel/.artifacts/bin/linux/amd64"
+	},
+	"postStartCommand": "echo 'export PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\"' >> ~/.bashrc",
 	"customizations": {
 		"vscode": {
 			"extensions": [
