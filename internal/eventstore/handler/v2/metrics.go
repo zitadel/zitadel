@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 )
 
 const (
@@ -23,7 +23,11 @@ type ProjectionMetrics struct {
 }
 
 func NewProjectionMetrics() *ProjectionMetrics {
-	projectionMetrics := &ProjectionMetrics{provider: metrics.M}
+	return newProjectionMetrics(metrics.GlobalMeter())
+}
+
+func newProjectionMetrics(m metrics.Metrics) *ProjectionMetrics {
+	projectionMetrics := &ProjectionMetrics{provider: m}
 
 	err := projectionMetrics.provider.RegisterCounter(
 		ProjectionEventsProcessed,
