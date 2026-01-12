@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceConfig } from "../service-url";
 import {
@@ -23,7 +24,6 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
-import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -438,7 +438,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
-          loginName: session?.factors?.user?.loginName ?? user.preferredLoginName,
+          loginName: command.ignoreUnknownUsernames
+            ? command.loginName
+            : (session?.factors?.user?.loginName ?? user.preferredLoginName),
         });
 
         if (command.requestId) {
