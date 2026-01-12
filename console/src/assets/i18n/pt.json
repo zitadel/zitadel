@@ -1689,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificação",
       "DESCRIPTION": "Determina em quais alterações as notificações serão enviadas.",
-      "PASSWORDCHANGE": "Mudança de senha"
+      "PASSWORDCHANGE": "Senha alterada"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Dê ao login o seu estilo personalizado e modifique seu comportamento.",
