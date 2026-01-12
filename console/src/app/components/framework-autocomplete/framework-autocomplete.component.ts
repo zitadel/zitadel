@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, Signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,8 +8,8 @@ import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/ma
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
-import { Framework } from '../quickstart/quickstart.component';
+import { frameworks } from '../../utils/framework';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,31 +29,19 @@ import { Framework } from '../quickstart/quickstart.component';
     InputModule,
   ],
 })
-export class FrameworkAutocompleteComponent implements OnInit {
-  public isLoading = signal(false);
-  @Input() public frameworkId?: string;
-  @Input() public frameworks: Framework[] = [];
-  @Input() public withCustom: boolean = false;
-  public myControl: FormControl = new FormControl();
-  @Output() public selectionChanged: EventEmitter<string> = new EventEmitter();
-  public filteredOptions: Observable<Framework[]> = of([]);
+export class FrameworkAutocompleteComponent {
+  public readonly withCustom = input<boolean>(false);
+  public selectionChanged = output<string>();
 
-  constructor() {}
+  protected readonly control: FormControl = new FormControl<string>('', { nonNullable: true });
+  protected filteredOptions: Signal<typeof frameworks>;
 
-  public ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map((value) => {
-        return this._filter(value || '');
-      }),
-    );
-  }
-
-  private _filter(value: string): Framework[] {
-    const filterValue = value.toLowerCase();
-    return this.frameworks
-      .filter((option) => option.id)
-      .filter((option) => option.title.toLowerCase().includes(filterValue));
+  constructor() {
+    const controlValue = toSignal(this.control.valueChanges, { initialValue: this.control.value });
+    this.filteredOptions = computed(() => {
+      const value = controlValue().toLowerCase();
+      return frameworks.filter((option) => option.title.toLowerCase().includes(value));
+    });
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {

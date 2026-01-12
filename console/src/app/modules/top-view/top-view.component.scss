@@ -3,6 +3,7 @@
   $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
   $warn: map-get($theme, warn);
+  $primary: map-get($theme, primary);
   $warn-color: map-get($warn, 500);
 
   .cnsl-top-view {
@@ -125,6 +126,91 @@
           flex-basis: auto;
           margin-left: 2rem;
         }
+      }
+    }
+
+    // Inline title editing styles
+    .cnsl-title-container {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      .cnsl-title-input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: inherit;
+
+        padding: 0;
+        min-height: auto;
+
+        border-bottom: 2px solid rgba(map-get($primary, 500), 0.4);
+        margin-bottom: -4px;
+
+        &::placeholder {
+          color: map-get($foreground, secondary-text);
+          opacity: 0.7;
+        }
+
+        &:focus {
+          border-bottom-color: rgba(map-get($primary, 500), 0.8);
+        }
+      }
+
+      .cnsl-title-edit-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin: 0 0.25rem;
+
+        button {
+          opacity: 0.7;
+          transition: opacity 0.2s ease;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+          }
+        }
+      }
+    }
+
+    .cnsl-title-editable {
+      cursor: pointer;
+      // padding: 0.25rem 0;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      // margin: -0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:hover {
+        background-color: map-get($background, hover);
+
+        .cnsl-title-edit-icon {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .cnsl-title-edit-icon {
+        opacity: 0;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        transform: translateX(-0.25rem);
+        color: map-get($foreground, secondary-text);
       }
     }
   }
