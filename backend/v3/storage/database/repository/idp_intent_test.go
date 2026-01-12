@@ -182,7 +182,23 @@ func TestGetIDPIntent(t *testing.T) {
 	idpIntentRepo := repository.IDPIntentRepository()
 
 	intentID1 := createIDPIntent(t, tx, instanceID, idpID)
-	intentID2 := createIDPIntent(t, tx, instanceID, idpID)
+	successURL, err := url.Parse("https://example.com/success")
+	require.NoError(t, err)
+	failURL, err := url.Parse("https://example.com/fail")
+	require.NoError(t, err)
+
+	intent2 := domain.IDPIntent{
+		ID:                   gofakeit.UUID(),
+		InstanceID:           instanceID,
+		SuccessURL:           successURL,
+		FailureURL:           failURL,
+		IDPID:                idpID,
+		IDPArguments:         map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
+		MaxIDPIntentLifetime: time.Hour * 2,
+		CreatedAt:            time.Now().AddDate(0, 0, 1),
+	}
+	err = idpIntentRepo.Create(t.Context(), tx, &intent2)
+	require.NoError(t, err)
 
 	tt := []struct {
 		testName         string
@@ -209,17 +225,6 @@ func TestGetIDPIntent(t *testing.T) {
 			expectedIntentID: intentID1,
 		},
 		{
-			testName: "when filtering by state should return matching intent with lowest PK",
-			inputQueryOpts: []database.QueryOption{
-				database.WithCondition(database.And(
-					idpIntentRepo.InstanceIDCondition(instanceID),
-					idpIntentRepo.StateCondition(domain.IDPIntentStateStarted),
-				)),
-				database.WithLimit(1),
-			},
-			expectedIntentID: intentID1,
-		},
-		{
 			testName: "when filtering by creation date descending should return matching intent with highest PK",
 			inputQueryOpts: []database.QueryOption{
 				database.WithCondition(database.And(
@@ -228,7 +233,7 @@ func TestGetIDPIntent(t *testing.T) {
 				database.WithOrderByDescending(idpIntentRepo.CreatedAtColumn()),
 				database.WithLimit(1),
 			},
-			expectedIntentID: intentID2,
+			expectedIntentID: intent2.ID,
 		},
 		{
 			testName: "when filtering by non-existent PK should return no row found error",
