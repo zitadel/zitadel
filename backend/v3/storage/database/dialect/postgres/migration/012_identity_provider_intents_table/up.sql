@@ -24,7 +24,7 @@ CREATE TABLE zitadel.identity_provider_intents
     idp_id_token            TEXT,
     idp_entry_attributes    JSONB,
     request_id              TEXT,
-    assertion               TEXT,
+    assertion               JSONB,
     succeeded_at            TIMESTAMPTZ,
     fail_reason             TEXT,
     expires_at              TIMESTAMPTZ,

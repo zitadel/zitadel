@@ -37,7 +37,7 @@ type IDPIntent struct {
 	IDPIDToken      string             `json:"idp_id_token,omitempty" db:"idp_id_token"`
 	EntryAttributes IDPEntryAttributes `json:"idp_entry_attributes,omitempty" db:"idp_entry_attributes"`
 	RequestID       string             `json:"request_id,omitempty" db:"request_id"`
-	Assertion       string             `json:"assertion,omitempty" db:"assertion"`
+	Assertion       []byte             `json:"assertion,omitempty" db:"assertion"`
 	SucceededAt     *time.Time         `json:"succeeded_at,omitzero" db:"succeeded_at"`
 	FailReason      string             `json:"fail_reason,omitempty" db:"fail_reason"`
 	ExpiresAt       *time.Time         `json:"expires_at,omitzero" db:"expires_at"`
@@ -153,7 +153,7 @@ type idpIntentChanges interface {
 	// SetRequestID sets the requestID of the IDP intent
 	SetRequestID(requestID string) database.Change
 	// SetAssertion sets the assertion of the IDP intent
-	SetAssertion(assertion string) database.Change
+	SetAssertion(assertion []byte) database.Change
 	// SetFailReason sets the fail reason of the IDP intent
 	SetFailReason(reason string) database.Change
 	// SetExpiresAt sets the expiration of the IDP intent

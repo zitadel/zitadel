@@ -373,7 +373,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				idpIntentRepo.SetIDPUserID("idp user id updated"),
 				idpIntentRepo.SetIDPUsername("idp username updated"),
 				idpIntentRepo.SetUserID("some-user-id"),
-				idpIntentRepo.SetAssertion("assertion"),
+				idpIntentRepo.SetAssertion([]byte(`{"assertion": "val1"}`)),
 				idpIntentRepo.SetSucceededAt(now),
 				idpIntentRepo.SetExpiresAt(tomorrow),
 			},
@@ -383,7 +383,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
 				toReturn.UserID = "some-user-id"
-				toReturn.Assertion = "assertion"
+				toReturn.Assertion = []byte(`{"assertion": "val1"}`)
 				toReturn.SucceededAt = &now
 				toReturn.ExpiresAt = &tomorrow
 				toReturn.State = domain.IDPIntentStateSucceeded

@@ -1116,7 +1116,7 @@ func (c *MockIDPIntentRepositoryRequestIDConditionCall) DoAndReturn(f func(strin
 }
 
 // SetAssertion mocks base method.
-func (m *MockIDPIntentRepository) SetAssertion(assertion string) database.Change {
+func (m *MockIDPIntentRepository) SetAssertion(assertion []byte) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetAssertion", assertion)
 	ret0, _ := ret[0].(database.Change)
@@ -1142,13 +1142,13 @@ func (c *MockIDPIntentRepositorySetAssertionCall) Return(arg0 database.Change) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDPIntentRepositorySetAssertionCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetAssertionCall {
+func (c *MockIDPIntentRepositorySetAssertionCall) Do(f func([]byte) database.Change) *MockIDPIntentRepositorySetAssertionCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDPIntentRepositorySetAssertionCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetAssertionCall {
+func (c *MockIDPIntentRepositorySetAssertionCall) DoAndReturn(f func([]byte) database.Change) *MockIDPIntentRepositorySetAssertionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -108,7 +108,6 @@ type rawIDPIntent struct {
 	UserID      *string `json:"user_id,omitempty" db:"user_id"`
 	IDPIDToken  *string `json:"idp_id_token,omitempty" db:"idp_id_token"`
 	RequestID   *string `json:"request_id,omitempty" db:"request_id"`
-	Assertion   *string `json:"assertion,omitempty" db:"assertion"`
 	FailReason  *string `json:"fail_reason,omitempty" db:"fail_reason"`
 }
 
@@ -135,7 +134,6 @@ func rawIDPIntentToDomain(raw *rawIDPIntent) (*domain.IDPIntent, error) {
 	raw.IDPIntent.UserID = gu.Value(raw.UserID)
 	raw.IDPIntent.IDPIDToken = gu.Value(raw.IDPIDToken)
 	raw.IDPIntent.RequestID = gu.Value(raw.RequestID)
-	raw.IDPIntent.Assertion = gu.Value(raw.Assertion)
 	raw.IDPIntent.FailReason = gu.Value(raw.FailReason)
 
 	return raw.IDPIntent, nil
@@ -170,7 +168,7 @@ func (i idpIntentRepository) Update(ctx context.Context, client database.QueryEx
 // -------------------------------------------------------------
 
 // SetAssertion implements [domain.idpIntentChanges].
-func (i idpIntentRepository) SetAssertion(assertion string) database.Change {
+func (i idpIntentRepository) SetAssertion(assertion []byte) database.Change {
 	return database.NewChange(i.AssertionColumn(), assertion)
 }
 
