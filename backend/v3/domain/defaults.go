@@ -28,6 +28,7 @@ var (
 	defaultIDGenerator            id.Generator
 	otpSMSSecretGeneratorConfig   *crypto.GeneratorConfig
 	otpEmailSecretGeneratorConfig *crypto.GeneratorConfig
+	sessionTokenVerifierFn        sessionTokenVerifierFunc
 )
 
 func SetPool(p database.Pool) {
@@ -84,4 +85,8 @@ func SetOTPSMSSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 
 func SetOTPEmailSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 	otpEmailSecretGeneratorConfig = cfg
+}
+
+func SetSessionTokenVerifierFn(fn sessionTokenVerifierFunc) {
+	sessionTokenVerifierFn = fn
 }

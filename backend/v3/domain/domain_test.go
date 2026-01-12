@@ -43,6 +43,16 @@ func getSessionIDCondition(repo *domainmock.MockSessionRepository, sessionID str
 	return idCondition
 }
 
+func getSessionInstanceIDCondition(repo *domainmock.MockSessionRepository, instanceID string) database.Condition {
+	idCondition := getTextCondition("zitadel.sessions", "instance_id", instanceID)
+
+	repo.EXPECT().
+		InstanceIDCondition(instanceID).
+		AnyTimes().
+		Return(idCondition)
+	return idCondition
+}
+
 func getHumanUserIDCondition(repo *domainmock.MockHumanUserRepository, userID string) database.Condition {
 	idCondition := getTextCondition("zitadel.users", "id", userID)
 
