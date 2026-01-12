@@ -1,6 +1,6 @@
 ---
 title: ZITADEL Support
-sidebar_label: Support
+sidebar_label: Customer Support
 ---
 
 :::note
