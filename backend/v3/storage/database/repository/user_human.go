@@ -31,6 +31,57 @@ func HumanUserRepository() domain.HumanUserRepository {
 	}
 }
 
+const createHumanUserStmt = "INSERT INTO zitadel.users (" +
+	"instance_id" +
+	", organization_id" +
+	", id" +
+	", username" +
+	", username_org_unique" +
+	", state" +
+	", type" +
+	", created_at" +
+	", updated_at" +
+	", first_name" +
+	", last_name" +
+	", nickname" +
+	", display_name" +
+	", preferred_language" +
+	", gender" +
+	", avatar_key" +
+	", multifactor_initialization_skipped_at" +
+	", password" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	"" +
+	") VALUES ("
+
+func (u userHuman) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
+	return nil
+}
+
 func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
 	if !condition.IsRestrictingColumn(u.TypeColumn()) {
 		condition = database.And(condition, u.TypeCondition(domain.UserTypeHuman))

@@ -11,6 +11,34 @@ type userMachine struct {
 	user
 }
 
+const createMachineUserStmt = "INSERT INTO zitadel.users (" +
+	"instance_id" +
+	", organization_id" +
+	", id" +
+	", username" +
+	", username_org_unique" +
+	", state" +
+	", type" +
+	", created_at" +
+	", updated_at" +
+	", name" +
+	", description" +
+	", secret" +
+	", access_token_type" +
+	") VALUES ("
+
+func (u userMachine) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
+	builder := database.NewStatementBuilder(createMachineUserStmt,
+		user.InstanceID, user.OrganizationID, user.ID, user.Username, database.NullInstruction, user.State, "machine")
+	var createdAt any = database.NowInstruction
+	if !user.CreatedAt.IsZero() {
+		createdAt = user.CreatedAt
+	}
+	builder.AppendArgs(createdAt, createdAt, user.Machine.Name, user.Machine.Description, user.Machine.Secret, user.Machine.AccessTokenType)
+	builder.WriteString(") RETURNING created_at, updated_at")
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+}
+
 // AddKey implements domain.MachineUserRepository.
 func (u *userMachine) AddKey(key *domain.MachineKey) database.Change {
 	panic("unimplemented")

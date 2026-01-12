@@ -33,15 +33,40 @@ func (u user) HumanRepository() domain.HumanUserRepository {
 // existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
 var existingUser = user{tableName: "existing_user"}
 
+const createUserStmtPrefix = "WITH existing_user AS (INSERT INTO zitadel.users (" +
+	"instance_id" +
+	", organization_id" +
+	", id" +
+	", username" +
+	", username_org_unique" +
+	", state" +
+	", created_at" +
+	", updated_at" +
+	", type" +
+	") VALUES ($1, $2, $3, $4, $5, $6, "
+
 // Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
+	builder := database.NewStatementBuilder(createUserStmtPrefix,
+		user.InstanceID, user.OrganizationID, user.ID, user.Username, database.NullInstruction, user.State)
+	var createdAt any = database.NowInstruction
+	if !user.CreatedAt.IsZero() {
+		createdAt = user.CreatedAt
+	}
+	builder.WriteArgs(createdAt, createdAt)
+	builder.WriteString(", ")
+
+	var create func(context.Context, database.QueryExecutor, *domain.User) error
 	if user.Human != nil {
-		return userHuman{user: u}.Create(ctx, client, user)
+		builder.WriteArg("human")
+		create = userHuman{user: u}.create
 	}
 	if user.Machine != nil {
-		return userMachine{user: u}.Create(ctx, client, user)
+		builder.WriteArg("machine")
+		create = userMachine{user: u}.create
 	}
-	panic("unimplemented")
+	builder.WriteString(") RETURNING *) ")
+	return create(ctx, client, user)
 }
 
 // Delete implements [domain.UserRepository.Delete].
