@@ -124,7 +124,7 @@ func AuthMethodToSecondFactor(method UserAuthMethodType) SecondFactorType {
 	case UserAuthMethodTypeOTP:
 		return SecondFactorTypeOTPSMS
 	default:
-		// First-factor methods: password, IDP, passwordless, private key
+		// First-factor methods: password, IDP, passkey, private key
 		return 0
 	}
 }

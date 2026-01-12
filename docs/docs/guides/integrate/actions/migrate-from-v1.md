@@ -9,7 +9,7 @@ In this guide, you will have all necessary information to migrate from Actions v
 ### Post Authentication
 
 A user has authenticated directly at ZITADEL.
-ZITADEL validated the users inputs for password, one-time password, security key or passwordless factor.
+ZITADEL validated the users inputs for password, one-time password or passkey factor.
 
 To react to different authentication actions, the session service, `zitadel.session.v2.SessionService`, provides the different endpoints. As a rule of thumb, use response triggers if you primarily want to handle successful and failed authentications. On the other hand, use event triggers if you need more fine-granular handling, for example by the used authentication factors.  
 

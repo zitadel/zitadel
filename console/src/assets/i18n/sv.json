@@ -219,7 +219,7 @@
           "DC": "När du hävdar en domän för din organisation, kommer användare som inte använder denna domän i sitt inloggningsnamn att uppmanas att ändra sitt inloggningsnamn för att matcha den hävdade domänen.",
           "INIT": "När en användare skapas, kommer de att få ett mail med en länk för att ställa in sitt lösenord.",
           "PC": "När en användare ändrar sitt lösenord, kommer de att få en notifikation om ändringen om du har aktiverat detta i notifikationsinställningarna.",
-          "PL": "När en användare lägger till en lösenordsfri autentiseringsmetod, måste de aktivera den genom att klicka på en länk i ett mail.",
+          "PL": "När en användare lägger till en Passkey autentiseringsmetod, måste de aktivera den genom att klicka på en länk i ett mail.",
           "PR": "När en användare återställer sitt lösenord, kommer de att få ett mail med en länk för att ställa in ett nytt lösenord.",
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Anpassa inloggningsformuläret.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Användarnamn och lösenord tillåtet",
-            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med lösenordsfri autentisering eller med en extern identitetsleverantör."
+            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med Passkey autentisering eller med en extern identitetsleverantör."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Användarregistrering tillåten",
@@ -840,19 +840,19 @@
       "TABLESTATE": "Status",
       "NAME": "Namn",
       "EMPTY": "Ingen enhet inställd",
-      "TITLE": "lösenordsfri autentisering",
-      "DESCRIPTION": "Lägg till WebAuthn-baserade autentiseringsmetoder för att logga in på ZITADEL lösenordsfrit.",
+      "TITLE": "Passkey-autentisering",
+      "DESCRIPTION": "Lägg till WebAuthn-baserade autentiseringsmetoder för att logga in på ZITADEL med en Passkey.",
       "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
       "U2F": "Lägg till metod",
       "U2F_DIALOG_TITLE": "Verifiera autentiserare",
-      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda lösenordsfria inloggning",
-      "U2F_SUCCESS": "lösenordsfri autentisering skapad framgångsrikt!",
+      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda Passkey-inloggning",
+      "U2F_SUCCESS": "Passkey-autentisering skapad framgångsrikt!",
       "U2F_ERROR": "Ett fel inträffade under inställningen!",
       "U2F_NAME": "Autentiserarens namn",
       "TYPE": {
         "0": "Ingen MFA definierad",
         "1": "Engångslösenord (OTP)",
-        "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Ingen status",
@@ -861,17 +861,17 @@
         "3": "Raderad"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Ta bort lösenordsfri autentiseringsmetod",
-        "DELETE_DESCRIPTION": "Du håller på att ta bort en lösenordsfri autentiseringsmetod. Är du säker?",
-        "ADD_TITLE": "lösenordsfri autentisering",
-        "ADD_DESCRIPTION": "Välj ett av de tillgängliga alternativen för att skapa en lösenordsfri autentiseringsmetod.",
+        "DELETE_TITLE": "Ta bort Passkey",
+        "DELETE_DESCRIPTION": "Du håller på att ta bort en Passkey. Är du säker?",
+        "ADD_TITLE": "Passkey-autentisering",
+        "ADD_DESCRIPTION": "Välj ett av de tillgängliga alternativen för att skapa en Passkey.",
         "SEND_DESCRIPTION": "Skicka en registreringslänk till din e-postadress.",
         "SEND": "Skicka registreringslänk",
         "SENT": "E-postmeddelandet skickades framgångsrikt. Kontrollera din inkorg för att fortsätta med inställningen.",
         "QRCODE_DESCRIPTION": "Generera QR-kod för skanning med en annan enhet.",
         "QRCODE": "Generera QR-kod",
         "QRCODE_SCAN": "Skanna denna QR-kod för att fortsätta med inställningen på din enhet.",
-        "NEW_DESCRIPTION": "Använd denna enhet för att ställa in lösenordsfrit.",
+        "NEW_DESCRIPTION": "Använd denna enhet för att ställa in Passkey.",
         "NEW": "Lägg till ny"
       }
     },
@@ -887,7 +887,7 @@
       "OTP": "Autentiseringsapp för TOTP (Tidsbaserat engångslösenord)",
       "OTP_DIALOG_TITLE": "Lägg till OTP",
       "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
-      "U2F": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifiera faktor",
       "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella tvåfaktor.",
       "U2F_SUCCESS": "Faktor tillagd framgångsrikt!",
@@ -902,7 +902,7 @@
       "TYPE": {
         "0": "Ingen MFA definierad",
         "1": "Engångslösenord (OTP)",
-        "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Ingen status",
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "E-postverifieringskod skickad.",
       "OTPREMOVED": "OTP borttagen.",
       "U2FREMOVED": "Faktor borttagen.",
-      "PASSWORDLESSREMOVED": "lösenordsfri borttagen.",
+      "PASSWORDLESSREMOVED": "Passkey borttagen.",
       "INITIALPASSWORDSET": "Initialt lösenord satt.",
       "PASSWORDNOTIFICATIONSENT": "Lösenordsändringsmeddelande skickat.",
       "PASSWORDCHANGED": "Lösenord ändrat framgångsrikt.",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Administratör borttagen.",
-      "MEMBERSADDED": "Administratörer tillagda.",
-      "MEMBERADDED": "Administratör tillagd.",
-      "MEMBERCHANGED": "Administratör ändrad.",
+      "MEMBERREMOVED": "administratör borttagen.",
+      "MEMBERSADDED": "administratörer tillagda.",
+      "MEMBERADDED": "administratör tillagd.",
+      "MEMBERCHANGED": "administratör ändrad.",
       "ROLEREMOVED": "Roll borttagen.",
       "ROLECHANGED": "Roll ändrad.",
       "REACTIVATED": "Återaktiverad",
@@ -1613,7 +1613,7 @@
         "2": "E-postverifiering",
         "3": "Telefonverifiering",
         "4": "Återställning av lösenord",
-        "5": "lösenordsfri initiering",
+        "5": "Passkey-initiering",
         "6": "App-hemlighet",
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
@@ -1842,11 +1842,11 @@
         "usernameChangeText": "Användarnamnsändring",
         "verifyMfaOtpText": "Verifiera OTP",
         "verifyMfaU2fText": "Verifiera Universal Second Factor",
-        "passwordlessPromptText": "lösenordsfri Prompt",
-        "passwordlessRegistrationDoneText": "lösenordsfri Registrering Klar",
-        "passwordlessRegistrationText": "lösenordsfri Registrering",
-        "passwordlessText": "lösenordsfri",
-        "externalRegistrationUserOverviewText": "Extern Registrering Användaröversikt"
+        "passwordlessPromptText": "Passkey-prompt",
+        "passwordlessRegistrationDoneText": "Passkey-registrering klar",
+        "passwordlessRegistrationText": "Passkey-registrering",
+        "passwordlessText": "Passkey",
+        "externalRegistrationUserOverviewText": "Extern registrering användaröversikt"
       }
     },
     "MESSAGE_TEXTS": {
@@ -1859,7 +1859,7 @@
         "VEO": "Verifiera E-post OTP",
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
-        "PL": "lösenordsfri",
+        "PL": "Passkey",
         "PC": "Lösenordsändring",
         "IU": "Bjud in användare"
       },
@@ -2408,8 +2408,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "lösenordsfri",
-      "MULTIFACTORDESCRIPTION": "Definiera dina tvåfaktorer för din lösenordsfria autentisering här.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definiera dina tvåfaktorer för din Passkey-autentisering här.",
       "SECONDFACTORTITLE": "Tvåfaktorautentisering",
       "SECONDFACTORDESCRIPTION": "Definiera ytterligare möjliga faktorer med vilka du kan säkra din lösenordsautentisering."
     },
@@ -2429,12 +2429,12 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Okänd",
-      "1": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Okänd",
       "1": "Engångslösenord via autentiseringsapp (TOTP)",
-      "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
+      "2": "Passkey",
       "3": "Engångslösenord via e-post (E-post OTP)",
       "4": "Engångslösenord via SMS (SMS OTP)",
       "5": "Återställningskoder"
@@ -2451,7 +2451,7 @@
       "DESCRIPTION": "Du kan välja fördefinierade eller egen skapade leverantörer för autentisering.",
       "SELECTIDPS": "Identitetsleverantörer"
     },
-    "PASSWORDLESS": "lösenordsfri inloggning",
+    "PASSWORDLESS": "Passkey-inloggning",
     "PASSWORDLESSTYPE": {
       "0": "Inte tillåtet",
       "1": "Tillåtet"

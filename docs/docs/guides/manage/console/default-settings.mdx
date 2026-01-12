@@ -18,7 +18,7 @@ When you configure your default settings, you can set the following:
 - **Organizations**: A list of your organizations
 - [**Features**](#features): Feature Settings let you try out new features before they become generally available. You can also disable features you are not interested in.
 - [**Notification settings**](#notification-settings): Setup Notification and Email Server settings for initialization-, verification- and other mails. Setup Twilio as SMS notification provider.
-- [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
+- [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether passkeys are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
 - [**Identity Providers**](#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Password Expiry**](#password-expiry): Set an expiry for passwords. After the expiration, a user will be prompted to change their password during the next login.
@@ -173,14 +173,14 @@ Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/in
   width="600px"
 />
 
-### Passwordless
+### Passkeys
 
-Passwordless authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
+Passkey authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
 There are two different types one is depending on the device (e.g. Fingerprint, Face recognition, WindowsHello) and the other is independent (eg. Yubikey, Solokey).
 
 ### Multifactor (MFA)
 
-In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universal Second Factor) with PIN. There is no other option at the moment.
+In the multifactors section you can configure what kind of multifactors should be allowed. For passkeys to work, it's required to enable U2F (Universal Second Factor) with PIN. There is no other option at the moment.
 Multifactors:
 
 - U2F (Universal Second Factor) with PIN, e.g FaceID, WindowsHello, Fingerprint, Hardwaretokens like Yubikey
@@ -322,10 +322,10 @@ Also you can set the link associated to the Documentation button in the console.
 These are the texts for your notification mails. Available for change are:
 
 | Message Text    | Description                                                                                                                |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------|
 | Domain Claim    | The Mail after an organisation claimed a domain for itself. Users on other organisations with this domain will be notified |
 | Initialization  | The mail after a user has been created. A code is part of the message which then must be verified on first login           |
-| Passwordless    | The Mail to register an additional passwordless device by a link                                                           |
+| Passkey         | The Mail to register an additional passkey device by a link                                                                |
 | Password Reset  | The Mail to reset the password by a link                                                                                   |
 | Verify Email    | The mail after the email has been changed. A code is part of the message which then must be verified on the next login     |
 | Password Change | Notify the user, that the password has been changed. Can be configured in [Notification](#notification)                    |
@@ -382,7 +382,7 @@ The following secrets can be configured:
 - Email verification code
 - Phone verification code
 - Password reset code
-- Passwordless initialization code
+- Passkey initialization code
 - Application secrets
 - One Time Password (OTP) - SMS
 - One Time Password (OTP) - Email
