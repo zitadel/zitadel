@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "administratör borttagen.",
-      "MEMBERSADDED": "administratörer tillagda.",
-      "MEMBERADDED": "administratör tillagd.",
-      "MEMBERCHANGED": "administratör ändrad.",
+      "MEMBERREMOVED": "Administratör borttagen.",
+      "MEMBERSADDED": "Administratörer tillagda.",
+      "MEMBERADDED": "Administratör tillagd.",
+      "MEMBERCHANGED": "Administratör ändrad.",
       "ROLEREMOVED": "Roll borttagen.",
       "ROLECHANGED": "Roll ändrad.",
       "REACTIVATED": "Återaktiverad",
