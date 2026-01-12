@@ -198,7 +198,7 @@ type XOAuth2Auth struct {
 }
 
 func (a XOAuth2Auth) isEmpty() bool {
-	return a.User == "" && a.ClientId == "" && a.ClientSecret == nil && a.TokenEndpoint == "" && len(a.Scopes) != 0
+	return a.User == "" && a.ClientId == "" && a.ClientSecret == nil && a.TokenEndpoint == "" && len(a.Scopes) == 0
 }
 
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {

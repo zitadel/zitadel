@@ -35,7 +35,7 @@ func (a *GenericAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 }
 
 func (a *GenericAuth) Next(fromServer []byte, more bool) ([]byte, error) {
-	if a.selectedMethod != nil {
+	if a.selectedMethod == nil {
 		return nil, zerrors.ThrowInternal(nil, "SMTP-G99DUr", "no auth method selected")
 	}
 

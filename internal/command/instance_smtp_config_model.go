@@ -259,7 +259,7 @@ func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) [
 	if wm.SMTPConfig.XOAuth2Auth.User != auth.User {
 		changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(auth.User))
 	}
-	if wm.SMTPConfig.XOAuth2Auth.ClientId != auth.User {
+	if wm.SMTPConfig.XOAuth2Auth.ClientId != auth.ClientId {
 		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(auth.ClientId))
 	}
 	if wm.SMTPConfig.XOAuth2Auth.ClientSecret != auth.ClientSecret {
