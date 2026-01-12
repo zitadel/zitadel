@@ -12,7 +12,7 @@ You can read more about the basic structure and important concepts of ZITADEL in
 
 ## Multi-tenancy architecture
 
-Multi-tenancy in ZITADEL can be achieved through either [Instances](/docs/concepts/structure/instance) or [Organizations](/docs/concepts/structure/organizations).
+Multi-tenancy in ZITADEL can be achieved through either [Instances](/docs/concepts/structure/instance) or [Organizations](/docs/guides/manage/console/organizations-overview).
 Where instances represent isolated ZITADEL instances, Organizations provide a more permeable approach to multi-tenancy.
 
 In most cases, when you want to achieve multi-tenancy, you use Organizations. Each organization can have their own set of Settings (eg, Security Policies, IDPs, Branding), Managers, and Users.
@@ -23,14 +23,14 @@ Please also consult our guide on [Solution Scenarios](/docs/guides/solution-scen
 Some solutions, that offer multi-tenancy, require you to copy applications and settings to each tenant and manage changes individually.
 ZITADEL works differently by using [Granted Projects](/docs/concepts/structure/granted_projects).
 
-Projects can be granted to [Organization](/docs/concepts/structure/projects#granted-organizations) or even to individual users.
+Projects can be granted to [Organization](/docs/guides/manage/console/organizations-overview#organization-grants) or even to individual users.
 You can think of it as a logical link to a Project, which can be used by the receiving Organization or User as if it was their own project, except privileges to modify the Project itself.
 
 Delegated access management is a great way of keeping the management overhead low and enabling [self-service](/docs/concepts/features/selfservice#managers-in-delegation) for Organizations to manage their own Settings and Authorizations.
 
 ## Actions
 
-ZITADEL [Actions](/docs/apis/actions/introduction) is the key feature to customize and create workflows and change the default behavior of the platform.
+ZITADEL [Actions](/docs/guides/manage/console/actions-overview) is the key feature to customize and create workflows and change the default behavior of the platform.
 
 You define custom code that should be run on a specific Trigger.
 A trigger could be the creation of a new user, getting profile information about a user, or a login attempt.
@@ -69,7 +69,7 @@ See the [User guide](./users.md) for batch migration of users.
 
 In case all your applications depend on ZITADEL after the migration date, and ZITADEL is able to retrieve the required user information, including secrets, from the legacy system, then the recommended way is to let **ZITADEL orchestrate the user migration just-in-time**:
 
-- Create a pre-authentication [Action](/docs/apis/actions/introduction) to request user data from the legacy system and create a new user in ZITADEL.
+- Create a pre-authentication [Action](/docs/guides/manage/console/actions-overview) to request user data from the legacy system and create a new user in ZITADEL.
 - Optionally, create a post-authentication Action to flag successfully migrated users in your legacy system
 
 For all other cases, we recommend that the **legacy system orchestrates the migration** of users to ZITADEL for more flexibility:

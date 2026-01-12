@@ -36,7 +36,8 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("no additional command provided")
 		},
-		Version: build.Version(),
+		Version:      build.Version(),
+		SilenceUsage: true,
 	}
 
 	viper.AutomaticEnv()
