@@ -33,7 +33,7 @@ type IDPIntent struct {
 	IDPUserID       string             `json:"idp_user_id,omitempty" db:"idp_user_id"`
 	IDPUsername     string             `json:"idp_username,omitempty" db:"idp_username"`
 	UserID          string             `json:"user_id,omitempty" db:"user_id"`
-	IDPAccessToken  string             `json:"idp_access_token,omitempty" db:"idp_access_token"`
+	IDPAccessToken  []byte             `json:"idp_access_token,omitempty" db:"idp_access_token"`
 	IDPIDToken      string             `json:"idp_id_token,omitempty" db:"idp_id_token"`
 	EntryAttributes IDPEntryAttributes `json:"idp_entry_attributes,omitempty" db:"idp_entry_attributes"`
 	RequestID       string             `json:"request_id,omitempty" db:"request_id"`
@@ -135,7 +135,7 @@ type idpIntentChanges interface {
 	// SetIDPID sets the idpID of the IDP intent
 	SetIDPID(idpID string) database.Change
 	// SetIDPArguments sets the idpArguments of the IDP intent
-	SetIDPArguments(idpArguments string) database.Change
+	SetIDPArguments(idpArguments []byte) database.Change
 	// SetIDPUser sets the idpUser of the IDP intent
 	SetIDPUser(idpUser []byte) database.Change
 	// SetIDPUserID sets the idpUserID of the IDP intent
@@ -145,7 +145,7 @@ type idpIntentChanges interface {
 	// SetUserID sets the userID of the IDP intent
 	SetUserID(userID string) database.Change
 	// SetIDPAccessToken sets the idpAccessToken of the IDP intent
-	SetIDPAccessToken(idpAccessToken string) database.Change
+	SetIDPAccessToken(idpAccessToken []byte) database.Change
 	// SetIDPIDToken sets the idpIDToken of the IDP intent
 	SetIDPIDToken(idpIDToken string) database.Change
 	// SetIDPEntryAttributes sets the idpEntryAttributes of the IDP intent

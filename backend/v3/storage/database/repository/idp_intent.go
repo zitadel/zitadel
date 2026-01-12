@@ -101,16 +101,15 @@ func (i idpIntentRepository) Get(ctx context.Context, client database.QueryExecu
 
 type rawIDPIntent struct {
 	*domain.IDPIntent
-	SuccessURL     string  `json:"success_url,omitempty" db:"success_url"`
-	FailureURL     string  `json:"failure_url,omitempty" db:"failure_url"`
-	IDPUserID      *string `json:"idp_user_id,omitempty" db:"idp_user_id"`
-	IDPUsername    *string `json:"idp_username,omitempty" db:"idp_username"`
-	UserID         *string `json:"user_id,omitempty" db:"user_id"`
-	IDPAccessToken *string `json:"idp_access_token,omitempty" db:"idp_access_token"`
-	IDPIDToken     *string `json:"idp_id_token,omitempty" db:"idp_id_token"`
-	RequestID      *string `json:"request_id,omitempty" db:"request_id"`
-	Assertion      *string `json:"assertion,omitempty" db:"assertion"`
-	FailReason     *string `json:"fail_reason,omitempty" db:"fail_reason"`
+	SuccessURL  string  `json:"success_url,omitempty" db:"success_url"`
+	FailureURL  string  `json:"failure_url,omitempty" db:"failure_url"`
+	IDPUserID   *string `json:"idp_user_id,omitempty" db:"idp_user_id"`
+	IDPUsername *string `json:"idp_username,omitempty" db:"idp_username"`
+	UserID      *string `json:"user_id,omitempty" db:"user_id"`
+	IDPIDToken  *string `json:"idp_id_token,omitempty" db:"idp_id_token"`
+	RequestID   *string `json:"request_id,omitempty" db:"request_id"`
+	Assertion   *string `json:"assertion,omitempty" db:"assertion"`
+	FailReason  *string `json:"fail_reason,omitempty" db:"fail_reason"`
 }
 
 func scanIDPIntent(ctx context.Context, querier database.QueryExecutor, builder *database.StatementBuilder) (*domain.IDPIntent, error) {
@@ -134,7 +133,6 @@ func rawIDPIntentToDomain(raw *rawIDPIntent) (*domain.IDPIntent, error) {
 	raw.IDPIntent.IDPUserID = gu.Value(raw.IDPUserID)
 	raw.IDPIntent.IDPUsername = gu.Value(raw.IDPUsername)
 	raw.IDPIntent.UserID = gu.Value(raw.UserID)
-	raw.IDPIntent.IDPAccessToken = gu.Value(raw.IDPAccessToken)
 	raw.IDPIntent.IDPIDToken = gu.Value(raw.IDPIDToken)
 	raw.IDPIntent.RequestID = gu.Value(raw.RequestID)
 	raw.IDPIntent.Assertion = gu.Value(raw.Assertion)
@@ -182,7 +180,7 @@ func (i idpIntentRepository) SetFailureURL(failureURL url.URL) database.Change {
 }
 
 // SetIDPAccessToken implements [domain.idpIntentChanges].
-func (i idpIntentRepository) SetIDPAccessToken(idpAccessToken string) database.Change {
+func (i idpIntentRepository) SetIDPAccessToken(idpAccessToken []byte) database.Change {
 	return database.NewChange(i.IDPAccessTokenColumn(), idpAccessToken)
 }
 
@@ -192,7 +190,7 @@ func (i *idpIntentRepository) SetIDPIDToken(idpIDToken string) database.Change {
 }
 
 // SetIDPArguments implements [domain.idpIntentChanges].
-func (i idpIntentRepository) SetIDPArguments(idpArguments string) database.Change {
+func (i idpIntentRepository) SetIDPArguments(idpArguments []byte) database.Change {
 	return database.NewChange(i.IDPArgumentsColumn(), idpArguments)
 }
 

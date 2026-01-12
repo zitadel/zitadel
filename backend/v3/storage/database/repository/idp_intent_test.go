@@ -344,7 +344,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				idpIntentRepo.SetIDPUserID("idp user id updated"),
 				idpIntentRepo.SetIDPUsername("idp username updated"),
 				idpIntentRepo.SetUserID("some-user-id"),
-				idpIntentRepo.SetIDPAccessToken("g1g4 s3cr3t 4cc3ss t0k3n"),
+				idpIntentRepo.SetIDPAccessToken([]byte(`{"secret": "g1g4 s3cr3t 4cc3ss t0k3n"}`)),
 				idpIntentRepo.SetIDPIDToken("idp id token"),
 				idpIntentRepo.SetSucceededAt(now),
 				idpIntentRepo.SetExpiresAt(tomorrow),
@@ -355,7 +355,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
 				toReturn.UserID = "some-user-id"
-				toReturn.IDPAccessToken = "g1g4 s3cr3t 4cc3ss t0k3n"
+				toReturn.IDPAccessToken = []byte(`{"secret": "g1g4 s3cr3t 4cc3ss t0k3n"}`)
 				toReturn.IDPIDToken = "idp id token"
 				toReturn.SucceededAt = &now
 				toReturn.ExpiresAt = &tomorrow

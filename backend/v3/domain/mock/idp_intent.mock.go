@@ -1268,7 +1268,7 @@ func (c *MockIDPIntentRepositorySetFailureURLCall) DoAndReturn(f func(url.URL) d
 }
 
 // SetIDPAccessToken mocks base method.
-func (m *MockIDPIntentRepository) SetIDPAccessToken(idpAccessToken string) database.Change {
+func (m *MockIDPIntentRepository) SetIDPAccessToken(idpAccessToken []byte) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetIDPAccessToken", idpAccessToken)
 	ret0, _ := ret[0].(database.Change)
@@ -1294,19 +1294,19 @@ func (c *MockIDPIntentRepositorySetIDPAccessTokenCall) Return(arg0 database.Chan
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDPIntentRepositorySetIDPAccessTokenCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetIDPAccessTokenCall {
+func (c *MockIDPIntentRepositorySetIDPAccessTokenCall) Do(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPAccessTokenCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDPIntentRepositorySetIDPAccessTokenCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetIDPAccessTokenCall {
+func (c *MockIDPIntentRepositorySetIDPAccessTokenCall) DoAndReturn(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPAccessTokenCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // SetIDPArguments mocks base method.
-func (m *MockIDPIntentRepository) SetIDPArguments(idpArguments string) database.Change {
+func (m *MockIDPIntentRepository) SetIDPArguments(idpArguments []byte) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetIDPArguments", idpArguments)
 	ret0, _ := ret[0].(database.Change)
@@ -1332,13 +1332,13 @@ func (c *MockIDPIntentRepositorySetIDPArgumentsCall) Return(arg0 database.Change
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDPIntentRepositorySetIDPArgumentsCall) Do(f func(string) database.Change) *MockIDPIntentRepositorySetIDPArgumentsCall {
+func (c *MockIDPIntentRepositorySetIDPArgumentsCall) Do(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPArgumentsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDPIntentRepositorySetIDPArgumentsCall) DoAndReturn(f func(string) database.Change) *MockIDPIntentRepositorySetIDPArgumentsCall {
+func (c *MockIDPIntentRepositorySetIDPArgumentsCall) DoAndReturn(f func([]byte) database.Change) *MockIDPIntentRepositorySetIDPArgumentsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

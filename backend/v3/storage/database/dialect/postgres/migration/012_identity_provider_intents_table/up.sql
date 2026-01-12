@@ -20,7 +20,7 @@ CREATE TABLE zitadel.identity_provider_intents
     idp_user_id             TEXT,
     idp_username            TEXT,
     user_id                 TEXT,
-    idp_access_token        TEXT,
+    idp_access_token        JSONB,
     idp_id_token            TEXT,
     idp_entry_attributes    JSONB,
     request_id              TEXT,
