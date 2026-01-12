@@ -165,7 +165,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
 				eventstore: expectEventstore(),
 			},
@@ -396,7 +396,7 @@ func TestCommandSide_OrgRemoveMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "meta data not existing, not found error",
+			name: "metadata not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -504,7 +504,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
 				eventstore: expectEventstore(),
 			},
