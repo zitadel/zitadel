@@ -1143,7 +1143,7 @@
       "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
       "OTPREMOVED": "OTP removed.",
       "U2FREMOVED": "Factor removed.",
-      "PASSWORDLESSREMOVED": "passkey removed.",
+      "PASSWORDLESSREMOVED": "Passkey removed.",
       "INITIALPASSWORDSET": "Initial password set.",
       "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
       "PASSWORDCHANGED": "Password changed successfully.",
@@ -1613,7 +1613,7 @@
         "2": "Email verification",
         "3": "Phone verification",
         "4": "Password Reset",
-        "5": "passkey Initialization",
+        "5": "Passkey Initialization",
         "6": "App Secret",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
@@ -1859,7 +1859,7 @@
         "VEO": "Verify Email OTP",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "passkey",
+        "PL": "Passkey",
         "PC": "Password Change",
         "IU": "Invite User"
       },
@@ -2409,7 +2409,7 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "passkey",
+      "MULTIFACTORTITLE": "Passkey",
       "MULTIFACTORDESCRIPTION": "Define your Multifactors for your Passkey here.",
       "SECONDFACTORTITLE": "Multifactor Authentication",
       "SECONDFACTORDESCRIPTION": "Define further possible factors with which you can secure your password authentication."
