@@ -5,8 +5,9 @@ import {
   AddProjectRoleRequestSchema,
   CreateProjectRequestSchema,
 } from '@zitadel/proto/zitadel/project/v2beta/project_service_pb';
-import { NewOrganizationService } from './new-organization.service';
 import { mutationOptions } from '@tanstack/angular-query-experimental';
+import { ManagementService } from './mgmt.service';
+import { StorageKey, StorageLocation, StorageService } from './storage.service';
 
 type CreateProjectRequest = Omit<
   Exclude<MessageInitShape<typeof CreateProjectRequestSchema>, { ['$typeName']: string }>,
@@ -18,10 +19,24 @@ type CreateProjectRequest = Omit<
 })
 export class ProjectService {
   private readonly grpcService = inject(GrpcService);
-  private readonly orgId = inject(NewOrganizationService).getOrgId();
+  private readonly storageService = inject(StorageService);
+  private readonly mgmtService = inject(ManagementService);
 
-  private createProject(request: CreateProjectRequest) {
-    return this.grpcService.project.createProject({ ...request, organizationId: this.orgId() });
+  private async createProject(request: CreateProjectRequest) {
+    const organizationId = this.storageService.getItem(StorageKey.organizationId, StorageLocation.session) ?? undefined;
+    const result = await this.grpcService.project.createProject({ ...request, organizationId });
+
+    try {
+      const { project } = await this.mgmtService.getProjectByID(result.id);
+      if (!project) {
+        return result;
+      }
+      this.mgmtService.ownedProjects.next([...this.mgmtService.ownedProjects.value, project]);
+    } catch {
+      //ignore
+    }
+
+    return result;
   }
 
   public createProjectMutationOptions = () =>
