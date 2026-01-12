@@ -78,7 +78,7 @@ Please check below the matrix for an overview where which scope is asserted.
 Custom claims are being inserted into user tokens in addition to the standard claims.
 Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
 
-You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
+You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/guides/manage/console/actions-overview).
 
 Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
 

@@ -26,7 +26,7 @@ Imagine signing in without passwords! Passkeys, replacing traditional passwords,
 ### Developer Resources
 
 * **Documentation:** Passkeys Guide: [https://zitadel.com/docs/guides/integrate/login-ui/passkey](/docs/guides/integrate/login-ui/passkey)
-* **Create Passkey Registration Link API:** [https://zitadel.com/docs/guides/manage/user/reg-create-user](/docs/guides/manage/user/reg-create-user)
+* [Create Passkey Registration Link API](/docs/guides/manage/user/reg-create-user)
 
 ### Notes
 
