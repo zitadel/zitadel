@@ -504,7 +504,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 			return err
 		}
 		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.XOAuth2Auth == nil {
-			return zerrors.ThrowNotFound(nil, "TODbO(wim) get error code", "Errors.SMTPConfig.NotFound")
+			return zerrors.ThrowNotFound(nil, "SMTP-p9c2", "Errors.SMTPConfig.NotFound")
 		}
 
 		config.SMTP.XOAuth2Auth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientSecret, c.smtpEncryption)
