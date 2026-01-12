@@ -127,7 +127,8 @@ func ThrowPayloadTooLarge(parent error) error {
 }
 
 func IsScimOrZitadelError(err error) bool {
-	return IsScimError(err) || zerrors.IsZitadelError(err)
+	_, zok := zerrors.AsZitadelError(err)
+	return IsScimError(err) || zok
 }
 
 func IsScimError(err error) bool {
@@ -174,7 +175,7 @@ func MapToScimError(ctx context.Context, translator *i18n.Translator, err error)
 		}
 	}
 
-	statusCode, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
+	statusCode, ok := http_util.ZitadelErrorToHTTPStatusCode(ctx, err)
 	if !ok {
 		statusCode = http.StatusInternalServerError
 	}

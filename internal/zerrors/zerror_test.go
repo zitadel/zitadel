@@ -19,26 +19,49 @@ func TestErrorMethod(t *testing.T) {
 	assert.Equal(t, subExptected, err.Error())
 }
 
-func TestIsZitadelError(t *testing.T) {
+func TestZitadelError_Is(t *testing.T) {
+	parent := errors.New("parent error")
+	target := zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "message")
 	tests := []struct {
-		name string
+		name string // description of this test case
 		err  error
 		want bool
 	}{
 		{
-			name: "zitadel error",
-			err:  zerrors.ThrowInvalidArgument(nil, "id", "msg"),
-			want: true,
+			name: "wrong type",
+			err:  errors.New("some other error"),
+			want: false,
 		},
 		{
-			name: "other error",
-			err:  errors.New("just a random error"),
+			name: "different kind",
+			err:  zerrors.CreateZitadelError(zerrors.KindNotFound, parent, "id", "message"),
 			want: false,
+		},
+		{
+			name: "different id",
+			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "otherID", "message"),
+			want: false,
+		},
+		{
+			name: "different message",
+			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "other message"),
+			want: false,
+		},
+		{
+			name: "different parent",
+			err:  zerrors.CreateZitadelError(zerrors.KindAborted, errors.New("other parent"), "id", "message"),
+			want: false,
+		},
+		{
+			name: "same error",
+			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "message"),
+			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, zerrors.IsZitadelError(tt.err), "IsZitadelError(%v)", tt.err)
+			got := errors.Is(tt.err, target)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

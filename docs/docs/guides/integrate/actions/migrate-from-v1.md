@@ -2,7 +2,7 @@
 title: Migrate from Actions v1 to v2
 ---
 
-In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/apis/actions/introduction#available-flow-types).
+In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/guides/manage/console/actions-overview#available-flow-types).
 
 ## Internal Authentication
 
@@ -97,7 +97,7 @@ Some use-cases:
 - Add metadata to user through function on `preaccesstoken`, [Action Function Example](./testing-function)
 - Add logs to the log claim through function on `preaccesstoken`, [Action Function Example](./testing-function)
 
-## Customize SAML Response
+## Complement SAML Response
 
 These are executed before the return of the SAML Response.
 

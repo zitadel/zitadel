@@ -50,4 +50,4 @@ New users automatically are assigned a role now if they register by authenticati
 ## What's next?
 
 - [Read more about the concepts around actions](/concepts/features/actions)
-- [Read more about all the options you have with actions](/apis/actions/introduction)
+- [Read more about all the options you have with actions](/guides/manage/console/actions-overview)

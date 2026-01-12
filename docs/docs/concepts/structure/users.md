@@ -47,7 +47,7 @@ These invited users are called external users.
 
 ### Uniqueness of users
 
-Users can only exist within one [organization](/concepts/structure/organizations).
+Users can only exist within one [organization](/guides/manage/console/organizations-overview).
 It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
@@ -77,6 +77,6 @@ You can use organization metadata or your own business logic to describe a hiera
 
 ## References
 
-- [Manage users in the Console](../../guides/manage/console/users)
+- [Manage users in the Console](../../guides/manage/console/users-overview)
 - [ZITADEL APIs: Users](/docs/apis/resources/mgmt/users)
 - [User onboarding and registration](/docs/guides/integrate/onboarding)
