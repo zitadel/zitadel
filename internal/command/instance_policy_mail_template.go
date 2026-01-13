@@ -32,14 +32,14 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 
 func (c *Commands) addDefaultMailTemplate(ctx context.Context, instanceAgg *eventstore.Aggregate, addedPolicy *InstanceMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.Command, error) {
 	if !policy.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-fm9sd", "Instance.MailTemplate.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-fm9sd", "Errors.Instance.MailTemplate.Invalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-5n8fs", "Instance.MailTemplate.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-5n8fs", "Errors.Instance.MailTemplate.AlreadyExists")
 	}
 
 	return instance.NewMailTemplateAddedEvent(ctx, instanceAgg, policy.Template), nil
@@ -63,7 +63,7 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 
 func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*InstanceMailTemplateWriteModel, eventstore.Command, error) {
 	if !policy.IsValid() {
-		return nil, nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m9ds", "Instance.MailTemplate.Invalid")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m9ds", "Errors.Instance.MailTemplate.Invalid")
 	}
 	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
 	if err != nil {
@@ -71,13 +71,13 @@ func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, nil, zerrors.ThrowNotFound(nil, "INSTANCE-2N8fs", "Instance.MailTemplate.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "INSTANCE-2N8fs", "Errors.Instance.MailTemplate.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.Template)
 	if !hasChanged {
-		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3nfsG", "Instance.MailTemplate.NotChanged")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-3nfsG", "Errors.Instance.MailTemplate.NotChanged")
 	}
 
 	return existingPolicy, changedEvent, nil

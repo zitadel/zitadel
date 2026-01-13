@@ -172,7 +172,7 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-38pZnUemLP", "Instance.PasswordLockoutPolicy.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-38pZnUemLP", "Errors.Instance.PasswordLockoutPolicy.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-PJURxRUoYG", "Errors.Internal")
 			}

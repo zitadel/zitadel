@@ -31,13 +31,13 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Instance.PasswordAgePolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.Instance.PasswordAgePolicy.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordAgePolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.ExpireWarnDays, policy.MaxAgeDays)
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-180sf", "Instance.PasswordAgePolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-180sf", "Errors.Instance.PasswordAgePolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

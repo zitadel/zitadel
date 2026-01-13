@@ -18,7 +18,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-67J9d", "Instance.IDPConfig.AlreadyExists")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-67J9d", "Errors.Instance.IDPConfig.AlreadyExists")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingConfig.WriteModel)
@@ -39,7 +39,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-d8kwF", "Instance.IDPConfig.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-d8kwF", "Errors.Instance.IDPConfig.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

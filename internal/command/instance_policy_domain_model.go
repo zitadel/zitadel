@@ -72,7 +72,7 @@ func (wm *InstanceDomainPolicyWriteModel) NewChangedEvent(
 		changes = append(changes, policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddresssMatchesInstanceDomain))
 	}
 	if len(changes) == 0 {
-		return nil, false, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Instance.DomainPolicy.NotChanged")
+		return nil, false, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Errors.Instance.DomainPolicy.NotChanged")
 	}
 	changedEvent, err = instance.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
 	return changedEvent, usernameChange, err

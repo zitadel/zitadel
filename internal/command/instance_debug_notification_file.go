@@ -35,7 +35,7 @@ func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instance
 		return nil, err
 	}
 	if addedWriteModel.State.Exists() {
-		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-d93nfs", "Instance.DebugNotificationProvider.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-d93nfs", "Errors.Instance.DebugNotificationProvider.AlreadyExists")
 	}
 
 	events := []eventstore.Command{
@@ -70,7 +70,7 @@ func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Contex
 		return nil, err
 	}
 	if !existingProvider.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-fm9wl", "Instance.DebugNotificationProvider.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-fm9wl", "Errors.Instance.DebugNotificationProvider.NotFound")
 	}
 	events := make([]eventstore.Command, 0)
 	changedEvent, hasChanged := existingProvider.NewChangedEvent(ctx,
@@ -80,7 +80,7 @@ func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Contex
 		events = append(events, changedEvent)
 	}
 	if len(events) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Instance.LoginPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.Instance.LoginPolicy.NotChanged")
 
 	}
 	return events, nil
@@ -94,7 +94,7 @@ func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context) (*domain.O
 		return nil, err
 	}
 	if !existingProvider.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-dj9ew", "Instance.DebugNotificationProvider.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-dj9ew", "Errors.Instance.DebugNotificationProvider.NotFound")
 	}
 
 	events, err := c.eventstore.Push(ctx, iam_repo.NewDebugNotificationProviderFileRemovedEvent(ctx, instanceAgg))
