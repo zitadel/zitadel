@@ -84,7 +84,7 @@ export function clientCredentials(clientId: string, clientSecret: string): Promi
       configuration().token_endpoint,
       {
         grant_type: 'client_credentials',
-        scope: 'openid profile urn:zitadel:instance:org:project:id:zitadel:aud',
+        scope: 'openid profile urn:zitadel:iam:org:project:id:zitadel:aud',
         client_id: clientId,
         client_secret: clientSecret,
       },
@@ -141,7 +141,7 @@ export class JWTProfileRequest implements TokenRequest {
     });
     return {
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      scope: 'openid urn:zitadel:instance:org:project:id:zitadel:aud',
+      scope: 'openid urn:zitadel:iam:org:project:id:zitadel:aud',
       assertion: `${assertion}`,
     };
   }

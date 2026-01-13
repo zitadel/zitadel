@@ -19,7 +19,7 @@ export const Config = {
 
 const client = {
   response_type: 'code',
-  scope: 'openid email profile urn:zitadel:instance:org:project:id:zitadel:aud',
+  scope: 'openid email profile urn:zitadel:iam:org:project:id:zitadel:aud',
   prompt: 'login',
   code_challenge_method: 'S256',
   code_challenge: crypto.sha256(Config.codeVerifier, 'base64rawurl'),
