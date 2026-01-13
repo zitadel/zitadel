@@ -267,6 +267,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -313,6 +314,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -393,6 +395,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:

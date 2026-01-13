@@ -264,6 +264,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -309,6 +310,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS

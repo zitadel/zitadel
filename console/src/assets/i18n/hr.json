@@ -1,0 +1,198 @@
+{
+	"APP_NAME": "ZITADEL",
+	"PAGINATOR": {
+		"PREVIOUS": "Prethodno",
+		"NEXT": "Sljedeće",
+		"COUNT": "Ukupno rezultata",
+		"MORE": "Više"
+	},
+	"FOOTER": {
+		"LINKS": {
+			"CONTACT": "Kontakt",
+			"TOS": "Uvjeti korištenja",
+			"PP": "Pravila privatnosti"
+		},
+		"THEME": {
+			"DARK": "Tamna",
+			"LIGHT": "Svijetla"
+		}
+	},
+	"HOME": {
+		"WELCOME": "Započnite sa ZITADEL-om",
+		"DISCLAIMER": "ZITADEL s vašim podacima postupa povjerljivo i sigurno.",
+		"DISCLAIMERLINK": "Dodatne informacije",
+		"DOCUMENTATION": {
+			"DESCRIPTION": "Brzo započnite sa ZITADEL-om."
+		},
+		"GETSTARTED": {
+			"DESCRIPTION": "Brzo započnite sa ZITADEL-om."
+		},
+		"QUICKSTARTS": {
+			"LABEL": "Prvi koraci",
+			"DESCRIPTION": "Brzo započnite sa ZITADEL-om."
+		},
+		"SHORTCUTS": {
+			"SHORTCUTS": "Prečaci",
+			"SETTINGS": "Dostupni prečaci",
+			"PROJECTS": "Projekti",
+			"REORDER": "Držite i povucite pločicu za premještanje",
+			"ADD": "Držite i povucite pločicu za dodavanje"
+		}
+	},
+	"ONBOARDING": {
+		"DESCRIPTION": "Sljedeći koraci",
+		"MOREDESCRIPTION": "više prečaca",
+		"COMPLETED": "dovršeno",
+		"DISMISS": "Ne hvala, snalazim se.",
+		"CARD": {
+			"TITLE": "Pokrenite svoj ZITADEL",
+			"DESCRIPTION": "Ova kontrolna lista pomaže postaviti vašu instancu i vodi vas kroz najvažnije korake"
+		},
+		"MILESTONES": {
+			"instance.policy.label.added": {
+				"title": "Postavite svoj brend",
+				"description": "Definirajte boje i oblik prijave te učitajte svoj logo i ikone.",
+				"action": "Postavi brendiranje"
+			},
+			"instance.smtp.config.added": {
+				"title": "Postavite SMTP postavke",
+				"description": "Postavite vlastite postavke poslužitelja za email.",
+				"action": "Postavi SMTP"
+			},
+			"PROJECT_CREATED": {
+				"title": "Stvorite projekt",
+				"description": "Dodajte projekt i definirajte njegove uloge i ovlaštenja.",
+				"action": "Stvori projekt"
+			},
+			"APPLICATION_CREATED": {
+				"title": "Registrirajte aplikaciju",
+				"description": "Registrirajte web, native, API ili SAML aplikaciju i postavite autentikacijski tijek.",
+				"action": "Registriraj aplikaciju"
+			},
+			"AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+				"title": "Prijavite se u aplikaciju",
+				"description": "Integrirajte aplikaciju sa ZITADEL-om za autentikaciju i testirajte prijavom s admin korisnikom.",
+				"action": "Prijavi se"
+			},
+			"user.human.added": {
+				"title": "Dodajte korisnike",
+				"description": "Dodajte korisnike svoje aplikacije",
+				"action": "Dodaj korisnika"
+			},
+			"user.grant.added": {
+				"title": "Dodijelite pristup",
+				"description": "Omogućite korisnicima pristup aplikaciji i postavite njihove uloge.",
+				"action": "Dodijeli pristup"
+			}
+		}
+	},
+	"MENU": {
+		"INSTANCE": "Zadane postavke",
+		"DASHBOARD": "Početna",
+		"PERSONAL_INFO": "Osobni podaci",
+		"DOCUMENTATION": "Dokumentacija",
+		"INSTANCEOVERVIEW": "Instanca",
+		"ORGS": "Organizacije",
+		"VIEWS": "Pregledi",
+		"EVENTS": "Događaji",
+		"FAILEDEVENTS": "Neuspjeli događaji",
+		"ORGANIZATION": "Organizacija",
+		"PROJECT": "Projekti",
+		"PROJECTOVERVIEW": "Pregled",
+		"PROJECTGRANTS": "Dodjele",
+		"ROLES": "Uloge",
+		"GRANTEDPROJECT": "Dodijeljeni projekti",
+		"HUMANUSERS": "Korisnici",
+		"MACHINEUSERS": "Servisni korisnici",
+		"LOGOUT": "Odjavi sve korisnike",
+		"NEWORG": "Nova organizacija",
+		"IAMADMIN": "Vi ste IAM administrator. Imajte na umu da imate proširene ovlasti.",
+		"SHOWORGS": "Prikaži sve organizacije",
+		"GRANTS": "Ovlaštenja",
+		"ACTIONS": "Akcije",
+		"TARGETS": "Ciljevi",
+		"PRIVACY": "Privatnost",
+		"TOS": "Uvjeti korištenja",
+		"OPENSHORTCUTSTOOLTIP": "Upišite ? za prikaz tipkovničkih prečaca",
+		"SETTINGS": "Postavke",
+		"CUSTOMERPORTAL": "Korisnički portal"
+	},
+	"ACTIONS": {
+		"ACTIONS": "Akcije",
+		"FILTER": "Filtriraj",
+		"RENAME": "Preimenuj",
+		"SET": "Postavi",
+		"COPY": "Kopiraj u međuspremnik",
+		"COPIED": "Kopirano u međuspremnik.",
+		"RESET": "Ponovno postavi",
+		"RESETDEFAULT": "Vrati na zadano",
+		"RESETTO": "Vrati na: ",
+		"RESETCURRENT": "Vrati na trenutno",
+		"SHOW": "Prikaži",
+		"HIDE": "Sakrij",
+		"SAVE": "Spremi",
+		"SAVENOW": "Spremi sada",
+		"NEW": "Novo",
+		"ADD": "Dodaj",
+		"CREATE": "Stvori",
+		"CONTINUE": "Nastavi",
+		"CONTINUEWITH": "Nastavi s {{value}}",
+		"BACK": "Natrag",
+		"CLOSE": "Zatvori",
+		"CLEAR": "Očisti",
+		"CANCEL": "Odustani",
+		"INFO": "Info",
+		"OK": "U redu",
+		"SELECT": "Odaberi",
+		"VIEW": "Prikaži",
+		"SELECTIONDELETE": "Obriši odabir",
+		"DELETE": "Obriši",
+		"REMOVE": "Ukloni",
+		"VERIFY": "Potvrdi",
+		"FINISH": "Završi",
+		"FINISHED": "Zatvori",
+		"CHANGE": "Promijeni",
+		"REACTIVATE": "Ponovno aktiviraj",
+		"ACTIVATE": "Aktiviraj",
+		"DEACTIVATE": "Deaktiviraj",
+		"REFRESH": "Osvježi",
+		"LOGIN": "Prijava",
+		"EDIT": "Uredi",
+		"PIN": "Prikvači / Otkvači",
+		"CONFIGURE": "Konfiguriraj",
+		"SEND": "Pošalji",
+		"NEWVALUE": "Nova vrijednost",
+		"RESTORE": "Vrati",
+		"CONTINUEWITHOUTSAVE": "Nastavi bez spremanja",
+		"OF": "od",
+		"PREVIOUS": "Prethodno",
+		"NEXT": "Sljedeće",
+		"MORE": "više",
+		"STEP": "Korak",
+		"SETUP": "Postavi",
+		"TEST": "Test",
+		"UNSAVEDCHANGES": "Nespremljene promjene",
+		"TABLE": {
+			"SHOWUSER": "Prikaži korisnika {{value}}"
+		},
+		"DOWNLOAD": "Preuzmi",
+		"APPLY": "Primijeni"
+	},
+	"TABLE": {
+		"NOROWS": "Nema podataka"
+	},
+	"ERRORS": {
+		"REQUIRED": "Molimo ispunite ovo polje.",
+		"ATLEASTONE": "Unesite barem jednu vrijednost.",
+		"INVALID_FORMAT": "Format nije ispravan.",
+		"NOTANEMAIL": "Unesena vrijednost nije email adresa.",
+		"MINLENGTH": "Mora imati najmanje {{requiredLength}} znakova.",
+		"MAXLENGTH": "Mora imati manje od {{requiredLength}} znakova.",
+		"UPPERCASEMISSING": "Mora sadržavati veliko slovo.",
+		"LOWERCASEMISSING": "Mora sadržavati malo slovo.",
+		"SYMBOLERROR": "Mora sadržavati simbol ili interpunkcijski znak.",
+		"NUMBERERROR": "Mora sadržavati znamenku.",
+		"PWNOTEQUAL": "Unesene lozinke se ne podudaraju.",
+		"PHONE": "Broj telefona mora započinjati s +."
+	}
+}
