@@ -282,7 +282,7 @@
       "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
       "info": {
         "description": "Een passkey is een authenticatiemethode op een apparaat zoals jouw vingerafdruk, Apple FaceID of iets dergelijks. ",
-        "link": "Wachtwoordloze authenticatie"
+        "link": "Passkey authenticatie"
       },
       "skip": "Overslaan",
       "submit": "Doorgaan"

@@ -9,7 +9,7 @@ The flow is represented by the following Ids in the API: `3`
 ## Post Authentication
 
 A user has authenticated directly at ZITADEL.
-ZITADEL validated the users inputs for password, one-time password, security key or passwordless factor.
+ZITADEL validated the users inputs for password, one-time password or passkey.
 Each validation step triggers the action.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_AUTHENTICATION` or `1`.
