@@ -10,7 +10,7 @@ By defining multiple schemas, you can even differentiate between different perso
 and restrictions, resp. requirements for them to authenticate. 
 
 For example, you could have separate schemas for your employees and your customers. While you might want to make sure that
-certain data like given name and family name are required for employees, they might be optional for the latter.
+certain data like first name and last name are required for employees, they might be optional for the latter.
 Or you might want to disable username password authentication for your admins and only allow phishing resistant methods like passkeys,
 but still allow it for your customers.
 

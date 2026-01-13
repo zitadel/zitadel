@@ -971,7 +971,7 @@
       "CHANGEUSERNAME_TITLE": "Alterar nome de usuário",
       "CHANGEUSERNAME_DESC": "Digite o novo nome no campo abaixo.",
       "FIRSTNAME": "Nome Próprio",
-      "LASTNAME": "Sobrenome",
+      "LASTNAME": "Apelido",
       "NICKNAME": "Apelido",
       "DISPLAYNAME": "Nome de Exibição",
       "PREFERREDLOGINNAME": "Nome de login preferido",
@@ -1861,8 +1861,8 @@
         "IU": "Convidar usuário"
       },
       "CHIPS": {
-        "firstname": "Nome próprio",
-        "lastname": "Sobrenome",
+        "firstname": "Nome Próprio",
+        "lastname": "Apelido",
         "code": "Código",
         "preferredLoginName": "Nome de login preferido",
         "displayName": "Nome de exibição",
@@ -2327,7 +2327,7 @@
     "EMAILATTRIBUTEATTRIBUTE": "atributo de E-mail",
     "EMAILVERIFIEDATTRIBUTE": "atributo de E-mail Verificado",
     "FIRSTNAMEATTRIBUTE": "atributo de Nome Próprio",
-    "LASTNAMEATTRIBUTE": "atributo de Sobrenome",
+    "LASTNAMEATTRIBUTE": "atributo de Apelido",
     "NICKNAMEATTRIBUTE": "atributo de Apelido",
     "PHONEATTRIBUTE": "atributo de Telefone",
     "PHONEVERIFIEDATTRIBUTE": "atributo de Telefone Verificado",
