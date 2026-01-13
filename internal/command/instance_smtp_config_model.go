@@ -242,7 +242,7 @@ func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) 
 }
 
 func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) []instance.SMTPConfigChanges {
-	// if no auth is yet present, set both
+	// if no auth is yet present, set all properties
 	if wm.SMTPConfig.XOAuth2Auth == nil {
 		return []instance.SMTPConfigChanges{
 			instance.ChangeSMTPConfigXOAuth2User(auth.User),
