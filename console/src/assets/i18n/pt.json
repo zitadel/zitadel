@@ -1865,7 +1865,7 @@
         "lastname": "Sobrenome",
         "code": "Código",
         "preferredLoginName": "Nome de login preferido",
-"displayName": "Nome de exibição",
+        "displayName": "Nome de exibição",
         "nickName": "Apelido",
         "loginnames": "Nomes de login",
         "domain": "Domínio",
