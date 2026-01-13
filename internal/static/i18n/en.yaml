@@ -178,7 +178,7 @@ Errors:
       U2F:
         NotExisting: U2F does not exist
       Passwordless:
-        NotExisting: Passwordless does not exist
+        NotExisting: Passkey does not exist
       RecoveryCodes:
         InvalidCode: Invalid recovery code provided
         MaxCountExceeded: Maximum number of recovery codes exceeded
@@ -807,24 +807,24 @@ EventTypes:
           skipped: Multifactor initialization skipped
       passwordless:
         token:
-          added: Token for Passwordless Login added
-          verified: Token for Passwordless Login verified
-          removed: Token for Passwordless Login removed
+          added: Token for Passkey Login added
+          verified: Token for Passkey Login verified
+          removed: Token for Passkey Login removed
           begin:
-            login: Passwordless Login check started
+            login: Passkey Login check started
           check:
-            succeeded: Passwordless Login check succeeded
-            failed: Passwordless Login check failed
+            succeeded: Passkey Login check succeeded
+            failed: Passkey Login check failed
           signcount:
-            changed: Checksum of the Passwordless Login Token has been changed
+            changed: Checksum of the Passkey Login Token has been changed
         initialization:
           code:
-            added: Passwordless initialization code added
-            sent: Passwordless initialization code sent
-            requested: Passwordless initialization code requested
+            added: Passkey initialization code added
+            sent: Passkey initialization code sent
+            requested: Passkey initialization code requested
             check:
-              succeeded: Passwordless initialization code successfully checked
-              failed: Passwordless initialization code check failed
+              succeeded: Passkey initialization code successfully checked
+              failed: Passkey initialization code check failed
       signed:
         out: User signed out
       refresh:

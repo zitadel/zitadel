@@ -840,12 +840,12 @@
       "TABLESTATE": "Status",
       "NAME": "Naam",
       "EMPTY": "Geen apparaat ingesteld",
-      "TITLE": "Wachtwoordloze authenticatie",
-      "DESCRIPTION": "Voeg op WebAuthn gebaseerde authenticatiemethoden toe om zonder wachtwoord in te loggen op ZITADEL.",
+      "TITLE": "Passkey authenticatie",
+      "DESCRIPTION": "Voeg op WebAuthn gebaseerde authenticatiemethoden toe met passkey in te loggen op ZITADEL.",
       "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
       "U2F": "Voeg methode toe",
       "U2F_DIALOG_TITLE": "Verifieer authenticator",
-      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte wachtwoordloze login",
+      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte passkey login",
       "U2F_SUCCESS": "Wachtwoordloze auth succesvol aangemaakt!",
       "U2F_ERROR": "Er is een fout opgetreden tijdens de installatie!",
       "U2F_NAME": "Authenticator Naam",
@@ -861,17 +861,17 @@
         "3": "Verwijderd"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Verwijder wachtwoordloze authenticatiemethode",
-        "DELETE_DESCRIPTION": "U staat op het punt om een wachtwoordloze authenticatiemethode te verwijderen. Weet u het zeker?",
-        "ADD_TITLE": "Wachtwoordloze Authenticatie",
-        "ADD_DESCRIPTION": "Selecteer een van de beschikbare opties voor het creëren van een wachtwoordloze authenticatiemethode.",
+        "DELETE_TITLE": "Verwijder passkey authenticatiemethode",
+        "DELETE_DESCRIPTION": "U staat op het punt om een passkey authenticatiemethode te verwijderen. Weet u het zeker?",
+        "ADD_TITLE": "Passkey Authenticatie",
+        "ADD_DESCRIPTION": "Selecteer een van de beschikbare opties voor het creëren van een passkey authenticatiemethode.",
         "SEND_DESCRIPTION": "Stuur uzelf een registratielink naar uw e-mailadres.",
         "SEND": "Stuur registratielink",
         "SENT": "De e-mail is succesvol verzonden. Controleer uw mailbox om verder te gaan met de installatie.",
         "QRCODE_DESCRIPTION": "Genereer QR-code voor het scannen met een ander apparaat.",
         "QRCODE": "Genereer QR-code",
         "QRCODE_SCAN": "Scan deze QR-code om verder te gaan met de installatie op uw apparaat.",
-        "NEW_DESCRIPTION": "Gebruik dit apparaat om Passwordless in te stellen.",
+        "NEW_DESCRIPTION": "Gebruik dit apparaat om passkey in te stellen.",
         "NEW": "Nieuw toevoegen"
       }
     },
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "E-mail verificatiecode verzonden.",
       "OTPREMOVED": "OTP verwijderd.",
       "U2FREMOVED": "Factor verwijderd.",
-      "PASSWORDLESSREMOVED": "Wachtwoordloos verwijderd.",
+      "PASSWORDLESSREMOVED": "Passkey verwijderd.",
       "INITIALPASSWORDSET": "Initieel wachtwoord ingesteld.",
       "PASSWORDNOTIFICATIONSENT": "Wachtwoord wijzigingsnotificatie verzonden.",
       "PASSWORDCHANGED": "Wachtwoord succesvol gewijzigd.",
@@ -1609,7 +1609,7 @@
         "2": "E-mail verificatie",
         "3": "Telefoon verificatie",
         "4": "Wachtwoord Reset",
-        "5": "Wachtwoordloos Initialisatie",
+        "5": "Passkey Initialisatie",
         "6": "App Secret",
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
@@ -1838,10 +1838,10 @@
         "usernameChangeText": "Gebruikersnaam wijziging",
         "verifyMfaOtpText": "Verifieer OTP",
         "verifyMfaU2fText": "Verifieer Universele Tweede Factor",
-        "passwordlessPromptText": "Wachtwoordloos Prompt",
-        "passwordlessRegistrationDoneText": "Wachtwoordloze Registratie Voltooid",
-        "passwordlessRegistrationText": "Wachtwoordloze Registratie",
-        "passwordlessText": "Wachtwoordloos",
+        "passwordlessPromptText": "Passkey Prompt",
+        "passwordlessRegistrationDoneText": "Passkey Registratie Voltooid",
+        "passwordlessRegistrationText": "Passkey Registratie",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Externe Registratie Gebruiker Overzicht"
       }
     },
@@ -1855,7 +1855,7 @@
         "VEO": "Verifieer Email OTP",
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
-        "PL": "Wachtwoordloos",
+        "PL": "Passkey",
         "PC": "Wachtwoord Verandering",
         "IU": "Gebruiker uitnodigen"
       },
@@ -2402,8 +2402,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Wachtwoordloos",
-      "MULTIFACTORDESCRIPTION": "Definieer uw multifactor voor uw wachtwoordloze authenticatie hier.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definieer uw multifactor voor uw passkey authenticatie hier.",
       "SECONDFACTORTITLE": "Multifactor Authenticatie",
       "SECONDFACTORDESCRIPTION": "Definieer verdere mogelijke factoren waarmee u uw wachtwoordauthenticatie kunt beveiligen."
     },
@@ -2445,7 +2445,7 @@
       "DESCRIPTION": "U kunt vooraf gedefinieerde of zelfgemaakte providers selecteren voor authenticatie.",
       "SELECTIDPS": "Identiteitsproviders"
     },
-    "PASSWORDLESS": "Wachtwoordloze Login",
+    "PASSWORDLESS": "Passkey Login",
     "PASSWORDLESSTYPE": {
       "0": "Niet toegestaan",
       "1": "Toegestaan"

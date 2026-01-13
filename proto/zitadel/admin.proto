@@ -2930,7 +2930,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "List Multi-factors (MFA)";
-            description: "Returns a list of multi-factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            description: "Returns a list of multi-factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  They are called passkeys and are used as first and second authentication and a password is not necessary."
             responses: {
                 key: "200";
                 value: {
@@ -2955,7 +2955,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "Add Multi-Factor (MFA)";
-            description: "Add a multi-factor (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            description: "Add a multi-factor (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). They are called passkeys and are used as first and second authentication and a password is not necessary."
             responses: {
                 key: "200";
                 value: {
