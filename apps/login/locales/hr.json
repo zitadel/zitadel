@@ -173,7 +173,7 @@
         },
         "accountNotFound": {
             "title": "Račun nije pronađen",
-            "description": "Nismo pronašli račun povezan s vjerodajnicama vašeg pružatelja identiteta.",
+            "description": "Nismo pronašli račun povezan s pristupnim podacima vašeg pružatelja identiteta.",
             "info": "Nije pronađen postojeći račun. Prijavite se postojećim računom ili se obratite administratoru za pomoć.",
             "backToLogin": "Povratak na prijavu"
         },
@@ -203,7 +203,7 @@
     },
     "ldap": {
         "title": "LDAP prijava",
-        "description": "Unesite svoje LDAP vjerodajnice.",
+        "description": "Unesite svoje LDAP pristupne podatke.",
         "submit": "Nastavi",
         "labels": {
             "username": "Korisničko ime",
