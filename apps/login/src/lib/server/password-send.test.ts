@@ -1,9 +1,9 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
-import { sendPassword } from "./password";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { sendPassword } from "./password";
 
 // Mock dependencies
 vi.mock("next/headers", () => ({
@@ -40,6 +40,7 @@ vi.mock("../zitadel", () => ({
   getLockoutSettings: vi.fn(),
   getPasswordExpirySettings: vi.fn(),
   getUserByID: vi.fn(),
+  searchUsers: vi.fn(),
 }));
 
 vi.mock("../cookies", () => ({
@@ -70,7 +71,7 @@ describe("sendPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
   let mockGetSessionCookieByLoginName: any;
-  let mockListUsers: any;
+  let mockSearchUsers: any;
   let mockGetLoginSettings: any;
   let mockCreateSessionAndUpdateCookie: any;
   let mockCompleteFlowOrGetUrl: any;
@@ -83,7 +84,7 @@ describe("sendPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieByLoginName } = await import("../cookies");
-    const { listUsers, getLoginSettings, listAuthenticationMethodTypes } = await import("../zitadel");
+    const { getLoginSettings, listAuthenticationMethodTypes, searchUsers } = await import("../zitadel");
     const { createSessionAndUpdateCookie } = await import("@/lib/server/cookie");
     const { completeFlowOrGetUrl } = await import("../client");
     const { checkMFAFactors } = await import("../verify-helper");
@@ -91,7 +92,7 @@ describe("sendPassword", () => {
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
     mockGetSessionCookieByLoginName = vi.mocked(getSessionCookieByLoginName);
-    mockListUsers = vi.mocked(listUsers);
+    mockSearchUsers = vi.mocked(searchUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
     mockCompleteFlowOrGetUrl = vi.mocked(completeFlowOrGetUrl);
@@ -107,8 +108,7 @@ describe("sendPassword", () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
 
     // 2. User exists
-    mockListUsers.mockResolvedValue({
-      details: { totalResult: BigInt(1) },
+    mockSearchUsers.mockResolvedValue({
       result: [{ userId: "user123", type: { case: "human", value: {} }, state: UserState.ACTIVE }],
     });
 
@@ -148,7 +148,7 @@ describe("sendPassword", () => {
     });
 
     // Verification
-    expect(mockListUsers).toHaveBeenCalledWith(expect.objectContaining({ loginName: "testuser" }));
+    expect(mockSearchUsers).toHaveBeenCalledWith(expect.objectContaining({ searchValue: "testuser" }));
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
     expect(mockCompleteFlowOrGetUrl).toHaveBeenCalled();
     expect(result).toEqual({ redirect: "/next-page" });

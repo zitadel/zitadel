@@ -1,6 +1,6 @@
-import { describe, expect, test, vi, beforeEach } from "vitest";
-import { checkSessionAndSetPassword, sendPassword, resetPassword, changePassword } from "./password";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { changePassword, checkSessionAndSetPassword, resetPassword, sendPassword } from "./password";
 
 // Mock dependencies
 vi.mock("next/headers", () => ({
@@ -33,12 +33,12 @@ vi.mock("../zitadel", () => ({
   getSession: vi.fn(),
   setPassword: vi.fn(),
   createServerTransport: vi.fn(),
-  listUsers: vi.fn(),
   getLockoutSettings: vi.fn(),
   passwordReset: vi.fn(),
   getUserByID: vi.fn(),
   setUserPassword: vi.fn(),
   getPasswordExpirySettings: vi.fn(),
+  searchUsers: vi.fn(),
 }));
 
 vi.mock("./cookie", () => ({
@@ -235,7 +235,7 @@ describe("sendPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
   let mockGetSessionCookieByLoginName: any;
-  let mockListUsers: any;
+  let mockSearchUsers: any;
   let mockGetLoginSettings: any;
   let mockCreateSessionAndUpdateCookie: any;
   let mockSetSessionAndUpdateCookie: any;
@@ -247,13 +247,13 @@ describe("sendPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieByLoginName } = await import("../cookies");
-    const { listUsers, getLoginSettings, getLockoutSettings } = await import("../zitadel");
+    const { getLoginSettings, getLockoutSettings, searchUsers } = await import("../zitadel");
     const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
     mockGetSessionCookieByLoginName = vi.mocked(getSessionCookieByLoginName);
-    mockListUsers = vi.mocked(listUsers);
+    mockSearchUsers = vi.mocked(searchUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
     mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
@@ -276,7 +276,7 @@ describe("sendPassword", () => {
 
   test("should return generic error when user not found and ignoreUnknownUsernames is true", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
-    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockSearchUsers.mockResolvedValue({ result: [] });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
 
     const result = await sendPassword({
@@ -289,7 +289,7 @@ describe("sendPassword", () => {
 
   test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
-    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockSearchUsers.mockResolvedValue({ result: [] });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
 
     const result = await sendPassword({
@@ -302,9 +302,8 @@ describe("sendPassword", () => {
 
   test("should return generic error when password verification fails and ignoreUnknownUsernames is true", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
-    mockListUsers.mockResolvedValue({
-      details: { totalResult: BigInt(1) },
-      result: [{ userId: "user123" }],
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
     mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
@@ -319,9 +318,8 @@ describe("sendPassword", () => {
 
   test("should return generic error when session creation fails with unknown error and ignoreUnknownUsernames is true", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
-    mockListUsers.mockResolvedValue({
-      details: { totalResult: BigInt(1) },
-      result: [{ userId: "user123" }],
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
     // Simulate an error that is NOT a failed attempt error (e.g. database error)
@@ -337,9 +335,8 @@ describe("sendPassword", () => {
 
   test("should return specific error with lockout info when password verification fails and ignoreUnknownUsernames is false", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
-    mockListUsers.mockResolvedValue({
-      details: { totalResult: BigInt(1) },
-      result: [{ userId: "user123" }],
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
     mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
@@ -367,8 +364,7 @@ describe("sendPassword", () => {
 
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
 
-    mockListUsers.mockResolvedValue({
-      details: { totalResult: BigInt(1) },
+    mockSearchUsers.mockResolvedValue({
       result: [
         {
           userId: "user123",
@@ -403,7 +399,7 @@ describe("sendPassword", () => {
 describe("resetPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
-  let mockListUsers: any;
+  let mockSearchUsers: any;
   let mockGetLoginSettings: any;
   let mockPasswordReset: any;
 
@@ -412,11 +408,11 @@ describe("resetPassword", () => {
 
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
-    const { listUsers, getLoginSettings, passwordReset } = await import("../zitadel");
+    const { getLoginSettings, passwordReset, searchUsers } = await import("../zitadel");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
-    mockListUsers = vi.mocked(listUsers);
+    mockSearchUsers = vi.mocked(searchUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockPasswordReset = vi.mocked(passwordReset);
 
@@ -425,7 +421,7 @@ describe("resetPassword", () => {
   });
 
   test("should return generic success when user not found and ignoreUnknownUsernames is true", async () => {
-    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockSearchUsers.mockResolvedValue({ result: [] });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
 
     const result = await resetPassword({
@@ -437,7 +433,7 @@ describe("resetPassword", () => {
   });
 
   test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
-    mockListUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+    mockSearchUsers.mockResolvedValue({ result: [] });
     mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
 
     const result = await resetPassword({
