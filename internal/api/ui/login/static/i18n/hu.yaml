@@ -405,8 +405,8 @@ Errors:
       NotFound: Profil nem található
       NotChanged: Profil nem változott
       Empty: Profil üres
-      FirstNameEmpty: A profilban a keresztnév üres
-      LastNameEmpty: A profilban a vezetéknév üres
+      FirstNameEmpty: A profilban az első név mező üres
+      LastNameEmpty: A profilban a vezetéknév mező üres
       IDMissing: Hiányzik a profil azonosító
     Email:
       NotFound: Email nem található
