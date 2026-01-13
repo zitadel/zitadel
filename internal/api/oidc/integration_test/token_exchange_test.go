@@ -157,7 +157,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	teResp, err = tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
-	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:instance:user:metadata", "urn:zitadel:instance:user:resourceowner"}
+	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
 
 	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
 	require.NoError(t, err)
@@ -378,7 +378,7 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	teResp, err := tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
-	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:instance:user:metadata", "urn:zitadel:instance:user:resourceowner"}
+	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
 
 	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
 	require.NoError(t, err)
