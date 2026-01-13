@@ -414,11 +414,11 @@ Errors:
       Empty: Política de Bloqueio de Senha Padrão vazia
       NotChanged: Política de Bloqueio de Senha Padrão não foi alterada
     DomainPolicy:
-      NotFound: Política IAM da Organização não encontrada
-      Empty: Política IAM da Organização está vazia
-      NotExisting: Política IAM da Organização não existente
-      AlreadyExists: Política IAM da Organização já existe
-      NotChanged: Política IAM da Organização não foi alterada
+      NotFound: Política de domínio da organização não encontrada
+      Empty: Política de domínio da organização está vazia
+      NotExisting: Política de domínio da organização não existe
+      AlreadyExists: Política de domínio da organização já existe
+      NotChanged: Política de domínio da organização não foi alterada
     NotificationPolicy:
       NotFound: Política de Notificação Padrão não encontrada
       NotChanged: Política de Notificação Padrão não foi alterada

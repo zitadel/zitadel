@@ -415,11 +415,11 @@ Errors:
       Empty: Výchozí zásady uzamčení hesla jsou prázdné
       NotChanged: Výchozí zásady uzamčení hesla nebyly změněny
     DomainPolicy:
-      NotFound: Zásady IAM organizace nenalezeny
-      Empty: Zásady IAM organizace jsou prázdné
-      NotExisting: Zásady IAM organizace neexistují
-      AlreadyExists: Zásady IAM organizace již existují
-      NotChanged: Zásady IAM organizace nebyly změněny
+      NotFound: Zásady domény organizace nenalezeny
+      Empty: Zásady domény organizace jsou prázdné
+      NotExisting: Zásady domény organizace neexistují
+      AlreadyExists: Zásady domény organizace již existují
+      NotChanged: Zásady domény organizace nebyly změněny
     NotificationPolicy:
       NotFound: Výchozí zásady oznámení nenalezeny
       NotChanged: Výchozí zásady oznámení nebyly změněny

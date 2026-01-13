@@ -415,11 +415,11 @@ Errors:
       Empty: La política de bloqueo de contraseña por defecto está vacía
       NotChanged: La política de bloqueo de contraseña por defecto no ha cambiado
     DomainPolicy:
-      NotFound: Política de IAM de la organización no encontrada
-      Empty: La política de IAM de la organización está vacía
-      NotExisting: La política de IAM de la organización no existe
-      AlreadyExists: La política de IAM de la organización ya existe
-      NotChanged: La política de IAM de la organización no ha cambiado
+      NotFound: Política de dominio de la organización no encontrada
+      Empty: La política de dominio de la organización está vacía
+      NotExisting: La política de dominio de la organización no existe
+      AlreadyExists: La política de dominio de la organización ya existe
+      NotChanged: La política de dominio de la organización no ha cambiado
     NotificationPolicy:
       NotFound: Política de notificación por defecto no encontrada
       NotChanged: La política de notificación por defecto no ha cambiado

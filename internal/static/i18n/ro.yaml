@@ -416,11 +416,11 @@ Errors:
         Empty: Politica implicită de blocare a parolei este goală
         NotChanged: Politica implicită de blocare a parolei nu a fost schimbată
       DomainPolicy:
-        NotFound: Politica IAM a organizației nu a fost găsită
-        Empty: Politica IAM a organizației este goală
-        NotExisting: Politica IAM a organizației nu există
-        AlreadyExists: Politica IAM a organizației există deja
-        NotChanged: Politica IAM a organizației nu a fost schimbată
+        NotFound: Politica de domeniu a organizației nu a fost găsită
+        Empty: Politica de domeniu a organizației este goală
+        NotExisting: Politica de domeniu a organizației nu există
+        AlreadyExists: Politica de domeniu a organizației există deja
+        NotChanged: Politica de domeniu a organizației nu a fost schimbată
       NotificationPolicy:
         NotFound: Politica de notificare implicită nu a fost găsită
         NotChanged: Politica de notificare implicită nu a fost schimbată

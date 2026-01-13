@@ -415,11 +415,11 @@ Errors:
       Empty: Standaard Wachtwoord Lockout Beleid is leeg
       NotChanged: Standaard Wachtwoord Lockout Beleid is niet veranderd
     DomainPolicy:
-      NotFound: Org IAM Beleid niet gevonden
-      Empty: Org IAM Beleid is leeg
-      NotExisting: Org IAM Beleid bestaat niet
-      AlreadyExists: Org IAM Beleid bestaat al
-      NotChanged: Org IAM Beleid is niet veranderd
+      NotFound: Organisatie domeinbeleid niet gevonden
+      Empty: Organisatie domeinbeleid is leeg
+      NotExisting: Organisatie domeinbeleid bestaat niet
+      AlreadyExists: Organisatie domeinbeleid bestaat al
+      NotChanged: Organisatie domeinbeleid is niet gewijzigd
     NotificationPolicy:
       NotFound: Standaard Notificatie Beleid niet gevonden
       NotChanged: Standaard Notificatie Beleid is niet veranderd

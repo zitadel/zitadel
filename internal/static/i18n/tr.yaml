@@ -416,11 +416,11 @@ Errors:
       Empty: Varsayılan Şifre Kilitleme Politikası boş
       NotChanged: Varsayılan Şifre Kilitleme Politikası değişmedi
     DomainPolicy:
-      NotFound: Org IAM Politikası bulunamadı
-      Empty: Org IAM Politikası boş
-      NotExisting: Org IAM Politikası mevcut değil
-      AlreadyExists: Org IAM Politikası zaten mevcut
-      NotChanged: Org IAM Politikası değişmedi
+      NotFound: Organizasyon etki alanı politikası bulunamadı
+      Empty: Organizasyon etki alanı politikası boş
+      NotExisting: Organizasyon etki alanı politikası mevcut değil
+      AlreadyExists: Organizasyon etki alanı politikası zaten mevcut
+      NotChanged: Organizasyon etki alanı politikası değiştirilmedi
     NotificationPolicy:
       NotFound: Varsayılan Bildirim Politikası bulunamadı
       NotChanged: Varsayılan Bildirim Politikası değişmedi

@@ -416,11 +416,11 @@ Errors:
       Empty: デフォルトのパスワードロックアウトポリシーが空です
       NotChanged: デフォルトのパスワードロックアウトポリシーは変更されていません
     DomainPolicy:
-      NotFound: 組織IAMポリシーは見つかりません
-      Empty: 組織IAMポリシーは空です
-      NotExisting: 組織IAMポリシーは存在しません
-      AlreadyExists: 組織IAMポリシーはすでに存在しています
-      NotChanged: 組織IAMポリシーは変更されていません
+      NotFound: 組織ドメインポリシーが見つかりません
+      Empty: 組織ドメインポリシーが空です
+      NotExisting: 組織ドメインポリシーが存在しません
+      AlreadyExists: 組織ドメインポリシーは既に存在します
+      NotChanged: 組織ドメインポリシーは変更されていません
     NotificationPolicy:
       NotFound: デフォルトの通知ポリシーが見つかりません
       NotChanged: デフォルトの通知ポリシーは変更されていません

@@ -415,11 +415,11 @@ Errors:
       Empty: Standardlösenordslåspolicy är tom
       NotChanged: Standardlösenordslåspolicy har inte ändrats
     DomainPolicy:
-      NotFound: Org IAM-policy hittades inte
-      Empty: Org IAM-policy är tom
-      NotExisting: Org IAM-policy existerar inte
-      AlreadyExists: Org IAM-policy finns redan
-      NotChanged: Org IAM-policy har inte ändrats
+      NotFound: Organisationsdomänpolicy hittades inte
+      Empty: Organisationsdomänpolicy är tom
+      NotExisting: Organisationsdomänpolicy finns inte
+      AlreadyExists: Organisationsdomänpolicy finns redan
+      NotChanged: Organisationsdomänpolicy har inte ändrats
     NotificationPolicy:
       NotFound: Standardnotifikationspolicy hittades inte
       NotChanged: Standardnotifikationspolicy har inte ändrats

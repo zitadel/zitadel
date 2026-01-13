@@ -415,11 +415,11 @@ Errors:
       Empty: Impostazioni di blocco della password predefinite sono vuote
       NotChanged: Le impostazioni di blocco della password predefinite non sono state cambiate
     DomainPolicy:
-      NotFound: Impostazioni Org IAM non trovate
-      Empty: Impostazioni Org IAM mancanti
-      NotExisting: Impostazioni Org IAM non esistenti
-      AlreadyExists: Impostazioni Org IAM già esistenti
-      NotChanged: Impostazioni Org IAM non sono state cambiate
+      NotFound: Politica del dominio dell'organizzazione non trovata
+      Empty: La politica del dominio dell'organizzazione è vuota
+      NotExisting: La politica del dominio dell'organizzazione non esiste
+      AlreadyExists: La politica del dominio dell'organizzazione esiste già
+      NotChanged: La politica del dominio dell'organizzazione non è stata modificata
     NotificationPolicy:
       NotFound: Impostazioni di notifica predefinite non trovate
       NotChanged: Impostazioni di notifica predefinite non è stato cambiato

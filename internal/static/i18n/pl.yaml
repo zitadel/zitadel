@@ -415,11 +415,11 @@ Errors:
       Empty: Domyślna polityka blokowania hasła jest pusta
       NotChanged: Domyślna polityka blokowania hasła nie została zmieniona
     DomainPolicy:
-      NotFound: Polityka IAM organizacji nie znaleziona
-      Empty: Polityka IAM organizacji jest pusta
-      NotExisting: Polityka IAM organizacji nie istnieje
-      AlreadyExists: Polityka IAM organizacji już istnieje
-      NotChanged: Polityka IAM organizacji nie została zmieniona
+      NotFound: Nie znaleziono polityki domeny organizacji
+      Empty: Polityka domeny organizacji jest pusta
+      NotExisting: Polityka domeny organizacji nie istnieje
+      AlreadyExists: Polityka domeny organizacji już istnieje
+      NotChanged: Polityka domeny organizacji nie została zmieniona
     NotificationPolicy:
       NotFound: Domyślna polityka powiadomień nie znaleziona
       NotChanged: Domyślna polityka powiadomień nie zmieniona
