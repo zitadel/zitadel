@@ -396,6 +396,13 @@ module.exports = {
             {
               type: "category",
               label: "Services",
+              link: {
+                type: "generated-index",
+                title: "Integrate ZITADEL with your Favorite Services",
+                slug: "/guides/integrate/services",
+                description:
+                  "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+              },
               items: [
                 "guides/integrate/services/google-workspace",
                 "guides/integrate/services/aws-saml",
