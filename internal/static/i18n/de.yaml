@@ -283,10 +283,6 @@ Errors:
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
-    OrgIAMPolicy:
-      Empty: Org IAM Policy ist leer
-      NotExisting: Org IAM Policy existiert nicht
-      AlreadyExists: Org IAM Policy existiert bereits
     NotificationPolicy:
       NotFound: Notification Policy konnte nicht gefunden werden
       NotChanged: Notification Policy wurde nicht verändert

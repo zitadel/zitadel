@@ -284,10 +284,6 @@ Errors:
       Empty: パスワード期限ポリシーは空です
       NotExisting: パスワード期限ポリシーは存在しません
       AlreadyExists: パスワード期限ポリシーはすでに存在しています
-    OrgIAMPolicy:
-      Empty: 組織IAMポリシーは空です
-      NotExisting: 組織IAMポリシーは存在しません
-      AlreadyExists: 組織IAMポリシーはすでに存在しています
     NotificationPolicy:
       NotFound: 通知ポリシーが見つかりません
       NotChanged: 通知ポリシーは変更されていません

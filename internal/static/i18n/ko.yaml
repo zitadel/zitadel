@@ -284,10 +284,6 @@ Errors:
       Empty: 비밀번호 만료 정책이 비어 있습니다
       NotExisting: 비밀번호 만료 정책이 존재하지 않습니다
       AlreadyExists: 비밀번호 만료 정책이 이미 존재합니다
-    OrgIAMPolicy:
-      Empty: 조직 IAM 정책이 비어 있습니다
-      NotExisting: 조직 IAM 정책이 존재하지 않습니다
-      AlreadyExists: 조직 IAM 정책이 이미 존재합니다
     NotificationPolicy:
       NotFound: 알림 정책을 찾을 수 없습니다
       NotChanged: 알림 정책이 변경되지 않았습니다

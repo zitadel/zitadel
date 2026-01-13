@@ -283,10 +283,6 @@ Errors:
       Empty: Polityka wieku hasła jest pusta
       NotExisting: Polityka wieku hasła nie istnieje
       AlreadyExists: Polityka wieku hasła już istnieje
-    OrgIAMPolicy:
-      Empty: Polityka IAM organizacji jest pusta
-      NotExisting: Polityka IAM organizacji nie istnieje
-      AlreadyExists: Polityka IAM organizacji już istnieje
     NotificationPolicy:
       NotFound: Polityka powiadomień nie znaleziona
       NotChanged: Polityka powiadomień nie zmieniona

@@ -282,10 +282,6 @@ Errors:
       Empty: A Política de Idade de Senha está vazia
       NotExisting: A Política de Idade de Senha não existe
       AlreadyExists: A Política de Idade de Senha já existe
-    OrgIAMPolicy:
-      Empty: A Política de IAM da Organização está vazia
-      NotExisting: A Política de IAM da Organização não existe
-      AlreadyExists: A Política de IAM da Organização já existe
     NotificationPolicy:
       NotFound: Política de Notificação não encontrada
       NotChanged: Política de Notificação não alterada

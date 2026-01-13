@@ -283,10 +283,6 @@ Errors:
       Empty: A jelszó korhatár szabályzat üres
       NotExisting: A jelszó korhatár szabályzat nem létezik
       AlreadyExists: A jelszó korhatár szabályzat már létezik
-    OrgIAMPolicy:
-      Empty: Az Org IAM Policy üres
-      NotExisting: Az Org IAM Policy nem létezik
-      AlreadyExists: Az Org IAM Policy már létezik
     NotificationPolicy:
       NotFound: A Notification Policy nem található
       NotChanged: A Notification Policy nem változott

@@ -283,10 +283,6 @@ Errors:
       Empty: Politika stáří hesla je prázdná
       NotExisting: Politika stáří hesla neexistuje
       AlreadyExists: Politika stáří hesla již existuje
-    OrgIAMPolicy:
-      Empty: Politika IAM organizace je prázdná
-      NotExisting: Politika IAM organizace neexistuje
-      AlreadyExists: Politika IAM organizace již existuje
     NotificationPolicy:
       NotFound: Politika oznámení nenalezena
       NotChanged: Politika oznámení nezměněna

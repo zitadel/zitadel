@@ -283,10 +283,6 @@ Errors:
       Empty: Standaard Wachtwoord Leeftijd Beleid is leeg
       NotExisting: Standaard Wachtwoord Leeftijd Beleid bestaat niet
       AlreadyExists: Standaard Wachtwoord Leeftijd Beleid bestaat al
-    OrgIAMPolicy:
-      Empty: Org IAM Beleid is leeg
-      NotExisting: Org IAM Beleid bestaat niet
-      AlreadyExists: Org IAM Beleid bestaat al
     NotificationPolicy:
       NotFound: Standaard Notificatie Beleid niet gevonden
       NotChanged: Standaard Notificatie Beleid is niet veranderd

@@ -284,10 +284,6 @@ Errors:
       Empty: Politica de vârstă a parolei este goală
       NotExisting: Politica de vârstă a parolei nu există
       AlreadyExists: Politica de vârstă a parolei există deja
-    OrgIAMPolicy:
-      Empty: Politica IAM a organizației este goală
-      NotExisting: Politica IAM a organizației nu există
-      AlreadyExists: Politica IAM a organizației există deja
     NotificationPolicy:
       NotFound: Politica de notificare nu a fost găsită
       NotChanged: Politica de notificare nu a fost schimbată

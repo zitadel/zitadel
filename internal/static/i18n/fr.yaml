@@ -283,10 +283,6 @@ Errors:
       Empty: La politique d'âge du mot de passe est vide
       NotExisting: La politique d'âge des mots de passe n'existe pas
       AlreadyExists: La politique relative à l'âge du mot de passe existe déjà
-    OrgIAMPolicy:
-      Empty: La politique IAM d'Org est vide
-      NotExisting: La politique Org IAM n'existe pas
-      AlreadyExists: La politique IAM d'Org existe déjà
     NotificationPolicy:
       NotFound: La politique notification n'a pas été trouvée
       NotChanged: La politique notification n'a pas été modifiée

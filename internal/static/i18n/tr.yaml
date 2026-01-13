@@ -284,10 +284,6 @@ Errors:
       Empty: Şifre Yaş Politikası boş
       NotExisting: Şifre Yaş Politikası mevcut değil
       AlreadyExists: Şifre Yaş Politikası zaten mevcut
-    OrgIAMPolicy:
-      Empty: Org IAM Politikası boş
-      NotExisting: Org IAM Politikası mevcut değil
-      AlreadyExists: Org IAM Politikası zaten mevcut
     NotificationPolicy:
       NotFound: Bildirim Politikası bulunamadı
       NotChanged: Bildirim Politikası değişmedi

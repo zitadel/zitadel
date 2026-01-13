@@ -278,10 +278,6 @@ Errors:
       Empty: Політика віку паролів порожня
       NotExisting: Політика віку паролів не існує
       AlreadyExists: Політика віку паролів вже існує
-    OrgIAMPolicy:
-      Empty: Політика Org IAM порожня
-      NotExisting: Політика Org IAM не існує
-      AlreadyExists: Політика Org IAM вже існує
     NotificationPolicy:
       NotFound: Політика сповіщень не знайдена
       NotChanged: Політика сповіщень не змінена

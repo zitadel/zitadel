@@ -283,10 +283,6 @@ Errors:
       Empty: Kebijakan Usia Kata Sandi kosong
       NotExisting: Kebijakan Usia Kata Sandi tidak ada
       AlreadyExists: Kebijakan Usia Kata Sandi sudah ada
-    OrgIAMPolicy:
-      Empty: Kebijakan IAM Organisasi kosong
-      NotExisting: Kebijakan IAM Organisasi tidak ada
-      AlreadyExists: Kebijakan IAM Organisasi sudah ada
     NotificationPolicy:
       NotFound: Kebijakan Pemberitahuan tidak ditemukan
       NotChanged: Kebijakan Pemberitahuan tidak diubah

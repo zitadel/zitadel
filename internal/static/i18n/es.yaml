@@ -283,10 +283,6 @@ Errors:
       Empty: La política de antigüedad de la contraseña está vacía
       NotExisting: La política de antigüedad de la contraseña no existe
       AlreadyExists: La política de antigüedad de la contraseña ya existe
-    OrgIAMPolicy:
-      Empty: La política de IAM de la organización está vacía
-      NotExisting: La política de IAM de la organización no existe
-      AlreadyExists: La política de IAM de la organización ya existe
     NotificationPolicy:
       NotFound: Política de notificación no encontrada
       NotChanged: La política de notificación no ha cambiado

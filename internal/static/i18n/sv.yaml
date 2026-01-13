@@ -283,10 +283,6 @@ Errors:
       Empty: Lösenordsålderpolicy är tom
       NotExisting: Lösenordsålderpolicy finns inte
       AlreadyExists: Lösenordsålderpolicy finns redan
-    OrgIAMPolicy:
-      Empty: Org IAM-policy är tom
-      NotExisting: Org IAM-policy finns inte
-      AlreadyExists: Org IAM-policy finns redan
     NotificationPolicy:
       NotFound: Notifikationspolicy hittades inte
       NotChanged: Notifikationspolicy har inte ändrats
