@@ -9,7 +9,9 @@
             "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
-            "{workspaceRoot}/main.go"
+            "{workspaceRoot}/main.go",
+            "{workspaceRoot}/internal/**/*.yaml",
+            "{workspaceRoot}/internal/**/*.yml"
         ],
         "runtime": [
             "sources",
