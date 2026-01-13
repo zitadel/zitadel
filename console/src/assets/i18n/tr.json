@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Servis Kullanıcıları",
     "LOGOUT": "Tüm Kullanıcıları Çıkış Yap",
     "NEWORG": "Yeni Organizasyon",
-    "IAMADMIN": "IAM Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
+    "IAMADMIN": "Örnek Yöneticisisiniz. Genişletilmiş izinleriniz olduğunu unutmayın.",
     "SHOWORGS": "Tüm Organizasyonları Göster",
     "GRANTS": "Yetkilendirmeler",
     "ACTIONS": "Eylemler",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Yönetici Rolleri",
-      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
+      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya Örnek detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
       "CREATIONDATE": "Oluşturma Tarihi",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Küresel Politikalarınızı ve Yönetim Erişim Ayarlarınızı yönetin."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Depolama Yönetimi",
+      "TITLE": "Örnek Depolama Yönetimi",
       "DESCRIPTION": "ZITADEL görünümlerinizi ve başarısız olaylarınızı yönetin."
     },
     "MEMBER": {
@@ -2798,7 +2798,7 @@
     "ADD": "Yönetici Ekle",
     "CREATIONTYPE": "Oluşturma Türü",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Örnek",
       "2": "Organizasyon",
       "0": "Sahip Olunan Proje",
       "1": "Verilen Proje",
