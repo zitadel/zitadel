@@ -6,7 +6,7 @@ sidebar_label: Caches [Beta]
 ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/docs/concepts/structure/instance) information in middleware.
 
 :::info
-Caches is currently an [experimental beta](/docs/support/software-release-cycles-support#beta) feature.
+Caches is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
 
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1332343909900222506)!
 :::
@@ -171,7 +171,7 @@ These settings typically change infrequently in production. ***Every*** request 
 
 ### Milestones
 
-Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/docs/guides/manage/console/overview) landing page.
+Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/docs/guides/manage/console/console-overview) landing page.
 Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, ZITADEL must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
 
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
@@ -179,7 +179,7 @@ For single instance setups which fulfilled all milestone (*your next steps* in c
 
 ### Organization
 
-Most resources like users, project and applications are part of an [organization](/docs/concepts/structure/organizations). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Most resources like users, project and applications are part of an [organization](/docs/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
 Organization objects are quite small and receive infrequent updates after they are created:
 
 - Change of organization name

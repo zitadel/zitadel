@@ -38,12 +38,12 @@ Overall, ZITADEL's hosted login page simplifies the authentication process for d
 ### Flexible usernames
 
 Different login name formats can be used on ZITADEL's hosted login page to select a user.
-Login methods can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain), their email addresses, or their phone numbers.
+Login methods can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations-overview#usernames-and-domains), their email addresses, or their phone numbers.
 By default, all of these login methods are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
 
 ### Support for multiple authentication methods
 
-The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
+The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passkey authentication method.
 The second factor (2FA) and multi-factor authentication methods (MFA) available in ZITADEL include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
@@ -60,7 +60,7 @@ ZITADEL offers various [identity provider templates](/docs/guides/integrate/iden
 
 ### Multi-tenancy authentication
 
-ZITADEL simplifies multi-tenancy authentication by securely managing authentication for multiple tenants, called [Organizations](/docs/concepts/structure/organizations), within a single [instance](/docs/concepts/structure/instance).
+ZITADEL simplifies multi-tenancy authentication by securely managing authentication for multiple tenants, called [Organizations](/docs/guides/manage/console/organizations-overview), within a single [instance](/docs/concepts/structure/instance).
 
 Key features include:
 
@@ -122,9 +122,9 @@ You can disable the prompt, in case multifactor authentication is not enforced b
 
 #### Enroll passkeys
 
-Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
+Users can select a button to initiate passkey login or use a fall-back method (ie. login with username/password), if available.
 
-The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
+The [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the operating system and browser.
@@ -150,7 +150,7 @@ For the first implementation we have excluded the following features:
 
 - **Create Users:** The new TypeScript Login app is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
-- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
+- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passkey authentication (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem
   can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*

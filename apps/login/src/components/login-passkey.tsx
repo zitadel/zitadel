@@ -220,7 +220,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
               }
 
               return router.push(
-                "/password?" + params, // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+                "/password?" + params, // alt is set because password is requested as alternative auth method, so passkey prompt can be escaped
               );
             }}
             data-testid="password-button"

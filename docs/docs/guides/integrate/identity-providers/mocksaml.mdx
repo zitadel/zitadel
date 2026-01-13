@@ -192,7 +192,6 @@ func manipulateResponse(resp *retrieveIdentityProviderIntentResponseWrapper) err
 
 	if len(rawInfo.Attributes.Email) == 0 ||
 		len(rawInfo.Attributes.FirstName) == 0 ||
-		len(rawInfo.Attributes.Id) == 0 ||
 		len(rawInfo.Attributes.LastName) == 0 {
 		log.Println("missing required attributes in the IDP response")
 		return nil
@@ -201,7 +200,8 @@ func manipulateResponse(resp *retrieveIdentityProviderIntentResponseWrapper) err
 	// to create a new user.
 	if resp.AddHumanUser != nil {
 		// set the required fields to create a new user in Zitadel based on the information returned by the IDP
-		resp.IdpInformation.UserName = rawInfo.Attributes.Email[0]
+		username := rawInfo.Attributes.Email[0]
+		resp.IdpInformation.UserName = username
 
 		resp.AddHumanUser.Profile = &user.SetHumanProfile{
 			GivenName:  rawInfo.Attributes.FirstName[0],
@@ -211,10 +211,12 @@ func manipulateResponse(resp *retrieveIdentityProviderIntentResponseWrapper) err
 			Email:        rawInfo.Attributes.Email[0],
 			Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
 		}
-		resp.AddHumanUser.Username = gu.Ptr(rawInfo.Attributes.Email[0])
+		resp.AddHumanUser.Username = gu.Ptr(username)
 		resp.AddHumanUser.IdpLinks = []*user.IDPLink{
 			{
-				UserName: rawInfo.Attributes.Email[0],
+				UserName: username,
+				UserId:   resp.GetIdpInformation().GetUserId(),
+				IdpId:    resp.GetIdpInformation().GetIdpId(),
 			},
 		}
 	}

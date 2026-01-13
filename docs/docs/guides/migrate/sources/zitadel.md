@@ -20,7 +20,7 @@ The following scripts don't include:
 - Machine keys
 - Personal Access Tokens
 - Application keys
-- Passwordless authentication
+- Passkey authentication
 
 Which results in that if you want to import, and you have no defined organization-specific custom policies, the experience for your users will not be exactly like in your old instance.
 
