@@ -177,7 +177,7 @@ Errors:
       U2F:
         NotExisting: L'U2F n'existe pas
       Passwordless:
-        NotExisting: Passwordless n'existe pas
+        NotExisting: Paskey n'existe pas
       RecoveryCodes:
         InvalidCode: Code de récupération invalide fourni
         MaxCountExceeded: Nombre maximum de codes de récupération dépassé

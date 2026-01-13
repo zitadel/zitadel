@@ -219,7 +219,7 @@
           "DC": "Când revendicați un domeniu pentru organizația dvs., utilizatorii care nu utilizează acest domeniu în numele lor de conectare vor fi solicitați să își schimbe numele de conectare pentru a se potrivi cu domeniul revendicat.",
           "INIT": "Când un utilizator este creat, acesta va primi un e-mail cu un link pentru a-și seta parola.",
           "PC": "Când un utilizator își schimbă parola, acesta va primi o notificare despre modificare dacă ați activat acest lucru în setările de notificare.",
-          "PL": "Când un utilizator adaugă o metodă de autentificare fără parolă, acesta trebuie să o activeze făcând clic pe un link dintr-un e-mail.",
+          "PL": "Când un utilizator adaugă o metodă de autentificare Passkey, acesta trebuie să o activeze făcând clic pe un link dintr-un e-mail.",
           "PR": "Când un utilizator își resetează parola, acesta va primi un e-mail cu un link pentru a seta o parolă nouă.",
           "VE": "Când un utilizator își schimbă adresa de e-mail, acesta va primi un e-mail cu un link pentru a verifica noua adresă.",
           "VP": "Când un utilizator își schimbă numărul de telefon, acesta va primi un SMS cu un cod pentru a verifica noul număr.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Personalizați formularul de autentificare.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Nume de utilizator și parolă permise",
-            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu numele lor de utilizator și parola. Dacă acest lucru este dezactivat, utilizatorii dvs. se pot conecta numai utilizând autentificarea fără parolă sau cu un furnizor de identitate extern."
+            "DESCRIPTION": "Permiteți utilizatorilor dvs. să se conecteze cu numele lor de utilizator și parola. Dacă acest lucru este dezactivat, utilizatorii dvs. se pot conecta numai utilizând autentificarea Passkey sau cu un furnizor de identitate extern."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Înregistrarea utilizatorilor permisă",
@@ -838,13 +838,13 @@
       "TABLESTATE": "Stare",
       "NAME": "Nume",
       "EMPTY": "Niciun dispozitiv setat",
-      "TITLE": "Autentificare fără parolă",
-      "DESCRIPTION": "Adăugați metode de autentificare bazate pe WebAuthn pentru a vă conecta la ZITADEL fără parolă.",
+      "TITLE": "Autentificare cu Passkey",
+      "DESCRIPTION": "Adăugați metode de autentificare bazate pe WebAuthn pentru a vă conecta la ZITADEL cu Passkey.",
       "MANAGE_DESCRIPTION": "Gestionați metodele de al doilea factor ale utilizatorilor dvs.",
       "U2F": "Adăugați metodă",
       "U2F_DIALOG_TITLE": "Verificați autentificatorul",
-      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru conectarea fără parolă utilizată",
-      "U2F_SUCCESS": "Autentificare fără parolă creată cu succes!",
+      "U2F_DIALOG_DESCRIPTION": "Introduceți un nume pentru conectarea cu Passkey utilizată",
+      "U2F_SUCCESS": "Passkey creată cu succes!",
       "U2F_ERROR": "A apărut o eroare în timpul configurării!",
       "U2F_NAME": "Numele autentificatorului",
       "TYPE": {
@@ -859,17 +859,17 @@
         "3": "Șters"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Eliminați metoda de autentificare fără parolă",
-        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o metodă de autentificare fără parolă. Sigur doriți să continuați?",
-        "ADD_TITLE": "Autentificare fără parolă",
-        "ADD_DESCRIPTION": "Selectați una dintre opțiunile disponibile pentru a crea o metodă de autentificare fără parolă.",
+        "DELETE_TITLE": "Eliminați metoda de autentificare cu passkey",
+        "DELETE_DESCRIPTION": "Sunteți pe cale să ștergeți o metodă de autentificare cu passkey. Sigur doriți să continuați?",
+        "ADD_TITLE": "Autentificare cu passkey",
+        "ADD_DESCRIPTION": "Selectați una dintre opțiunile disponibile pentru a crea o metodă de autentificare cu passkey.",
         "SEND_DESCRIPTION": "Trimiteți-vă un link de înregistrare la adresa dvs. de e-mail.",
         "SEND": "Trimiteți linkul de înregistrare",
         "SENT": "E-mailul a fost livrat cu succes. Verificați-vă căsuța poștală pentru a continua cu configurarea.",
         "QRCODE_DESCRIPTION": "Generați codul QR pentru scanare cu un alt dispozitiv.",
         "QRCODE": "Generați codul QR",
-        "QRCODE_SCAN": "Scanați acest cod QR pentru a continua cu configurarea pe dispozitivul dvs.",
-        "NEW_DESCRIPTION": "Utilizați acest dispozitiv pentru a configura Autentificarea fără parolă.",
+        "QRCODE_SCAN": "Scanați acest cod QR pentru a continua cu configurarea passkey pe dispozitivul dvs.",
+        "NEW_DESCRIPTION": "Utilizați acest dispozitiv pentru a configura Autentificarea cu passkey.",
         "NEW": "Adăugați nou"
       }
     },
@@ -1140,7 +1140,7 @@
       "EMAILVERIFICATIONSENT": "Codul de verificare a e-mailului trimis.",
       "OTPREMOVED": "OTP eliminat.",
       "U2FREMOVED": "Factor eliminat.",
-      "PASSWORDLESSREMOVED": "Fără parolă eliminat.",
+      "PASSWORDLESSREMOVED": "Autentificare cu passkey eliminată.",
       "INITIALPASSWORDSET": "Parola inițială setată.",
       "PASSWORDNOTIFICATIONSENT": "Notificarea de modificare a parolei trimisă.",
       "PASSWORDCHANGED": "Parola modificată cu succes.",
@@ -1607,7 +1607,7 @@
         "2": "Verificarea e-mailului",
         "3": "Verificarea telefonului",
         "4": "Resetarea parolei",
-        "5": "Inițializarea fără parolă",
+        "5": "Inițializarea Passkey",
         "6": "Secretul aplicației",
         "7": "Parolă unică (OTP) - SMS",
         "8": "Parolă unică (OTP) - E-mail"
@@ -1836,10 +1836,10 @@
         "usernameChangeText": "Modificarea numelui de utilizator",
         "verifyMfaOtpText": "Verificați OTP",
         "verifyMfaU2fText": "Verificați al doilea factor universal",
-        "passwordlessPromptText": "Solicitare fără parolă",
-        "passwordlessRegistrationDoneText": "Înregistrarea fără parolă efectuată",
-        "passwordlessRegistrationText": "Înregistrarea fără parolă",
-        "passwordlessText": "Fără parolă",
+        "passwordlessPromptText": "Solicitare Passkey",
+        "passwordlessRegistrationDoneText": "Înregistrarea cu Passkey efectuată",
+        "passwordlessRegistrationText": "Înregistrarea cu Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Prezentare generală utilizator înregistrare externă"
       }
     },
@@ -1853,7 +1853,7 @@
         "VEO": "Verificați OTP e-mail",
         "PR": "Resetare parolă",
         "DC": "Revendicare domeniu",
-        "PL": "Fără parolă",
+        "PL": "Passkey",
         "PC": "Modificare parolă",
         "IU": "Invitați utilizatorul"
       },
@@ -2401,8 +2401,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Fără parolă",
-      "MULTIFACTORDESCRIPTION": "Definiți-vă multifactorii pentru autentificarea fără parolă aici.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definiți-vă multifactorii pentru autentificarea cu passkey aici.",
       "SECONDFACTORTITLE": "Autentificare multifactor",
       "SECONDFACTORDESCRIPTION": "Definiți alți factori posibili cu care vă puteți securiza autentificarea cu parolă."
     },
@@ -2444,7 +2444,7 @@
       "DESCRIPTION": "Puteți selecta furnizori predefiniți sau autocreați pentru autentificare.",
       "SELECTIDPS": "Furnizori de identitate"
     },
-    "PASSWORDLESS": "Conectare fără parolă",
+    "PASSWORDLESS": "Autentificare cu Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Nepermis",
       "1": "Permis"
