@@ -50,7 +50,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/http' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer {TOKEN}' \
+    -H 'Authorization: Bearer ${TOKEN}' \
     -d '{
       "endpoint": "http://relay.example.com/provider",
       "description": "provider description"
@@ -67,7 +67,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/:id/_activate' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer {TOKEN}' \
+    -H 'Authorization: Bearer ${TOKEN}' \
     -d '{}'
   ```
 
@@ -84,7 +84,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/http' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer {TOKEN}' \
+    -H 'Authorization: Bearer ${TOKEN}' \
     -d '{
       "endpoint": "http://relay.example.com/provider",
       "description": "provider description"
@@ -101,7 +101,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/:id/_activate' \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'Authorization: Bearer {TOKEN}' \
+    -H 'Authorization: Bearer ${TOKEN}' \
     -d '{}'
   ```
 
