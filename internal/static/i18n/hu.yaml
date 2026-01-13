@@ -177,7 +177,7 @@ Errors:
       U2F:
         NotExisting: Az U2F nem létezik
       Passwordless:
-        NotExisting: Passwordless nem létezik
+        NotExisting: Passkey nem létezik
       RecoveryCodes:
         InvalidCode: Érvénytelen visszaállítási kód lett megadva
         MaxCountExceeded: A visszaállítási kódok maximális száma túllépve

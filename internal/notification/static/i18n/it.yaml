@@ -46,12 +46,12 @@ DomainClaimed:
   Text: Il dominio {{.Domain}} è stato rivendicato da un'organizzazione. Il tuo attuale utente {{.Username}} non fa parte di questa organizzazione. Perciò dovrai cambiare la tua email quando farai il login. Abbiamo creato un nome utente temporaneo ({{.TempUsername}}) per questo login.
   ButtonText: Accedi
 PasswordlessRegistration:
-  Title: ZITADEL - Aggiungere autenticazione passwordless
-  PreHeader: Aggiungi l'autenticazione passwordless
-  Subject: Aggiungi l'autenticazione passwordless
+  Title: ZITADEL - Aggiungere autenticazione con passkey
+  PreHeader: Aggiungi l'autenticazione con passkey
+  Subject: Aggiungi l'autenticazione con passkey
   Greeting: 'Ciao {{.DisplayName}},'
-  Text: Abbiamo ricevuto una richiesta per aggiungere l'autenticazione passwordless. Usa il pulsante qui sotto per aggiungere il tuo token o dispositivo per il login senza password.
-  ButtonText: Attiva passwordless
+  Text: Abbiamo ricevuto una richiesta per aggiungere l'autenticazione con passkey. Usa il pulsante qui sotto per aggiungere il tuo token o dispositivo per il login senza password.
+  ButtonText: Attiva passkey
 PasswordChange:
   Title: ZITADEL - La password dell'utente è stata modificata
   PreHeader: Modifica della password

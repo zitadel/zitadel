@@ -518,7 +518,7 @@
         "description": "Your device will ask for your fingerprint, face, or screen lock",
         "info": {
           "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-          "link": "Passwordless Authentication"
+          "link": "passkey Authentication"
         },
         "skip": "Skip",
         "submit": "Continue"

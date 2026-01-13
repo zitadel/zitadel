@@ -284,7 +284,7 @@
       "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
       "info": {
         "description": "Passkey, parmak izi, Apple FaceID veya benzeri gibi bir cihazdaki kimlik doğrulama yöntemidir. ",
-        "link": "Şifresiz Kimlik Doğrulama"
+        "link": "Passkey ile Kimlik Doğrulama"
       },
       "skip": "Atla",
       "submit": "Devam"
