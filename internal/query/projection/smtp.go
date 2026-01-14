@@ -340,6 +340,23 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.Password != nil {
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
 	}
+
+	if !e.PlainAuth.IsEmpty() {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.PlainAuth.User),
+			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
+		)
+	}
+
+	if !e.XOAuth2Auth.IsEmpty() {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthUser, e.XOAuth2Auth.User),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientId, e.XOAuth2Auth.ClientId),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientSecret, e.XOAuth2Auth.ClientSecret),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
+		)
+	}
 	if len(smtpColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(
 			smtpColumns,
