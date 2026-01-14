@@ -184,7 +184,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     prism: {
-      theme: themes.dracula,
+      theme: themes.github,
       darkTheme: themes.dracula,
       additionalLanguages: [
         "csharp",
