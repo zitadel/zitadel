@@ -69,8 +69,8 @@ module.exports = {
           label: "Example Applications",
           link: {
             type: "generated-index",
-            title: "Integrate",
-            slug: "examples/introduction",
+            title: "Example Applications",
+            slug: "/examples/introduction",
             description:
               "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
           },
@@ -80,7 +80,7 @@ module.exports = {
               label: "Frontend (SPA)",
               link: {
                 type: "generated-index",
-                title: "User Service API",
+                title: "Frontend (SPA) Quickstart Guides",
                 slug: "/examples/introduction/frontend",
                 description:
                   "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
@@ -126,7 +126,7 @@ module.exports = {
               label: "APIs / Backend Services",
               link: {
                 type: "generated-index",
-                title: "User Service API",
+                title: "APIs / Backend Quickstart Guides",
                 slug: "/examples/introduction/backend",
                 description:
                   "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
