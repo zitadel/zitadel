@@ -700,7 +700,7 @@
     "ORGNAME": "Organization Name",
     "ORGID": "Organization ID",
     "STATE": "State",
-    "PRIMARYDOMAIN": "Primary Domain",
+    "PRIMARYDOMAIN": "Organization Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
@@ -1421,7 +1421,7 @@
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
-      "PRIMARYDOMAIN": "Primary Domain",
+      "PRIMARYDOMAIN": "Organization Domain",
       "STATE": "State",
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
@@ -1432,9 +1432,9 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Verified domains",
+      "TITLE": "Organization Domains",
       "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
-      "SETPRIMARY": "Set as Primary",
+      "SETPRIMARY": "Set as Organization Domain",
       "DELETE": {
         "TITLE": "Delete Domain",
         "DESCRIPTION": "You are about to delete one of your domains."
@@ -1462,7 +1462,7 @@
       "MEMBERADDED": "Manager added.",
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
-      "SETPRIMARY": "Primary domain set.",
+      "SETPRIMARY": "Organization Domain set.",
       "DELETED": "Organization deleted successfully",
       "DEFAULTORGNOTFOUND": "The default organization was not found",
       "ORG_WAS_DELETED": "Organization has been deleted."
@@ -1500,7 +1500,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
-      "VERIFIED_DOMAINS": "Verified domains",
+      "VERIFIED_DOMAINS": "Organization Domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",

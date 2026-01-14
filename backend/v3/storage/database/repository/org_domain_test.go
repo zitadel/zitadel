@@ -68,7 +68,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "add verified domain",
+			name: "add Organization Domain (verified)",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
@@ -79,7 +79,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "add primary domain",
+			name: "add Organization Domain as current",
 			organizationDomain: domain.AddOrganizationDomain{
 				InstanceID:     instanceID,
 				OrgID:          orgID,
@@ -281,7 +281,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 		err      error
 	}{
 		{
-			name: "get primary domain",
+			name: "get Organization Domain",
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instanceID),
@@ -333,7 +333,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "get verified domain",
+			name: "get Organization Domain (verified)",
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instanceID),
@@ -467,7 +467,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			expectedCount: 3,
 		},
 		{
-			name: "list verified domains",
+			name: "list Organization Domains (verified)",
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instance.ID),
@@ -477,7 +477,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			expectedCount: 2,
 		},
 		{
-			name: "list primary domains",
+			name: "list Organization Domains (current)",
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					domainRepo.InstanceIDCondition(instance.ID),

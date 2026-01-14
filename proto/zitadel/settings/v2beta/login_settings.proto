@@ -82,10 +82,10 @@ message LoginSettings {
   ];
   repeated SecondFactorType second_factors = 14;
   repeated MultiFactorType multi_factors = 15;
-  // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
+  // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the Organization Domains and will redirect to the registration of that organization on success.
   bool allow_domain_discovery = 16 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
+      description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the Organization Domains and will redirect to the registration of that organization on success."
     }
   ];
   bool disable_login_with_email = 17 [

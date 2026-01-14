@@ -52,7 +52,7 @@ message OrganizationNameQuery {
 }
 
 message OrganizationDomainQuery {
-  // Domain used in organization, not necessary primary domain.
+  // Domain used in organization, not necessarily the Organization Domain.
   string domain = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

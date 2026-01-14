@@ -438,7 +438,7 @@ service OrganizationService {
   //
   // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
-  // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
+  // Generate a new file to be able to verify your Organization Domain with DNS or HTTP challenge.
   //
   // Required permission:
   //  - `org.write`

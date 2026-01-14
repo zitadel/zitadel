@@ -700,7 +700,7 @@
     "USERNAME": "Numele utilizatorului",
     "ORGNAME": "Numele organizației",
     "ORGID": "ID-ul organizației",
-    "PRIMARYDOMAIN": "Domeniu principal",
+    "PRIMARYDOMAIN": "Domeniu organizație",
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
     "METHODS": {
@@ -1418,7 +1418,7 @@
       },
       "DOWNLOAD_FILE": "Descărcați fișierul",
       "SELECTORGTOOLTIP": "Selectați această organizație.",
-      "PRIMARYDOMAIN": "Domeniu principal",
+      "PRIMARYDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "USEPASSWORD": "Setați parola inițială",
       "USEPASSWORDDESC": "Utilizatorul nu trebuie să seteze parola în timpul inițializării."

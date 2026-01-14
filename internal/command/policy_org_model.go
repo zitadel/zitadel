@@ -179,7 +179,7 @@ func (wm *DomainPolicyUsernamesWriteModel) newUsername(username string, userLogi
 		return username + "@" + wm.PrimaryDomain
 	}
 	// the UserLoginMustBeDomain is currently false
-	// which means the usernames might already be suffixed by a verified domain
+	// which means the usernames might already be suffixed by an organization domain
 	// so let's remove a potential duplicate suffix
 	for _, verifiedDomain := range wm.VerifiedDomains {
 		if index := strings.LastIndex(username, "@"+verifiedDomain); index > 0 {

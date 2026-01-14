@@ -702,7 +702,7 @@
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
     "ORGID": "ID organizace",
-    "PRIMARYDOMAIN": "Primární doména",
+    "PRIMARYDOMAIN": "Doména organizace",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Stáhnout soubor",
       "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",
-      "PRIMARYDOMAIN": "Primární doména",
+      "PRIMARYDOMAIN": "Doména organizace",
       "STATE": "Stav",
       "USEPASSWORD": "Nastavit počáteční heslo",
       "USEPASSWORDDESC": "Uživatel nemusí během inicializace nastavovat heslo."

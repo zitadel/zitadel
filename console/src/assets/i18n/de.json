@@ -702,7 +702,7 @@
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primäre Domäne",
+    "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
-      "PRIMARYDOMAIN": "Primäre Domain",
+      "PRIMARYDOMAIN": "Organisationsdomäne",
       "STATE": "Status",
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initialisierung nicht setzen."

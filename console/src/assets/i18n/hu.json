@@ -702,7 +702,7 @@
     "USERNAME": "Felhasználói Név",
     "ORGNAME": "Szervezet Neve",
     "ORGID": "Szervezet ID",
-    "PRIMARYDOMAIN": "Elsődleges Domain",
+    "PRIMARYDOMAIN": "Szervezeti domain",
     "PROJECTNAME": "Projekt Neve",
     "RESOURCEOWNER": "Erőforrás Tulajdonos",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Fájl letöltése",
       "SELECTORGTOOLTIP": "Ezt a szervezetet válaszd.",
-      "PRIMARYDOMAIN": "Elsődleges Domain",
+      "PRIMARYDOMAIN": "Szervezeti domain",
       "STATE": "Állapot",
       "USEPASSWORD": "Első jelszó beállítása",
       "USEPASSWORDDESC": "A felhasználónak nem kell jelszót beállítania az inicializálás során."

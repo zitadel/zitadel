@@ -702,7 +702,7 @@
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primär domän",
+    "PRIMARYDOMAIN": "Organisationsdomän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Ladda ner fil",
       "SELECTORGTOOLTIP": "Välj denna organisation.",
-      "PRIMARYDOMAIN": "Primär domän",
+      "PRIMARYDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "USEPASSWORD": "Ange initialt lösenord",
       "USEPASSWORDDESC": "Användaren behöver inte ange lösenordet under initialiseringen."

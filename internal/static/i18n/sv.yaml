@@ -222,7 +222,7 @@ Errors:
     DomainVerificationHTTPNotFound: Filen som innehåller utmaningen hittades inte på den förväntade URL:en. Kontrollera att du har laddat upp filen på rätt plats med läsbehörigheter
     DomainVerificationHTTPNoMatch: Filen som innehåller utmaningen har hittats på den förväntade URL:en men den innehåller inte rätt token-text. Kontrollera dess innehåll
     DomainVerificationTimeout: Det uppstod en timeout vid förfrågan till DNS-servern
-    PrimaryDomainNotDeletable: Primär domän får inte raderas
+    PrimaryDomainNotDeletable: Organisationsdomän får inte raderas
     DomainNotFound: Domän hittades inte
     MemberIDMissing: Medlems-ID saknas
     MemberNotFound: Organisationsmedlem hittades inte
