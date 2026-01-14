@@ -180,7 +180,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.PlainAuth.User),
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
 		)
-	} else {
+	} else if e.User != "" || e.Password != nil {
 		columns = append(columns,
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthUser, e.User),
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password),
