@@ -173,7 +173,7 @@ In this case these are the following events:
 - Password verification failed
 - One-time password (OTP) check failed (Authenticator Apps like Authy, Google Authenticator, etc)
 - Universal Second Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc)
-- Passwordless/Passkey check failed (FaceID, WindowsHello, FingerPrint, etc)
+- Passkey check failed (FaceID, WindowsHello, FingerPrint, etc)
 
 ```bash
 curl --request POST \

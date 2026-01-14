@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Impossibile caricare la sessione",
       "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
       "failedPrecondition": "Precondizione non soddisfatta",
-      "sessionNotValid": "La sessione non è valida"
+      "sessionNotValid": "La sessione non è valida",
+      "passwordVerificationMissing": "Manca la verifica della password.",
+      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
-        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
-        "couldNotSetSession": "Impossibile impostare la sessione",
-        "couldNotGetUser": "Impossibile recuperare i dati dell'utente",
-        "couldNotRetrieveSessionCookie": "Impossibile recuperare il cookie di sessione"
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
       }
     },
     "set": {
@@ -285,7 +284,7 @@
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
       "info": {
         "description": "Una passkey è un metodo di autenticazione su un dispositivo come la tua impronta digitale, Apple FaceID o simili.",
-        "link": "Autenticazione senza password"
+        "link": "Autenticazione con Passkey"
       },
       "skip": "Salta",
       "submit": "Continua"
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "L'utente è già verificato!",
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
-      "emailSendFailed": "Impossibile inviare l'email di verifica"
+      "emailSendFailed": "Impossibile inviare l'email di verifica",
+      "contextMissing": "Si è verificato un errore. Riprova."
     }
   },
   "authenticator": {

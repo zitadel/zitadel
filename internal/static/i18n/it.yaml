@@ -177,7 +177,7 @@ Errors:
       U2F:
         NotExisting: U2F non esistente
       Passwordless:
-        NotExisting: Passwordless non esistente
+        NotExisting: Passkey non esistente
       RecoveryCodes:
         InvalidCode: Codice di recupero non valido fornito
         MaxCountExceeded: Numero massimo di codici di recupero superato
@@ -805,14 +805,14 @@ EventTypes:
           skipped: Inizializzazione saltata
       passwordless:
         token:
-          added: Aggiunto il token per l'autenticazione passwordless
-          verified: Token per l'autenticazione passwordless verificato
-          removed: Token per l'autenticazione passwordless rimosso
+          added: Aggiunto il token per l'autenticazione con passkey
+          verified: Token per l'autenticazione con passkey verificato
+          removed: Token per l'autenticazione con passkey rimosso
           begin:
-            login: Avviata l'autenticazione passwordless
+            login: Avviata l'autenticazione con passkey
           check:
-            succeeded: Controllo dell'autenticazione passwordless riuscito
-            failed: Controllo dell'autenticazione passwordless fallito
+            succeeded: Controllo dell'autenticazione con passkey riuscito
+            failed: Controllo dell'autenticazione con passkey fallito
           signcount:
             changed: Il checksum è stato cambiato
         initialization:

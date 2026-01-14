@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// GetSMTPConfig reads the iam SMTP provider config
+// GetActiveEmailConfig reads the iam SMTP provider config
 func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.Config, error) {
 	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
