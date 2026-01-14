@@ -46,12 +46,12 @@ DomainClaimed:
   Text: Het domein {{.Domain}} is geclaimd door een organisatie. Uw huidige gebruiker {{.Username}} is geen onderdeel van deze organisatie. Daarom moet u uw email veranderen wanneer u inlogt. We hebben een tijdelijke gebruikersnaam ({{.TempUsername}}) voor deze login gecreëerd.
   ButtonText: Inloggen
 PasswordlessRegistration:
-  Title: Voeg Wachtwoordloze Login Toe
-  PreHeader: Voeg Wachtwoordloze Login Toe
-  Subject: Voeg Wachtwoordloze Login Toe
+  Title: Voeg Passkey Toe
+  PreHeader: Voeg Passkey Toe
+  Subject: Voeg Passkey Toe
   Greeting: Hallo {{.DisplayName}},
-  Text: We hebben een verzoek ontvangen om een token toe te voegen voor wachtwoordloze login. Gebruik de knop hieronder om uw token of apparaat toe te voegen voor wachtwoordloze login.
-  ButtonText: Voeg Wachtwoordloze Login Toe
+  Text: We hebben een verzoek ontvangen om een token toe te voegen voor passkey login. Gebruik de knop hieronder om uw token of apparaat toe te voegen voor passkey login.
+  ButtonText: Voeg Passkey Login Toe
 PasswordChange:
   Title: Wachtwoord van gebruiker is veranderd
   PreHeader: Verander wachtwoord

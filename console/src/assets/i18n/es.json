@@ -219,7 +219,7 @@
           "DC": "Cuando reclamas un dominio para tu organización, a los usuarios que no utilicen este dominio en su nombre de inicio de sesión se les solicitará cambiar su nombre de inicio de sesión para que coincida con el dominio reclamado.",
           "INIT": "Cuando se crea un usuario, recibirá un correo electrónico con un enlace para establecer su contraseña.",
           "PC": "Cuando un usuario cambia su contraseña, recibirá una notificación sobre el cambio si has habilitado esto en la configuración de notificaciones.",
-          "PL": "Cuando un usuario agrega un método de autenticación sin contraseña, necesita activarlo haciendo clic en un enlace en un correo electrónico.",
+          "PL": "Cuando un usuario agrega una llave de acceso como método de autenticación, necesita activarlo haciendo clic en un enlace en un correo electrónico.",
           "PR": "Cuando un usuario restablece su contraseña, recibirá un correo electrónico con un enlace para establecer una nueva contraseña.",
           "VE": "Cuando un usuario cambia su dirección de correo electrónico, recibirá un correo electrónico con un enlace para verificar la nueva dirección.",
           "VP": "Cuando un usuario cambia su número de teléfono, recibirá un SMS con un código para verificar el nuevo número.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Personaliza el formulario de inicio de sesión.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Permitido Nombre de Usuario y Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con su nombre de usuario y contraseña. Si esto está desactivado, tus usuarios solo pueden iniciar sesión utilizando autenticación sin contraseña o con un proveedor de identidad externo."
+            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con su nombre de usuario y contraseña. Si esto está desactivado, tus usuarios solo pueden iniciar sesión utilizando llaves de acceso o con un proveedor de identidad externo."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Permitida la Registración de Usuarios",
@@ -840,19 +840,19 @@
       "TABLESTATE": "Estado",
       "NAME": "Nombre",
       "EMPTY": "No se han configurado dispositivos",
-      "TITLE": "Autenticación sin contraseña",
-      "DESCRIPTION": "Añadir métodos de autenticación basados en WebAuthn para iniciar sesión en ZITADEL sin contraseña.",
+      "TITLE": "Llave de acceso",
+      "DESCRIPTION": "Añadir métodos de autenticación basados en WebAuthn para iniciar sesión en ZITADEL con una llave de acceso.",
       "MANAGE_DESCRIPTION": "Gestiona los métodos de doble factor de tus usuarios.",
       "U2F": "Añadir método",
       "U2F_DIALOG_TITLE": "Verificar autenticador",
-      "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para el inicio de sesión sin contraseña utilizado",
-      "U2F_SUCCESS": "¡La autenticación sin contraseña se creó con éxito!",
+      "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para el inicio de sesión con llave de acceso utilizado",
+      "U2F_SUCCESS": "¡La llave de acceso se creó con éxito!",
       "U2F_ERROR": "¡Se ha producido un error durante la configuración!",
       "U2F_NAME": "Nombre de autenticador",
       "TYPE": {
         "0": "No se ha definido MFA",
         "1": "One Time Password (OTP)",
-        "2": "Huella dactilar, claves de seguridad, Face ID y otros"
+        "2": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)"
       },
       "STATE": {
         "0": "Sin estado",
@@ -861,17 +861,17 @@
         "3": "Borrado"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Eliminar método de autenticación sin contraseña",
-        "DELETE_DESCRIPTION": "Estás a punto de borrar un método de autenticación sin contraseña. ¿Estás seguro?",
-        "ADD_TITLE": "Autenticación sin contraseña",
-        "ADD_DESCRIPTION": "Selecciona una de las opciones disponibles para crear un método de autenticación sin contraseña.",
+        "DELETE_TITLE": "Eliminar llave de acceso",
+        "DELETE_DESCRIPTION": "Estás a punto de borrar una llave de acceso. ¿Estás seguro?",
+        "ADD_TITLE": "Llave de acceso",
+        "ADD_DESCRIPTION": "Selecciona una de las opciones disponibles para crear una llave de acceso.",
         "SEND_DESCRIPTION": "Envíate a ti mismo un enlace de registro a tu dirección de email.",
         "SEND": "Enviar enlace de registro",
         "SENT": "El email fue enviado con éxito. Comprueba tu buzón para continuar con la configuración.",
         "QRCODE_DESCRIPTION": "Genera un código QR para escanearlo con otro dispositivo.",
         "QRCODE": "Generar código QR",
         "QRCODE_SCAN": "Escanea este código QR para continuar con la configuración de tu dispositivo.",
-        "NEW_DESCRIPTION": "Utiliza este dispositivo para configurar la autenticación sin contraseña.",
+        "NEW_DESCRIPTION": "Utiliza este dispositivo para configurar una llave de acceso.",
         "NEW": "Añadir nueva"
       }
     },
@@ -887,7 +887,7 @@
       "OTP": "App autenticadora para TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Añadir TOTP",
       "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una app autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
-      "U2F": "Huella dactilar, claves de seguridad, Face ID y otros",
+      "U2F": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)",
       "U2F_DIALOG_TITLE": "Verificar factor",
       "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para tu Multifactor universal.",
       "U2F_SUCCESS": "¡Factor añadido con éxito!",
@@ -902,7 +902,7 @@
       "TYPE": {
         "0": "No se ha definido MFA",
         "1": "One Time Password (OTP)",
-        "2": "Huella dactilar, claves de seguridad, Face ID y otros"
+        "2": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)"
       },
       "STATE": {
         "0": "Sin estado",
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Enviado código de verificación para el email.",
       "OTPREMOVED": "OTP eliminado.",
       "U2FREMOVED": "Factor eliminado.",
-      "PASSWORDLESSREMOVED": "Acceso sin contraseña eliminado.",
+      "PASSWORDLESSREMOVED": "Llave de acceso eliminada.",
       "INITIALPASSWORDSET": "Se estableció una contraseña inicial.",
       "PASSWORDNOTIFICATIONSENT": "Se envió una notificación de cambio de contraseña.",
       "PASSWORDCHANGED": "La contraseña se cambió con éxito.",
@@ -1610,7 +1610,7 @@
         "2": "Verificación de email",
         "3": "Verificación de teléfono",
         "4": "Restablecimiento de contraseña",
-        "5": "Inicialización de acceso sin contraseña",
+        "5": "Inicialización de llave de acceso",
         "6": "Secreto de App",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
@@ -1689,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificación",
       "DESCRIPTION": "Determina en qué cambios se enviarán notificaciones.",
-      "PASSWORDCHANGE": "Cambio de contraseña"
+      "PASSWORDCHANGE": "Contraseña cambiada"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Da a tu inicio de sesión tu estilo personalizado y modifica su comportamiento.",
@@ -1839,10 +1839,10 @@
         "usernameChangeText": "Cambio de nombre de usuario",
         "verifyMfaOtpText": "Verificar OTP",
         "verifyMfaU2fText": "Verificar doble factor universal",
-        "passwordlessPromptText": "Diálogo de entrada de acceso sin contraseña",
-        "passwordlessRegistrationDoneText": "Registro sin contraseña, hecho",
-        "passwordlessRegistrationText": "Registro sin contraseña",
-        "passwordlessText": "Acceso sin contraseña",
+        "passwordlessPromptText": "Símbolo de llave de acceso",
+        "passwordlessRegistrationDoneText": "Registro de llave de acceso completado",
+        "passwordlessRegistrationText": "Registro de llave de acceso",
+        "passwordlessText": "Llave de acceso",
         "externalRegistrationUserOverviewText": "Resumen de registro de usuario externo"
       }
     },
@@ -1856,7 +1856,7 @@
         "VEO": "Verificar OTP de correo electrónico",
         "PR": "Restablecimiento de contraseña",
         "DC": "Reclamar un dominio",
-        "PL": "Acceso sin contraseña",
+        "PL": "Llave de acceso",
         "PC": "Cambio de contraseña",
         "IU": "Invitar usuario"
       },
@@ -2380,8 +2380,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Acceso sin contraseña",
-      "MULTIFACTORDESCRIPTION": "Define tus multifactores para tu autenticación sin contraseña aquí.",
+      "MULTIFACTORTITLE": "Llave de acceso",
+      "MULTIFACTORDESCRIPTION": "Define tus multifactores para tu autenticación con llave de acceso aquí.",
       "SECONDFACTORTITLE": "Autenticación multifactor",
       "SECONDFACTORDESCRIPTION": "Define otros factores posibles con los que puedes asegurar tu autenticación con contraseña."
     },
@@ -2401,12 +2401,12 @@
     "TYPE": "Tipo",
     "MULTIFACTORTYPES": {
       "0": "Desconocido",
-      "1": "Huella dactilar, claves de seguridad, Face ID y otros"
+      "1": "Llave de acceso"
     },
     "SECONDFACTORTYPES": {
       "0": "Desconocido",
       "1": "One Time Password por Authenticator App (TOTP)",
-      "2": "Huella dactilar, claves de seguridad, Face ID y otros",
+      "2": "Llave de acceso",
       "3": "One Time Password por email (Email OTP)",
       "4": "One Time Password por SMS (SMS OTP)",
       "5": "Códigos de recuperación"
@@ -2423,7 +2423,7 @@
       "DESCRIPTION": "Puedes seleccionar proveedores predefinidos o creados por uno mismo para la autenticación.",
       "SELECTIDPS": "Proveedores de identidad (IDP)"
     },
-    "PASSWORDLESS": "Inicio de sesión sin contraseña",
+    "PASSWORDLESS": "Inicio de sesión con llave de acceso",
     "PASSWORDLESSTYPE": {
       "0": "No permitido",
       "1": "Permitido"
