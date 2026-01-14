@@ -73,7 +73,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	case LogFormatGCPErrorReporting:
 		zerrors.EnableReportLocation(true)
 		options.ReplaceAttr = replaceErrAttr
-		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
+		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
 	}
 
 	stdErrHandler = slogctx.NewHandler(

@@ -79,7 +79,7 @@ Instrumentation:
 
 # Legacy logging (Deprecated, see Instrumentation.Slog)
 Log:
-  Level: fatal # ZITADEL_LOG_LEVEL
+  Level: info # ZITADEL_LOG_LEVEL
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 
