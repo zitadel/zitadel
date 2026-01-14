@@ -99,6 +99,13 @@ module.exports = {
             {
               type: "category",
               label: "Mobile & Native",
+              link: {
+                type: "generated-index",
+                title: "Mobile & Native Quickstart Guides",
+                slug: "/examples/introduction/mobile",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Mobile & Native applications.",
+              },
               items: [
                 "examples/login/flutter",
               ],
@@ -106,6 +113,13 @@ module.exports = {
             {
               type: "category",
               label: "Full-Stack / SSR",
+              link: {
+                type: "generated-index",
+                title: "Full-Stack / SSR Quickstart Guides",
+                slug: "/examples/introduction/fullstack",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
+              },
               items: [
                 "examples/login/nextjs",
                 "examples/login/nextjs-b2b",
@@ -114,6 +128,13 @@ module.exports = {
             {
               type: "category",
               label: "Web App (Server-Side)",
+              link: {
+                type: "generated-index",
+                title: "Web App (Server-Side) Quickstart Guides",
+                slug: "/examples/introduction/webapp",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
+              },
               items: [
                 "examples/login/symfony",
                 "examples/login/java-spring",
