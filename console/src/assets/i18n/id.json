@@ -1685,7 +1685,7 @@
     "NOTIFICATION": {
       "TITLE": "Pemberitahuan",
       "DESCRIPTION": "Menentukan perubahan apa, pemberitahuan akan dikirim.",
-      "PASSWORDCHANGE": "Perubahan kata sandi"
+      "PASSWORDCHANGE": "Kata sandi diubah"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Berikan login gaya pribadi Anda dan ubah perilakunya.",

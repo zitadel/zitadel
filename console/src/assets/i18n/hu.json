@@ -1686,7 +1686,7 @@
     "NOTIFICATION": {
       "TITLE": "Értesítés",
       "DESCRIPTION": "Meghatározza, hogy milyen változások esetén lesznek értesítések küldve.",
-      "PASSWORDCHANGE": "Jelszó megváltoztatása"
+      "PASSWORDCHANGE": "Jelszó megváltoztatva"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Adj egyéni stílust a bejelentkezésnek, és módosítsd a viselkedését.",
