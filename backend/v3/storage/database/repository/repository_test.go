@@ -94,7 +94,7 @@ func savepointForRollback(t *testing.T, tx database.Transaction) (savepoint data
 	}
 }
 
-func createInstance(t *testing.T, tx database.Transaction) (instanceID string) {
+func createInstance(t *testing.T, tx database.QueryExecutor) (instanceID string) {
 	t.Helper()
 	instance := domain.Instance{
 		ID:              gofakeit.UUID(),
@@ -112,7 +112,7 @@ func createInstance(t *testing.T, tx database.Transaction) (instanceID string) {
 	return instance.ID
 }
 
-func createOrganization(t *testing.T, tx database.Transaction, instanceID string) (orgID string) {
+func createOrganization(t *testing.T, tx database.QueryExecutor, instanceID string) (orgID string) {
 	t.Helper()
 	org := domain.Organization{
 		InstanceID: instanceID,
@@ -127,7 +127,7 @@ func createOrganization(t *testing.T, tx database.Transaction, instanceID string
 	return org.ID
 }
 
-func createProject(t *testing.T, tx database.Transaction, instanceID, orgID string) (projectID string) {
+func createProject(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) (projectID string) {
 	t.Helper()
 	project := domain.Project{
 		InstanceID:     instanceID,
@@ -143,7 +143,7 @@ func createProject(t *testing.T, tx database.Transaction, instanceID, orgID stri
 	return project.ID
 }
 
-func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID, projectID, key string) string {
+func createProjectRole(t *testing.T, tx database.QueryExecutor, instanceID, orgID, projectID, key string) string {
 	t.Helper()
 	if key == "" {
 		key = integration.RoleKey()

@@ -24,7 +24,7 @@ type MachineUser struct {
 	Name            string                  `json:"name,omitempty" db:"name"`
 	Description     string                  `json:"description,omitempty" db:"description"`
 	Secret          []byte                  `json:"secret,omitempty" db:"secret"`
-	AccessTokenType PersonalAccessTokenType `json:"access_token_type,omitempty" db:"access_token_type"`
+	AccessTokenType PersonalAccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 
 	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"pats"`
 	Keys []*MachineKey          `json:"keys,omitempty" db:"keys"`

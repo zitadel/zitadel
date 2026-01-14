@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"context"
 	"encoding/base64"
 	"testing"
 	"time"
@@ -16,8 +15,9 @@ import (
 )
 
 func Test_machineUser_create(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	t.Cleanup(rollback)
+	// tx, rollback := transactionForRollback(t)
+	// t.Cleanup(rollback)
+	tx := pool
 
 	userRepo := repository.UserRepository()
 
@@ -51,7 +51,7 @@ func Test_machineUser_create(t *testing.T) {
 	}
 	type test struct {
 		name  string
-		setup func(t *testing.T, tx database.Transaction) error
+		setup func(t *testing.T, tx database.QueryExecutor) error
 		args  args
 		want  want
 	}
@@ -169,9 +169,51 @@ func Test_machineUser_create(t *testing.T) {
 				},
 			}
 		}(),
-		// {
-		// 	name: "with keys",
-		// },
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			key := &domain.MachineKey{
+				ID:        gofakeit.UUID(),
+				PublicKey: []byte(base64.StdEncoding.EncodeToString([]byte("secret"))),
+				CreatedAt: createdAt,
+				ExpiresAt: createdAt.Add(24 * time.Hour),
+				Type:      domain.MachineKeyTypeJSON,
+			}
+			return test{
+				name: "with keys",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Machine: &domain.MachineUser{
+							Name:        "machine",
+							Description: "description",
+							Keys:        []*domain.MachineKey{key},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Machine: &domain.MachineUser{
+							Name:        "machine",
+							Description: "description",
+							Keys:        []*domain.MachineKey{key},
+						},
+					},
+				},
+			}
+		}(),
 		// {
 		// 	name: "with personal access tokens",
 		// },
@@ -184,14 +226,17 @@ func Test_machineUser_create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			savepoint, err := tx.Begin(t.Context())
-			require.NoError(t, err)
-			t.Cleanup(func() {
-				err := savepoint.Rollback(context.Background())
-				if err != nil {
-					t.Log("rollback savepoint failed", err)
-				}
-			})
+			// savepoint, err := tx.Begin(t.Context())
+			// require.NoError(t, err)
+			// t.Cleanup(func() {
+			// 	err := savepoint.Rollback(context.Background())
+			// 	if err != nil {
+			// 		t.Log("rollback savepoint failed", err)
+			// 	}
+			// })
+			savepoint := tx
+			var err error
+
 			if tt.setup != nil {
 				err := tt.setup(t, savepoint)
 				require.NoError(t, err)

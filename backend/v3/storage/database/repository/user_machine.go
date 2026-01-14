@@ -23,8 +23,7 @@ func (u userMachine) create(ctx context.Context, client database.QueryExecutor, 
 			", name, description, secret, access_token_type, created_at, updated_at)"+
 			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, ",
 		user.InstanceID, user.OrganizationID, user.ID, user.Username, user.State, "machine",
-		user.Machine.Name, user.Machine.Description,
-		user.Machine.Secret, uint8(user.Machine.AccessTokenType),
+		user.Machine.Name, user.Machine.Description, user.Machine.Secret, uint8(user.Machine.AccessTokenType),
 	)
 	builder.WriteArgs(createdAt, createdAt)
 	builder.WriteString(") RETURNING *)")

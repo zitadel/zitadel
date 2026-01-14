@@ -39,8 +39,7 @@ func (u user) Create(ctx context.Context, client database.QueryExecutor, user *d
 	var create func(context.Context, database.QueryExecutor, *domain.User) error
 	if user.Human != nil {
 		create = userHuman{user: u}.create
-	}
-	if user.Machine != nil {
+	} else if user.Machine != nil {
 		create = userMachine{user: u}.create
 	}
 	return create(ctx, client, user)
@@ -61,7 +60,7 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	", users.state, users.created_at, users.updated_at" +
 	// machine columns
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
-	`, 'description', users.description, 'secret', users.secret` +
+	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
 	`, 'accessTokenType', users.access_token_type) END AS machine` +
 	// human columns
 	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
@@ -69,7 +68,7 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
 	`, 'avatarKey', users.avatar_key` +
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
-	`, 'password', users.password, 'passwordChangeRequired', users.password_change_required` +
+	`, 'password', encode(users.password, 'base64'), 'passwordChangeRequired', users.password_change_required` +
 	`, 'passwordVerifiedAt', users.password_verified_at` +
 	// -- users.password_verification_id
 	`, 'failedPasswordAttempts', users.failed_password_attempts, 'email', users.email` +
