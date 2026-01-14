@@ -1691,7 +1691,7 @@
     "NOTIFICATION": {
       "TITLE": "通知",
       "DESCRIPTION": "确定将发送哪些更改、通知",
-      "PASSWORDCHANGE": "更改密码"
+      "PASSWORDCHANGE": "密码已更改"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",

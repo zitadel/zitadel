@@ -1688,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Oznámení",
       "DESCRIPTION": "Určuje, při jakých změnách budou odesílána oznámení.",
-      "PASSWORDCHANGE": "Změna hesla"
+      "PASSWORDCHANGE": "Heslo změněno"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Upravte si přihlašovací stránku podle svého stylu a změňte její chování.",

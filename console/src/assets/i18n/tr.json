@@ -1691,7 +1691,7 @@
     "NOTIFICATION": {
       "TITLE": "Bildirim",
       "DESCRIPTION": "Hangi değişikliklerde bildirimlerin gönderileceğini belirler.",
-      "PASSWORDCHANGE": "Şifre değişikliği"
+      "PASSWORDCHANGE": "Şifre değiştirildi"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Girişe kişiselleştirilmiş tarzınızı verin ve davranışını değiştirin.",
