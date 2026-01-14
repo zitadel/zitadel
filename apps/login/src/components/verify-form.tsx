@@ -25,18 +25,11 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  organization,
-  requestId,
-  code,
-  isInvite,
-}: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },
@@ -73,9 +66,7 @@ export function VerifyForm({
   }
 
   const fcn = useCallback(
-    async function submitCodeAndContinue(
-      value: Inputs,
-    ): Promise<boolean | void> {
+    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setLoading(true);
 
       const response = await sendVerification({
