@@ -28,7 +28,7 @@ type Props = {
 
 export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("password");
