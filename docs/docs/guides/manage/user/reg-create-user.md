@@ -14,9 +14,9 @@ If you are collecting all the user information and a password, you can directly 
 With the `password_change_required` flag you can choose if the user has to change the password on the first login or not.
 This might make sense if an administrator created the user.
 
-## With passwordless
+## With passkey
 
-You can directly ask for a link to create the passwordless registration for the user. 
+You can directly ask for a link to create the passkey registration for the user. 
 Fill the user data and set the attribute `request_passwordless_registration` to true.
 You will get a link for the registration and an expiration time in the response.
 
@@ -27,11 +27,11 @@ If you add `requestPlatformType` as query parameter to the link you can define w
 
 If nothing is requested, the type will not be restricted and all possibilities of the device will be taken into account.
 
-### Add passwordless to existing user
+### Add passkey to existing user
 
-If you already have a user in ZITADEL, it is possible to add passwordless later.
+If you already have a user in ZITADEL, it is possible to add passkey later.
 
-[Add Passwordless Registration ](/apis/resources/mgmt)
+[Add Passkey Registration ](/apis/resources/mgmt)
 
 Send the user_id in the request and you will get a link and an expiration as response.
 You can then customize the link the same as described above in the creation process.
@@ -39,7 +39,7 @@ You can then customize the link the same as described above in the creation proc
 The second possibility is to send the link directly to the user per email.
 Use the following request in that case:
 
-[Send Passwordless Registration ](/apis/resources/mgmt)
+[Send Passkey Registration ](/apis/resources/mgmt)
 
 ## Verified Email Address
 

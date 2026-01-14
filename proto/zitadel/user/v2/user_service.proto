@@ -1737,7 +1737,7 @@ service UserService {
 
   // List all possible authentication methods of a user
   //
-  // List all possible authentication methods of a user like password, passwordless, (T)OTP and more..
+  // List all possible authentication methods of a user like password, passkey, (T)OTP and more..
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}/authentication_methods"

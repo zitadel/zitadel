@@ -22,7 +22,7 @@ Downtime Period means a period of one or more consecutive minutes of Downtime. P
 
 Downtime means any period of time in which Core Services are not Available within the Region of the customer’s organization. Downtime excludes any time in which ZITADEL Cloud is not Available because of
 
-- [Announced maintenance work](/docs/support/software-release-cycles-support#maintenance)
+- [Announced maintenance work](https://help.zitadel.com/zitadel-software-release-cycle#maintenance)
 - Emergency maintenance
 - Force majeure events.
 
