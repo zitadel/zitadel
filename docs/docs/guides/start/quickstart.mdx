@@ -5,11 +5,14 @@ sidebar_label: Quick Start Guide
 
 import { ResponsivePlayer } from "../../../src/components/player";
 
-In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL.
+In this quick start guide, you’ll learn how to set up Zitadel and use it to secure a React Single Page Application (SPA).
 
 <ResponsivePlayer controls url='https://www.youtube.com/watch?v=5THbQljoPKg' />
 
-The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE) flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
+This sample app implements the [OIDC PKCE](/docs/guides/integrate/login/oidc/login-users) flow for secure authentication.
+- Login: Exchanges a code challenge for an access token via ZITADEL.
+- Authorize: Uses the token to retrieve profile data from the userinfo endpoint.
+- Logout: Clears the local session and revokes the token.
 
 ## ZITADEL terminology: instances, organizations, projects, users, roles, authorizations and apps
 
@@ -67,25 +70,26 @@ The order of creation for the above components may vary depending on the specifi
 
 ### 1. Sign up for the ZITADEL Cloud customer portal and register your organization
 
-1. Go to [zitadel.com](http://zitadel.com) and click “Start for FREE”.
+1. Go to [zitadel.com](http://zitadel.com) and click “Sign up”.
 
-![Home Page](/img/guides/quickstart/v3_1.png)
+![Home Page](/img/guides/quickstart/cloud_sign_up.png)
 
-2. You can sign up by entering your email address or via social login, e.g., Google. Let's sign up using an email address. Enter your email address and click "Sign in with Email".
+2. You can sign up by entering your name and email address or via social login, e.g., Google. Let's sign up using an email address. Click "Get Started".
 
-![Registration Page](/img/guides/quickstart/v3_2.png)
+![Registration Page](/img/guides/quickstart/cloud_register.png)
 
-3. Next, complete your details and click "Continue".
+3. Next, add your team name and click "Create your account".
 
-![Congratulations Page](/img/guides/quickstart/v3_3.png)
+![Registration Team Page](/img/guides/quickstart/cloud_register_team.png)
 
-4. Add a password as shown below. Adhere to the password requirements, agree to the terms of service and privacy policy by selecting the checkbox, and click the "Get started" button.
+4. Your account is created, please verify your email.
 
-![Code](/img/guides/quickstart/v3_4.png)
+![Registration Verify Email](/img/guides/quickstart/cloud_register_email_code.png)
+![Inbox Verification Email](/img/guides/quickstart/cloud_register_verification_email.png)
 
-5. Enter your login data. Provide the password you just created. Click "next".
+5. Choose and set up your preferred authentication method. We recommend using Passkey.
 
-![Inbox](/img/guides/quickstart/v3_5.png)
+![Register Authentication Method](/img/guides/quickstart/cloud_register_authentication.png)
 
 6. You will now have to verify your email address.
 
