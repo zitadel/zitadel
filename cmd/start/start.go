@@ -21,7 +21,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
@@ -750,7 +749,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	errCh := make(chan error)
 
 	go func() {
-		logging.Infof("server is listening on %s", lis.Addr().String())
+		slog.Info("server is listening", "address", lis.Addr().String())
 		if tlsConfig != nil {
 			// we don't need to pass the files here, because we already initialized the TLS config on the server
 			errCh <- http1Server.ServeTLS(lis, "", "")
@@ -776,7 +775,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	if err != nil {
 		return fmt.Errorf("could not shutdown gracefully: %w", err)
 	}
-	logging.New().Info("server shutdown gracefully")
+	slog.InfoContext(ctx, "server shutdown gracefully")
 	return nil
 }
 
