@@ -132,6 +132,7 @@
   --input-border: #1a191954;
   --input-hover-border: #000000;
   --input-background: #00000004;
+  --ifm-global-radius: 12px;
 }
 
 .tile-wrapper {
@@ -175,6 +176,7 @@ pre code {
   text-transform: uppercase;
   color: #6b7280;
 }
+
 
 .navbar:not(.navbar-sidebar--show) {
   background-color: hsla(0, 0%, 100%, 0.8);
@@ -239,13 +241,23 @@ pre code {
   background-color: #737c8850;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Lato", sans-serif;
+  letter-spacing: -0.025em; /* Tighter tracking for a modern look */
+  margin-bottom: 1rem;
+}
+
 h1 {
-  font-size: 3rem;
+  font-weight: 900; /* Use that Black weight you imported */
+  font-size: 3.5rem;
 }
 
 h2 {
-  font-size: 2.5rem;
-  margin-top: 2.5rem;
+  font-weight: 700;
+  font-size: 2.25rem;
+  margin-top: 3rem; /* More breathing room */
+  border-bottom: 1px solid var(--ifm-color-emphasis-200); /* subtle divider */
+  padding-bottom: 0.5rem;
 }
 
 h3 {
@@ -513,10 +525,25 @@ a {
 }
 
 .alert {
-  font-size: 14px;
-  border: none;
-  font-weight: 600;
+  border-radius: 8px;
+  border-left-width: 4px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
+
+.alert--info {
+  background-color: #eff6ff;
+  border-left-color: var(--ifm-color-info);
+}
+.alert--warning {
+  background-color: #fffbeb;
+  border-left-color: var(--ifm-color-warning);
+}
+/* Dark mode adjustments for alerts */
+[data-theme='dark'] .alert--info { background-color: rgba(59, 130, 246, 0.1); }
+[data-theme='dark'] .alert--warning { background-color: rgba(245, 158, 11, 0.1); }
 
 p strong {
   color: var(--font-color-strong);
