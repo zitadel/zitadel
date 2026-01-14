@@ -118,7 +118,7 @@
             "dependsOn": [
                 "generate"
             ],
-            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./...",
+            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
                 "{workspaceRoot}/go*"
@@ -212,6 +212,9 @@
             ],
             "command": "cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
+            "inputs": [
+                "{workspaceRoot}/console/dist/console/**/*"
+            ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
             ]
@@ -221,6 +224,7 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/daixiang0/gci@v0.11.2",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",

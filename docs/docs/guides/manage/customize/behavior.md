@@ -45,9 +45,9 @@ Now, make the action hook into the [external authentication flow](/apis/actions/
 
 <!-- TODO: ## Test if your action works -->
 
-New users automatically are assiged a role now if they register by authenticating with an external identity provider.
+New users automatically are assigned a role now if they register by authenticating with an external identity provider.
 
 ## What's next?
 
 - [Read more about the concepts around actions](/concepts/features/actions)
-- [Read more about all the options you have with actions](/apis/actions/introduction)
+- [Read more about all the options you have with actions](/guides/manage/console/actions-overview)

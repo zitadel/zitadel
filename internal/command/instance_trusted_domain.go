@@ -68,7 +68,7 @@ func validateTrustedDomain(trustedDomain string) (string, error) {
 	return trustedDomain, nil
 }
 
-func (c *Commands) RemoveTrustedDomain(ctx context.Context, trustedDomain string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveTrustedDomain(ctx context.Context, trustedDomain string, errorIfNotFound bool) (*domain.ObjectDetails, error) {
 	trustedDomain = strings.TrimSpace(trustedDomain)
 	if trustedDomain == "" || len(trustedDomain) > 253 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-ajAzwu", "Errors.Invalid.Argument")
@@ -83,8 +83,12 @@ func (c *Commands) RemoveTrustedDomain(ctx context.Context, trustedDomain string
 		return nil, err
 	}
 	if !slices.Contains(model.Domains, trustedDomain) {
-		return nil, zerrors.ThrowNotFound(nil, "COMMA-de3z9", "Errors.Instance.Domain.NotFound")
+		if errorIfNotFound {
+			return nil, zerrors.ThrowNotFound(nil, "COMMA-de3z9", "Errors.Instance.Domain.NotFound")
+		}
+		return nil, nil
 	}
+
 	err = c.pushAppendAndReduce(ctx, model, instance.NewTrustedDomainRemovedEvent(ctx, InstanceAggregateFromWriteModel(&model.WriteModel), trustedDomain))
 	if err != nil {
 		return nil, err

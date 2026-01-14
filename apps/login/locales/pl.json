@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Nie można załadować sesji",
       "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
       "failedPrecondition": "Nie spełniono warunków wstępnych",
-      "sessionNotValid": "Sesja jest nieważna"
+      "sessionNotValid": "Sesja jest nieważna",
+      "passwordVerificationMissing": "Brak weryfikacji hasła.",
+      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
-        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
-        "couldNotSetSession": "Nie można ustawić sesji",
-        "couldNotGetUser": "Nie można pobrać danych użytkownika",
-        "couldNotRetrieveSessionCookie": "Nie można pobrać pliku cookie sesji"
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
       }
     },
     "set": {
@@ -285,7 +284,7 @@
       "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
       "info": {
         "description": "Klucz dostępu to metoda uwierzytelniania na urządzeniu, wykorzystująca np. odcisk palca, Apple FaceID lub podobne rozwiązania.",
-        "link": "Uwierzytelnianie bez hasła"
+        "link": "Uwierzytelnianie kluczem dostępu"
       },
       "skip": "Pomiń",
       "submit": "Kontynuuj"
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
-      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej"
+      "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
     }
   },
   "authenticator": {
@@ -452,6 +452,6 @@
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
-    "couldNotContinueSession": "Nie można kontynuować sesji - brakujące informacje o użytkowniku"
+    "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
   }
 }

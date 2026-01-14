@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"fmt"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 )
 
 // traceInvoker decorates each command with tracing.
@@ -17,12 +19,9 @@ func NewTraceInvoker(next Invoker) *traceInvoker {
 }
 
 func (i *traceInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
-	ctx, span := tracer.Start(ctx, fmt.Sprintf("%T", executor))
+	ctx, span := tracing.NewNamedSpan(ctx, fmt.Sprintf("%T", executor))
 	defer func() {
-		if err != nil {
-			span.RecordError(err)
-		}
-		span.End()
+		span.EndWithError(err)
 	}()
 
 	return i.execute(ctx, executor, opts)
