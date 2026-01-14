@@ -67,10 +67,24 @@ module.exports = {
         {
           type: "category",
           label: "Example Applications",
+          link: {
+            type: "generated-index",
+            title: "Integrate",
+            slug: "examples/introduction",
+            description:
+              "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
+          },
           items: [
             {
               type: "category",
               label: "Frontend (SPA)",
+              link: {
+                type: "generated-index",
+                title: "User Service API",
+                slug: "/examples/introduction/frontend",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
+              },
               items: [
                 {
                   type: "link",
@@ -110,6 +124,13 @@ module.exports = {
             {
               type: "category",
               label: "APIs / Backend Services",
+              link: {
+                type: "generated-index",
+                title: "User Service API",
+                slug: "/examples/introduction/backend",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
+              },
               items: [
                 "examples/secure-api/go",
                 "examples/secure-api/java-spring",
@@ -184,6 +205,13 @@ module.exports = {
     {
       type: "category",
       label: "Integrate & Authenticate",
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       collapsed: true,
       items: [
         {
@@ -313,7 +341,7 @@ module.exports = {
                     "sdk-examples/client-libraries/python",
                     "sdk-examples/flask",
                     "sdk-examples/django",
-					"sdk-examples/fastapi",
+                    "sdk-examples/fastapi",
                   ],
                 },
                 {
@@ -326,7 +354,7 @@ module.exports = {
                   label: "Java",
                   items: [
                     "sdk-examples/java",
-					"sdk-examples/spring",
+                    "sdk-examples/spring",
                     "sdk-examples/client-libraries/java",
                   ],
                 },
@@ -335,7 +363,7 @@ module.exports = {
                   label: "PHP",
                   items: [
                     "sdk-examples/symfony",
-					"sdk-examples/laravel",
+                    "sdk-examples/laravel",
                     "sdk-examples/client-libraries/php",
                   ],
                 },
