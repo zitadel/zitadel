@@ -29,10 +29,10 @@ type IAMSMTPConfigWriteModel struct {
 type SMTPConfig struct {
 	TLS            bool
 	Host           string
+	User           string
 	SenderAddress  string
 	SenderName     string
 	ReplyToAddress string
-	User           string
 	PlainAuth      *instance.PlainAuth
 	XOAuth2Auth    *instance.XOAuth2Auth
 }
@@ -172,7 +172,7 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	fromName,
 	replyToAddress,
 	smtpHost string,
-	user string,
+	smtpUser string,
 	plainAuth *instance.PlainAuth,
 	xoauth2Auth *instance.XOAuth2Auth,
 ) (*instance.SMTPConfigChangedEvent, bool, error) {
@@ -203,8 +203,8 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	if wm.SMTPConfig.Host != smtpHost {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPHost(smtpHost))
 	}
-	if wm.SMTPConfig.User != user {
-		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(user))
+	if wm.SMTPConfig.User != smtpUser {
+		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(smtpUser))
 	}
 	if plainAuth != nil {
 		changes = append(changes, smtpPlainAuthChanges(wm.SMTPConfig.PlainAuth, *plainAuth)...)
@@ -334,10 +334,10 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 	wm.SMTPConfig = &SMTPConfig{
 		TLS:            e.TLS,
 		Host:           e.Host,
+		User:           e.User,
 		SenderName:     e.SenderName,
 		SenderAddress:  e.SenderAddress,
 		ReplyToAddress: e.ReplyToAddress,
-		User:           e.User,
 	}
 
 	if e.PlainAuth != nil {
@@ -399,6 +399,9 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	if e.Host != nil {
 		wm.SMTPConfig.Host = *e.Host
 	}
+	if e.User != nil {
+		wm.SMTPConfig.User = *e.User
+	}
 	if e.FromAddress != nil {
 		wm.SMTPConfig.SenderAddress = *e.FromAddress
 	}
@@ -407,9 +410,6 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	}
 	if e.ReplyToAddress != nil {
 		wm.SMTPConfig.ReplyToAddress = *e.ReplyToAddress
-	}
-	if e.User != nil {
-		wm.SMTPConfig.User = *e.User
 	}
 
 	if !e.PlainAuth.IsEmpty() {

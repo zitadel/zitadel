@@ -80,7 +80,7 @@ var (
 		"sender_name",
 		"reply_to_address",
 		"smtp_host",
-		"user",
+		"smtp_user",
 		"smtp_password",
 		"xoauth2auth_client_credentials_client_id",
 		"xoauth2auth_client_credentials_client_secret",
