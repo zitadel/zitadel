@@ -9,7 +9,7 @@ import (
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-// GetSMTPConfig is deprecated. Please move to the new endpoint GetEmailProvider.
+// Deprecated: use [GetEmailProvider] instead.
 func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
 	smtp, err := s.query.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -20,7 +20,7 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 	}, nil
 }
 
-// GetSMTPConfigById is deprecated. Please move to the new endpoint GetEmailProviderById.
+// Deprecated: use [GetEmailProviderById] instead.
 func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPConfigByIdRequest) (*admin_pb.GetSMTPConfigByIdResponse, error) {
 	smtp, err := s.query.SMTPConfigByID(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPCon
 	}, nil
 }
 
-// AddSMTPConfig is deprecated. Please move to the new endpoint AddEmailProviderSMTP
+// Deprecated: use [AddEmailProviderSMTP] instead.
 func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
 	config := addSMTPToConfig(ctx, req)
 	if err := s.command.AddSMTPConfig(ctx, config); err != nil {
@@ -43,7 +43,7 @@ func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigR
 	}, nil
 }
 
-// UpdateSMTPConfig is deprecated. Please move to the new endpoint UpdateEmailProviderSMTP
+// Deprecated: use [UpdateEmailProviderSMTP] instead.
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
 	config := updateSMTPToConfig(ctx, req)
 	if err := s.command.ChangeSMTPConfig(ctx, config); err != nil {
@@ -54,6 +54,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 	}, nil
 }
 
+// Deprecated: use [RemoveEmailProviderSMTP] instead.
 func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
 	details, err := s.command.RemoveSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
@@ -64,6 +65,7 @@ func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPC
 	}, nil
 }
 
+// Deprecated: use [UpdateEmailProviderSMTPPassword] instead.
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
 	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.Password)
 	if err != nil {
@@ -74,7 +76,7 @@ func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.Upd
 	}, nil
 }
 
-// ListSMTPConfigs is deprecated. Please move to the new endpoint ListEmailProviders.
+// Deprecated: use [ListEmailProviders] instead.
 func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConfigsRequest) (*admin_pb.ListSMTPConfigsResponse, error) {
 	queries, err := listSMTPConfigsToModel(req)
 	if err != nil {
@@ -90,6 +92,7 @@ func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConf
 	}, nil
 }
 
+// Deprecated: use [ActivateEmailProvider] instead.
 func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateSMTPConfigRequest) (*admin_pb.ActivateSMTPConfigResponse, error) {
 	result, err := s.command.ActivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
@@ -101,6 +104,7 @@ func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateS
 	}, nil
 }
 
+// Deprecated: use [DeactivateEmailProvider] instead.
 func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.DeactivateSMTPConfigRequest) (*admin_pb.DeactivateSMTPConfigResponse, error) {
 	result, err := s.command.DeactivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
@@ -112,6 +116,7 @@ func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.Deactiv
 	}, nil
 }
 
+// Deprecated: use [TestEmailProviderSMTPById] instead.
 func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPConfigByIdRequest) (*admin_pb.TestSMTPConfigByIdResponse, error) {
 	err := s.command.TestSMTPConfigById(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress)
 	if err != nil {
@@ -121,7 +126,7 @@ func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPC
 	return &admin_pb.TestSMTPConfigByIdResponse{}, nil
 }
 
-// TestSMTPConfig is deprecated. Please move to the new endpoint TestEmailProviderSMTP.
+// Deprecated: use [TestEmailProviderSMTP] instead.
 func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
 	config := smtp.Config{
 		Tls:      req.Tls,

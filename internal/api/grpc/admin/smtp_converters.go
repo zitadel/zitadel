@@ -19,7 +19,6 @@ func listSMTPConfigsToModel(req *admin_pb.ListSMTPConfigsRequest) (*query.SMTPCo
 	}, nil
 }
 
-// SMTPConfigToProviderPb is deprecated.
 func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
 	ret := &settings_pb.SMTPConfig{
 		Details:     object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
@@ -39,7 +38,6 @@ func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
 	return ret
 }
 
-// SMTPConfigsToPb is deprecated.
 func SMTPConfigsToPb(configs []*query.SMTPConfig) []*settings_pb.SMTPConfig {
 	c := make([]*settings_pb.SMTPConfig, len(configs))
 	for i, config := range configs {

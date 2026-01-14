@@ -134,7 +134,7 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 	}
 }
 
-// addSMTPToConfig is deprecated. Please move to addEmailProviderSMTPToConfig
+// Deprecated: use [addEmailProviderSMTPToConfig] instead
 func addSMTPToConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) *command.AddSMTPConfig {
 	cmd := &command.AddSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
@@ -156,7 +156,7 @@ func addSMTPToConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) *c
 	return cmd
 }
 
-// updateSMTPToConfig is deprecated. Please move to updateEmailProviderSMTPToConfig
+// Deprecated: use [updateEmailProviderSMTPToConfig] instead
 func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) *command.ChangeSMTPConfig {
 	cmd := &command.ChangeSMTPConfig{
 		ResourceOwner:  authz.GetInstance(ctx).InstanceID(),
@@ -179,7 +179,7 @@ func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigReque
 	return cmd
 }
 
-// SMTPConfigToPb is deprecated. Please move to smtpToPb.
+// Deprecated: use [smtpToPb] instead.
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	if smtp.SMTPConfig == nil {
 		return nil
