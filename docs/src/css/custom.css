@@ -703,25 +703,8 @@ table#zitadel-versions td {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
-.theme-code-block::after {
-  content: "";
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #ff5f56; 
-  box-shadow: 
-    20px 0 0 #ffbd2e, 
-    40px 0 0 #27c93f; 
-  z-index: 10;
-  pointer-events: none;
-}
-
-
 div[class*="codeBlockTitle_"] {
-  padding-left: 90px !important; 
+  padding-left: 1rem !important; 
   background-color: var(--ifm-pre-background) !important;
   border-bottom: 1px solid var(--ifm-toc-border-color);
   margin-bottom: 0 !important;
@@ -737,20 +720,6 @@ div[class*="codeBlockTitle_"] {
   margin: 0 !important;
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
-}
-
-@supports selector(.theme-code-block:not(:has(div[class*="codeBlockTitle_"]))) {
-  .theme-code-block:not(:has(div[class*="codeBlockTitle_"])) pre {
-    padding-top: 3.5rem !important;
-  }
-}
-
-
-.theme-code-block:has(.language-text) pre,
-.theme-code-block:has(.language-none) pre {
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
-  line-height: 1.5;
 }
 
 .theme-code-block code {
