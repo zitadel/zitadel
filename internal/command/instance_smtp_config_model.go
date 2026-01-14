@@ -393,7 +393,7 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 		wm.SMTPConfig.ReplyToAddress = *e.ReplyToAddress
 	}
 
-	if wm.SMTPConfig.PlainAuth == nil && (e.PlainAuth.User != nil || e.PlainAuth.Password != nil) {
+	if wm.SMTPConfig.PlainAuth == nil && !e.PlainAuth.IsEmpty() {
 		wm.SMTPConfig.PlainAuth = &instance.PlainAuth{}
 		wm.SMTPConfig.XOAuth2Auth = nil
 	}
@@ -408,8 +408,7 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 		wm.SMTPConfig.PlainAuth.Password = e.Password
 	}
 
-	if wm.SMTPConfig.XOAuth2Auth == nil &&
-		(e.XOAuth2Auth.User != nil || e.XOAuth2Auth.ClientId != nil || e.XOAuth2Auth.ClientSecret != nil || e.XOAuth2Auth.TokenEndpoint != nil || len(e.XOAuth2Auth.Scopes) != 0) {
+	if wm.SMTPConfig.XOAuth2Auth == nil && !e.XOAuth2Auth.IsEmpty() {
 		wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{}
 		wm.SMTPConfig.PlainAuth = nil
 	}

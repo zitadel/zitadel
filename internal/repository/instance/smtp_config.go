@@ -115,9 +115,17 @@ type XOAuth2AuthChanged struct {
 	Scopes        []string            `json:"scopes,omitempty"`
 }
 
+func (c XOAuth2AuthChanged) IsEmpty() bool {
+	return c.User == nil && c.ClientId == nil && c.ClientSecret == nil && c.TokenEndpoint == nil && len(c.Scopes) != 0
+}
+
 type PlainAuthChanged struct {
 	User     *string             `json:"user,omitempty"`
 	Password *crypto.CryptoValue `json:"password,omitempty"`
+}
+
+func (c PlainAuthChanged) IsEmpty() bool {
+	return c.User == nil && c.Password == nil
 }
 
 func (e *SMTPConfigChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
