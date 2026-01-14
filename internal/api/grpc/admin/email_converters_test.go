@@ -129,9 +129,7 @@ func Test_emailProvidersToPb(t *testing.T) {
 							User:           "user",
 							ReplyToAddress: "address",
 							Auth: &settings_pb.EmailProviderSMTP_Plain{
-								Plain: &settings_pb.SMTPPlainAuth{
-									User: "user",
-								},
+								Plain: &settings_pb.SMTPPlainAuth{},
 							},
 						},
 					},
@@ -221,9 +219,7 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						User:           "user",
 						ReplyToAddress: "address",
 						Auth: &settings_pb.EmailProviderSMTP_Plain{
-							Plain: &settings_pb.SMTPPlainAuth{
-								User: "user",
-							},
+							Plain: &settings_pb.SMTPPlainAuth{},
 						},
 					},
 				},
@@ -392,9 +388,7 @@ func Test_smtpToPb(t *testing.T) {
 					User:           "user",
 					ReplyToAddress: "address",
 					Auth: &settings_pb.EmailProviderSMTP_Plain{
-						Plain: &settings_pb.SMTPPlainAuth{
-							User: "user",
-						},
+						Plain: &settings_pb.SMTPPlainAuth{},
 					},
 				},
 			},
@@ -412,9 +406,7 @@ func Test_smtpToPb(t *testing.T) {
 				Smtp: &settings_pb.EmailProviderSMTP{
 					User: "user",
 					Auth: &settings_pb.EmailProviderSMTP_Plain{
-						Plain: &settings_pb.SMTPPlainAuth{
-							User: "user",
-						},
+						Plain: &settings_pb.SMTPPlainAuth{},
 					},
 				},
 			},
@@ -432,9 +424,7 @@ func Test_smtpToPb(t *testing.T) {
 				Smtp: &settings_pb.EmailProviderSMTP{
 					User: "plain-user",
 					Auth: &settings_pb.EmailProviderSMTP_Plain{
-						Plain: &settings_pb.SMTPPlainAuth{
-							User: "plain-user",
-						},
+						Plain: &settings_pb.SMTPPlainAuth{},
 					},
 				},
 			},
@@ -453,12 +443,16 @@ func Test_smtpToPb(t *testing.T) {
 			},
 			res: &settings_pb.EmailProvider_Smtp{
 				Smtp: &settings_pb.EmailProviderSMTP{
+					User: "xoauth2-user",
 					Auth: &settings_pb.EmailProviderSMTP_Xoauth2{
 						Xoauth2: &settings_pb.SMTPXOAuth2Auth{
-							User:          "xoauth2-user",
-							ClientId:      "my-client",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scopes"},
+							OAuth2Type: &settings_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &settings_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId: "my-client",
+								},
+							},
 						},
 					},
 				},
@@ -534,9 +528,9 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User: "plain-user",
 					Auth: &admin_pb.AddEmailProviderSMTPRequest_Plain{
 						Plain: &admin_pb.SMTPPlainAuth{
-							User:     "plain-user",
 							Password: "other_password",
 						},
 					},
@@ -555,13 +549,17 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.AddEmailProviderSMTPRequest{
+					User: "xoauth2-user",
 					Auth: &admin_pb.AddEmailProviderSMTPRequest_Xoauth2{
 						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
-							User:          "xoauth2-user",
-							ClientId:      "my-client",
-							ClientSecret:  "some-secret",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
 						},
 					},
 				},
@@ -651,10 +649,10 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.UpdateEmailProviderSMTPRequest{
-					Id: "id",
+					Id:   "id",
+					User: "plain-user",
 					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Plain{
 						Plain: &admin_pb.SMTPPlainAuth{
-							User:     "plain-user",
 							Password: "other_password",
 						},
 					},
@@ -674,14 +672,18 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.UpdateEmailProviderSMTPRequest{
-					Id: "id",
+					Id:   "id",
+					User: "xoauth2-user",
 					Auth: &admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2{
 						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
-							User:          "xoauth2-user",
-							ClientId:      "my-client",
-							ClientSecret:  "some-secret",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
 						},
 					},
 				},
@@ -839,9 +841,9 @@ func Test_testEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.TestEmailProviderSMTPRequest{
+					User: "plain-user",
 					Auth: &admin_pb.TestEmailProviderSMTPRequest_Plain{
 						Plain: &admin_pb.SMTPPlainAuth{
-							User:     "plain-user",
 							Password: "other_password",
 						},
 					},
@@ -861,13 +863,17 @@ func Test_testEmailProviderSMTPToConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 				req: &admin_pb.TestEmailProviderSMTPRequest{
+					User: "xoauth2-user",
 					Auth: &admin_pb.TestEmailProviderSMTPRequest_Xoauth2{
 						Xoauth2: &admin_pb.SMTPXOAuth2Auth{
-							User:          "xoauth2-user",
-							ClientId:      "my-client",
-							ClientSecret:  "some-secret",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scopes"},
+							OAuth2Type: &admin_pb.SMTPXOAuth2Auth_ClientCredentials_{
+								ClientCredentials: &admin_pb.SMTPXOAuth2Auth_ClientCredentials{
+									ClientId:     "my-client",
+									ClientSecret: "some-secret",
+								},
+							},
 						},
 					},
 				},

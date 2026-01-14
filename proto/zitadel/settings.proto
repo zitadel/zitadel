@@ -149,35 +149,30 @@ message EmailProviderSMTP {
 
 message SMTPNoAuth {}
 
-message SMTPPlainAuth {
-  string user = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-    }
-  ];
-}
+message SMTPPlainAuth {}
 
 message SMTPXOAuth2Auth {
-  string user = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-    }
-  ];
-  string client_id = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-    }
-  ];
-  string token_endpoint = 4 [
+  string token_endpoint = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"http://auth.example.com/token\"";
     }
   ];
-  repeated string scopes = 5 [
+  repeated string scopes = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"https://mail.example.com\"]";
     }
   ];
+  oneof OAuth2Type {
+    ClientCredentials client_credentials = 3;
+  }
+
+  message ClientCredentials {
+    string client_id = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+      }
+    ];
+  }
 }
 
 message EmailProviderHTTP {

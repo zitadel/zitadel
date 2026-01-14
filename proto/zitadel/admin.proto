@@ -4944,6 +4944,7 @@ message AddEmailProviderSMTPRequest {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
         }
     ];
+    // Deprecated: use [Auth] oneof instead.
     string password = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"this-is-my-password\"";
@@ -4975,14 +4976,7 @@ message AddEmailProviderSMTPRequest {
 message SMTPNoAuth {}
 
 message SMTPPlainAuth {
-    string user = 1 [
-        (validate.rules).string = {min_len: 0, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-        }
-    ];
-    string password = 2 [
+    string password = 1 [
         (validate.rules).string = {min_len: 0, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -4992,34 +4986,7 @@ message SMTPPlainAuth {
 }
 
 message SMTPXOAuth2Auth {
-    string user = 1 [
-        (validate.rules).string = {min_len: 0, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-            min_length: 0;
-            max_length: 200;
-        }
-    ];
-    string client_id = 2 [
-        (validate.rules).string = {min_len: 0, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
-            min_length: 0;
-            max_length: 200;
-        }
-    ];
-    string client_secret = 3 [
-        (validate.rules).string = {min_len: 0, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"this-is-my-client-secret\"";
-            min_length: 0;
-            max_length: 200;
-        }
-    ];
-    string token_endpoint = 4 [
+    string token_endpoint = 1 [
         (validate.rules).string = {min_len: 0, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -5028,13 +4995,37 @@ message SMTPXOAuth2Auth {
             max_length: 200;
         }
     ];
-    repeated string scopes = 5 [
+    repeated string scopes = 2 [
         (google.api.field_behavior) = REQUIRED,
         (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://mail.example.com\"]";
         }
     ];
+    oneof OAuth2Type {
+        ClientCredentials client_credentials = 3;
+    }
+
+    message ClientCredentials {
+        string client_id = 1 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+        string client_secret = 2 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"this-is-my-client-secret\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+    }
 }
 
 message AddEmailProviderSMTPResponse {
