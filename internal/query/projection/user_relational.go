@@ -1379,7 +1379,6 @@ func (p *userRelationalProjection) reduceMachineAdded(event eventstore.Event) (*
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
 		repo := repository.UserRepository()
-
 		return repo.Create(ctx, v3_sql.SQLTx(tx),
 			&domain.User{
 				ID:             e.Aggregate().ID,

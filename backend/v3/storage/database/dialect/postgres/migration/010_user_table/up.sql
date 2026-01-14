@@ -29,39 +29,39 @@ CREATE TABLE zitadel.users(
 
     -- human
 
-    , first_name TEXT CHECK (first_name <> '' AND type = 'human')
-    , last_name TEXT CHECK (last_name <> '' AND type = 'human')
-    , nickname TEXT CHECK (type = 'human')
-    , display_name TEXT CHECK (display_name   <> '' AND type = 'human')
-    , preferred_language TEXT CHECK (preferred_language <> '' AND type = 'human')
-    , gender SMALLINT CHECK (type = 'human')
-    , avatar_key TEXT CHECK (type = 'human')
-    , multi_factor_initialization_skipped_at TIMESTAMPTZ CHECK (type = 'human')
+    , first_name TEXT
+    , last_name TEXT
+    , nickname TEXT
+    , display_name TEXT
+    , preferred_language TEXT
+    , gender SMALLINT
+    , avatar_key TEXT
+    , multifactor_initialization_skipped_at TIMESTAMPTZ
 
-    , password BYTEA CHECK (type = 'human')
-    , password_change_required BOOLEAN CHECK (type = 'human')
-    , password_verified_at TIMESTAMPTZ CHECK (type = 'human')
-    , unverified_password_id TEXT CHECK (type = 'human')
-    , failed_password_attempts SMALLINT DEFAULT 0 CHECK (failed_password_attempts >= 0 AND type = 'human')
+    , password BYTEA
+    , password_change_required BOOLEAN
+    , password_verified_at TIMESTAMPTZ
+    , unverified_password_id TEXT
+    , failed_password_attempts SMALLINT
 
-    , email TEXT CHECK (type = 'human')
-    , email_verified_at TIMESTAMPTZ CHECK (type = 'human')
-    , unverified_email_id TEXT CHECK (type = 'human')
-    , email_otp_enabled_at TIMESTAMPTZ CHECK (type = 'human')
-    , last_successful_email_otp_check TIMESTAMPTZ CHECK (type = 'human')
-    , email_otp_verification_id TEXT CHECK (type = 'human')
+    , email TEXT
+    , email_verified_at TIMESTAMPTZ
+    , unverified_email_id TEXT
+    , email_otp_enabled_at TIMESTAMPTZ
+    , last_successful_email_otp_check TIMESTAMPTZ
+    , email_otp_verification_id TEXT
 
-    , phone TEXT CHECK (type = 'human')
-    , phone_verified_at TIMESTAMPTZ CHECK (type = 'human')
-    , unverified_phone_id TEXT CHECK (type = 'human')
-    , sms_otp_enabled_at TIMESTAMPTZ CHECK (type = 'human')
-    , last_successful_sms_otp_check TIMESTAMPTZ CHECK (type = 'human')
-    , sms_otp_verification_id TEXT CHECK (type = 'human')
+    , phone TEXT
+    , phone_verified_at TIMESTAMPTZ
+    , unverified_phone_id TEXT
+    , sms_otp_enabled_at TIMESTAMPTZ
+    , last_successful_sms_otp_check TIMESTAMPTZ
+    , sms_otp_verification_id TEXT
 
-    , totp_secret_id TEXT CHECK (type = 'human') -- reference to a verification that holds the secret
-    , totp_verified_at TIMESTAMPTZ CHECK (type = 'human')
-    , unverified_totp_id TEXT CHECK (type = 'human') -- reference to a verification that holds the new secret during change
-    , last_successful_totp_check TIMESTAMPTZ CHECK (type = 'human')
+    , totp_secret_id TEXT -- reference to a verification that holds the secret
+    , totp_verified_at TIMESTAMPTZ
+    , unverified_totp_id TEXT -- reference to a verification that holds the new secret during change
+    , last_successful_totp_check TIMESTAMPTZ
 
     , FOREIGN KEY (instance_id, unverified_password_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_password_id)
     , FOREIGN KEY (instance_id, unverified_email_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_email_id)
@@ -71,10 +71,10 @@ CREATE TABLE zitadel.users(
 
     -- machine
     
-    , name TEXT CHECK (name <> '' AND type = 'machine')
-    , description TEXT CHECK (type = 'machine')
-    , secret BYTEA CHECK (type = 'machine')
-    , access_token_type SMALLINT CHECK (type = 'machine')
+    , name TEXT
+    , description TEXT
+    , secret BYTEA
+    , access_token_type SMALLINT
 );
 
 -- user
@@ -99,6 +99,31 @@ CREATE UNIQUE INDEX ON zitadel.users(sms_otp_verification_id) WHERE sms_otp_veri
 CREATE FUNCTION zitadel.validate_human_user()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- Validate that machine-specific fields are NULL
+    IF NEW.name IS NOT NULL OR NEW.description IS NOT NULL OR NEW.secret IS NOT NULL OR NEW.access_token_type IS NOT NULL THEN
+        RAISE EXCEPTION 'Machine-specific fields must be NULL for human users';
+    END IF;
+
+    -- Validate non-empty string fields
+    IF NEW.first_name IS NOT NULL AND NEW.first_name = '' THEN
+        RAISE EXCEPTION 'first_name cannot be empty string';
+    END IF;
+    IF NEW.last_name IS NOT NULL AND NEW.last_name = '' THEN
+        RAISE EXCEPTION 'last_name cannot be empty string';
+    END IF;
+    IF NEW.display_name IS NOT NULL AND NEW.display_name = '' THEN
+        RAISE EXCEPTION 'display_name cannot be empty string';
+    END IF;
+    IF NEW.preferred_language IS NOT NULL AND NEW.preferred_language = '' THEN
+        RAISE EXCEPTION 'preferred_language cannot be empty string';
+    END IF;
+
+    -- Validate numeric constraints
+    IF NEW.failed_password_attempts IS NOT NULL AND NEW.failed_password_attempts < 0 THEN
+        RAISE EXCEPTION 'failed_password_attempts must be >= 0';
+    END IF;
+
+    -- Set defaults
     IF NEW.password_change_required IS NULL THEN
         NEW.password_change_required := FALSE;
     END IF;
@@ -124,9 +149,29 @@ EXECUTE FUNCTION zitadel.validate_human_user();
 CREATE FUNCTION zitadel.validate_machine_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.name IS NULL THEN
-        NEW.name := '';
+    -- Validate that human-specific fields are NULL
+    IF NEW.first_name IS NOT NULL OR NEW.last_name IS NOT NULL OR NEW.nickname IS NOT NULL 
+       OR NEW.display_name IS NOT NULL OR NEW.preferred_language IS NOT NULL OR NEW.gender IS NOT NULL
+       OR NEW.avatar_key IS NOT NULL OR NEW.multifactor_initialization_skipped_at IS NOT NULL
+       OR NEW.password IS NOT NULL OR NEW.password_change_required IS NOT NULL 
+       OR NEW.password_verified_at IS NOT NULL OR NEW.unverified_password_id IS NOT NULL
+       OR NEW.failed_password_attempts IS NOT NULL OR NEW.email IS NOT NULL 
+       OR NEW.email_verified_at IS NOT NULL OR NEW.unverified_email_id IS NOT NULL
+       OR NEW.email_otp_enabled_at IS NOT NULL OR NEW.last_successful_email_otp_check IS NOT NULL
+       OR NEW.email_otp_verification_id IS NOT NULL OR NEW.phone IS NOT NULL
+       OR NEW.phone_verified_at IS NOT NULL OR NEW.unverified_phone_id IS NOT NULL
+       OR NEW.sms_otp_enabled_at IS NOT NULL OR NEW.last_successful_sms_otp_check IS NOT NULL
+       OR NEW.sms_otp_verification_id IS NOT NULL OR NEW.totp_secret_id IS NOT NULL
+       OR NEW.totp_verified_at IS NOT NULL OR NEW.unverified_totp_id IS NOT NULL
+       OR NEW.last_successful_totp_check IS NOT NULL THEN
+        RAISE EXCEPTION 'Human-specific fields must be NULL for machine users';
     END IF;
+
+    -- Validate name is not empty
+    IF NEW.name IS NULL OR NEW.name = '' THEN
+        RAISE EXCEPTION 'name cannot be empty string';
+    END IF;
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

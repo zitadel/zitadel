@@ -15,15 +15,15 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 
-	Machine  *MachineUser    `json:"machine,omitempty" db:"machine"`
-	Human    *HumanUser      `json:"human,omitempty" db:"human"`
+	Machine  *MachineUser    `json:"machine,omitempty" db:"-"`
+	Human    *HumanUser      `json:"human,omitempty" db:"-"`
 	Metadata []*UserMetadata `json:"metadata,omitempty" db:"metadata"`
 }
 
 type MachineUser struct {
 	Name            string                  `json:"name,omitempty" db:"name"`
 	Description     string                  `json:"description,omitempty" db:"description"`
-	Secret          string                  `json:"secret,omitempty" db:"secret"`
+	Secret          []byte                  `json:"secret,omitempty" db:"secret"`
 	AccessTokenType PersonalAccessTokenType `json:"access_token_type,omitempty" db:"access_token_type"`
 
 	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"pats"`
@@ -98,18 +98,18 @@ type HumanPassword struct {
 }
 
 type HumanEmail struct {
-	Address    string    `json:"address" db:"email"`
+	Address    string    `json:"address" db:"address"`
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-"`
+	OTP        OTP       `json:"-" db:"otp"`
 	// Unverified is the verification data for setting a new email
 	// If nil, no email change is in progress
 	Unverified *Verification `json:"-"`
 }
 
 type HumanPhone struct {
-	Number     string    `json:"number" db:"phone"`
+	Number     string    `json:"number" db:"number"`
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-"`
+	OTP        OTP       `json:"-" db:"otp"`
 	// Unverified is the verification data for setting a new phone number
 	// If nil, no phone change is in progress
 	Unverified *Verification `json:"-"`

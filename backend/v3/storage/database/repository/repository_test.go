@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -45,9 +46,19 @@ func runTests(m *testing.M) int {
 }
 
 func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), err error) {
-	connector, stop, err := embedded.StartEmbedded()
-	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
+	var connector database.Connector
+	if url := os.Getenv("ZITADEL_TEST_POSTGRES_URL"); url != "" {
+		log.Println("using database provided by env")
+		connector, err = postgres.DecodeConfig(url)
+		if err != nil {
+			return nil, nil, fmt.Errorf("unable to connect to provided postgres: %w", err)
+		}
+		stop = func() {}
+	} else {
+		connector, stop, err = embedded.StartEmbedded()
+		if err != nil {
+			return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
+		}
 	}
 
 	pool_, err := connector.Connect(ctx)
@@ -68,7 +79,7 @@ func transactionForRollback(t *testing.T) (tx database.Transaction, rollback fun
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	return tx, func() {
-		err := tx.Rollback(t.Context())
+		err := tx.Rollback(context.Background())
 		require.NoError(t, err)
 	}
 }
@@ -78,7 +89,7 @@ func savepointForRollback(t *testing.T, tx database.Transaction) (savepoint data
 	savepoint, err := tx.Begin(t.Context())
 	require.NoError(t, err)
 	return savepoint, func() {
-		err := savepoint.Rollback(t.Context())
+		err := savepoint.Rollback(context.Background())
 		require.NoError(t, err)
 	}
 }

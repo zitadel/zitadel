@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -33,39 +34,15 @@ func (u user) HumanRepository() domain.HumanUserRepository {
 // existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
 var existingUser = user{tableName: "existing_user"}
 
-const createUserStmtPrefix = "WITH existing_user AS (INSERT INTO zitadel.users (" +
-	"instance_id" +
-	", organization_id" +
-	", id" +
-	", username" +
-	", username_org_unique" +
-	", state" +
-	", created_at" +
-	", updated_at" +
-	", type" +
-	") VALUES ($1, $2, $3, $4, $5, $6, "
-
 // Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-	builder := database.NewStatementBuilder(createUserStmtPrefix,
-		user.InstanceID, user.OrganizationID, user.ID, user.Username, database.NullInstruction, user.State)
-	var createdAt any = database.NowInstruction
-	if !user.CreatedAt.IsZero() {
-		createdAt = user.CreatedAt
-	}
-	builder.WriteArgs(createdAt, createdAt)
-	builder.WriteString(", ")
-
 	var create func(context.Context, database.QueryExecutor, *domain.User) error
 	if user.Human != nil {
-		builder.WriteArg("human")
 		create = userHuman{user: u}.create
 	}
 	if user.Machine != nil {
-		builder.WriteArg("machine")
 		create = userMachine{user: u}.create
 	}
-	builder.WriteString(") RETURNING *) ")
 	return create(ctx, client, user)
 }
 
@@ -80,53 +57,37 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-const queryUserStmt = `SELECT
-	u.instance_id
-	, u.organization_id
-	, u.id
-	, u.username
-	, u.state
-	, u.created_at
-	, u.updated_at
-	
-	, u.name AS machine.name
-	, u.description AS machine.description
-	, u.secret AS machine.secret
-	, u.access_token_type AS machine.access_token_type
-	
-	, u.first_name AS human.first_name
-	, u.last_name AS human.last_name
-	, u.nickname AS human.nickname
-	, u.display_name AS human.display_name
-	, u.preferred_language AS human.preferred_language
-	, u.gender AS human.gender
-	, u.avatar_key AS human.avatar_key
-	, u.multifactor_initialization_skipped_at AS human.multifactor_initialization_skipped_at
-	, u.password AS human.password
-	, u.password_change_required AS human.password_change_required
-	, u.password_verified_at AS human.password_verified_at
-	-- u.password_verification_id
-	u.failed_password_attempts AS human.failed_password_attempts,
-	, u.email AS human.email
-	, u.email_verified_at AS human.email_verified_at
-	-- , u.unverified_email_id 
-	, u.email_otp_enabled_at AS human.email_otp_enabled_at
-	, u.last_successful_email_otp_check AS human.last_successful_email_otp_check
-	-- , u.email_otp_verification_id
-
-	, u.phone AS human.phone
-	, u.phone_verified_at AS human.phone_verified_at
-	-- , u.unverified_phone_id
-	, u.sms_otp_enabled_at AS human.sms_otp_enabled_at
-	, u.last_successful_sms_otp_check AS human.last_successful_sms_otp_check
-	-- , u.sms_otp_verification_id
-
-	-- , totp_secret_id
-	, totp_verified_at AS human.totp_verified_at
-	-- , unverified_totp_id
-	, last_successful_totp_check AS human.last_successful_totp_check
-FROM zitadel.users u
-`
+const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
+	", users.state, users.created_at, users.updated_at" +
+	// machine columns
+	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
+	`, 'description', users.description, 'secret', users.secret` +
+	`, 'accessTokenType', users.access_token_type) END AS machine` +
+	// human columns
+	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
+	`, 'nickname', users.nickname, 'displayName', users.display_name` +
+	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
+	`, 'avatarKey', users.avatar_key` +
+	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
+	`, 'password', users.password, 'passwordChangeRequired', users.password_change_required` +
+	`, 'passwordVerifiedAt', users.password_verified_at` +
+	// -- users.password_verification_id
+	`, 'failedPasswordAttempts', users.failed_password_attempts, 'email', users.email` +
+	`, 'emailVerifiedAt', users.email_verified_at` +
+	// -- , users.unverified_email_id
+	`, 'emailOtpEnabledAt', users.email_otp_enabled_at` +
+	`, 'lastSuccessfulEmailOtpCheck', users.last_successful_email_otp_check` +
+	// -- , users.email_otp_verification_id
+	`, 'phone', users.phone, 'phoneVerifiedAt', users.phone_verified_at` +
+	// -- , users.unverified_phone_id
+	`, 'smsOtpEnabledAt', users.sms_otp_enabled_at` +
+	`, 'lastSuccessfulSmsOtpCheck', users.last_successful_sms_otp_check` +
+	// -- , users.sms_otp_verification_id
+	// -- , totp_secret_id
+	`,'totpVerifiedAt', users.totp_verified_at` +
+	// -- , unverified_totp_id
+	`,'lastSuccessfulTotpCheck', users.last_successful_totp_check` +
+	`) END AS human FROM zitadel.users`
 
 // Get implements [domain.UserRepository.Get].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
@@ -412,6 +373,61 @@ func (u user) metadataValueColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
+type rawUser struct {
+	domain.User
+	Machine *json.RawMessage `json:"machine,omitempty" db:"machine"`
+	Human   *json.RawMessage `json:"human,omitempty" db:"human"`
+}
+
+func (u *rawUser) toDomain() (*domain.User, error) {
+	if u.Machine != nil {
+		err := json.Unmarshal(*u.Machine, &u.User.Machine)
+		if err != nil {
+			return nil, err
+		}
+	} else if u.Human != nil {
+		err := json.Unmarshal(*u.Human, &u.User.Human)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &u.User, nil
+}
+
+func scanUser(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var user rawUser
+	if err = rows.(database.CollectableRows).CollectExactlyOneRow(&user); err != nil {
+		return nil, err
+	}
+	return user.toDomain()
+}
+
+func scanUsers(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []rawUser
+	if err = rows.(database.CollectableRows).Collect(&users); err != nil {
+		return nil, err
+	}
+	result := make([]*domain.User, len(users))
+	for i, user := range users {
+		domainUser, err := user.toDomain()
+		if err != nil {
+			return nil, err
+		}
+		result[i] = domainUser
+	}
+	return result, nil
+}
+
 // -------------------------------------------------------------
 // sub repositories
 // -------------------------------------------------------------
@@ -453,31 +469,5 @@ func (u user) LoadVerifications() domain.UserRepository {
 
 // Machine implements [domain.UserRepository.Machine].
 func (u user) Machine() domain.MachineUserRepository {
-	panic("unimplemented")
-}
-
-func scanUser(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.User, error) {
-	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
-	user := &domain.User{}
-	if err = rows.(database.CollectableRows).CollectExactlyOneRow(user); err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func scanUsers(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.User, error) {
-	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
-	var users []*domain.User
-	if err = rows.(database.CollectableRows).Collect(&users); err != nil {
-		return nil, err
-	}
-	return users, nil
+	return userMachine{user: u}
 }

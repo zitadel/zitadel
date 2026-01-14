@@ -31,55 +31,50 @@ func HumanUserRepository() domain.HumanUserRepository {
 	}
 }
 
-const createHumanUserStmt = "INSERT INTO zitadel.users (" +
-	"instance_id" +
-	", organization_id" +
-	", id" +
-	", username" +
-	", username_org_unique" +
-	", state" +
-	", type" +
-	", created_at" +
-	", updated_at" +
-	", first_name" +
-	", last_name" +
-	", nickname" +
-	", display_name" +
-	", preferred_language" +
-	", gender" +
-	", avatar_key" +
-	", multifactor_initialization_skipped_at" +
-	", password" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	"" +
-	") VALUES ("
+const createHumanUserCTE = "WITH existing_user AS (INSERT INTO zitadel.users (" +
+	"instance_id, organization_id, id, username, username_org_unique, state, type, created_at" +
+	", updated_at, first_name, last_name, nickname, display_name, preferred_language, gender" +
+	", avatar_key, multifactor_initialization_skipped_at) VALUES " +
+	"($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *)"
 
 func (u userHuman) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-	return nil
+	var createdAt any = database.NowInstruction
+	if !user.CreatedAt.IsZero() {
+		createdAt = user.CreatedAt
+	}
+	builder := database.NewStatementBuilder(createHumanUserCTE,
+		user.InstanceID, user.OrganizationID, user.ID, user.Username, database.NullInstruction,
+		user.State, "human", createdAt, createdAt, user.Human.FirstName, user.Human.LastName,
+		user.Human.Nickname, user.Human.DisplayName, user.Human.PreferredLanguage, user.Human.Gender,
+		user.Human.AvatarKey, user.Human.MultifactorInitializationSkippedAt,
+	)
+	var changes database.Changes
+
+	// TODO: set email
+	// TODO: set phone
+	if user.Human.Phone != nil {
+		// u.SetPhone()
+	}
+	// TODO: add passkeys
+	// for _, passkey := range user.Human.Passkeys {
+	// }
+
+	// TODO: set password
+	// TODO: set TOTP
+	// TODO: add identity provider links
+	for _, link := range user.Human.IdentityProviderLinks {
+		changes = append(changes, u.AddIdentityProviderLink(link))
+	}
+	// TODO: add verifications
+	// for _, verification := range user.Human.Verifications {
+	// 	changes = append(changes, u.SetVerification("", verification))
+	// }
+
+	changes.Write(builder)
+	builder.WriteString("SELECT * FROM existing_user")
+
+	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+
 }
 
 func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
