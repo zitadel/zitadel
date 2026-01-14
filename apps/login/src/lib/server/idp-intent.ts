@@ -1,21 +1,22 @@
 "use server";
 
+import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import {
-  retrieveIDPIntent,
-  getIDPByID,
-  addIDPLink,
-  listUsers,
   addHuman,
+  addIDPLink,
+  getActiveIdentityProviders,
+  getDefaultOrg,
+  getIDPByID,
   getLoginSettings,
   getOrgsByDomain,
-  getActiveIdentityProviders,
+  getSession,
   getUserByID,
-  getDefaultOrg,
-  updateHuman,
+  listUsers,
+  retrieveIDPIntent,
   ServiceConfig,
+  updateHuman,
 } from "@/lib/zitadel";
-import { headers } from "next/headers";
 import { Code, ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
@@ -24,12 +25,11 @@ import {
   AddHumanUserRequestSchema,
   UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getSession } from "@/lib/zitadel";
-import { getSessionCookieById } from "@/lib/cookies";
-import { createNewSessionFromIdpIntent } from "./idp";
-import { getTranslations } from "next-intl/server";
 import crypto from "crypto";
+import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
+import { createNewSessionFromIdpIntent } from "./idp";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 

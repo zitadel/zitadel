@@ -19,6 +19,7 @@ type Inputs =
       firstname: string;
       lastname: string;
       email: string;
+      username?: string;
     }
   | FieldValues;
 
@@ -36,7 +37,7 @@ type Props = {
   };
   idpUserId: string;
   idpId: string;
-  idpUserName: string;
+  idpUserName?: string;
 };
 
 export function RegisterFormIDPIncomplete({
@@ -69,7 +70,7 @@ export function RegisterFormIDPIncomplete({
     try {
       const response = await registerUserAndLinkToIDP({
         idpId: idpId,
-        idpUserName: idpUserName,
+        idpUserName: idpUserName ? idpUserName : values.username,
         idpUserId: idpUserId,
         email: values.email,
         firstName: values.firstname,
@@ -93,30 +94,45 @@ export function RegisterFormIDPIncomplete({
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
-        <div className="mb-4 grid grid-cols-2 gap-4">
-          <div className="">
-            <TextInput
-              type="firstname"
-              autoComplete="firstname"
-              required
-              {...register("firstname", { required: t("required.firstname") })}
-              label={t("labels.firstname")}
-              error={errors.firstname?.message as string}
-              data-testid="firstname-text-input"
-            />
+        <div className="mb-4 grid grid-cols-1 gap-4">
+          {!idpUserName && (
+            <div className="">
+              <TextInput
+                type="text"
+                autoComplete="username"
+                required
+                {...register("username", { required: "Username is required" })}
+                label="Username"
+                error={errors.username?.message as string}
+                data-testid="username-text-input"
+              />
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="">
+              <TextInput
+                type="firstname"
+                autoComplete="firstname"
+                required
+                {...register("firstname", { required: t("required.firstname") })}
+                label={t("labels.firstname")}
+                error={errors.firstname?.message as string}
+                data-testid="firstname-text-input"
+              />
+            </div>
+            <div className="">
+              <TextInput
+                type="lastname"
+                autoComplete="lastname"
+                required
+                {...register("lastname", { required: t("required.lastname") })}
+                label={t("labels.lastname")}
+                error={errors.lastname?.message as string}
+                data-testid="lastname-text-input"
+              />
+            </div>
           </div>
           <div className="">
-            <TextInput
-              type="lastname"
-              autoComplete="lastname"
-              required
-              {...register("lastname", { required: t("required.lastname") })}
-              label={t("labels.lastname")}
-              error={errors.lastname?.message as string}
-              data-testid="lastname-text-input"
-            />
-          </div>
-          <div className="col-span-2">
             <TextInput
               type="email"
               autoComplete="email"
