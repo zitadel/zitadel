@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -37,7 +35,9 @@ type locker struct {
 
 func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
 	workerName, err := id.SonyFlakeGenerator().Next()
-	logging.OnError(err).Panic("unable to generate lockID")
+	if err != nil {
+		panic(fmt.Sprintf("unable to generate lockID: %v", err))
+	}
 	return &locker{
 		client: client,
 		lockStmt: func(values string, instances int) string {

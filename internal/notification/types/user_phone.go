@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -34,7 +32,6 @@ func generateSms(
 	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
-	logging.OnError(err).Error("could not create sms channel")
 	if smsChannels == nil || smsChannels.Len() == 0 {
 		return zchannels.NewCancelError(
 			zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent"),

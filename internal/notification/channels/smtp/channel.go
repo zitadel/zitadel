@@ -3,10 +3,9 @@ package smtp
 import (
 	"crypto/tls"
 	"errors"
+	"log/slog"
 	"net"
 	"net/smtp"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -25,10 +24,9 @@ type Email struct {
 func InitChannel(cfg *Config) (*Email, error) {
 	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
 	if err != nil {
-		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
 	}
-	logging.New().Debug("successfully initialized smtp email channel")
+	slog.Debug("successfully initialized smtp email channel")
 	return &Email{
 		smtpClient:     client,
 		senderName:     cfg.FromName,
@@ -118,7 +116,7 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
-		logging.OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
+		slog.Warn("could not connect using normal tls. trying starttls instead...", "error", err)
 		return smtpConfig.getSMTPClientWithStartTls(host)
 	}
 
