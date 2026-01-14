@@ -31,9 +31,7 @@ func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
 		ret.Host = config.SMTPConfig.Host
 		ret.SenderAddress = config.SMTPConfig.SenderAddress
 		ret.SenderName = config.SMTPConfig.SenderName
-		if config.SMTPConfig.PlainAuth != nil {
-			ret.User = config.SMTPConfig.PlainAuth.User
-		}
+		ret.User = config.SMTPConfig.User
 	}
 	return ret
 }

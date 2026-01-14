@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -144,11 +143,11 @@ func addSMTPToConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) *c
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
+		User:           req.User,
 	}
 
 	if req.User != "" || req.Password != "" {
-		cmd.PlainAuth = &smtp.PlainAuthConfig{
-			User:     req.User,
+		cmd.PlainAuth = &command.PlainAuth{
 			Password: req.Password,
 		}
 	}
@@ -167,11 +166,11 @@ func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigReque
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
+		User:           req.User,
 	}
 
 	if req.User != "" || req.Password != "" {
-		cmd.PlainAuth = &smtp.PlainAuthConfig{
-			User:     req.User,
+		cmd.PlainAuth = &command.PlainAuth{
 			Password: req.Password,
 		}
 	}
@@ -185,7 +184,7 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 		return nil
 	}
 
-	cfg := &settings_pb.SMTPConfig{
+	return &settings_pb.SMTPConfig{
 		Description:    smtp.Description,
 		Tls:            smtp.SMTPConfig.TLS,
 		SenderAddress:  smtp.SMTPConfig.SenderAddress,
@@ -195,13 +194,8 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
 		Id:             smtp.ID,
 		State:          settings_pb.SMTPConfigState(smtp.State),
+		User:           smtp.SMTPConfig.User,
 	}
-
-	if smtp.SMTPConfig.PlainAuth != nil {
-		cfg.User = smtp.SMTPConfig.PlainAuth.User
-	}
-
-	return cfg
 }
 
 func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {

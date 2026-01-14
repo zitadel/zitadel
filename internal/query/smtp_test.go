@@ -29,9 +29,8 @@ var (
 		` projections.smtp_configs6_smtp.host,` +
 		` projections.smtp_configs6_smtp.username,` +
 		` projections.smtp_configs6_smtp.password,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_user,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_client_id,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_credentials_client_id,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_credentials_client_secret,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
 		` projections.smtp_configs6_http.id,` +
@@ -55,9 +54,8 @@ var (
 		` projections.smtp_configs6_smtp.host,` +
 		` projections.smtp_configs6_smtp.username,` +
 		` projections.smtp_configs6_smtp.password,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_user,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_client_id,` +
-		` projections.smtp_configs6_smtp.xoauth2auth_client_secret,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_credentials_client_id,` +
+		` projections.smtp_configs6_smtp.xoauth2auth_client_credentials_client_secret,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_token_endpoint,` +
 		` projections.smtp_configs6_smtp.xoauth2auth_scope,` +
 		` projections.smtp_configs6_http.id,` +
@@ -82,11 +80,10 @@ var (
 		"sender_name",
 		"reply_to_address",
 		"smtp_host",
-		"smtp_user",
+		"user",
 		"smtp_password",
-		"xoauth2auth_user",
-		"xoauth2auth_client_id",
-		"xoauth2auth_client_secret",
+		"xoauth2auth_client_credentials_client_id",
+		"xoauth2auth_client_credentials_client_secret",
 		"xoauth2auth_token_endpoint",
 		"xoauth2auth_scope",
 		"id",
@@ -155,7 +152,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						nil,
 					},
 				),
 			},
@@ -170,8 +166,8 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 					SenderName:     "name",
 					ReplyToAddress: "reply-to",
 					Host:           "host",
+					User:           "user",
 					PlainAuth: &PlainAuth{
-						User:     "user",
 						Password: &crypto.CryptoValue{},
 					},
 				},
@@ -195,7 +191,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						"2232323",
 						domain.SMTPConfigStateActive,
 						"test",
-						nil,
 						nil,
 						nil,
 						nil,
@@ -268,7 +263,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						nil,
 					},
 				),
 			},
@@ -283,8 +277,8 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 					SenderName:     "name2",
 					ReplyToAddress: "reply-to2",
 					Host:           "host2",
+					User:           "user2",
 					PlainAuth: &PlainAuth{
-						User:     "user2",
 						Password: &crypto.CryptoValue{},
 					},
 				},
@@ -323,7 +317,6 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						nil,
 					},
 				),
 			},
@@ -338,8 +331,8 @@ func Test_SMTPConfigPrepares(t *testing.T) {
 					SenderName:     "name3",
 					ReplyToAddress: "reply-to3",
 					Host:           "host3",
+					User:           "user3",
 					PlainAuth: &PlainAuth{
-						User:     "user3",
 						Password: &crypto.CryptoValue{},
 					},
 				},
@@ -428,7 +421,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							nil,
 						},
 					},
 				),
@@ -449,8 +441,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							SenderName:     "name",
 							ReplyToAddress: "reply-to",
 							Host:           "host",
+							User:           "user",
 							PlainAuth: &PlainAuth{
-								User:     "user",
 								Password: &crypto.CryptoValue{},
 							},
 						},
@@ -477,7 +469,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							"2232323",
 							domain.SMTPConfigStateActive,
 							"test",
-							nil,
 							nil,
 							nil,
 							nil,
@@ -522,7 +513,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							nil,
 						},
 						{
 							testNow,
@@ -540,7 +530,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							"host3",
 							"user3",
 							&crypto.CryptoValue{},
-							nil,
 							nil,
 							nil,
 							nil,
@@ -586,8 +575,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							SenderName:     "name2",
 							ReplyToAddress: "reply-to2",
 							Host:           "host2",
+							User:           "user2",
 							PlainAuth: &PlainAuth{
-								User:     "user2",
 								Password: &crypto.CryptoValue{},
 							},
 						},
@@ -606,8 +595,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 							SenderName:     "name3",
 							ReplyToAddress: "reply-to3",
 							Host:           "host3",
+							User:           "user3",
 							PlainAuth: &PlainAuth{
-								User:     "user3",
 								Password: &crypto.CryptoValue{},
 							},
 						},

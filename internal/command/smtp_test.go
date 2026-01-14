@@ -77,8 +77,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					ResourceOwner: "INSTANCE",
 					From:          "from@domain.ch",
 					Host:          "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -137,8 +137,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"",
 							"host:587",
+							"user",
 							&instance.PlainAuth{
-								User: "user",
 								Password: &crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -161,8 +161,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -203,8 +203,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
+							"user",
 							&instance.PlainAuth{
-								User: "user",
 								Password: &crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -228,8 +228,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					FromName:       "name",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:           "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -255,8 +255,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -282,8 +282,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "   ",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -324,8 +324,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"",
 							"[2001:db8::1]:2525",
+							"user",
 							&instance.PlainAuth{
-								User: "user",
 								Password: &crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -348,8 +348,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "[2001:db8::1]:2525",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -390,9 +390,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
-							&instance.PlainAuth{
-								User: "user",
-							},
+							"user",
+							&instance.PlainAuth{},
 							nil,
 						),
 					),
@@ -409,9 +408,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					FromName:       "name",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user",
-					},
+					User:           "user",
+					PlainAuth:      &PlainAuth{},
 				},
 			},
 			res: res{
@@ -450,6 +448,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
+							"",
 							nil,
 							nil,
 						),
@@ -505,18 +504,20 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 							"name",
 							"replyto@domain.ch",
 							"host:587",
+							"user",
 							nil,
 							&instance.XOAuth2Auth{
-								User:     "user",
-								ClientId: "client-id",
-								ClientSecret: &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("password"),
-								},
 								TokenEndpoint: "auth.example.com/token",
 								Scopes:        []string{"scope"},
+								ClientCredentials: &instance.XOAuth2ClientCredentials{
+									ClientId: "client-id",
+									ClientSecret: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
+								},
 							},
 						),
 					),
@@ -533,11 +534,11 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					FromName:       "name",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host:587",
-					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
-						User:          "user",
+					User:           "user",
+					XOAuth2Auth: &XOAuth2Auth{
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scope"},
-						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+						ClientCredentialsAuth: &OAuth2ClientCredentials{
 							ClientId:     "client-id",
 							ClientSecret: "password",
 						},
@@ -654,9 +655,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user",
-					},
+					User:          "user",
+					PlainAuth:     &PlainAuth{},
 				},
 			},
 			res: res{
@@ -694,8 +694,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -713,9 +713,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@wrongdomain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user",
-					},
+					User:          "user",
+					PlainAuth:     &PlainAuth{},
 				},
 			},
 			res: res{
@@ -751,8 +750,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -770,9 +769,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user",
-					},
+					User:          "user",
+					PlainAuth:     &PlainAuth{},
 				},
 			},
 			res: res{
@@ -810,8 +808,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -828,9 +826,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							"name2",
 							"replyto@domain.ch",
 							"host2:587",
-							&instance.PlainAuth{
-								User: "user2",
-							},
+							"user2",
+							&instance.PlainAuth{},
 							nil,
 						),
 					),
@@ -846,9 +843,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host2:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user2",
-					},
+					User:           "user2",
+					PlainAuth:      &PlainAuth{},
 				},
 			},
 			res: res{
@@ -871,8 +867,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "host",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -897,8 +893,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:          "from@domain.ch",
 					FromName:      "name",
 					Host:          "   ",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:          "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -938,8 +934,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -956,9 +952,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							"name2",
 							"replyto@domain.ch",
 							"[2001:db8::1]:2525",
-							&instance.PlainAuth{
-								User: "user2",
-							},
+							"user2",
+							&instance.PlainAuth{},
 							nil,
 						),
 					),
@@ -974,9 +969,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "[2001:db8::1]:2525",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User: "user2",
-					},
+					User:           "user2",
+					PlainAuth:      &PlainAuth{},
 				},
 			},
 			res: res{
@@ -1014,9 +1008,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
-								&instance.PlainAuth{
-									User: "user",
-								},
+								"user",
+								&instance.PlainAuth{},
 								nil,
 							),
 						),
@@ -1031,18 +1024,20 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							"name2",
 							"replyto@domain.ch",
 							"host2:587",
+							"user2",
 							nil,
 							&instance.XOAuth2Auth{
-								User:     "user2",
-								ClientId: "client-id",
-								ClientSecret: &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("password"),
-								},
 								TokenEndpoint: "auth.example.com/token",
 								Scopes:        []string{"scope"},
+								ClientCredentials: &instance.XOAuth2ClientCredentials{
+									ClientId: "client-id",
+									ClientSecret: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
+								},
 							},
 						),
 					),
@@ -1059,11 +1054,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host2:587",
-					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
-						User:          "user2",
+					User:           "user2",
+					XOAuth2Auth: &XOAuth2Auth{
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scope"},
-						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+						ClientCredentialsAuth: &OAuth2ClientCredentials{
 							ClientId:     "client-id",
 							ClientSecret: "password",
 						},
@@ -1105,18 +1100,20 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user2",
 								nil,
 								&instance.XOAuth2Auth{
-									User:     "user2",
-									ClientId: "client-id",
-									ClientSecret: &crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("client-secret"),
-									},
 									TokenEndpoint: "auth.example.com/token",
 									Scopes:        []string{"scope"},
+									ClientCredentials: &instance.XOAuth2ClientCredentials{
+										ClientId: "client-id",
+										ClientSecret: &crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("client-secret"),
+										},
+									},
 								},
 							),
 						),
@@ -1131,8 +1128,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							"name2",
 							"replyto@domain.ch",
 							"host2:587",
+							"user",
 							&instance.PlainAuth{
-								User: "user",
 								Password: &crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -1156,8 +1153,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					FromName:       "name2",
 					ReplyToAddress: "replyto@domain.ch",
 					Host:           "host2:587",
-					PlainAuth: &smtp.PlainAuthConfig{
-						User:     "user",
+					User:           "user",
+					PlainAuth: &PlainAuth{
 						Password: "password",
 					},
 				},
@@ -1269,8 +1266,8 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -1691,8 +1688,8 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -1735,8 +1732,8 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -1902,8 +1899,8 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -1952,8 +1949,8 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -2134,8 +2131,8 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"host:587",
+								"user",
 								&instance.PlainAuth{
-									User:     "user",
 									Password: &crypto.CryptoValue{},
 								},
 								nil,
@@ -2365,8 +2362,8 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
+								"user",
 								&instance.PlainAuth{
-									User: "user",
 									Password: &crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -2449,18 +2446,20 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
+								"user",
 								nil,
 								&instance.XOAuth2Auth{
-									User:     "user",
-									ClientId: "client-id",
-									ClientSecret: &crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
 									TokenEndpoint: "auth.example.com/token",
 									Scopes:        []string{"scope"},
+									ClientCredentials: &instance.XOAuth2ClientCredentials{
+										ClientId: "client-id",
+										ClientSecret: &crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("password"),
+										},
+									},
 								},
 							),
 						),
@@ -2596,8 +2595,8 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
+								"user",
 								&instance.PlainAuth{
-									User: "user",
 									Password: &crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -2639,18 +2638,20 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 								"name",
 								"",
 								"mail.smtp2go.com:2525",
+								"user",
 								nil,
 								&instance.XOAuth2Auth{
-									User:     "user",
-									ClientId: "client-id",
-									ClientSecret: &crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("client-secret"),
-									},
 									TokenEndpoint: "auth.example.com/token",
 									Scopes:        []string{"scope"},
+									ClientCredentials: &instance.XOAuth2ClientCredentials{
+										ClientId: "client-id",
+										ClientSecret: &crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("client-secret"),
+										},
+									},
 								},
 							),
 						),
@@ -2686,7 +2687,7 @@ func TestCommandSide_TestSMTPConfigById(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls bool, fromAddress, fromName, replyTo, host string, plainAuth *instance.PlainAuth, xoauth2Auth *instance.XOAuth2Auth) *instance.SMTPConfigChangedEvent {
+func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls bool, fromAddress, fromName, replyTo, host, user string, plainAuth *instance.PlainAuth, xoauth2Auth *instance.XOAuth2Auth) *instance.SMTPConfigChangedEvent {
 	changes := []instance.SMTPConfigChanges{
 		instance.ChangeSMTPConfigDescription(description),
 		instance.ChangeSMTPConfigTLS(tls),
@@ -2694,21 +2695,24 @@ func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls 
 		instance.ChangeSMTPConfigFromName(fromName),
 		instance.ChangeSMTPConfigReplyToAddress(replyTo),
 		instance.ChangeSMTPConfigSMTPHost(host),
+		instance.ChangeSMTPConfigSMTPUser(user),
 	}
 	if plainAuth != nil {
 		changes = append(changes,
-			instance.ChangeSMTPConfigSMTPUser(plainAuth.User),
 			instance.ChangeSMTPConfigSMTPPassword(plainAuth.Password),
 		)
 	}
 	if xoauth2Auth != nil {
 		changes = append(changes,
-			instance.ChangeSMTPConfigXOAuth2User(xoauth2Auth.User),
-			instance.ChangeSMTPConfigXOAuth2ClientId(xoauth2Auth.ClientId),
-			instance.ChangeSMTPConfigXOAuth2ClientSecret(xoauth2Auth.ClientSecret),
 			instance.ChangeSMTPConfigXOAuth2TokenEndpoint(xoauth2Auth.TokenEndpoint),
 			instance.ChangeSMTPConfigXOAuth2Scopes(xoauth2Auth.Scopes),
 		)
+		if xoauth2Auth.ClientCredentials != nil {
+			changes = append(changes,
+				instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientId(xoauth2Auth.ClientCredentials.ClientId),
+				instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientSecret(xoauth2Auth.ClientCredentials.ClientSecret),
+			)
+		}
 	}
 	event, _ := instance.NewSMTPConfigChangeEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,

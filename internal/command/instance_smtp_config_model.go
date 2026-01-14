@@ -32,6 +32,7 @@ type SMTPConfig struct {
 	SenderAddress  string
 	SenderName     string
 	ReplyToAddress string
+	User           string
 	PlainAuth      *instance.PlainAuth
 	XOAuth2Auth    *instance.XOAuth2Auth
 }
@@ -171,6 +172,7 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	fromName,
 	replyToAddress,
 	smtpHost string,
+	user string,
 	plainAuth *instance.PlainAuth,
 	xoauth2Auth *instance.XOAuth2Auth,
 ) (*instance.SMTPConfigChangedEvent, bool, error) {
@@ -201,11 +203,14 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	if wm.SMTPConfig.Host != smtpHost {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPHost(smtpHost))
 	}
+	if wm.SMTPConfig.User != user {
+		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(user))
+	}
 	if plainAuth != nil {
-		changes = append(changes, smtpPlainAuthChanges(wm, *plainAuth)...)
+		changes = append(changes, smtpPlainAuthChanges(wm.SMTPConfig.PlainAuth, *plainAuth)...)
 	}
 	if xoauth2Auth != nil {
-		changes = append(changes, smtpXOAuthChanges(wm, *xoauth2Auth)...)
+		changes = append(changes, smtpXOAuthChanges(wm.SMTPConfig.XOAuth2Auth, *xoauth2Auth)...)
 	}
 
 	if len(changes) == 0 {
@@ -218,21 +223,16 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(
 	return changeEvent, true, nil
 }
 
-func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) []instance.SMTPConfigChanges {
+func smtpPlainAuthChanges(wm *instance.PlainAuth, auth instance.PlainAuth) []instance.SMTPConfigChanges {
 	// if no auth is yet present, set both
-	if wm.SMTPConfig.PlainAuth == nil {
+	if wm == nil {
 		return []instance.SMTPConfigChanges{
-			instance.ChangeSMTPConfigSMTPUser(auth.User),
 			instance.ChangeSMTPConfigSMTPPassword(auth.Password),
 		}
 	}
 
 	// if auth is already present, add changes for the changed values
 	var changes []instance.SMTPConfigChanges
-
-	if wm.SMTPConfig.PlainAuth.User != auth.User {
-		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(auth.User))
-	}
 
 	if auth.Password != nil {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(auth.Password))
@@ -241,13 +241,12 @@ func smtpPlainAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.PlainAuth) 
 	return changes
 }
 
-func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) []instance.SMTPConfigChanges {
+func smtpXOAuthChanges(wm *instance.XOAuth2Auth, auth instance.XOAuth2Auth) []instance.SMTPConfigChanges {
 	// if no auth is yet present, set all properties
-	if wm.SMTPConfig.XOAuth2Auth == nil {
+	if wm == nil {
 		return []instance.SMTPConfigChanges{
-			instance.ChangeSMTPConfigXOAuth2User(auth.User),
-			instance.ChangeSMTPConfigXOAuth2ClientId(auth.ClientId),
-			instance.ChangeSMTPConfigXOAuth2ClientSecret(auth.ClientSecret),
+			instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientId(auth.ClientCredentials.ClientId),
+			instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientSecret(auth.ClientCredentials.ClientSecret),
 			instance.ChangeSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint),
 			instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes),
 		}
@@ -256,29 +255,42 @@ func smtpXOAuthChanges(wm *IAMSMTPConfigWriteModel, auth instance.XOAuth2Auth) [
 	// if auth is already present, add changes for the changed values
 	var changes []instance.SMTPConfigChanges
 
-	if wm.SMTPConfig.XOAuth2Auth.User != auth.User {
-		changes = append(changes, instance.ChangeSMTPConfigXOAuth2User(auth.User))
-	}
-	if wm.SMTPConfig.XOAuth2Auth.ClientId != auth.ClientId {
-		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientId(auth.ClientId))
-	}
-	if wm.SMTPConfig.XOAuth2Auth.ClientSecret != auth.ClientSecret {
-		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientSecret(auth.ClientSecret))
-	}
-	if wm.SMTPConfig.XOAuth2Auth.TokenEndpoint != auth.TokenEndpoint {
+	if wm.TokenEndpoint != auth.TokenEndpoint {
 		changes = append(changes, instance.ChangeSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint))
 	}
-	if len(wm.SMTPConfig.XOAuth2Auth.Scopes) != len(auth.Scopes) {
+	if len(wm.Scopes) != len(auth.Scopes) {
 		changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
 	} else {
 		for _, s := range auth.Scopes {
-			if !slices.Contains(wm.SMTPConfig.XOAuth2Auth.Scopes, s) {
+			if !slices.Contains(wm.Scopes, s) {
 				changes = append(changes, instance.ChangeSMTPConfigXOAuth2Scopes(auth.Scopes))
 				break
 			}
 		}
 	}
 
+	if auth.ClientCredentials != nil {
+		changes = append(changes, smtpXOAuthClientCredentialChanges(auth.ClientCredentials, *auth.ClientCredentials)...)
+	}
+
+	return changes
+}
+
+func smtpXOAuthClientCredentialChanges(wm *instance.XOAuth2ClientCredentials, cc instance.XOAuth2ClientCredentials) []instance.SMTPConfigChanges {
+	if wm == nil {
+		return []instance.SMTPConfigChanges{
+			instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientId(cc.ClientId),
+			instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientSecret(cc.ClientSecret),
+		}
+	}
+
+	var changes []instance.SMTPConfigChanges
+	if wm.ClientId != cc.ClientId {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientId(cc.ClientId))
+	}
+	if wm.ClientSecret != cc.ClientSecret {
+		changes = append(changes, instance.ChangeSMTPConfigXOAuth2ClientCredentialsClientSecret(cc.ClientSecret))
+	}
 	return changes
 }
 
@@ -325,21 +337,25 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 		SenderName:     e.SenderName,
 		SenderAddress:  e.SenderAddress,
 		ReplyToAddress: e.ReplyToAddress,
+		User:           e.User,
 	}
 
 	if e.PlainAuth != nil {
 		wm.SMTPConfig.PlainAuth = &instance.PlainAuth{
-			User:     e.PlainAuth.User,
 			Password: e.PlainAuth.Password,
 		}
 	}
 	if e.XOAuth2Auth != nil {
 		wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{
-			User:          e.XOAuth2Auth.User,
-			ClientId:      e.XOAuth2Auth.ClientId,
-			ClientSecret:  e.XOAuth2Auth.ClientSecret,
 			TokenEndpoint: e.XOAuth2Auth.TokenEndpoint,
 			Scopes:        e.XOAuth2Auth.Scopes,
+		}
+
+		if e.XOAuth2Auth.ClientCredentials != nil {
+			wm.SMTPConfig.XOAuth2Auth.ClientCredentials = &instance.XOAuth2ClientCredentials{
+				ClientId:     e.XOAuth2Auth.ClientCredentials.ClientId,
+				ClientSecret: e.XOAuth2Auth.ClientCredentials.ClientSecret,
+			}
 		}
 	}
 
@@ -392,40 +408,41 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	if e.ReplyToAddress != nil {
 		wm.SMTPConfig.ReplyToAddress = *e.ReplyToAddress
 	}
-
-	if wm.SMTPConfig.PlainAuth == nil && !e.PlainAuth.IsEmpty() {
-		wm.SMTPConfig.PlainAuth = &instance.PlainAuth{}
-		wm.SMTPConfig.XOAuth2Auth = nil
-	}
-	if e.PlainAuth.User != nil {
-		wm.SMTPConfig.PlainAuth.User = *e.PlainAuth.User
-	} else if e.User != nil {
-		wm.SMTPConfig.PlainAuth.User = *e.User
-	}
-	if e.PlainAuth.Password != nil {
-		wm.SMTPConfig.PlainAuth.Password = e.PlainAuth.Password
-	} else if e.Password != nil {
-		wm.SMTPConfig.PlainAuth.Password = e.Password
+	if e.User != nil {
+		wm.SMTPConfig.User = *e.User
 	}
 
-	if wm.SMTPConfig.XOAuth2Auth == nil && !e.XOAuth2Auth.IsEmpty() {
-		wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{}
-		wm.SMTPConfig.PlainAuth = nil
+	if !e.PlainAuth.IsEmpty() {
+		if wm.SMTPConfig.PlainAuth == nil {
+			wm.SMTPConfig.PlainAuth = &instance.PlainAuth{}
+			wm.SMTPConfig.XOAuth2Auth = nil
+		}
+		if e.PlainAuth.Password != nil {
+			wm.SMTPConfig.PlainAuth.Password = e.PlainAuth.Password
+		} else if e.Password != nil {
+			wm.SMTPConfig.PlainAuth.Password = e.Password
+		}
 	}
-	if e.XOAuth2Auth.User != nil {
-		wm.SMTPConfig.XOAuth2Auth.User = *e.XOAuth2Auth.User
-	}
-	if e.XOAuth2Auth.ClientId != nil {
-		wm.SMTPConfig.XOAuth2Auth.ClientId = *e.XOAuth2Auth.ClientId
-	}
-	if e.XOAuth2Auth.ClientSecret != nil {
-		wm.SMTPConfig.XOAuth2Auth.ClientSecret = e.XOAuth2Auth.ClientSecret
-	}
-	if e.XOAuth2Auth.TokenEndpoint != nil {
-		wm.SMTPConfig.XOAuth2Auth.TokenEndpoint = *e.XOAuth2Auth.TokenEndpoint
-	}
-	if e.XOAuth2Auth.Scopes != nil {
-		wm.SMTPConfig.XOAuth2Auth.Scopes = e.XOAuth2Auth.Scopes
+
+	if !e.XOAuth2Auth.IsEmpty() {
+		if wm.SMTPConfig.XOAuth2Auth == nil {
+			wm.SMTPConfig.XOAuth2Auth = &instance.XOAuth2Auth{}
+			wm.SMTPConfig.PlainAuth = nil
+		}
+		if e.XOAuth2Auth.TokenEndpoint != nil {
+			wm.SMTPConfig.XOAuth2Auth.TokenEndpoint = *e.XOAuth2Auth.TokenEndpoint
+		}
+		if e.XOAuth2Auth.Scopes != nil {
+			wm.SMTPConfig.XOAuth2Auth.Scopes = e.XOAuth2Auth.Scopes
+		}
+		if wm.SMTPConfig.XOAuth2Auth.ClientCredentials != nil && !e.XOAuth2Auth.ClientCredentials.IsEmpty() {
+			if e.XOAuth2Auth.ClientCredentials.ClientId != nil {
+				wm.SMTPConfig.XOAuth2Auth.ClientCredentials.ClientId = *e.XOAuth2Auth.ClientCredentials.ClientId
+			}
+			if e.XOAuth2Auth.ClientCredentials.ClientSecret != nil {
+				wm.SMTPConfig.XOAuth2Auth.ClientCredentials.ClientSecret = e.XOAuth2Auth.ClientCredentials.ClientSecret
+			}
+		}
 	}
 
 	// If ID has empty value we're dealing with the old and unique smtp settings

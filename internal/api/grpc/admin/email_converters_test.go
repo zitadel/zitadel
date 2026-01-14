@@ -85,9 +85,8 @@ func Test_emailProvidersToPb(t *testing.T) {
 							SenderName:     "sendername",
 							ReplyToAddress: "address",
 							Host:           "host",
-							PlainAuth: &query.PlainAuth{
-								User: "user",
-							},
+							User:           "user",
+							PlainAuth:      &query.PlainAuth{},
 						},
 						HTTPConfig: nil,
 						State:      1,
@@ -189,9 +188,8 @@ func Test_emailProviderToProviderPb(t *testing.T) {
 						SenderName:     "sendername",
 						ReplyToAddress: "address",
 						Host:           "host",
-						PlainAuth: &query.PlainAuth{
-							User: "user",
-						},
+						User:           "user",
+						PlainAuth:      &query.PlainAuth{},
 					},
 					HTTPConfig: &query.HTTP{
 						Endpoint:   "endpoint",
@@ -369,13 +367,12 @@ func Test_smtpToPb(t *testing.T) {
 			name: "all fields filled",
 			args: args{
 				req: &query.SMTP{
-					SenderAddress: "sender",
-					SenderName:    "sendername",
-					TLS:           true,
-					Host:          "host",
-					PlainAuth: &query.PlainAuth{
-						User: "user",
-					},
+					SenderAddress:  "sender",
+					SenderName:     "sendername",
+					TLS:            true,
+					Host:           "host",
+					User:           "user",
+					PlainAuth:      &query.PlainAuth{},
 					ReplyToAddress: "address",
 				},
 			},
@@ -397,9 +394,8 @@ func Test_smtpToPb(t *testing.T) {
 			name: "legacy auth must still be supported",
 			args: args{
 				req: &query.SMTP{
-					PlainAuth: &query.PlainAuth{
-						User: "user",
-					},
+					User:      "user",
+					PlainAuth: &query.PlainAuth{},
 				},
 			},
 			res: &settings_pb.EmailProvider_Smtp{
@@ -415,9 +411,8 @@ func Test_smtpToPb(t *testing.T) {
 			name: "plain auth must map to plain",
 			args: args{
 				req: &query.SMTP{
-					PlainAuth: &query.PlainAuth{
-						User: "plain-user",
-					},
+					User:      "plain-user",
+					PlainAuth: &query.PlainAuth{},
 				},
 			},
 			res: &settings_pb.EmailProvider_Smtp{
@@ -433,11 +428,13 @@ func Test_smtpToPb(t *testing.T) {
 			name: "xoauth2 auth must map to xoauth2",
 			args: args{
 				req: &query.SMTP{
+					User: "xoauth2-user",
 					XOAuth2Auth: &query.XOAuth2Auth{
-						User:          "xoauth2-user",
-						ClientId:      "my-client",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scopes"},
+						ClientCredentials: &query.XOAuthClientCredentials{
+							ClientId: "my-client",
+						},
 					},
 				},
 			},
@@ -496,8 +493,8 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 				ResourceOwner: "instance",
 				Description:   "description",
 				Host:          "host",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "user",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
 					Password: "password",
 				},
 				Tls:            true,
@@ -517,8 +514,8 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 			},
 			res: &command.AddSMTPConfig{
 				ResourceOwner: "instance",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "user",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
 					Password: "password",
 				},
 			},
@@ -538,8 +535,8 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 			},
 			res: &command.AddSMTPConfig{
 				ResourceOwner: "instance",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "plain-user",
+				User:          "plain-user",
+				PlainAuth: &command.PlainAuth{
 					Password: "other_password",
 				},
 			},
@@ -566,11 +563,11 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 			},
 			res: &command.AddSMTPConfig{
 				ResourceOwner: "instance",
-				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
-					User:          "xoauth2-user",
+				User:          "xoauth2-user",
+				XOAuth2Auth: &command.XOAuth2Auth{
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
-					ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+					ClientCredentialsAuth: &command.OAuth2ClientCredentials{
 						ClientId:     "my-client",
 						ClientSecret: "some-secret",
 					},
@@ -617,8 +614,8 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 				ID:            "id",
 				Description:   "description",
 				Host:          "host",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "user",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
 					Password: "password",
 				},
 				Tls:            true,
@@ -640,8 +637,8 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 			res: &command.ChangeSMTPConfig{
 				ResourceOwner: "instance",
 				ID:            "id",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "user",
+				User:          "user",
+				PlainAuth: &command.PlainAuth{
 					Password: "password",
 				},
 			},
@@ -663,8 +660,8 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 			res: &command.ChangeSMTPConfig{
 				ResourceOwner: "instance",
 				ID:            "id",
-				PlainAuth: &smtp.PlainAuthConfig{
-					User:     "plain-user",
+				User:          "plain-user",
+				PlainAuth: &command.PlainAuth{
 					Password: "other_password",
 				},
 			},
@@ -693,11 +690,11 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 			res: &command.ChangeSMTPConfig{
 				ResourceOwner: "instance",
 				ID:            "id",
-				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
-					User:          "xoauth2-user",
+				User:          "xoauth2-user",
+				XOAuth2Auth: &command.XOAuth2Auth{
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
-					ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+					ClientCredentialsAuth: &command.OAuth2ClientCredentials{
 						ClientId:     "my-client",
 						ClientSecret: "some-secret",
 					},

@@ -38,15 +38,17 @@ type SMTPConfigAddedEvent struct {
 }
 
 type XOAuth2Auth struct {
-	User          string              `json:"user,omitempty"`
-	ClientId      string              `json:"clientId,omitempty"`
-	ClientSecret  *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	TokenEndpoint string              `json:"tokenEndpoint,omitempty"`
-	Scopes        []string            `json:"scopes,omitempty"`
+	TokenEndpoint     string                    `json:"tokenEndpoint,omitempty"`
+	Scopes            []string                  `json:"scopes,omitempty"`
+	ClientCredentials *XOAuth2ClientCredentials `json:"clientCredentials,omitempty"`
+}
+
+type XOAuth2ClientCredentials struct {
+	ClientId     string              `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
 type PlainAuth struct {
-	User     string              `json:"user,omitempty"`
 	Password *crypto.CryptoValue `json:"password,omitempty"`
 }
 
@@ -59,6 +61,7 @@ func NewSMTPConfigAddedEvent(
 	senderName,
 	replyToAddress,
 	host string,
+	user string,
 	plainAuth *PlainAuth,
 	xoauth2Auth *XOAuth2Auth,
 ) *SMTPConfigAddedEvent {
@@ -75,6 +78,7 @@ func NewSMTPConfigAddedEvent(
 		SenderName:     senderName,
 		ReplyToAddress: replyToAddress,
 		Host:           host,
+		User:           user,
 		PlainAuth:      plainAuth,
 		XOAuth2Auth:    xoauth2Auth,
 	}
@@ -108,24 +112,30 @@ type SMTPConfigChangedEvent struct {
 }
 
 type XOAuth2AuthChanged struct {
-	User          *string             `json:"user,omitempty"`
-	ClientId      *string             `json:"clientId,omitempty"`
-	ClientSecret  *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	TokenEndpoint *string             `json:"tokenEndpoint,omitempty"`
-	Scopes        []string            `json:"scopes,omitempty"`
+	TokenEndpoint     *string                         `json:"tokenEndpoint,omitempty"`
+	Scopes            []string                        `json:"scopes,omitempty"`
+	ClientCredentials XOAuth2ClientCredentialsChanged `json:"clientCredentials,omitempty"`
 }
 
 func (c XOAuth2AuthChanged) IsEmpty() bool {
-	return c.User == nil && c.ClientId == nil && c.ClientSecret == nil && c.TokenEndpoint == nil && len(c.Scopes) == 0
+	return c.ClientCredentials.IsEmpty() && c.TokenEndpoint == nil && len(c.Scopes) == 0
+}
+
+type XOAuth2ClientCredentialsChanged struct {
+	ClientId     *string             `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+}
+
+func (c XOAuth2ClientCredentialsChanged) IsEmpty() bool {
+	return c.ClientId == nil && c.ClientSecret == nil
 }
 
 type PlainAuthChanged struct {
-	User     *string             `json:"user,omitempty"`
 	Password *crypto.CryptoValue `json:"password,omitempty"`
 }
 
 func (c PlainAuthChanged) IsEmpty() bool {
-	return c.User == nil && c.Password == nil
+	return c.Password == nil
 }
 
 func (e *SMTPConfigChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -210,7 +220,6 @@ func ChangeSMTPConfigSMTPHost(smtpHost string) func(event *SMTPConfigChangedEven
 func ChangeSMTPConfigSMTPUser(smtpUser string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.User = &smtpUser
-		e.PlainAuth.User = &smtpUser
 	}
 }
 
@@ -221,21 +230,15 @@ func ChangeSMTPConfigSMTPPassword(password *crypto.CryptoValue) func(event *SMTP
 	}
 }
 
-func ChangeSMTPConfigXOAuth2User(user string) func(event *SMTPConfigChangedEvent) {
+func ChangeSMTPConfigXOAuth2ClientCredentialsClientId(clientId string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.XOAuth2Auth.User = &user
+		e.XOAuth2Auth.ClientCredentials.ClientId = &clientId
 	}
 }
 
-func ChangeSMTPConfigXOAuth2ClientId(clientId string) func(event *SMTPConfigChangedEvent) {
+func ChangeSMTPConfigXOAuth2ClientCredentialsClientSecret(clientSecret *crypto.CryptoValue) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.XOAuth2Auth.ClientId = &clientId
-	}
-}
-
-func ChangeSMTPConfigXOAuth2ClientSecret(clientSecret *crypto.CryptoValue) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.XOAuth2Auth.ClientSecret = clientSecret
+		e.XOAuth2Auth.ClientCredentials.ClientSecret = clientSecret
 	}
 }
 

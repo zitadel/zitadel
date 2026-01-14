@@ -57,24 +57,26 @@ func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto cryp
 	}
 
 	if qs.XOAuth2Auth != nil {
-		clientSecret, err := crypto.DecryptString(qs.XOAuth2Auth.ClientSecret, passCrypto)
-		if err != nil {
-			return nil, err
-		}
 		config.SMTPConfig.SMTP.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
-			User:          qs.XOAuth2Auth.User,
+			User:          qs.User,
 			TokenEndpoint: qs.XOAuth2Auth.TokenEndpoint,
 			Scopes:        qs.XOAuth2Auth.Scopes,
-			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
-				ClientId:     qs.XOAuth2Auth.ClientId,
+		}
+		if qs.XOAuth2Auth.ClientCredentials != nil {
+			clientSecret, err := crypto.DecryptString(qs.XOAuth2Auth.ClientCredentials.ClientSecret, passCrypto)
+			if err != nil {
+				return nil, err
+			}
+			config.SMTPConfig.SMTP.XOAuth2Auth.ClientCredentialsAuth = &smtp.OAuth2ClientCredentials{
+				ClientId:     qs.XOAuth2Auth.ClientCredentials.ClientId,
 				ClientSecret: clientSecret,
-			},
+			}
 		}
 	}
 
 	if qs.PlainAuth != nil {
 		config.SMTPConfig.SMTP.PlainAuth = &smtp.PlainAuthConfig{
-			User: qs.PlainAuth.User,
+			User: qs.User,
 		}
 
 		if qs.PlainAuth.Password != nil {

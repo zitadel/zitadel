@@ -82,28 +82,30 @@ func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 			SenderAddress:  config.SenderAddress,
 			SenderName:     config.SenderName,
 			ReplyToAddress: config.ReplyToAddress,
+			User:           config.User,
 		},
 	}
 
 	if config.PlainAuth != nil {
-		ret.Smtp.User = config.PlainAuth.User
 		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_Plain{
 			Plain: &settings_pb.SMTPPlainAuth{},
 		}
 	}
 	if config.XOAuth2Auth != nil {
-		ret.Smtp.User = config.XOAuth2Auth.User
-		ret.Smtp.Auth = &settings_pb.EmailProviderSMTP_Xoauth2{
+		xoauth2 := &settings_pb.EmailProviderSMTP_Xoauth2{
 			Xoauth2: &settings_pb.SMTPXOAuth2Auth{
 				TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
 				Scopes:        config.XOAuth2Auth.Scopes,
-				OAuth2Type: &settings_pb.SMTPXOAuth2Auth_ClientCredentials_{
-					ClientCredentials: &settings_pb.SMTPXOAuth2Auth_ClientCredentials{
-						ClientId: config.XOAuth2Auth.ClientId,
-					},
-				},
 			},
 		}
+		if config.XOAuth2Auth.ClientCredentials != nil {
+			xoauth2.Xoauth2.OAuth2Type = &settings_pb.SMTPXOAuth2Auth_ClientCredentials_{
+				ClientCredentials: &settings_pb.SMTPXOAuth2Auth_ClientCredentials{
+					ClientId: config.XOAuth2Auth.ClientCredentials.ClientId,
+				},
+			}
+		}
+		ret.Smtp.Auth = xoauth2
 	}
 
 	return ret
@@ -118,23 +120,22 @@ func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
+		User:           req.User,
 	}
 
 	switch v := req.Auth.(type) {
 	case *admin_pb.AddEmailProviderSMTPRequest_None:
 		// Nothing to do, no auth is required
 	case *admin_pb.AddEmailProviderSMTPRequest_Plain:
-		cmd.PlainAuth = &smtp.PlainAuthConfig{
-			User:     req.User,
+		cmd.PlainAuth = &command.PlainAuth{
 			Password: v.Plain.Password,
 		}
 	case *admin_pb.AddEmailProviderSMTPRequest_Xoauth2:
 		xoauth2 := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_)
-		cmd.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
-			User:          req.User,
+		cmd.XOAuth2Auth = &command.XOAuth2Auth{
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
-			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+			ClientCredentialsAuth: &command.OAuth2ClientCredentials{
 				ClientId:     xoauth2.ClientCredentials.ClientId,
 				ClientSecret: xoauth2.ClientCredentials.ClientSecret,
 			},
@@ -143,8 +144,7 @@ func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 		// ensure backwards compatibility
 		//nolint:staticcheck
 		if req.User != "" || req.Password != "" {
-			cmd.PlainAuth = &smtp.PlainAuthConfig{
-				User:     req.User,
+			cmd.PlainAuth = &command.PlainAuth{
 				Password: req.Password,
 			}
 		}
@@ -163,23 +163,22 @@ func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		Host:           req.Host,
+		User:           req.User,
 	}
 
 	switch v := req.Auth.(type) {
 	case *admin_pb.UpdateEmailProviderSMTPRequest_None:
 		// Nothing to do, no auth is required
 	case *admin_pb.UpdateEmailProviderSMTPRequest_Plain:
-		cmd.PlainAuth = &smtp.PlainAuthConfig{
-			User:     req.User,
+		cmd.PlainAuth = &command.PlainAuth{
 			Password: v.Plain.Password,
 		}
 	case *admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2:
 		xoauth2 := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_)
-		cmd.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
-			User:          req.User,
+		cmd.XOAuth2Auth = &command.XOAuth2Auth{
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
-			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+			ClientCredentialsAuth: &command.OAuth2ClientCredentials{
 				ClientId:     xoauth2.ClientCredentials.ClientId,
 				ClientSecret: xoauth2.ClientCredentials.ClientSecret,
 			},
@@ -187,8 +186,7 @@ func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 	default:
 		// ensure backwards compatibility
 		if req.User != "" || req.Password != "" {
-			cmd.PlainAuth = &smtp.PlainAuthConfig{
-				User:     req.User,
+			cmd.PlainAuth = &command.PlainAuth{
 				Password: req.Password,
 			}
 		}
