@@ -412,7 +412,7 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, organizations.GetResult(), 1)
 		primaryDomain = organizations.GetResult()[0].GetPrimaryDomain()
-	}, retryDuration, tick, "could not find primary domain")
+	}, retryDuration, tick, "could not find Organization Domain")
 
 	_, err := Client.AddOrganizationDomain(CTX, &org.AddOrganizationDomainRequest{
 		OrganizationId: orgId,
@@ -459,7 +459,7 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 			},
 		},
 		{
-			name: "list org domain, all domains",
+			name: "list Organization Domain, all domains",
 			args: args{
 				ctx: CTX,
 				request: &org.ListOrganizationDomainsRequest{

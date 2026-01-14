@@ -405,7 +405,7 @@ func assertNoReservedScopes(t *testing.T, claims map[string]any) {
 // each role should contain the org IDs expected by wantRoleOrgIDs.
 //
 // In the claim map, each project role claim is expected to be a map of multiple roles and
-// each role is expected to be a map of multiple Org IDs to Org Domains.
+// each role is expected to be a map of multiple Org IDs to Organization Domains.
 func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, claimProjectRole bool, wantRoles, wantRoleOrgIDs []string) {
 	t.Helper()
 	projectRoleClaims := []string{fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)}
@@ -418,7 +418,7 @@ func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]a
 
 		gotRoles := make([]string, 0, len(roleMap))
 		for roleKey := range roleMap {
-			role, ok := roleMap[roleKey].(map[string]any) // map of multiple org IDs to org domains
+			role, ok := roleMap[roleKey].(map[string]any) // map of multiple org IDs to organization domains
 			require.Truef(t, ok, "role %s not found or wrong type %T", roleKey, roleMap[roleKey])
 			gotRoles = append(gotRoles, roleKey)
 

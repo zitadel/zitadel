@@ -486,7 +486,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "human, scope org primary domain prefix",
+			name: "human, scope Organization Domain prefix",
 			args: args{
 				user:  humanUserInfo,
 				scope: []string{domain.OrgDomainPrimaryScope + "foo.com"},
