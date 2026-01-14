@@ -1607,7 +1607,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				// TODO remove error for deleting org domain already deleted
+				// TODO remove error for deleting organization domain already deleted
 				// require.NoError(t, err)
 				require.Contains(t, err.Error(), "Domain doesn't exist on organization")
 				// check details
