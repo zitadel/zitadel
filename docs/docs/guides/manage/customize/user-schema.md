@@ -15,7 +15,7 @@ Or you might want to disable username password authentication for your admins an
 but still allow it for your customers.
 
 :::info
-Please be aware that User Schema is in a [preview stage](/support/software-release-cycles-support#preview) not feature complete
+Please be aware that User Schema is in a [preview stage](https://help.zitadel.com/zitadel-software-release-cycle#preview) not feature complete
 and therefore not generally available.
 
 Do not use it for production yet. To test it out, you need to enable the `UserSchema` [feature flag](/apis/resources/feature_service_v2/feature-service).

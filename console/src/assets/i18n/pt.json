@@ -219,7 +219,7 @@
           "DC": "Quando você reivindica um domínio para sua organização, usuários que não usam este domínio em seu nome de login serão solicitados a mudar seu nome de login para corresponder ao domínio reivindicado.",
           "INIT": "Quando um usuário é criado, ele receberá um e-mail com um link para definir sua senha.",
           "PC": "Quando um usuário muda sua senha, ele receberá uma notificação sobre a mudança se você habilitou isso nas configurações de notificação.",
-          "PL": "Quando um usuário adiciona um método de autenticação sem senha, ele precisa ativá-lo clicando em um link em um e-mail.",
+          "PL": "Quando um usuário adiciona um método de autenticação passkey, ele precisa ativá-lo clicando em um link em um e-mail.",
           "PR": "Quando um usuário reseta sua senha, ele receberá um e-mail com um link para definir uma nova senha.",
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
@@ -840,13 +840,13 @@
       "TABLESTATE": "Status",
       "NAME": "Nome",
       "EMPTY": "Nenhum dispositivo configurado",
-      "TITLE": "Autenticação sem Senha",
-      "DESCRIPTION": "Adicione Métodos de Autenticação baseados em WebAuthn para fazerlogin no ZITADEL sem senha.",
+      "TITLE": "Autenticação com Passkey",
+      "DESCRIPTION": "Adicione Métodos de Autenticação baseados em WebAuthn para fazer login no ZITADEL com passkey.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "U2F": "Adicionar método",
       "U2F_DIALOG_TITLE": "Verificar autenticador",
-      "U2F_DIALOG_DESCRIPTION": "Digite um nome para seu login sem senha usado",
-      "U2F_SUCCESS": "Autenticação sem senha criada com sucesso!",
+      "U2F_DIALOG_DESCRIPTION": "Digite um nome para seu login com passkey usado",
+      "U2F_SUCCESS": "Autenticação com passkey criada com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
       "TYPE": {
@@ -861,17 +861,17 @@
         "3": "Excluído"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Remover Método de Autenticação sem Senha",
-        "DELETE_DESCRIPTION": "Você está prestes a excluir um método de autenticação sem senha. Tem certeza?",
-        "ADD_TITLE": "Autenticação sem senha",
-        "ADD_DESCRIPTION": "Selecione uma das opções disponíveis para criar um método de autenticação sem senha.",
+        "DELETE_TITLE": "Remover Método de Autenticação com Passkey",
+        "DELETE_DESCRIPTION": "Você está prestes a excluir um método de autenticação com passkey. Tem certeza?",
+        "ADD_TITLE": "Autenticação com passkey",
+        "ADD_DESCRIPTION": "Selecione uma das opções disponíveis para criar um método de autenticação com passkey.",
         "SEND_DESCRIPTION": "Envie a si mesmo um link de registro para o seu endereço de e-mail.",
         "SEND": "Enviar link de registro",
         "SENT": "O e-mail foi entregue com sucesso. Verifique sua caixa de correio para continuar com a configuração.",
         "QRCODE_DESCRIPTION": "Gerar um código QR para escanear com outro dispositivo.",
         "QRCODE": "Gerar código QR",
-        "QRCODE_SCAN": "Escanear este código QR para continuar com a configuração no seu dispositivo.",
-        "NEW_DESCRIPTION": "Use este dispositivo para configurar a autenticação sem senha.",
+        "QRCODE_SCAN": "Escanear este código QR para continuar com a configuração da passkey no seu dispositivo.",
+        "NEW_DESCRIPTION": "Use este dispositivo para configurar a autenticação com passkey.",
         "NEW": "Adicionar novo"
       }
     },
@@ -1142,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Código de verificação de e-mail enviado.",
       "OTPREMOVED": "OTP removido.",
       "U2FREMOVED": "Fator removido.",
-      "PASSWORDLESSREMOVED": "Autenticação sem senha removida.",
+      "PASSWORDLESSREMOVED": "Autenticação com passkey removida.",
       "INITIALPASSWORDSET": "Senha inicial definida.",
       "PASSWORDNOTIFICATIONSENT": "Notificação de alteração de senha enviada.",
       "PASSWORDCHANGED": "Senha alterada com sucesso.",
@@ -1610,7 +1610,7 @@
         "2": "Verificação de email",
         "3": "Verificação de telefone",
         "4": "Redefinição de senha",
-        "5": "Inicialização sem senha",
+        "5": "Inicialização passkey",
         "6": "Segredo do aplicativo",
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
@@ -1689,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificação",
       "DESCRIPTION": "Determina em quais alterações as notificações serão enviadas.",
-      "PASSWORDCHANGE": "Mudança de senha"
+      "PASSWORDCHANGE": "Senha alterada"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Dê ao login o seu estilo personalizado e modifique seu comportamento.",
@@ -1839,10 +1839,10 @@
         "usernameChangeText": "Alteração de nome de usuário",
         "verifyMfaOtpText": "Verificar OTP",
         "verifyMfaU2fText": "Verificar Fator de Segundo Universal",
-        "passwordlessPromptText": "Prompt de autenticação sem senha",
-        "passwordlessRegistrationDoneText": "Registro sem senha concluído",
-        "passwordlessRegistrationText": "Registro sem senha",
-        "passwordlessText": "Sem senha",
+        "passwordlessPromptText": "Prompt de autenticação com passkey",
+        "passwordlessRegistrationDoneText": "Registro com passkey concluído",
+        "passwordlessRegistrationText": "Registro com passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Visão geral do usuário de registro externo"
       }
     },
@@ -1856,7 +1856,7 @@
         "VEO": "Verificar OTP de Email",
         "PR": "Redefinição de Senha",
         "DC": "Reivindicação de Domínio",
-        "PL": "Sem senha",
+        "PL": "Passkey",
         "PC": "Alteração de Senha",
         "IU": "Convidar usuário"
       },
@@ -2379,8 +2379,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Sem Senha",
-      "MULTIFACTORDESCRIPTION": "Defina seus Multifactores para autenticação sem senha aqui.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Defina seus Multifactores para autenticação com passkey aqui.",
       "SECONDFACTORTITLE": "Autenticação Multifator",
       "SECONDFACTORDESCRIPTION": "Defina outros fatores possíveis com os quais você pode proteger a autenticação por senha."
     },
@@ -2422,7 +2422,7 @@
       "DESCRIPTION": "Você pode selecionar provedores pré-definidos ou criados por você para autenticação.",
       "SELECTIDPS": "Provedores de identidade"
     },
-    "PASSWORDLESS": "Login sem Senha",
+    "PASSWORDLESS": "Login com Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Não permitido",
       "1": "Permitido"

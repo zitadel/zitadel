@@ -29,5 +29,5 @@ Overall, the ZITADEL console serves as a comprehensive tool for administrators t
 
 Notes:
 
-- Detailed guide on [using the console](/docs/guides/manage/console/overview)
+- Detailed guide on [using the console](/docs/guides/manage/console/console-overview)
 - [Restrict access](/docs/guides/solution-scenarios/restrict-console) to the console

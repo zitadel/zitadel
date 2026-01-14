@@ -46,12 +46,12 @@ DomainClaimed:
   Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.Username}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
   ButtonText: Login
 PasswordlessRegistration:
-  Title: Add Passwordless Login
-  PreHeader: Add Passwordless Login
-  Subject: Add Passwordless Login
+  Title: Add Passkey Login
+  PreHeader: Add Passkey Login
+  Subject: Add Passkey Login
   Greeting: Hello {{.DisplayName}},
-  Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login.
-  ButtonText: Add Passwordless Login
+  Text: We received a request to add a token for passkey login. Please use the button below to add your token or device for passkey login.
+  ButtonText: Add Passkey Login
 PasswordChange:
   Title: Password of user has changed
   PreHeader: Change password
