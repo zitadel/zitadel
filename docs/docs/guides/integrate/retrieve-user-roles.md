@@ -81,6 +81,14 @@ If you need them included in your ID Token, select **’User Roles Inside ID Tok
 
 Alternatively, you can include the claims `urn:iam:org:project:roles` or/and `urn:zitadel:iam:org:projects:roles` in your scope to achieve the same as above. 
 
+### Determine the roles assigned to a user
+
+To determine the roles assigned to a user, you have two options:
+
+- **Token claims**: Request that the relevant roles claim (such as `urn:zitadel:iam:org:project:{projectId}:roles`) is included in the token when you authenticate. The roles assigned to the user will then be part of the token’s payload.
+- **Token introspection**: After a token is issued, you can introspect it using the [ZITADEL introspection endpoint](/docs/guides/integrate/token-introspection) to view the roles claim. This will return the roles assigned to the user according to the token.
+
+
 ### Retrieve roles from the userinfo endpoint
 
 The user info endpoint is  **`${CUSTOM_DOMAIN}`/oidc/v1/userinfo**.
