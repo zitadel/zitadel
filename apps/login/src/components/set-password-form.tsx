@@ -47,7 +47,7 @@ export function SetPasswordForm({
   codeRequired,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },

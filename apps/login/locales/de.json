@@ -284,7 +284,7 @@
       "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
       "info": {
         "description": "Ein Passkey ist eine Authentifizierungsmethode auf einem Gerät wie Ihr Fingerabdruck, Apple FaceID oder ähnliches.",
-        "link": "Passwortlose Authentifizierung"
+        "link": "Passkey-Authentifizierung"
       },
       "skip": "Überspringen",
       "submit": "Weiter"

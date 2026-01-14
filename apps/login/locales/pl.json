@@ -284,7 +284,7 @@
       "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
       "info": {
         "description": "Klucz dostępu to metoda uwierzytelniania na urządzeniu, wykorzystująca np. odcisk palca, Apple FaceID lub podobne rozwiązania.",
-        "link": "Uwierzytelnianie bez hasła"
+        "link": "Uwierzytelnianie kluczem dostępu"
       },
       "skip": "Pomiń",
       "submit": "Kontynuuj"

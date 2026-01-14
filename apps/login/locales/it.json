@@ -284,7 +284,7 @@
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
       "info": {
         "description": "Una passkey è un metodo di autenticazione su un dispositivo come la tua impronta digitale, Apple FaceID o simili.",
-        "link": "Autenticazione senza password"
+        "link": "Autenticazione con Passkey"
       },
       "skip": "Salta",
       "submit": "Continua"

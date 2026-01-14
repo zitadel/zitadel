@@ -44,7 +44,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const initialized = useRef(false);
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ? code : "",
     },

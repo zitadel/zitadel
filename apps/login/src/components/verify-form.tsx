@@ -30,7 +30,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },

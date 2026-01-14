@@ -284,7 +284,7 @@
       "description": "您的设备将请求指纹、面部识别或屏幕锁",
       "info": {
         "description": "密钥是在设备上如指纹、Apple FaceID 或类似的认证方法。",
-        "link": "无密码认证"
+        "link": "密码密钥认证"
       },
       "skip": "跳过",
       "submit": "继续"
