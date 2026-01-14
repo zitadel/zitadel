@@ -3,6 +3,8 @@ package initialise
 import (
 	"context"
 	"embed"
+	"fmt"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,10 +45,15 @@ The user provided by flags needs privileges to
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel init command failed", "err", err)
+				}
+			}()
 			config := MustNewConfig(viper.GetViper())
 
-			InitAll(cmd.Context(), config)
+			return InitAll(cmd.Context(), config)
 		},
 	}
 
@@ -54,16 +61,21 @@ The user provided by flags needs privileges to
 	return cmd
 }
 
-func InitAll(ctx context.Context, config *Config) {
+func InitAll(ctx context.Context, config *Config) error {
 	err := initialise(ctx, config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
 	)
-	logging.OnError(err).Fatal("unable to initialize the database")
+	if err != nil {
+		return fmt.Errorf("initialize database failed: %w", err)
+	}
 
 	err = verifyZitadel(ctx, config.Database)
-	logging.OnError(err).Fatal("unable to initialize ZITADEL")
+	if err != nil {
+		return fmt.Errorf("initialize ZITADEL failed: %w", err)
+	}
+	return nil
 }
 
 func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {

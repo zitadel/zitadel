@@ -62,11 +62,12 @@ export async function registerUser(
 
   const checks = create(ChecksSchema, checkPayload);
 
-  const session = await createSessionAndUpdateCookie({
+  const result = await createSessionAndUpdateCookie({
     checks,
     requestId: command.requestId,
     lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
   });
+  const session = result.session;
 
   if (!session || !session.factors?.user) {
     return { error: t("errors.couldNotCreateSession") };

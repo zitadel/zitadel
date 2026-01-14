@@ -147,7 +147,9 @@
       "couldNotLoadSession": "No se pudo cargar la sesión",
       "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
       "failedPrecondition": "Precondición fallida",
-      "sessionNotValid": "La sesión no es válida"
+      "sessionNotValid": "La sesión no es válida",
+      "passwordVerificationMissing": "Falta la verificación de la contraseña.",
+      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "No se pudo encontrar la sesión",
         "couldNotUpdateSession": "No se pudo actualizar la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
-        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso",
-        "couldNotSetSession": "No se pudo establecer la sesión",
-        "couldNotGetUser": "No se pudieron recuperar los datos del usuario",
-        "couldNotRetrieveSessionCookie": "No se pudo recuperar la cookie de sesión"
+        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
       }
     },
     "set": {
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "¡El usuario ya está verificado!",
       "couldNotResendInvite": "No se pudo reenviar la invitación",
       "inviteSendFailed": "No se pudo enviar el correo de invitación",
-      "emailSendFailed": "No se pudo enviar el correo de verificación"
+      "emailSendFailed": "No se pudo enviar el correo electrónico de verificación",
+      "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo."
     }
   },
   "authenticator": {

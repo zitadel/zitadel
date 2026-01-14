@@ -1,7 +1,7 @@
 "use client";
 
-import { completeFlowOrGetUrl, handleServerActionResponse } from "@/lib/client";
-import { updateSession } from "@/lib/server/session";
+import { handleServerActionResponse, completeFlowOrGetUrl } from "@/lib/client";
+import { updateOrCreateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -46,7 +46,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const initialized = useRef(false);
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ? code : "",
     },
@@ -96,7 +96,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     }
 
     setLoading(true);
-    const response = await updateSession({
+    const response = await updateOrCreateSession({
       loginName,
       sessionId,
       organization,
@@ -153,7 +153,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       });
     }
 
-    const response = await updateSession({
+    const response = await updateOrCreateSession({
       loginName,
       sessionId,
       organization,

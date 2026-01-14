@@ -24,14 +24,24 @@ type Props = {
   requestId: string | undefined;
   loginSettings: LoginSettings | undefined;
   organization?: string;
+  defaultOrganization?: string;
   suffix?: string;
   submit: boolean;
   allowRegister: boolean;
 };
 
-export function UsernameForm({ loginName, requestId, organization, suffix, loginSettings, submit, allowRegister }: Props) {
+export function UsernameForm({
+  loginName,
+  requestId,
+  organization,
+  defaultOrganization,
+  suffix,
+  loginSettings,
+  submit,
+  allowRegister,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       loginName: loginName ? loginName : "",
     },
@@ -52,8 +62,10 @@ export function UsernameForm({ loginName, requestId, organization, suffix, login
       const res = await sendLoginname({
         loginName: values.loginName,
         organization,
+        defaultOrganization,
         requestId,
         suffix,
+        ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
       });
 
       handleServerActionResponse(res, router, setSamlData, setError);

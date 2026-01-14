@@ -49,7 +49,7 @@ export function RegisterFormIDPIncomplete({
   idpUserName,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: defaultValues?.email ?? "",
       firstname: defaultValues?.firstname ?? "",

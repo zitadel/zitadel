@@ -119,7 +119,7 @@ export async function checkMFAFactors(
     }
 
     const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
+    // if passkey is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {

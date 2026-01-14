@@ -42,7 +42,7 @@ export function SetRegisterPasswordForm({
   requestId,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstname: firstname ?? "",

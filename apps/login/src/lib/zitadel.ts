@@ -197,19 +197,21 @@ export async function getPasswordComplexitySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function createSessionFromChecks({
+export async function createSessionFromChecksAndChallenges({
   serviceConfig,
   checks,
+  challenges,
   lifetime,
 }: WithServiceConfig<{
   checks: Checks;
+  challenges?: RequestChallenges;
   lifetime: Duration;
 }>) {
   const sessionService: Client<typeof SessionService> = await createServiceForHost(SessionService, serviceConfig);
 
   const userAgent = await getUserAgent();
 
-  return sessionService.createSession({ checks, lifetime, userAgent }, {});
+  return sessionService.createSession({ ...{ checks, lifetime, userAgent }, ...(challenges ? { challenges } : {}) }, {});
 }
 
 export async function createSessionForUserIdAndIdpIntent({
