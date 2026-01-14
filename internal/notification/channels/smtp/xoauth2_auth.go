@@ -24,11 +24,15 @@ type xoauth2Auth struct {
 }
 
 type XOAuth2AuthConfig struct {
-	User          string
-	ClientId      string
-	ClientSecret  string
-	TokenEndpoint string
-	Scopes        []string
+	User                  string
+	TokenEndpoint         string
+	Scopes                []string
+	ClientCredentialsAuth *OAuth2ClientCredentials
+}
+
+type OAuth2ClientCredentials struct {
+	ClientId     string
+	ClientSecret string
 }
 
 func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
@@ -38,8 +42,8 @@ func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 
 	if a.tokenSource == nil {
 		config := &clientcredentials.Config{
-			ClientID:     a.config.ClientId,
-			ClientSecret: a.config.ClientSecret,
+			ClientID:     a.config.ClientCredentialsAuth.ClientId,
+			ClientSecret: a.config.ClientCredentialsAuth.ClientSecret,
 			Scopes:       a.config.Scopes,
 			TokenURL:     a.config.TokenEndpoint,
 		}

@@ -568,10 +568,12 @@ func Test_addEmailProviderSMTPToConfig(t *testing.T) {
 				ResourceOwner: "instance",
 				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 					User:          "xoauth2-user",
-					ClientId:      "my-client",
-					ClientSecret:  "some-secret",
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
+					ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+						ClientId:     "my-client",
+						ClientSecret: "some-secret",
+					},
 				},
 			},
 		},
@@ -693,10 +695,12 @@ func Test_updateEmailProviderSMTPToConfig(t *testing.T) {
 				ID:            "id",
 				XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 					User:          "xoauth2-user",
-					ClientId:      "my-client",
-					ClientSecret:  "some-secret",
 					TokenEndpoint: "auth.example.com/token",
 					Scopes:        []string{"scopes"},
+					ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+						ClientId:     "my-client",
+						ClientSecret: "some-secret",
+					},
 				},
 			},
 		},
@@ -882,10 +886,12 @@ func Test_testEmailProviderSMTPToConfig(t *testing.T) {
 				SMTP: smtp.SMTP{
 					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 						User:          "xoauth2-user",
-						ClientId:      "my-client",
-						ClientSecret:  "some-secret",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scopes"},
+						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+							ClientId:     "my-client",
+							ClientSecret: "some-secret",
+						},
 					},
 				},
 			},

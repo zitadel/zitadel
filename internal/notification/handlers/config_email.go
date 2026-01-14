@@ -63,10 +63,12 @@ func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto cryp
 		}
 		config.SMTPConfig.SMTP.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
 			User:          qs.XOAuth2Auth.User,
-			ClientId:      qs.XOAuth2Auth.ClientId,
-			ClientSecret:  clientSecret,
 			TokenEndpoint: qs.XOAuth2Auth.TokenEndpoint,
 			Scopes:        qs.XOAuth2Auth.Scopes,
+			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+				ClientId:     qs.XOAuth2Auth.ClientId,
+				ClientSecret: clientSecret,
+			},
 		}
 	}
 

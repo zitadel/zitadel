@@ -535,10 +535,12 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					Host:           "host:587",
 					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 						User:          "user",
-						ClientId:      "client-id",
-						ClientSecret:  "password",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scope"},
+						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+							ClientId:     "client-id",
+							ClientSecret: "password",
+						},
 					},
 				},
 			},
@@ -1059,10 +1061,12 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					Host:           "host2:587",
 					XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 						User:          "user2",
-						ClientId:      "client-id",
-						ClientSecret:  "password",
 						TokenEndpoint: "auth.example.com/token",
 						Scopes:        []string{"scope"},
+						ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+							ClientId:     "client-id",
+							ClientSecret: "password",
+						},
 					},
 				},
 			},
@@ -2414,10 +2418,12 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 							User:          "user",
-							ClientId:      "client-id",
-							ClientSecret:  "client-secret",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scope"},
+							ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+								ClientId:     "client-id",
+								ClientSecret: "client-secret",
+							},
 						},
 						Host: "mail.smtp2go.com:2525",
 					},
@@ -2473,9 +2479,11 @@ func TestCommandSide_TestSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						XOAuth2Auth: &smtp.XOAuth2AuthConfig{
 							User:          "user",
-							ClientId:      "client-id",
 							TokenEndpoint: "auth.example.com/token",
 							Scopes:        []string{"scope"},
+							ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+								ClientId: "client-id",
+							},
 						},
 						Host: "mail.smtp2go.com:2525",
 					},

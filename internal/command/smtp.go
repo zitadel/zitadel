@@ -69,13 +69,13 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 	var xoauth2Auth *instance.XOAuth2Auth
 
 	if config.XOAuth2Auth != nil {
-		clientSecret, err := crypto.Encrypt([]byte(config.XOAuth2Auth.ClientSecret), c.smtpEncryption)
+		clientSecret, err := crypto.Encrypt([]byte(config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret), c.smtpEncryption)
 		if err != nil {
 			return err
 		}
 		xoauth2Auth = &instance.XOAuth2Auth{
 			User:          config.XOAuth2Auth.User,
-			ClientId:      config.XOAuth2Auth.ClientId,
+			ClientId:      config.XOAuth2Auth.ClientCredentialsAuth.ClientId,
 			ClientSecret:  clientSecret,
 			TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
 			Scopes:        config.XOAuth2Auth.Scopes,
@@ -184,12 +184,12 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfi
 	if config.XOAuth2Auth != nil {
 		xoauth2Auth = &instance.XOAuth2Auth{
 			User:          config.XOAuth2Auth.User,
-			ClientId:      config.XOAuth2Auth.ClientId,
+			ClientId:      config.XOAuth2Auth.ClientCredentialsAuth.ClientId,
 			TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
 			Scopes:        config.XOAuth2Auth.Scopes,
 		}
-		if config.XOAuth2Auth.ClientSecret != "" {
-			xoauth2Auth.ClientSecret, err = crypto.Encrypt([]byte(config.XOAuth2Auth.ClientSecret), c.smtpEncryption)
+		if config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret != "" {
+			xoauth2Auth.ClientSecret, err = crypto.Encrypt([]byte(config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret), c.smtpEncryption)
 			if err != nil {
 				return err
 			}
@@ -479,7 +479,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9kj", "Errors.SMTPConfig.TestPassword")
 	}
 
-	if id == "" && config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientSecret == "" {
+	if id == "" && config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-9OP96s", "Errors.SMTPConfig.TestClientSecret")
 	}
 
@@ -498,7 +498,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 		}
 	}
 
-	if config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientSecret == "" {
+	if config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret == "" {
 		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 		if err != nil {
 			return err
@@ -507,7 +507,7 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 			return zerrors.ThrowNotFound(nil, "SMTP-p9c2", "Errors.SMTPConfig.NotFound")
 		}
 
-		config.SMTP.XOAuth2Auth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientSecret, c.smtpEncryption)
+		config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientSecret, c.smtpEncryption)
 		if err != nil {
 			return err
 		}
@@ -561,10 +561,12 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 		}
 		xoauth2Auth = &smtp.XOAuth2AuthConfig{
 			User:          smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.User,
-			ClientId:      smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientId,
-			ClientSecret:  clientSecret,
 			TokenEndpoint: smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.TokenEndpoint,
 			Scopes:        smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.Scopes,
+			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+				ClientId:     smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientId,
+				ClientSecret: clientSecret,
+			},
 		}
 	}
 

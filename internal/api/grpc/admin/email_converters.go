@@ -132,10 +132,12 @@ func addEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.AddEmailPro
 		xoauth2 := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_)
 		cmd.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
 			User:          req.User,
-			ClientId:      xoauth2.ClientCredentials.ClientId,
-			ClientSecret:  xoauth2.ClientCredentials.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
+			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+				ClientId:     xoauth2.ClientCredentials.ClientId,
+				ClientSecret: xoauth2.ClientCredentials.ClientSecret,
+			},
 		}
 	default:
 		// ensure backwards compatibility
@@ -175,10 +177,12 @@ func updateEmailProviderSMTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 		xoauth2 := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_)
 		cmd.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
 			User:          req.User,
-			ClientId:      xoauth2.ClientCredentials.ClientId,
-			ClientSecret:  xoauth2.ClientCredentials.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
+			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+				ClientId:     xoauth2.ClientCredentials.ClientId,
+				ClientSecret: xoauth2.ClientCredentials.ClientSecret,
+			},
 		}
 	default:
 		// ensure backwards compatibility
@@ -235,10 +239,12 @@ func testEmailProviderSMTPToConfig(req *admin_pb.TestEmailProviderSMTPRequest) *
 		xoauth2 := v.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_)
 		cfg.SMTP.XOAuth2Auth = &smtp.XOAuth2AuthConfig{
 			User:          req.User,
-			ClientId:      xoauth2.ClientCredentials.ClientId,
-			ClientSecret:  xoauth2.ClientCredentials.ClientSecret,
 			TokenEndpoint: v.Xoauth2.TokenEndpoint,
 			Scopes:        v.Xoauth2.Scopes,
+			ClientCredentialsAuth: &smtp.OAuth2ClientCredentials{
+				ClientId:     xoauth2.ClientCredentials.ClientId,
+				ClientSecret: xoauth2.ClientCredentials.ClientSecret,
+			},
 		}
 	default:
 		// ensure backwards compatibility
