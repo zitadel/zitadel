@@ -182,6 +182,9 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     prism: {
+      // 1. Force a dark syntax theme for BOTH modes so it matches your dark CSS background
+      theme: require('prism-react-renderer/themes/dracula'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
       additionalLanguages: [
         "csharp",
         "dart",
