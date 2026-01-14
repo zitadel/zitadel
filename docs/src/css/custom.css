@@ -735,8 +735,10 @@ div[class*="codeBlockTitle_"] {
   padding-top: 1rem !important; 
 }
 
-.theme-code-block:not(:has(div[class*="codeBlockTitle_"])) pre {
-  padding-top: 3.5rem !important;
+@supports selector(.theme-code-block:not(:has(div[class*="codeBlockTitle_"]))) {
+  .theme-code-block:not(:has(div[class*="codeBlockTitle_"])) pre {
+    padding-top: 3.5rem !important;
+  }
 }
 
 .theme-code-block code {
