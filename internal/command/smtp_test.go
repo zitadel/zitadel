@@ -1072,6 +1072,98 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change auth from xoauth2 to plain, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, true,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"",
+								true,
+								"from@domain.ch",
+								"name",
+								"",
+								"host:587",
+								nil,
+								&instance.XOAuth2Auth{
+									User:     "user2",
+									ClientId: "client-id",
+									ClientSecret: &crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("client-secret"),
+									},
+									TokenEndpoint: "auth.example.com/token",
+									Scopes:        []string{"scope"},
+								},
+							),
+						),
+					),
+					expectPush(
+						newSMTPConfigChangedEvent(
+							context.Background(),
+							"ID",
+							"test",
+							false,
+							"from2@domain.ch",
+							"name2",
+							"replyto@domain.ch",
+							"host2:587",
+							&instance.PlainAuth{
+								User: "user",
+								Password: &crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
+							},
+							nil,
+						),
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				smtp: &ChangeSMTPConfig{
+					ResourceOwner:  "INSTANCE",
+					ID:             "ID",
+					Description:    "test",
+					Tls:            false,
+					From:           "from2@domain.ch",
+					FromName:       "name2",
+					ReplyToAddress: "replyto@domain.ch",
+					Host:           "host2:587",
+					PlainAuth: &smtp.PlainAuthConfig{
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
