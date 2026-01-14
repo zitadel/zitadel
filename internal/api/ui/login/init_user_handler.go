@@ -6,6 +6,9 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -109,7 +112,8 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, userAgentID, initCodeGenerator)
 	if err != nil {
-		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", data.UserID).WithError(err).Warn("error verifying initial code")
+		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, zerrors.ThrowInvalidArgument(nil, "LOGIN-lk3os", "Errors.User.Code.Invalid"))
 		return
 	}
 	l.renderInitUserDone(w, r, authReq, userOrgID)
@@ -127,6 +131,10 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 		return
 	}
 	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator, authRequestID)
+	if !zerrors.IsInternal(err) {
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", userID).WithError(err).Warn("error requesting init mail")
+		err = nil // we ignore errors on resend to not leak information
+	}
 	l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 }
 
