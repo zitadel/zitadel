@@ -3,11 +3,11 @@ package zerrors
 import "fmt"
 
 func ThrowDeadlineExceeded(parent error, id, message string) error {
-	return CreateZitadelError(KindDeadlineExceeded, parent, id, message)
+	return newZitadelError(KindDeadlineExceeded, parent, id, message)
 }
 
 func ThrowDeadlineExceededf(parent error, id, format string, a ...any) error {
-	return CreateZitadelError(KindDeadlineExceeded, parent, id, fmt.Sprintf(format, a...))
+	return newZitadelError(KindDeadlineExceeded, parent, id, fmt.Sprintf(format, a...))
 }
 
 func IsDeadlineExceeded(err error) bool {

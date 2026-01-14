@@ -1588,7 +1588,7 @@ func (l *Login) externalUserID(ctx context.Context, userID, idpID string) (strin
 // It's used if an error occurs during the login process with an external IDP and local authentication is allowed,
 // respectively used as fallback.
 type IdPError struct {
-	err *zerrors.ZitadelError
+	err error
 }
 
 func (e *IdPError) Error() string {
@@ -1611,5 +1611,6 @@ func WrapIdPError(err error) *IdPError {
 	if errors.As(err, &zErr) {
 		id = zErr.ID
 	}
-	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
+	err = zerrors.ThrowPreconditionFailed(err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")
+	return &IdPError{err: err}
 }

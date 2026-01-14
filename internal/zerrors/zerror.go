@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync/atomic"
+
+	"github.com/zitadel/sloggcp"
 )
 
 //go:generate enumer -type=Kind -trimprefix=Kind -json
@@ -76,23 +79,44 @@ const (
 	KindUnauthenticated Kind = 16
 )
 
+var (
+	enableReportLocation atomic.Bool
+)
+
+func EnableReportLocation(enable bool) {
+	enableReportLocation.Store(enable)
+}
+
 type ZitadelError struct {
 	Kind    Kind
 	Parent  error
 	Message string
 	ID      string
+
+	// location where the error was created
+	reportLocation *sloggcp.ReportLocation
 }
 
 func ThrowError(parent error, id, message string) error {
-	return CreateZitadelError(KindUnknown, parent, id, message)
+	return newZitadelError(KindUnknown, parent, id, message)
 }
 
 func CreateZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
+	return newZitadelError(kind, parent, id, message)
+}
+
+func newZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
+	var reportLocation *sloggcp.ReportLocation
+	if enableReportLocation.Load() {
+		reportLocation = sloggcp.NewReportLocation(2)
+	}
+
 	return &ZitadelError{
-		Kind:    kind,
-		Parent:  parent,
-		ID:      id,
-		Message: message,
+		Kind:           kind,
+		Parent:         parent,
+		ID:             id,
+		Message:        message,
+		reportLocation: reportLocation,
 	}
 }
 
@@ -165,3 +189,10 @@ func (err *ZitadelError) LogValue() slog.Value {
 		slog.Any("parent", err.Parent),
 	)
 }
+
+// ReportLocation implements [sloggcp.ReportLocationError].
+func (err *ZitadelError) ReportLocation() *sloggcp.ReportLocation {
+	return err.reportLocation
+}
+
+var _ sloggcp.ReportLocationError = (*ZitadelError)(nil)

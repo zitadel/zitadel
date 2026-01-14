@@ -49,6 +49,7 @@ Instrumentation:
     #   - "text": Logs are printed on StdErr as human-readable text
     #   - "json": Logs are printed on StdErr as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
     Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
