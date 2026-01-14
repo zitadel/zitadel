@@ -710,7 +710,7 @@ table#zitadel-versions td {
 /* --- HANDLE TITLED BLOCKS (e.g. title="script.js") --- */
 /* Target the Title Bar using Docusaurus class pattern */
 div[class*="codeBlockTitle_"] {
-  padding-left: 75px !important; /* Push filename to the right of dots */
+  padding-left: 90px !important; /* Push filename to the right of dots */
   background-color: #1e1e2e !important;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   margin-bottom: 0 !important;
