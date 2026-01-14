@@ -27,17 +27,9 @@ type Props = {
   allowRegister: boolean;
 };
 
-export function UsernameForm({
-  loginName,
-  requestId,
-  organization,
-  suffix,
-  loginSettings,
-  submit,
-  allowRegister,
-}: Props) {
+export function UsernameForm({ loginName, requestId, organization, suffix, loginSettings, submit, allowRegister }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       loginName: loginName ? loginName : "",
     },
@@ -87,10 +79,7 @@ export function UsernameForm({
   }, []);
 
   let inputLabel = t("labels.loginname");
-  if (
-    loginSettings?.disableLoginWithEmail &&
-    loginSettings?.disableLoginWithPhone
-  ) {
+  if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {
     inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
     inputLabel = t("labels.usernameOrPhoneNumber");
