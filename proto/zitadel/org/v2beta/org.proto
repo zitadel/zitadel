@@ -40,7 +40,7 @@ message Organization {
       example: "\"ZITADEL\"";
     }
   ];
-  // Primary domain used in the organization.
+  // Organization Domain used in the organization.
   string primary_domain = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"zitadel.cloud\"";
