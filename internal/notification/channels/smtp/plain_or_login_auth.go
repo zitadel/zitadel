@@ -11,14 +11,16 @@ import (
 // golang net/smtp SMTP AUTH LOGIN or PLAIN Auth Handler
 // Reference: https://gist.github.com/andelf/5118732?permalink_comment_id=4825669#gistcomment-4825669
 
-func PlainOrLoginAuth(username, password, host string) smtp.Auth {
-	return &plainOrLoginAuth{username: username, password: password, host: host}
+func PlainOrLoginAuth(config PlainAuthConfig, host string) smtp.Auth {
+	return &plainOrLoginAuth{
+		host:   host,
+		config: config,
+	}
 }
 
 type plainOrLoginAuth struct {
-	username   string
-	password   string
 	host       string
+	config     PlainAuthConfig
 	authMethod string
 }
 
@@ -36,7 +38,7 @@ func (a *plainOrLoginAuth) Start(server *smtp.ServerInfo) (string, []byte, error
 		return a.authMethod, nil, nil
 	} else {
 		a.authMethod = "PLAIN"
-		resp := []byte("\x00" + a.username + "\x00" + a.password)
+		resp := []byte("\x00" + a.config.User + "\x00" + a.config.Password)
 		return a.authMethod, resp, nil
 	}
 }
@@ -53,9 +55,9 @@ func (a *plainOrLoginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 
 	switch {
 	case bytes.Equal(fromServer, []byte("Username:")):
-		return []byte(a.username), nil
+		return []byte(a.config.User), nil
 	case bytes.Equal(fromServer, []byte("Password:")):
-		return []byte(a.password), nil
+		return []byte(a.config.Password), nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "SMTP-HjW21", "unexpected server challenge")
 	}
