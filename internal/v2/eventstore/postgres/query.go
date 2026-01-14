@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"slices"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -94,7 +92,7 @@ var from = " FROM eventstore.events2"
 
 func writeFilters(stmt *database.Statement, filters []*eventstore.Filter) {
 	if len(filters) == 0 {
-		logging.Fatal("query does not contain filters")
+		panic("query does not contain filters")
 	}
 
 	for i, filter := range filters {

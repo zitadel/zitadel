@@ -3,12 +3,13 @@ package resources
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"log/slog"
 	"time"
 	// import timezone database to ensure it is available at runtime
 	// data is required to validate time zones.
 	_ "time/tzdata"
 
-	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/scim/metadata"
@@ -70,7 +71,7 @@ func buildMetadataKeyQuery(ctx context.Context, key metadata.Key) query.SearchQu
 	scopedKey := metadata.ScopeKey(ctx, key)
 	q, err := query.NewUserMetadataKeySearchQuery(string(scopedKey), query.TextEquals)
 	if err != nil {
-		logging.Panic("Error build user metadata query for key " + key)
+		panic("Error build user metadata query for key " + key)
 	}
 
 	return q
@@ -164,8 +165,7 @@ func getValueForMetadataKey(user *ScimUser, key metadata.Key) ([]byte, error) {
 		return []byte(valueStr), validateValueForMetadataKey(valueStr, key)
 	}
 
-	logging.Panicf("Unknown metadata key %s", key)
-	return nil, nil
+	panic(fmt.Sprintf("Unknown metadata key %s", key))
 }
 
 func validateValueForMetadataKey(v string, key metadata.Key) error {
@@ -230,8 +230,7 @@ func getRawValueForMetadataKey(user *ScimUser, key metadata.Key) interface{} {
 		break
 	}
 
-	logging.Panicf("Unknown or unsupported metadata key %s", key)
-	return nil
+	panic(fmt.Sprintf("Unknown or unsupported metadata key %s", key))
 }
 
 func extractScalarMetadata(ctx context.Context, md map[metadata.ScopedKey][]byte, key metadata.Key) string {
@@ -251,7 +250,7 @@ func extractHttpURLMetadata(ctx context.Context, md map[metadata.ScopedKey][]byt
 
 	url, err := schemas.ParseHTTPURL(string(val))
 	if err != nil {
-		logging.OnError(err).Warn("Failed to parse scim url metadata for " + key)
+		slog.WarnContext(ctx, "Failed to parse scim url metadata", "key", key, "error", err)
 		return nil
 	}
 

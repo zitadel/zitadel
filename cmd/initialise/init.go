@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 )
@@ -79,7 +78,7 @@ func InitAll(ctx context.Context, config *Config) error {
 }
 
 func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {
-	logging.Info("initialization started")
+	slog.InfoContext(ctx, "initialization started")
 
 	err := ReadStmts()
 	if err != nil {
