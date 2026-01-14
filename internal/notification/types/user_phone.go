@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -32,6 +33,9 @@ func generateSms(
 	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "could not create sms channel", "error", err)
+	}
 	if smsChannels == nil || smsChannels.Len() == 0 {
 		return zchannels.NewCancelError(
 			zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent"),
