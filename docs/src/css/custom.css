@@ -690,16 +690,17 @@ table#zitadel-versions td {
 
 .theme-code-block {
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   margin-bottom: 2.5rem;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.1);
-  background-color: #1e1e2e;
+  background-color: var(--ifm-pre-background); 
   position: relative;
 }
 
 [data-theme='dark'] .theme-code-block {
   border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
 .theme-code-block::after {
@@ -715,28 +716,39 @@ table#zitadel-versions td {
     20px 0 0 #ffbd2e, 
     40px 0 0 #27c93f; 
   z-index: 10;
-  pointer-events: none; 
+  pointer-events: none;
 }
+
 
 div[class*="codeBlockTitle_"] {
   padding-left: 90px !important; 
-  background-color: #1e1e2e !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background-color: var(--ifm-pre-background) !important;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
   margin-bottom: 0 !important;
   font-family: "Lato", sans-serif;
   font-weight: 600;
-  color: rgba(255,255,255,0.9);
+  color: var(--ifm-heading-color);
 }
 
 .theme-code-block pre {
-  background-color: #1e1e2e !important;
+  background-color: var(--ifm-pre-background) !important;
   border: none;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  padding-top: 1rem !important; 
+  margin: 0 !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
 }
 
-.theme-code-block:not(:has(div[class*="codeBlockTitle_"])) pre {
+.theme-code-block:not(:has(div[class*="codeBlockTitle_"])):not(:has(.language-text)):not(:has(.language-none)) pre {
   padding-top: 3.5rem !important;
+}
+
+
+.theme-code-block:has(.language-text) pre,
+.theme-code-block:has(.language-none) pre {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  line-height: 1.5;
 }
 
 .theme-code-block code {
@@ -748,22 +760,22 @@ div[class*="codeBlockTitle_"] {
 .theme-code-block button {
   top: 12px !important;
   right: 12px !important;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--ifm-color-emphasis-200);
+  border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 8px;
-  color: #a0a0a0;
+  color: var(--ifm-color-content-secondary);
   transition: all 0.2s;
 }
 
 .theme-code-block button:hover {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-primary);
   transform: scale(1.05);
 }
 
 .docusaurus-highlight-code-line {
-  background-color: rgba(255, 235, 59, 0.1);
-  border-left: 3px solid #fbbf24;
+  background-color: var(--ifm-color-emphasis-200);
+  border-left: 3px solid var(--ifm-color-primary);
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
