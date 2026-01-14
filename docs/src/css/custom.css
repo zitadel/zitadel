@@ -541,9 +541,24 @@ a {
   background-color: #fffbeb;
   border-left-color: var(--ifm-color-warning);
 }
+.alert--secondary {
+  background-color: #f9fafb;
+  border-left-color: var(--ifm-color-secondary);
+}
+.alert--danger {
+  background-color: #fef2f2;
+  border-left-color: var(--ifm-color-danger);
+}
+.alert--success {
+  background-color: #ecfdf3;
+  border-left-color: var(--ifm-color-success);
+}
 /* Dark mode adjustments for alerts */
 [data-theme='dark'] .alert--info { background-color: rgba(59, 130, 246, 0.1); }
 [data-theme='dark'] .alert--warning { background-color: rgba(245, 158, 11, 0.1); }
+[data-theme='dark'] .alert--secondary { background-color: rgba(148, 163, 184, 0.12); }
+[data-theme='dark'] .alert--danger { background-color: rgba(239, 68, 68, 0.12); }
+[data-theme='dark'] .alert--success { background-color: rgba(34, 197, 94, 0.12); }
 
 p strong {
   color: var(--font-color-strong);
