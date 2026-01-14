@@ -23,10 +23,11 @@ type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
 };
 
-export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
+export function PasswordForm({ loginSettings, loginName, organization, defaultOrganization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -47,6 +48,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
     const response = await sendPassword({
       loginName,
       organization,
+      defaultOrganization,
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
@@ -78,10 +80,11 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
     const response = await resetPassword({
       loginName,
       organization,
+      defaultOrganization,
       requestId,
     })
       .catch(() => {
-        setError(t("verify.errors.couldNotResetPassword"));
+        setError(t("errors.couldNotSendResetLink"));
         return;
       })
       .finally(() => {
@@ -89,7 +92,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       });
 
     if (response && "error" in response) {
-      setError(response.error);
+      setError(response.error as string);
       return;
     }
 

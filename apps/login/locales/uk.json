@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Не вдалося завантажити сеанс",
       "couldNotLoadAuthMethods": "Не вдалося завантажити методи автентифікації",
       "failedPrecondition": "Не виконано передумову",
-      "sessionNotValid": "Сеанс недійсний"
+      "sessionNotValid": "Сеанс недійсний",
+      "passwordVerificationMissing": "Відсутня перевірка пароля.",
+      "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз."
     }
   },
   "idp": {
@@ -406,7 +408,8 @@
       "userAlreadyVerified": "Користувача вже підтверджено!",
       "couldNotResendInvite": "Не вдалося повторно надіслати запрошення",
       "inviteSendFailed": "Не вдалося надіслати лист-запрошення",
-      "emailSendFailed": "Не вдалося надіслати лист підтвердження"
+      "emailSendFailed": "Не вдалося надіслати лист підтвердження",
+      "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз."
     }
   },
   "authenticator": {

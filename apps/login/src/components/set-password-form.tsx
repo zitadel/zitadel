@@ -31,6 +31,7 @@ type Props = {
   loginName: string;
   userId: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
 };
@@ -38,6 +39,7 @@ type Props = {
 export function SetPasswordForm({
   passwordComplexitySettings,
   organization,
+  defaultOrganization,
   requestId,
   loginName,
   userId,
@@ -65,6 +67,7 @@ export function SetPasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
+      defaultOrganization,
       requestId,
     })
       .catch(() => {
@@ -75,7 +78,7 @@ export function SetPasswordForm({
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
     }
@@ -83,9 +86,11 @@ export function SetPasswordForm({
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
-    let payload: { userId: string; password: string; code?: string } = {
+
+    let payload: { userId: string; password: string; code?: string; organization?: string } = {
       userId: userId,
       password: values.password,
+      organization,
     };
 
     // this is not required for initial password setup
