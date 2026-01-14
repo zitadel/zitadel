@@ -106,7 +106,8 @@ type humanConditions interface {
 	ProvidedUserIDCondition(providedUserID string) database.Condition
 	ProvidedUsernameCondition(username string) database.Condition
 
-	humanPasskeyConditions
+	ExistsPasskey(condition database.Condition) database.Condition
+	PasskeyConditions() HumanPasskeyConditions
 }
 
 type humanChanges interface {
@@ -276,7 +277,7 @@ type machineColumns interface {
 	userColumns
 }
 
-type humanPasskeyConditions interface {
+type HumanPasskeyConditions interface {
 	PasskeyIDCondition(passkeyID string) database.Condition
 	PasskeyKeyIDCondition(keyID string) database.Condition
 	PasskeyChallengeCondition(challenge string) database.Condition

@@ -255,15 +255,16 @@ CREATE TRIGGER trg_set_updated_at_user_metadata
 
 CREATE TABLE zitadel.user_personal_access_tokens(
     instance_id TEXT NOT NULL
-    , token_id TEXT NOT NULL
-
-    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-
     , user_id TEXT NOT NULL
-    , expiration TIMESTAMPTZ
+    
+    , id TEXT NOT NULL
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    , expires_at TIMESTAMPTZ
+    , type SMALLINT NOT NULL CHECK (type >= 0)
+    , public_key BYTEA NOT NULL
     , scopes TEXT[]
     
-    , PRIMARY KEY (instance_id, token_id)
+    , PRIMARY KEY (instance_id, id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
 );
 

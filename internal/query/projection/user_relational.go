@@ -2091,7 +2091,7 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.CheckSMSOTP(&domain.CheckTypeInit{
-				Code:      e.Code.Crypted,
+				// Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),
@@ -2199,7 +2199,7 @@ func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Even
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.CheckEmailOTP(&domain.CheckTypeInit{
-				Code:      e.Code.Crypted,
+				// Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),

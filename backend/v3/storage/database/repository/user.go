@@ -23,8 +23,12 @@ func MachineUserRepository() domain.MachineUserRepository {
 }
 
 type user struct {
-	verification verification
-	tableName    string
+	verification            verification
+	tableName               string
+	shouldLoadMachineKeys   bool
+	machineKeyRepo          machineKeyRepo
+	shouldLoadPATs          bool
+	personalAccessTokenRepo personalAccessTokenRepo
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -61,7 +65,10 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	// machine columns
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
 	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
-	`, 'accessTokenType', users.access_token_type) END AS machine` +
+	`, 'accessTokenType', users.access_token_type` +
+	`, 'keys', jsonb_agg(DISTINCT jsonb_build_object('id', machine_keys.id, 'publicKey', encode(machine_keys.public_key, 'base64'), 'createdAt', machine_keys.created_at, 'expiresAt', machine_keys.expires_at, 'type', machine_keys.type)) FILTER (WHERE machine_keys.user_id IS NOT NULL)` +
+	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'publicKey', encode(user_personal_access_tokens.public_key, 'base64'), 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'type', user_personal_access_tokens.type, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +
+	`) END AS machine` +
 	// human columns
 	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
 	`, 'nickname', users.nickname, 'displayName', users.display_name` +
@@ -90,6 +97,11 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 
 // Get implements [domain.UserRepository.Get].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
+	opts = append(opts,
+		u.joinMachineKeys(),
+		u.joinPATs(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -107,6 +119,12 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 
 // List implements [domain.UserRepository.List].
 func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
+	opts = append(opts,
+		u.joinMachineKeys(),
+		u.joinPATs(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
+
 	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
@@ -443,16 +461,58 @@ func (u user) LoadIdentityProviderLinks() domain.UserRepository {
 
 // LoadKeys implements [domain.UserRepository.LoadKeys].
 func (u user) LoadKeys() domain.UserRepository {
-	panic("unimplemented")
+	return &user{
+		tableName:             u.tableName,
+		verification:          u.verification,
+		shouldLoadMachineKeys: true,
+	}
+}
+
+func (u user) joinMachineKeys() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.machineKeyRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), u.machineKeyRepo.userIDColumn()),
+	)
+	if !u.shouldLoadMachineKeys {
+		conditions = append(conditions, database.IsNull(u.machineKeyRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.machineKeyRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+func (u user) LoadPATs() domain.UserRepository {
+	return &user{
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          true,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
+		shouldLoadMachineKeys: u.shouldLoadMachineKeys,
+		machineKeyRepo:        u.machineKeyRepo,
+	}
+}
+
+func (u user) joinPATs() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.personalAccessTokenRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), u.personalAccessTokenRepo.userIDColumn()),
+	)
+	if !u.shouldLoadPATs {
+		conditions = append(conditions, database.IsNull(u.personalAccessTokenRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.personalAccessTokenRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
 }
 
 // LoadMetadata implements [domain.UserRepository.LoadMetadata].
 func (u user) LoadMetadata() domain.UserRepository {
-	panic("unimplemented")
-}
-
-// LoadPATs implements [domain.UserRepository.LoadPATs].
-func (u user) LoadPATs() domain.UserRepository {
 	panic("unimplemented")
 }
 

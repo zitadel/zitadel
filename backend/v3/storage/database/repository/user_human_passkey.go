@@ -170,6 +170,14 @@ func (u userHuman) UpdatePasskey(condition database.Condition, changes ...databa
 // conditions
 // -------------------------------------------------------------
 
+func (u userHuman) ExistsPasskey(condition database.Condition) database.Condition {
+	panic("unimplemented")
+}
+
+func (u userHuman) PasskeyConditions() domain.HumanPasskeyConditions {
+	panic("unimplemented")
+}
+
 // PasskeyChallengeCondition implements [domain.HumanUserRepository.PasskeyChallengeCondition].
 func (u userHuman) PasskeyChallengeCondition(challenge string) database.Condition {
 	// TODO: implement passkey challenge condition

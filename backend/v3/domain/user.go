@@ -138,7 +138,7 @@ type PersonalAccessToken struct {
 	CreatedAt time.Time               `json:"createdAt,omitzero" db:"created_at"`
 	ExpiresAt time.Time               `json:"expiresAt,omitzero" db:"expires_at"`
 	Type      PersonalAccessTokenType `json:"type" db:"type"`
-	PublicKey string                  `json:"-" db:"public_key"`
+	PublicKey []byte                  `json:"publicKey" db:"public_key"`
 	Scopes    []string                `json:"scopes" db:"scopes"`
 }
 
@@ -154,7 +154,7 @@ const (
 
 type MachineKey struct {
 	ID        string         `json:"id" db:"id"`
-	PublicKey []byte         `json:"-" db:"public_key"`
+	PublicKey []byte         `json:"publicKey" db:"public_key"`
 	CreatedAt time.Time      `json:"createdAt,omitzero" db:"created_at"`
 	ExpiresAt time.Time      `json:"expiresAt,omitzero" db:"expires_at"`
 	Type      MachineKeyType `json:"type" db:"type"`

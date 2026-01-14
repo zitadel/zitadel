@@ -9,6 +9,8 @@ import (
 
 type userMachine struct {
 	user
+	machineKeyRepo
+	personalAccessTokenRepo
 }
 
 func (u userMachine) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
@@ -35,74 +37,12 @@ func (u userMachine) create(ctx context.Context, client database.QueryExecutor, 
 	for _, pat := range user.Machine.PATs {
 		changes = append(changes, u.AddPersonalAccessToken(pat))
 	}
-	changes.Write(builder)
+	for i, change := range changes {
+		sessionCTE(change, i, 0, builder)
+	}
 	builder.WriteString("SELECT created_at, updated_at FROM existing_user")
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-}
-
-// AddKey implements [domain.MachineUserRepository].
-func (u userMachine) AddKey(key *domain.MachineKey) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.machine_keys (" +
-				"instance_id, user_id, id, created_at, expires_at, type, public_key" +
-				") SELECT instance_id, id, ",
-			)
-			var createdAt any = database.NowInstruction
-			if !key.CreatedAt.IsZero() {
-				createdAt = key.CreatedAt
-			}
-			builder.WriteArgs(key.ID, createdAt, key.ExpiresAt, key.Type, key.PublicKey)
-			builder.WriteString(" FROM existing_user")
-		},
-		nil,
-	)
-}
-
-// AddPersonalAccessToken implements [domain.MachineUserRepository].
-func (u userMachine) AddPersonalAccessToken(pat *domain.PersonalAccessToken) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.machine_user_personal_access_tokens (" +
-				"instance_id, user_id, token_id, created_at, expiration, scopes" +
-				") SELECT instance_id, id, ",
-			)
-			var createdAt any = database.NowInstruction
-			if !pat.CreatedAt.IsZero() {
-				createdAt = pat.CreatedAt
-			}
-			builder.WriteArgs(pat.ID, createdAt, pat.ExpiresAt, pat.Scopes)
-			builder.WriteString(" FROM existing_user")
-		},
-		nil,
-	)
-}
-
-// RemoveKey implements [domain.MachineUserRepository].
-func (u userMachine) RemoveKey(id string) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM zitadel.machine_keys WHERE " +
-				"(instance_id, user_id, id) = (SELECT instance_id, id, ")
-			builder.WriteArg(id)
-			builder.WriteString(" FROM existing_user)")
-		},
-		nil,
-	)
-}
-
-// RemovePersonalAccessToken implements [domain.MachineUserRepository].
-func (u userMachine) RemovePersonalAccessToken(id string) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM zitadel.machine_user_personal_access_tokens WHERE " +
-				"(instance_id, user_id, token_id) = (SELECT instance_id, id, ")
-			builder.WriteArg(id)
-			builder.WriteString(" FROM existing_user)")
-		},
-		nil,
-	)
 }
 
 // SetAccessTokenType implements [domain.MachineUserRepository].
@@ -133,17 +73,17 @@ func (u userMachine) Update(ctx context.Context, client database.QueryExecutor, 
 var _ domain.MachineUserRepository = (*userMachine)(nil)
 
 func (u userMachine) nameColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "name")
+	return database.NewColumn(u.user.unqualifiedTableName(), "name")
 }
 
 func (u userMachine) descriptionColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "description")
+	return database.NewColumn(u.user.unqualifiedTableName(), "description")
 }
 
 func (u userMachine) accessTokenTypeColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "access_token_type")
+	return database.NewColumn(u.user.unqualifiedTableName(), "access_token_type")
 }
 
 func (u userMachine) secretColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "secret")
+	return database.NewColumn(u.user.unqualifiedTableName(), "secret")
 }

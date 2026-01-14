@@ -179,3 +179,21 @@ func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grant
 
 	return projectGrant.ID
 }
+
+func createMachineUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) (userID string) {
+	t.Helper()
+	user := domain.User{
+		InstanceID:     instanceID,
+		OrganizationID: orgID,
+		ID:             gofakeit.UUID(),
+		Username:       gofakeit.Username(),
+		State:          domain.UserStateActive,
+		Machine: &domain.MachineUser{
+			Name: gofakeit.Name(),
+		},
+	}
+	userRepo := repository.UserRepository()
+	err := userRepo.Create(t.Context(), tx, &user)
+	require.NoError(t, err)
+	return user.ID
+}
