@@ -28,7 +28,6 @@ CREATE TABLE zitadel.identity_provider_intents
     succeeded_at            TIMESTAMPTZ,
     fail_reason             TEXT,
     expires_at              TIMESTAMPTZ,
-    max_idp_intent_lifetime INTERVAL,
 
     PRIMARY KEY (instance_id, id),
 --     FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users (instance_id, id) ON DELETE CASCADE,
