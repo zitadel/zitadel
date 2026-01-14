@@ -1688,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificatie",
       "DESCRIPTION": "Bepaalt bij welke wijzigingen notificaties worden verzonden.",
-      "PASSWORDCHANGE": "Wachtwoord wijziging"
+      "PASSWORDCHANGE": "Wachtwoord gewijzigd"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Geef de login uw gepersonaliseerde stijl en wijzig zijn gedrag.",

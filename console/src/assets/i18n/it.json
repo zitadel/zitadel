@@ -1688,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Notifiche",
       "DESCRIPTION": "Determina su quali modifiche verranno inviate le notifiche",
-      "PASSWORDCHANGE": "Cambiamento della password"
+      "PASSWORDCHANGE": "Password modificata"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",
