@@ -116,7 +116,7 @@ type XOAuth2AuthChanged struct {
 }
 
 func (c XOAuth2AuthChanged) IsEmpty() bool {
-	return c.User == nil && c.ClientId == nil && c.ClientSecret == nil && c.TokenEndpoint == nil && len(c.Scopes) != 0
+	return c.User == nil && c.ClientId == nil && c.ClientSecret == nil && c.TokenEndpoint == nil && len(c.Scopes) == 0
 }
 
 type PlainAuthChanged struct {
