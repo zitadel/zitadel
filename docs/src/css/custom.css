@@ -645,3 +645,97 @@ p strong {
 table#zitadel-versions td {
   vertical-align: top;
 }
+
+/* --- 8. Ultra-Modern Code Blocks (Mac Style) - FIXED --- */
+
+/* The Main Container */
+.theme-code-block {
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.1);
+  background-color: #1e1e2e; /* Force dark background */
+  position: relative;
+}
+
+[data-theme='dark'] .theme-code-block {
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* The "Traffic Lights" - Applied ONCE to the container */
+.theme-code-block::after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56; /* Red Dot */
+  box-shadow: 
+    20px 0 0 #ffbd2e, /* Yellow Dot */
+    40px 0 0 #27c93f; /* Green Dot */
+  z-index: 10;
+  pointer-events: none; /* Let clicks pass through */
+}
+
+/* --- HANDLE TITLED BLOCKS (e.g. title="script.js") --- */
+/* Target the Title Bar using Docusaurus class pattern */
+div[class*="codeBlockTitle_"] {
+  padding-left: 75px !important; /* Push filename to the right of dots */
+  background-color: #1e1e2e !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 0 !important;
+  font-family: "Lato", sans-serif;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+/* --- HANDLE CODE CONTENT --- */
+.theme-code-block pre {
+  background-color: #1e1e2e !important;
+  border: none;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  /* Default padding for blocks WITH titles */
+  padding-top: 1rem !important; 
+}
+
+/* CONDITIONALLY handle blocks WITHOUT titles.
+   If no title exists, we must push the code down so dots don't overlap code.
+   Uses :has() selector (supported in all modern browsers).
+*/
+.theme-code-block:not(:has(div[class*="codeBlockTitle_"])) pre {
+  padding-top: 3.5rem !important;
+}
+
+.theme-code-block code {
+  font-size: 14.5px !important;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* Adjust Copy Button position */
+.theme-code-block button {
+  top: 12px !important;
+  right: 12px !important;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #a0a0a0;
+  transition: all 0.2s;
+}
+
+.theme-code-block button:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgba(255, 235, 59, 0.1);
+  border-left: 3px solid #fbbf24;
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
