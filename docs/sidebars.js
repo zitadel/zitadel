@@ -311,13 +311,9 @@ module.exports = {
                   label: "Python",
                   items: [
                     "sdk-examples/client-libraries/python",
-                    "sdk-examples/python-flask",
-                    "sdk-examples/python-django",
-                    {
-                      type: "link",
-                      label: "FastAPI",
-                      href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-                    },
+                    "sdk-examples/flask",
+                    "sdk-examples/django",
+					"sdk-examples/fastapi",
                   ],
                 },
                 {
@@ -330,6 +326,7 @@ module.exports = {
                   label: "Java",
                   items: [
                     "sdk-examples/java",
+					"sdk-examples/spring",
                     "sdk-examples/client-libraries/java",
                   ],
                 },
@@ -338,6 +335,7 @@ module.exports = {
                   label: "PHP",
                   items: [
                     "sdk-examples/symfony",
+					"sdk-examples/laravel",
                     "sdk-examples/client-libraries/php",
                   ],
                 },
