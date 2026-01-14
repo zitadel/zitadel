@@ -2,7 +2,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -24,39 +24,26 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const submit: boolean = searchParams?.submit === "true";
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
-  });
-
-  const contextLoginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   const identityProviders = await getActiveIdentityProviders({
-    serviceUrl,
+    serviceConfig,
     orgId: organization ?? defaultOrganization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   return (
     <DynamicTheme branding={branding}>
@@ -74,7 +61,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           loginName={loginName}
           requestId={requestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-          loginSettings={contextLoginSettings}
+          defaultOrganization={defaultOrganization}
+          loginSettings={loginSettings}
           suffix={suffix}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}

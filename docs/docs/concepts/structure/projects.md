@@ -8,7 +8,7 @@ import ProjectDescription from './\_project_description.mdx';
 
 <ProjectDescription name="ProjectDescription" />
 
-To learn how to set up a project read this console guide [here](../../guides/manage/console/projects.mdx).
+To learn how to set up a project read this console guide [here](../../guides/manage/console/projects-overview.mdx).
 
 ## Applications
 

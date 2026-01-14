@@ -1,10 +1,10 @@
 ---
 title: ZITADEL Support
-sidebar_label: Support
+sidebar_label: Customer Support
 ---
 
 :::note
-We describe our [support services](/docs/legal/service-description/support-services) and information required in more detail in our legal section. Beware that not all features may be supported by your subscription and consult the [support states](/docs/support/software-release-cycles-support#support-states).
+We describe our [support services](/docs/legal/service-description/support-services) and information required in more detail in our legal section. Beware that not all features may be supported by your subscription and consult the [support states](https://help.zitadel.com/zitadel-support-states).
 :::
 
 ## General

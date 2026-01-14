@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 import { isSessionValid } from "./session";
 import { sendLoginname } from "@/lib/server/loginname";
-import { createResponse, getLoginSettings } from "@/lib/zitadel";
+import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 
 describe("saml", () => {
   let mockCookies: any;
@@ -133,8 +133,8 @@ describe("saml", () => {
 
       await setSAMLFormCookie(largeSamlValue);
 
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("SAML form cookie value is large"));
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("5000 characters"));
+      // Expect no warning about size as it was removed for security/performance
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     it("should handle empty SAML value", async () => {
@@ -154,7 +154,8 @@ describe("saml", () => {
       const uid = await setSAMLFormCookie(longValue);
 
       expect(uid).toBe(mockUid);
-      expect(console.warn).toHaveBeenCalled();
+      // Expect no warning for long values
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     it("should throw error when cookie setting fails", async () => {
@@ -169,14 +170,6 @@ describe("saml", () => {
       mockCookies.set.mockRejectedValue(error);
 
       await expect(setSAMLFormCookie("test-value")).rejects.toThrow();
-
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to set SAML form cookie"),
-        expect.objectContaining({
-          error,
-          uid: mockUid,
-        }),
-      );
     });
   });
 
@@ -202,7 +195,6 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("non-existent-uid");
 
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("SAML form cookie not found"));
     });
 
     it("should return null if cookie has empty value", async () => {
@@ -214,7 +206,6 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("test-uid");
 
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("empty value"));
     });
 
     it("should handle errors gracefully", async () => {
@@ -226,7 +217,6 @@ describe("saml", () => {
       const result = await getSAMLFormCookie("test-uid");
 
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Error retrieving SAML form cookie"), error);
     });
 
     it("should handle null cookie value", async () => {
@@ -271,7 +261,7 @@ describe("saml", () => {
     };
 
     const baseParams = {
-      serviceUrl: "https://example.com",
+      serviceConfig: { baseUrl: "https://example.com" } as ServiceConfig,
       samlRequest: "saml-request-id",
       sessionId: "session-123",
       sessions: [mockSession],
@@ -300,7 +290,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(baseParams);
 
       expect(isSessionValid).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         session: mockSession,
       });
     });
@@ -314,7 +304,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(baseParams);
 
       expect(createResponse).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         req: expect.objectContaining({
           samlRequestId: "saml-request-id",
           responseKind: {
@@ -483,7 +473,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(params);
 
       expect(isSessionValid).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         session: mockSession,
       });
     });
@@ -508,7 +498,7 @@ describe("saml", () => {
       await loginWithSAMLAndSession(params);
 
       expect(createResponse).toHaveBeenCalledWith({
-        serviceUrl: baseParams.serviceUrl,
+        serviceConfig: baseParams.serviceConfig,
         req: expect.objectContaining({
           responseKind: {
             case: "session",

@@ -5,7 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -30,8 +30,12 @@ function isSessionValid(session: Partial<Session>): {
   verifiedAt?: Timestamp;
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
   const validIDP = session?.factors?.intent?.verifiedAt;
+
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey || validIDP;
@@ -46,7 +50,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { loginName, checkAfter, force, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -59,11 +63,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    }).then((methods) => {
-      return getUserByID({ serviceUrl, userId }).then((user) => {
+    return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
+      return getUserByID({ serviceConfig, userId }).then((user) => {
         const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
@@ -80,7 +81,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   async function loadSessionByLoginname(loginName?: string, organization?: string) {
     return loadMostRecentSession({
-      serviceUrl,
+      serviceConfig,
       sessionParams: {
         loginName,
         organization,
@@ -92,25 +93,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
       return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
   const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    serviceConfig,
+    organization: sessionWithData?.factors?.user?.organizationId,
   });
 
-  const { valid } = isSessionValid(sessionWithData);
+  const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
 
   return (
     <DynamicTheme branding={branding}>

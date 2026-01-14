@@ -60,7 +60,7 @@ describe("register", () => {
     });
   });
 
-  it("should redirect a user who selects passwordless on register to /passkey/set", () => {
+  it("should redirect a user who selects passkey on register to /passkey/set", () => {
     cy.visit("/register");
     cy.get('input[data-testid="firstname-text-input"]').focus().type("John");
     cy.get('input[data-testid="lastname-text-input"]').focus().type("Doe");

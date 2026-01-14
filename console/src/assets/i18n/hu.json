@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projektek",
-      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
+      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Például lehet egyetlen projekted 3 alkalmazással; egy a webes frontendhez, egy a mobilalkalmazásodhoz és egy a backendhez. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
       "OWNED": {
         "TITLE": "Tulajdonolt Projektek",
         "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, jogosultságait és alkalmazásait te menedzselheted."
@@ -219,7 +219,7 @@
           "DC": "Amikor lefoglalod a domain nevet a szervezet számára, azok a felhasználók, akik nem ezt a domaint használják bejelentkezési névként, felszólítást kapnak a login nevük megváltoztatására, hogy az egyezzen a lefoglalt domainnel.",
           "INIT": "Amikor létrehozol egy felhasználót, kapni fog egy e-mailt egy linkkel, amin megadhatja a jelszavát.",
           "PC": "Amikor egy felhasználó megváltoztatja a jelszavát, értesítést kap a változásról, ha ezt engedélyezted az értesítési beállításokban.",
-          "PL": "Amikor egy felhasználó hozzáad egy jelszó nélküli hitelesítési módot, aktiválnia kell azt egy e-mailben kapott linkre kattintva.",
+          "PL": "Amikor egy felhasználó hozzáad egy Passkey hitelesítési módot, aktiválnia kell azt egy e-mailben kapott linkre kattintva.",
           "PR": "Amikor egy felhasználó visszaállítja a jelszavát, kap egy e-mailt egy linkkel az új jelszó beállításához.",
           "VE": "Amikor egy felhasználó megváltoztatja az e-mail címét, kap egy e-mailt egy linkkel az új cím megerősítéséhez.",
           "VP": "Amikor egy felhasználó megváltoztatja a telefonszámát, kap egy SMS-t egy kóddal az új szám megerősítéséhez.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Szabd testre a bejelentkező űrlapot.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Felhasználónév és jelszó engedélyezve",
-            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy felhasználónévvel és jelszóval jelentkezzenek be. Ha ez nincs engedélyezve, a felhasználóid csak jelszó nélküli azonosítással vagy külső identitásszolgáltatóval tudnak bejelentkezni."
+            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy felhasználónévvel és jelszóval jelentkezzenek be. Ha ez nincs engedélyezve, a felhasználóid csak Passkey azonosítással vagy külső identitásszolgáltatóval tudnak bejelentkezni."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Felhasználói regisztráció engedélyezve",
@@ -623,6 +623,14 @@
           "restAsync": "REST Aszinkron"
         },
         "TYPES_DESCRIPTION": "Webhook, a hívás kezeli az állapotkódot, de a válasz lényegtelen\nCall, a hívás kezeli az állapotkódot és a választ\nAsync, a hívás sem az állapotkódot, sem a választ nem kezeli, de párhuzamosan hívható más célokkal",
+        "PAYLOAD_TYPE": "Tartalom típusa",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nincs megadva",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Titkosított JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Szabványos JSON üzenet aláírási fejlécvel az ellenőrzéshez.\nJWT: Az üzenet aláírt JWT-ként kerül elküldésre. Az ellenőrzés a JWT aláírásával történik.\nJWE: A JWT további titkosítást kap, hogy megakadályozza az illetéktelen hozzáférést az üzenet adataihoz.",
         "ENDPOINT": "Végpont",
         "ENDPOINT_DESCRIPTION": "Adja meg azt a végpontot, ahol a kódja található. Győződjön meg arról, hogy elérhető számunkra!",
         "TIMEOUT": "Időtúllépés",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Állapot",
       "NAME": "Név",
       "EMPTY": "Nincs eszköz beállítva",
-      "TITLE": "Jelszó nélküli Hitelesítés",
-      "DESCRIPTION": "Adj hozzá WebAuthn alapú hitelesítési módszereket a jelszó nélküli bejelentkezéshez a ZITADEL-be.",
+      "TITLE": "Passkey Hitelesítés",
+      "DESCRIPTION": "Adj hozzá WebAuthn alapú hitelesítési módszereket a Passkey-vel való bejelentkezéshez a ZITADEL-be.",
       "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második faktoros módszereit.",
       "U2F": "Módszer hozzáadása",
       "U2F_DIALOG_TITLE": "Hitelesítő eszköz ellenőrzése",
-      "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt jelszó nélküli bejelentkezésnek",
-      "U2F_SUCCESS": "A jelszó nélküli hitelesítés sikeresen létrehozva!",
+      "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt Passkey bejelentkezésnek",
+      "U2F_SUCCESS": "A Passkey hitelesítés sikeresen létrehozva!",
       "U2F_ERROR": "Hiba történt a beállítás során!",
       "U2F_NAME": "Hitelesítő neve",
       "TYPE": {
         "0": "Nincs MFA meghatározva",
         "1": "Egyszeri jelszó (OTP)",
-        "2": "Ujjlenyomat, biztonsági kulcsok, Face ID és egyéb"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Nincs állapot",
@@ -853,17 +861,17 @@
         "3": "Törölve"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Jelszó nélküli hitelesítési módszer eltávolítása",
-        "DELETE_DESCRIPTION": "Egy jelszó nélküli hitelesítési módszert készülsz törölni. Biztos vagy benne?",
-        "ADD_TITLE": "Jelszó nélküli hitelesítés",
-        "ADD_DESCRIPTION": "Válaszd ki az elérhető opciók közül a jelszó nélküli hitelesítés módjának létrehozásához.",
+        "DELETE_TITLE": "Passkey eltávolítása",
+        "DELETE_DESCRIPTION": "Egy Passkey-t készülsz törölni. Biztos vagy benne?",
+        "ADD_TITLE": "Passkey hitelesítés",
+        "ADD_DESCRIPTION": "Válaszd ki az elérhető opciók közül a Passkey létrehozásához.",
         "SEND_DESCRIPTION": "Küldj magadnak egy regisztrációs linket az email címedre.",
         "SEND": "Regisztrációs link küldése",
         "SENT": "Az email sikeresen elküldve. Ellenőrizd a postaládádat a beállítás folytatásához.",
         "QRCODE_DESCRIPTION": "Generálj QR-kódot egy másik eszközzel történő beolvasáshoz.",
         "QRCODE": "QR-kód generálása",
         "QRCODE_SCAN": "Olvasd be ezt a QR-kódot a beállítás folytatásához az eszközödön.",
-        "NEW_DESCRIPTION": "Használd ezt az eszközt a Jelszó nélküli beállításhoz.",
+        "NEW_DESCRIPTION": "Használd ezt az eszközt a Passkey beállításhoz.",
         "NEW": "Új hozzáadása"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "Hitelesítő alkalmazás TOTP-hez (ideiglenes egyedi jelszó időalapú)",
       "OTP_DIALOG_TITLE": "OTP hozzáadása",
       "OTP_DIALOG_DESCRIPTION": "Olvasd be a QR-kódot egy hitelesítő alkalmazással, majd írd be a kódot alul, hogy ellenőrizd és aktiváld az OTP módszert.",
-      "U2F": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor ellenőrzése",
       "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt univerzális Multifactor-odnak.",
       "U2F_SUCCESS": "A faktor sikeresen hozzáadva!",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "Nem definiáltak többtényezős hitelesítést",
         "1": "Egyszeri Jelszó (OTP)",
-        "2": "Ujjlenyomat, Biztonsági Kulcsok, Arcfelismerés és egyéb"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Nincs Állapot",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Az e-mail ellenőrző kód elküldve.",
       "OTPREMOVED": "Az OTP eltávolítva.",
       "U2FREMOVED": "A faktor eltávolítva.",
-      "PASSWORDLESSREMOVED": "A jelszónélküli belépés eltávolítva.",
+      "PASSWORDLESSREMOVED": "Passkey eltávolítva.",
       "INITIALPASSWORDSET": "A kezdeti jelszó beállítva.",
       "PASSWORDNOTIFICATIONSENT": "A jelszóváltoztatási értesítés elküldve.",
       "PASSWORDCHANGED": "A jelszó sikeresen megváltoztatva.",
@@ -1147,7 +1155,7 @@
       "MACHINEADDED": "Service User létrehozva!",
       "DELETED": "A felhasználó sikeresen törölve!",
       "UNLOCKED": "A felhasználó sikeresen feloldva!",
-      "PASSWORDLESSREGISTRATIONSENT": "A regisztrációs link sikeresen elküldve.",
+      "PASSWORDLESSREGISTRATIONSENT": "A Passkey regisztrációs link sikeresen elküldve.",
       "SECRETGENERATED": "A titok sikeresen létrehozva!",
       "SECRETREMOVED": "A titok sikeresen eltávolítva!"
     },
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1598,7 +1607,7 @@
         "2": "E-mail ellenőrzés",
         "3": "Telefonos ellenőrzés",
         "4": "Jelszó visszaállítás",
-        "5": "Jelszó nélküli inicializálás",
+        "5": "Passkey inicializálás",
         "6": "Alkalmazás titok",
         "7": "Egyszer használatos jelszó (OTP) - SMS",
         "8": "Egyszer használatos jelszó (OTP) - Email"
@@ -1677,7 +1686,7 @@
     "NOTIFICATION": {
       "TITLE": "Értesítés",
       "DESCRIPTION": "Meghatározza, hogy milyen változások esetén lesznek értesítések küldve.",
-      "PASSWORDCHANGE": "Jelszó megváltoztatása"
+      "PASSWORDCHANGE": "Jelszó megváltoztatva"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Adj egyéni stílust a bejelentkezésnek, és módosítsd a viselkedését.",
@@ -1794,7 +1803,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -1826,10 +1836,10 @@
         "usernameChangeText": "Felhasználónév módosítása",
         "verifyMfaOtpText": "OTP ellenőrzése",
         "verifyMfaU2fText": "Univerzális második faktor ellenőrzése",
-        "passwordlessPromptText": "Jelszó nélküli kérés",
-        "passwordlessRegistrationDoneText": "Jelszó nélküli regisztráció kész",
-        "passwordlessRegistrationText": "Jelszó nélküli regisztráció",
-        "passwordlessText": "Jelszó nélküli",
+        "passwordlessPromptText": "Passkey kérés",
+        "passwordlessRegistrationDoneText": "Passkey regisztráció kész",
+        "passwordlessRegistrationText": "Passkey regisztráció",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Külső regisztrációs felhasználói áttekintés"
       }
     },
@@ -1843,7 +1853,7 @@
         "VEO": "Email OTP igazolása",
         "PR": "Jelszó visszaállítása",
         "DC": "Domain igénylés",
-        "PL": "Jelszó nélküli",
+        "PL": "Passkey",
         "PC": "Jelszó módosítása",
         "IU": "Felhasználó meghívása"
       },
@@ -2393,8 +2403,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Jelszó nélküli",
-      "MULTIFACTORDESCRIPTION": "Itt definiálhatod a jelszó nélküli azonosítás több faktorát.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Itt definiálhatod a Passkey azonosítás több faktorát.",
       "SECONDFACTORTITLE": "Többfaktoros hitelesítés",
       "SECONDFACTORDESCRIPTION": "Határozz meg további lehetséges faktorokat, amelyekkel biztosíthatod a jelszavas hitelesítésed."
     },
@@ -2414,12 +2424,12 @@
     "TYPE": "Típus",
     "MULTIFACTORTYPES": {
       "0": "Ismeretlen",
-      "1": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Ismeretlen",
       "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
-      "2": "Ujjlenyomat, Biztonsági Kulcsok, Face ID és egyéb",
+      "2": "Passkey",
       "3": "Egyszeri Jelszó Emailben (Email OTP)",
       "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
       "5": "Helyreállítási kódok"
@@ -2436,7 +2446,7 @@
       "DESCRIPTION": "Előre definiált vagy saját magad által létrehozott szolgáltatókat választhatsz az azonosításhoz.",
       "SELECTIDPS": "Identitásszolgáltatók"
     },
-    "PASSWORDLESS": "Jelszó nélküli bejelentkezés",
+    "PASSWORDLESS": "Passkey bejelentkezés",
     "PASSWORDLESSTYPE": {
       "0": "Nem engedélyezett",
       "1": "Engedélyezett"
@@ -2776,7 +2786,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy menedzsert",

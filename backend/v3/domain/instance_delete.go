@@ -2,7 +2,11 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"strings"
+	"time"
+
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -20,6 +24,8 @@ type DeleteInstanceCommand struct {
 	// InstanceName is public for testing purposes
 	// do not use this field
 	InstanceName string
+
+	DeleteTime *time.Time
 }
 
 // RequiresTransaction implements [Transactional].
@@ -46,6 +52,9 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	instanceToDelete, err := instanceRepo.Get(ctx, opts.DB(), database.WithCondition(instanceRepo.IDCondition(d.ID)))
 	if err != nil {
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil
+		}
 		return err
 	}
 
@@ -58,17 +67,21 @@ func (d *DeleteInstanceCommand) Execute(ctx context.Context, opts *InvokeOpts) (
 
 	deletedRows, err := instanceRepo.Delete(ctx, opts.DB(), instanceToDelete.ID)
 	if err != nil {
-		return err
+		if errors.Is(err, &database.NoRowFoundError{}) {
+			return nil
+		}
+		return zerrors.ThrowInternal(err, "DOM-caF4Vs", "Errors.Instance.Delete")
 	}
 
 	if deletedRows > 1 {
-		err = zerrors.ThrowInternalf(nil, "DOM-Od04Jx", "expecting 1 row deleted, got %d", deletedRows)
-		return err
+		return zerrors.ThrowInternal(nil, "DOM-Od04Jx", "Errors.Instsance.DeleteMismatch")
 	}
 
 	if deletedRows < 1 {
-		err = zerrors.ThrowNotFound(nil, "DOM-daglwD", "instance not found")
+		return nil
 	}
+
+	d.DeleteTime = gu.Ptr(time.Now())
 
 	return err
 }
@@ -85,7 +98,7 @@ func (d *DeleteInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 	}
 
 	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Yz8f1X", "permission denied")
+		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Yz8f1X", "Errors.PermissionDenied")
 	}
 
 	return nil

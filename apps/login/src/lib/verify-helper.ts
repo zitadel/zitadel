@@ -8,7 +8,7 @@ import crypto from "crypto";
 import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
-import { getUserByID } from "./zitadel";
+import { getUserByID, ServiceConfig } from "./zitadel";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -82,21 +82,13 @@ export function checkEmailVerification(session: Session, humanUser?: HumanUser, 
 }
 
 export async function checkMFAFactors(
-  serviceUrl: string,
+  serviceConfig: ServiceConfig,
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],
   organization?: string,
   requestId?: string,
 ) {
-  console.log("checkMFAFactors called with session:", {
-    sessionId: session.id,
-    userId: session.factors?.user?.id,
-    loginName: session.factors?.user?.loginName,
-    hasIntentFactor: !!session.factors?.intent?.verifiedAt,
-    hasPasswordFactor: !!session.factors?.password?.verifiedAt,
-    hasWebAuthNFactor: !!session.factors?.webAuthN?.verifiedAt,
-  });
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
@@ -127,7 +119,7 @@ export async function checkMFAFactors(
     }
 
     const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
+    // if passkey is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {
@@ -179,10 +171,7 @@ export async function checkMFAFactors(
     session?.factors?.user?.id &&
     shouldEnforceMFA(session, loginSettings)
   ) {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session.factors?.user?.id,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: session.factors?.user?.id });
 
     const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 

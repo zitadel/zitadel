@@ -12,27 +12,15 @@ import (
 type Change interface {
 	gomock.Matcher
 	// Write writes the change to the given statement builder.
-	Write(builder *StatementBuilder)
+	Write(builder *StatementBuilder) error
 	// IsOnColumn checks if the change is on the given column.
 	IsOnColumn(col Column) bool
 }
 
-// NewChange creates a new Change for the given column and value.
-// If you want to set a column to NULL, use [NewChangePtr].
-func NewChange[V Value](col Column, value V) Change {
-	return &change[V]{
-		column: col,
-		value:  value,
-	}
-}
-
-// NewChangePtr creates a new Change for the given column and value pointer.
-// If the value pointer is nil, the column will be set to NULL.
-func NewChangePtr[V Value](col Column, value *V) Change {
-	if value == nil {
-		return NewChange(col, NullInstruction)
-	}
-	return NewChange(col, *value)
+// NoChange can be implemented by Changes that might not result in any actual change,
+// resp. when the change has no set statement, e.g. [CTEChange] with no change function.
+type NoChange interface {
+	NoChange() bool
 }
 
 type change[V Value] struct {
@@ -61,11 +49,30 @@ var (
 	_ gomock.Matcher = (*change[string])(nil)
 )
 
-// Write implements [Change.Write].
-func (c change[V]) Write(builder *StatementBuilder) {
+// NewChange creates a new Change for the given column and value.
+// If you want to set a column to NULL, use [NewChangePtr].
+func NewChange[V Value](col Column, value V) Change {
+	return &change[V]{
+		column: col,
+		value:  value,
+	}
+}
+
+// NewChangePtr creates a new Change for the given column and value pointer.
+// If the value pointer is nil, the column will be set to NULL.
+func NewChangePtr[V Value](col Column, value *V) Change {
+	if value == nil {
+		return NewChange(col, NullInstruction)
+	}
+	return NewChange(col, *value)
+}
+
+// Write implements [Change].
+func (c change[V]) Write(builder *StatementBuilder) error {
 	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(c.value)
+	return nil
 }
 
 // IsOnColumn implements [Change.IsOnColumn].
@@ -86,14 +93,26 @@ func (c Changes) IsOnColumn(col Column) bool {
 	})
 }
 
-// Write implements [Change.Write].
-func (m Changes) Write(builder *StatementBuilder) {
-	for i, change := range m {
-		if i > 0 {
+// Write implements [Change].
+func (c Changes) Write(builder *StatementBuilder) error {
+	var hadChanges bool
+	for _, change := range c {
+		ch, ok := change.(NoChange)
+		hasChanges := !ok || !ch.NoChange()
+		// if the previous change actually wrote a change to the builder
+		// and this change has changes, add a comma
+		if hadChanges && hasChanges {
 			builder.WriteString(", ")
 		}
-		change.Write(builder)
+		if err := change.Write(builder); err != nil {
+			return err
+		}
+		// if the change had changes, mark that we had changes for the next iteration
+		if hasChanges {
+			hadChanges = hasChanges
+		}
 	}
+	return nil
 }
 
 // Matches implements [gomock.Matcher].
@@ -116,6 +135,21 @@ func (c Changes) Matches(x any) bool {
 // String implements [gomock.Matcher].
 func (c Changes) String() string {
 	return "database.Changes"
+}
+
+// NoChange implements [NoChange].
+// It returns false if any of the changes writes to the builder.
+func (c Changes) NoChange() bool {
+	for _, change := range c {
+		no, ok := change.(NoChange)
+		if !ok {
+			return false
+		}
+		if no.NoChange() {
+			return true
+		}
+	}
+	return true
 }
 
 var _ Change = Changes(nil)
@@ -153,10 +187,11 @@ func (c *changeToColumn) String() string {
 }
 
 // Write implements [Change].
-func (c *changeToColumn) Write(builder *StatementBuilder) {
+func (c *changeToColumn) Write(builder *StatementBuilder) error {
 	c.to.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	c.from.WriteQualified(builder)
+	return nil
 }
 
 var _ Change = (*changeToColumn)(nil)
@@ -191,11 +226,12 @@ func (i *incrementColumnChange) String() string {
 }
 
 // Write implements [Change].
-func (i *incrementColumnChange) Write(builder *StatementBuilder) {
+func (i *incrementColumnChange) Write(builder *StatementBuilder) error {
 	i.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	i.column.WriteUnqualified(builder)
 	builder.WriteString(" + 1")
+	return nil
 }
 
 var _ Change = (*incrementColumnChange)(nil)
@@ -242,7 +278,7 @@ func (c *changeToStatement) String() string {
 }
 
 // Write implements [Change].
-func (c *changeToStatement) Write(builder *StatementBuilder) {
+func (c *changeToStatement) Write(builder *StatementBuilder) error {
 	_, ok := c.column.(Columns)
 	if ok {
 		builder.WriteRune('(')
@@ -254,6 +290,7 @@ func (c *changeToStatement) Write(builder *StatementBuilder) {
 	builder.WriteString(" = (")
 	c.stmt(builder)
 	builder.WriteString(")")
+	return nil
 }
 
 var _ Change = (*changeToStatement)(nil)
@@ -311,7 +348,7 @@ func (c *cteChange) Matches(x any) bool {
 	return slices.Equal(expectedCTEBuilder.Args(), actualCTEBuilder.Args())
 }
 
-// Name implements [CTEChange].
+// SetName implements [CTEChange].
 func (c *cteChange) SetName(name string) {
 	c.name = name
 }
@@ -322,14 +359,21 @@ func (c *cteChange) String() string {
 }
 
 // Write implements [CTEChange].
-func (c *cteChange) Write(builder *StatementBuilder) {
+func (c *cteChange) Write(builder *StatementBuilder) error {
 	if c.change == nil {
-		return
+		return nil
 	}
 	c.change(c.name).Write(builder)
+	return nil
 }
 
 // WriteCTE implements [CTEChange].
 func (c *cteChange) WriteCTE(builder *StatementBuilder) {
 	c.cte(builder)
+}
+
+// NoChange implements [NoChange].
+// It returns true if there is no change function defined.
+func (c *cteChange) NoChange() bool {
+	return c.change == nil
 }
