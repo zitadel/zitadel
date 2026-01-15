@@ -13,6 +13,11 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
+const (
+	FailingUser = "IAM FAIL"
+	FailingPsw  = "test failed successfully"
+)
+
 // FetchUser implements the [idp.Session] interface.
 //
 // This is a mock implementation of [idp.Session.FetchUser] that is used
@@ -23,7 +28,15 @@ import (
 // fake (external) LDAP server.
 //
 // The substitution/overloading is done through build tags.
+//
+// When the LDAP start intent is called with `username = [FailingUser]` and
+// `password = [FailingPsw]`, the method return [ErrFailedLogin] to be able
+// to mock an intent failed event.
 func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
+	if s.User == FailingUser && s.Password == FailingPsw {
+		return nil, ErrFailedLogin
+	}
+
 	usr := NewUser(
 		gofakeit.UUID(),
 		gofakeit.FirstName(),
