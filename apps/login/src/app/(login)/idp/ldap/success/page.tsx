@@ -23,8 +23,18 @@ export default async function LDAPSuccessPage(props: {
   } = searchParams;
 
   // Validate required parameters before passing to client component
-  if (!id || !token) {
-    throw new Error("Missing required LDAP callback parameters");
+  const missingParams: string[] = [];
+  if (!id) {
+    missingParams.push("id");
+  }
+  if (!token) {
+    missingParams.push("token");
+  }
+  if (missingParams.length > 0) {
+    const paramLabel = missingParams.length === 1 ? "parameter" : "parameters";
+    throw new Error(
+      `Missing required LDAP callback ${paramLabel}: ${missingParams.join(", ")}`
+    );
   }
 
   return (
