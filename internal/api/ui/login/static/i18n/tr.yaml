@@ -445,8 +445,8 @@ Errors:
       NotFound: Profil bulunamadı
       NotChanged: Profil değişmedi
       Empty: Profil boş
-      FirstNameEmpty: Profildeki ad boş
-      LastNameEmpty: Profildeki soyadı boş
+      FirstNameEmpty: Profildeki ad alanı boş
+      LastNameEmpty: Profildeki soyad alanı boş
       IDMissing: Profil ID'si eksik
     Email:
       NotFound: E-posta bulunamadı
