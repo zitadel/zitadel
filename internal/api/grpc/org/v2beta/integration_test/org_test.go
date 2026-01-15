@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2beta"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
@@ -301,22 +302,44 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
-	ctx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	t.Parallel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
+
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+	instOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+
+	relationInst := integration.NewInstance(ctxWithSysAuthZ)
+	instOwnerRelationCtx := relationInst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, relationInst,
+		&feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
+		func(tCollection *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.True(tCollection, got.EnableRelationalTables.GetEnabled())
+		},
+	)
 
 	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(ctx, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
+		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		relationInst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
-	relTableState := integration.RelationalTablesEnableMatrix()
+	type instanceAndCtx struct {
+		testType string
+		instance *integration.Instance
+		ctx      context.Context
+	}
+	testedInstances := []instanceAndCtx{
+		{testType: "eventstore", instance: inst, ctx: instOwnerCtx},
+		{testType: "relations", instance: inst, ctx: instOwnerRelationCtx},
+	}
 
-	cases := len(relTableState)
+	cases := len(testedInstances)
 	orgs, orgNames, _ := createOrgs(CTX, t, Client, 2*cases)
 
-	for i, stateCase := range relTableState {
-		integration.EnsureInstanceFeature(t, ctx, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
+	for i, stateCase := range testedInstances {
 		tests := []struct {
 			name    string
 			ctx     context.Context
@@ -366,11 +389,11 @@ func TestServer_UpdateOrganization(t *testing.T) {
 					Id:   orgs[1+(i*cases)].GetId(),
 					Name: integration.OrganizationName(),
 				},
-				wantErr: !stateCase.FeatureSet.GetEnableRelationalTables(), //TODO: implement for relational tables
+				wantErr: stateCase.instance.ID() == inst.ID(), //TODO: implement for relational tables
 			},
 		}
 		for _, tt := range tests {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tt.name), func(t1 *testing.T) {
+			t.Run(fmt.Sprintf("%s - %s", stateCase.testType, tt.name), func(t1 *testing.T) {
 				got, err := Client.UpdateOrganization(tt.ctx, tt.req)
 				if tt.wantErr {
 					require.Error(t1, err)
