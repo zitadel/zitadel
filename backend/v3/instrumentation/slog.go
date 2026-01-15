@@ -40,7 +40,13 @@ type LogConfig struct {
 	Level     slog.Level
 	Format    LogFormat
 	AddSource bool
+	Errors    ErrorConfig
 	Exporter  ExporterConfig
+}
+
+type ErrorConfig struct {
+	ReportLocation bool
+	StackTrace     bool
 }
 
 // setLogger configures the global slog logger.
@@ -71,10 +77,13 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		options.ReplaceAttr = sloggcp.ReplaceAttr
 		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
 	case LogFormatGCPErrorReporting:
-		zerrors.EnableReportLocation(true)
+		zerrors.GCPErrorReportingEnabled(true)
 		options.ReplaceAttr = replaceErrAttr
 		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
 	}
+
+	zerrors.EnableReportLocation(cfg.Errors.ReportLocation)
+	zerrors.EnableStackTrace(cfg.Errors.StackTrace)
 
 	stdErrHandler = slogctx.NewHandler(
 		stdErrHandler,

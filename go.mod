@@ -101,7 +101,7 @@ require (
 	github.com/zitadel/passwap v0.10.0
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.1
-	github.com/zitadel/sloggcp v0.3.0
+	github.com/zitadel/sloggcp v0.5.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0

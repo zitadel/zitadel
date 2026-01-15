@@ -54,6 +54,12 @@ Instrumentation:
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    # Configure how errors are logged.
+    Errors:
+      # Adds the source file, line number and function where the error was created.
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      # Adds stack traces to logged errors.
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables OTEL log exporter
