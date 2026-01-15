@@ -45,11 +45,13 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 					ReplyToAddress: "reply@example.com",
 					Host:           "mail.com",
 					User:           "mail-user",
-					Password: &crypto.CryptoValue{
-						CryptoType: 0,
-						Algorithm:  cryptAlg,
-						KeyID:      keyId,
-						Crypted:    encryptedPwd,
+					PlainAuth: &query.PlainAuth{
+						Password: &crypto.CryptoValue{
+							CryptoType: 0,
+							Algorithm:  cryptAlg,
+							KeyID:      keyId,
+							Crypted:    encryptedPwd,
+						},
 					},
 				},
 			},
@@ -60,9 +62,11 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 				},
 				SMTPConfig: &smtp.Config{
 					SMTP: smtp.SMTP{
-						Host:     "mail.com",
-						User:     "mail-user",
-						Password: pwd,
+						Host: "mail.com",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "mail-user",
+							Password: pwd,
+						},
 					},
 					Tls:            true,
 					From:           "sender@example.com",
@@ -92,7 +96,9 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 				SMTPConfig: &smtp.Config{
 					SMTP: smtp.SMTP{
 						Host: "mail.com",
-						User: "mail-user",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User: "mail-user",
+						},
 					},
 					Tls:            true,
 					From:           "sender@example.com",

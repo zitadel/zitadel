@@ -88,5 +88,14 @@ func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto cryp
 		}
 	}
 
+	// if no auth is configured but there is a user, use plain auth without a password
+	if qs.User != "" &&
+		config.SMTPConfig.SMTP.PlainAuth == nil &&
+		config.SMTPConfig.SMTP.XOAuth2Auth == nil {
+		config.SMTPConfig.SMTP.PlainAuth = &smtp.PlainAuthConfig{
+			User: qs.User,
+		}
+	}
+
 	return config, nil
 }
