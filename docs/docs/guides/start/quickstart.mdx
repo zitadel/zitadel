@@ -14,58 +14,6 @@ This sample app implements the [OIDC PKCE](/docs/guides/integrate/login/oidc/log
 - Authorize: Uses the token to retrieve profile data from the userinfo endpoint.
 - Logout: Clears the local session and revokes the token.
 
-## ZITADEL terminology: instances, organizations, projects, users, roles, authorizations and apps
-
-In ZITADEL, instances, organizations, projects, users, roles, and apps are the main components that make up the platform.
-
-The order of creation for the above components would typically be as follows:
-
-<ul>
-  <li>
-    <b>Instance</b>: An instance is a top-level entity in ZITADEL that
-    represents a deployment of ZITADEL for a registered account. An instance can
-    have one or more organizations.
-  </li>
-  <li>
-    <b>Organization</b>: An organization is a logical separation within an
-    instance that represents a company/organization and can have one or more
-    projects. The default organization is the one that is provided at the start
-    of the account registration process. Typically, an instance would have one
-    organization, but in B2B scenarios, an instance would have more than one.
-  </li>
-  <li>
-    <b>Project</b>: A project is a logical separation within an organization and
-    is a container for apps, roles and authorization policies for the resources
-    it contains.
-  </li>
-  <li>
-    <b>Users</b>: Users are created at the organizational level and are granted
-    access to the resources within projects. They can be assigned different
-    roles, which define the permissions and privileges they have within the
-    project.
-  </li>
-  <li>
-    <b>Roles</b>: Roles are the sets of permissions and privileges that are
-    assigned to users within a project.
-  </li>
-  <li>
-    <b>Authorizations</b>: Authorization policies in ZITADEL are defined at the
-    project level, which means that they apply to all the resources within the
-    project. These policies are based on the roles that are assigned to users,
-    and they determine the actions that users are allowed to perform within the
-    project.
-  </li>
-  <li>
-    <b>Apps</b>: Apps are the applications that are developed and managed within
-    a project. They can be client apps that use the resources within the
-    project, or they can be backend apps that provide the resources for other
-    apps to use. The apps can use the OIDC or SAML protocol to authenticate
-    users to access protected resources.
-  </li>
-</ul>
-
-The order of creation for the above components may vary depending on the specific needs and requirements of the organization.
-
 ## Set up and manage ZITADEL for your identity projects
 
 ### 1. Sign up for the ZITADEL Cloud customer portal and register your organization
@@ -90,166 +38,76 @@ The order of creation for the above components may vary depending on the specifi
 5. Choose and set up your preferred authentication method. We recommend using Passkey.
 
 ![Register Authentication Method](/img/guides/quickstart/cloud_register_authentication.png)
+![Register Authentication Method Passkey](/img/guides/quickstart/cloud_register_authentication.png)
 
-6. You will now have to verify your email address.
-
-![Verify Email](/img/guides/quickstart/v3_17.png)
-
-6. Go to your inbox and open the email from ZITADEL and click the "Verify email" button.
-
-![Code](/img/guides/quickstart/v3_6.png)
-
-7. The user is now activated. Click the "login" button.
-
-![User Activated](/img/guides/quickstart/v3_7.png)
-
-8. Now you will have to log in with the username and password that you provided. Click “Sign in with Email”, then provide a name for your team or organization and continue.
-
-![Login](/img/guides/quickstart/v3_8.png)
+6. Authenticate with the just added method
 
 ### 2. Complete onboarding questions
 
 To begin, we'll ask you a few questions.
-These will help us understand your needs and personalize your ZITADEL experience, ensuring you get the most out of it.
+These will help us understand your needs and improve your ZITADEL experience.
 
 ![Onboarding Questions](/img/guides/quickstart/onboarding_questions.png)
 
 ### 3. Create your first instance
 
-As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs.
-This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications.
-The possibilities are endless. You can create your first instance for free.
+You can spin up multiple Instances to organize your workflow.
 
-1. Create an instance.
-by clicking on “Create Instance”.
+**What is an [Instance](/docs/concepts/structure/instance)?** An Instance is a completely isolated ZITADEL environment with its own users, settings, and data.
+You can think of it as a "virtual tenant." Use them to separate your environments (Development, Test, Production) or to manage distinct clients.
 
-![Create Instance](/img/guides/quickstart/create_instance.png)
+1. Click **Create Instance**.
 
-2. Provide a name for your instance and click on the “Continue” button at the bottom of this screen.
+![Create Instance](/img/guides/quickstart/cloud_create_instance.png)
 
-![Create Instance Name](/img/guides/quickstart/create_instance_name.png)
+2. Name your instance and click Next.
 
-3. Next, you should see the following screen. Add a username and password for the instance administrator and click "Create".
+![Create Instance Name](/img/guides/quickstart/cloud_create_instance_name.png)
 
-![Create Instance Admin](/img/guides/quickstart/create_instance_admin.png)
+3. Choose your Region and click Next.
 
-3. After creating your first instance, you're ready to configure user authentication. To access the management console, click the 'Sign in to your instance' button.
+![Create Instance Region](/img/guides/quickstart/cloud_create_instance_region.png)
 
-![Sign In Instance](/img/guides/quickstart/sign_in_instance.png)
+4. Set up your Instance Administrator by entering a username and password, then click Next.
 
-6. To log in to your instance, provide the username and password you set in the instance creation, and click “next”.
+![Create Instance Admin](/img/guides/quickstart/cloud_create_instance_admin.png)
 
-7. Skip the 2-factor authentication for now by clicking “skip”.
+5. Click Create Instance to finalize your setup.
 
-8. And there you go! You now have access to your instance.
+![Create Instance Confirmation](/img/guides/quickstart/cloud_create_instance_confirmation.png)
 
-![Instance Details](/img/guides/quickstart/instance_dashboard.png)
+### 4. Create your first app
 
-### 4. Create your first project and app
+Click **Create your app**. This opens the Management Console in a new tab. Log in using the Admin credentials you just created.
+![Create App](/img/guides/quickstart/cloud_create_app.png)
 
-Because applications are always associated with a project, we'll guide you through setting up both in the following steps.
+In ZITADEL, Applications live inside Projects.
+- [**Project**](/docs/guides/manage/console/projects-overview): A container for grouping apps that share the same users, roles, and permissions (e.g., "Customer Portal").
+- [**Application**](/docs/guides/manage/console/applications-overview): The actual technical entry point (e.g., your React web app or a mobile app).
 
-1. Click the "Create Application" button or the Framework/Language of your choice on the right side
-
-2. Insert “Project1” (or any name of your choice) as the project’s name and select the framework/language of your choice in our case "React" and click the “Continue” button. (If you can't find your framework/languages select "Other")
+1. Insert “Project1” (or any name of your choice) as the project’s name and select the framework/language of your choice in our case "React" and click the “Continue” button. (If you can't find your framework/languages select "Other")
 
 ![Project Name and Framework/Language](/img/guides/quickstart/create_project_react.png)
 
 3. An overview of the configuration for the framework you have selected is shown
 
+- **Recommended Security**: We use [Authorization Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [PKCE]((/docs/apis/openidoauth/grant-types#authorization-code)). This is the modern standard for securing web apps by ensuring that only your specific app instance can exchange an auth code for a token.
+- **Redirect URIs**: These tell ZITADEL where to send the user after specific actions. For this React sample, they are pre-set to:
+  - Redirect URI: http://localhost:3000/callback (where users land after login)
+  - Post Logout URI: http://localhost:3000/ (where users land after logging out)
+
 ![Project Configuration Overview - React App](/img/guides/quickstart/project_config_overview_react.png)
 
-What the configuration does:
-- We recommend using the [Authentication Code Flow](/docs/apis/openidoauth/grant-types#authorization-code) with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for secure OIDC configuration. This setup includes specific App, Grant, and Response Types, as well as an Authentication Method. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
-- The redirect URI is where the ZITADEL authorization server redirects the user after they have been authenticated. The "Redirect URI" is preconfigured to [http://localhost:3000/callback](http://localhost:3000/callback) and the “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/) for the React example
+### 5. Obtain ClientId and OIDC endpoints for your application {#referred1}
 
-4. The detailed configuration of your app will be shown
+To connect your React app, you need three key values.
 
-![Project Name and Framework/Language](/img/guides/quickstart/app_detail_overview_react.png)
-
-### 5. Add users (optional)
-
-[Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the obtain ClientId and OIDC endpoints.
-
-1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here. Click on the “New” button to create a new user.
-
-![Add User](/img/guides/quickstart/26.png)
-
-2. Let’s add another user as shown below. Fill in the user details as shown below and click on the “Create” button when you are done.
-
-![Add User](/img/guides/quickstart/27.png)
-
-3. The newly created user details will be displayed as shown below.
-
-![User Info](/img/guides/quickstart/28.png)
-
-4. Once you navigate back to the "Users" view, you will see a list of all the users that have been added to your instance. If you need to add more users, you can do so.
-
-![User Info](/img/guides/quickstart/29.png)
-
-### 6. Add roles to your project (optional)
-
-1. To add roles to your project, click on “Roles” on the left as shown below. Next, click on the “New” button.
-
-![Add Roles](/img/guides/quickstart/22.png)
-
-2. Let’s create the role “manager” as shown below. Add “Manager” and “Group1” as display name and group respectively.
-
-![Add Role](/img/guides/quickstart/23.png)
-
-3. You can also add other roles in this step by clicking on “Add additional role”. Let’s go ahead and add two more as shown below. Click “Save” when you are done.
-
-![Add Role](/img/guides/quickstart/24.png)
-
-4. Now you can view a list of all the roles you just created.
-
-![Add Role](/img/guides/quickstart/25.png)
-
-### 7. Add authorizations to your project (optional)
-
-1. Click on “Authorizations” on the top menu.
-
-![Add Authorization](/img/guides/quickstart/30.png)
-
-2. Select users for the authorization. You can select 1 or more users for a single authorization grant. Let’s select all the users for this grant.
-
-![Add Authorization](/img/guides/quickstart/31.png)
-
-3. Next, select a project. Since we created only “Project1” so far, you will see just that. Go ahead and select it.
-
-![Add Authorization](/img/guides/quickstart/32.png)
-
-4. Let’s select the role “sales”. Click on “Save”.
-
-![Add Authorization](/img/guides/quickstart/33.png)
-
-5. Now you will see the users with their designated roles.
-
-![Add Authorization](/img/guides/quickstart/34.png)
-
-6. To assign additional roles to a user, you can click on the user's name and select the desired roles from the list. This will grant the user additional permissions within the project. Click on “Change”.
-
-![Add Authorization](/img/guides/quickstart/35.png)
-
-7. You can see that additional roles have been assigned to the users in this updated authorization list and this should now give you an indication of how authorizations work in ZITADEL.
-
-![Add Authorization](/img/guides/quickstart/37.png)
-
-### 8. Obtain ClientId and OIDC endpoints for your application {#referred1}
-
-You will need the ClientId and the OIDC endpoints (issuer and userinfo) when building your React application. The issuer URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints. By providing the issuer URL, you can use the OIDC library to automatically determine the endpoints for these requests.
-
-The authorization endpoint is used to initiate the authorization process, the token endpoint is used to exchange authorization codes for access tokens, and the userinfo endpoint is used to retrieve information about the user. You need an access token to access the userinfo endpoint and other protected resources.
-
-1. Click on “Configurations” to access the Client ID as shown below:
-
-![Get URLs](/img/guides/quickstart/51.png)
-
-2. The issuer URL and userinfo endpoint can be accessed by clicking on “URLs” on the left. Make note of the corresponding values for “issuer” and “userinfo_endpoint”.
-
-![Get URLs](/img/guides/quickstart/52.png)
-
-And with that, configuring ZITADEL for our application is complete. Now we can move on to building our React application. Let's get coding!
+1. **Client ID** Navigate to Configurations in the left menu to find your Client ID. This identifies your app to ZITADEL.
+![Get Client ID](/img/guides/quickstart/project_client_id.png)
+2. **Issuer & UserInfo URLs** Click on URLs in the left sidebar.
+  - **Issuer URL**: This is the most important value. Your OIDC library uses this to automatically discover all other necessary endpoints (like login and token exchange).
+  - **Userinfo Endpoint**: Used to fetch the logged-in user's profile details.
+![Get URLs](/img/guides/quickstart/project_urls.png)
 
 ## Create your React application with ZITADEL OIDC PKCE authentication
 
