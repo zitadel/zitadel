@@ -446,8 +446,8 @@ Errors:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
       Empty: プロファイルが空です
-      FirstNameEmpty: 名前が空です
-      LastNameEmpty: 姓が空です
+      FirstNameEmpty: プロフィールでは名欄が空白です。
+      LastNameEmpty: プロフィールでは姓欄が空白です。
       IDMissing: プロファイルIDが不足しています
     Email:
       NotFound: メールアドレスが見つかりません
