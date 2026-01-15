@@ -176,7 +176,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 
 	if e.PlainAuth != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password))
-	} else if e.User != "" || e.Password != nil {
+	} else if e.Password != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password))
 	}
 	if e.XOAuth2Auth != nil {
