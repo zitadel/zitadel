@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
+  const { userId, loginName, code, organization, requestId, invite, send, redirectUrl } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -166,6 +166,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           code={code}
           isInvite={invite === "true"}
           requestId={requestId}
+          redirectUrl={redirectUrl}
         />
       </div>
     </DynamicTheme>

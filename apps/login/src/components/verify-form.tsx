@@ -23,6 +23,7 @@ type Props = {
   code?: string;
   isInvite: boolean;
   requestId?: string;
+  redirectUrl?: string;
 };
 
 export function VerifyForm({
@@ -32,6 +33,7 @@ export function VerifyForm({
   requestId,
   code,
   isInvite,
+  redirectUrl
 }: Props) {
   const router = useRouter();
 
@@ -97,6 +99,10 @@ export function VerifyForm({
       if (response && "error" in response && response?.error) {
         setError(response.error);
         return;
+      }
+
+      if (redirectUrl) {
+        return router.push(redirectUrl);
       }
 
       if (response && "redirect" in response && response?.redirect) {
