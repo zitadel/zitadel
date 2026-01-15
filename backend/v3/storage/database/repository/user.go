@@ -175,7 +175,9 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	}
 
 	builder.WriteString(" UPDATE zitadel.users SET ")
-	database.Changes(changes).Write(builder)
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
 	builder.WriteString(" FROM existing_user")
 	writeCondition(builder, database.And(
 		database.NewColumnCondition(u.idColumn(), existingUser.idColumn()),
@@ -190,10 +192,6 @@ func (u user) unqualifiedTableName() string {
 		return u.tableName
 	}
 	return "users"
-}
-
-func (u user) unqualifiedMetadataTableName() string {
-	return "user_metadata"
 }
 
 // -------------------------------------------------------------
@@ -319,24 +317,8 @@ func (u user) updatedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "updated_at")
 }
 
-func (u user) metadataInstanceIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMetadataTableName(), "instance_id")
-}
-
 func (u user) organizationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "organization_id")
-}
-
-func (u user) metadataUserIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMetadataTableName(), "user_id")
-}
-
-func (u user) metadataKeyColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMetadataTableName(), "key")
-}
-
-func (u user) metadataValueColumn() database.Column {
-	return database.NewColumn(u.unqualifiedMetadataTableName(), "value")
 }
 
 // -------------------------------------------------------------

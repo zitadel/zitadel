@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -31,35 +32,63 @@ func HumanUserRepository() domain.HumanUserRepository {
 	}
 }
 
-const createHumanUserCTE = "WITH existing_user AS (INSERT INTO zitadel.users (" +
-	"instance_id, organization_id, id, username, username_org_unique, state, type, created_at" +
-	", updated_at, first_name, last_name, nickname, display_name, preferred_language, gender" +
-	", avatar_key, multifactor_initialization_skipped_at) VALUES " +
-	"($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *)"
-
 func (u userHuman) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
 	var createdAt any = database.NowInstruction
 	if !user.CreatedAt.IsZero() {
 		createdAt = user.CreatedAt
 	}
-	builder := database.NewStatementBuilder(createHumanUserCTE,
-		user.InstanceID, user.OrganizationID, user.ID, user.Username, database.NullInstruction,
-		user.State, "human", createdAt, createdAt, user.Human.FirstName, user.Human.LastName,
-		user.Human.Nickname, user.Human.DisplayName, user.Human.PreferredLanguage, user.Human.Gender,
-		user.Human.AvatarKey, user.Human.MultifactorInitializationSkippedAt,
+	builder := database.NewStatementBuilder(
+		"WITH existing_user AS (INSERT INTO zitadel.users ("+
+			"instance_id, organization_id, id, username, state, type"+
+			", first_name, last_name, nickname, preferred_language, gender"+
+			", avatar_key, multifactor_initialization_skipped_at, password, email"+
+			", created_at, updated_at)"+
+			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ",
+		user.InstanceID, user.OrganizationID, user.ID, user.Username, user.State, "human",
+		user.Human.FirstName, user.Human.LastName, user.Human.Nickname, user.Human.PreferredLanguage, user.Human.Gender,
+		user.Human.AvatarKey, user.Human.MultifactorInitializationSkippedAt, user.Human.Password.Password, user.Human.Email.Address,
 	)
+	builder.WriteArgs(createdAt, createdAt)
+	builder.WriteString(") RETURNING *)")
+
 	var changes database.Changes
+	changes = append(changes, u.SetPassword(&domain.VerificationTypeSkipped{
+		Value:     &user.Human.Password.Password,
+		SkippedAt: user.CreatedAt,
+	}))
+	if user.Human.Password.IsChangeRequired {
+		changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
+	}
 
 	// TODO: set email
+	if user.Human.Email.Unverified != nil {
+		changes = append(changes, u.SetEmail(&domain.VerificationTypeInit{
+			Value:     &user.Human.Email.Address,
+			CreatedAt: user.CreatedAt,
+			Expiry:    gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt)),
+			Code:      user.Human.Email.Unverified.Code,
+		}))
+	}
 	// TODO: set phone
 	if user.Human.Phone != nil {
-		// u.SetPhone()
+		if user.Human.Phone.Unverified != nil {
+			changes = append(changes, u.SetPhone(&domain.VerificationTypeInit{
+				Value:     &user.Human.Phone.Number,
+				CreatedAt: user.CreatedAt,
+				Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
+				Code:      user.Human.Phone.Unverified.Code,
+			}))
+		} else {
+			changes = append(changes, u.SetPhone(&domain.VerificationTypeSkipped{
+				Value:     &user.Human.Phone.Number,
+				SkippedAt: user.CreatedAt,
+			}))
+		}
 	}
 	// TODO: add passkeys
 	// for _, passkey := range user.Human.Passkeys {
 	// }
 
-	// TODO: set password
 	// TODO: set TOTP
 	// TODO: add identity provider links
 	for _, link := range user.Human.IdentityProviderLinks {
@@ -70,7 +99,9 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 	// 	changes = append(changes, u.SetVerification("", verification))
 	// }
 
-	changes.Write(builder)
+	if err := changes.Write(builder); err != nil {
+		return err
+	}
 	builder.WriteString("SELECT * FROM existing_user")
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)

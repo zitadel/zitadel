@@ -335,11 +335,15 @@ func (c *cteChange) Matches(x any) bool {
 	var expectedCTEBuilder, actualCTEBuilder StatementBuilder
 	c.cte(&expectedCTEBuilder)
 	if c.change != nil {
-		c.change(c.name).Write(&expectedCTEBuilder)
+		if err := c.change(c.name).Write(&expectedCTEBuilder); err != nil {
+			return false
+		}
 	}
 	toMatch.cte(&actualCTEBuilder)
 	if toMatch.change != nil {
-		toMatch.change(toMatch.name).Write(&actualCTEBuilder)
+		if err := toMatch.change(toMatch.name).Write(&actualCTEBuilder); err != nil {
+			return false
+		}
 	}
 
 	if expectedCTEBuilder.String() != actualCTEBuilder.String() {
@@ -363,8 +367,7 @@ func (c *cteChange) Write(builder *StatementBuilder) error {
 	if c.change == nil {
 		return nil
 	}
-	c.change(c.name).Write(builder)
-	return nil
+	return c.change(c.name).Write(builder)
 }
 
 // WriteCTE implements [CTEChange].

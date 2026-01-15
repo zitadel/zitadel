@@ -202,6 +202,82 @@ func (c *MockProjectRepositoryGetCall) DoAndReturn(f func(context.Context, datab
 	return c
 }
 
+// GrantedOrganizationIDColumn mocks base method.
+func (m *MockProjectRepository) GrantedOrganizationIDColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GrantedOrganizationIDColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// GrantedOrganizationIDColumn indicates an expected call of GrantedOrganizationIDColumn.
+func (mr *MockProjectRepositoryMockRecorder) GrantedOrganizationIDColumn() *MockProjectRepositoryGrantedOrganizationIDColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GrantedOrganizationIDColumn", reflect.TypeOf((*MockProjectRepository)(nil).GrantedOrganizationIDColumn))
+	return &MockProjectRepositoryGrantedOrganizationIDColumnCall{Call: call}
+}
+
+// MockProjectRepositoryGrantedOrganizationIDColumnCall wrap *gomock.Call
+type MockProjectRepositoryGrantedOrganizationIDColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockProjectRepositoryGrantedOrganizationIDColumnCall) Return(arg0 database.Column) *MockProjectRepositoryGrantedOrganizationIDColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockProjectRepositoryGrantedOrganizationIDColumnCall) Do(f func() database.Column) *MockProjectRepositoryGrantedOrganizationIDColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockProjectRepositoryGrantedOrganizationIDColumnCall) DoAndReturn(f func() database.Column) *MockProjectRepositoryGrantedOrganizationIDColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// GrantedOrganizationIDCondition mocks base method.
+func (m *MockProjectRepository) GrantedOrganizationIDCondition(organizationID string) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GrantedOrganizationIDCondition", organizationID)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// GrantedOrganizationIDCondition indicates an expected call of GrantedOrganizationIDCondition.
+func (mr *MockProjectRepositoryMockRecorder) GrantedOrganizationIDCondition(organizationID any) *MockProjectRepositoryGrantedOrganizationIDConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GrantedOrganizationIDCondition", reflect.TypeOf((*MockProjectRepository)(nil).GrantedOrganizationIDCondition), organizationID)
+	return &MockProjectRepositoryGrantedOrganizationIDConditionCall{Call: call}
+}
+
+// MockProjectRepositoryGrantedOrganizationIDConditionCall wrap *gomock.Call
+type MockProjectRepositoryGrantedOrganizationIDConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockProjectRepositoryGrantedOrganizationIDConditionCall) Return(arg0 database.Condition) *MockProjectRepositoryGrantedOrganizationIDConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockProjectRepositoryGrantedOrganizationIDConditionCall) Do(f func(string) database.Condition) *MockProjectRepositoryGrantedOrganizationIDConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockProjectRepositoryGrantedOrganizationIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockProjectRepositoryGrantedOrganizationIDConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IDColumn mocks base method.
 func (m *MockProjectRepository) IDColumn() database.Column {
 	m.ctrl.T.Helper()
