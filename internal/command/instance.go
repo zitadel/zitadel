@@ -520,6 +520,10 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
+	var pwd []byte
+	if smtpConfig.SMTP.PlainAuth != nil {
+		pwd = []byte(smtpConfig.SMTP.PlainAuth.Password)
+	}
 	*validations = append(*validations,
 		commands.prepareAddAndActivateSMTPConfig(
 			instanceAgg,
@@ -529,7 +533,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
 			smtpConfig.SMTP.PlainAuth.User,
-			[]byte(smtpConfig.SMTP.PlainAuth.Password),
+			pwd,
 			smtpConfig.Tls,
 		),
 	)
