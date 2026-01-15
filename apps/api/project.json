@@ -8,7 +8,8 @@
             "{workspaceRoot}/internal/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
-            "{workspaceRoot}/main.go"
+            "{workspaceRoot}/main.go",
+            "{workspaceRoot}/internal/**/*.yaml"
         ],
         "runtime": [
             "sources",

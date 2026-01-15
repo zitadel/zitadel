@@ -465,7 +465,7 @@ func TestBulk(t *testing.T) {
 								"urn:ietf:params:scim:api:zitadel:messages:2.0:ErrorDetail",
 							},
 							ScimType: "invalidValue",
-							Detail:   "Given name in profile is empty",
+							Detail:   "First name in profile is empty",
 							Status:   "400",
 							ZitadelDetail: &scim.ZitadelErrorDetail{
 								ID:      "USER-UCej2",
