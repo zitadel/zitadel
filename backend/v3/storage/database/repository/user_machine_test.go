@@ -294,6 +294,24 @@ func Test_machineUser_create(t *testing.T) {
 						Username:       username,
 						State:          domain.UserStateActive,
 						CreatedAt:      createdAt,
+						Metadata: []*domain.UserMetadata{
+							{
+								Metadata: domain.Metadata{
+									Key:       "meta1",
+									Value:     []byte("value1"),
+									CreatedAt: createdAt,
+									UpdatedAt: createdAt,
+								},
+							},
+							{
+								Metadata: domain.Metadata{
+									Key:       "meta2",
+									Value:     []byte("123"),
+									CreatedAt: createdAt,
+									UpdatedAt: createdAt,
+								},
+							},
+						},
 						Machine: &domain.MachineUser{
 							Name:            "machine",
 							Description:     "description",
@@ -313,6 +331,26 @@ func Test_machineUser_create(t *testing.T) {
 						State:          domain.UserStateActive,
 						CreatedAt:      createdAt,
 						UpdatedAt:      createdAt,
+						Metadata: []*domain.UserMetadata{
+							{
+								Metadata: domain.Metadata{
+									InstanceID: instanceID,
+									Key:        "meta1",
+									Value:      []byte("value1"),
+									CreatedAt:  createdAt,
+									UpdatedAt:  createdAt,
+								},
+							},
+							{
+								Metadata: domain.Metadata{
+									InstanceID: instanceID,
+									Key:        "meta2",
+									Value:      []byte("123"),
+									CreatedAt:  createdAt,
+									UpdatedAt:  createdAt,
+								},
+							},
+						},
 						Machine: &domain.MachineUser{
 							Name:            "machine",
 							Description:     "description",
@@ -385,6 +423,25 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 
 	require.Equal(t, expected.Machine == nil, actual.Machine == nil, "machine check")
 	require.Equal(t, expected.Human == nil, actual.Human == nil, "human check")
+
+	require.Len(t, actual.Metadata, len(expected.Metadata), "metadata")
+	for i, expectedMetadata := range expected.Metadata {
+		var actualMetadata *domain.UserMetadata
+		actual.Metadata = slices.DeleteFunc(actual.Metadata, func(m *domain.UserMetadata) bool {
+			if m.Key == expectedMetadata.Key {
+				actualMetadata = m
+				return true
+			}
+			return false
+		})
+		require.NotNil(t, actualMetadata, "metadata[%d] not found", i)
+		assert.Equal(t, expectedMetadata.Key, actualMetadata.Key, "metadata[%d] key", i)
+		assert.Equal(t, expectedMetadata.Value, actualMetadata.Value, "metadata[%d] value", i)
+		assert.True(t, expectedMetadata.CreatedAt.Equal(actualMetadata.CreatedAt), "metadata[%d] created at", i)
+		assert.True(t, expectedMetadata.UpdatedAt.Equal(actualMetadata.UpdatedAt), "metadata[%d] updated at", i)
+		expectedMetadata.UpdatedAt.UnixNano()
+	}
+	assert.Empty(t, actual.Metadata, "unmatched metadata")
 
 	if expected.Machine != nil {
 		assert.Equal(t, expected.Machine.Name, actual.Machine.Name, "machine name")

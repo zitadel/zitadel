@@ -1,22 +1,109 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+type userMetadataRepo struct{}
+
+// AddMetadata implements [domain.UserRepository.AddMetadata].
+func (u userMetadataRepo) AddMetadata(metadata ...*domain.Metadata) database.Change {
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
+			builder.WriteString(" SELECT existing_user.instance_id, existing_user.id, md.key::TEXT, md.value::BYTEA, md.created_at::TIMESTAMPTZ, md.updated_at::TIMESTAMPTZ")
+			builder.WriteString(" FROM existing_user CROSS JOIN (VALUES ")
+			for i, md := range metadata {
+				if i > 0 {
+					builder.WriteString(", ")
+				}
+				builder.WriteRune('(')
+				// The complex placeholder handling is needed to append the type casts
+				// if we use WriteArgs directly, pgx resolves all args as TEXT instead of the correct type
+				placeholders := make([]string, 4)
+				placeholders[0] = builder.AppendArg(md.Key)
+				placeholders[1] = builder.AppendArg(md.Value) + "::BYTEA"
+				var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
+				if !md.CreatedAt.IsZero() {
+					createdAt = md.CreatedAt
+				}
+				if !md.UpdatedAt.IsZero() {
+					updatedAt = md.UpdatedAt
+				}
+				placeholders[2] = builder.AppendArg(createdAt) + "::TIMESTAMPTZ"
+				placeholders[3] = builder.AppendArg(updatedAt) + "::TIMESTAMPTZ"
+				builder.WriteString(strings.Join(placeholders, ", "))
+				builder.WriteRune(')')
+			}
+			builder.WriteString(") AS md(key, value, created_at, updated_at) ON CONFLICT (")
+			database.Columns{
+				u.instanceIDColumn(),
+				u.userIDColumn(),
+				u.keyColumn(),
+			}.WriteUnqualified(builder)
+			builder.WriteString(") DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at WHERE ")
+			u.valueColumn().WriteQualified(builder)
+			builder.WriteString(" IS DISTINCT FROM EXCLUDED.value")
+		},
+		nil,
+	)
+}
+
+// RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
+func (u userMetadataRepo) RemoveMetadata(condition database.Condition) database.Change {
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("DELETE FROM zitadel.user_metadata USING ")
+			builder.WriteString(existingUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(existingUser.InstanceIDColumn(), u.instanceIDColumn()),
+				database.NewColumnCondition(existingUser.idColumn(), u.userIDColumn()),
+				condition,
+			))
+		},
+		nil,
+	)
+}
+
 type userMetadataConditions struct {
-	user
+	userMetadataRepo
 }
 
 // MetadataKeyCondition implements [domain.UserMetadataConditions].
 func (u userMetadataConditions) MetadataKeyCondition(op database.TextOperation, key string) database.Condition {
-	return database.NewTextCondition(u.metadataKeyColumn(), op, key)
+	return database.NewTextCondition(u.keyColumn(), op, key)
 }
 
 // MetadataValueCondition implements [domain.UserMetadataConditions].
 func (u userMetadataConditions) MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition {
-	return database.NewBytesCondition[[]byte](database.SHA256Column(u.metadataValueColumn()), op, database.SHA256Value(value))
+	return database.NewBytesCondition[[]byte](database.SHA256Column(u.valueColumn()), op, database.SHA256Value(value))
 }
 
 var _ domain.UserMetadataConditions = (*userMetadataConditions)(nil)
+
+func (userMetadataRepo) qualifiedTableName() string {
+	return "zitadel.user_metadata"
+}
+
+func (userMetadataRepo) unqualifiedTableName() string {
+	return "user_metadata"
+}
+
+func (u userMetadataRepo) instanceIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
+}
+
+func (u userMetadataRepo) userIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "user_id")
+}
+
+func (u userMetadataRepo) keyColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "key")
+}
+
+func (u userMetadataRepo) valueColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "value")
+}

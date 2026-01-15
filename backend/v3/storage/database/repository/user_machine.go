@@ -37,6 +37,9 @@ func (u userMachine) create(ctx context.Context, client database.QueryExecutor, 
 	for _, pat := range user.Machine.PATs {
 		changes = append(changes, u.AddPersonalAccessToken(pat))
 	}
+	for _, metadata := range user.Metadata {
+		changes = append(changes, u.AddMetadata(&metadata.Metadata))
+	}
 	for i, change := range changes {
 		sessionCTE(change, i, 0, builder)
 	}

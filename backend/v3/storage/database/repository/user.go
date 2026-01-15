@@ -23,12 +23,14 @@ func MachineUserRepository() domain.MachineUserRepository {
 }
 
 type user struct {
-	verification            verification
-	tableName               string
-	shouldLoadMachineKeys   bool
-	machineKeyRepo          machineKeyRepo
-	shouldLoadPATs          bool
-	personalAccessTokenRepo personalAccessTokenRepo
+	verification          verification
+	tableName             string
+	shouldLoadMachineKeys bool
+	machineKeyRepo
+	shouldLoadPATs bool
+	personalAccessTokenRepo
+	shouldLoadMetadata bool
+	userMetadataRepo
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -62,6 +64,7 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 
 const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
 	", users.state, users.created_at, users.updated_at" +
+	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'userId', user_metadata.user_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
 	// machine columns
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
 	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
@@ -100,6 +103,7 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 	opts = append(opts,
 		u.joinMachineKeys(),
 		u.joinPATs(),
+		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 	options := new(database.QueryOpts)
@@ -122,6 +126,7 @@ func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...d
 	opts = append(opts,
 		u.joinMachineKeys(),
 		u.joinPATs(),
+		u.joinMetadata(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 
@@ -195,58 +200,6 @@ func (u user) unqualifiedMetadataTableName() string {
 // changes
 // -------------------------------------------------------------
 
-// AddMetadata implements [domain.UserRepository.AddMetadata].
-func (u user) AddMetadata(metadata ...*domain.Metadata) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.user_metadata(instance_id, user_id, key, value, created_at, updated_at)")
-			builder.WriteString(" SELECT existing_user.instance_id, existing_user.id, md.key, md.value, md.created_at, md.updated_at")
-			builder.WriteString(" FROM existing_user CROSS JOIN (VALUES ")
-			for i, md := range metadata {
-				if i > 0 {
-					builder.WriteString(", ")
-				}
-				builder.WriteRune('(')
-				builder.WriteArgs(md.Key, md.Value)
-				var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
-				if !md.CreatedAt.IsZero() {
-					createdAt = md.CreatedAt
-				}
-				if !md.UpdatedAt.IsZero() {
-					updatedAt = md.UpdatedAt
-				}
-				builder.WriteArgs(createdAt, updatedAt)
-				builder.WriteRune(')')
-			}
-			builder.WriteString(") AS md(key, value, created_at, updated_at)")
-			builder.WriteString("ON CONFLICT (")
-			database.Columns{
-				u.metadataInstanceIDColumn(),
-				u.metadataUserIDColumn(),
-				u.metadataKeyColumn(),
-			}.WriteQualified(builder)
-			builder.WriteString(") DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at")
-		},
-		nil,
-	)
-}
-
-// RemoveMetadata implements [domain.UserRepository.RemoveMetadata].
-func (u user) RemoveMetadata(condition database.Condition) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("DELETE FROM zitadel.user_metadata USING ")
-			builder.WriteString(existingUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingUser.InstanceIDColumn(), u.metadataInstanceIDColumn()),
-				database.NewColumnCondition(existingUser.idColumn(), u.metadataUserIDColumn()),
-				condition,
-			))
-		},
-		nil,
-	)
-}
-
 // SetState implements [domain.UserRepository.SetState].
 func (u user) SetState(state domain.UserState) database.Change {
 	return database.NewChange(u.StateColumn(), state)
@@ -291,7 +244,7 @@ func (u user) LoginNameCondition(op database.TextOperation, loginName string) da
 }
 
 func (u user) MetadataConditions() domain.UserMetadataConditions {
-	return userMetadataConditions{user: u}
+	return userMetadataConditions{userMetadataRepo: u.userMetadataRepo}
 }
 
 // OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
@@ -462,9 +415,17 @@ func (u user) LoadIdentityProviderLinks() domain.UserRepository {
 // LoadKeys implements [domain.UserRepository.LoadKeys].
 func (u user) LoadKeys() domain.UserRepository {
 	return &user{
-		tableName:             u.tableName,
-		verification:          u.verification,
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          u.shouldLoadPATs,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
 		shouldLoadMachineKeys: true,
+		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: u.shouldLoadMetadata,
+		userMetadataRepo:   u.userMetadataRepo,
 	}
 }
 
@@ -493,6 +454,9 @@ func (u user) LoadPATs() domain.UserRepository {
 
 		shouldLoadMachineKeys: u.shouldLoadMachineKeys,
 		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: u.shouldLoadMetadata,
+		userMetadataRepo:   u.userMetadataRepo,
 	}
 }
 
@@ -513,7 +477,34 @@ func (u user) joinPATs() database.QueryOption {
 
 // LoadMetadata implements [domain.UserRepository.LoadMetadata].
 func (u user) LoadMetadata() domain.UserRepository {
-	panic("unimplemented")
+	return &user{
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          u.shouldLoadPATs,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
+		shouldLoadMachineKeys: u.shouldLoadMachineKeys,
+		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: true,
+		userMetadataRepo:   u.userMetadataRepo,
+	}
+}
+
+func (u user) joinMetadata() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), u.userMetadataRepo.userIDColumn()),
+	)
+	if !u.shouldLoadPATs {
+		conditions = append(conditions, database.IsNull(u.userMetadataRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.userMetadataRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
 }
 
 // LoadPasskeys implements [domain.UserRepository.LoadPasskeys].
