@@ -80,7 +80,7 @@ const (
 	KindUnauthenticated Kind = 16
 )
 
-// Because errors are created though singletons, config is global.
+// Because errors are created through singletons, config is global.
 var (
 	enableReportLocation atomic.Bool
 	enableStackTrace     atomic.Bool
