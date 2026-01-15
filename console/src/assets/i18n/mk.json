@@ -970,7 +970,7 @@
       "CHANGEUSERNAME": "промени",
       "CHANGEUSERNAME_TITLE": "Промени корисничко име",
       "CHANGEUSERNAME_DESC": "Внесете го новото име во полето подолу.",
-      "FIRSTNAME": "Име",
+      "FIRSTNAME": "Прво име",
       "LASTNAME": "Презиме",
       "NICKNAME": "Прекар",
       "DISPLAYNAME": "Име за приказ",
@@ -1689,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Известување",
       "DESCRIPTION": "Одредува на кои промени ќе се испраќаат известувања.",
-      "PASSWORDCHANGE": "Промена на лозинка"
+      "PASSWORDCHANGE": "Лозинката е променета"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Додадете личен стил на најавата и модифицирајте ги правилата за најава.",
@@ -1861,7 +1861,7 @@
         "IU": "Покана за корисникот"
       },
       "CHIPS": {
-        "firstname": "Име",
+        "firstname": "Прво име",
         "lastname": "Презиме",
         "code": "Код",
         "preferredLoginName": "Посакувано корисничко име",
@@ -2327,7 +2327,7 @@
     "DISPLAYNAMEATTRIBUTE": "Атрибут за име за приказ",
     "EMAILATTRIBUTEATTRIBUTE": "Атрибут за е-пошта",
     "EMAILVERIFIEDATTRIBUTE": "Атрибут за верифицирана е-пошта",
-    "FIRSTNAMEATTRIBUTE": "Атрибут за име",
+    "FIRSTNAMEATTRIBUTE": "Атрибут за прво име",
     "LASTNAMEATTRIBUTE": "Атрибут за презиме",
     "NICKNAMEATTRIBUTE": "Атрибут за прекар",
     "PHONEATTRIBUTE": "Атрибут за телефонски број",

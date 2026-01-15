@@ -970,8 +970,8 @@
       "CHANGEUSERNAME": "memodifikasi",
       "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
       "CHANGEUSERNAME_DESC": "Masukkan nama baru pada kolom di bawah.",
-      "FIRSTNAME": "Nama Pemberian",
-      "LASTNAME": "Nama keluarga",
+      "FIRSTNAME": "Nama depan",
+      "LASTNAME": "Nama belakang",
       "NICKNAME": "Nama panggilan",
       "DISPLAYNAME": "Nama Tampilan",
       "PREFERREDLOGINNAME": "Nama login pilihan",
@@ -1685,7 +1685,7 @@
     "NOTIFICATION": {
       "TITLE": "Pemberitahuan",
       "DESCRIPTION": "Menentukan perubahan apa, pemberitahuan akan dikirim.",
-      "PASSWORDCHANGE": "Perubahan kata sandi"
+      "PASSWORDCHANGE": "Kata sandi diubah"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Berikan login gaya pribadi Anda dan ubah perilakunya.",
@@ -1858,8 +1858,8 @@
         "IU": "Mengundang Pengguna"
       },
       "CHIPS": {
-        "firstname": "Nama yang diberikan",
-        "lastname": "Nama keluarga",
+        "firstname": "Nama depan",
+        "lastname": "Nama belakang",
         "code": "Kode",
         "preferredLoginName": "Nama Login Pilihan",
         "displayName": "Nama tampilan",
@@ -2330,8 +2330,8 @@
     "DISPLAYNAMEATTRIBUTE": "Atribut nama tampilan",
     "EMAILATTRIBUTEATTRIBUTE": "Atribut email",
     "EMAILVERIFIEDATTRIBUTE": "Atribut terverifikasi email",
-    "FIRSTNAMEATTRIBUTE": "Atribut nama yang diberikan",
-    "LASTNAMEATTRIBUTE": "Atribut nama keluarga",
+    "FIRSTNAMEATTRIBUTE": "Atribut nama depan",
+    "LASTNAMEATTRIBUTE": "Atribut nama belakang",
     "NICKNAMEATTRIBUTE": "Atribut nama panggilan",
     "PHONEATTRIBUTE": "Atribut telepon",
     "PHONEVERIFIEDATTRIBUTE": "Atribut terverifikasi telepon",

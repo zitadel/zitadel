@@ -431,7 +431,7 @@ Errors:
       NotFound: Профилът не е намерен
       NotChanged: Профилът не е променен
       Empty: Профилът е празен
-      FirstNameEmpty: Първото име в профила е празно
+      FirstNameEmpty: Името в профила е празно
       LastNameEmpty: Фамилията в профила е празна
       IDMissing: Липсва ID на потребителския профил
     Email:

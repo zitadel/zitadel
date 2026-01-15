@@ -971,8 +971,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "Given Name",
-      "LASTNAME": "Family Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERREDLOGINNAME": "Preferred login name",
@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Determines on which changes, notifications will be sent.",
-      "PASSWORDCHANGE": "Password change"
+      "PASSWORDCHANGE": "Password changed"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
@@ -1864,8 +1864,8 @@
         "IU": "Invite User"
       },
       "CHIPS": {
-        "firstname": "Given name",
-        "lastname": "Family name",
+        "firstname": "First name",
+        "lastname": "Last name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -2336,8 +2336,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Given name attribute",
-    "LASTNAMEATTRIBUTE": "Family name attribute",
+    "FIRSTNAMEATTRIBUTE": "First name attribute",
+    "LASTNAMEATTRIBUTE": "Last name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
