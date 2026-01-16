@@ -78,24 +78,17 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
 	`, 'avatarKey', users.avatar_key` +
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
-	`, 'password', encode(users.password, 'base64'), 'passwordChangeRequired', users.password_change_required` +
-	`, 'passwordVerifiedAt', users.password_verified_at` +
+	`, password, jsonb_build_object('password', encode(users.password, 'base64'), 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts)` +
 	// -- users.password_verification_id
-	`, 'failedPasswordAttempts', users.failed_password_attempts, 'email', users.email` +
-	`, 'emailVerifiedAt', users.email_verified_at` +
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check))` + //TODO: handle nullable
 	// -- , users.unverified_email_id
-	`, 'emailOtpEnabledAt', users.email_otp_enabled_at` +
-	`, 'lastSuccessfulEmailOtpCheck', users.last_successful_email_otp_check` +
 	// -- , users.email_otp_verification_id
-	`, 'phone', users.phone, 'phoneVerifiedAt', users.phone_verified_at` +
+	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check)) ELSE NULL END` + //TODO: handle nullable
 	// -- , users.unverified_phone_id
-	`, 'smsOtpEnabledAt', users.sms_otp_enabled_at` +
-	`, 'lastSuccessfulSmsOtpCheck', users.last_successful_sms_otp_check` +
 	// -- , users.sms_otp_verification_id
 	// -- , totp_secret_id
-	`,'totpVerifiedAt', users.totp_verified_at` +
+	`, 'totp', jsonb_build_object('verifiedAt', users.totp_verified_at,'lastSuccessfullyCheckedAt', users.last_successful_totp_check)` +
 	// -- , unverified_totp_id
-	`,'lastSuccessfulTotpCheck', users.last_successful_totp_check` +
 	`) END AS human FROM zitadel.users`
 
 // Get implements [domain.UserRepository.Get].

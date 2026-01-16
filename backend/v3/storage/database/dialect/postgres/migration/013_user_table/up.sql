@@ -96,7 +96,7 @@ CREATE UNIQUE INDEX ON zitadel.users(unverified_phone_id) WHERE unverified_phone
 CREATE UNIQUE INDEX ON zitadel.users(email_otp_verification_id) WHERE email_otp_verification_id IS NOT NULL;
 CREATE UNIQUE INDEX ON zitadel.users(sms_otp_verification_id) WHERE sms_otp_verification_id IS NOT NULL;
 
-CREATE FUNCTION zitadel.validate_human_user()
+CREATE OR REPLACE FUNCTION zitadel.validate_human_user()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Validate that machine-specific fields are NULL
@@ -129,12 +129,6 @@ BEGIN
     END IF;
     IF NEW.failed_password_attempts IS NULL THEN
         NEW.failed_password_attempts := 0;
-    END IF;
-    IF NEW.email_otp_enabled IS NULL THEN
-        NEW.email_otp_enabled := FALSE;
-    END IF;
-    IF NEW.sms_otp_enabled IS NULL THEN
-        NEW.sms_otp_enabled := FALSE;
     END IF;
     RETURN NEW;
 END;

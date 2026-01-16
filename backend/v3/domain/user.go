@@ -84,7 +84,7 @@ const (
 
 type HumanPassword struct {
 	// Password is the hashed password
-	Password string `json:"-" db:"password"`
+	Password string `json:"password" db:"password"` //TODO: make sure password is not marshalled
 	// IsChangeRequired indicates if the user must change their password
 	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
 	// VerifiedAt is the time when the current password was verified
@@ -100,7 +100,7 @@ type HumanPassword struct {
 type HumanEmail struct {
 	Address    string    `json:"address" db:"address"`
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-" db:"otp"`
+	OTP        OTP       `json:"otp" db:"otp"`
 	// Unverified is the verification data for setting a new email
 	// If nil, no email change is in progress
 	Unverified *Verification `json:"-"`
@@ -109,7 +109,7 @@ type HumanEmail struct {
 type HumanPhone struct {
 	Number     string    `json:"number" db:"number"`
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-	OTP        OTP       `json:"-" db:"otp"`
+	OTP        OTP       `json:"otp,omitzero" db:"otp"`
 	// Unverified is the verification data for setting a new phone number
 	// If nil, no phone change is in progress
 	Unverified *Verification `json:"-"`

@@ -2,12 +2,10 @@ package repository_test
 
 import (
 	"context"
-	"slices"
 	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -408,80 +406,5 @@ func Test_machineUser_create(t *testing.T) {
 			require.NoError(t, err)
 			assertUser(t, tt.want.user, got)
 		})
-	}
-}
-
-func assertUser(t *testing.T, expected, actual *domain.User) {
-	t.Helper()
-	assert.Equal(t, expected.InstanceID, actual.InstanceID)
-	assert.Equal(t, expected.OrganizationID, actual.OrganizationID)
-	assert.Equal(t, expected.ID, actual.ID)
-	assert.Equal(t, expected.Username, actual.Username)
-	assert.Equal(t, expected.State, actual.State)
-	assert.True(t, expected.CreatedAt.Equal(actual.CreatedAt), "created at")
-	assert.True(t, expected.UpdatedAt.Equal(actual.UpdatedAt), "updated at")
-
-	require.Equal(t, expected.Machine == nil, actual.Machine == nil, "machine check")
-	require.Equal(t, expected.Human == nil, actual.Human == nil, "human check")
-
-	require.Len(t, actual.Metadata, len(expected.Metadata), "metadata")
-	for i, expectedMetadata := range expected.Metadata {
-		var actualMetadata *domain.UserMetadata
-		actual.Metadata = slices.DeleteFunc(actual.Metadata, func(m *domain.UserMetadata) bool {
-			if m.Key == expectedMetadata.Key {
-				actualMetadata = m
-				return true
-			}
-			return false
-		})
-		require.NotNil(t, actualMetadata, "metadata[%d] not found", i)
-		assert.Equal(t, expectedMetadata.Key, actualMetadata.Key, "metadata[%d] key", i)
-		assert.Equal(t, expectedMetadata.Value, actualMetadata.Value, "metadata[%d] value", i)
-		assert.True(t, expectedMetadata.CreatedAt.Equal(actualMetadata.CreatedAt), "metadata[%d] created at", i)
-		assert.True(t, expectedMetadata.UpdatedAt.Equal(actualMetadata.UpdatedAt), "metadata[%d] updated at", i)
-		expectedMetadata.UpdatedAt.UnixNano()
-	}
-	assert.Empty(t, actual.Metadata, "unmatched metadata")
-
-	if expected.Machine != nil {
-		assert.Equal(t, expected.Machine.Name, actual.Machine.Name, "machine name")
-		assert.Equal(t, expected.Machine.Description, actual.Machine.Description, "machine description")
-		assert.Equal(t, expected.Machine.AccessTokenType, actual.Machine.AccessTokenType, "machine access token type")
-		assert.Equal(t, expected.Machine.Secret, actual.Machine.Secret, "machine secret")
-		require.Len(t, actual.Machine.PATs, len(expected.Machine.PATs), "machine pats")
-		for i, expectedPAT := range expected.Machine.PATs {
-			var actualPAT *domain.PersonalAccessToken
-			actual.Machine.PATs = slices.DeleteFunc(actual.Machine.PATs, func(p *domain.PersonalAccessToken) bool {
-				if p.ID == expectedPAT.ID {
-					actualPAT = p
-					return true
-				}
-				return false
-			})
-			require.NotNil(t, actualPAT, "machine pat[%d] not found", i)
-			assert.Equal(t, expectedPAT.ID, actualPAT.ID, "machine pat[%d] id", i)
-			assert.True(t, expectedPAT.CreatedAt.Equal(actualPAT.CreatedAt), "machine pat[%d] created at", i)
-			assert.True(t, expectedPAT.ExpiresAt.Equal(actualPAT.ExpiresAt), "machine pat[%d] expires at", i)
-			assert.Equal(t, expectedPAT.Scopes, actualPAT.Scopes, "machine pat[%d] scopes", i)
-		}
-		assert.Empty(t, actual.Machine.PATs, "unmatched machine pats")
-		require.Len(t, actual.Machine.Keys, len(expected.Machine.Keys), "machine keys")
-		for i, expectedKey := range expected.Machine.Keys {
-			var actualKey *domain.MachineKey
-			actual.Machine.Keys = slices.DeleteFunc(actual.Machine.Keys, func(k *domain.MachineKey) bool {
-				if k.ID == expectedKey.ID {
-					actualKey = k
-					return true
-				}
-				return false
-			})
-			require.NotNil(t, actualKey, "machine key[%d] not found", i)
-			assert.Equal(t, expectedKey.ID, actualKey.ID, "machine key[%d] id", i)
-			assert.Equal(t, expectedKey.PublicKey, actualKey.PublicKey, "machine key[%d] public key", i)
-			assert.True(t, expectedKey.CreatedAt.Equal(actualKey.CreatedAt), "machine key[%d] created at", i)
-			assert.True(t, expectedKey.ExpiresAt.Equal(actualKey.ExpiresAt), "machine key[%d] expires at", i)
-			assert.Equal(t, expectedKey.Type, actualKey.Type, "machine key[%d] type", i)
-		}
-		assert.Empty(t, actual.Machine.Keys, "unmatched machine keys")
 	}
 }

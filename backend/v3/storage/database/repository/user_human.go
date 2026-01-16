@@ -3,6 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/muhlemmer/gu"
@@ -37,52 +40,91 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 	if !user.CreatedAt.IsZero() {
 		createdAt = user.CreatedAt
 	}
-	builder := database.NewStatementBuilder(
-		"WITH existing_user AS (INSERT INTO zitadel.users ("+
-			"instance_id, organization_id, id, username, state, type"+
-			", first_name, last_name, nickname, preferred_language, gender"+
-			", avatar_key, multifactor_initialization_skipped_at, password, email"+
-			", created_at, updated_at)"+
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ",
-		user.InstanceID, user.OrganizationID, user.ID, user.Username, user.State, "human",
-		user.Human.FirstName, user.Human.LastName, user.Human.Nickname, user.Human.PreferredLanguage, user.Human.Gender,
-		user.Human.AvatarKey, user.Human.MultifactorInitializationSkippedAt, user.Human.Password.Password, user.Human.Email.Address,
-	)
-	builder.WriteArgs(createdAt, createdAt)
-	builder.WriteString(") RETURNING *)")
+	values := map[string]any{
+		"instance_id":                           user.InstanceID,
+		"organization_id":                       user.OrganizationID,
+		"id":                                    user.ID,
+		"username":                              user.Username,
+		"state":                                 user.State,
+		"type":                                  "human",
+		"first_name":                            user.Human.FirstName,
+		"last_name":                             user.Human.LastName,
+		"nickname":                              user.Human.Nickname,
+		"preferred_language":                    user.Human.PreferredLanguage,
+		"gender":                                user.Human.Gender,
+		"avatar_key":                            user.Human.AvatarKey,
+		"multifactor_initialization_skipped_at": user.Human.MultifactorInitializationSkippedAt,
+		"created_at":                            createdAt,
+		"updated_at":                            createdAt,
 
-	var changes database.Changes
-	changes = append(changes, u.SetPassword(&domain.VerificationTypeSkipped{
-		Value:     &user.Human.Password.Password,
-		SkippedAt: user.CreatedAt,
-	}))
+		"password":             user.Human.Password.Password,
+		"password_verified_at": user.Human.Password.VerifiedAt,
+
+		"email": user.Human.Email.Address,
+	}
+
+	// we need to cheat a bit here to be able to use CTEChanges
+	// we pretend we have an existing user to be able to use the existing change mechanisms
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT $1, $2, $3)", user.InstanceID, user.OrganizationID, user.ID)
+
+	// var changes database.Changes
+	var ctes []database.CTEChange
+	// changes = append(changes, u.SetPassword(&domain.VerificationTypeSkipped{
+	// 	Value:     &user.Human.Password.Password,
+	// 	SkippedAt: user.CreatedAt,
+	// }))
 	if user.Human.Password.IsChangeRequired {
-		changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
+		// changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
+		values["password_change_required"] = true
 	}
 
 	// TODO: set email
 	if user.Human.Email.Unverified != nil {
-		changes = append(changes, u.SetEmail(&domain.VerificationTypeInit{
+		// changes = append(changes, u.SetEmail(&domain.VerificationTypeInit{
+		// 	Value:     &user.Human.Email.Address,
+		// 	CreatedAt: user.CreatedAt,
+		// 	Expiry:    gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt)),
+		// 	Code:      user.Human.Email.Unverified.Code,
+		// }))
+		change := u.SetEmail(&domain.VerificationTypeInit{
 			Value:     &user.Human.Email.Address,
 			CreatedAt: user.CreatedAt,
 			Expiry:    gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt)),
 			Code:      user.Human.Email.Unverified.Code,
-		}))
+		}).(database.CTEChange)
+		change.SetName("email_verification")
+		ctes = append(ctes, change)
+		values["email_verification_id"] = func(builder *database.StatementBuilder) {
+			builder.WriteString(`(SELECT id FROM email_verification)`)
+		}
 	}
 	// TODO: set phone
 	if user.Human.Phone != nil {
 		if user.Human.Phone.Unverified != nil {
-			changes = append(changes, u.SetPhone(&domain.VerificationTypeInit{
+			// changes = append(changes, u.SetPhone(&domain.VerificationTypeInit{
+			// 	Value:     &user.Human.Phone.Number,
+			// 	CreatedAt: user.CreatedAt,
+			// 	Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
+			// 	Code:      user.Human.Phone.Unverified.Code,
+			// }))
+			change := u.SetPhone(&domain.VerificationTypeInit{
 				Value:     &user.Human.Phone.Number,
 				CreatedAt: user.CreatedAt,
 				Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
 				Code:      user.Human.Phone.Unverified.Code,
-			}))
+			}).(database.CTEChange)
+			change.SetName("phone_verification")
+			ctes = append(ctes, change)
+			values["phone_verification_id"] = func(builder *database.StatementBuilder) {
+				builder.WriteString(`(SELECT id FROM phone_verification)`)
+			}
 		} else {
-			changes = append(changes, u.SetPhone(&domain.VerificationTypeSkipped{
-				Value:     &user.Human.Phone.Number,
-				SkippedAt: user.CreatedAt,
-			}))
+			values["phone"] = user.Human.Phone.Number
+			values["phone_verified_at"] = user.Human.Phone.VerifiedAt
+			// changes = append(changes, u.SetPhone(&domain.VerificationTypeSkipped{
+			// 	Value:     &user.Human.Phone.Number,
+			// 	SkippedAt: user.CreatedAt,
+			// }))
 		}
 	}
 	// TODO: add passkeys
@@ -91,21 +133,40 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 
 	// TODO: set TOTP
 	// TODO: add identity provider links
-	for _, link := range user.Human.IdentityProviderLinks {
-		changes = append(changes, u.AddIdentityProviderLink(link))
+	for i, link := range user.Human.IdentityProviderLinks {
+		ctes = append(ctes, u.AddIdentityProviderLink(link).(database.CTEChange))
+		ctes[len(ctes)-1].SetName(fmt.Sprintf("idp_link_%d", i))
 	}
 	// TODO: add verifications
 	// for _, verification := range user.Human.Verifications {
 	// 	changes = append(changes, u.SetVerification("", verification))
 	// }
 
-	if err := changes.Write(builder); err != nil {
-		return err
+	// write CTE changes
+	for _, cte := range ctes {
+		builder.WriteString(", ")
+		cte.WriteCTE(builder)
 	}
-	builder.WriteString("SELECT * FROM existing_user")
+	columns := slices.Sorted(maps.Keys(values))
+
+	// write final insert
+	builder.WriteString(" INSERT INTO zitadel.users (")
+	builder.WriteString(strings.Join(columns, ", "))
+	builder.WriteString(") VALUES (")
+	for i, column := range columns {
+		if i > 0 {
+			builder.WriteString(", ")
+		}
+		value := values[column]
+		if fn, ok := value.(func(builder *database.StatementBuilder)); ok {
+			fn(builder)
+			continue
+		}
+		builder.WriteArg(value)
+	}
+	builder.WriteString(") RETURNING created_at, updated_at")
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
-
 }
 
 func (u userHuman) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {

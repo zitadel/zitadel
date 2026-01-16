@@ -176,7 +176,9 @@ func (s session) Create(ctx context.Context, client database.QueryExecutor, sess
 		)
 		fingerprintID = session.UserAgent.FingerprintID
 	}
-	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName() + ` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
+	builder.WriteString(`INSERT INTO `)
+	builder.WriteString(s.qualifiedTableName())
+	builder.WriteString(` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
 	builder.WriteArgs(session.InstanceID, session.ID, session.Lifetime, session.CreatorID, fingerprintID, createdAt, updatedAt)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&session.CreatedAt, &session.UpdatedAt)
