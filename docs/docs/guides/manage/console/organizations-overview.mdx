@@ -149,7 +149,12 @@ To apply a custom design (e.g., for a specific B2B customer):
 3.  Ensure the **Login Behavior** on your **Project** is configured to allow organization-specific branding. Read more about project branding [here](./projects-overview#branding).
 
 ### Triggering Organization Context
+When a user begins the login process, ZITADEL automatically determines the user's organization based on their entered login name and redirects them to the appropriate organization context. Users cannot select their organization manually.
+
 By default, the ZITADEL Login uses the instance default settings. To trigger the specific settings (and branding) of an organization, you must provide the organization scope in your authentication request:
 
 ```bash
 urn:zitadel:iam:org:id:{id}
+```
+
+This value is a [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) within ZITADEL.
