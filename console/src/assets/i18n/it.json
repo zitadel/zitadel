@@ -1083,7 +1083,7 @@
       "TITLE": "Assegnazioni dei ruoli",
       "DESCRIPTION": "Concedere a questo utente l'accesso a certi progetti",
       "CREATE": {
-        "TITLE": "Nessuna assegnazione dei ruoli",
+        "TITLE": "Crea assegnazione di ruolo",
         "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli di progetto corrispondenti."
       },
       "PROJECTNAME": "Nome del progretto",

@@ -2824,7 +2824,7 @@
       "DESCRIPTION": "Határozza meg a szerepkör-hozzárendeléseket a megadott felhasználóhoz. Ne feledd, hogy csak azoknak a projekteknek és felhasználóknak a bejegyzéseit láthatod, amelyekhez van jogosultságod."
     },
     "CREATE": {
-      "TITLE": "Nincs szerepkör hozzárendelés",
+      "TITLE": "Szerepkör hozzárendelés létrehozása",
       "DESCRIPTION": "Keresd meg a szervezetet, a projektet és a hozzá tartozó szerepköröket."
     },
     "EDIT": {
