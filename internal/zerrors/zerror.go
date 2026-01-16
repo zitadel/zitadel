@@ -4,6 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"runtime/debug"
+	"sync/atomic"
+
+	"github.com/zitadel/sloggcp"
 )
 
 //go:generate enumer -type=Kind -trimprefix=Kind -json
@@ -76,24 +80,66 @@ const (
 	KindUnauthenticated Kind = 16
 )
 
+// Because errors are created through singletons, config is global.
+var (
+	enableReportLocation atomic.Bool
+	enableStackTrace     atomic.Bool
+	gcpErrorReporting    atomic.Bool
+)
+
+// EnableReportLocation enables or disables report locations for created errors.
+func EnableReportLocation(enable bool) {
+	enableReportLocation.Store(enable)
+}
+
+// EnableStackTrace enables or disables stack traces for created errors.
+func EnableStackTrace(enable bool) {
+	enableStackTrace.Store(enable)
+}
+
+// GCPErrorReportingEnabled enables or disables special handling for GCP Error Reporting.
+// It must be enabled when using a sloggcp handler to avoid duplicate report locations and stack traces.
+func GCPErrorReportingEnabled(enable bool) {
+	gcpErrorReporting.Store(enable)
+}
+
 type ZitadelError struct {
 	Kind    Kind
 	Parent  error
 	Message string
 	ID      string
+
+	// location where the error was created
+	reportLocation *sloggcp.ReportLocation
+	// stack trace at the point the error was created
+	stackTrace    []byte
+	hasStackTrace bool
 }
 
 func ThrowError(parent error, id, message string) error {
-	return CreateZitadelError(KindUnknown, parent, id, message)
+	return newZitadelError(KindUnknown, parent, id, message)
 }
 
 func CreateZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
-	return &ZitadelError{
+	return newZitadelError(kind, parent, id, message)
+}
+
+func newZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
+	err := &ZitadelError{
 		Kind:    kind,
 		Parent:  parent,
 		ID:      id,
 		Message: message,
 	}
+	if enableReportLocation.Load() {
+		// skip 2: newZitadelError + Create / Throw function.
+		err.reportLocation = sloggcp.NewReportLocation(2)
+	}
+	if enableStackTrace.Load() {
+		err.stackTrace = debug.Stack()
+		err.hasStackTrace = true
+	}
+	return err
 }
 
 func (err *ZitadelError) Error() string {
@@ -158,10 +204,41 @@ func AsZitadelError(err error) (*ZitadelError, bool) {
 var _ slog.LogValuer = (*ZitadelError)(nil)
 
 func (err *ZitadelError) LogValue() slog.Value {
-	return slog.GroupValue(
+	attributes := make([]slog.Attr, 0, 6)
+	attributes = append(attributes,
 		slog.String("kind", err.Kind.String()),
 		slog.String("message", err.Message),
 		slog.String("id", err.ID),
-		slog.Any("parent", err.Parent),
 	)
+	if err.Parent != nil {
+		attributes = append(attributes, slog.Any("parent", err.Parent))
+	}
+	// if gcp error reporting is enabled, log the error as a group without
+	// report location and stack trace, as those are handled by the handler.
+	if gcpErrorReporting.Load() {
+		return slog.GroupValue(attributes...)
+	}
+
+	if err.reportLocation != nil {
+		attributes = append(attributes, slog.Any("reportLocation", err.reportLocation))
+	}
+	if err.hasStackTrace {
+		attributes = append(attributes, slog.String("stackTrace", string(err.stackTrace)))
+	}
+	return slog.GroupValue(attributes...)
 }
+
+// ReportLocation implements [sloggcp.ReportLocationError].
+func (err *ZitadelError) ReportLocation() *sloggcp.ReportLocation {
+	return err.reportLocation
+}
+
+// StackTrace implements [sloggcp.StackTraceError].
+func (err *ZitadelError) StackTrace() (trace []byte, ok bool) {
+	return err.stackTrace, err.hasStackTrace
+}
+
+var (
+	_ sloggcp.ReportLocationError = (*ZitadelError)(nil)
+	_ sloggcp.StackTraceError     = (*ZitadelError)(nil)
+)
