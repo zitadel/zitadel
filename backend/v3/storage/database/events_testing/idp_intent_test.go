@@ -26,10 +26,6 @@ import (
 )
 
 func TestServer_IDPIntentReduces(t *testing.T) {
-
-	// Create Intent
-	// UserClient.StartIdentityProviderIntent()
-
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Minute)
 
 	idpIntentRepo := repository.IDPIntentRepository()
@@ -162,7 +158,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		expiryDate := time.Now().Add(time.Minute * 30)
-		idpIntentID, _, _, _, err := sink.SuccessfulSAMLIntent(instanceID, samlIDP.GetId(), "some-idp-user", "some-user", expiryDate)
+		idpIntentID, _, _, _, err := sink.SuccessfulSAMLIntent(instanceID, samlIDP.GetId(), "some-idp-user", "some-user", "", expiryDate)
 		require.NoError(t, err)
 		afterSuccess := time.Now()
 		t.Cleanup(func() {
@@ -190,59 +186,54 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("when emitting SAMLRequest event should update intent with request ID", func(t *testing.T) {
-	// 	samlIDP, err := AdminClient.AddSAMLProvider(IAMCTX, defaultInstanceSAMLRequest(gofakeit.Name(), gu.Ptr(true)))
-	// 	require.NoError(t, err)
+	t.Run("when emitting SAMLRequest event should update intent with request ID", func(t *testing.T) {
+		samlIDP, err := AdminClient.AddSAMLProvider(IAMCTX, defaultInstanceSAMLRequest(gofakeit.Name(), gu.Ptr(true)))
+		require.NoError(t, err)
 
-	// 	req := &user.StartIdentityProviderIntentRequest{
-	// 		IdpId: samlIDP.GetId(),
-	// 		Content: &user.StartIdentityProviderIntentRequest_Urls{
-	// 			Urls: &user.RedirectURLs{
-	// 				SuccessUrl: "https://localhost:8081/success",
-	// 				FailureUrl: "https://localhost:8081/fail",
-	// 			},
-	// 		},
-	// 	}
-	// 	res, err := UserClient.StartIdentityProviderIntent(IAMCTX, req)
-	// 	require.NoError(t, err)
-	// 	formData, ok := res.GetNextStep().(*user.StartIdentityProviderIntentResponse_FormData)
-	// 	require.True(t, ok)
+		expiry := time.Now().Add(time.Hour * 1)
+		req := &user.StartIdentityProviderIntentRequest{
+			IdpId: samlIDP.GetId(),
+			Content: &user.StartIdentityProviderIntentRequest_Urls{
+				Urls: &user.RedirectURLs{
+					SuccessUrl: "https://localhost:8081/success",
+					FailureUrl: "https://localhost:8081/fail",
+				},
+			},
+		}
+		res, err := UserClient.StartIdentityProviderIntent(IAMCTX, req)
+		require.NoError(t, err)
+		formData, ok := res.GetNextStep().(*user.StartIdentityProviderIntentResponse_FormData)
+		require.True(t, ok)
 
-	// 	idpIntentID, ok := formData.FormData.GetFields()["RelayState"]
-	// 	require.True(t, ok)
+		idpIntentID, ok := formData.FormData.GetFields()["RelayState"]
+		require.True(t, ok)
 
-	// 	jsonData, err := json.Marshal(formData.FormData.GetFields())
-	// 	require.NoError(t, err)
+		t.Cleanup(func() {
+			idpIntentRepo.Delete(IAMCTX, pool, idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID))
+			AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{IdpId: samlIDP.GetId()})
+		})
 
-	// 	httpResp, err := http.Post(formData.FormData.GetUrl(), "application/json", bytes.NewBuffer(jsonData))
-	// 	require.NoError(t, err)
-	// 	defer httpResp.Body.Close()
-	// 	body, err := io.ReadAll(httpResp.Body)
-	// 	require.NoError(t, err)
+		idpIntentID, token, _, _, err := sink.SuccessfulSAMLIntent(instanceID, samlIDP.GetId(), "idp-user-id", "some-user", idpIntentID, expiry)
+		require.NoError(t, err)
 
-	// 	fmt.Println(string(body))
-	// 	t.Cleanup(func() {
-	// 		idpIntentRepo.Delete(IAMCTX, pool, idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID))
-	// 		AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{IdpId: samlIDP.GetId()})
-	// 	})
-	// 	_, err = UserClient.RetrieveIdentityProviderIntent(IAMCTX, &user.RetrieveIdentityProviderIntentRequest{
-	// 		IdpIntentId:    idpIntentID,
-	// 		IdpIntentToken: "",
-	// 	})
-	// 	require.NoError(t, err)
-	// 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-	// 		retrievedRelationalIntent, err := idpIntentRepo.Get(
-	// 			IAMCTX,
-	// 			pool,
-	// 			database.WithCondition(database.And(
-	// 				idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID),
-	// 			)),
-	// 		)
-	// 		require.NoError(collect, err)
-	// 		assert.NotEmpty(collect, retrievedRelationalIntent.RequestID)
-	// 	}, retryDuration, tick)
+		_, err = UserClient.RetrieveIdentityProviderIntent(IAMCTX, &user.RetrieveIdentityProviderIntentRequest{
+			IdpIntentId:    idpIntentID,
+			IdpIntentToken: token,
+		})
+		require.NoError(t, err)
+		require.EventuallyWithT(t, func(collect *assert.CollectT) {
+			retrievedRelationalIntent, err := idpIntentRepo.Get(
+				IAMCTX,
+				pool,
+				database.WithCondition(database.And(
+					idpIntentRepo.PrimaryKeyCondition(instanceID, idpIntentID),
+				)),
+			)
+			require.NoError(collect, err)
+			assert.NotEmpty(collect, retrievedRelationalIntent.RequestID)
+		}, retryDuration, tick)
 
-	// })
+	})
 
 	t.Run("when LDAP intent flow fails should update intent state and reason", func(t *testing.T) {
 		ldapProvider, err := AdminClient.AddLDAPProvider(IAMCTX, defaultInstanceLDAPRequest(gofakeit.Name()))
