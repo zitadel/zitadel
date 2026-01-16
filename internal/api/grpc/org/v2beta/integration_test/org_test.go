@@ -874,176 +874,216 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 }
 
 func TestServer_ActivateOrganization(t *testing.T) {
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(CTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	relTableState := integration.RelationalTablesEnableMatrix()
+	t.Parallel()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
 
-	orgsNumPerCase := 2
-	orgs, _, _ := createOrgs(CTX, t, Client, orgsNumPerCase*len(relTableState))
-	require.NotNil(t, orgs)
-	require.NotEmpty(t, orgs)
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	for i, stateCase := range relTableState {
-		deactivatedOrgID := orgs[1+(orgsNumPerCase*i)].GetId()
-		deactivateRes, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-			Id: deactivatedOrgID,
-		})
-		require.NoError(t, err)
-		now := time.Now()
-		assert.WithinRange(t, deactivateRes.GetChangeDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+	type TestCase struct {
+		name      string
+		inst      *integration.Instance
+		instOwner context.Context
+	}
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
-		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-				Filter: []*v2beta_org.OrganizationSearchFilter{
-					{Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{IdFilter: &v2beta_org.OrgIDFilter{Id: deactivatedOrgID}}},
-				},
+	cases := []TestCase{
+		func() TestCase {
+			inst := integration.NewInstance(ctxWithSysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+			return TestCase{
+				name:      "eventstore",
+				inst:      inst,
+				instOwner: instOwner,
+			}
+		}(),
+		func() TestCase {
+			inst := integration.NewInstance(ctxWithSysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+			_, err := inst.Client.FeatureV2.SetInstanceFeatures(instOwner, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)})
+			require.NoError(t, err)
+			return TestCase{
+				name:      "relational",
+				inst:      inst,
+				instOwner: instOwner,
+			}
+		}(),
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			inst := testCase.inst
+			client := inst.Client.OrgV2beta
+			instOwner := testCase.instOwner
+
+			tt.Cleanup(func() {
+				_, err := inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+				assert.NoError(tt, err)
 			})
-			assert.NoError(ttt, err)
-			assert.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
-		}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
-		tt := []struct {
-			name       string
-			ctx        context.Context
-			inputOrgID string
-			err        error
-		}{
-			{
-				name:       "Activate, happy path",
-				ctx:        CTX,
-				inputOrgID: deactivatedOrgID,
-			},
-			{
-				name:       "Activate, no permission",
-				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
-				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-				err: func() error {
-					//TODO: implement permissions for relational tables
-					if stateCase.FeatureSet.GetEnableRelationalTables() {
-						return errors.New("Organisation is already active")
-					}
-					return errors.New("membership not found")
-				}(),
-			},
-			{
-				name:       "Activate, not existing",
-				ctx:        CTX,
-				inputOrgID: "non-existing-org-id",
-				err:        errors.New("Organisation not found"),
-			},
-			{
-				name:       "Activate, already activated",
-				ctx:        CTX,
-				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-				err:        errors.New("Organisation is already active"),
-			},
-		}
+			tt.Run("Happy path", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, client, 1)
+				organisation := orgs[0]
 
-		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-		for _, tc := range tt {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.name), func(t *testing.T) {
-				_, err := Client.ActivateOrganization(tc.ctx, &v2beta_org.ActivateOrganizationRequest{
-					Id: tc.inputOrgID,
-				})
-				if tc.err != nil {
-					require.Contains(t, err.Error(), tc.err.Error())
-				} else {
-					require.NoError(t, err)
+				_, err := client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+				require.NoError(ttt, err)
+
+				// when
+				_, err = client.ActivateOrganization(instOwner, &v2beta_org.ActivateOrganizationRequest{Id: organisation.Id})
+
+				// then
+				assert.NoError(ttt, err)
+			})
+
+			tt.Run("Unhappy: no permission", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, client, 1)
+				organisation := orgs[0]
+				usersWithoutPermissions := []integration.UserType{
+					integration.UserTypeOrgOwner,
+				}
+
+				_, err := client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+				assert.NoError(ttt, err)
+
+				for _, userType := range usersWithoutPermissions {
+					ttt.Run(userType.String(), func(tttt *testing.T) {
+						u := inst.WithAuthorizationToken(ctx, userType)
+
+						// when
+						_, err = client.ActivateOrganization(u, &v2beta_org.ActivateOrganizationRequest{Id: organisation.Id})
+
+						// then
+						assert.ErrorContains(tttt, err, "membership not found")
+					})
 				}
 			})
-		}
+
+			tt.Run("Unhappy: unknown org", func(ttt *testing.T) {
+				// when
+				_, err := client.ActivateOrganization(instOwner, &v2beta_org.ActivateOrganizationRequest{Id: "does not exist"})
+
+				// then
+				assert.ErrorContains(ttt, err, "Organisation not found")
+			})
+
+			tt.Run("Unhappy: already activated", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, inst.Client.OrgV2beta, 1)
+				organisation := orgs[0]
+
+				// when
+				_, err := client.ActivateOrganization(instOwner, &v2beta_org.ActivateOrganizationRequest{Id: organisation.Id})
+
+				// then
+				assert.ErrorContains(ttt, err, "Organisation is already active")
+			})
+		})
 	}
 }
 
 func TestServer_DeactivateOrganization(t *testing.T) {
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(CTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	relTableState := integration.RelationalTablesEnableMatrix()
+	t.Parallel()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	defer cancel()
 
-	orgsNumPerCase := 2
-	orgs, _, _ := createOrgs(CTX, t, Client, orgsNumPerCase*len(relTableState))
-	require.NotNil(t, orgs)
-	require.NotEmpty(t, orgs)
+	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	for i, stateCase := range relTableState {
-		deactivatedOrgID := orgs[1+(orgsNumPerCase*i)].GetId()
-		deactivateRes, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
-			Id: deactivatedOrgID,
-		})
-		require.NoError(t, err)
-		now := time.Now()
-		assert.WithinRange(t, deactivateRes.GetChangeDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+	type TestCase struct {
+		name      string
+		inst      *integration.Instance
+		instOwner context.Context
+	}
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
-		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
-				Filter: []*v2beta_org.OrganizationSearchFilter{
-					{Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{IdFilter: &v2beta_org.OrgIDFilter{Id: deactivatedOrgID}}},
-				},
+	cases := []TestCase{
+		func() TestCase {
+			inst := integration.NewInstance(ctxWithSysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+			return TestCase{
+				name:      "eventstore",
+				inst:      inst,
+				instOwner: instOwner,
+			}
+		}(),
+		func() TestCase {
+			inst := integration.NewInstance(ctxWithSysAuthZ)
+			instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+			_, err := inst.Client.FeatureV2.SetInstanceFeatures(instOwner, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(false)})
+			require.NoError(t, err)
+			return TestCase{
+				name:      "relational",
+				inst:      inst,
+				instOwner: instOwner,
+			}
+		}(),
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(tt *testing.T) {
+			inst := testCase.inst
+			client := inst.Client.OrgV2beta
+			instOwner := testCase.instOwner
+
+			tt.Cleanup(func() {
+				_, err := inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+				require.NoError(tt, err)
 			})
-			assert.NoError(ttt, err)
-			assert.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
-		}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
-		tt := []struct {
-			name       string
-			ctx        context.Context
-			inputOrgID string
-			err        error
-		}{
-			{
-				name:       "Deactivate, happy path",
-				ctx:        CTX,
-				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-			},
-			{
-				name:       "Deactivate, no permission",
-				ctx:        Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
-				inputOrgID: orgs[0+(orgsNumPerCase*i)].GetId(),
-				err: func() error {
-					//TODO: implement for relational tables
-					if stateCase.FeatureSet.GetEnableRelationalTables() {
-						return errors.New("Organisation is already deactivated")
-					}
-					return errors.New("membership not found")
-				}(),
-			},
-			{
-				name:       "Deactivate, not existing",
-				ctx:        CTX,
-				inputOrgID: "non-existing-org-id",
-				err:        errors.New("Organisation not found"),
-			},
-			{
-				name:       "Deactivate, already deactivated",
-				ctx:        CTX,
-				inputOrgID: deactivatedOrgID,
-				err:        errors.New("Organisation is already deactivated"),
-			},
-		}
+			tt.Run("Happy path", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, client, 1)
+				organisation := orgs[0]
 
-		integration.EnsureInstanceFeature(t, CTX, Instance, stateCase.FeatureSet, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.Equal(tCollect, stateCase.FeatureSet.GetEnableRelationalTables(), got.EnableRelationalTables.GetEnabled())
-		})
-		for _, tc := range tt {
-			t.Run(fmt.Sprintf("%s - %s", stateCase.State, tc.name), func(t *testing.T) {
-				_, err := Client.DeactivateOrganization(tc.ctx, &v2beta_org.DeactivateOrganizationRequest{
-					Id: tc.inputOrgID,
-				})
-				if tc.err != nil {
-					require.Contains(t, err.Error(), tc.err.Error())
-				} else {
-					require.NoError(t, err)
+				// when
+				_, err := client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+
+				// then
+				assert.NoError(ttt, err)
+			})
+
+			tt.Run("Unhappy: no permission", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, client, 1)
+				organisation := orgs[0]
+				usersWithoutPermissions := []integration.UserType{
+					integration.UserTypeOrgOwner,
+				}
+
+				for _, userType := range usersWithoutPermissions {
+					ttt.Run(userType.String(), func(tttt *testing.T) {
+						u := inst.WithAuthorizationToken(ctx, userType)
+
+						// when
+						_, err := client.DeactivateOrganization(u, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+
+						// then
+						assert.ErrorContains(tttt, err, "membership not found")
+					})
 				}
 			})
-		}
+
+			tt.Run("Unhappy: unknown org", func(ttt *testing.T) {
+				// when
+				_, err := client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: "does not exist"})
+
+				// then
+				assert.ErrorContains(ttt, err, "Organisation not found")
+			})
+
+			tt.Run("Unhappy: already deactivated", func(ttt *testing.T) {
+				// given
+				orgs, _, _ := createOrgs(instOwner, ttt, inst.Client.OrgV2beta, 1)
+				organisation := orgs[0]
+				_, err := client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+				require.NoError(ttt, err)
+
+				// when
+				_, err = client.DeactivateOrganization(instOwner, &v2beta_org.DeactivateOrganizationRequest{Id: organisation.Id})
+
+				// then
+				assert.ErrorContains(ttt, err, "Organisation is already deactivated")
+			})
+		})
 	}
 }
 
