@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _IDPIntentStateName = "startedsucceededfailedconsumed"
+const _IDPIntentStateName = "startedsucceededfailed"
 
-var _IDPIntentStateIndex = [...]uint8{0, 7, 16, 22, 30}
+var _IDPIntentStateIndex = [...]uint8{0, 7, 16, 22}
 
-const _IDPIntentStateLowerName = "startedsucceededfailedconsumed"
+const _IDPIntentStateLowerName = "startedsucceededfailed"
 
 func (i IDPIntentState) String() string {
 	if i >= IDPIntentState(len(_IDPIntentStateIndex)-1) {
@@ -28,10 +28,9 @@ func _IDPIntentStateNoOp() {
 	_ = x[IDPIntentStateStarted-(0)]
 	_ = x[IDPIntentStateSucceeded-(1)]
 	_ = x[IDPIntentStateFailed-(2)]
-	_ = x[IDPIntentStateConsumed-(3)]
 }
 
-var _IDPIntentStateValues = []IDPIntentState{IDPIntentStateStarted, IDPIntentStateSucceeded, IDPIntentStateFailed, IDPIntentStateConsumed}
+var _IDPIntentStateValues = []IDPIntentState{IDPIntentStateStarted, IDPIntentStateSucceeded, IDPIntentStateFailed}
 
 var _IDPIntentStateNameToValueMap = map[string]IDPIntentState{
 	_IDPIntentStateName[0:7]:        IDPIntentStateStarted,
@@ -40,15 +39,12 @@ var _IDPIntentStateNameToValueMap = map[string]IDPIntentState{
 	_IDPIntentStateLowerName[7:16]:  IDPIntentStateSucceeded,
 	_IDPIntentStateName[16:22]:      IDPIntentStateFailed,
 	_IDPIntentStateLowerName[16:22]: IDPIntentStateFailed,
-	_IDPIntentStateName[22:30]:      IDPIntentStateConsumed,
-	_IDPIntentStateLowerName[22:30]: IDPIntentStateConsumed,
 }
 
 var _IDPIntentStateNames = []string{
 	_IDPIntentStateName[0:7],
 	_IDPIntentStateName[7:16],
 	_IDPIntentStateName[16:22],
-	_IDPIntentStateName[22:30],
 }
 
 // IDPIntentStateString retrieves an enum value from the enum constants string name.

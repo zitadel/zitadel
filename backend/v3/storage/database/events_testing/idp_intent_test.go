@@ -283,7 +283,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("when session update checks intent should update intent state to consumed", func(t *testing.T) {
+	t.Run("when session update checks intent should delete intent", func(t *testing.T) {
 		// ==========
 		//   GIVEN
 		// ==========
@@ -367,13 +367,12 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 		})
 
 		require.EventuallyWithT(t, func(collect *assert.CollectT) {
-			retrievedRelationalIntent, err := idpIntentRepo.Get(
+			_, err := idpIntentRepo.Get(
 				IAMCTX,
 				pool,
 				database.WithCondition(idpIntentRepo.PrimaryKeyCondition(instanceID, intentID)),
 			)
-			require.NoError(collect, err)
-			assert.Equal(collect, domain.IDPIntentStateConsumed, retrievedRelationalIntent.State)
+			assert.Error(collect, err)
 		}, retryDuration, tick)
 	})
 }

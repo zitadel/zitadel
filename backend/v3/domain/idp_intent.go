@@ -16,7 +16,6 @@ const (
 	IDPIntentStateStarted IDPIntentState = iota
 	IDPIntentStateSucceeded
 	IDPIntentStateFailed
-	IDPIntentStateConsumed
 )
 
 type IDPIntent struct {

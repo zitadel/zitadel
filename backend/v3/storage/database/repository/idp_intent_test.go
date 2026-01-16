@@ -132,7 +132,7 @@ func TestCreateIDPIntent(t *testing.T) {
 				IDPID:        tc.inputIDPID,
 				IDPArguments: tc.inputIDPArgs,
 
-				State:     domain.IDPIntentStateConsumed, // Should disregard
+				State:     domain.IDPIntentStateFailed, // Should disregard
 				IDPUserID: "should disregard",
 			}
 
@@ -447,33 +447,20 @@ func TestUpdateIDPIntent(t *testing.T) {
 			expectedUpdatedRows: 1,
 		},
 		{
-			testName:        "when simulating ConsumedEvent should update state",
-			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
-			inputChanges: database.Changes{
-				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
-			},
-			expectedUpdatedRecords: func() []*domain.IDPIntent {
-				toReturn := intent1
-				toReturn.State = domain.IDPIntentStateConsumed
-				return []*domain.IDPIntent{&toReturn}
-			},
-			expectedUpdatedRows: 1,
-		},
-		{
 			testName: "when updating multiple records should return updated records",
 			inputConditions: database.Or(
 				idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
 				idpIntentRepo.PrimaryKeyCondition(instanceID, intentID2),
 			),
 			inputChanges: database.Changes{
-				idpIntentRepo.SetState(domain.IDPIntentStateConsumed),
+				idpIntentRepo.SetState(domain.IDPIntentStateFailed),
 				idpIntentRepo.SetRequestID("req-123"),
 			},
 			expectedUpdatedRecords: func() []*domain.IDPIntent {
 				toReturn1, toReturn2 := intent1, intent2
-				toReturn1.State = domain.IDPIntentStateConsumed
+				toReturn1.State = domain.IDPIntentStateFailed
 				toReturn1.RequestID = "req-123"
-				toReturn2.State = domain.IDPIntentStateConsumed
+				toReturn2.State = domain.IDPIntentStateFailed
 				toReturn2.RequestID = "req-123"
 				return []*domain.IDPIntent{&toReturn1, &toReturn2}
 			},
@@ -555,7 +542,7 @@ func TestDeleteIDPIntent(t *testing.T) {
 	}{
 		{
 			testName:        "when PK condition not set should return missing condition error",
-			inputConditions: idpIntentRepo.StateCondition(domain.IDPIntentStateConsumed),
+			inputConditions: idpIntentRepo.StateCondition(domain.IDPIntentStateFailed),
 			expectedError:   database.NewMissingConditionError(nil),
 		},
 		{

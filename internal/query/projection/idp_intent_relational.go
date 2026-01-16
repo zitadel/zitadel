@@ -244,11 +244,10 @@ func (i *idpIntentRelationalProjection) reduceConsumedEvent(evt eventstore.Event
 		}
 
 		repo := repository.IDPIntentRepository()
-		_, err := repo.Update(
+		_, err := repo.Delete(
 			ctx,
 			v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetState(domain.IDPIntentStateConsumed),
 		)
 		return err
 	}), nil
