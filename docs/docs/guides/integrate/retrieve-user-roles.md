@@ -99,7 +99,7 @@ Send the access token of the user as `Bearer Token` in the `Authorization` heade
 **cURL Request:**
 ```bash
 curl --request GET \
- --url $CUSTOM_DOMAIN/oidc/v1/userinfo
+ --url ${CUSTOM_DOMAIN}/oidc/v1/userinfo
  --header 'Authorization: Bearer <TOKEN>'
 ```
 
@@ -231,7 +231,7 @@ Returns a list of roles for the authenticated user and for the requesting projec
 
 **cURL request:** 
 ```bash
-curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/permissions/me/_search' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -257,7 +257,7 @@ This request can be used if you are building a management UI. For instance, if t
 **cURL Request:** 
 
 ```bash
-curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/permissions/zitadel/me/_search' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/zitadel/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -303,7 +303,7 @@ Returns a list of user grants the authenticated user has. User grants consist of
 **cURL request:**
 
 ```bash
-curl -L -X POST 'https://$CUSTOM_DOMAIN/auth/v1/usergrants/me/_search' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/usergrants/me/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -415,7 +415,7 @@ Returns a list of user roles that match the search queries. A user with manager 
 **cURL request:** 
 
 ```bash
-curl -L -X POST 'https://$CUSTOM_DOMAIN/management/v1/users/grants/_search' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/management/v1/users/grants/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -484,7 +484,7 @@ Returns a user grant per ID. A user grant is a role a user has for a specific pr
 **cURL request:**
 
 ```bash 
-curl -L -X GET 'https://$CUSTOM_DOMAIN/management/v1/users/:userId/grants/:grantId' \
+curl -L -X GET 'https://${CUSTOM_DOMAIN}/management/v1/users/:userId/grants/:grantId' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```

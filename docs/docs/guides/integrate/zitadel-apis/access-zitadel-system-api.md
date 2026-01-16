@@ -125,7 +125,7 @@ Now that you configured ZITADEL and created a JWT, you can call the System API a
 
 ```bash
 curl --request POST \
-  --url $CUSTOM_DOMAIN/system/v1/instances/_search \
+  --url ${CUSTOM_DOMAIN}/system/v1/instances/_search \
   --header 'Authorization: Bearer {token}' \
   --header 'Content-Type: application/json'
 ```

@@ -9,7 +9,7 @@ The list of session IDs can be sent in the “search sessions” request to get 
 
 ```bash
 curl --request POST \
-  --url https://$CUSTOM_DOMAIN/v2/sessions/search \
+  --url https://${CUSTOM_DOMAIN}/v2/sessions/search \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

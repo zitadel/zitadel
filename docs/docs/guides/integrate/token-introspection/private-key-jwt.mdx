@@ -153,7 +153,7 @@ Make a POST request to the introspection endpoint, sending the above parameters:
 
 ```bash
 curl --request POST \
-  --url $CUSTOM_DOMAIN/oauth/v2/introspect \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \

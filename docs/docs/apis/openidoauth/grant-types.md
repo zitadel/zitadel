@@ -78,7 +78,7 @@ JWT
 
 | Claim | Example                    | Description                                                                                                   |
 | :---- | :------------------------- | :------------------------------------------------------------------------------------------------------------ |
-| aud   | `"https://$CUSTOM_DOMAIN"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
+| aud   | `"https://${CUSTOM_DOMAIN}"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
 | exp   | `1605183582`               | Unix timestamp of the expiry                                                                                  |
 | iat   | `1605179982`               | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                             |
 | iss   | `"77479219772321307"`      | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
@@ -88,7 +88,7 @@ JWT
 {
 	"iss": "77479219772321307",
 	"sub": "77479219772321307",
-	"aud": "https://$CUSTOM_DOMAIN",
+	"aud": "https://${CUSTOM_DOMAIN}",
 	"exp": 1605183582,
 	"iat": 1605179982
 }
