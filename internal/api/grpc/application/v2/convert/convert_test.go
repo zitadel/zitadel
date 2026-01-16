@@ -42,6 +42,7 @@ func TestAppToPb(t *testing.T) {
 				State:        domain.AppStateActive,
 				Name:         "test-application",
 				APIConfig:    &query.APIApp{},
+				ProjectID:    "project1",
 			},
 			expectedPbApp: &application.Application{
 				ApplicationId: "id",
@@ -52,6 +53,7 @@ func TestAppToPb(t *testing.T) {
 				Configuration: &application.Application_ApiConfiguration{
 					ApiConfiguration: &application.APIConfiguration{},
 				},
+				ProjectId: "project1",
 			},
 		},
 		{
@@ -80,6 +82,12 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 	require.NoError(t, err)
 
 	validSearchByProjectQuery, err := query.NewAppProjectIDSearchQuery("project1")
+	require.NoError(t, err)
+
+	validSearchByClientIDQuery, err := query.NewAppClientIDSearchQuery("clientID")
+	require.NoError(t, err)
+
+	validSearchByEntityIDQuery, err := query.NewAppClientIDSearchQuery("entityID")
 	require.NoError(t, err)
 
 	sysDefaults := systemdefaults.SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 150}
@@ -125,6 +133,12 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 					{
 						Filter: &application.ApplicationSearchFilter_NameFilter{NameFilter: &application.ApplicationNameFilter{Name: "test"}},
 					},
+					{
+						Filter: &application.ApplicationSearchFilter_ClientIdFilter{ClientIdFilter: &application.ClientIDFilter{ClientId: "clientID"}},
+					},
+					{
+						Filter: &application.ApplicationSearchFilter_EntityIdFilter{EntityIdFilter: &application.EntityIDFilter{EntityId: "entityID"}},
+					},
 				},
 				SortingColumn: application.ApplicationSorting_APPLICATION_SORT_BY_NAME,
 				Pagination:    &filter_pb_v2.PaginationRequest{Asc: true},
@@ -140,6 +154,8 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 				Queries: []query.SearchQuery{
 					validSearchByProjectQuery,
 					validSearchByNameQuery,
+					validSearchByClientIDQuery,
+					validSearchByEntityIDQuery,
 				},
 			},
 		},
