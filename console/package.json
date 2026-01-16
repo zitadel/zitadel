@@ -82,7 +82,7 @@
     "@zitadel/client": "workspace:*",
     "@zitadel/proto": "workspace:*",
     "eslint": "^8.57.1",
-    "jasmine-core": "~5.6.0",
+    "jasmine-core": "~5.12.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
