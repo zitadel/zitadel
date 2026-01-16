@@ -1,8 +1,6 @@
 module github.com/zitadel/zitadel
 
-go 1.24.0
-
-toolchain go1.24.7
+go 1.25
 
 require (
 	cloud.google.com/go/profiler v0.4.3
@@ -65,7 +63,6 @@ require (
 	github.com/muesli/gamut v0.3.1
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
-	github.com/muhlemmer/sloggcp v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/pashagolub/pgxmock/v4 v4.9.0
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
@@ -102,6 +99,7 @@ require (
 	github.com/zitadel/passwap v0.10.0
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.1
+	github.com/zitadel/sloggcp v0.5.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.13.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0

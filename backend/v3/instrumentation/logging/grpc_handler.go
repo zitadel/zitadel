@@ -2,7 +2,6 @@ package logging
 
 import (
 	"context"
-	"log/slog"
 	"slices"
 	"strings"
 
@@ -31,44 +30,7 @@ func NewGrpcInterceptor(ignoredMethodSuffixes ...string) grpc.UnaryServerInterce
 		if err != nil {
 			code = status.Code(err)
 		}
-		logger.Log(ctx,
-			assertGrpcLevel(code),
-			"gRPC served",
-			"code", code,
-		)
-
+		logger.InfoContext(ctx, "gRPC request", "code", code)
 		return resp, err
-	}
-}
-
-func assertGrpcLevel(code codes.Code) slog.Level {
-	switch code {
-	case codes.Unimplemented:
-		return slog.LevelDebug
-
-	// client errors
-	case codes.Canceled,
-		codes.InvalidArgument,
-		codes.NotFound,
-		codes.AlreadyExists,
-		codes.PermissionDenied,
-		codes.ResourceExhausted,
-		codes.FailedPrecondition,
-		codes.OutOfRange,
-		codes.Unauthenticated:
-		return slog.LevelWarn
-
-	// server errors
-	case codes.Unknown,
-		codes.Aborted,
-		codes.DeadlineExceeded,
-		codes.Internal,
-		codes.Unavailable,
-		codes.DataLoss:
-		return slog.LevelError
-	case codes.OK:
-		fallthrough
-	default: // includes 0 code when no error
-		return slog.LevelInfo
 	}
 }
