@@ -1686,7 +1686,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificare",
       "DESCRIPTION": "Determină la ce modificări vor fi trimise notificări.",
-      "PASSWORDCHANGE": "Modificarea parolei"
+      "PASSWORDCHANGE": "Parolă modificată"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Oferiți conectării stilul dvs. personalizat și modificați-i comportamentul.",

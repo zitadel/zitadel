@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Meddelande",
       "DESCRIPTION": "Bestämmer vid vilka ändringar meddelanden kommer att skickas.",
-      "PASSWORDCHANGE": "Lösenordsändring"
+      "PASSWORDCHANGE": "Lösenord ändrat"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Ge inloggningen din personliga stil och ändra dess beteende.",

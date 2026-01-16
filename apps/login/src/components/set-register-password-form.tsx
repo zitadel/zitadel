@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
@@ -45,7 +40,7 @@ export function SetRegisterPasswordForm({
   requestId,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstname: firstname ?? "",
@@ -93,9 +88,7 @@ export function SetRegisterPasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -155,17 +148,11 @@ export function SetRegisterPasswordForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
+          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
           onClick={handleSubmit(submitRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="password.submit" namespace="register" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="password.submit" namespace="register" />
         </Button>
       </div>
     </form>

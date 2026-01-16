@@ -1742,7 +1742,7 @@
     "NOTIFICATION": {
       "TITLE": "Уведомление",
       "DESCRIPTION": "Устанавливает, в связи с какими изменениями будут отправляться уведомления.",
-      "PASSWORDCHANGE": "Изменение пароля"
+      "PASSWORDCHANGE": "Пароль изменен"
     },
     "PRIVATELABELING": {
       "TITLE": "Брендинг",

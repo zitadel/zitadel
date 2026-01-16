@@ -1687,7 +1687,7 @@
     "NOTIFICATION": {
       "TITLE": "Powiadomienie",
       "DESCRIPTION": "Określa, na jakie zmiany będą wysyłane powiadomienia.",
-      "PASSWORDCHANGE": "Zmiana hasła"
+      "PASSWORDCHANGE": "Hasło zmienione"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Nadaj logowaniu swój indywidualny styl i modyfikuj jego zachowanie.",
@@ -2328,8 +2328,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Atrybut imienia",
+    "LASTNAMEATTRIBUTE": "Atrybut nazwiska",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",

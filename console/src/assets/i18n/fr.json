@@ -971,7 +971,7 @@
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
       "CHANGEUSERNAME_DESC": "Entrez le nouveau nom dans le champ ci-dessous.",
       "FIRSTNAME": "Prénom",
-      "LASTNAME": "Nom de famille",
+      "LASTNAME": "Nom",
       "NICKNAME": "Surnom",
       "DISPLAYNAME": "Nom d'affichage",
       "PREFERREDLOGINNAME": "Nom de connexion préféré",
@@ -1688,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Notifications",
       "DESCRIPTION": "Détermine sur quels changements, les notifications seront envoyées",
-      "PASSWORDCHANGE": "Changement de mot de passe"
+      "PASSWORDCHANGE": "Mot de passe changé"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Donnez à la connexion votre style personnalisé et modifiez son comportement.",
@@ -1861,7 +1861,7 @@
       },
       "CHIPS": {
         "firstname": "Prénom",
-        "lastname": "Nom de famille",
+        "lastname": "Nom",
         "code": "Code",
         "preferredLoginName": "Nom de connexion préféré",
         "displayName": "Nom d'affichage",
@@ -2329,8 +2329,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "E-mail attribute",
     "EMAILVERIFIEDATTRIBUTE": "E-mail verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Attribut du prénom",
+    "LASTNAMEATTRIBUTE": "Attribut du nom",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",

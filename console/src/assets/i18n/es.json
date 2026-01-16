@@ -1689,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Notificación",
       "DESCRIPTION": "Determina en qué cambios se enviarán notificaciones.",
-      "PASSWORDCHANGE": "Cambio de contraseña"
+      "PASSWORDCHANGE": "Contraseña cambiada"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Da a tu inicio de sesión tu estilo personalizado y modifica su comportamiento.",
@@ -2325,8 +2325,8 @@
     "DISPLAYNAMEATTRIBUTE": "Atributo Displayname",
     "EMAILATTRIBUTEATTRIBUTE": "Atributo Email",
     "EMAILVERIFIEDATTRIBUTE": "Atributo Email verificado",
-    "FIRSTNAMEATTRIBUTE": "Atributo Firstname",
-    "LASTNAMEATTRIBUTE": "Atributo Lastname",
+    "FIRSTNAMEATTRIBUTE": "Atributo del nombre",
+    "LASTNAMEATTRIBUTE": "Atributo del apellido",
     "NICKNAMEATTRIBUTE": "Atributo Nickname",
     "PHONEATTRIBUTE": "Atributo Phone",
     "PHONEVERIFIEDATTRIBUTE": "Atributo phone verificado",
