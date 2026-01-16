@@ -23,10 +23,19 @@
     <div class="fields">
         {{if .Edit}}
         <div class="field">
+            <label class="lgn-label" for="countryCode">{{t "InitMFAOTPSMS.CountryCodeLabel"}}</label>
+            <select class="lgn-input" id="countryCode" name="countryCode" required>
+                {{range .CountryCodes}}
+                <option value="{{.ISOCode}}" {{if eq .ISOCode $.CountryCode}}selected{{end}}>{{.Name}} ({{.CallingCode}})</option>
+                {{end}}
+            </select>
+        </div>
+        <div class="field">
             <label class="lgn-label" for="newPhone">{{t "InitMFAOTPSMS.PhoneLabel"}}</label>
             <input class="lgn-input" type="tel" id="newPhone" name="newPhone" autocomplete="off" value="{{.Phone}}" autofocus required>
         </div>
         {{else}}
+        <input type="hidden" name="countryCode" value="{{ .CountryCode }}" />
         <div class="field lgn-actions">
             <p>{{.Phone}}</p>
             <span class="fill-space"></span>
