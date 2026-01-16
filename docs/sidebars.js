@@ -714,7 +714,7 @@ module.exports = {
       collapsed: true,
       items: [
         "guides/manage/console/console-overview",
-        "guides/manage/cloud/egress.md",
+        "guides/manage/cloud/egress",
         {
           type: "category",
           label: "Customer Portal",
