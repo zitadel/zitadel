@@ -598,6 +598,7 @@ module.exports = {
             "guides/migrate/sources/keycloak",
           ],
         },
+        "guides/manage/cloud/egress"
       ],
     },
     {
