@@ -598,9 +598,9 @@ module.exports = {
             "guides/migrate/sources/keycloak",
           ],
         },
-        "guides/manage/cloud/egress"
       ],
     },
+    {
     {
       type: "category",
       label: "Configure Identity & Policies",
