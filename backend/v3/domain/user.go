@@ -103,7 +103,7 @@ type HumanEmail struct {
 	OTP        OTP       `json:"otp" db:"otp"`
 	// Unverified is the verification data for setting a new email
 	// If nil, no email change is in progress
-	Unverified *Verification `json:"-"`
+	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanPhone struct {
@@ -112,7 +112,7 @@ type HumanPhone struct {
 	OTP        OTP       `json:"otp,omitzero" db:"otp"`
 	// Unverified is the verification data for setting a new phone number
 	// If nil, no phone change is in progress
-	Unverified *Verification `json:"-"`
+	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type HumanTOTP struct {

@@ -492,6 +492,16 @@ func (u user) LoadVerifications() domain.UserRepository {
 	panic("unimplemented")
 }
 
+func (u user) joinVerifications() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.instanceIDColumn()),
+		database.NewInCondition(u.verification.IDColumn(), 
+		 	u.emailVerificationIDColumn(),
+		 	u.phoneVerificationIDColumn(),
+		 	u.totpVerificationIDColumn()
+	),
+
 // Machine implements [domain.UserRepository.Machine].
 func (u user) Machine() domain.MachineUserRepository {
 	return userMachine{user: u}

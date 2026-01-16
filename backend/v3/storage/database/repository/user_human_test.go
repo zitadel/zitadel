@@ -1,12 +1,12 @@
 package repository_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -14,8 +14,9 @@ import (
 )
 
 func Test_humanUser_create(t *testing.T) {
-	tx, rollback := transactionForRollback(t)
-	t.Cleanup(rollback)
+	// tx, rollback := transactionForRollback(t)
+	// t.Cleanup(rollback)
+	tx := pool
 
 	userRepo := repository.UserRepository()
 	userRepo = userRepo.LoadKeys().LoadPATs()
@@ -48,7 +49,6 @@ func Test_humanUser_create(t *testing.T) {
 
 			return test{
 				name: "minimal representation",
-
 				args: args{
 					user: &domain.User{
 						InstanceID:     instanceID,
@@ -90,6 +90,125 @@ func Test_humanUser_create(t *testing.T) {
 				},
 			}
 		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+
+			return test{
+				name: "including optional profile fields",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName:                          firstName,
+							LastName:                           lastName,
+							Nickname:                           "Nick",
+							DisplayName:                        firstName + " " + lastName,
+							PreferredLanguage:                  language.Georgian,
+							Gender:                             domain.HumanGenderFemale,
+							AvatarKey:                          "http://localhost:8080/my/profile/picture",
+							MultifactorInitializationSkippedAt: createdAt,
+							Password: domain.HumanPassword{
+								Password:         "my-password",
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName:                          firstName,
+							LastName:                           lastName,
+							Nickname:                           "Nick",
+							DisplayName:                        firstName + " " + lastName,
+							PreferredLanguage:                  language.Georgian,
+							Gender:                             domain.HumanGenderFemale,
+							AvatarKey:                          "http://localhost:8080/my/profile/picture",
+							MultifactorInitializationSkippedAt: createdAt,
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+						},
+					},
+				},
+			}
+		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+
+			return test{
+				name: "with unverified email without expiry",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Password:         "my-password",
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+								Unverified: &domain.Verification{
+									Code: []byte("verification-code"),
+								},
+							},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address: email,
+								Unverified: &domain.Verification{
+									Value: &email,
+									Code:  []byte("verification-code"),
+								},
+							},
+						},
+					},
+				},
+			}
+		}(),
 		// func() test {
 		// 	username := gofakeit.Username()
 		// 	return test{
@@ -115,14 +234,16 @@ func Test_humanUser_create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			savepoint, err := tx.Begin(t.Context())
-			require.NoError(t, err)
-			t.Cleanup(func() {
-				err := savepoint.Rollback(context.Background())
-				if err != nil {
-					t.Log("rollback savepoint failed", err)
-				}
-			})
+			// savepoint, err := tx.Begin(t.Context())
+			// require.NoError(t, err)
+			// t.Cleanup(func() {
+			// 	err := savepoint.Rollback(context.Background())
+			// 	if err != nil {
+			// 		t.Log("rollback savepoint failed", err)
+			// 	}
+			// })
+			savepoint := tx
+			var err error
 
 			err = userRepo.Create(t.Context(), savepoint, tt.args.user)
 			require.ErrorIs(t, err, tt.want.err)

@@ -221,7 +221,19 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 		t.Error("human.email.otp.check not asserted")
 	}
 	if expected.Email.Unverified != nil {
-		t.Error("human.email.unverified not asserted")
+		require.NotNil(t, actual.Email.Unverified, "human email unverified not nil")
+		assert.Equal(t, expected.Email.Unverified.Value, actual.Email.Unverified.Value, "human email unverified value")
+		assert.Equal(t, expected.Email.Unverified.Code, actual.Email.Unverified.Code, "human email unverified code")
+		if expected.Email.Unverified.ExpiresAt != nil {
+			require.NotNil(t, actual.Email.Unverified.ExpiresAt, "human email unverified expires at not nil")
+			assert.True(t, expected.Email.Unverified.ExpiresAt.Equal(*actual.Email.Unverified.ExpiresAt), "human email unverified expires at")
+		} else {
+			assert.Nil(t, actual.Email.Unverified.ExpiresAt, "human email unverified expires at nil")
+		}
+		assert.Equal(t, expected.Email.Unverified.FailedAttempts, actual.Email.Unverified.FailedAttempts, "human email unverified failed attempts")
+		assert.True(t, expected.Email.Unverified.VerifiedAt.Equal(actual.Email.Unverified.VerifiedAt), "human email unverified verified at")
+	} else {
+		assert.Nil(t, actual.Email.Unverified, "human email unverified nil")
 	}
 
 	if expected.Phone == nil {

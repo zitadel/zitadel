@@ -40,91 +40,95 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 	if !user.CreatedAt.IsZero() {
 		createdAt = user.CreatedAt
 	}
-	values := map[string]any{
-		"instance_id":                           user.InstanceID,
-		"organization_id":                       user.OrganizationID,
-		"id":                                    user.ID,
-		"username":                              user.Username,
-		"state":                                 user.State,
-		"type":                                  "human",
-		"first_name":                            user.Human.FirstName,
-		"last_name":                             user.Human.LastName,
-		"nickname":                              user.Human.Nickname,
-		"preferred_language":                    user.Human.PreferredLanguage,
-		"gender":                                user.Human.Gender,
-		"avatar_key":                            user.Human.AvatarKey,
-		"multifactor_initialization_skipped_at": user.Human.MultifactorInitializationSkippedAt,
-		"created_at":                            createdAt,
-		"updated_at":                            createdAt,
-
-		"password":             user.Human.Password.Password,
-		"password_verified_at": user.Human.Password.VerifiedAt,
-
-		"email": user.Human.Email.Address,
+	columnValues := map[string]any{
+		"instance_id":     user.InstanceID,
+		"organization_id": user.OrganizationID,
+		"id":              user.ID,
+		"username":        user.Username,
+		"state":           user.State,
+		"type":            "human",
+		"first_name":      user.Human.FirstName,
+		"last_name":       user.Human.LastName,
+		"created_at":      createdAt,
+		"updated_at":      createdAt,
+		"password":        user.Human.Password.Password,
+		"email":           user.Human.Email.Address,
+	}
+	if !user.Human.MultifactorInitializationSkippedAt.IsZero() {
+		columnValues["multifactor_initialization_skipped_at"] = user.Human.MultifactorInitializationSkippedAt
+	}
+	if !user.Human.Password.VerifiedAt.IsZero() {
+		columnValues["password_verified_at"] = user.Human.Password.VerifiedAt
+	}
+	if !user.Human.PreferredLanguage.IsRoot() {
+		columnValues["preferred_language"] = user.Human.PreferredLanguage
+	}
+	if user.Human.Password.IsChangeRequired {
+		// changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
+		columnValues["password_change_required"] = true
+	}
+	if user.Human.DisplayName != "" {
+		columnValues["display_name"] = user.Human.DisplayName
+	}
+	if user.Human.Nickname != "" {
+		columnValues["nickname"] = user.Human.Nickname
+	}
+	if user.Human.Gender != domain.HumanGenderUnspecified {
+		columnValues["gender"] = user.Human.Gender
+	}
+	if user.Human.AvatarKey != "" {
+		columnValues["avatar_key"] = user.Human.AvatarKey
 	}
 
 	// we need to cheat a bit here to be able to use CTEChanges
 	// we pretend we have an existing user to be able to use the existing change mechanisms
-	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT $1, $2, $3)", user.InstanceID, user.OrganizationID, user.ID)
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT $1 AS instance_id, $2 AS organization_id, $3 AS id)", user.InstanceID, user.OrganizationID, user.ID)
+	ctes := make(map[string]database.CTEChange)
 
-	// var changes database.Changes
-	var ctes []database.CTEChange
-	// changes = append(changes, u.SetPassword(&domain.VerificationTypeSkipped{
-	// 	Value:     &user.Human.Password.Password,
-	// 	SkippedAt: user.CreatedAt,
-	// }))
-	if user.Human.Password.IsChangeRequired {
-		// changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
-		values["password_change_required"] = true
-	}
-
-	// TODO: set email
 	if user.Human.Email.Unverified != nil {
-		// changes = append(changes, u.SetEmail(&domain.VerificationTypeInit{
-		// 	Value:     &user.Human.Email.Address,
-		// 	CreatedAt: user.CreatedAt,
-		// 	Expiry:    gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt)),
-		// 	Code:      user.Human.Email.Unverified.Code,
-		// }))
-		change := u.SetEmail(&domain.VerificationTypeInit{
+		verification := &domain.VerificationTypeInit{
 			Value:     &user.Human.Email.Address,
 			CreatedAt: user.CreatedAt,
-			Expiry:    gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt)),
 			Code:      user.Human.Email.Unverified.Code,
-		}).(database.CTEChange)
+		}
+		if user.Human.Email.Unverified.Value != nil {
+			verification.Value = user.Human.Email.Unverified.Value
+		}
+		if user.Human.Email.Unverified.ExpiresAt != nil && !user.Human.Email.Unverified.ExpiresAt.IsZero() {
+			verification.Expiry = gu.Ptr(time.Since(*user.Human.Email.Unverified.ExpiresAt))
+		}
+
+		change := u.SetEmail(verification).(database.CTEChange)
 		change.SetName("email_verification")
-		ctes = append(ctes, change)
-		values["email_verification_id"] = func(builder *database.StatementBuilder) {
+		ctes["email_verification"] = change
+		columnValues["unverified_email_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM email_verification)`)
 		}
 	}
-	// TODO: set phone
 	if user.Human.Phone != nil {
 		if user.Human.Phone.Unverified != nil {
-			// changes = append(changes, u.SetPhone(&domain.VerificationTypeInit{
-			// 	Value:     &user.Human.Phone.Number,
-			// 	CreatedAt: user.CreatedAt,
-			// 	Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
-			// 	Code:      user.Human.Phone.Unverified.Code,
-			// }))
-			change := u.SetPhone(&domain.VerificationTypeInit{
+			verification := &domain.VerificationTypeInit{
 				Value:     &user.Human.Phone.Number,
 				CreatedAt: user.CreatedAt,
 				Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
 				Code:      user.Human.Phone.Unverified.Code,
-			}).(database.CTEChange)
+			}
+			if user.Human.Phone.Unverified.Value != nil {
+				verification.Value = user.Human.Phone.Unverified.Value
+			}
+			if user.Human.Phone.Unverified.ExpiresAt != nil && !user.Human.Phone.Unverified.ExpiresAt.IsZero() {
+				verification.Expiry = gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt))
+			}
+
+			change := u.SetPhone(verification).(database.CTEChange)
 			change.SetName("phone_verification")
-			ctes = append(ctes, change)
-			values["phone_verification_id"] = func(builder *database.StatementBuilder) {
+			ctes["phone_verification"] = change
+			columnValues["unverified_phone_id"] = func(builder *database.StatementBuilder) {
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
 			}
 		} else {
-			values["phone"] = user.Human.Phone.Number
-			values["phone_verified_at"] = user.Human.Phone.VerifiedAt
-			// changes = append(changes, u.SetPhone(&domain.VerificationTypeSkipped{
-			// 	Value:     &user.Human.Phone.Number,
-			// 	SkippedAt: user.CreatedAt,
-			// }))
+			columnValues["phone"] = user.Human.Phone.Number
+			columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
 		}
 	}
 	// TODO: add passkeys
@@ -134,8 +138,9 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 	// TODO: set TOTP
 	// TODO: add identity provider links
 	for i, link := range user.Human.IdentityProviderLinks {
-		ctes = append(ctes, u.AddIdentityProviderLink(link).(database.CTEChange))
-		ctes[len(ctes)-1].SetName(fmt.Sprintf("idp_link_%d", i))
+		name := fmt.Sprintf("idp_link_%d", i)
+		ctes[name] = u.AddIdentityProviderLink(link).(database.CTEChange)
+		ctes[name].SetName(name)
 	}
 	// TODO: add verifications
 	// for _, verification := range user.Human.Verifications {
@@ -143,11 +148,14 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 	// }
 
 	// write CTE changes
-	for _, cte := range ctes {
+	for name, cte := range ctes {
 		builder.WriteString(", ")
+		builder.WriteString(name)
+		builder.WriteString(" AS (")
 		cte.WriteCTE(builder)
+		builder.WriteString(")")
 	}
-	columns := slices.Sorted(maps.Keys(values))
+	columns := slices.Sorted(maps.Keys(columnValues))
 
 	// write final insert
 	builder.WriteString(" INSERT INTO zitadel.users (")
@@ -157,7 +165,7 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 		if i > 0 {
 			builder.WriteString(", ")
 		}
-		value := values[column]
+		value := columnValues[column]
 		if fn, ok := value.(func(builder *database.StatementBuilder)); ok {
 			fn(builder)
 			continue

@@ -292,6 +292,29 @@ func NewColumnCondition(col1, col2 Column) Condition {
 	}
 }
 
+// NewInCondition creates a condition that checks if a column is in a set of values.
+// The values can be either literals or columns.
+func NewInCondition(col Column, values ...any) Condition {
+	return valueCondition{
+		col: col,
+		write: func(builder *StatementBuilder) {
+			col.WriteQualified(builder)
+			builder.WriteString(" IN (")
+			for i, value := range values {
+				if i > 0 {
+					builder.WriteString(", ")
+				}
+				if col, ok := value.(Column); ok {
+					col.WriteQualified(builder)
+					continue
+				}
+				builder.WriteArg(value)
+			}
+			builder.WriteString(")")
+		},
+	}
+}
+
 // Write implements [Condition].
 func (c valueCondition) Write(builder *StatementBuilder) {
 	c.write(builder)

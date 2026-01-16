@@ -1,6 +1,6 @@
 CREATE TABLE zitadel.verifications(
     instance_id TEXT NOT NULL
-    , id TEXT NOT NULL
+    , id TEXT NOT NULL DEFAULT gen_random_uuid()::TEXT
 
     , value TEXT
     , code BYTEA

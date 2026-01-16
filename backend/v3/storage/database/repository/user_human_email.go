@@ -109,7 +109,18 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			))
 		}, nil)
 	case *domain.VerificationTypeInit:
-
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, value, code, created_at, expiry) SELECT instance_id, ")
+			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			builder.WriteString(" RETURNING id")
+		}, func(name string) database.Change {
+			return database.NewChangeToStatement(u.emailVerificationIDColumn(), func(builder *database.StatementBuilder) {
+				builder.WriteString("SELECT id FROM ")
+				builder.WriteString(name)
+			})
+		})
 	case *domain.VerificationTypeUpdate:
 		changes := make(database.Changes, 0, 3)
 		if typ.Value != nil {
@@ -172,5 +183,5 @@ func (u userHuman) emailVerifiedAtColumn() database.Column {
 }
 
 func (u userHuman) emailVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email_verification_id")
+	return database.NewColumn(u.unqualifiedTableName(), "unverified_email_id")
 }
