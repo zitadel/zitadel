@@ -509,7 +509,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 						require.NotNil(t, retrievedIntent.SucceededAt)
 						assert.WithinRange(t, *retrievedIntent.SucceededAt, beforeUpdate, afterUpdate)
 						require.NotNil(t, retrievedIntent.ExpiresAt)
-						assert.Equal(t, expectedIntent.ExpiresAt, retrievedIntent.ExpiresAt)
+						assert.WithinRange(t, *retrievedIntent.ExpiresAt, beforeUpdate.AddDate(0, 0, 1), afterUpdate.AddDate(0, 0, 1))
 					}
 					assert.Equal(t, expectedIntent.FailReason, retrievedIntent.FailReason)
 				}

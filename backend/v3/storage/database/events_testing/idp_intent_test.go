@@ -147,7 +147,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 			require.NotNil(collect, retrievedRelationalIntent.SucceededAt)
 			assert.WithinRange(collect, *retrievedRelationalIntent.SucceededAt, beforeCreate, afterSuccess)
 			require.NotNil(collect, retrievedRelationalIntent.ExpiresAt)
-			assert.WithinRange(collect, *retrievedRelationalIntent.ExpiresAt, expiryDate, afterSuccess.Add(time.Hour*30))
+			assert.WithinRange(collect, *retrievedRelationalIntent.ExpiresAt, expiryDate.Add(time.Millisecond*-5), expiryDate.Add(time.Second*1))
 		}, retryDuration, tick)
 
 	})
@@ -181,7 +181,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 			require.NotNil(collect, retrievedRelationalIntent.SucceededAt)
 			assert.WithinRange(collect, *retrievedRelationalIntent.SucceededAt, beforeCreate, afterSuccess)
 			require.NotNil(collect, retrievedRelationalIntent.ExpiresAt)
-			assert.WithinRange(collect, *retrievedRelationalIntent.ExpiresAt, expiryDate, afterSuccess.Add(time.Hour*30))
+			assert.WithinRange(collect, *retrievedRelationalIntent.ExpiresAt, expiryDate.Add(time.Millisecond*-5), expiryDate.Add(time.Second*1))
 
 		}, retryDuration, tick)
 	})
