@@ -601,7 +601,6 @@ module.exports = {
       ],
     },
     {
-    {
       type: "category",
       label: "Configure Identity & Policies",
       collapsed: true,
@@ -715,6 +714,7 @@ module.exports = {
       collapsed: true,
       items: [
         "guides/manage/console/console-overview",
+        "guides/manage/cloud/egress.md",
         {
           type: "category",
           label: "Customer Portal",
