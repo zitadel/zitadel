@@ -64,15 +64,16 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 
 const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
 	", users.state, users.created_at, users.updated_at" +
+	// metadata
 	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'userId', user_metadata.user_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
-	// machine columns
+	// machine
 	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
 	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
 	`, 'accessTokenType', users.access_token_type` +
 	`, 'keys', jsonb_agg(DISTINCT jsonb_build_object('id', machine_keys.id, 'publicKey', encode(machine_keys.public_key, 'base64'), 'createdAt', machine_keys.created_at, 'expiresAt', machine_keys.expires_at, 'type', machine_keys.type)) FILTER (WHERE machine_keys.user_id IS NOT NULL)` +
 	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'publicKey', encode(user_personal_access_tokens.public_key, 'base64'), 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'type', user_personal_access_tokens.type, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +
 	`) END AS machine` +
-	// human columns
+	// human
 	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
 	`, 'nickname', users.nickname, 'displayName', users.display_name` +
 	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
@@ -80,7 +81,7 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
 	`, password, jsonb_build_object('password', encode(users.password, 'base64'), 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts)` +
 	// -- users.password_verification_id
-	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check))` + //TODO: handle nullable
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check), 'pendingVerification', CASE WHEN users.unverified_email_id IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT value, encode(code, 'base64') AS code, created_at+expiry AS "expiresAt", failed_attempts AS "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = users.unverified_email_id) AS res) ELSE NULL END)` + //TODO: handle nullable
 	// -- , users.unverified_email_id
 	// -- , users.email_otp_verification_id
 	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check)) ELSE NULL END` + //TODO: handle nullable
@@ -492,15 +493,15 @@ func (u user) LoadVerifications() domain.UserRepository {
 	panic("unimplemented")
 }
 
-func (u user) joinVerifications() database.QueryOption {
-	conditions := make([]database.Condition, 0, 3)
-	conditions = append(conditions,
-		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.instanceIDColumn()),
-		database.NewInCondition(u.verification.IDColumn(), 
-		 	u.emailVerificationIDColumn(),
-		 	u.phoneVerificationIDColumn(),
-		 	u.totpVerificationIDColumn()
-	),
+// func (u user) joinVerifications() database.QueryOption {
+// 	conditions := make([]database.Condition, 0, 3)
+// 	conditions = append(conditions,
+// 		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.instanceIDColumn()),
+// 		database.NewInCondition(u.verification.IDColumn(),
+// 		 	u.emailVerificationIDColumn(),
+// 		 	u.phoneVerificationIDColumn(),
+// 		 	u.totpVerificationIDColumn(),
+// 	),
 
 // Machine implements [domain.UserRepository.Machine].
 func (u user) Machine() domain.MachineUserRepository {
