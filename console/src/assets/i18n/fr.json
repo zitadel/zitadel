@@ -9,7 +9,7 @@
         "DESCRIPTION": "Complétez les étapes suivantes pour sécuriser votre application.",
         "CREATE_PROJECT": {
           "TITLE": "Créer un projet",
-          "DESCRIPTION": "Ajoutez un projet et définissez ses rôles et autorisations."
+          "DESCRIPTION": "Ajouter un projet et définir ses rôles et attributions de rôles"
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pourriez avoir un seul projet avec 3 applications : une pour votre frontend web, une pour votre application mobile et une pour votre backend. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
       "OWNED": {
         "TITLE": "Projets Possédés",
-        "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les autorisations et les applications."
+        "DESCRIPTION": "Ce sont les projets dont vous êtes propriétaire. Vous pouvez gérer les paramètres, les attributions de rôles et les applications pour ces projets."
       },
       "GRANTED": {
         "TITLE": "Projets Octroyés",
@@ -61,9 +61,9 @@
         "METADATA": "Ajoutez des attributs personnalisés à votre utilisateur comme votre département. Vous pouvez utiliser cette information dans les actions de votre organisation."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorisations",
-      "DESCRIPTION": "Les autorisations définissent les droits d'accès d'un utilisateur à un projet. Vous pouvez octroyer à un utilisateur l'accès à un projet et définir les rôles de l'utilisateur au sein de ce projet."
+    "ROLE ASSIGNMENTS": {
+      "TITLE": "Attributions de rôles",
+      "DESCRIPTION": "Les attributions de rôles définissent les droits d'accès d'un utilisateur à un projet. Vous pouvez accorder à un utilisateur l'accès à un projet et définir les rôles des utilisateurs au sein de ce projet."
     },
     "ACTIONS": {
       "TITLE": "Actions",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Créez un projet",
-        "description": "Ajoutez un projet et définissez ses rôles et autorisations.",
+        "description": "Ajoutez un projet et définissez ses rôles et attributions de rôles.",
         "action": "Créez un projet"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Nouvelle organisation",
     "IAMADMIN": "Vous êtes un administrateur IAM. Notez que vous disposez de permissions étendues.",
     "SHOWORGS": "Afficher toutes les organisations",
-    "GRANTS": "Autorisations",
+    "GRANTS": "Attributions de rôles",
     "ACTIONS": "Actions",
     "PRIVACY": "Vie privée",
     "TOS": "Conditions de service",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
     "ORG_SETTINGS_MANAGER": "A le droit de gérer les paramètres de l'organisation",
-    "ORG_USER_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux utilisateurs",
+    "ORG_USER_PERMISSION_EDITOR": "A l'autorisation de gérer les attributions de rôles",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
     "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
@@ -765,7 +765,7 @@
       "SECURITY": "Mot de passe et sécurité",
       "KEYS": "Clés",
       "PAT": "Jetons d'accès personnels",
-      "USERGRANTS": "Autorisations",
+      "USERGRANTS": "Attributions de rôles",
       "MEMBERSHIPS": "Adhésions",
       "METADATA": "Métadonnées"
     },
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Code de vérification"
     },
     "GRANTS": {
-      "TITLE": "Attribution d'un utilisateur",
+      "TITLE": "Attributions de rôles",
       "DESCRIPTION": "Accorder à cet utilisateur l'accès à certains projets",
       "CREATE": {
-        "TITLE": "Créer une autorisation d'utilisateur",
+        "TITLE": "Créer une attribution de rôles",
         "DESCRIPTION": "Recherchez l'organisation, le projet et les rôles de projet correspondants."
       },
       "PROJECTNAME": "Nom du projet",
@@ -2142,7 +2142,7 @@
       "ASSERTION": "Affirmer les rôles lors de l'authentification",
       "ASSERTION_DESCRIPTION": "Les informations sur les rôles sont envoyées par le point de terminaison Userinfo et, selon les paramètres de votre application, sous forme de jetons ou d'autres types.",
       "CHECK": "Vérifier l'autorisation lors de l'authentification",
-      "CHECK_DESCRIPTION": "Si cette option est définie, les utilisateurs ne sont autorisés à s'authentifier que si un rôle est attribué à leur compte.",
+      "CHECK_DESCRIPTION": "Refuser l'authentification si l'utilisateur n'a aucun rôle attribué à ce projet. Les attributions de rôles au projet sans attribution d'un rôle spécifique à l'utilisateur sont autorisées.",
       "DIALOG": {
         "DELETE_TITLE": "Supprimer un rôle",
         "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un rôle de projet. Êtes-vous sûr ?"
@@ -2510,7 +2510,7 @@
       "DATECHANGED": "Modifié",
       "URLS": "URLs",
       "DELETE": "Supprimer l'application",
-      "JUMPTOPROJECT": "Pour configurer des rôles, des autorisations et bien plus encore, accédez au projet.",
+      "JUMPTOPROJECT": "Pour configurer les rôles, les attributions de rôles et plus encore, accédez au projet.",
       "DETAIL": {
         "TITLE": "Détail",
         "STATE": {
@@ -2786,42 +2786,42 @@
   },
   "ROLESLABEL": "Rôles",
   "GRANTS": {
-    "TITLE": "Autorisations",
-    "DESC": "Ce sont toutes les autorisations sur votre organisation.",
-    "DELETE": "Supprimer une autorisation",
-    "EMPTY": "Aucune autorisation trouvée",
-    "ADD": "Créer une autorisation",
+    "TITLE": "Attributions de rôles",
+    "DESC": "Ce sont toutes les attributions de rôles sur votre organisation.",
+    "DELETE": "Supprimer une attribution de rôle",
+    "EMPTY": "Aucune attribution de rôle trouvée",
+    "ADD": "Créer une attribution de rôle",
     "ADD_BTN": "Nouveau",
     "PROJECT": {
-      "TITLE": "Autorisation",
-      "DESCRIPTION": "Définit les autorisations pour le projet spécifié. Notez que vous ne pouvez voir que les entrées des projets et des utilisateurs pour lesquels vous avez les autorisations."
+      "TITLE": "Attribution de rôle",
+      "DESCRIPTION": "Définissez les attributions de rôles pour le projet spécifié. Notez que vous ne pouvez voir que les entrées des projets et des utilisateurs pour lesquels vous disposez des autorisations."
     },
     "USER": {
-      "TITLE": "Autorisation",
-      "DESCRIPTION": "Définit les autorisations pour l'utilisateur spécifié. Notez que vous pouvez seulement voir les entrées des projets et des utilisateurs pour lesquels vous avez les permissions."
+      "TITLE": "Attribution de rôle",
+      "DESCRIPTION": "Définit les attributions de rôles pour l'utilisateur spécifié. Notez que vous pouvez seulement voir les entrées des projets et des utilisateurs pour lesquels vous avez les permissions."
     },
     "CREATE": {
-      "TITLE": "Créer une autorisation",
+      "TITLE": "Créer une attribution de rôle",
       "DESCRIPTION": "Rechercher l'organisation, le projet et les rôles correspondants."
     },
     "EDIT": {
-      "TITLE": "Modifier l'autorisation"
+      "TITLE": "Modifier l'attribution de rôle"
     },
     "DETAIL": {
-      "TITLE": "Détail de l'autorisation",
-      "DESCRIPTION": "Vous pouvez voir ici tous les détails de l'autorisation."
+      "TITLE": "Détail de l'attribution de rôle",
+      "DESCRIPTION": "Vous pouvez voir ici tous les détails de l'attribution de rôle."
     },
     "TOAST": {
-      "UPDATED": "Autorisation mise à jour.",
-      "REMOVED": "Autorisation supprimée",
-      "BULKREMOVED": "Autorisations supprimées.",
+      "UPDATED": "Attribution de rôle mise à jour",
+      "REMOVED": "Attribution de rôle supprimée",
+      "BULKREMOVED": "Attributions de rôles supprimées.",
       "CANTSHOWINFO": "Vous ne pouvez pas visiter le profil de cet utilisateur car vous n'êtes pas membre de l'organisation à laquelle appartient cet utilisateur."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Supprimer une autorisation",
-      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une autorisation. Voulez-vous continuer ?",
-      "BULK_DELETE_TITLE": "Supprimer des autorisations",
-      "BULK_DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer plusieurs autorisations. Voulez-vous continuer ?"
+      "DELETE_TITLE": "Supprimer une attribution de rôle",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une attribution de rôle. Voulez-vous continuer ?",
+      "BULK_DELETE_TITLE": "Supprimer des attributions de rôles",
+      "BULK_DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer plusieurs attributions de rôles. Voulez-vous continuer ?"
     }
   },
   "CHANGES": {

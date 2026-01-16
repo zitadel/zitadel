@@ -9,7 +9,7 @@
         "DESCRIPTION": "Voltooi de volgende stappen om je applicatie te beveiligen.",
         "CREATE_PROJECT": {
           "TITLE": "Maak een project",
-          "DESCRIPTION": "Voeg een project toe en definieer de rollen en autorisaties."
+          "DESCRIPTION": "Voeg projecten toe en definieer rollen en roltoewijzingen."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele app, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
       "OWNED": {
         "TITLE": "Eigen Projecten",
-        "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
+        "DESCRIPTION": "Dit zijn projecten waarvan u eigenaar bent. U kunt hun instellingen, roltoewijzingen en toepassingen beheren."
       },
       "GRANTED": {
         "TITLE": "Toegekende Projecten",
@@ -61,9 +61,9 @@
         "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Autorisaties",
-      "DESCRIPTION": "Autorisaties bepalen de toegangsrechten van een gebruiker tot een project. Je kunt een gebruiker toegang verlenen tot een project en de rollen van de gebruikers binnen dat project definiëren."
+    "ROLE ASSIGNMENTS": {
+      "TITLE": "Roltoewijzingen",
+      "DESCRIPTION": "\nRoltoewijzingen definiëren de toegangsrechten van gebruikers tot projecten. U kunt gebruikers toegang verlenen tot projecten en hun rollen binnen die projecten definiëren."
     },
     "ACTIONS": {
       "TITLE": "Acties",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Maak een project aan",
-        "description": "Voeg een project toe en definieer de rollen en machtigingen.",
+        "description": "Voeg projecten toe en definieer rollen en roltoewijzingen.",
         "action": "Project aanmaken"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Nieuwe organisatie",
     "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
     "SHOWORGS": "Toon alle organisaties",
-    "GRANTS": "Machtigingen",
+    "GRANTS": "Roltoewijzingen",
     "ACTIONS": "Acties",
     "PRIVACY": "Privacy",
     "TOS": "Algemene voorwaarden",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
     "ORG_SETTINGS_MANAGER": "Heeft toestemming om de instellingen van de organisatie te beheren",
-    "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
+    "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om roltoewijzingen te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
@@ -765,7 +765,7 @@
       "SECURITY": "Wachtwoord en beveiliging",
       "KEYS": "Sleutels",
       "PAT": "Persoonlijke toegangstokens",
-      "USERGRANTS": "Machtigingen",
+      "USERGRANTS": "Roltoewijzingen",
       "MEMBERSHIPS": "Lidmaatschappen",
       "METADATA": "Metadata"
     },
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifieer code"
     },
     "GRANTS": {
-      "TITLE": "Gebruikerstoegang",
+      "TITLE": "Roltoewijzingen",
       "DESCRIPTION": "Verleen deze gebruiker toegang tot bepaalde projecten",
       "CREATE": {
-        "TITLE": "Creëer gebruikerstoegang",
+        "TITLE": "Rol toewijzing aanmaken",
         "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende projectrollen."
       },
       "PROJECTNAME": "Projectnaam",
@@ -2142,7 +2142,7 @@
       "ASSERTION": "Bevestig Rollen bij Authenticatie",
       "ASSERTION_DESCRIPTION": "Rol informatie wordt verzonden vanaf de Userinfo eindpunt en afhankelijk van uw applicatie instellingen in tokens en andere typen.",
       "CHECK": "Controleer autorisatie bij Authenticatie",
-      "CHECK_DESCRIPTION": "Als dit is ingesteld, mogen gebruikers alleen authenticeren als een rol is toegewezen aan hun account.",
+      "CHECK_DESCRIPTION": "Weiger authenticatie als de gebruiker geen rollen heeft toegewezen aan dit project. Roltoewijzingen aan het project zonder een specifieke rol aan de gebruiker toe te wijzen, zijn toegestaan.",
       "DIALOG": {
         "DELETE_TITLE": "Verwijder rol",
         "DELETE_DESCRIPTION": "U staat op het punt om een projectrol te verwijderen. Weet u het zeker?"
@@ -2528,7 +2528,7 @@
       "DATECHANGED": "Gewijzigd",
       "URLS": "URL's",
       "DELETE": "Verwijder App",
-      "JUMPTOPROJECT": "Om rollen, autorisaties en meer te configureren, navigeert u naar het project.",
+      "JUMPTOPROJECT": "Ga naar het project om rollen, roltoewijzingen en meer te configureren.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -2804,42 +2804,42 @@
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
-    "TITLE": "Autorisaties",
-    "DESC": "Dit zijn alle autorisaties op uw organisatie.",
-    "DELETE": "Verwijder Autorisatie",
-    "EMPTY": "Geen autorisatie gevonden",
-    "ADD": "Creëer Autorisatie",
+    "TITLE": "Roltoewijzingen",
+    "DESC": "Dit zijn alle roltoewijzingen binnen uw organisatie.",
+    "DELETE": "Een roltoewijzing verwijderen",
+    "EMPTY": "Geen roltoewijzing gevonden",
+    "ADD": "Creëer Roltoewijzingen",
     "ADD_BTN": "Nieuw",
     "PROJECT": {
-      "TITLE": "Autorisatie",
-      "DESCRIPTION": "Definieer autorisaties voor het gespecificeerde project. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+      "TITLE": "Roltoewijzing",
+      "DESCRIPTION": "Definieer roltoewijzingen voor het gespecificeerde project. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
     },
     "USER": {
-      "TITLE": "Autorisatie",
-      "DESCRIPTION": "Definieer autorisaties voor de gespecificeerde gebruiker. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+      "TITLE": "Roltoewijzing",
+      "DESCRIPTION": "Definieer roltoewijzingen voor de gespecificeerde gebruiker. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
     },
     "CREATE": {
-      "TITLE": "Creëer autorisatie",
+      "TITLE": "Een roltoewijzing maken",
       "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende rollen."
     },
     "EDIT": {
-      "TITLE": "Wijzig autorisatie"
+      "TITLE": "Roltoewijzing wijzigen"
     },
     "DETAIL": {
-      "TITLE": "Autorisatie Detail",
-      "DESCRIPTION": "Hier kunt u alle details van de autorisatie zien."
+      "TITLE": "Details roltoewijzing",
+      "DESCRIPTION": "Hier kunt u alle details van de roltoewijzing zien."
     },
     "TOAST": {
-      "UPDATED": "Autorisatie bijgewerkt.",
-      "REMOVED": "Autorisatie verwijderd",
-      "BULKREMOVED": "Autorisaties verwijderd.",
+      "UPDATED": "Roltoewijzing bijgewerkt",
+      "REMOVED": "Roltoewijzing verwijderd",
+      "BULKREMOVED": "Roltoewijzingen verwijderd.",
       "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen lid bent van de organisatie waartoe deze gebruiker behoort"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Verwijder autorisatie",
-      "DELETE_DESCRIPTION": "U staat op het punt om een autorisatie te verwijderen. Wilt u doorgaan?",
-      "BULK_DELETE_TITLE": "Verwijder autorisaties",
-      "BULK_DELETE_DESCRIPTION": "U staat op het punt om meerdere autorisaties te verwijderen. Wilt u doorgaan?"
+      "DELETE_TITLE": "Verwijder roltoewijzing",
+      "DELETE_DESCRIPTION": "U staat op het punt om een roltoewijzing te verwijderen. Wilt u doorgaan?",
+      "BULK_DELETE_TITLE": "Verwijder roltoewijzingen",
+      "BULK_DELETE_DESCRIPTION": "U staat op het punt om meerdere roltoewijzingen te verwijderen. Wilt u doorgaan?"
     }
   },
   "CHANGES": {

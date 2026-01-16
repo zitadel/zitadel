@@ -15,6 +15,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta;au
 
 // AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //
+// Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+//
 // For managing permissions and roles for ZITADEL internal resources, like organizations, projects,
 // users, etc., please use the InternalPermissionService.
 //
@@ -26,6 +28,8 @@ service AuthorizationService {
   // Deprecated: please move to the corresponding endpoint under authorization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // ListAuthorizations returns all authorizations matching the request and necessary permissions.
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // Required permissions:
   //   - "user.grant.read"
@@ -65,6 +69,8 @@ service AuthorizationService {
   // Deprecated: please move to the corresponding endpoint under authorization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // CreateAuthorization creates a new authorization for a user in an owned or granted project.
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // Required permissions:
   //   - "user.grant.write"
@@ -114,6 +120,8 @@ service AuthorizationService {
   //
   // UpdateAuthorization updates the authorization.
   //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
   // Note that any role keys previously granted to the user and not present in the request will be revoked.
   //
   // Required permissions:
@@ -157,6 +165,8 @@ service AuthorizationService {
   // Deprecated: please move to the corresponding endpoint under authorization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // DeleteAuthorization deletes the authorization.
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // In case the authorization is not found, the request will return a successful response as
   // the desired state is already achieved.
@@ -203,6 +213,8 @@ service AuthorizationService {
   //
   // ActivateAuthorization activates an existing but inactive authorization.
   //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
   // In case the authorization is already active, the request will return a successful response as
   // the desired state is already achieved.
   // You can check the change date in the response to verify if the authorization was activated by the request.
@@ -248,6 +260,8 @@ service AuthorizationService {
   // Deprecated: please move to the corresponding endpoint under authorization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // DeactivateAuthorization deactivates an existing and active authorization.
+  //
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // In case the authorization is already inactive, the request will return a successful response as
   // the desired state is already achieved.
@@ -312,6 +326,7 @@ message ListAuthorizationsResponse {
 
 message CreateAuthorizationRequest {
   // UserID is the ID of the user who should be granted the authorization.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -360,6 +375,7 @@ message CreateAuthorizationRequest {
 
 message CreateAuthorizationResponse {
   // ID is the unique identifier of the newly created authorization.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
@@ -375,6 +391,7 @@ message CreateAuthorizationResponse {
 
 message UpdateAuthorizationRequest {
   // ID is the unique identifier of the authorization.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -414,6 +431,7 @@ message UpdateAuthorizationResponse {
 
 message DeleteAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be deleted.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -435,6 +453,7 @@ message DeleteAuthorizationResponse {
 
 message ActivateAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be activated.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -456,6 +475,7 @@ message ActivateAuthorizationResponse {
 
 message DeactivateAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be deactivated.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

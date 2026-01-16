@@ -184,9 +184,9 @@ This object represents [the claims](../openidoauth/claims) which will be written
 
 Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects-overview#role-settings) and your [application](../../guides/manage/console/applications-overview#token-settings)
 
-## user grant list
+## role assignments list
 
-This object represents a list of user grant stored in ZITADEL.
+This object represents a list of roles assigned to a user stored in ZITADEL.
 
 - `count` *Number*
 - `sequence` *Number*

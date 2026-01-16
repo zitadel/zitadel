@@ -9,7 +9,7 @@
         "DESCRIPTION": "Führe die folgenden Schritte aus, um deine Anwendung zu sichern.",
         "CREATE_PROJECT": {
           "TITLE": "Erstelle ein Projekt",
-          "DESCRIPTION": "Füge ein Projekt hinzu und definiere Rollen und Berechtigungen."
+          "DESCRIPTION": "Füge ein Projekt hinzu und definiere Rollen und Rollenzuweisungen."
         }
       },
       "MORE_SHORTCUTS": {
@@ -37,7 +37,7 @@
       "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile App und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
       "OWNED": {
         "TITLE": "Eigene Projekte",
-        "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
+        "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Rollenzuweisungen und Anwendungen dieser Projekte verwalten."
       },
       "GRANTED": {
         "TITLE": "Gewährte Projekte",
@@ -61,9 +61,9 @@
         "METADATA": "Füge deinem Benutzer benutzerdefinierte Attribute hinzu, wie deine Abteilung. Du kannst diese Informationen in den Aktionen deiner Organisation nutzen."
       }
     },
-    "AUTHORIZATIONS": {
-      "TITLE": "Berechtigungen",
-      "DESCRIPTION": "Berechtigungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts einstellen."
+    "ROLE ASSIGNMENTS": {
+      "TITLE": "Rollenzuweisungen",
+      "DESCRIPTION": "Rollenzuweisungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts einstellen."
     },
     "ACTIONS": {
       "TITLE": "Aktionen",
@@ -382,7 +382,7 @@
       },
       "PROJECT_CREATED": {
         "title": "Erstelle ein Projekt",
-        "description": "Erstelle dein erstes Projekt und definiere Rollen",
+        "description": "Erstelle dein erstes Projekt und definiere dessen Rollen und Rollenzuweisungen.",
         "action": "Projekt erstellen"
       },
       "APPLICATION_CREATED": {
@@ -429,7 +429,7 @@
     "NEWORG": "Neue Organisation",
     "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
-    "GRANTS": "Berechtigungen",
+    "GRANTS": "Rollenzuweisungen",
     "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
@@ -661,7 +661,7 @@
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
     "ORG_SETTINGS_MANAGER": "Hat die Berechtigung, die Einstellungen der Organisation zu verwalten",
-    "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
+    "ORG_USER_PERMISSION_EDITOR": "Hat die Berechtigung, Rollenzuweisungen zu verwalten",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
@@ -765,7 +765,7 @@
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Berechtigungen",
+      "USERGRANTS": "Rollenzuweisungen",
       "MEMBERSHIPS": "Mitgliedschaften",
       "METADATA": "Metadaten"
     },
@@ -1081,10 +1081,10 @@
       "ENTERCODE_DESC": "Verifikationscode senden und verifizieren."
     },
     "GRANTS": {
-      "TITLE": "Benutzerberechtigungen",
+      "TITLE": "Rollenzuweisungen",
       "DESCRIPTION": "Erteile diesem Benutzer Verwaltungszugriff auf bestimmte Projekte.",
       "CREATE": {
-        "TITLE": "Benutzerberechtigung erstellen",
+        "TITLE": "Rollenzuweisungen erstellen",
         "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
       },
       "PROJECTNAME": "Projektname",
@@ -2509,7 +2509,7 @@
       "DATECHANGED": "Geändert",
       "URLS": "URLs",
       "DELETE": "App löschen",
-      "JUMPTOPROJECT": "Um Rollen, Berechtigungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
+      "JUMPTOPROJECT": "Um Rollen, Rollenzuweisungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
       "DETAIL": {
         "TITLE": "Details",
         "STATE": {
@@ -2785,42 +2785,42 @@
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
-    "TITLE": "Berechtigungen",
-    "DESC": "Hier werden alle Berechtigungen deiner Organisation angezeigt.",
-    "DELETE": "Berechtigung löschen",
-    "EMPTY": "Keine Berechtigungen gefunden",
-    "ADD": "Berechtigung erstellen",
+    "TITLE": "Rollenzuweisungen",
+    "DESC": "Hier werden alle Rollenzuweisungen deiner Organisation angezeigt.",
+    "DELETE": "Rollenzuweisung löschen",
+    "EMPTY": "Keine Rollenzuweisung gefunden",
+    "ADD": "Rollenzuweisung erstellen",
     "ADD_BTN": "Neu",
     "PROJECT": {
-      "TITLE": "Autorisierung",
+      "TITLE": "Rollenzuweisung",
       "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
     },
     "USER": {
-      "TITLE": "Autorisierung",
+      "TITLE": "Rollenzuweisung",
       "DESCRIPTION": "Definiere die Operationen und Rechte, die dem Benutzer zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen, für die Du eine Autorisierung besitzt."
     },
     "CREATE": {
-      "TITLE": "Autorisierung erstellen",
+      "TITLE": "Rollenzuweisung erstellen",
       "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
     },
     "EDIT": {
-      "TITLE": "Autorisierung bearbeiten"
+      "TITLE": "Rollenzuweisung bearbeiten"
     },
     "DETAIL": {
-      "TITLE": "Autorisierungsdetails",
+      "TITLE": "Details zur Rollenzuweisung",
       "DESCRIPTION": ""
     },
     "TOAST": {
-      "UPDATED": "Berechtigung geändert.",
-      "REMOVED": "Berechtigung entfernt.",
-      "BULKREMOVED": "Berechtigungen entfernt.",
+      "UPDATED": "Rollenzuweisung geändert.",
+      "REMOVED": "Rollenzuweisung entfernt.",
+      "BULKREMOVED": "Rollenzuweisungen entfernt.",
       "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Mitglied der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Authorisierung löschen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Autorisierung zu entfernen. Wollen Sie fortfahren?",
-      "BULK_DELETE_TITLE": "Autorisierungen löschen",
-      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
+      "DELETE_TITLE": "Rollenzuweisung löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rollenzuweisung zu entfernen. Wollen Sie fortfahren?",
+      "BULK_DELETE_TITLE": "Rollenzuweisungen löschen",
+      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Rollenzuweisungen zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "CHANGES": {

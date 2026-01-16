@@ -69,6 +69,7 @@ message Project {
 
   // AuthorizationRequired is a boolean flag that can be enabled to check if a user has
   // an authorization to use this project assigned when login into an application of this project.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   bool authorization_required = 8;
 
   // ProjectAccessRequired is a boolean flag that can be enabled to check if the organization of the user,
@@ -213,6 +214,7 @@ message ProjectRole {
 
   // Key of the project role. The key identifies the role. It's the only relevant attribute for ZITADEL and
   // will be used for authorization checks and as claim in tokens and user info responses.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string key = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"role.super.man\""}];
 
   // CreationDate is the timestamp of the project role creation.

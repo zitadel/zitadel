@@ -25,6 +25,7 @@ service ProjectService {
   // Create a new project. A project is a vessel to group applications, roles and
   // authorizations. Every project belongs to exactly one organization, but
   // can be granted to other organizations for self-management of their authorizations.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // Required permission:
   //   - `project.create`
@@ -187,6 +188,7 @@ service ProjectService {
   // Grant a project to another organization.
   // The project grant will allow the granted organization to access the project and manage
   // the authorizations for its users.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // Required permission:
   //   - `project.grant.create`

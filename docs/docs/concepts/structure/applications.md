@@ -7,7 +7,7 @@ import AppType from "../../guides/manage/console/_application-types.mdx";
 
 Applications are the entry point to your project.
 [Users](users.md) either login into one of your clients and interact with them directly or use one of your APIs.
-All applications share the roles and authorizations of their [project](projects.md).
+All applications share the roles and role assignments of their [project](projects.md).
 
 ## Supported application types
 

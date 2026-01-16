@@ -690,6 +690,7 @@ message PersonalAccessToken {
     ];
 }
 
+// User grants are the roles users have for a specific project and organization.
 message UserGrant {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

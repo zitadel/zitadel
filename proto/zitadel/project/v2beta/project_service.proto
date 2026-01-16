@@ -517,6 +517,7 @@ service ProjectService {
   //
   // Grant a project to another organization.
   // The project grant will allow the granted organization to access the project and manage the authorizations for its users.
+  // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   //
   // Required permission:
   //   - `project.grant.create`
