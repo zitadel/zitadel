@@ -1,0 +1,123 @@
+---
+title: Configure OKTA as a SAML Identity Provider in ZITADEL
+sidebar_label: OKTA SAML
+id: okta-saml
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import PrefillAction from './_prefill_action.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="OKTA"/>
+
+## ZITADEL Configuration
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="SAML"/>
+
+### Create a new SAML Provider
+
+To be able to create the application in OKTA we need the provider id from ZITADEL.
+1. Create a new SAML Provider with a name and a random text in the Metadata Xml field.
+We will fill that as soon as we have done the configuration in OKTA.
+2. Save Configuration
+
+As an alternative you can add the SAML identity provider through the API, either on the default settings or on a specific organization:
+- [Add Default SAML Identity Provider](/docs/apis/resources/admin/admin-service-add-saml-provider)
+- [Add SAML Identity Provider on Organization](/docs/apis/resources/mgmt/management-service-add-saml-provider)
+
+![OKTA Provider Empty](/img/guides/zitadel_okta_saml_provider_empty.png)
+
+After you created the SAML Provider in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
+
+![OKTA SAML App URLs](/img/guides/zitadel_okta_saml_provider_urls.png)
+
+## OKTA Configuration
+
+### Register a new client
+
+1. Log in to your OKTA Account and go to the applications list: `OKTA-DOMAIN/admin/apps/active`
+2. Click on "Create App Integration" and choose "SAML 2.0"
+3. Give the application a name
+4. Click on the ZITADEL URLs that your SAML IDP shows since you created it in ZITADEL and paste them accordingly:
+- **Single sign-on URL**: Paste the *ZITADEL ACS Login Form URL*.
+- **Audience URI (SP Entity ID)**: Paste the *ZITADEL Metadata URL*
+5. Save the configuration
+6. Copy the metadata URL from the details
+
+![Add new SAML Application in OKTA](/img/guides/okta_add_saml_app.png)
+
+### Add Attribute Statements
+
+To send the user data from OKTA to ZITADEL you have to add some attribute mappings in your SAML Settings
+You can define the name by yourself, just ensure you use the same later on in the ZITADEL Action we will add.
+
+Add the following three mappings:
+
+| Name         | Name format | Value          |
+| ------------ | ----------- |--------------- |
+| givenname    | Basic       | user.firstName |
+| surname      | Basic       | user.lastName  |
+| emailaddress | Basic       | user.email     |
+
+![Add Attribute Mapping ](/img/guides/okta_saml_attribute_mapping.png)
+
+### Assign Users to Application
+
+To allow users to authenticate with that app go to the "Assign" Tab.
+1. Click the Assign Button
+2. Choose Assign To People
+3. Select the users you like to be able to authenticate
+
+![Add new SAML Application in OKTA](/img/guides/okta_assign_user_to_app.png)
+
+## Finish ZITADEL Configuration
+
+You are now finished with the configuration in OKTA and you can switch back to your identity provider configuration in ZITADEL.
+
+### Add Metadata Xml
+
+Add [the metadata URL you have saved before from OKTA](#register-a-new-client) to the Metadata URL.
+As soon as you have saved the provider, and you have a look at the detail you should now see the Metadata Xml field filled.
+
+If you prefer changing the configuration through the API you can update the SAML provider on the default settings or a specific organization:
+- [Update Default SAML Identity Provider](/docs/apis/resources/admin/admin-service-update-saml-provider)
+- [Update SAML Identity Provider on Organization](/docs/apis/resources/mgmt/management-service-update-saml-provider)
+
+![OKTA Provider Empty](/img/guides/zitadel_okta_saml_provider_filled.png)
+
+You can also fill the optional fields if needed:
+
+<GeneralConfigDescription provider_account="OKTA account" />
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the OKTA Provider](/img/guides/zitadel_activate_okta_saml.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
+
+## Test the setup
+
+<TestSetup loginscreen="your OKTA login"/>
+
+![OKTA Button](/img/guides/zitadel_login_okta.png)
+
+![OKTA Login](/img/guides/okta_login.png)
+
+### Add Action to map user attributes
+
+<PrefillAction fields="username, firstname, lastname, email and email verified" provider="OKTA"/>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_form.js
+```
+

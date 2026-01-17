@@ -1,0 +1,67 @@
+---
+title: Install ZITADEL on MacOS
+sidebar_label: MacOS
+---
+
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+
+## Install PostgreSQL
+
+Download a `postgresql` binary as described [in the PostgreSQL docs](https://www.postgresql.org/download/macosx/).
+ZITADEL is tested against PostgreSQL latest stable tag and latest Ubuntu LTS.
+
+## Run PostgreSQL
+
+```bash
+sudo pg_ctl init -D /tmp/postgresql
+sudo pg_ctl start -D /tmp/postgresql
+```
+
+## Install ZITADEL
+
+### Homebrew
+
+```bash
+brew install zitadel/tap/zitadel
+```
+
+### Download from GitHub
+
+Download the ZITADEL release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest)
+
+## Unpack the archive
+move to your download location and unpack the archive
+
+```bash
+#unpack and copy to /usr/local/bin
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_Darwin_$(uname -m).tar.gz  | tar -xJ zitadel && sudo mv zitadel /usr/local/bin
+```
+
+## Run ZITADEL
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+<DefaultUser components={props.components} />
+<NoteInstanceNotFound/>
+
+## VideoGuide
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/Ob-kBzmezeg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Setup ZITADEL with a service account
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+
+# then you can move your machine key
+mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
+```
+
+This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform-provider).
+
+<Next components={props.components} />
+<Disclaimer components={props.components} />

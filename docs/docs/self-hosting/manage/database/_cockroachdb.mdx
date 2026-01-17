@@ -1,0 +1,39 @@
+## Zitadel v2 with Cockroach
+
+:::warning
+Zitadel v3 removed CockroachDB support. See the [CLI mirror guide](../cli/mirror) for migrating to PostgreSQL.
+:::
+
+The default database of Zitadel v2 is [CockroachDB](https://www.cockroachlabs.com). The SQL database provides a bunch of features like horizontal scalability, data regionality and many more.
+
+Currently versions >= 25.1 are supported.
+
+The default configuration of the database looks like this:
+
+```yaml
+Database:
+  cockroach:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+    Admin:
+      Username: root
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+```

@@ -1,0 +1,230 @@
+---
+title: Mirror data from cockroach to postgres
+sidebar_label: Mirror command
+---
+
+The `mirror` command allows you to do database to database migrations. This functionality is useful to copy data from one database to another.
+
+The data can be mirrored to multiple database without influencing each other.
+
+## Use cases
+
+Migrate from cockroachdb to postgres.
+
+Replicate data to a secondary environment for testing.
+
+## Prerequisites
+
+You need an existing source database, most probably the database Zitadel currently serves traffic from.
+
+To mirror the data, the destination database needs to be initialized and set up without an instance. You can find the commands to start an empty Zitadel deployment in [the example section](#prepare-the-destination-database).
+
+### Start the destination database 
+
+Follow one of the following guides to start the database:
+
+* [Linux](/docs/self-hosting/deploy/linux#run-postgresql)
+* [MacOS](/docs/self-hosting/deploy/macos#install-postgresql)
+
+Or use the following commands for [Docker Compose](/docs/self-hosting/deploy/compose)
+
+```bash
+# Download the docker compose example configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
+
+# Run the database and application containers.
+docker compose up db --detach
+```
+
+## Example
+
+### Prepare the destination database
+
+The following commands setup the database without an instance.
+
+```bash
+zitadel init --config /path/to/your/new/config.yaml
+zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+```
+
+### Mirror the data
+
+The next step is to copy the data from the source to the destination database. For detailed configuration options, please refer to the [configuration section](#configuration).
+
+```bash
+zitadel mirror --system --config /path/to/your/mirror/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+```
+
+### Initialize the data and verify
+
+The last step is to setup the permissions and verify the data, there might be differences between source and destination, refer to [`zitadel mirror verify`](#zitadel-mirror-verify) to get an overview of possible diffs.
+
+```bash
+zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+zitadel mirror verify --system --config /path/to/your/mirror/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+```
+
+## Usage
+
+The general syntax for the mirror command is:
+
+```bash
+zitadel mirror [flags]
+
+Flags:
+  -h, --help                     help for mirror
+
+      --config stringArray       path to config file to overwrite system defaults
+
+      --ignore-previous          ignores previous migrations of the events table. This flag should be used if you manually dropped previously mirrored events.
+      --replace                  replaces all data of the following tables for the provided instances or all if the `--system`-flag is set:
+                                 * system.assets
+                                 * auth.auth_requests
+                                 * eventstore.unique_constraints
+                                 The should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.
+
+      --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
+      --system                   migrates the whole system. Either this or the `--instance`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
+
+# For the flags below use the same configuration you also use in the current deployment
+
+      --masterkey string         masterkey as argument for en/decryption keys
+  -m, --masterkeyFile string     path to the masterkey for en/decryption keys
+      --masterkeyFromEnv         read masterkey for en/decryption keys from environment variable (ZITADEL_MASTERKEY)
+      --tlsMode externalSecure   start Zitadel with (enabled), without (disabled) TLS or external component e.g. reverse proxy (external) terminating TLS, this flag will overwrite externalSecure and `tls.enabled` in configs files
+```
+
+## Configuration
+
+```yaml
+# The source database the data are copied from. Use either cockroach or postgres, by default cockroach is used
+Source:
+  cockroach:
+    Host: localhost # ZITADEL_SOURCE_COCKROACH_HOST
+    Port: 26257 # ZITADEL_SOURCE_COCKROACH_PORT
+    Database: zitadel # ZITADEL_SOURCE_COCKROACH_DATABASE
+    MaxOpenConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_SOURCE_COCKROACH_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_SOURCE_COCKROACH_MAXCONNIDLETIME
+    Options: "" # ZITADEL_SOURCE_COCKROACH_OPTIONS
+    User:
+      Username: zitadel # ZITADEL_SOURCE_COCKROACH_USER_USERNAME
+      Password: "" # ZITADEL_SOURCE_COCKROACH_USER_PASSWORD
+      SSL:
+        Mode: disable # ZITADEL_SOURCE_COCKROACH_USER_SSL_MODE
+        RootCert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_CERT
+        Key: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_KEY
+  # Postgres is used as soon as a value is set
+  # The values describe the possible fields to set values
+  postgres:
+    Host: # ZITADEL_SOURCE_POSTGRES_HOST
+    Port: # ZITADEL_SOURCE_POSTGRES_PORT
+    Database: # ZITADEL_SOURCE_POSTGRES_DATABASE
+    MaxOpenConns: # ZITADEL_SOURCE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: # ZITADEL_SOURCE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: # ZITADEL_SOURCE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: # ZITADEL_SOURCE_POSTGRES_MAXCONNIDLETIME
+    Options: # ZITADEL_SOURCE_POSTGRES_OPTIONS
+    User:
+      Username: # ZITADEL_SOURCE_POSTGRES_USER_USERNAME
+      Password: # ZITADEL_SOURCE_POSTGRES_USER_PASSWORD
+      SSL:
+        Mode: # ZITADEL_SOURCE_POSTGRES_USER_SSL_MODE
+        RootCert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_CERT
+        Key: # ZITADEL_SOURCE_POSTGRES_USER_SSL_KEY
+
+# The destination database the data are copied to. Use either cockroach or postgres, by default cockroach is used
+Destination:
+  postgres:
+    Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
+    Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    MaxOpenConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DATABASE_POSTGRES_OPTIONS
+    User:
+      Username: zitadel # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
+      Password: "" # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      SSL:
+        Mode: disable # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
+        Key: "" # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+
+# As cockroachdb first copies the data into memory this parameter is used to iterate through the events table and fetch only the given amount of events per iteration
+EventBulkSize: 10000 # ZITADEL_EVENTBULKSIZE
+# The maximum duration an auth request was last updated before it gets ignored.
+# Default is 30 days
+MaxAuthRequestAge: 720h # ZITADEL_MAXAUTHREQUESTAGE
+
+Projections:
+  # Defines how many projections are allowed to run in parallel
+  ConcurrentInstances: 7 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
+  # Limits the amount of events projected by each iteration
+  EventBulkLimit: 1000 # ZITADEL_PROJECTIONS_EVENTBULKLIMIT
+
+Auth:
+  Spooler:
+    # Limits the amount of events projected by each iteration
+    BulkLimit: 1000 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
+
+Admin:
+  Spooler:
+    # Limits the amount of events projected by each iteration
+    BulkLimit: 10 #ZITADEL_ADMIN_SPOOLER_BULKLIMIT
+
+Log:
+  Level: info
+```
+
+## Sub commands
+
+The provided sub commands allow more fine grained execution of copying the data.
+
+The following commands are safe to execute multiple times by adding the `--replace`-flag which replaces the data not provided by the events in the destination database.
+
+### `zitadel mirror auth`
+
+Copies the auth requests to the destination database.
+
+### `zitadel mirror eventstore`
+
+Copies the events since the last migration and unique constraints to the destination database.
+
+### `zitadel mirror projections`
+
+Executes all projections in the destination database.
+
+It is NOOP if the projections are already up-to-date. 
+
+### `zitadel mirror system`
+
+Copies encryption keys and assets to the destination database.
+
+### `zitadel mirror verify`
+
+Prints the amount of rows of the source and destination database and the diff. Positive numbers indicate more rows in the destination table that in the source, negative numbers the opposite.
+
+The following tables will likely have an unequal count:
+
+* **projections.current_states**: If your deployment was upgraded several times, the number of entries in the destination will be lower
+* **projections.locks**: If your deployment was upgraded several times, the number of entries in the destination will be lower
+* **projections.keys4\***: Only not expired keys are inserted, the number of entries in the destination will be lower
+* **projections.failed_events**: Should be lower or equal.
+* **auth.users2**: Was replaced with auth.users3, the number of entries in the destination will be 0
+* **auth.users3**: Is the replacement of auth.users2, the number of entries in the destination will be equal or higher
+
+## Limitations
+
+It is not possible to use files as source or destination. See github issue [here](https://github.com/zitadel/zitadel/issues/7966)
+
+Currently the encryption keys of the source database must be copied to the destination database. See github issue [here](https://github.com/zitadel/zitadel/issues/7964)
+
+It is not possible to change the domain of the Zitadel deployment.
+
+Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag 

@@ -1,0 +1,17 @@
+ZITADEL is organized around the idea that:
+
+* Multiple organizations can be managed within one [instance](/concepts/structure/instance).
+* organizations can grant each other rights to self-manage certain aspects of the IAM (eg, roles for access management)
+* organizations are vessels for users and projects
+
+![Overview ZITADEL Organizations](/img/concepts/objects/organization.png)
+
+Organizations in ZITADEL are therefore comparable to tenants of a system or organizational units of a directory based system.
+
+You can use projects within your organization to manage the security context of closely related components, such as roles, grants and authorizations for multiple clients. You can set up multiple projects within your organization.
+
+ZITADEL allows you to give other organizations permission to manage certain aspects of a project within your organization on their own. This means you could set up a project with roles that should exist within your service/software, but allow another organization to allocate the roles to users within their own organization. As a service provider, you will find this feature useful, as it allows you to establish a self-service culture for your business customers.
+
+![Organization Grant](/img/concepts/objects/organization_grants.png)
+
+Each organization has its own pool of usernames, which includes human and service users, for its domain (`{username}@{domainname}.{zitadeldomain}`). A username is unique within your organization. You can configure ZITADEL to use your own domain, and simplify user experience (`{loginname}@{yourdomain.tld}`).

@@ -1,0 +1,102 @@
+---
+title: machine jwt profile grant benchmark of zitadel v2.66.0
+sidebar_label: machine jwt profile grant
+---
+
+The tests showed heavy database load by time by the first two database queries. These queries need to be analyzed further.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 15:39 UTC |
+| Test duration                         | 30min |
+| Executed test                         | machine\_jwt\_profile\_grant |
+| k6 version                            | v0.54.0 |
+| VUs                                   | 150 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 2<br/> Memory: 512 Mib <br/>Container count: 5 |
+| ZITADEL Version                       | v2.66.0 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v15.8 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: Write events using the newly added eventstore.push function<br/>2: Query events by instance\_id, aggregate\_type, aggregate\_id, event\_types<br/>3: Query user<br/> |
+| k6 Iterations per second              | 439 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | Scale out |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+     ✓ openid configuration
+     ✗ token status ok
+      ↳  99% — ✓ 790655 / ✗ 5
+     ✗ access token returned
+      ↳  99% — ✓ 790655 / ✗ 5
+
+     █ setup
+
+       ✓ user defined
+       ✓ authorize status ok
+       ✓ login name status ok
+       ✓ login shows password page
+       ✓ password status ok
+       ✓ password callback
+       ✓ code set
+       ✓ token status ok
+       ✓ access token created
+       ✓ id token created
+       ✓ info created
+       ✓ org created
+       ✓ create user is status ok
+       ✓ generate machine key status ok
+
+     █ teardown
+
+       ✓ org removed
+
+     checks...............................: 99.99% ✓ 1581773    ✗ 10    
+     data_received........................: 1.1 GB 623 kB/s
+     data_sent............................: 628 MB 347 kB/s
+     http_req_blocked.....................: min=167ns    avg=20.68µs  max=493.59ms p(50)=468ns    p(95)=717ns    p(99)=928ns   
+     http_req_connecting..................: min=0s       avg=10.06µs  max=388.27ms p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_duration....................: min=17.71ms  avg=337.34ms max=16.27s   p(50)=249.03ms p(95)=888.75ms p(99)=1.4s    
+       { expected_response:true }.........: min=17.71ms  avg=337.29ms max=3.56s    p(50)=249.03ms p(95)=888.7ms  p(99)=1.4s    
+     http_req_failed......................: 0.00%  ✓ 5          ✗ 791265
+     http_req_receiving...................: min=25.49µs  avg=1.58ms   max=539.43ms p(50)=89.69µs  p(95)=7.55ms   p(99)=23.46ms 
+     http_req_sending.....................: min=22.7µs   avg=69.14µs  max=480.23ms p(50)=59.16µs  p(95)=85.15µs  p(99)=129.88µs
+     http_req_tls_handshaking.............: min=0s       avg=9.38µs   max=98.15ms  p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_waiting.....................: min=15.11ms  avg=335.69ms max=16.26s   p(50)=246.91ms p(95)=888.27ms p(99)=1.4s    
+     http_reqs............................: 791270 437.256468/s
+     iteration_duration...................: min=32.28ms  avg=341.46ms max=16.27s   p(50)=253ms    p(95)=892.49ms p(99)=1.41s   
+     iterations...........................: 790660 436.919382/s
+     login_ui_enter_login_name_duration...: min=179.27ms avg=179.27ms max=179.27ms p(50)=179.27ms p(95)=179.27ms p(99)=179.27ms
+     login_ui_enter_password_duration.....: min=17.71ms  avg=17.71ms  max=17.71ms  p(50)=17.71ms  p(95)=17.71ms  p(99)=17.71ms 
+     login_ui_init_login_duration.........: min=77.66ms  avg=77.66ms  max=77.66ms  p(50)=77.66ms  p(95)=77.66ms  p(99)=77.66ms 
+     login_ui_token_duration..............: min=86.79ms  avg=86.79ms  max=86.79ms  p(50)=86.79ms  p(95)=86.79ms  p(99)=86.79ms 
+     oidc_token_duration..................: min=28.38ms  avg=337.54ms max=16.27s   p(50)=249.17ms p(95)=889.01ms p(99)=1.4s    
+     org_create_org_duration..............: min=44.94ms  avg=44.94ms  max=44.94ms  p(50)=44.94ms  p(95)=44.94ms  p(99)=44.94ms 
+     user_add_machine_key_duration........: min=38.11ms  avg=66.64ms  max=160.59ms p(50)=60.28ms  p(95)=104.99ms p(99)=112.5ms 
+     user_create_machine_duration.........: min=37.12ms  avg=122.76ms max=1.03s    p(50)=78.25ms  p(95)=266.95ms p(99)=306.94ms
+     vus..................................: 150    min=0        max=150 
+     vus_max..............................: 150    min=150      max=150 
+
+
+running (30m09.6s), 000/150 VUs, 790660 complete and 0 interrupted iterations
+default ✓ [======================================] 150 VUs  30m0s
+```
+

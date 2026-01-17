@@ -1,0 +1,9 @@
+| Property          | Description                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| access_token      | An `access_token` as opaque token or JWT for the subject user                        |
+| token_type        | Type of the `access_token`. Value can be `Bearer` or `N_A`                           |
+| issued_token_type | [Token type](#token-types) of the returned token, matches the `requested_token_type` |
+| refresh_token     | A refresh token if the `offline_access` scope was requested                          |
+| id_token          | An ID Token of the subject user, only with `openid` scope                            |
+| expires_in        | Number of second until the expiration of the `access_token`                          |
+| scope             | Scopes of the `access_token`. These might differ from the provided `scope` parameter |

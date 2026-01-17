@@ -1,0 +1,17 @@
+Per default the login ui of the default organization is shown.
+To allow users of a specific organization to register with their IDP (e.g Entra ID) you have two options.
+
+1. Identify organization with organization scope
+
+By sending the organization scope in the authorization request to ZITADEL the specified organization will directly be triggered.
+The configured settings of that organization such as IDPs will directly be shown.
+If only one IDP is configured and local accounts are disabled the user will directly be redirected to the external provider.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+2. Domain Discovery
+
+When domain discovery is enabled, ZITADEL is able to identify the entered domain of a user and match it to a specific organization.
+If you want to know more about domain discovery and how to set it up please read the following guide:
+[Domain Discovery in ZITADEL](/docs/guides/solution-scenarios/domain-discovery)

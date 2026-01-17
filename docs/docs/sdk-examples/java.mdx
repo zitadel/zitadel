@@ -1,0 +1,101 @@
+---
+title: Java Spring Boot
+sidebar_label: Java Spring Boot
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/java.svg" alt="java logo"/>
+        </td>
+        <td>
+            <a href="https://www.java.com/" target="_blank">Java</a> is a general-purpose programming language designed for object-oriented programming.
+            <a href="https://spring.io/projects/spring-security/" target="_blank">Spring Security</a> is used to protect your applications from unauthorized access, protect sensitive data, and enforce access control policies.
+            Get started integrating authentication to your Java Web App or API by checking out our <a href="https://github.com/zitadel/zitadel-java" target="_blank">zitadel-java</a> Example
+        </td>
+    </tr>
+</table>
+
+
+### Resources
+- [Example App Repository with Spring Security](https://github.com/zitadel/zitadel-java)
+- [Example Web App with Spring Security](https://github.com/zitadel/zitadel-java/tree/main/web)
+- [Example API App with Spring Security](https://github.com/zitadel/zitadel-java/tree/main/api)
+- [Web APP Step-By-Step Guide](/docs/examples/login/java-spring)
+- [API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
+
+### Java SDK
+
+Java Spring Security is a widely used and common framework to integrate Authentication and Authorization into your Applications.
+As of this at the moment there is no specific ZITADEL SDK, but we do show you how to integrate ZITADEL with Java Spring Security.
+You can use this for both your Web as for your API Applications.
+
+The following features are covered by Java Spring Security:
+- Authenticate your user using OIDC
+- Requesting ZITADEL userinfo endpoint to get user data
+- Refresh Token
+- Requesting User Roles from userinfo
+- Check if user has specified role
+- Logout
+
+The goal is to have a ZITADEL Java SDK in the future which will cover the following:
+- Wrapper around Java Spring Security
+- Authentication with OIDC
+- Authorization and checking Roles
+- Integrate ZITADEL APIs to read and manage resources
+- Integrate ZITADEL Session API to create your own login UI
+
+### Java Examples
+
+#### Web Application Example
+
+What does the Web Application Example include:
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Public Page: Accessible without authentication
+- Private Page: Shows user information of authenticated user, only accessible after login
+- Task Page: Only accessible after login and uses the API example. Requires the admin role for the application for some interaction.
+- Logout
+
+[Example Web App with Spring Security](https://github.com/zitadel/zitadel-java/web)
+
+#### API Application Example
+
+What does the API Application Example include:
+- REST API Application secured with Spring Security and OAuth2
+- Public Endpoint: Accessible without authentication
+- Private Endpoint: Accessible with a token
+- Administrator Endpoint: Accessible with a token of a user with admin role
+
+[Example API App with Spring Security](https://github.com/zitadel/zitadel-java/api)
+
+### Step-By-Step Guide
+
+For Java Spring we do have two different Step-By-Step Guides.
+One to create your web application with integrated login and one to create your API with permission checks for calling users.
+The guides lead you through the whole process from configuring the right application in ZITADEL to a ready application with integrated login or authentication checks.
+
+#### Web Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Example page accessible by authenticated user showing task list
+   - Task list can be read by authenticated user
+   - New tasks can be created by user with admin role
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[Web APP Step-By-Step Guide](/docs/examples/login/java-spring)
+![Profile Page](/img/java-spring/app-profile.png)
+
+#### API Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example REST API checking tokens against ZITADEL with OAuth2
+2. Public Endpoint accessible by any user
+3. Private Endpoint accessible by authenticated user
+4. Private Endpoint accessible by user with role 'admin'
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)

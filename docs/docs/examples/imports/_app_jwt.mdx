@@ -1,0 +1,53 @@
+1. Go to your Project and click on the **New** button as shown below.
+
+![Register the API](/img/examples/secure-api/app-jwt/1.png)
+
+2.  Give a name to your application (Test API is the name given below) and select type **API**.
+
+![Register the API](/img/examples/secure-api/app-jwt/2.png)
+
+3. Select **JWT** as the authentication method and click **Continue**.
+
+![Register the API](/img/examples/secure-api/app-jwt/3.png)
+
+4. Now review your configuration and click **Create**.
+
+![Register the API](/img/examples/secure-api/app-jwt/4.png)
+
+5. You will now see the API’s **Client ID**. You will not see a Client Secret because we are using a private JWT key.
+
+![Register the API](/img/examples/secure-api/app-jwt/5.png)
+
+6. Next, we must create the key pairs. Click on **New**.
+
+![Register the API](/img/examples/secure-api/app-jwt/6.png)
+
+7. Select **JSON** as the type of key. You can also set an expiration time for the key or leave it empty. Click on **Add**.
+
+![Register the API](/img/examples/secure-api/app-jwt/7.png)
+
+8. Download the created key by clicking the **Download** button and then click **Close**.
+
+![Register the API](/img/examples/secure-api/app-jwt/8.png)
+
+9. The key will be downloaded.
+
+![Register the API](/img/examples/secure-api/app-jwt/9.png)
+
+10. When you click on URLs on the left, you will see the relevant OIDC URLs. Note down the **issuer** URL, **token_endpoint** and **introspection_endpoint**.
+
+![Register the API](/img/examples/secure-api/app-jwt/10.png)
+
+11. The key that you downloaded will be of the following format.
+```
+{
+  "type":"application",
+  "keyId":"<YOUR_KEY_ID>",
+  "key":"-----BEGIN RSA PRIVATE KEY-----\<YOUR_PRIVATE_KEY>\n-----END RSA PRIVATE KEY-----\n",
+  "appId":"<YOUR_APP_ID>",
+  "clientId":"<YOUR_CLIENT_ID>"
+}
+```
+12. Also note down the **Resource ID** of your project.
+
+![Register the API](/img/examples/secure-api/app-jwt/11.png)

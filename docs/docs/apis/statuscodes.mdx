@@ -1,0 +1,20 @@
+---
+title: GRPC Status Codes in ZITADEL
+sidebar_label: GRPC Status Codes
+---
+
+| GRPC Number    | GRPC Code                 | HTTP Status Code | HTTP Status Text             |Description                                                                                                                           |
+| :---------| :------------------- | ------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 0         | OK                   | 200 |OK              | Not an error; returned on success.                              |
+| 2         | UNKNOWN              | 500 |Internal        | Unknown error, this is sent if the error could not be identified as one of the errors described below |
+| 3         | INVALID_ARGUMENT     | 400 |Bad Request     | The client specified an invalid argument. Note that this differs from FAILED_PRECONDITION. INVALID_ARGUMENT indicates arguments that are problematic regardless of the state of the system (e.g., a malformed file name).                                                              |
+| 4         | DEADLINE_EXCEEDED    | 504 |Gateway Timeout | The deadline expired before the operation could complete.                                                               |
+| 5         | NOT_FOUND            | 404 |Not found       | Some requested entity (e.g. user or project) was not found.                                                            |
+| 6         | ALREADY_EXISTS       | 409 |Conflict        | The entity that a client attempted to create (e.g. user or project) already exists.                                                             |
+| 7         | PERMISSION_DENIED    | 403 |Forbidden       |The caller does not have permission to execute the specified operation.                                                              |
+| 9         | FAILED_PRECONDITION  | 400 |Bad Request     | The operation was rejected because the system is not in a state required for the operation's execution. e.g a project that is already deactivated, should be deactivated |
+| 12        | UNIMPLEMENTED        | 501 |Not Implemented |The operation is not implemented or is not supported/enabled in this service.                                                              |
+| 13        | INTERNAL             | 500 |Internal        |Internal errors. This means that some invariants expected by the underlying system have been broken. This error code is reserved for serious errors. |
+| 14        | UNAVAILABLE          | 503 |Service Unavailable | The service is currently unavailable.                                                              |
+| 16        | UNAUTHENTICATED      | 401 |Unauthorized    |The request does not have valid authentication credentials for the operation.      |
+

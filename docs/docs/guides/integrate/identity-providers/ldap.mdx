@@ -1,0 +1,75 @@
+---
+title: Configure LDAP as an Identity Provider in ZITADEL
+sidebar_label: LDAP
+---
+
+import Intro from './_intro.mdx';
+import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="an LDAP server"/>
+
+## How it works
+
+<HowLDAPIDPWorks/>
+
+## ZITADEL Configuration
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="Active Directory / LDAP"/>
+
+### Create a new LDAP Provider
+
+Fill in the following fields in the LDAP template.
+
+:::caution
+We highly recommend to use LDAPS or StartTLS enable servers.
+Otherwise, your users passwords are sent in clear text through the wire.
+:::
+
+**Name**: Name of the identity provider
+
+**Servers**: List of servers in a format of "schema://host:port", as example "ldap://localhost:389". If possible, replace "ldap" with "ldaps" with the corresponding port.
+
+**BaseDN**: BaseDN which will be used with each request to the LDAP server
+
+**BindDn** and **BindPassword**: BindDN and password used to connect to the LDAP for the SearchQuery, should be an admin or user with enough permissions to search for the users to login.
+
+**Userbase**: Base used for the user, normally "dn" but can also be configured.
+
+**User filters**: Attributes of the user which are "or"-joined in the query for the user, used value is the input of the loginname, for example if you try to login with user@example.com and filters "uid" and "email" the resulting SearchQuery contains "(|(uid=user@example.com)(email=user@example.com))"
+
+**User Object Classes**: ObjectClasses which are "and"-joined in the SearchQuery and the user has to have in the LDAP.
+
+**LDAP Attributes**: Mapping of LDAP attributes to ZITADEL attributes, the ID attributes is required, the rest depends on usage of the identity provider
+
+**StartTLS**: If this setting is enabled after the initial connection ZITADEL tries to build a TLS connection. If your LDAP server doesn't support LDAPS, at least it should support StartTLS.
+
+**Timeout**: If this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
+
+<GeneralConfigDescription provider_account="LDAP user" />
+
+![LDAP Provider](/img/guides/zitadel_ldap_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the LDAP Provider](/img/guides/zitadel_activate_ldap.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
+
+## Test the setup
+
+<TestSetup loginscreen="ZITADELs LDAP login"/>
+
+![LDAP Button](/img/guides/zitadel_login_ldap.png)
+
+![LDAP Login](/img/guides/zitadel_login_ldap_input.png)

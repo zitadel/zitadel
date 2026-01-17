@@ -1,0 +1,19 @@
+import ThemedImage from "@theme/ThemedImage";
+
+export default function GenerateKey(props) {
+  return props.appType == "api" || props.authType == "jwt" ? (
+    <div>
+     <h3>Create key for private key JWT</h3>
+      <p>
+        After you successfully created your application with authentication type
+        JWT your can create keys in the Configuration section and Keys Card of
+        the app details like following image shows:
+      </p>
+      <img
+        width="400px"
+        alt="Generate key"
+        src="/docs/img/guides/application/generate-key.png"
+      />
+    </div>
+  ) : null;
+}

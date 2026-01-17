@@ -1,0 +1,19 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
+Log:
+  Level: 'info'
+
+# Make ZITADEL accessible over HTTP, not HTTPS
+ExternalSecure: false
+
+# If not using the docker compose example, adjust these values for connecting ZITADEL to your PostgreSQL
+Database:
+  postgres:
+    Host: 'db'
+    Port: 5432
+    Database: zitadel
+    User:
+      SSL:
+        Mode: 'disable'
+    Admin:
+      SSL:
+        Mode: 'disable'

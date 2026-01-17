@@ -1,0 +1,51 @@
+import CodeBlock from '@theme/CodeBlock';
+import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
+import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
+import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
+import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
+
+The docker compose example mounts the example zitadel configuration files to the ZITADEL container.
+
+By executing the commands below, you will download the following files:
+
+<details>
+    <summary>docker-compose.yaml</summary>
+    <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
+</details>
+
+<details>
+    <summary>example-zitadel-config.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+</details>
+
+<details>
+    <summary>example-zitadel-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+</details>
+
+<details>
+    <summary>example-zitadel-init-steps.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+</details>
+
+```bash
+# Download the docker compose example configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/docker-compose.yaml
+
+# Download and adjust the example configuration file containing standard configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-config.yaml
+
+# Download and adjust the example configuration file containing secret configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-secrets.yaml
+
+# Download and adjust the example configuration file containing database initialization configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
+
+# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# Generate one to a file if you haven't done so already and pass it as environment variable
+LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
+export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
+
+# Run the database and application containers
+docker compose up --detach
+```

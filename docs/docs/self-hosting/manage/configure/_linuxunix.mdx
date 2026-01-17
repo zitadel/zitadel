@@ -1,0 +1,69 @@
+import CodeBlock from '@theme/CodeBlock';
+import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
+import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
+import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
+
+### Configure by Files
+
+By executing the commands below, you will download the following files:
+
+<details>
+    <summary>example-zitadel-config.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+</details>
+
+<details>
+    <summary>example-zitadel-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+</details>
+
+<details>
+    <summary>example-zitadel-init-steps.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+</details>
+
+```bash
+# Download and adjust the example configuration file containing standard configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-config.yaml
+
+# Download and adjust the example configuration file containing secret configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-secrets.yaml
+
+# Download and adjust the example configuration file containing database initialization configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
+
+# A single ZITADEL instance always needs the same 32 characters long masterkey
+# If you haven't done so already, you can generate a new one
+# The key must be passed as argument
+ZITADEL_MASTERKEY="$(LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32)"
+
+# Pass zitadel configuration by configuration files
+zitadel start-from-init \
+    --config ./example-zitadel-config.yaml \
+    --config ./example-zitadel-secrets.yaml \
+    --steps ./example-zitadel-init-steps.yaml \
+    --masterkey "${ZITADEL_MASTERKEY}"
+```
+
+### Configure by Environment Variables
+
+```bash
+# Set runtime environment variables
+export ZITADEL_DATABASE_POSTGRES_HOST=my.database 
+export ZITADEL_DATABASE_POSTGRES_PORT=5432 
+export ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel 
+export ZITADEL_DATABASE_POSTGRES_USER_USERNAME=my_zitadel_db_user 
+export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=Secret_DB_User_Password 
+export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable 
+export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root 
+export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
+export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
+
+# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# Generate one to a file if you haven't done so already and pass it as environment variable
+LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
+
+# Let the zitadel binary read configuration from environment variables
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled --masterkeyFile ./zitadel-masterkey
+```

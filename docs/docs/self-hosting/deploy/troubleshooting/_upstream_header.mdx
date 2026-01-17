@@ -1,0 +1,37 @@
+If you operate Zitadel behind a Reverse Proxy or Ingress inside a Kubernetes cluster, 
+you may encounter an Error like `upstream sent too big header while reading response header from upstream`
+in your NGINX Logs and receive a 403 Error when accessing NGINX.
+
+you can solve it by increasing the grpc buffer size in your nginx config:
+
+### Ingress NGINX
+```yaml
+ingress:
+enabled: true
+annotations:
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+        SecRuleRemoveById 949110
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+        grpc_set_header Host $host;
+        more_clear_input_headers "Host" "X-Forwarded-Host";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
+    # highlight-next-line
+    nginx.ingress.kubernetes.io/server-snippet: "grpc_buffer_size 8k;"
+```
+### NGINX Config
+```nginx
+    http {
+        server {
+            listen 80;
+            http2 on;
+            location / {
+                grpc_pass grpc://zitadel-disabled-tls:8080;
+                grpc_set_header Host $host:$server_port;
+                # highlight-next-line
+                grpc_buffer_size 8k;
+            }
+        }
+    }
+```

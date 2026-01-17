@@ -1,0 +1,59 @@
+import TabItem from "@theme/TabItem";
+import Tabs from "@theme/Tabs";
+import PKCE from "./authmethods/_pkce.mdx";
+import Basic from "./authmethods/_basic.mdx";
+import Implicit from "./authmethods/_implicit.mdx";
+import PKCENative from "./authmethods/_pkcenative.mdx";
+import JWTPrivateKey from "./authmethods/_jwtpk.mdx";
+
+export default function AuthMethods(props) {
+  return props.selected == "web" ? (
+    <div>
+      <Tabs
+        groupId="auth-type"
+        default="pkce"
+        values={[
+          { label: "PKCE", value: "pkce" },
+          { label: "Basic Auth", value: "basic" },
+          { label: "JWT with Private Key", value: "jwtpk" },
+        ]}
+      >
+        <TabItem value="pkce">
+          <PKCE />
+        </TabItem>
+        <TabItem value="basic">
+          <Basic />
+        </TabItem>
+        <TabItem value="jwtpk">
+          <JWTPrivateKey />
+        </TabItem>
+      </Tabs>
+    </div>
+  ) : props.selected == "native" ? (
+    <Tabs
+      groupId="auth-type"
+      default="pkce"
+      values={[{ label: "PKCE", value: "pkce" }]}
+    >
+      <TabItem value="pkce">
+        <PKCENative />
+      </TabItem>
+    </Tabs>
+  ) : props.selected == "spa" ? (
+    <Tabs
+      groupId="auth-type"
+      default="pkce"
+      values={[
+        { label: "PKCE", value: "pkce" },
+        { label: "Implicit", value: "implicit" },
+      ]}
+    >
+      <TabItem value="pkce">
+        <PKCE />
+      </TabItem>
+      <TabItem value="implicit">
+        <Implicit />
+      </TabItem>
+    </Tabs>
+  ) : null;
+}
