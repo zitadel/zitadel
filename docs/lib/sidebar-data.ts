@@ -1,11 +1,8 @@
-import json
-
-# Docusaurus GUIDES structure (simplified for conversion)
-guides_sidebar = [
+export const guidesSidebar = [
     {
       "type": "category",
       "label": "Get Started",
-      "collapsed": False,
+      "collapsed": false,
       "items": [
         "guides/overview",
         "guides/start/quickstart",
@@ -760,50 +757,115 @@ guides_sidebar = [
         "guides/manage/cloud/support",
       ],
     },
-]
+] as const;
 
-def map_path(p):
-    if not isinstance(p, str): return p
-    # Relative to "guides/" folder in "content/docs/guides/meta.json"
-    
-    # Strip "guides/"
-    if p.startswith("guides/"):
-        return p[7:] # remove "guides/"
-    
-    # Prepend "../" for siblings
-    if p.startswith("concepts/") or \
-       p.startswith("apis/") or \
-       p.startswith("examples/") or \
-       p.startswith("sdk-examples/") or \
-       p.startswith("self-hosting/") or \
-       p.startswith("product/") or \
-       p.startswith("support/"):
-       return "../" + p
-       
-    return p
-
-def map_item(item):
-    if isinstance(item, str):
-        return map_path(item)
-    if item["type"] == "category":
-        return {
-            "title": item["label"],
-            "pages": [map_item(i) for i in item.get("items", [])]
-        }
-    if item["type"] == "link":
-        return {
-            "title": item["label"],
-            "url": item["href"]
-        }
-    if item["type"] == "doc":
-        if "label" in item:
-             return {
-                 "title": item["label"],
-                 "url": map_path(item["id"])
-             }
-        return map_path(item["id"])
-    return None
-
-meta_pages = [map_item(i) for i in guides_sidebar]
-
-print(json.dumps({"root": True, "pages": meta_pages}, indent=2))
+export const apisSidebar = [
+    "apis/introduction",
+    {
+      "type": "category",
+      "label": "Core Resources",
+      "items": [
+        {
+          "type": "category",
+          "label": "V2",
+          "items": [
+            { "type": "category", "label": "User", "items": ["reference/api/user"] },
+            { "type": "category", "label": "Session", "items": ["reference/api/session"] },
+            { "type": "category", "label": "OIDC", "items": ["reference/api/oidc"] },
+            { "type": "category", "label": "SAML", "items": ["reference/api/saml"] },
+            { "type": "category", "label": "Settings", "items": ["reference/api/settings"] },
+            { "type": "category", "label": "Feature", "items": ["reference/api/feature"] },
+            { "type": "category", "label": "Organization", "items": ["reference/api/org"] },
+            { "type": "category", "label": "Identity Provider", "items": ["reference/api/idp"] },
+            { "type": "category", "label": "Web Key", "items": ["reference/api/webkey"] },
+            { "type": "category", "label": "Action", "items": ["reference/api/action"] },
+            { "type": "category", "label": "Instance", "items": ["reference/api/instance"] },
+            { "type": "category", "label": "Project", "items": ["reference/api/project"] },
+            { "type": "category", "label": "Application", "items": ["reference/api/application"] },
+            { "type": "category", "label": "Authorizations", "items": ["reference/api/authorization"] },
+            { "type": "category", "label": "Internal Permissions", "items": ["reference/api/internal_permission"] },
+          ],
+        },
+        {
+          "type": "category",
+          "label": "V1",
+          "items": [
+            { "type": "category", "label": "Authenticated User", "items": ["reference/api-v1/auth"] },
+            { "type": "category", "label": "Organization Objects", "items": ["reference/api-v1/management"] },
+            { "type": "category", "label": "Instance Objects", "items": ["reference/api-v1/admin"] },
+            { "type": "category", "label": "Instance Lifecycle", "items": ["reference/api-v1/system"] },
+            "apis/migration_v1_to_v2"
+          ],
+        },
+        {
+          "type": "category",
+          "label": "Assets",
+          "items": ["apis/assets/assets"],
+        },
+      ],
+    },
+    {
+      "type": "category",
+      "label": "Observability",
+      "items": [
+        "apis/observability/metrics",
+        "apis/observability/health",
+      ],
+    },
+    {
+      "type": "category",
+      "label": "Provision Users",
+      "items": ["apis/scim2"],
+    },
+    {
+      "type": "doc",
+      "label": "gRPC Status Codes",
+      "id": "apis/statuscodes",
+    },
+    {
+      "type": "link",
+      "label": "Rate Limits (Cloud)",
+      "href": "/legal/policies/rate-limit-policy",
+    },
+    {
+      "type": "category",
+      "label": "Benchmarks",
+      "items": [
+        {
+          "type": "category",
+          "label": "v2.65.0",
+          "items": ["apis/benchmarks/v2.65.0/machine_jwt_profile_grant/index"],
+        },
+        {
+          "type": "category",
+          "label": "v2.66.0",
+          "items": ["apis/benchmarks/v2.66.0/machine_jwt_profile_grant/index"],
+        },
+        {
+          "type": "category",
+          "label": "v2.70.0",
+          "items": [
+            "apis/benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v2.70.0/oidc_session/index",
+          ],
+        },
+        {
+          "type": "category",
+          "label": "v4",
+          "items": [
+            "apis/benchmarks/v4/add_session/index",
+            "apis/benchmarks/v4/human_password_login/index",
+            "apis/benchmarks/v4/introspect/index",
+            "apis/benchmarks/v4/machine_client_credentials_login/index",
+            "apis/benchmarks/v4/machine_jwt_profile_grant/index",
+            "apis/benchmarks/v4/machine_pat_login/index",
+            "apis/benchmarks/v4/manipulate_user/index",
+            "apis/benchmarks/v4/oidc_session/index",
+            "apis/benchmarks/v4/otp_session/index",
+            "apis/benchmarks/v4/password_session/index",
+            "apis/benchmarks/v4/user_info/index",
+          ],
+        },
+      ],
+    },
+] as const;
