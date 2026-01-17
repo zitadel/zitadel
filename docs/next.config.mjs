@@ -4,17 +4,14 @@ import { rehypeCode } from 'fumadocs-core/mdx-plugins';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-/*
-  experimental: {
-    turbo: {
-      rules: {
-        '** / *.{go,yaml,Caddyfile,conf}': {
-          as: 'raw',
-        },
+  turbopack: {
+    rules: {
+      '*.{go,yaml,Caddyfile,conf}': {
+        loaders: ['raw-loader'],
+        as: '*.js',
       },
     },
   },
-*/
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(go|yaml|Caddyfile|conf)$/,
