@@ -236,19 +236,19 @@ app.use(async (_, next) => {
   await next();
 });
 
-app.get("/api/info", (c) => {
+app.get("/docs/img/api/info", (c) => {
   return new Response("Public Data");
 });
 
 // The `auth.require()` middleware is optional here, as the `User.me` method already checks for it.
-app.get("/api/me", auth.require(), async (c) => {
+app.get("/docs/img/api/me", auth.require(), async (c) => {
   const user = await User.me();
 
   return c.json(user);
 });
 
 // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
-app.get("/api/me/messages", auth.require(), async (c) => {
+app.get("/docs/img/api/me/messages", auth.require(), async (c) => {
   const user = await User.me();
 
   // This will throw an error if the user does not have the `read:messages` role

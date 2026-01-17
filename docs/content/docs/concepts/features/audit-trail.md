@@ -8,7 +8,7 @@ Most other solutions replace a historic record and track changes in a separate l
 ZITADEL only ever appends data in an [Eventstore](/docs/concepts/eventstore/overview), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
-![Example of events that happen for a profile change and a login](/concepts/audit-trail/audit-log-events.png)
+![Example of events that happen for a profile change and a login](/docs/img/concepts/audit-trail/audit-log-events.png)
 
 This form of audit log has several benefits over storing classic audit logs.
 You can view past data in-context of the whole system at a single point in time.
@@ -31,14 +31,14 @@ You can check the last changes of most objects in the [Console](/docs/guides/man
 In the following screenshot you can see an example of last changes on an [user](/docs/guides/manage/console/users-overview).
 The same view is available on several other objects such as organization or project.
 
-![Profile Self Manage](/guides/console/myprofile.png)
+![Profile Self Manage](/docs/img/guides/console/myprofile.png)
 
 ### Event View
 
 Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/console-overview).
 Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events
 
-![Event viewer](/concepts/audit-trail/event-viewer.png)
+![Event viewer](/docs/img/concepts/audit-trail/event-viewer.png)
 
 ### Event API
 

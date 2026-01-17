@@ -23,7 +23,7 @@ import { ResponsivePlayer } from "@/components/player";
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Google Cloud Platform later.
 
-![Google Provider](/guides/zitadel_google_create_provider.png)
+![Google Provider](/docs/img/guides/zitadel_google_create_provider.png)
 
 ## Google Configuration
 
@@ -34,13 +34,13 @@ You will have to paste it in the Google Cloud Platform later.
 3. Choose "Web application" as application type and give a name
 4. [Paste the ZITADEL Callback URL you copied before](#open-the-google-identity-provider-template) into the authorized redirect URIs
 
-![Google OAuth App Registration](/guides/google_oauth_app_registration.png)
+![Google OAuth App Registration](/docs/img/guides/google_oauth_app_registration.png)
 
 ### Client ID and secret
 
 You will need the Client ID and Client secret to configure the Google Identity Provider in ZITADEL.
 
-![Google Client ID and Secret](/guides/google_client_id_secret.png)
+![Google Client ID and Secret](/docs/img/guides/google_client_id_secret.png)
 
 ## ZITADEL Configuration
 
@@ -60,7 +60,7 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <Activate/>
 
-![Activate the Google Provider](/guides/zitadel_activate_google.png)
+![Activate the Google Provider](/docs/img/guides/zitadel_activate_google.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -71,6 +71,6 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 <TestSetup loginscreen="your Google login"/>
 
 {/* TODO: Image highlights GitHub */}
-![Google Button](/guides/zitadel_login_google.png)
+![Google Button](/docs/img/guides/zitadel_login_google.png)
 
-![Google Login](/guides/google_login.png)
+![Google Login](/docs/img/guides/google_login.png)

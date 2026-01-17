@@ -86,7 +86,7 @@ So the value `MTIzNA` decodes to `1234`.
 You might want to include metadata directly into the ID Token.
 For that you need to enable "User Info inside ID Token" in your application's settings.
 
-![](/console_projects_application_token_settings.png)
+![](/docs/img/console_projects_application_token_settings.png)
 
 Now request a new token from ZITADEL by logging in with the user that has metadata attached.
 Make sure you log into the correct client/application where you enabled the settings.

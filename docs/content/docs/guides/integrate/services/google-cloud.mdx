@@ -50,11 +50,11 @@ Create a new application and click on "I'm a pro. Skip this wizard."
 You need to add the redirect URL and configure token settings after creating the application.
 :::
 
-![Create application screen](/guides/integrate/services/google-cloud-create-app.png)
+![Create application screen](/docs/img/guides/integrate/services/google-cloud-create-app.png)
 
 ## **ZITADEL**: Redirect url
 
-![Redirect URL](/guides/integrate/services/google-cloud-redirect-url.png)
+![Redirect URL](/docs/img/guides/integrate/services/google-cloud-redirect-url.png)
 
 After creating, go to the application settings "Redirect settings" and add the redirect url from Googles configuration guide. 
 It looks something like `https://auth.cloud.google/signin-callback/locations/global/workforcePools/WORKFORCE_POOL_ID/providers/WORKFORCE_PROVIDER_ID`.
@@ -67,7 +67,7 @@ Make sure to replace the `WORKFORCE_POOL_ID` and `WORKFORCE_PROVIDER_ID` with yo
 
 ## **ZITADEL**: Token settings
 
-![Token settings](/guides/integrate/services/google-cloud-token-settings.png)
+![Token settings](/docs/img/guides/integrate/services/google-cloud-token-settings.png)
 
 After creating, go to the application settings "Token settings" and configure as follows:
 
@@ -111,7 +111,7 @@ function googleGroups(ctx, api) {
 
 ```
 
-![Action Code](/guides/integrate/services/google-cloud-action-code.png)
+![Action Code](/docs/img/guides/integrate/services/google-cloud-action-code.png)
 
 
 
@@ -125,7 +125,7 @@ And add the the Action Script to the following Flow and Trigger:
 - **Trigger Type**: Pre access token creation
 - **Actions**: googleGroups
 
-![Action Flow](/guides/integrate/services/google-cloud-action-flow.png)
+![Action Flow](/docs/img/guides/integrate/services/google-cloud-action-flow.png)
 
 ## **Google Cloud**: Create a WIP provider
 

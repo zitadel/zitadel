@@ -31,11 +31,11 @@ As an alternative you can add the SAML identity provider through the API, either
 - [Add Default SAML Identity Provider](/docs/apis/resources/admin/admin-service-add-saml-provider)
 - [Add SAML Identity Provider on Organization](/docs/apis/resources/mgmt/management-service-add-saml-provider)
 
-![OKTA Provider Empty](/guides/zitadel_okta_saml_provider_empty.png)
+![OKTA Provider Empty](/docs/img/guides/zitadel_okta_saml_provider_empty.png)
 
 After you created the SAML Provider in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
 
-![OKTA SAML App URLs](/guides/zitadel_okta_saml_provider_urls.png)
+![OKTA SAML App URLs](/docs/img/guides/zitadel_okta_saml_provider_urls.png)
 
 ## OKTA Configuration
 
@@ -50,7 +50,7 @@ After you created the SAML Provider in ZITADEL, you can copy the URLs you need t
 5. Save the configuration
 6. Copy the metadata URL from the details
 
-![Add new SAML Application in OKTA](/guides/okta_add_saml_app.png)
+![Add new SAML Application in OKTA](/docs/img/guides/okta_add_saml_app.png)
 
 ### Add Attribute Statements
 
@@ -65,7 +65,7 @@ Add the following three mappings:
 | surname      | Basic       | user.lastName  |
 | emailaddress | Basic       | user.email     |
 
-![Add Attribute Mapping ](/guides/okta_saml_attribute_mapping.png)
+![Add Attribute Mapping ](/docs/img/guides/okta_saml_attribute_mapping.png)
 
 ### Assign Users to Application
 
@@ -74,7 +74,7 @@ To allow users to authenticate with that app go to the "Assign" Tab.
 2. Choose Assign To People
 3. Select the users you like to be able to authenticate
 
-![Add new SAML Application in OKTA](/guides/okta_assign_user_to_app.png)
+![Add new SAML Application in OKTA](/docs/img/guides/okta_assign_user_to_app.png)
 
 ## Finish ZITADEL Configuration
 
@@ -89,7 +89,7 @@ If you prefer changing the configuration through the API you can update the SAML
 - [Update Default SAML Identity Provider](/docs/apis/resources/admin/admin-service-update-saml-provider)
 - [Update SAML Identity Provider on Organization](/docs/apis/resources/mgmt/management-service-update-saml-provider)
 
-![OKTA Provider Empty](/guides/zitadel_okta_saml_provider_filled.png)
+![OKTA Provider Empty](/docs/img/guides/zitadel_okta_saml_provider_filled.png)
 
 You can also fill the optional fields if needed:
 
@@ -99,7 +99,7 @@ You can also fill the optional fields if needed:
 
 <Activate/>
 
-![Activate the OKTA Provider](/guides/zitadel_activate_okta_saml.png)
+![Activate the OKTA Provider](/docs/img/guides/zitadel_activate_okta_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -109,9 +109,9 @@ You can also fill the optional fields if needed:
 
 <TestSetup loginscreen="your OKTA login"/>
 
-![OKTA Button](/guides/zitadel_login_okta.png)
+![OKTA Button](/docs/img/guides/zitadel_login_okta.png)
 
-![OKTA Login](/guides/okta_login.png)
+![OKTA Login](/docs/img/guides/okta_login.png)
 
 ### Add Action to map user attributes
 

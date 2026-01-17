@@ -166,7 +166,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
                 type: 'folder',
                 name: item.label || 'Category',
                 children: children,
-                defaultOpen: !item.collapsed 
+                defaultOpen: item.collapsed === false 
             } as PageTree.Folder;
         }
         

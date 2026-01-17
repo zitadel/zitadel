@@ -13,7 +13,7 @@ They have two environments, the development and the production environment.
 In this case Time uses authentication and authorizations from ZITADEL.
 This means that the users and also their authorizations will be managed within ZITADEL.
 
-![Architecture](/concepts/usecase/saas.png)
+![Architecture](/docs/img/concepts/usecase/saas.png)
 
 ## Organization
 

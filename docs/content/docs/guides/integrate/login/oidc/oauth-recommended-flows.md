@@ -36,7 +36,7 @@ So what do we want to achieve with delegated authentication?
   - Users have to **authorize** applications to access certain [**scopes**](/docs/apis/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](/docs/apis/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
   - Access tokens are bearer tokens, meaning that possession of the token provides access to a resource. But the tokens expire frequently and the application must request a new access token via **refresh token** or the user must reauthenticate
 
-![Overview federated identities](/guides/consulting_federated_identities_basics.png)
+![Overview federated identities](/docs/img/guides/consulting_federated_identities_basics.png)
 
 This is where the so-called “flows” come into play: There are a number of different flows on how to handle the process from authentication, over authorization, getting tokens and requesting additional information about the user.
 

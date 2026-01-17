@@ -2,7 +2,6 @@ export const guidesSidebar = [
     {
       "type": "category",
       "label": "Get Started",
-      "collapsed": false,
       "items": [
         "guides/overview",
         "guides/start/quickstart",

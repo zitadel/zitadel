@@ -16,7 +16,7 @@ Before we can start building our application, we have to do a few configuration 
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select **Native** application type and continue.
 
-![Create app in console](/flutter/nativeapp.png)
+![Create app in console](/docs/img/flutter/nativeapp.png)
 
 ### Redirect URIs
 
@@ -169,11 +169,11 @@ Our Android and iOS Application opens ZITADEL's login within a custom tab, on We
 If everything works out correctly, your applications should look like this:
 
 <div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '500px', 'margin': '0 auto'}}>
-    <img src="../../img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
-    <img src="../../img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
+    <img src="/docs/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
 </div>
 
 <div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '800px', 'margin': '0 auto'}}>
-    <img src="../../img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
-    <img src="../../img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
+    <img src="/docs/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
 </div>

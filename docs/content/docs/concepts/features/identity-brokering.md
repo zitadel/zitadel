@@ -28,7 +28,7 @@ Federated identity management is an arrangement that is made between two or more
 For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL.
 Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if the user is already registered) or a new one with the claims provided by Google.
 
-![Diagram of an identity brokering scheme using a central identity provider that has a trust link to the Google IdP and Entra ID](/concepts/features/identity-brokering.png)
+![Diagram of an identity brokering scheme using a central identity provider that has a trust link to the Google IdP and Entra ID](/docs/img/concepts/features/identity-brokering.png)
 
 The schema is a very simplified version, but shows the essential steps for identity brokering
 
@@ -59,7 +59,7 @@ Using an identity provider with strong multitenancy capabilities such as ZITADEL
 [Domain discovery](/docs/guides/solution-scenarios/domain-discovery) ensures that users are redirected to their external identity provider based on their email-address or username.
 [Managers](../structure/managers) can configure organization domains that are used for domain-based redirection to an external IdP.
 
-![Diagram explaining domain discovery](/concepts/features/domain-discovery.png)
+![Diagram explaining domain discovery](/docs/img/concepts/features/domain-discovery.png)
 
 ## Simplify identity brokering with ZITADEL templates
 
