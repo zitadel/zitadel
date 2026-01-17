@@ -1,0 +1,676 @@
+{
+  "root": true,
+  "pages": [
+    {
+      "title": "Get Started",
+      "pages": [
+        "overview",
+        "start/quickstart",
+        {
+          "title": "Key Concepts",
+          "pages": [
+            "../concepts/structure/instance",
+            "manage/console/organizations-overview",
+            "manage/console/projects-overview",
+            "manage/console/applications-overview",
+            "manage/console/users-overview",
+            "../concepts/structure/managers"
+          ]
+        },
+        {
+          "title": "Authenticate Users",
+          "pages": [
+            "integrate/login/login-users",
+            "integrate/login/hosted-login",
+            "integrate/login/oidc/logout"
+          ]
+        },
+        {
+          "title": "Example Applications",
+          "pages": [
+            {
+              "title": "Frontend (SPA)",
+              "pages": [
+                {
+                  "title": "Vanilla-JS",
+                  "url": "https://github.com/zitadel/zitadel-vanilla-js"
+                },
+                "../examples/login/react",
+                "../examples/login/angular",
+                "../examples/login/vue"
+              ]
+            },
+            {
+              "title": "Mobile & Native",
+              "pages": [
+                "../examples/login/flutter"
+              ]
+            },
+            {
+              "title": "Full-Stack / SSR",
+              "pages": [
+                "../examples/login/nextjs",
+                "../examples/login/nextjs-b2b"
+              ]
+            },
+            {
+              "title": "Web App (Server-Side)",
+              "pages": [
+                "../examples/login/symfony",
+                "../examples/login/java-spring",
+                "../examples/login/python-django",
+                "../examples/login/go"
+              ]
+            },
+            {
+              "title": "APIs / Backend Services",
+              "pages": [
+                "../examples/secure-api/go",
+                "../examples/secure-api/java-spring",
+                "../examples/secure-api/python-django",
+                "../examples/secure-api/python-flask",
+                "../examples/secure-api/nodejs-nestjs",
+                "../examples/secure-api/pylon"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Use Cases",
+          "pages": [
+            "solution-scenarios/b2b",
+            "solution-scenarios/configurations",
+            "solution-scenarios/saas",
+            "solution-scenarios/b2c",
+            "solution-scenarios/frontend-calling-backend-API",
+            {
+              "title": "Machine-to-Machine (M2M)",
+              "pages": [
+                "integrate/service-users/authenticate-service-users",
+                "integrate/service-users/private-key-jwt",
+                "integrate/service-users/client-credentials",
+                "integrate/service-users/personal-access-token"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Onboard Customers and Users",
+          "pages": [
+            "integrate/onboarding/b2b",
+            "integrate/onboarding/end-users"
+          ]
+        },
+        {
+          "title": "Branding & Customization",
+          "pages": [
+            "manage/customize/branding",
+            "manage/customize/texts",
+            "manage/customize/restrictions",
+            "manage/customize/user-schema",
+            "manage/customize/user-metadata",
+            "manage/customize/notification-providers",
+            "../concepts/features/custom-domain"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Integrate & Authenticate",
+      "pages": [
+        {
+          "title": "OIDC & OAuth Flows",
+          "pages": [
+            "integrate/login/oidc/oauth-recommended-flows",
+            "integrate/login/oidc/login-users",
+            "integrate/login/oidc/device-authorization",
+            "../apis/openidoauth/endpoints",
+            "../apis/openidoauth/authn-methods",
+            "../apis/openidoauth/scopes",
+            "../apis/openidoauth/claims",
+            "../apis/openidoauth/grant-types",
+            "../apis/openidoauth/authrequest",
+            "integrate/login/oidc/webkeys",
+            "integrate/token-exchange"
+          ]
+        },
+        {
+          "title": "SAML",
+          "pages": [
+            "integrate/login/saml",
+            "../apis/saml/endpoints"
+          ]
+        },
+        {
+          "title": "API Access",
+          "pages": [
+            "integrate/zitadel-apis/access-zitadel-apis",
+            "integrate/zitadel-apis/access-zitadel-system-api",
+            "integrate/zitadel-apis/event-api",
+            "integrate/zitadel-apis/example-zitadel-api-with-go",
+            "integrate/zitadel-apis/example-zitadel-api-with-dot-net",
+            {
+              "title": "Zitadel APIs",
+              "url": "/docs/apis/introduction"
+            }
+          ]
+        },
+        {
+          "title": "SDKs",
+          "pages": [
+            "../sdk-examples/introduction",
+            {
+              "title": "Frontend (SPA)",
+              "pages": [
+                "../sdk-examples/react",
+                "../sdk-examples/angular",
+                "../sdk-examples/vue"
+              ]
+            },
+            {
+              "title": "Mobile & Native",
+              "pages": [
+                {
+                  "title": "Dart / Flutter",
+                  "url": "https://github.com/smartive/zitadel-dart"
+                },
+                {
+                  "title": ".NET (MAUI/Xamarin)",
+                  "url": "https://github.com/smartive/zitadel-net"
+                }
+              ]
+            },
+            {
+              "title": "Full-Stack / SSR",
+              "pages": [
+                "../sdk-examples/nextjs",
+                "../sdk-examples/nuxtjs",
+                "../sdk-examples/sveltekit",
+                "../sdk-examples/qwik",
+                "../sdk-examples/solidstart",
+                "../sdk-examples/astro",
+                {
+                  "title": "NextAuth",
+                  "url": "https://next-auth.js.org/providers/zitadel"
+                }
+              ]
+            },
+            {
+              "title": "Backend & API",
+              "pages": [
+                {
+                  "title": "Node.js",
+                  "pages": [
+                    "../sdk-examples/client-libraries/node",
+                    "../sdk-examples/expressjs",
+                    "../sdk-examples/fastify",
+                    "../sdk-examples/hono",
+                    "../sdk-examples/nestjs",
+                    {
+                      "title": "Passport.js",
+                      "url": "https://github.com/buehler/node-passport-zitadel"
+                    },
+                    {
+                      "title": "Node.js (Community)",
+                      "url": "https://www.npmjs.com/package/@zitadel/node"
+                    }
+                  ]
+                },
+                {
+                  "title": "Python",
+                  "pages": [
+                    "../sdk-examples/client-libraries/python",
+                    "../sdk-examples/flask",
+                    "../sdk-examples/django",
+                    "../sdk-examples/fastapi"
+                  ]
+                },
+                {
+                  "title": "Go",
+                  "pages": [
+                    "../sdk-examples/go"
+                  ]
+                },
+                {
+                  "title": "Java",
+                  "pages": [
+                    "../sdk-examples/java",
+                    "../sdk-examples/spring",
+                    "../sdk-examples/client-libraries/java"
+                  ]
+                },
+                {
+                  "title": "PHP",
+                  "pages": [
+                    "../sdk-examples/symfony",
+                    "../sdk-examples/laravel",
+                    "../sdk-examples/client-libraries/php"
+                  ]
+                },
+                {
+                  "title": "Other Languages",
+                  "pages": [
+                    "../sdk-examples/client-libraries/ruby",
+                    {
+                      "title": "Elixir",
+                      "url": "https://github.com/maennchen/zitadel_api"
+                    },
+                    {
+                      "title": "Rust",
+                      "url": "https://github.com/smartive/zitadel-rust"
+                    },
+                    {
+                      "title": "Pylon",
+                      "url": "https://github.com/getcronit/pylon"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "SCIM",
+          "pages": [
+            "integrate/scim-okta-guide"
+          ]
+        },
+        {
+          "title": "Token Introspection",
+          "pages": [
+            "integrate/token-introspection/basic-auth",
+            "integrate/token-introspection/private-key-jwt"
+          ]
+        },
+        "integrate/back-channel-logout",
+        {
+          "title": "External Integrations",
+          "pages": [
+            {
+              "title": "Services",
+              "pages": [
+                "integrate/services/google-workspace",
+                "integrate/services/aws-saml",
+                "integrate/services/atlassian-saml",
+                "integrate/services/pingidentity-saml",
+                "integrate/services/google-cloud",
+                "integrate/services/cloudflare-oidc",
+                "integrate/services/gitlab-saml",
+                "integrate/services/auth0-saml",
+                "integrate/services/auth0-oidc",
+                "integrate/services/gitlab-self-hosted",
+                {
+                  "title": "Bold BI",
+                  "url": "https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi"
+                },
+                {
+                  "title": "Cloudflare Workers",
+                  "url": "https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers"
+                },
+                {
+                  "title": "Firezone",
+                  "url": "https://www.firezone.dev/docs/authenticate/oidc/zitadel"
+                },
+                {
+                  "title": "Netbird",
+                  "url": "https://docs.netbird.io/selfhosted/identity-providers"
+                },
+                {
+                  "title": "Nextcloud",
+                  "url": "https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting"
+                },
+                {
+                  "title": "Psono",
+                  "url": "https://doc.psono.com/admin/configuration/oidc-zitadel.html"
+                },
+                {
+                  "title": "Zoho Desk",
+                  "url": "https://help.zoho.com/portal/en/kb/desk/user-management-and-security/data-security/articles/setting-up-saml-single-signon-for-help-center#Zitadel_IDP"
+                }
+              ]
+            },
+            {
+              "title": "Tools",
+              "pages": [
+                {
+                  "title": "Argo CD",
+                  "url": "https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/"
+                },
+                "integrate/tools/apache2",
+                "integrate/authenticated-mongodb-charts",
+                "../examples/identity-proxy/oauth2-proxy"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Build your own Login UI",
+          "pages": [
+            "integrate/login-ui/session-validation",
+            "integrate/login-ui/username-password",
+            "integrate/login-ui/external-login",
+            "integrate/login-ui/passkey",
+            "integrate/login-ui/mfa",
+            "integrate/login-ui/select-account",
+            "integrate/login-ui/password-reset",
+            "integrate/login-ui/logout",
+            "integrate/login-ui/oidc-standard",
+            "integrate/login-ui/saml-standard",
+            "integrate/login-ui/device-auth",
+            "integrate/login-ui/login-app"
+          ]
+        },
+        {
+          "title": "Actions",
+          "pages": [
+            {
+              "title": "V1",
+              "pages": [
+                "manage/console/actions-overview",
+                "../apis/actions/modules",
+                "../apis/actions/code-examples",
+                "../apis/actions/internal-authentication",
+                "../apis/actions/external-authentication",
+                "../apis/actions/complement-token",
+                "../apis/actions/customize-samlresponse",
+                "../apis/actions/objects",
+                "manage/customize/behavior"
+              ]
+            },
+            {
+              "title": "V2",
+              "pages": [
+                "integrate/actions/usage",
+                "integrate/actions/testing-request",
+                "integrate/actions/testing-request-manipulation",
+                "integrate/actions/testing-response",
+                "integrate/actions/testing-response-manipulation",
+                "integrate/actions/testing-function",
+                "integrate/actions/testing-function-manipulation",
+                "integrate/actions/testing-event",
+                "integrate/actions/testing-request-signature",
+                "integrate/actions/migrate-from-v1",
+                "integrate/actions/webhook-site-setup"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Migrate",
+          "pages": [
+            "migrate/introduction",
+            "migrate/users",
+            "migrate/sources/zitadel",
+            "migrate/sources/auth0",
+            "migrate/sources/keycloak"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Configure Identity & Policies",
+      "pages": [
+        "manage/user/reg-create-user",
+        "manage/terraform-provider",
+        {
+          "title": "Identity Providers",
+          "pages": [
+            {
+              "title": "Social Logins",
+              "pages": [
+                "integrate/identity-providers/google",
+                "integrate/identity-providers/apple",
+                "integrate/identity-providers/github",
+                "integrate/identity-providers/gitlab",
+                "integrate/identity-providers/linkedin-oauth"
+              ]
+            },
+            {
+              "title": "Enterprise (SAML & OIDC)",
+              "pages": [
+                "integrate/identity-providers/azure-ad-oidc",
+                "integrate/identity-providers/azure-ad-saml",
+                "integrate/identity-providers/okta-oidc",
+                "integrate/identity-providers/okta-saml",
+                "integrate/identity-providers/keycloak",
+                "integrate/identity-providers/onelogin-saml",
+                "integrate/identity-providers/pingfederate-saml"
+              ]
+            },
+            {
+              "title": "Legacy & Directory (LDAP)",
+              "pages": [
+                "integrate/identity-providers/ldap",
+                "integrate/identity-providers/openldap"
+              ]
+            },
+            {
+              "title": "Custom & Generic",
+              "pages": [
+                "integrate/identity-providers/generic-oidc",
+                "integrate/identity-providers/jwt_idp",
+                "integrate/identity-providers/mocksaml"
+              ]
+            },
+            {
+              "title": "Guides",
+              "pages": [
+                "integrate/identity-providers/migrate",
+                "integrate/identity-providers/additional-information"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Policies",
+          "pages": [
+            "manage/console/default-settings",
+            "../concepts/structure/policies"
+          ]
+        },
+        {
+          "title": "Roles & Permissions",
+          "pages": [
+            "manage/console/roles",
+            "integrate/retrieve-user-roles",
+            "../concepts/structure/granted_projects",
+            "manage/console/managers"
+          ]
+        },
+        {
+          "title": "Compliance & Security",
+          "pages": [
+            "../concepts/features/audit-trail",
+            "integrate/external-audit-log"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Test & Debug",
+      "pages": [
+        {
+          "title": "OIDC Playground",
+          "url": "https://zitadel.com/playgrounds/oidc"
+        }
+      ]
+    },
+    {
+      "title": "Deploy & Operate",
+      "pages": [
+        "manage/console/console-overview",
+        {
+          "title": "Customer Portal",
+          "pages": [
+            "manage/cloud/start",
+            "manage/cloud/instances",
+            "manage/cloud/settings",
+            "manage/cloud/billing",
+            "manage/cloud/users"
+          ]
+        },
+        {
+          "title": "Self-Hosted",
+          "pages": [
+            "../self-hosting/deploy/overview",
+            "../self-hosting/deploy/linux",
+            "../self-hosting/deploy/macos",
+            "../self-hosting/deploy/devcontainer",
+            "../self-hosting/deploy/compose",
+            "../self-hosting/deploy/kubernetes",
+            {
+              "title": "Manage",
+              "pages": [
+                {
+                  "title": "Production & Operations",
+                  "pages": [
+                    "../self-hosting/manage/production",
+                    "../self-hosting/manage/productionchecklist",
+                    "../self-hosting/manage/usage_control"
+                  ]
+                },
+                {
+                  "title": "Configuration",
+                  "pages": [
+                    "../self-hosting/manage/configure/configure",
+                    "../self-hosting/manage/custom-domain",
+                    "../self-hosting/manage/tls_modes",
+                    "../self-hosting/manage/http2",
+                    "../self-hosting/manage/login-client"
+                  ]
+                },
+                {
+                  "title": "Reverse Proxy",
+                  "pages": [
+                    "../self-hosting/manage/reverseproxy/traefik/traefik",
+                    "../self-hosting/manage/reverseproxy/nginx/nginx",
+                    "../self-hosting/manage/reverseproxy/caddy/caddy",
+                    "../self-hosting/manage/reverseproxy/httpd/httpd",
+                    "../self-hosting/manage/reverseproxy/cloudflare/cloudflare",
+                    "../self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
+                    "../self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud"
+                  ]
+                },
+                {
+                  "title": "Observability",
+                  "pages": [
+                    "../self-hosting/manage/service_ping",
+                    {
+                      "title": "Metrics",
+                      "pages": [
+                        "../self-hosting/manage/metrics/prometheus"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Tools",
+                  "pages": [
+                    {
+                      "title": "Command Line Interface",
+                      "pages": [
+                        "../self-hosting/manage/cli/mirror"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "../self-hosting/deploy/troubleshooting/troubleshooting"
+          ]
+        },
+        {
+          "title": "Scaling & Performance",
+          "pages": [
+            "../self-hosting/manage/updating_scaling",
+            "../self-hosting/manage/database/database",
+            "../self-hosting/manage/cache"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Architecture & Concepts",
+      "pages": [
+        {
+          "title": "System Architecture",
+          "pages": [
+            "../concepts/architecture/solution",
+            "../concepts/architecture/software",
+            "../concepts/architecture/secrets"
+          ]
+        },
+        "../concepts/principles",
+        {
+          "title": "Advanced Topics",
+          "pages": [
+            {
+              "title": "Event Store",
+              "pages": [
+                "../concepts/eventstore/overview",
+                "../concepts/eventstore/implementation"
+              ]
+            },
+            "../concepts/features/selfservice",
+            "../concepts/features/account-linking",
+            "../concepts/features/external-user-grant",
+            "../concepts/features/identity-brokering",
+            "../concepts/features/passkeys",
+            "../concepts/knowledge/opaque-tokens",
+            "solution-scenarios/domain-discovery",
+            "solution-scenarios/restrict-console"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Product, Releases & Support",
+      "pages": [
+        {
+          "title": "Product Features",
+          "pages": [
+            "../product/roadmap"
+          ]
+        },
+        {
+          "title": "Releases",
+          "pages": [
+            {
+              "title": "Changelog",
+              "url": "https://zitadel.com/changelog"
+            },
+            "../product/release-cycle"
+          ]
+        },
+        {
+          "title": "Support Resources",
+          "pages": [
+            "../support/troubleshooting",
+            "../support/technical_advisory",
+            {
+              "title": "Support States",
+              "url": "https://help.zitadel.com/zitadel-support-states"
+            },
+            {
+              "title": "Zitadel Release Cycle",
+              "url": "https://help.zitadel.com/zitadel-software-release-cycle"
+            },
+            {
+              "title": "Knowledge Base",
+              "url": "https://help.zitadel.com"
+            }
+          ]
+        },
+        {
+          "title": "Pricing",
+          "url": "https://zitadel.com/pricing"
+        },
+        {
+          "title": "Contact Us",
+          "url": "https://zitadel.com/contact"
+        },
+        "manage/cloud/support"
+      ]
+    }
+  ]
+}

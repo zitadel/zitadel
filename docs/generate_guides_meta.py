@@ -743,7 +743,7 @@ guides_sidebar = [
             {
               "type": "link",
               "label": "Knowledge Base",
-              "href: "https://help.zitadel.com",
+              "href": "https://help.zitadel.com",
             }
           ],
         },
@@ -762,9 +762,29 @@ guides_sidebar = [
     },
 ]
 
+def map_path(p):
+    if not isinstance(p, str): return p
+    # Relative to "guides/" folder in "content/docs/guides/meta.json"
+    
+    # Strip "guides/"
+    if p.startswith("guides/"):
+        return p[7:] # remove "guides/"
+    
+    # Prepend "../" for siblings
+    if p.startswith("concepts/") or \
+       p.startswith("apis/") or \
+       p.startswith("examples/") or \
+       p.startswith("sdk-examples/") or \
+       p.startswith("self-hosting/") or \
+       p.startswith("product/") or \
+       p.startswith("support/"):
+       return "../" + p
+       
+    return p
+
 def map_item(item):
     if isinstance(item, str):
-        return item
+        return map_path(item)
     if item["type"] == "category":
         return {
             "title": item["label"],
@@ -777,16 +797,13 @@ def map_item(item):
         }
     if item["type"] == "doc":
         if "label" in item:
-             # If label is present, we might want to preserve it, but Fumadocs uses file content or meta.
-             # But here we are returning pages list.
-             # If we want custom title, we use object.
              return {
                  "title": item["label"],
-                 "url": item["id"] # Assuming id is path
+                 "url": map_path(item["id"])
              }
-        return item["id"]
+        return map_path(item["id"])
     return None
 
-meta_pages = ["index"] + [map_item(i) for i in guides_sidebar]
+meta_pages = [map_item(i) for i in guides_sidebar]
 
-print(json.dumps({"pages": meta_pages}, indent=2))
+print(json.dumps({"root": True, "pages": meta_pages}, indent=2))
