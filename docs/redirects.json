@@ -1,1147 +1,1433 @@
 [
   {
     "source": "/docs/apis/actions/code-examples",
-    "destination": "/docs/references/actions/code-examples"
+    "destination": "/docs/references/actions/code-examples",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/complement-token",
-    "destination": "/docs/references/actions/complement-token"
+    "destination": "/docs/references/actions/complement-token",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/customize-samlresponse",
-    "destination": "/docs/references/actions/customize-samlresponse"
+    "destination": "/docs/references/actions/customize-samlresponse",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/external-authentication",
-    "destination": "/docs/references/actions/external-authentication"
+    "destination": "/docs/references/actions/external-authentication",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/internal-authentication",
-    "destination": "/docs/references/actions/internal-authentication"
+    "destination": "/docs/references/actions/internal-authentication",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/introduction",
-    "destination": "/docs/references/actions/introduction"
+    "destination": "/docs/references/actions/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/modules",
-    "destination": "/docs/references/actions/modules"
+    "destination": "/docs/references/actions/modules",
+    "permanent": true
   },
   {
     "source": "/docs/apis/actions/objects",
-    "destination": "/docs/references/actions/objects"
+    "destination": "/docs/references/actions/objects",
+    "permanent": true
   },
   {
     "source": "/docs/apis/apis",
-    "destination": "/docs/references/apis"
+    "destination": "/docs/references/apis",
+    "permanent": true
   },
   {
     "source": "/docs/apis/assets",
-    "destination": "/docs/references/assets/assets"
+    "destination": "/docs/references/assets/assets",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks",
-    "destination": "/docs/references/benchmarks"
+    "destination": "/docs/references/benchmarks",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v2.65.0/machine_jwt_profile_grant",
-    "destination": "/docs/references/benchmarks/v2.65.0/machine_jwt_profile_grant"
+    "destination": "/docs/references/benchmarks/v2.65.0/machine_jwt_profile_grant",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v2.66.0/machine_jwt_profile_grant",
-    "destination": "/docs/references/benchmarks/v2.66.0/machine_jwt_profile_grant"
+    "destination": "/docs/references/benchmarks/v2.66.0/machine_jwt_profile_grant",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v2.70.0/machine_jwt_profile_grant",
-    "destination": "/docs/references/benchmarks/v2.70.0/machine_jwt_profile_grant"
+    "destination": "/docs/references/benchmarks/v2.70.0/machine_jwt_profile_grant",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v2.70.0/oidc_session",
-    "destination": "/docs/references/benchmarks/v2.70.0/oidc_session"
+    "destination": "/docs/references/benchmarks/v2.70.0/oidc_session",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/add_session",
-    "destination": "/docs/references/benchmarks/v4/add_session"
+    "destination": "/docs/references/benchmarks/v4/add_session",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/human_password_login",
-    "destination": "/docs/references/benchmarks/v4/human_password_login"
+    "destination": "/docs/references/benchmarks/v4/human_password_login",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/introspect",
-    "destination": "/docs/references/benchmarks/v4/introspect"
+    "destination": "/docs/references/benchmarks/v4/introspect",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/machine_client_credentials_login",
-    "destination": "/docs/references/benchmarks/v4/machine_client_credentials_login"
+    "destination": "/docs/references/benchmarks/v4/machine_client_credentials_login",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/machine_jwt_profile_grant",
-    "destination": "/docs/references/benchmarks/v4/machine_jwt_profile_grant"
+    "destination": "/docs/references/benchmarks/v4/machine_jwt_profile_grant",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/machine_pat_login",
-    "destination": "/docs/references/benchmarks/v4/machine_pat_login"
+    "destination": "/docs/references/benchmarks/v4/machine_pat_login",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/manipulate_user",
-    "destination": "/docs/references/benchmarks/v4/manipulate_user"
+    "destination": "/docs/references/benchmarks/v4/manipulate_user",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/oidc_session",
-    "destination": "/docs/references/benchmarks/v4/oidc_session"
+    "destination": "/docs/references/benchmarks/v4/oidc_session",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/otp_session",
-    "destination": "/docs/references/benchmarks/v4/otp_session"
+    "destination": "/docs/references/benchmarks/v4/otp_session",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/password_session",
-    "destination": "/docs/references/benchmarks/v4/password_session"
+    "destination": "/docs/references/benchmarks/v4/password_session",
+    "permanent": true
   },
   {
     "source": "/docs/apis/benchmarks/v4/user_info",
-    "destination": "/docs/references/benchmarks/v4/user_info"
+    "destination": "/docs/references/benchmarks/v4/user_info",
+    "permanent": true
   },
   {
     "source": "/docs/apis/introduction",
-    "destination": "/docs/references/introduction"
+    "destination": "/docs/references/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/apis/migration_v1_to_v2",
-    "destination": "/docs/references/migration_v1_to_v2"
+    "destination": "/docs/references/migration_v1_to_v2",
+    "permanent": true
   },
   {
     "source": "/docs/apis/observability/health",
-    "destination": "/docs/references/observability/health"
+    "destination": "/docs/references/observability/health",
+    "permanent": true
   },
   {
     "source": "/docs/apis/observability/metrics",
-    "destination": "/docs/references/observability/metrics"
+    "destination": "/docs/references/observability/metrics",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/authn-methods",
-    "destination": "/docs/references/openidoauth/authn-methods"
+    "destination": "/docs/references/openidoauth/authn-methods",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/authrequest",
-    "destination": "/docs/references/openidoauth/authrequest"
+    "destination": "/docs/references/openidoauth/authrequest",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/claims",
-    "destination": "/docs/references/openidoauth/claims"
+    "destination": "/docs/references/openidoauth/claims",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/endpoints",
-    "destination": "/docs/references/openidoauth/endpoints"
+    "destination": "/docs/references/openidoauth/endpoints",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/grant-types",
-    "destination": "/docs/references/openidoauth/grant-types"
+    "destination": "/docs/references/openidoauth/grant-types",
+    "permanent": true
   },
   {
     "source": "/docs/apis/openidoauth/scopes",
-    "destination": "/docs/references/openidoauth/scopes"
+    "destination": "/docs/references/openidoauth/scopes",
+    "permanent": true
   },
   {
     "source": "/docs/apis/resources/admin",
-    "destination": "/docs/references/api-v1/admin"
+    "destination": "/docs/references/api-v1/admin",
+    "permanent": true
   },
   {
     "source": "/docs/apis/resources/auth",
-    "destination": "/docs/references/api-v1/auth"
+    "destination": "/docs/references/api-v1/auth",
+    "permanent": true
   },
   {
     "source": "/docs/apis/resources/org_service/v2",
-    "destination": "/docs/references/v2"
+    "destination": "/docs/references/v2",
+    "permanent": true
   },
   {
     "source": "/docs/apis/resources/system",
-    "destination": "/docs/references/api-v1/system"
+    "destination": "/docs/references/api-v1/system",
+    "permanent": true
   },
   {
     "source": "/docs/apis/saml/endpoints",
-    "destination": "/docs/references/saml/endpoints"
+    "destination": "/docs/references/saml/endpoints",
+    "permanent": true
   },
   {
     "source": "/docs/apis/scim2",
-    "destination": "/docs/references/scim2"
+    "destination": "/docs/references/scim2",
+    "permanent": true
   },
   {
     "source": "/docs/apis/statuscodes",
-    "destination": "/docs/references/statuscodes"
+    "destination": "/docs/references/statuscodes",
+    "permanent": true
   },
   {
     "source": "/docs/apis/v2",
-    "destination": "/docs/references/v2"
+    "destination": "/docs/references/v2",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/branding",
-    "destination": "/docs/manage-and-govern/customize/branding"
+    "destination": "/docs/manage-and-govern/customize/branding",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/instance",
-    "destination": "/docs/concepts/structure/instance"
+    "destination": "/docs/concepts/structure/instance",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/notification-providers",
-    "destination": "/docs/manage-and-govern/customize/notification-providers"
+    "destination": "/docs/manage-and-govern/customize/notification-providers",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/organizations",
-    "destination": "/docs/concepts/structure/organizations"
+    "destination": "/docs/concepts/structure/organizations",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/restrictions",
-    "destination": "/docs/manage-and-govern/customize/restrictions"
+    "destination": "/docs/manage-and-govern/customize/restrictions",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/secrets",
-    "destination": "/docs/concepts/architecture/secrets"
+    "destination": "/docs/concepts/architecture/secrets",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/admin/settings",
-    "destination": "/docs/manage-and-govern/cloud/settings"
+    "destination": "/docs/manage-and-govern/cloud/settings",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/auth/policies",
-    "destination": "/docs/concepts/structure/policies"
+    "destination": "/docs/concepts/structure/policies",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/auth/user-metadata",
-    "destination": "/docs/manage-and-govern/customize/user-metadata"
+    "destination": "/docs/manage-and-govern/customize/user-metadata",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/auth/users",
-    "destination": "/docs/concepts/structure/users"
+    "destination": "/docs/concepts/structure/users",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/actions",
-    "destination": "/docs/concepts/features/actions"
+    "destination": "/docs/concepts/features/actions",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/applications",
-    "destination": "/docs/concepts/structure/applications"
+    "destination": "/docs/concepts/structure/applications",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/branding",
-    "destination": "/docs/manage-and-govern/customize/branding"
+    "destination": "/docs/manage-and-govern/customize/branding",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/organizations",
-    "destination": "/docs/concepts/structure/organizations"
+    "destination": "/docs/concepts/structure/organizations",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/projects",
-    "destination": "/docs/concepts/structure/projects"
+    "destination": "/docs/concepts/structure/projects",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/settings",
-    "destination": "/docs/manage-and-govern/cloud/settings"
+    "destination": "/docs/manage-and-govern/cloud/settings",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/user-metadata",
-    "destination": "/docs/manage-and-govern/customize/user-metadata"
+    "destination": "/docs/manage-and-govern/customize/user-metadata",
+    "permanent": true
   },
   {
     "source": "/docs/category/apis/resources/mgmt/users",
-    "destination": "/docs/concepts/structure/users"
+    "destination": "/docs/concepts/structure/users",
+    "permanent": true
   },
   {
     "source": "/docs/examples/identity-proxy/oauth2-proxy",
-    "destination": "/docs/build-and-integrate/examples/identity-proxy/oauth2-proxy"
+    "destination": "/docs/build-and-integrate/examples/identity-proxy/oauth2-proxy",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/angular",
-    "destination": "/docs/build-and-integrate/examples/login/angular"
+    "destination": "/docs/build-and-integrate/examples/login/angular",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/flutter",
-    "destination": "/docs/build-and-integrate/examples/login/flutter"
+    "destination": "/docs/build-and-integrate/examples/login/flutter",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/go",
-    "destination": "/docs/build-and-integrate/examples/login/go"
+    "destination": "/docs/build-and-integrate/examples/login/go",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/java-spring",
-    "destination": "/docs/build-and-integrate/examples/login/java-spring"
+    "destination": "/docs/build-and-integrate/examples/login/java-spring",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/nextjs",
-    "destination": "/docs/build-and-integrate/examples/login/nextjs"
+    "destination": "/docs/build-and-integrate/examples/login/nextjs",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/nextjs-b2b",
-    "destination": "/docs/build-and-integrate/examples/login/nextjs-b2b"
+    "destination": "/docs/build-and-integrate/examples/login/nextjs-b2b",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/python-django",
-    "destination": "/docs/build-and-integrate/examples/login/python-django"
+    "destination": "/docs/build-and-integrate/examples/login/python-django",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/react",
-    "destination": "/docs/build-and-integrate/examples/login/react"
+    "destination": "/docs/build-and-integrate/examples/login/react",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/symfony",
-    "destination": "/docs/build-and-integrate/examples/login/symfony"
+    "destination": "/docs/build-and-integrate/examples/login/symfony",
+    "permanent": true
   },
   {
     "source": "/docs/examples/login/vue",
-    "destination": "/docs/build-and-integrate/examples/login/vue"
+    "destination": "/docs/build-and-integrate/examples/login/vue",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/go",
-    "destination": "/docs/build-and-integrate/examples/login/go"
+    "destination": "/docs/build-and-integrate/examples/login/go",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/java-spring",
-    "destination": "/docs/build-and-integrate/examples/login/java-spring"
+    "destination": "/docs/build-and-integrate/examples/login/java-spring",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/nodejs-nestjs",
-    "destination": "/docs/build-and-integrate/examples/secure-api/nodejs-nestjs"
+    "destination": "/docs/build-and-integrate/examples/secure-api/nodejs-nestjs",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/pylon",
-    "destination": "/docs/build-and-integrate/examples/secure-api/pylon"
+    "destination": "/docs/build-and-integrate/examples/secure-api/pylon",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/python-django",
-    "destination": "/docs/build-and-integrate/examples/login/python-django"
+    "destination": "/docs/build-and-integrate/examples/login/python-django",
+    "permanent": true
   },
   {
     "source": "/docs/examples/secure-api/python-flask",
-    "destination": "/docs/build-and-integrate/examples/secure-api/python-flask"
+    "destination": "/docs/build-and-integrate/examples/secure-api/python-flask",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions",
-    "destination": "/docs/concepts/features/actions"
+    "destination": "/docs/concepts/features/actions",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/migrate-from-v1",
-    "destination": "/docs/build-and-integrate/actions/migrate-from-v1"
+    "destination": "/docs/build-and-integrate/actions/migrate-from-v1",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-event",
-    "destination": "/docs/build-and-integrate/actions/testing-event"
+    "destination": "/docs/build-and-integrate/actions/testing-event",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-function",
-    "destination": "/docs/build-and-integrate/actions/testing-function"
+    "destination": "/docs/build-and-integrate/actions/testing-function",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-function-manipulation",
-    "destination": "/docs/build-and-integrate/actions/testing-function-manipulation"
+    "destination": "/docs/build-and-integrate/actions/testing-function-manipulation",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-request",
-    "destination": "/docs/build-and-integrate/actions/testing-request"
+    "destination": "/docs/build-and-integrate/actions/testing-request",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-request-manipulation",
-    "destination": "/docs/build-and-integrate/actions/testing-request-manipulation"
+    "destination": "/docs/build-and-integrate/actions/testing-request-manipulation",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-request-signature",
-    "destination": "/docs/build-and-integrate/actions/testing-request-signature"
+    "destination": "/docs/build-and-integrate/actions/testing-request-signature",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-response",
-    "destination": "/docs/build-and-integrate/actions/testing-response"
+    "destination": "/docs/build-and-integrate/actions/testing-response",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/testing-response-manipulation",
-    "destination": "/docs/build-and-integrate/actions/testing-response-manipulation"
+    "destination": "/docs/build-and-integrate/actions/testing-response-manipulation",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/usage",
-    "destination": "/docs/build-and-integrate/actions/usage"
+    "destination": "/docs/build-and-integrate/actions/usage",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/actions/webhook-site-setup",
-    "destination": "/docs/build-and-integrate/actions/webhook-site-setup"
+    "destination": "/docs/build-and-integrate/actions/webhook-site-setup",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/authenticated-mongodb-charts",
-    "destination": "/docs/build-and-integrate/authenticated-mongodb-charts"
+    "destination": "/docs/build-and-integrate/authenticated-mongodb-charts",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/back-channel-logout",
-    "destination": "/docs/build-and-integrate/back-channel-logout"
+    "destination": "/docs/build-and-integrate/back-channel-logout",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/external-audit-log",
-    "destination": "/docs/build-and-integrate/external-audit-log"
+    "destination": "/docs/build-and-integrate/external-audit-log",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/additional-information",
-    "destination": "/docs/build-and-integrate/identity-providers/additional-information"
+    "destination": "/docs/build-and-integrate/identity-providers/additional-information",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/apple",
-    "destination": "/docs/build-and-integrate/identity-providers/apple"
+    "destination": "/docs/build-and-integrate/identity-providers/apple",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/azure-ad-oidc",
-    "destination": "/docs/build-and-integrate/identity-providers/azure-ad-oidc"
+    "destination": "/docs/build-and-integrate/identity-providers/azure-ad-oidc",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/azure-ad-saml",
-    "destination": "/docs/build-and-integrate/identity-providers/azure-ad-saml"
+    "destination": "/docs/build-and-integrate/identity-providers/azure-ad-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/github",
-    "destination": "/docs/build-and-integrate/identity-providers/github"
+    "destination": "/docs/build-and-integrate/identity-providers/github",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/gitlab",
-    "destination": "/docs/build-and-integrate/identity-providers/gitlab"
+    "destination": "/docs/build-and-integrate/identity-providers/gitlab",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/google",
-    "destination": "/docs/build-and-integrate/identity-providers/google"
+    "destination": "/docs/build-and-integrate/identity-providers/google",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/introduction",
-    "destination": "/docs/build-and-integrate/identity-providers/introduction"
+    "destination": "/docs/build-and-integrate/identity-providers/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/jwt_idp",
-    "destination": "/docs/build-and-integrate/identity-providers/jwt_idp"
+    "destination": "/docs/build-and-integrate/identity-providers/jwt_idp",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/keycloak",
-    "destination": "/docs/build-and-integrate/identity-providers/keycloak"
+    "destination": "/docs/build-and-integrate/identity-providers/keycloak",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/ldap",
-    "destination": "/docs/build-and-integrate/identity-providers/ldap"
+    "destination": "/docs/build-and-integrate/identity-providers/ldap",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/migrate",
-    "destination": "/docs/build-and-integrate/identity-providers/migrate"
+    "destination": "/docs/build-and-integrate/identity-providers/migrate",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/mocksaml",
-    "destination": "/docs/build-and-integrate/identity-providers/mocksaml"
+    "destination": "/docs/build-and-integrate/identity-providers/mocksaml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/okta-oidc",
-    "destination": "/docs/build-and-integrate/identity-providers/okta-oidc"
+    "destination": "/docs/build-and-integrate/identity-providers/okta-oidc",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/identity-providers/openldap",
-    "destination": "/docs/build-and-integrate/identity-providers/openldap"
+    "destination": "/docs/build-and-integrate/identity-providers/openldap",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/device-auth",
-    "destination": "/docs/build-and-integrate/login-ui/device-auth"
+    "destination": "/docs/build-and-integrate/login-ui/device-auth",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/external-login",
-    "destination": "/docs/build-and-integrate/login-ui/external-login"
+    "destination": "/docs/build-and-integrate/login-ui/external-login",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/login-app",
-    "destination": "/docs/build-and-integrate/login-ui/login-app"
+    "destination": "/docs/build-and-integrate/login-ui/login-app",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/logout",
-    "destination": "/docs/build-and-integrate/login/oidc/logout"
+    "destination": "/docs/build-and-integrate/login/oidc/logout",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/mfa",
-    "destination": "/docs/build-and-integrate/login-ui/mfa"
+    "destination": "/docs/build-and-integrate/login-ui/mfa",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/oidc-standard",
-    "destination": "/docs/build-and-integrate/login-ui/oidc-standard"
+    "destination": "/docs/build-and-integrate/login-ui/oidc-standard",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/passkey",
-    "destination": "/docs/build-and-integrate/login-ui/passkey"
+    "destination": "/docs/build-and-integrate/login-ui/passkey",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/password-reset",
-    "destination": "/docs/build-and-integrate/login-ui/password-reset"
+    "destination": "/docs/build-and-integrate/login-ui/password-reset",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/saml-standard",
-    "destination": "/docs/build-and-integrate/login-ui/saml-standard"
+    "destination": "/docs/build-and-integrate/login-ui/saml-standard",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/select-account",
-    "destination": "/docs/build-and-integrate/login-ui/select-account"
+    "destination": "/docs/build-and-integrate/login-ui/select-account",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/session-validation",
-    "destination": "/docs/build-and-integrate/login-ui/session-validation"
+    "destination": "/docs/build-and-integrate/login-ui/session-validation",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login-ui/username-password",
-    "destination": "/docs/build-and-integrate/login-ui/username-password"
+    "destination": "/docs/build-and-integrate/login-ui/username-password",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/hosted-login",
-    "destination": "/docs/build-and-integrate/login/hosted-login"
+    "destination": "/docs/build-and-integrate/login/hosted-login",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/login-users",
-    "destination": "/docs/build-and-integrate/login/login-users"
+    "destination": "/docs/build-and-integrate/login/login-users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/oidc/device-authorization",
-    "destination": "/docs/build-and-integrate/login/oidc/device-authorization"
+    "destination": "/docs/build-and-integrate/login/oidc/device-authorization",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/oidc/login-users",
-    "destination": "/docs/build-and-integrate/login/login-users"
+    "destination": "/docs/build-and-integrate/login/login-users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/oidc/logout",
-    "destination": "/docs/build-and-integrate/login/oidc/logout"
+    "destination": "/docs/build-and-integrate/login/oidc/logout",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/oidc/oauth-recommended-flows",
-    "destination": "/docs/build-and-integrate/login/oidc/oauth-recommended-flows"
+    "destination": "/docs/build-and-integrate/login/oidc/oauth-recommended-flows",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/oidc/webkeys",
-    "destination": "/docs/build-and-integrate/login/oidc/webkeys"
+    "destination": "/docs/build-and-integrate/login/oidc/webkeys",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/login/saml",
-    "destination": "/docs/build-and-integrate/login/saml"
+    "destination": "/docs/build-and-integrate/login/saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/onboarding/b2b",
-    "destination": "/docs/build-and-integrate/onboarding/b2b"
+    "destination": "/docs/build-and-integrate/onboarding/b2b",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/onboarding/end-users",
-    "destination": "/docs/build-and-integrate/onboarding/end-users"
+    "destination": "/docs/build-and-integrate/onboarding/end-users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/retrieve-user-roles",
-    "destination": "/docs/build-and-integrate/retrieve-user-roles"
+    "destination": "/docs/build-and-integrate/retrieve-user-roles",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/scim-okta-guide",
-    "destination": "/docs/build-and-integrate/scim-okta-guide"
+    "destination": "/docs/build-and-integrate/scim-okta-guide",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/service-users/authenticate-service-users",
-    "destination": "/docs/build-and-integrate/service-users/authenticate-service-users"
+    "destination": "/docs/build-and-integrate/service-users/authenticate-service-users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/service-users/client-credentials",
-    "destination": "/docs/build-and-integrate/service-users/client-credentials"
+    "destination": "/docs/build-and-integrate/service-users/client-credentials",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/service-users/personal-access-token",
-    "destination": "/docs/build-and-integrate/service-users/personal-access-token"
+    "destination": "/docs/build-and-integrate/service-users/personal-access-token",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/service-users/private-key-jwt",
-    "destination": "/docs/build-and-integrate/service-users/private-key-jwt"
+    "destination": "/docs/build-and-integrate/service-users/private-key-jwt",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/atlassian-saml",
-    "destination": "/docs/build-and-integrate/services/atlassian-saml"
+    "destination": "/docs/build-and-integrate/services/atlassian-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/auth0-oidc",
-    "destination": "/docs/build-and-integrate/services/auth0-oidc"
+    "destination": "/docs/build-and-integrate/services/auth0-oidc",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/auth0-saml",
-    "destination": "/docs/build-and-integrate/services/auth0-saml"
+    "destination": "/docs/build-and-integrate/services/auth0-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/aws-saml",
-    "destination": "/docs/build-and-integrate/services/aws-saml"
+    "destination": "/docs/build-and-integrate/services/aws-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/cloudflare-oidc",
-    "destination": "/docs/build-and-integrate/services/cloudflare-oidc"
+    "destination": "/docs/build-and-integrate/services/cloudflare-oidc",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/gitlab-saml",
-    "destination": "/docs/build-and-integrate/services/gitlab-saml"
+    "destination": "/docs/build-and-integrate/services/gitlab-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/gitlab-self-hosted",
-    "destination": "/docs/build-and-integrate/services/gitlab-self-hosted"
+    "destination": "/docs/build-and-integrate/services/gitlab-self-hosted",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/google-cloud",
-    "destination": "/docs/build-and-integrate/services/google-cloud"
+    "destination": "/docs/build-and-integrate/services/google-cloud",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/google-workspace",
-    "destination": "/docs/build-and-integrate/services/google-workspace"
+    "destination": "/docs/build-and-integrate/services/google-workspace",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/services/pingidentity-saml",
-    "destination": "/docs/build-and-integrate/services/pingidentity-saml"
+    "destination": "/docs/build-and-integrate/services/pingidentity-saml",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/token-exchange",
-    "destination": "/docs/build-and-integrate/token-exchange"
+    "destination": "/docs/build-and-integrate/token-exchange",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/token-introspection",
-    "destination": "/docs/build-and-integrate/token-introspection"
+    "destination": "/docs/build-and-integrate/token-introspection",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/token-introspection/basic-auth",
-    "destination": "/docs/build-and-integrate/token-introspection/basic-auth"
+    "destination": "/docs/build-and-integrate/token-introspection/basic-auth",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/token-introspection/private-key-jwt",
-    "destination": "/docs/build-and-integrate/service-users/private-key-jwt"
+    "destination": "/docs/build-and-integrate/service-users/private-key-jwt",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/tools/apache2",
-    "destination": "/docs/build-and-integrate/tools/apache2"
+    "destination": "/docs/build-and-integrate/tools/apache2",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis",
-    "destination": "/docs/build-and-integrate/zitadel-apis/access-zitadel-apis"
+    "destination": "/docs/build-and-integrate/zitadel-apis/access-zitadel-apis",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api",
-    "destination": "/docs/build-and-integrate/zitadel-apis/access-zitadel-system-api"
+    "destination": "/docs/build-and-integrate/zitadel-apis/access-zitadel-system-api",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/zitadel-apis/event-api",
-    "destination": "/docs/build-and-integrate/zitadel-apis/event-api"
+    "destination": "/docs/build-and-integrate/zitadel-apis/event-api",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net",
-    "destination": "/docs/build-and-integrate/zitadel-apis/example-zitadel-api-with-dot-net"
+    "destination": "/docs/build-and-integrate/zitadel-apis/example-zitadel-api-with-dot-net",
+    "permanent": true
   },
   {
     "source": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-go",
-    "destination": "/docs/build-and-integrate/zitadel-apis/example-zitadel-api-with-go"
+    "destination": "/docs/build-and-integrate/zitadel-apis/example-zitadel-api-with-go",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/billing",
-    "destination": "/docs/manage-and-govern/cloud/billing"
+    "destination": "/docs/manage-and-govern/cloud/billing",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/instances",
-    "destination": "/docs/manage-and-govern/cloud/instances"
+    "destination": "/docs/manage-and-govern/cloud/instances",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/overview",
-    "destination": "/docs/concepts/eventstore/overview"
+    "destination": "/docs/concepts/eventstore/overview",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/settings",
-    "destination": "/docs/manage-and-govern/cloud/settings"
+    "destination": "/docs/manage-and-govern/cloud/settings",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/start",
-    "destination": "/docs/manage-and-govern/cloud/start"
+    "destination": "/docs/manage-and-govern/cloud/start",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/support",
-    "destination": "/docs/manage-and-govern/cloud/support"
+    "destination": "/docs/manage-and-govern/cloud/support",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/cloud/users",
-    "destination": "/docs/concepts/structure/users"
+    "destination": "/docs/concepts/structure/users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/actions",
-    "destination": "/docs/concepts/features/actions"
+    "destination": "/docs/concepts/features/actions",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/applications",
-    "destination": "/docs/concepts/structure/applications"
+    "destination": "/docs/concepts/structure/applications",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/default-settings",
-    "destination": "/docs/manage-and-govern/console/default-settings"
+    "destination": "/docs/manage-and-govern/console/default-settings",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/managers",
-    "destination": "/docs/concepts/structure/managers"
+    "destination": "/docs/concepts/structure/managers",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/organizations",
-    "destination": "/docs/concepts/structure/organizations"
+    "destination": "/docs/concepts/structure/organizations",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/overview",
-    "destination": "/docs/concepts/eventstore/overview"
+    "destination": "/docs/concepts/eventstore/overview",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/projects",
-    "destination": "/docs/concepts/structure/projects"
+    "destination": "/docs/concepts/structure/projects",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/roles",
-    "destination": "/docs/manage-and-govern/console/roles"
+    "destination": "/docs/manage-and-govern/console/roles",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/console/users",
-    "destination": "/docs/concepts/structure/users"
+    "destination": "/docs/concepts/structure/users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/behavior",
-    "destination": "/docs/manage-and-govern/customize/behavior"
+    "destination": "/docs/manage-and-govern/customize/behavior",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/branding",
-    "destination": "/docs/manage-and-govern/customize/branding"
+    "destination": "/docs/manage-and-govern/customize/branding",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/notification-providers",
-    "destination": "/docs/manage-and-govern/customize/notification-providers"
+    "destination": "/docs/manage-and-govern/customize/notification-providers",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/restrictions",
-    "destination": "/docs/manage-and-govern/customize/restrictions"
+    "destination": "/docs/manage-and-govern/customize/restrictions",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/texts",
-    "destination": "/docs/manage-and-govern/customize/texts"
+    "destination": "/docs/manage-and-govern/customize/texts",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/user-metadata",
-    "destination": "/docs/manage-and-govern/customize/user-metadata"
+    "destination": "/docs/manage-and-govern/customize/user-metadata",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/customize/user-schema",
-    "destination": "/docs/manage-and-govern/customize/user-schema"
+    "destination": "/docs/manage-and-govern/customize/user-schema",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/terraform-provider",
-    "destination": "/docs/manage-and-govern/terraform-provider"
+    "destination": "/docs/manage-and-govern/terraform-provider",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/user/reg-create-user",
-    "destination": "/docs/manage-and-govern/user/reg-create-user"
+    "destination": "/docs/manage-and-govern/user/reg-create-user",
+    "permanent": true
   },
   {
     "source": "/docs/guides/manage/user/scim2",
-    "destination": "/docs/manage-and-govern/user/scim2"
+    "destination": "/docs/manage-and-govern/user/scim2",
+    "permanent": true
   },
   {
     "source": "/docs/guides/migrate/introduction",
-    "destination": "/docs/build-and-integrate/identity-providers/introduction"
+    "destination": "/docs/build-and-integrate/identity-providers/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/guides/migrate/sources/auth0",
-    "destination": "/docs/manage-and-govern/migrate/sources/auth0"
+    "destination": "/docs/manage-and-govern/migrate/sources/auth0",
+    "permanent": true
   },
   {
     "source": "/docs/guides/migrate/sources/keycloak",
-    "destination": "/docs/build-and-integrate/identity-providers/keycloak"
+    "destination": "/docs/build-and-integrate/identity-providers/keycloak",
+    "permanent": true
   },
   {
     "source": "/docs/guides/migrate/sources/zitadel",
-    "destination": "/docs/manage-and-govern/migrate/sources/zitadel"
+    "destination": "/docs/manage-and-govern/migrate/sources/zitadel",
+    "permanent": true
   },
   {
     "source": "/docs/guides/migrate/users",
-    "destination": "/docs/concepts/structure/users"
+    "destination": "/docs/concepts/structure/users",
+    "permanent": true
   },
   {
     "source": "/docs/guides/overview",
-    "destination": "/docs/concepts/eventstore/overview"
+    "destination": "/docs/concepts/eventstore/overview",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/b2b",
-    "destination": "/docs/build-and-integrate/onboarding/b2b"
+    "destination": "/docs/build-and-integrate/onboarding/b2b",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/b2c",
-    "destination": "/docs/build-and-integrate/solution-scenarios/b2c"
+    "destination": "/docs/build-and-integrate/solution-scenarios/b2c",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/configurations",
-    "destination": "/docs/build-and-integrate/solution-scenarios/configurations"
+    "destination": "/docs/build-and-integrate/solution-scenarios/configurations",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/domain-discovery",
-    "destination": "/docs/build-and-integrate/solution-scenarios/domain-discovery"
+    "destination": "/docs/build-and-integrate/solution-scenarios/domain-discovery",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/frontend-calling-backend-API",
-    "destination": "/docs/build-and-integrate/solution-scenarios/frontend-calling-backend-API"
+    "destination": "/docs/build-and-integrate/solution-scenarios/frontend-calling-backend-API",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/introduction",
-    "destination": "/docs/build-and-integrate/identity-providers/introduction"
+    "destination": "/docs/build-and-integrate/identity-providers/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/restrict-console",
-    "destination": "/docs/build-and-integrate/solution-scenarios/restrict-console"
+    "destination": "/docs/build-and-integrate/solution-scenarios/restrict-console",
+    "permanent": true
   },
   {
     "source": "/docs/guides/solution-scenarios/saas",
-    "destination": "/docs/build-and-integrate/solution-scenarios/saas"
+    "destination": "/docs/build-and-integrate/solution-scenarios/saas",
+    "permanent": true
   },
   {
     "source": "/docs/guides/start/quickstart",
-    "destination": "/docs/quickstarts/quickstart"
+    "destination": "/docs/quickstarts/quickstart",
+    "permanent": true
   },
   {
     "source": "/docs/legal/annex-support-services",
-    "destination": "/docs/manage-and-govern/legal/annex-support-services"
+    "destination": "/docs/manage-and-govern/legal/annex-support-services",
+    "permanent": true
   },
   {
     "source": "/docs/legal/data-processing-agreement",
-    "destination": "/docs/manage-and-govern/legal/data-processing-agreement"
+    "destination": "/docs/manage-and-govern/legal/data-processing-agreement",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies",
-    "destination": "/docs/concepts/structure/policies"
+    "destination": "/docs/concepts/structure/policies",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/acceptable-use-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/acceptable-use-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/acceptable-use-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/account-lockout-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/account-lockout-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/account-lockout-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/brand-trademark-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/brand-trademark-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/brand-trademark-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/feature-development-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/feature-development-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/feature-development-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/privacy-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/privacy-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/privacy-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/rate-limit-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/rate-limit-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/rate-limit-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/policies/vulnerability-disclosure-policy",
-    "destination": "/docs/manage-and-govern/legal/policies/vulnerability-disclosure-policy"
+    "destination": "/docs/manage-and-govern/legal/policies/vulnerability-disclosure-policy",
+    "permanent": true
   },
   {
     "source": "/docs/legal/service-description/cloud-service-description",
-    "destination": "/docs/manage-and-govern/legal/service-description/cloud-service-description"
+    "destination": "/docs/manage-and-govern/legal/service-description/cloud-service-description",
+    "permanent": true
   },
   {
     "source": "/docs/legal/service-description/service-level-description",
-    "destination": "/docs/manage-and-govern/legal/service-description/service-level-description"
+    "destination": "/docs/manage-and-govern/legal/service-description/service-level-description",
+    "permanent": true
   },
   {
     "source": "/docs/legal/service-description/support-services",
-    "destination": "/docs/manage-and-govern/legal/service-description/support-services"
+    "destination": "/docs/manage-and-govern/legal/service-description/support-services",
+    "permanent": true
   },
   {
     "source": "/docs/legal/subprocessors",
-    "destination": "/docs/manage-and-govern/legal/subprocessors"
+    "destination": "/docs/manage-and-govern/legal/subprocessors",
+    "permanent": true
   },
   {
     "source": "/docs/legal/terms-of-service",
-    "destination": "/docs/manage-and-govern/legal/terms-of-service"
+    "destination": "/docs/manage-and-govern/legal/terms-of-service",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/angular",
-    "destination": "/docs/build-and-integrate/examples/login/angular"
+    "destination": "/docs/build-and-integrate/examples/login/angular",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/astro",
-    "destination": "/docs/build-and-integrate/sdk-examples/astro"
+    "destination": "/docs/build-and-integrate/sdk-examples/astro",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/client-libraries/java",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/java"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/java",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/client-libraries/node",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/node"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/node",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/client-libraries/php",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/php"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/php",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/client-libraries/python",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/python"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/python",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/client-libraries/ruby",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/ruby"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/ruby",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/expressjs",
-    "destination": "/docs/build-and-integrate/sdk-examples/expressjs"
+    "destination": "/docs/build-and-integrate/sdk-examples/expressjs",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/fastify",
-    "destination": "/docs/build-and-integrate/sdk-examples/fastify"
+    "destination": "/docs/build-and-integrate/sdk-examples/fastify",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/flutter",
-    "destination": "/docs/build-and-integrate/examples/login/flutter"
+    "destination": "/docs/build-and-integrate/examples/login/flutter",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/go",
-    "destination": "/docs/build-and-integrate/examples/login/go"
+    "destination": "/docs/build-and-integrate/examples/login/go",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/hono",
-    "destination": "/docs/build-and-integrate/sdk-examples/hono"
+    "destination": "/docs/build-and-integrate/sdk-examples/hono",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/introduction",
-    "destination": "/docs/build-and-integrate/identity-providers/introduction"
+    "destination": "/docs/build-and-integrate/identity-providers/introduction",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/java",
-    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/java"
+    "destination": "/docs/build-and-integrate/sdk-examples/client-libraries/java",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/nestjs",
-    "destination": "/docs/build-and-integrate/sdk-examples/nestjs"
+    "destination": "/docs/build-and-integrate/sdk-examples/nestjs",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/nextjs",
-    "destination": "/docs/build-and-integrate/examples/login/nextjs"
+    "destination": "/docs/build-and-integrate/examples/login/nextjs",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/nuxtjs",
-    "destination": "/docs/build-and-integrate/sdk-examples/nuxtjs"
+    "destination": "/docs/build-and-integrate/sdk-examples/nuxtjs",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/python-django",
-    "destination": "/docs/build-and-integrate/examples/login/python-django"
+    "destination": "/docs/build-and-integrate/examples/login/python-django",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/python-flask",
-    "destination": "/docs/build-and-integrate/examples/secure-api/python-flask"
+    "destination": "/docs/build-and-integrate/examples/secure-api/python-flask",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/qwik",
-    "destination": "/docs/build-and-integrate/sdk-examples/qwik"
+    "destination": "/docs/build-and-integrate/sdk-examples/qwik",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/react",
-    "destination": "/docs/build-and-integrate/examples/login/react"
+    "destination": "/docs/build-and-integrate/examples/login/react",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/solidstart",
-    "destination": "/docs/build-and-integrate/sdk-examples/solidstart"
+    "destination": "/docs/build-and-integrate/sdk-examples/solidstart",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/sveltekit",
-    "destination": "/docs/build-and-integrate/sdk-examples/sveltekit"
+    "destination": "/docs/build-and-integrate/sdk-examples/sveltekit",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/symfony",
-    "destination": "/docs/build-and-integrate/examples/login/symfony"
+    "destination": "/docs/build-and-integrate/examples/login/symfony",
+    "permanent": true
   },
   {
     "source": "/docs/sdk-examples/vue",
-    "destination": "/docs/build-and-integrate/examples/login/vue"
+    "destination": "/docs/build-and-integrate/examples/login/vue",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/compose",
-    "destination": "/docs/operate-and-self-host/deploy/compose"
+    "destination": "/docs/operate-and-self-host/deploy/compose",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/devcontainer",
-    "destination": "/docs/operate-and-self-host/deploy/devcontainer"
+    "destination": "/docs/operate-and-self-host/deploy/devcontainer",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/kubernetes",
-    "destination": "/docs/operate-and-self-host/deploy/kubernetes"
+    "destination": "/docs/operate-and-self-host/deploy/kubernetes",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/linux",
-    "destination": "/docs/operate-and-self-host/deploy/linux"
+    "destination": "/docs/operate-and-self-host/deploy/linux",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/macos",
-    "destination": "/docs/operate-and-self-host/deploy/macos"
+    "destination": "/docs/operate-and-self-host/deploy/macos",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/overview",
-    "destination": "/docs/concepts/eventstore/overview"
+    "destination": "/docs/concepts/eventstore/overview",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/deploy/troubleshooting",
-    "destination": "/docs/manage-and-govern/support/troubleshooting"
+    "destination": "/docs/manage-and-govern/support/troubleshooting",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/cache",
-    "destination": "/docs/operate-and-self-host/manage/cache"
+    "destination": "/docs/operate-and-self-host/manage/cache",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/cli/mirror",
-    "destination": "/docs/operate-and-self-host/manage/cli/mirror"
+    "destination": "/docs/operate-and-self-host/manage/cli/mirror",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/cli/overview",
-    "destination": "/docs/concepts/eventstore/overview"
+    "destination": "/docs/concepts/eventstore/overview",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/configure",
-    "destination": "/docs/operate-and-self-host/manage/configure/configure"
+    "destination": "/docs/operate-and-self-host/manage/configure/configure",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/custom-domain",
-    "destination": "/docs/concepts/features/custom-domain"
+    "destination": "/docs/concepts/features/custom-domain",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/database",
-    "destination": "/docs/operate-and-self-host/manage/database/database"
+    "destination": "/docs/operate-and-self-host/manage/database/database",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/http2",
-    "destination": "/docs/operate-and-self-host/manage/http2"
+    "destination": "/docs/operate-and-self-host/manage/http2",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/login-client",
-    "destination": "/docs/operate-and-self-host/manage/login-client"
+    "destination": "/docs/operate-and-self-host/manage/login-client",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/production",
-    "destination": "/docs/operate-and-self-host/manage/production"
+    "destination": "/docs/operate-and-self-host/manage/production",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/productionchecklist",
-    "destination": "/docs/operate-and-self-host/manage/productionchecklist"
+    "destination": "/docs/operate-and-self-host/manage/productionchecklist",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/caddy",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/caddy/caddy"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/caddy/caddy",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/cloudflare",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/cloudflare/cloudflare"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/cloudflare/cloudflare",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/cloudflare_tunnel",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/httpd",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/httpd/httpd"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/httpd/httpd",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/nginx",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/nginx/nginx"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/nginx/nginx",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/reverse_proxy",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/reverse_proxy"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/reverse_proxy",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/traefik",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/traefik/traefik"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/traefik/traefik",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/reverseproxy/zitadel_cloud",
-    "destination": "/docs/operate-and-self-host/manage/reverseproxy/zitadel_cloud/zitadel_cloud"
+    "destination": "/docs/operate-and-self-host/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/service_ping",
-    "destination": "/docs/operate-and-self-host/manage/service_ping"
+    "destination": "/docs/operate-and-self-host/manage/service_ping",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/tls_modes",
-    "destination": "/docs/operate-and-self-host/manage/tls_modes"
+    "destination": "/docs/operate-and-self-host/manage/tls_modes",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/updating_scaling",
-    "destination": "/docs/operate-and-self-host/manage/updating_scaling"
+    "destination": "/docs/operate-and-self-host/manage/updating_scaling",
+    "permanent": true
   },
   {
     "source": "/docs/self-hosting/manage/usage_control",
-    "destination": "/docs/operate-and-self-host/manage/usage_control"
+    "destination": "/docs/operate-and-self-host/manage/usage_control",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10000",
-    "destination": "/docs/manage-and-govern/support/advisory/a10000"
+    "destination": "/docs/manage-and-govern/support/advisory/a10000",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10001",
-    "destination": "/docs/manage-and-govern/support/advisory/a10001"
+    "destination": "/docs/manage-and-govern/support/advisory/a10001",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10002",
-    "destination": "/docs/manage-and-govern/support/advisory/a10002"
+    "destination": "/docs/manage-and-govern/support/advisory/a10002",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10003",
-    "destination": "/docs/manage-and-govern/support/advisory/a10003"
+    "destination": "/docs/manage-and-govern/support/advisory/a10003",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10004",
-    "destination": "/docs/manage-and-govern/support/advisory/a10004"
+    "destination": "/docs/manage-and-govern/support/advisory/a10004",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10005",
-    "destination": "/docs/manage-and-govern/support/advisory/a10005"
+    "destination": "/docs/manage-and-govern/support/advisory/a10005",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10006",
-    "destination": "/docs/manage-and-govern/support/advisory/a10006"
+    "destination": "/docs/manage-and-govern/support/advisory/a10006",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10007",
-    "destination": "/docs/manage-and-govern/support/advisory/a10007"
+    "destination": "/docs/manage-and-govern/support/advisory/a10007",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10008",
-    "destination": "/docs/manage-and-govern/support/advisory/a10008"
+    "destination": "/docs/manage-and-govern/support/advisory/a10008",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10009",
-    "destination": "/docs/manage-and-govern/support/advisory/a10009"
+    "destination": "/docs/manage-and-govern/support/advisory/a10009",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10010",
-    "destination": "/docs/manage-and-govern/support/advisory/a10010"
+    "destination": "/docs/manage-and-govern/support/advisory/a10010",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10011",
-    "destination": "/docs/manage-and-govern/support/advisory/a10011"
+    "destination": "/docs/manage-and-govern/support/advisory/a10011",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10012",
-    "destination": "/docs/manage-and-govern/support/advisory/a10012"
+    "destination": "/docs/manage-and-govern/support/advisory/a10012",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10013",
-    "destination": "/docs/manage-and-govern/support/advisory/a10013"
+    "destination": "/docs/manage-and-govern/support/advisory/a10013",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10014",
-    "destination": "/docs/manage-and-govern/support/advisory/a10014"
+    "destination": "/docs/manage-and-govern/support/advisory/a10014",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10015",
-    "destination": "/docs/manage-and-govern/support/advisory/a10015"
+    "destination": "/docs/manage-and-govern/support/advisory/a10015",
+    "permanent": true
   },
   {
     "source": "/docs/support/advisory/a10016",
-    "destination": "/docs/manage-and-govern/support/advisory/a10016"
+    "destination": "/docs/manage-and-govern/support/advisory/a10016",
+    "permanent": true
   },
   {
     "source": "/docs/support/technical_advisory",
-    "destination": "/docs/manage-and-govern/support/technical_advisory"
+    "destination": "/docs/manage-and-govern/support/technical_advisory",
+    "permanent": true
   },
   {
     "source": "/docs/support/troubleshooting",
-    "destination": "/docs/manage-and-govern/support/troubleshooting"
+    "destination": "/docs/manage-and-govern/support/troubleshooting",
+    "permanent": true
   },
   {
     "source": "/docs/build-and-integrate/sdks-tools",

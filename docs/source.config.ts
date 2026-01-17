@@ -13,7 +13,7 @@ export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
     schema: frontmatterSchema,
-    files: ['**/*.md', '**/*.mdx'],
+    files: ['**/!(_)*.md', '**/!(_)*.mdx'],
     postprocess: {
       includeProcessedMarkdown: true,
     },

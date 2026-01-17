@@ -1,9 +1,6 @@
 {
-  "title": "Reference",
   "pages": [
     "api",
-    "cli",
-    "terraform",
-    "tools"
+    "api-v1"
   ]
 }

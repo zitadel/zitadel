@@ -1,9 +1,0 @@
-{
-  "pages": [
-    "_application",
-    "_auth-type",
-    "_generate-key",
-    "_redirect-uris",
-    "_review-config"
-  ]
-}

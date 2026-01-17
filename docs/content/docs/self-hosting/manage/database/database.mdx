@@ -1,0 +1,48 @@
+---
+title: Database
+---
+
+import Tabs from "@/components/docusaurus/tabs";
+import TabItem from "@/components/docusaurus/tabs";
+import Cockroach from './_cockroachdb.mdx'
+import Postgres from './_postgres.mdx'
+
+# Database Configuration
+
+<Tabs
+    groupId="database-vendor"
+    default="postgres"
+    values={[
+        {'label': 'Postgres', 'value': 'pg'},
+        {'label': 'Cockroach (Zitadel v2)', 'value': 'crdb'},
+    ]}
+>
+    <TabItem value="pg">
+        <Postgres/>
+    </TabItem>
+    <TabItem value="crdb">
+        <Cockroach/>
+    </TabItem>
+</Tabs>
+
+## Zitadel Credentials
+
+The [init phase](/docs/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user (`Database.*.User.Username` & `Database.*.User.Password`) if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
+
+:::caution
+The `init` command is designed to be run **only once**, during the initial setup of ZITADEL. Running `init` again after changing the database user or credentials does **not** migrate database object ownerships, nor does it reassign permissions on schemas, tables, or other objects to a new user. You must update these permissions manually if you switch users.
+:::
+
+### Rotating Database Credentials
+
+If you must rotate the credentials:
+
+- You can change the password for the existing ZITADEL user, but you must manually update the password wherever ZITADEL needs it.
+- Creating a new database user requires manual reassignment of ownership and privileges for all required database objects (schemas, tables, etc.) to the new user. 
+- After migration, remove or deprecate the old user using admin access and commands appropriate for your database provider.
+
+Attempting to run `init` a second time with new credentials will fail if the user already exists, and will not change existing permissions or migrate data.
+
+:::caution
+Dropping and recreating the database does **not** automatically remove existing users. Always verify and clean up old users if necessary.
+:::

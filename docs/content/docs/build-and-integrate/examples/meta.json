@@ -1,8 +1,0 @@
-{
-  "pages": [
-    "identity-proxy",
-    "imports",
-    "login",
-    "secure-api"
-  ]
-}

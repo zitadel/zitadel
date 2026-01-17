@@ -1,0 +1,102 @@
+---
+title: Actions
+sidebar_label: Overview
+---
+
+## Overview
+
+An Identity and Access Management system is a highly interactive environment. ZITADEL includes a powerful feature called **Actions**, which allows you to programmatically react to specific events within the system.
+
+Actions allow you to define custom scripts (JavaScript) that are executed based on specific triggers (Flows). This enables advanced customization, such as modifying tokens, calling external APIs during login, or customizing authentication flows.
+
+<img
+  src="../../../img/guides/console/actionsmenu.png"
+  width="700px"
+  alt="Actions menu"
+/>
+
+## How Actions Work
+
+The Actions architecture consists of three main components:
+
+1.  **Action:** The JavaScript code containing your business logic.
+2.  **Trigger Type:** The specific event in ZITADEL (e.g., "Post Authentication") where code execution is allowed.
+3.  **Flow:** The configuration that links an Action to a Trigger Type.
+
+### The JavaScript Runtime
+
+ZITADEL interprets your Action scripts as JavaScript.
+
+* **Compliance:** Scripts must be **ECMAScript 5.1(+)** compliant.
+* **Engine:** The underlying engine is [goja](https://github.com/dop251/goja). Refer to their documentation for detailed references about the underlying library features and limitations.
+
+### Structure of an Action Script
+
+The script of an action must contain a function that matches the Action's name. ZITADEL calls this function at runtime.
+
+The function receives two primary objects:
+
+* `ctx` (Context): Provides **readable** information about the current request (User, Request Info, etc.).
+* `api` (API): Provides **methods** to mutate state (Set Claims, Deny Access, etc.).
+
+**Example:**
+If your action is named **doSomething**, your script must look like this:
+
+```js
+function doSomething(ctx, api){
+    // read from ctx and manipulate with api
+}
+```
+
+### Available Modules
+
+You can use the following built-in modules inside your JavaScript code:
+
+* [**HTTP module**](../../../apis/actions/modules#http): To call external APIs / Webhooks.
+* [**Logging module**](../../../apis/actions/modules#log): To log information to stdout (useful for debugging).
+* [**UUID module**](../../../apis/actions/modules#uuid): To generate UUIDs.
+
+Stuck customizing ZITADEL actions? Find samples for setting OIDC claims, SAML attributes, extending JIT provisioning data, calling external APIs, and more in [this repository](https://github.com/zitadel/actions).
+
+## Managing Actions in Console
+
+### 1. Create an Action
+
+To add an action, navigate to your Organization's top navigation and select **Actions**. Click the **New** button and provide:
+
+* **Name:** Must match the function name in your script.
+* **Script:** Your JavaScript code.
+* **Timeout:** How long the script is allowed to run before being terminated.
+* **Allowed to Fail:** If checked, the flow will continue even if the script throws an error.
+
+<img src="../../../img/guides/console/action.png" alt="Create Action" width="450px" />
+
+### 2. Create a Flow (Link Action to Trigger)
+
+Merely creating an Action does not run it. You must create a **Flow** to define *when* it runs.
+
+1.  Select the **Flow Type** (e.g., External Authentication).
+2.  Select the **Trigger** (e.g., Post Authentication).
+3.  Add your Action to the list of executed scripts.
+
+<img src="../../../img/guides/console/flow.png" alt="Flow" width="400px" />
+
+**Example Scenario:**
+You create an **External Authentication** Flow with a **Post Authentication** trigger. Now, whenever a user authenticates via an external IDP (like Google or Azure AD), your Action is triggered immediately after the authentication step but before the session is finalized.
+
+## Available Flow Types
+
+Trigger types define the point during the execution of a request. Each trigger defines which readable information (`ctx`) and mutable properties (`api`) are passed into the called function.
+
+Currently, ZITADEL supports the following flows:
+
+* [**Internal Authentication**](../../../apis/actions/internal-authentication): Triggers during login with ZITADEL (username/password).
+* [**External Authentication**](../../../apis/actions/external-authentication): Triggers during login with an external Identity Provider.
+* [**Complement Token**](../../../apis/actions/complement-token): Triggers when tokens (ID Token / Access Token) are created, allowing you to add custom claims.
+* [**Customize SAML Response**](../../../apis/actions/customize-samlresponse): Triggers when a SAML response is generated.
+
+## References
+
+* [Guide: Customize Behavior with Actions](/docs/guides/manage/customize/behavior)
+* [ZITADEL Roadmap](https://zitadel.com/roadmap)
+

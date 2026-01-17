@@ -1,9 +1,0 @@
-{
-  "pages": [
-    "_basic",
-    "_implicit",
-    "_jwtpk",
-    "_pkce",
-    "_pkcenative"
-  ]
-}
