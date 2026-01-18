@@ -114,7 +114,12 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	handler.Use(security, limitingAccessInterceptor.WithoutLimiting().Handle)
 
 	env := handler.NewRoute().Path(envRequestPath).Subrouter()
-	env.Use(callDurationInterceptor, middleware.TelemetryHandler(), instanceHandler)
+	env.Use(
+		callDurationInterceptor,
+		middleware.TraceHandler(),
+		middleware.LogHandler("console"),
+		instanceHandler,
+	)
 	env.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		ctx := r.Context()

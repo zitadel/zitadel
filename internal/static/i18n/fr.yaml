@@ -177,7 +177,7 @@ Errors:
       U2F:
         NotExisting: L'U2F n'existe pas
       Passwordless:
-        NotExisting: Passwordless n'existe pas
+        NotExisting: Paskey n'existe pas
       RecoveryCodes:
         InvalidCode: Code de récupération invalide fourni
         MaxCountExceeded: Nombre maximum de codes de récupération dépassé
@@ -575,6 +575,10 @@ Errors:
     NoTimeout: La cible n'a pas de délai d'attente
     InvalidURL: La cible a une URL non valide
     NotFound: La cible introuvable
+    InvalidExpirationDate: La date d'expiration de la clé doit être dans le futur
+    PublicKeyExpired: La clé publique de la cible a expiré
+    PublicKeyActive: Impossible de supprimer une clé publique active de la cible
+    InvalidPublicKey: La clé publique est invalide. Elle doit être une clé publique RSA ou ECDSA encodée PEM au format PKCS#8
   Execution:
     ConditionInvalid: La condition d'exécution n'est pas valide
     Invalid: L'exécution est invalide
@@ -583,6 +587,7 @@ Errors:
     NoTargets: Aucune cible définie
     Failed: Exécution échouée
     ResponseIsNotValidJSON: La réponse n'est pas un JSON valide
+    MissingEncryptionKey: Clé de chiffrement manquante pour l'exécution
   UserSchema:
     NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
     Type:

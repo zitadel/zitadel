@@ -99,7 +99,7 @@ The following table describes the milestones that are sent to the endpoints:
 | An authentication succeeded for the first time on an instance.                    | This is the first authentication with the instances automatically created admin user during the instance setup, which can be a human or a machine. |
 | A project is created for the first time in a virtual instance.                    | The ZITADEL project that is automatically created during the instance setup is omitted.                                                            |
 | An application is created for the first time in a virtual instance.               | The applications in the ZITADEL project that are automatically created during the instance setup are omitted.                                      |
-| An authentication succeeded for the first time in a virtal instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
+| An authentication succeeded for the first time in a virtual instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
 | A virtual instance is deleted.                                                    | This data point is sent when a virtual instance is deleted via ZITADELs system API                                                                 |
 
 
@@ -227,7 +227,7 @@ DefaultInstance:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
-- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
+- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/console-overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform-provider).
 

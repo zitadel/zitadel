@@ -46,7 +46,7 @@ export function RegisterForm({
   idpCount = 0,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstName: firstname ?? "",

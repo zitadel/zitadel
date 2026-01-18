@@ -25,8 +25,8 @@ Upload your logo for the chosen theme, as soon as it is uploaded the preview on 
 ### Colors
 
 In the next part you can configure your colors.
-Background colour is self-explanatory, the primary color will be used for buttons, links and some highlights.
-The warn color is used for all the error messages and warnings and the font colour for texts.
+Background color is self-explanatory, the primary color will be used for buttons, links and some highlights.
+The warn color is used for all the error messages and warnings and the font color for texts.
 
 ### Font
 

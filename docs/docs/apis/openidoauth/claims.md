@@ -57,9 +57,9 @@ Please check below the matrix for an overview where which scope is asserted.
 | email_verified     | `true`                                                         | Boolean if the email was verified by ZITADEL                                                                                                                               |
 | events             | `{ "http://schemas.openid.net/event/backchannel-logout": {} }` | Security Events such as Back-Channel Logout                                                                                                                                |
 | exp                | `1311281970`                                                   | Time the token expires (as unix time)                                                                                                                                      |
-| family_name        | `Runner`                                                       | The subjects family name                                                                                                                                                   |
+| family_name        | `Runner`                                                       | Last name of the subject                                                                                                                                                   |
 | gender             | `other`                                                        | Gender of the subject                                                                                                                                                      |
-| given_name         | `Road`                                                         | Given name of the subject                                                                                                                                                  |
+| given_name         | `Road`                                                         | First name of the subject                                                                                                                                                  |
 | iat                | `1311280970`                                                   | Time of the token was issued at (as unix time)                                                                                                                             |
 | iss                | `$CUSTOM-DOMAIN`                                               | Issuing domain of a token                                                                                                                                                  |
 | jti                | `69234237813329048`                                            | Unique id of the token                                                                                                                                                     |
@@ -78,7 +78,7 @@ Please check below the matrix for an overview where which scope is asserted.
 Custom claims are being inserted into user tokens in addition to the standard claims.
 Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
 
-You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
+You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/guides/manage/console/actions-overview).
 
 Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
 

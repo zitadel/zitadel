@@ -10,12 +10,12 @@ By defining multiple schemas, you can even differentiate between different perso
 and restrictions, resp. requirements for them to authenticate. 
 
 For example, you could have separate schemas for your employees and your customers. While you might want to make sure that
-certain data like given name and family name are required for employees, they might be optional for the latter.
-Or you might want to disable username password authentication for your admins and only allow phishing resistant methods like passkeys,
+certain data, such as the first name and the last name, are required for employees, they might be optional for the latter.
+Or you might want to disable username-password authentication for your admins and only allow phishing-resistant methods (e.g., passkeys),
 but still allow it for your customers.
 
 :::info
-Please be aware that User Schema is in a [preview stage](/support/software-release-cycles-support#preview) not feature complete
+Please be aware that User Schema is in a [preview stage](https://help.zitadel.com/zitadel-software-release-cycle#preview) not feature complete
 and therefore not generally available.
 
 Do not use it for production yet. To test it out, you need to enable the `UserSchema` [feature flag](/apis/resources/feature_service_v2/feature-service).
@@ -23,11 +23,11 @@ Do not use it for production yet. To test it out, you need to enable the `UserSc
 
 ## Create your first schema
 
-Let's create the first very simple schema `user`, which defines a `givenName` and `familyName` for a user and allows them to
-authenticate with username and password.
+Let's create your first schema, `user`, which defines a `givenName` (first name) and `familyName` (last name) for a user and allows them to
+authenticate with their username and password.
 
 We can do so by calling the [create user schema endpoint](/docs/apis/resources/user_schema_service_v3/user-schema-service-create-user-schema)
-with the following data. Make sure to provide an access_token with an IAM_OWNER role.
+with the following data. Make sure to provide an `access_token` with an `IAM_OWNER` role.
 
 ```bash
 curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas" \
@@ -67,18 +67,18 @@ This will return something similar to:
 }
 ```
 
-So you successfully create a schema and could use that to manage your users based on that.
-But let's first checkout some possibilities ZITADEL offers.
+You have now successfully created a schema, which can be used to manage your users.
+But let's first check out some possibilities ZITADEL offers.
 
 ## Assign Permissions
 
-In the first step we've created a very simple `user` schema with only `givenName` and `familyName`.
-This allows any user with the permission to edit the user's data to change these values.
-Let's now update the schema and add some more properties and restrict who's able to retrieve and change data.
+In the first step we created a very simple `user` schema with only `givenName` (first name) and `familyName` (last name).
+This allows any user with permissions to edit the user's data to change these values.
+Let's now update the schema to add some more properties and restrict who's able to retrieve and change data.
 
 By setting `urn:zitadel:schema:permission` to fields, we can define the permissions for that field of different user roles / context.
 
-For example by adding it to the `givenName` and `familyName` we can keep the state from before, where any `owner` (e.g. ORG_OWNER)
+For example, by adding it to the `givenName` and `familyName` we can keep the state from before, where any `owner` (e.g. ORG_OWNER)
 as well as the user themselves (`self`) are allowed to read (`r`) and write (`w`) the data.
 
 Let's now assume our service provides some profile information of the user on a dedicated page.
@@ -136,9 +136,9 @@ curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
 
 ## Retrieve the Existing Schemas
 
-To check the state of existing schemas you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
+To check the state of existing schemas, you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
 In this case we will query for the one with state `active`. Check out the api documentation for detailed information on possible filters.
-The API also allows to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
+The API also allows retrieving a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
 
 ```bash
 curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \
@@ -162,7 +162,7 @@ curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \
 }'
 ```
 
-If you've followed this guide, it should list you a singe schema:
+If you've followed this guide, it should list you a single schema:
 
 ```json
 {
@@ -226,6 +226,5 @@ If you've followed this guide, it should list you a singe schema:
 
 ### Revision
 
-Note the `revision` property, which is currently `2`. Each update to the `schema`-property will increase
-it by `1`. The revision will later be reflected on the managed users to state based on which revision of the schema
-they were last updated on.
+Note the `revision` property, which is currently `2`. Each update to the `schema`-property will increment
+it by `1`. This revision number will be stored on managed users to indicate which schema version was used for their last update.

@@ -252,7 +252,7 @@
       "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou votre verrouillage d'écran",
       "info": {
         "description": "Une clé d'accès est une méthode d'authentification sur un appareil, comme votre empreinte digitale, Apple FaceID ou équivalent.",
-        "link": "Authentification sans mot de passe"
+        "link": "Authentification par clé d'accès"
       },
       "skip": "Ignorer",
       "submit": "Continuer"

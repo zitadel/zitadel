@@ -2,14 +2,14 @@
 title: Migrate from Actions v1 to v2
 ---
 
-In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/apis/actions/introduction#available-flow-types).
+In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/guides/manage/console/actions-overview#available-flow-types).
 
 ## Internal Authentication
 
 ### Post Authentication
 
 A user has authenticated directly at ZITADEL.
-ZITADEL validated the users inputs for password, one-time password, security key or passwordless factor.
+ZITADEL validated the users inputs for password, one-time password or passkey factor.
 
 To react to different authentication actions, the session service, `zitadel.session.v2.SessionService`, provides the different endpoints. As a rule of thumb, use response triggers if you primarily want to handle successful and failed authentications. On the other hand, use event triggers if you need more fine-granular handling, for example by the used authentication factors.  
 
@@ -97,7 +97,7 @@ Some use-cases:
 - Add metadata to user through function on `preaccesstoken`, [Action Function Example](./testing-function)
 - Add logs to the log claim through function on `preaccesstoken`, [Action Function Example](./testing-function)
 
-## Customize SAML Response
+## Complement SAML Response
 
 These are executed before the return of the SAML Response.
 

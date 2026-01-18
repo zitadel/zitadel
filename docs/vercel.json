@@ -20,7 +20,10 @@
     }
   ],
   "redirects": [
-    { "source": "/", "destination": "/docs" },
+    {
+      "source": "/",
+      "destination": "/docs"
+    },
     {
       "source": "/docs/category/apis/:slug*",
       "destination": "/docs/apis/:slug*",
@@ -229,6 +232,66 @@
     {
       "source": "/docs/legal/service-description/billing",
       "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/overview",
+      "destination": "/docs/guides/manage/console/console-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/organizations",
+      "destination": "/docs/guides/manage/console/organizations-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/organizations",
+      "destination": "/docs/guides/manage/console/organizations-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/projects",
+      "destination": "/docs/guides/manage/console/projects-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/projects",
+      "destination": "/docs/guides/manage/console/projects-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/applications",
+      "destination": "/docs/guides/manage/console/applications-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/applications",
+      "destination": "/docs/guides/manage/console/applications-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/users",
+      "destination": "/docs/guides/manage/console/users-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/users",
+      "destination": "/docs/guides/manage/console/users-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/actions",
+      "destination": "/docs/guides/manage/console/actions-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/actions/introduction",
+      "destination": "/docs/guides/manage/console/actions-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/features/console",
+      "destination": "/docs/guides/manage/console/console-overview",
       "permanent": true
     }
   ]

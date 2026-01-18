@@ -177,7 +177,7 @@ Errors:
       U2F:
         NotExisting: Az U2F nem létezik
       Passwordless:
-        NotExisting: Passwordless nem létezik
+        NotExisting: Passkey nem létezik
       RecoveryCodes:
         InvalidCode: Érvénytelen visszaállítási kód lett megadva
         MaxCountExceeded: A visszaállítási kódok maximális száma túllépve
@@ -575,6 +575,10 @@ Errors:
     NoTimeout: A célnak nincs időkorlátja
     InvalidURL: A cél érvénytelen URL-t tartalmaz
     NotFound: Cél nem található
+    InvalidExpirationDate: A kulcs lejárati dátumának a jövőben kell lennie
+    PublicKeyExpired: A cél nyilvános kulcsa lejárt
+    PublicKeyActive: Nem törölhető az aktív cél nyilvános kulcs
+    InvalidPublicKey: A nyilvános kulcs érvénytelen. PEM-kódolt RSA vagy ECDSA nyilvános kulcsnak kell lennie PKCS#8 formátumban
   Execution:
     ConditionInvalid: Végrehajtási feltétel érvénytelen
     Invalid: A végrehajtás érvénytelen
@@ -583,6 +587,7 @@ Errors:
     NoTargets: Nincsenek célok meghatározva
     Failed: Végrehajtás sikertelen
     ResponseIsNotValidJSON: Az válasz nem érvényes JSON
+    MissingEncryptionKey: Hiányzik a titkosítási kulcs
   UserSchema:
     NotEnabled: A "User Schema" funkció nincs engedélyezve
     Type:
