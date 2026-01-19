@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 :::info
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/docs/apis/resources/auth/user-authorizations-grants)
+[API reference: User Authorization / Grants](/docs/category/apis/resources/auth/user-authorizations-grants)
 :::
