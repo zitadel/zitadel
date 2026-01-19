@@ -40,13 +40,13 @@ func TestCreateInstance(t *testing.T) {
 				instanceId := gofakeit.Name()
 				instanceName := gofakeit.Name()
 				instance := domain.Instance{
-					ID:              instanceId,
-					Name:            instanceName,
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        instanceId,
+					Name:                      instanceName,
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 				return instance
 			}(),
@@ -57,13 +57,13 @@ func TestCreateInstance(t *testing.T) {
 				instanceId := gofakeit.Name()
 				// instanceName := gofakeit.Name()
 				instance := domain.Instance{
-					ID:              instanceId,
-					Name:            "",
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        instanceId,
+					Name:                      "",
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 				return instance
 			}(),
@@ -73,13 +73,13 @@ func TestCreateInstance(t *testing.T) {
 			name: "adding same instance twice",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Instance {
 				inst := domain.Instance{
-					ID:              gofakeit.UUID(),
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        gofakeit.UUID(),
+					Name:                      gofakeit.Name(),
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 
 				err := instanceRepo.Create(t.Context(), tx, &inst)
@@ -109,13 +109,13 @@ func TestCreateInstance(t *testing.T) {
 				name: "adding instance with same name twice",
 				testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Instance {
 					inst := domain.Instance{
-						ID:              gofakeit.Name(),
-						Name:            instanceName,
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        gofakeit.Name(),
+						Name:                      instanceName,
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					err := instanceRepo.Create(t.Context(), tx, &inst)
@@ -128,13 +128,13 @@ func TestCreateInstance(t *testing.T) {
 					return &inst
 				},
 				instance: domain.Instance{
-					ID:              instanceId,
-					Name:            instanceName,
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        instanceId,
+					Name:                      instanceName,
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				},
 				// two instances can have the sane name
 				err: nil,
@@ -144,12 +144,12 @@ func TestCreateInstance(t *testing.T) {
 			name: "adding instance with no id",
 			instance: func() domain.Instance {
 				instance := domain.Instance{
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					Name:                      gofakeit.Name(),
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 				return instance
 			}(),
@@ -195,8 +195,8 @@ func TestCreateInstance(t *testing.T) {
 			assert.Equal(t, tt.instance.Name, instance.Name)
 			assert.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
 			assert.Equal(t, tt.instance.IAMProjectID, instance.IAMProjectID)
-			assert.Equal(t, tt.instance.ConsoleClientID, instance.ConsoleClientID)
-			assert.Equal(t, tt.instance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, tt.instance.ManagementConsoleClientID, instance.ManagementConsoleClientID)
+			assert.Equal(t, tt.instance.ManagementConsoleAppID, instance.ManagementConsoleAppID)
 			assert.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
 			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
@@ -227,13 +227,13 @@ func TestUpdateInstance(t *testing.T) {
 			name: "happy path",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Instance {
 				inst := domain.Instance{
-					ID:              gofakeit.UUID(),
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        gofakeit.UUID(),
+					Name:                      gofakeit.Name(),
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 
 				// create instance
@@ -247,13 +247,13 @@ func TestUpdateInstance(t *testing.T) {
 			name: "update deleted instance",
 			testFunc: func(t *testing.T, tx database.QueryExecutor) *domain.Instance {
 				inst := domain.Instance{
-					ID:              gofakeit.UUID(),
-					Name:            gofakeit.Name(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        gofakeit.UUID(),
+					Name:                      gofakeit.Name(),
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 
 				// create instance
@@ -340,13 +340,13 @@ func TestGetInstance(t *testing.T) {
 				name: "happy path get using id",
 				testFunc: func(t *testing.T) *domain.Instance {
 					inst := domain.Instance{
-						ID:              gofakeit.UUID(),
-						Name:            gofakeit.BeerName(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        gofakeit.UUID(),
+						Name:                      gofakeit.BeerName(),
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					// create instance
@@ -360,13 +360,13 @@ func TestGetInstance(t *testing.T) {
 			name: "happy path including domains",
 			testFunc: func(t *testing.T) *domain.Instance {
 				inst := domain.Instance{
-					ID:              gofakeit.NewCrypto().UUID(),
-					Name:            gofakeit.BeerName(),
-					DefaultOrgID:    "defaultOrgId",
-					IAMProjectID:    "iamProject",
-					ConsoleClientID: "consoleCLient",
-					ConsoleAppID:    "consoleApp",
-					DefaultLanguage: "defaultLanguage",
+					ID:                        gofakeit.NewCrypto().UUID(),
+					Name:                      gofakeit.BeerName(),
+					DefaultOrgID:              "defaultOrgId",
+					IAMProjectID:              "iamProject",
+					ManagementConsoleClientID: "managementConsoleCLient",
+					ManagementConsoleAppID:    "managementConsoleApp",
+					DefaultLanguage:           "defaultLanguage",
 				}
 
 				// create instance
@@ -434,8 +434,8 @@ func TestGetInstance(t *testing.T) {
 			assert.Equal(t, returnedInstance.Name, instance.Name)
 			assert.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
 			assert.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
-			assert.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
-			assert.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, returnedInstance.ManagementConsoleClientID, instance.ManagementConsoleClientID)
+			assert.Equal(t, returnedInstance.ManagementConsoleAppID, instance.ManagementConsoleAppID)
 			assert.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
 		})
 	}
@@ -468,13 +468,13 @@ func TestListInstance(t *testing.T) {
 				for i := range noOfInstances {
 
 					inst := domain.Instance{
-						ID:              strconv.Itoa(i),
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        strconv.Itoa(i),
+						Name:                      gofakeit.Name(),
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					// create instance
@@ -495,13 +495,13 @@ func TestListInstance(t *testing.T) {
 				for i := range noOfInstances {
 
 					inst := domain.Instance{
-						ID:              strconv.Itoa(i),
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        strconv.Itoa(i),
+						Name:                      gofakeit.Name(),
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					// create instance
@@ -524,13 +524,13 @@ func TestListInstance(t *testing.T) {
 					for i := range noOfInstances {
 
 						inst := domain.Instance{
-							ID:              instanceID,
-							Name:            gofakeit.Name(),
-							DefaultOrgID:    "defaultOrgId",
-							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
-							DefaultLanguage: "defaultLanguage",
+							ID:                        instanceID,
+							Name:                      gofakeit.Name(),
+							DefaultOrgID:              "defaultOrgId",
+							IAMProjectID:              "iamProject",
+							ManagementConsoleClientID: "managementConsoleCLient",
+							ManagementConsoleAppID:    "managementConsoleApp",
+							DefaultLanguage:           "defaultLanguage",
 						}
 
 						// create instance
@@ -555,13 +555,13 @@ func TestListInstance(t *testing.T) {
 					for i := range noOfInstances {
 
 						inst := domain.Instance{
-							ID:              strconv.Itoa(i),
-							Name:            instanceName,
-							DefaultOrgID:    "defaultOrgId",
-							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
-							DefaultLanguage: "defaultLanguage",
+							ID:                        strconv.Itoa(i),
+							Name:                      instanceName,
+							DefaultOrgID:              "defaultOrgId",
+							IAMProjectID:              "iamProject",
+							ManagementConsoleClientID: "managementConsoleCLient",
+							ManagementConsoleAppID:    "managementConsoleApp",
+							DefaultLanguage:           "defaultLanguage",
 						}
 
 						// create instance
@@ -611,8 +611,8 @@ func TestListInstance(t *testing.T) {
 				assert.Equal(t, returnedInstances[i].Name, instance.Name)
 				assert.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
 				assert.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
-				assert.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
-				assert.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
+				assert.Equal(t, returnedInstances[i].ManagementConsoleClientID, instance.ManagementConsoleClientID)
+				assert.Equal(t, returnedInstances[i].ManagementConsoleAppID, instance.ManagementConsoleAppID)
 				assert.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
 			}
 		})
@@ -644,13 +644,13 @@ func TestDeleteInstance(t *testing.T) {
 				name: "happy path delete single instance filter id",
 				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 					inst := domain.Instance{
-						ID:              instanceID,
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        instanceID,
+						Name:                      gofakeit.Name(),
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					// create instance
@@ -675,13 +675,13 @@ func TestDeleteInstance(t *testing.T) {
 				testFunc: func(t *testing.T, tx database.QueryExecutor) {
 
 					inst := domain.Instance{
-						ID:              instanceID,
-						Name:            gofakeit.BeerName(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+						ID:                        instanceID,
+						Name:                      gofakeit.BeerName(),
+						DefaultOrgID:              "defaultOrgId",
+						IAMProjectID:              "iamProject",
+						ManagementConsoleClientID: "managementConsoleCLient",
+						ManagementConsoleAppID:    "managementConsoleApp",
+						DefaultLanguage:           "defaultLanguage",
 					}
 
 					// create instance

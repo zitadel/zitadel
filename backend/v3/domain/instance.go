@@ -11,15 +11,15 @@ import (
 )
 
 type Instance struct {
-	ID              string    `json:"id,omitempty" db:"id"`
-	Name            string    `json:"name,omitempty" db:"name"`
-	DefaultOrgID    string    `json:"defaultOrgId,omitempty" db:"default_org_id"`
-	IAMProjectID    string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
-	ConsoleClientID string    `json:"consoleClientId,omitempty" db:"console_client_id"`
-	ConsoleAppID    string    `json:"consoleAppId,omitempty" db:"console_app_id"`
-	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
-	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+	ID                        string    `json:"id,omitempty" db:"id"`
+	Name                      string    `json:"name,omitempty" db:"name"`
+	DefaultOrgID              string    `json:"defaultOrgId,omitempty" db:"default_org_id"`
+	IAMProjectID              string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
+	ManagementConsoleClientID string    `json:"managementConsoleClientId,omitempty" db:"console_client_id"`
+	ManagementConsoleAppID    string    `json:"managementConsoleAppId,omitempty" db:"console_app_id"`
+	DefaultLanguage           string    `json:"defaultLanguage,omitempty" db:"default_language"`
+	CreatedAt                 time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt                 time.Time `json:"updatedAt" db:"updated_at"`
 
 	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
@@ -51,10 +51,10 @@ type instanceColumns interface {
 	DefaultOrgIDColumn() database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
 	IAMProjectIDColumn() database.Column
-	// ConsoleClientIDColumn returns the column for the default IAM org id field
-	ConsoleClientIDColumn() database.Column
-	// ConsoleAppIDColumn returns the column for the console client id field
-	ConsoleAppIDColumn() database.Column
+	// ManagementConsoleClientIDColumn returns the column for the default management console client id field
+	ManagementConsoleClientIDColumn() database.Column
+	// ManagementConsoleAppIDColumn returns the column for the management console client id field
+	ManagementConsoleAppIDColumn() database.Column
 	// DefaultLanguageColumn returns the column for the default language field
 	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
@@ -87,10 +87,10 @@ type instanceChanges interface {
 	SetDefaultOrg(id string) database.Change
 	// SetDefaultLanguage sets the default language column.
 	SetDefaultLanguage(language language.Tag) database.Change
-	// SetConsoleClientID sets the console client id column.
-	SetConsoleClientID(id string) database.Change
-	// SetConsoleAppID sets the console app id column.
-	SetConsoleAppID(id string) database.Change
+	// SetManagementConsoleClientID sets the management console client id column.
+	SetManagementConsoleClientID(id string) database.Change
+	// SetManagementConsoleAppID sets the management console app id column.
+	SetManagementConsoleAppID(id string) database.Change
 }
 
 // InstanceRepository is the interface for the instance repository.

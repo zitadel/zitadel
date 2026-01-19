@@ -36,13 +36,13 @@ func TestSession_Create(t *testing.T) {
 	instanceRepo := repository.InstanceRepository()
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceId,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -221,13 +221,13 @@ func TestSession_Update(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceId,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -930,13 +930,13 @@ func TestSession_Delete(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceId,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -1014,13 +1014,13 @@ func TestSession_Get(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceId,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -1090,13 +1090,13 @@ func TestSession_List(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
 	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceId,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)

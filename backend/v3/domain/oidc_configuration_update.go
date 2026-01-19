@@ -8,9 +8,9 @@ import (
 
 // TODO(IAM-Marco): Finish implementation
 type OIDCConfigurationUpdate struct {
-	instanceDomainName string
-	projectID          string
-	consoleAppID       string
+	instanceDomainName     string
+	projectID              string
+	managementConsoleAppID string
 
 	// oidcConfigChanges []OIDConfigChange
 	// appID string
@@ -21,9 +21,9 @@ func (o *OIDCConfigurationUpdate) RequiresTransaction() {}
 
 func NewOIDCConfigurationUpdate(instanceDomainName, projectID, consoleAppID string) *OIDCConfigurationUpdate {
 	return &OIDCConfigurationUpdate{
-		instanceDomainName: instanceDomainName,
-		projectID:          projectID,
-		consoleAppID:       consoleAppID,
+		instanceDomainName:     instanceDomainName,
+		projectID:              projectID,
+		managementConsoleAppID: consoleAppID,
 	}
 }
 

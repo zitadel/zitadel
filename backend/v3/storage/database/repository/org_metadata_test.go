@@ -31,13 +31,13 @@ func TestGetOrganizationMetadata(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceID,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -182,13 +182,13 @@ func TestListOrganizationMetadata(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceID,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -360,13 +360,13 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceID,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err := instanceRepo.Create(t.Context(), pool, &instance)
 	require.NoError(t, err)
@@ -434,13 +434,13 @@ func TestSetOrganizationMetadata(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceID,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -824,13 +824,13 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:              instanceID,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
+		ID:                        instanceID,
+		Name:                      gofakeit.Name(),
+		DefaultOrgID:              "defaultOrgId",
+		IAMProjectID:              "iamProject",
+		ManagementConsoleClientID: "managementConsoleClient",
+		ManagementConsoleAppID:    "managementConsoleApp",
+		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
