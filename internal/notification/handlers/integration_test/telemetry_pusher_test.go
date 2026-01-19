@@ -121,7 +121,7 @@ func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCCo
 			{
 				Query: &app.AppQuery_NameQuery{
 					NameQuery: &app.AppNameQuery{
-						Name:   "Console",
+						Name:   "Management Console",
 						Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 					},
 				},
