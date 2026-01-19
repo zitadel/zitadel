@@ -6,7 +6,7 @@ description: A list of static IP addresses ZITADEL Cloud uses to make outbound c
 
 When configuring your firewall or network security groups, you may need to allow traffic **from** ZITADEL Cloud to your internal infrastructure.
 
-This page lists the static Egress (outgoing) IP addresses used by ZITADEL Cloud instances.
+This page lists the static Egress (outgoing) IP addresses used by ZITADEL Cloud regions.
 
 ## When do I need this?
 
