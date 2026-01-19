@@ -15,8 +15,8 @@ var emptyInstance = &instance{}
 type Instance interface {
 	InstanceID() string
 	ProjectID() string
-	ConsoleClientID() string
-	ConsoleApplicationID() string
+	ManagementConsoleClientID() string
+	ManagementConsoleApplicationID() string
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
@@ -62,11 +62,11 @@ func (i *instance) ProjectID() string {
 	return i.projectID
 }
 
-func (i *instance) ConsoleClientID() string {
+func (i *instance) ManagementConsoleClientID() string {
 	return i.clientID
 }
 
-func (i *instance) ConsoleApplicationID() string {
+func (i *instance) ManagementConsoleApplicationID() string {
 	return i.appID
 }
 

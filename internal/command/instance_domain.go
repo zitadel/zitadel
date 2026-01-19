@@ -150,7 +150,7 @@ func (c *Commands) prepareUpdateConsoleRedirectURIs(instanceDomain string) prepa
 }
 
 func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter preparation.FilterToQueryReducer, instanceDomain string) (*project.OIDCConfigChangedEvent, error) {
-	appWriteModel, err := getOIDCAppWriteModel(ctx, filter, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
+	appWriteModel, err := getOIDCAppWriteModel(ctx, filter, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ManagementConsoleApplicationID(), "")
 	if err != nil {
 		return nil, err
 	}

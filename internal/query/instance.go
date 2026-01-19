@@ -487,11 +487,11 @@ func (i *authzInstance) ProjectID() string {
 	return i.IAMProjectID
 }
 
-func (i *authzInstance) ConsoleClientID() string {
+func (i *authzInstance) ManagementConsoleClientID() string {
 	return i.ConsoleID
 }
 
-func (i *authzInstance) ConsoleApplicationID() string {
+func (i *authzInstance) ManagementConsoleApplicationID() string {
 	return i.ConsoleAppID
 }
 
