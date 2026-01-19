@@ -61,7 +61,7 @@
         "METADATA": "Füge deinem Benutzer benutzerdefinierte Attribute hinzu, wie deine Abteilung. Du kannst diese Informationen in den Aktionen deiner Organisation nutzen."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Rollenzuweisungen",
       "DESCRIPTION": "Rollenzuweisungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts einstellen."
     },

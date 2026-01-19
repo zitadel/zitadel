@@ -61,7 +61,7 @@
         "METADATA": "Přidejte vlastní atributy k vašemu uživateli, jako je vaše oddělení. Tyto informace můžete využít v akcích vaší organizace."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Přiřazení rolí",
       "DESCRIPTION": "Přiřazení rolí definují přístupová práva uživatele k projektu. Můžete uživateli udělit přístup k projektu a definovat role uživatele v rámci toho projektu."
     },

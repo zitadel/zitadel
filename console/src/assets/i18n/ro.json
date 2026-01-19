@@ -61,7 +61,7 @@
         "METADATA": "Adăugați atribute personalizate utilizatorului dvs., cum ar fi departamentul. Puteți utiliza aceste informații în acțiunile organizațiilor dvs."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Atribuirea rolurilor",
       "DESCRIPTION": "Atribuirea rolurilor definește permisiunile de acces ale utilizatorilor la proiecte. Puteți acorda utilizatorilor acces la proiecte și puteți defini rolurile acestora în cadrul acelor proiecte."
     },

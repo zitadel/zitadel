@@ -61,7 +61,7 @@
         "METADATA": "Ajoutez des attributs personnalisés à votre utilisateur comme votre département. Vous pouvez utiliser cette information dans les actions de votre organisation."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Attributions de rôles",
       "DESCRIPTION": "Les attributions de rôles définissent les droits d'accès d'un utilisateur à un projet. Vous pouvez accorder à un utilisateur l'accès à un projet et définir les rôles des utilisateurs au sein de ce projet."
     },

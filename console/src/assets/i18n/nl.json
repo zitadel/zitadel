@@ -61,7 +61,7 @@
         "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Roltoewijzingen",
       "DESCRIPTION": "\nRoltoewijzingen definiëren de toegangsrechten van gebruikers tot projecten. U kunt gebruikers toegang verlenen tot projecten en hun rollen binnen die projecten definiëren."
     },

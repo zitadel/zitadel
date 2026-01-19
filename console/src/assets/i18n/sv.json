@@ -61,7 +61,7 @@
         "METADATA": "Lägg till anpassade attribut till din användare som din avdelning. Du kan använda denna information i din organisations åtgärder."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Rolltilldelningar",
       "DESCRIPTION": "Rolltilldelningar definierar användarnas åtkomstbehörigheter till projekt. Du kan ge användare åtkomst till projekt och definiera deras roller inom dessa projekt."
     },

@@ -61,7 +61,7 @@
         "METADATA": "Adj hozzá egyéni attribútumokat a felhasználódhoz, mint például az osztályod. Ezt az információt felhasználhatod a szervezeted műveleteiben."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Szerepkör-hozzárendelések",
       "DESCRIPTION": "A szerepkör-hozzárendelések meghatározzák a felhasználó hozzáférési jogait egy projekthez. Hozzáférést adhat egy felhasználónak egy projekthez, és meghatározhatja a felhasználói szerepköröket az adott projekten belül."
     },

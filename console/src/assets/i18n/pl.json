@@ -61,7 +61,7 @@
         "METADATA": "Dodaj niestandardowe atrybuty do siebie, takie jak twój dział. Możesz użyć tych informacji w działaniach swojej organizacji."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Przypisania ról",
       "DESCRIPTION": "Przypisania ról definiują prawa dostępu użytkownika do projektu. Możesz przyznać użytkownikowi dostęp do projektu i zdefiniować role użytkowników w tym projekcie."
     },

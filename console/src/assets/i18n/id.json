@@ -61,7 +61,7 @@
         "METADATA": "Tambahkan atribut khusus ke pengguna Anda seperti departemen Anda. Anda dapat menggunakan informasi ini dalam tindakan organisasi Anda."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Penugasan peran",
       "DESCRIPTION": "Penugasan peran menentukan hak akses pengguna ke suatu proyek. Anda dapat memberikan akses kepada pengguna ke suatu proyek dan menentukan peran mereka di dalam proyek tersebut."
     },

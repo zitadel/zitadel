@@ -61,7 +61,7 @@
         "METADATA": "Kullanıcınıza departmanınız gibi özel öznitelikler ekleyin. Bu bilgileri organizasyonunuzun eylemlerinde kullanabilirsiniz."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Rol Atamaları",
       "DESCRIPTION": "Rol atamaları, kullanıcıların proje erişim izinlerini tanımlar. Kullanıcılara projelere erişim izni verebilir ve bu projelerdeki rollerini tanımlayabilirsiniz."
     },

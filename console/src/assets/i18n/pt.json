@@ -61,7 +61,7 @@
         "METADATA": "Adicione atributos personalizados ao seu usuário, como seu departamento. Você pode usar essas informações nas ações da sua organização."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Atribuições de funções",
       "DESCRIPTION": "Atribuições de funções definem os direitos de acesso de um usuário a um projeto. Você pode conceder acesso de um usuário a um projeto e definir os papéis dos usuários dentro desse projeto."
     },

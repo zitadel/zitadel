@@ -61,7 +61,7 @@
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
       }
     },
-    "ROLE ASSIGNMENTS": {
+    "ROLE_ASSIGNMENTS": {
       "TITLE": "Role Assignments",
       "DESCRIPTION": "Role assignments define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
     },
@@ -725,7 +725,7 @@
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
@@ -1120,8 +1120,8 @@
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organization",
-      "EXTERNAL": "To grant a user of your organization",
+      "SELF": "If you want to assign the role to a user of an other organization",
+      "EXTERNAL": "To assign the role to a user of your organization",
       "CLICKHERE": "click here"
     },
     "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
@@ -2064,12 +2064,12 @@
         "TITLE": "Create Organization Grant",
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
-        "SEL_ROLES": "Select the roles you want to be added to the grant",
+        "SEL_ROLES": "Select the roles you want to assign",
         "SEL_USER": "Select users",
         "SEL_ORG": "Search an organization",
         "SEL_ORG_DESC": "Search the organization to grant.",
-        "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
-        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
+        "ORG_DESCRIPTION": "You are about to assign a role to the user for the organization {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to assign a role to a user from another organization.",
         "SEL_ORG_FORMFIELD": "Organization",
         "FOR_ORG": "The grant is created for:"
       },
