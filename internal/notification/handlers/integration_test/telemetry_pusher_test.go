@@ -56,8 +56,8 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	// create the session to be used for the authN of the clients
 	sessionID, sessionToken, _, _ := instance.CreatePasswordSession(t, iamOwnerCtx, instance.AdminUserID, "Password1!")
 
-	console := consoleOIDCConfig(t, instance)
-	loginToClient(t, instance, console.GetClientId(), console.GetRedirectUris()[0], sessionID, sessionToken)
+	managementConsole := consoleOIDCConfig(t, instance)
+	loginToClient(t, instance, managementConsole.GetClientId(), managementConsole.GetRedirectUris()[0], sessionID, sessionToken)
 	awaitMilestone(t, sub, instance.ID(), milestone.AuthenticationSucceededOnInstance)
 
 	// make sure the client has been projected

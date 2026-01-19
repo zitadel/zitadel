@@ -31,11 +31,11 @@ import (
 )
 
 const (
-	zitadelProjectName = "ZITADEL"
-	mgmtAppName        = "Management-API"
-	adminAppName       = "Admin-API"
-	authAppName        = "Auth-API"
-	consoleAppName     = "Management Console"
+	zitadelProjectName       = "ZITADEL"
+	mgmtAppName              = "Management-API"
+	adminAppName             = "Admin-API"
+	authAppName              = "Auth-API"
+	managementConsoleAppName = "Management Console"
 )
 
 type InstanceSetup struct {
@@ -561,7 +561,7 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
 			ID:        ids.managementConsoleAppID,
-			Name:      consoleAppName,
+			Name:      managementConsoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
 		RedirectUris:             []string{},

@@ -117,14 +117,14 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			events := []eventstore.Command{
 				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
 			}
-			consoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
+			managementConsoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
-			if consoleChangeEvent == nil {
+			if managementConsoleChangeEvent == nil {
 				return events, nil
 			}
-			return append(events, consoleChangeEvent), nil
+			return append(events, managementConsoleChangeEvent), nil
 		}, nil
 	}
 }
@@ -135,15 +135,15 @@ func (c *Commands) prepareUpdateConsoleRedirectURIs(instanceDomain string) prepa
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-E3j3s", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			consoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
+			managementConsoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
-			if consoleChangeEvent == nil {
+			if managementConsoleChangeEvent == nil {
 				return nil, nil
 			}
 			return []eventstore.Command{
-				consoleChangeEvent,
+				managementConsoleChangeEvent,
 			}, nil
 		}, nil
 	}

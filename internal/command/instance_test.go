@@ -63,14 +63,14 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, exter
 	events = append(events, apiAppEvents(ctx, orgID, id, "admin-id", "Admin-API")...)
 	events = append(events, apiAppEvents(ctx, orgID, id, "auth-id", "Auth-API")...)
 
-	consoleAppID := "console-id"
-	consoleClientID := "clientID"
-	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Management Console", consoleClientID, externalSecure)...)
+	managementConsoleAppID := "console-id"
+	managementConsoleClientID := "clientID"
+	events = append(events, oidcAppEvents(ctx, orgID, id, managementConsoleAppID, "Management Console", managementConsoleClientID, externalSecure)...)
 	events = append(events,
 		instance.NewIAMConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
-			&consoleClientID,
-			&consoleAppID,
+			&managementConsoleClientID,
+			&managementConsoleAppID,
 		),
 	)
 	return events
