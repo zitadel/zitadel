@@ -33,25 +33,25 @@ Open the Google settings for [SSO with third-party IdP](https://admin.google.com
 
 ![SSO with third-party IdP](/img/guides/integrate/services/google-workspace-sso-overview.png)
 
-Download the public certificate from your ZITADEL instance by requesting `$CUSTOM_DOMAIN/saml/v2/certificate`
+Download the public certificate from your ZITADEL instance by requesting `${CUSTOM_DOMAIN}/saml/v2/certificate`
 
 ```bash
- wget $CUSTOM_DOMAIN/saml/v2/certificate -O idp.crt
+ wget ${CUSTOM_DOMAIN}/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$CUSTOM_DOMAIN` with your Custom Domain.
+Always replace `${CUSTOM_DOMAIN}` with your Custom Domain.
 
 Use the following configuration
 
 | Setting | Value |
 | --- | --- |
 | Set up SSO with third-party identity provider | Enable (check) |
-| Sign-in page URL | `$CUSTOM_DOMAIN`/saml/v2/SSO |
-| Sign-out page URL | `$CUSTOM_DOMAIN`/saml/v2/SLO |
+| Sign-in page URL | `${CUSTOM_DOMAIN}`/saml/v2/SSO |
+| Sign-out page URL | `${CUSTOM_DOMAIN}`/saml/v2/SLO |
 | Verification Certificate | Upload the certificate (idp.crt) |
 | Use a domain-specific issuer | Enable (check) |
 | Network masks | Leave blank|
-| Change password URL | `$CUSTOM_DOMAIN`/ui/console/users/me?id=security |
+| Change password URL | `${CUSTOM_DOMAIN}`/ui/console/users/me?id=security |
 
 ### Create a SAML application in ZITADEL
 
@@ -119,24 +119,24 @@ Open the Google settings for [SSO with third-party IdP](https://admin.google.com
 
 ![SSO with third-party IdP](/img/guides/integrate/services/google-workspace-sso-overview.png)
 
-Download the public certificate from your ZITADEL instance by requesting `$CUSTOM_DOMAIN/saml/v2/certificate`
+Download the public certificate from your ZITADEL instance by requesting `${CUSTOM_DOMAIN}/saml/v2/certificate`
 
 ```bash
- wget $CUSTOM_DOMAIN/saml/v2/certificate -O idp.crt
+ wget ${CUSTOM_DOMAIN}/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$CUSTOM_DOMAIN` with your Custom Domain.
+Always replace `${CUSTOM_DOMAIN}` with your Custom Domain.
 
 Use the following configuration
 
-| Setting                  | Value                                             |
-|--------------------------|---------------------------------------------------|
-| SSO profile name         | ZITADEL SSO                                       |
-| IDP entity ID            | $CUSTOM_DOMAIN/saml/v2/metadata                |
-| Sign-in page URL         | $CUSTOM_DOMAIN/saml/v2/SSO                     |
-| Sign-out page URL        | $CUSTOM_DOMAIN/saml/v2/SLO                     |
-| Change password URL      | $CUSTOM_DOMAIN/ui/console/users/me?id=security |
-| Verification Certificate | Upload the certificate (idp.crt)                  |
+| Setting                  | Value                                              |
+|--------------------------|----------------------------------------------------|
+| SSO profile name         | ZITADEL SSO                                        |
+| IDP entity ID            | `${CUSTOM_DOMAIN}`/saml/v2/metadata                |
+| Sign-in page URL         | `${CUSTOM_DOMAIN}`/saml/v2/SSO                     |
+| Sign-out page URL        | `${CUSTOM_DOMAIN}`/saml/v2/SLO                     |
+| Change password URL      | `${CUSTOM_DOMAIN}`/ui/console/users/me?id=security |
+| Verification Certificate | Upload the certificate (idp.crt)                   |
 
 Now go ahead and click *SAVE*
 

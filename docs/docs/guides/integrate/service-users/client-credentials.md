@@ -34,7 +34,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
-  --url https://$CUSTOM_DOMAIN/oauth/v2/token \
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=client_credentials \
   --data scope='openid profile' \

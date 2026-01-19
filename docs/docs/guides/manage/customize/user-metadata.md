@@ -182,9 +182,9 @@ curl -L -X POST "https://${CUSTOM_DOMAIN}/auth/v1/users/me/metadata/_search" \
 }'
 ```
 
-Replace `$\{ACCESS_TOKEN}` with your user's access token.  
-Replace `$\{CUSTOM-DOMAIN}` with your ZITADEL instance's url.  
-Replace `$\{METADATA_KEY}` with they key you want to search for (f.e. "ContractNumber")
+Replace `${ACCESS_TOKEN}` with your user's access token.  
+Replace `${CUSTOM-DOMAIN}` with your ZITADEL instance's url.  
+Replace `${METADATA_KEY}` with they key you want to search for (f.e. "ContractNumber")
 
 :::info Get all metadata
 You can omit the queries array to retrieve all metadata key-value pairs.

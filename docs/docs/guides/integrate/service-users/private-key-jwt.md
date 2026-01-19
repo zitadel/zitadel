@@ -108,7 +108,7 @@ Payload:
 {
     "iss": "100507859606888466",
     "sub": "100507859606888466",
-    "aud": "https://$CUSTOM_DOMAIN",
+    "aud": "https://${CUSTOM_DOMAIN}",
     "iat": [Current UTC timestamp, e.g. 1605179982, must be no older than 1 hour],
     "exp": [Expiration UTC timestamp, e.g. 1605183582]
 }
@@ -165,7 +165,7 @@ With the encoded JWT from the previous step, craft a POST request to ZITADEL's t
 
 ```bash
 curl --request POST \
-  --url https:/$CUSTOM_DOMAIN/oauth/v2/token \
+  --url https:/${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid' \

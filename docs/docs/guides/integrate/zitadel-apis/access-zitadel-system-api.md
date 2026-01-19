@@ -89,7 +89,7 @@ The JWT payload will need to contain the following claims:
 {
   "iss": "<userid>",
   "sub": "<userid>",
-  "aud": "<https://$CUSTOM_DOMAIN>",
+  "aud": "<https://${CUSTOM_DOMAIN}>",
   "exp": <now+1h>,
   "iat": <now>
 }
