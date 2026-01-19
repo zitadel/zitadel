@@ -2,7 +2,6 @@ package logging
 
 import (
 	"context"
-	"log/slog"
 	"slices"
 	"strings"
 
@@ -29,43 +28,7 @@ func NewConnectInterceptor(next connect.UnaryFunc, ignoredMethodSuffixes ...stri
 		if err != nil {
 			code = connect.CodeOf(err)
 		}
-		logger.Log(ctx,
-			assertConnectLevel(code),
-			"connect RPC served",
-			"code", code,
-		)
-
+		logger.InfoContext(ctx, "connect RPC request", "code", code)
 		return resp, err
-	}
-}
-
-func assertConnectLevel(code connect.Code) slog.Level {
-	switch code {
-	case connect.CodeUnimplemented:
-		return slog.LevelDebug
-
-	// client errors
-	case connect.CodeCanceled,
-		connect.CodeInvalidArgument,
-		connect.CodeNotFound,
-		connect.CodeAlreadyExists,
-		connect.CodePermissionDenied,
-		connect.CodeResourceExhausted,
-		connect.CodeFailedPrecondition,
-		connect.CodeOutOfRange,
-		connect.CodeUnauthenticated:
-		return slog.LevelWarn
-
-	// server errors
-	case connect.CodeUnknown,
-		connect.CodeAborted,
-		connect.CodeDeadlineExceeded,
-		connect.CodeInternal,
-		connect.CodeUnavailable,
-		connect.CodeDataLoss:
-		return slog.LevelError
-
-	default: // includes 0 code when no error
-		return slog.LevelInfo
 	}
 }
