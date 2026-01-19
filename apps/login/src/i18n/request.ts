@@ -19,7 +19,8 @@ export default getRequestConfig(async () => {
   try {
     const settings = await getSupportedLanguages({ serviceConfig });
     if (settings.supportedLanguages?.length) {
-      supportedLanguages = settings.supportedLanguages;
+      const localLanguageCodes = LANGS.map((l) => l.code);
+      supportedLanguages = settings.supportedLanguages.filter((l) => localLanguageCodes.includes(l));
     }
     if (settings.defaultLanguage) {
       defaultLanguage = settings.defaultLanguage;

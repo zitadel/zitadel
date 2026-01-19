@@ -34,7 +34,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   try {
     const settings = await getSupportedLanguages({ serviceConfig });
     if (settings.supportedLanguages?.length) {
-      languages = settings.supportedLanguages.map((code) => getLanguage(code));
+      languages = settings.supportedLanguages
+        .filter((code) => LANGS.find((l) => l.code === code))
+        .map((code) => getLanguage(code));
     }
   } catch (e) {
     console.error("Failed to load supported languages", e);
