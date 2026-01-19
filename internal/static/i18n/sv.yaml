@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Varningsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde
         FontColorDark: Teckensnittsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde
   UserGrant:
-    AlreadyExists: Användarbeviljandet finns redan
-    NotFound: Användarbeviljandet hittades inte
-    Invalid: Användarbeviljandet är ogiltigt
-    NotChanged: Användarbeviljandet har inte ändrats
+    AlreadyExists: Rolluppdraget finns redan
+    NotFound: Rolluppdraget hittades inte
+    Invalid: Rolluppdraget är ogiltigt
+    NotChanged: Rolluppdraget har inte ändrats
     IDMissing: Id saknas
     NoPermissionForProject: Användaren har inga behörigheter i detta projekt
     RoleKeyNotFound: Rollen hittades inte
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organisation
   project: Projekt
   user: Användare
-  usergrant: Användarbehörighet
+  usergrant: Rolluppdrag
   quota: Kvot
   feature: Funktion
   target: Mål
@@ -872,16 +872,16 @@ EventTypes:
     signed:
       out: Användare utloggad
     grant:
-      added: Auktorisering tillagd
-      changed: Auktorisering ändrad
-      removed: Auktorisering borttagen
-      deactivated: Auktorisering avaktiverad
-      reactivated: Auktorisering återaktiverad
-      reserved: Auktorisering reserverad
-      released: Auktorisering släppt
+      added: Roll tilldelad
+      changed: Rolluppdraget ändrat
+      removed: Rolluppdraget borttaget
+      deactivated: Rolluppdraget inaktiverat
+      reactivated: Rolluppdraget återaktiverat
+      reserved: Rolluppdraget reserverat
+      released: Rolluppdraget frisläppt
       cascade:
-        removed: Auktorisering borttagen
-        changed: Auktorisering ändrad
+        removed: Rolluppdraget borttaget
+        changed: Rolluppdraget ändrat
     metadata:
       set: Användarmetadata inställd
       removed: Användarmetadata borttagen

@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Waarschuwingskleur (donkere modus) is geen geldige Hex kleur waarde
         FontColorDark: Tekstkleur (donkere modus) is geen geldige Hex kleur waarde
   UserGrant:
-    AlreadyExists: Gebruikerstoekenning bestaat al
-    NotFound: Gebruikerstoekenning niet gevonden
-    Invalid: Gebruikerstoekenning is ongeldig
-    NotChanged: Gebruikerstoekenning is niet veranderd
+    AlreadyExists: Roltoewijzing bestaat al
+    NotFound: Roltoewijzing niet gevonden
+    Invalid: Roltoewijzing is ongeldig
+    NotChanged: Roltoewijzing is niet gewijzigd
     IDMissing: ID ontbreekt
     NoPermissionForProject: Gebruiker heeft geen rechten op dit project
     RoleKeyNotFound: Rol niet gevonden
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organisatie
   project: Project
   user: Gebruiker
-  usergrant: Gebruikerstoekenning
+  usergrant: Roltoewijzing
   quota: Quota
   feature: Functie
   target: Doel
@@ -872,16 +872,16 @@ EventTypes:
     signed:
       out: Gebruiker uitgelogd
     grant:
-      added: Autorisatie toegevoegd
-      changed: Autorisatie gewijzigd
-      removed: Autorisatie verwijderd
-      deactivated: Autorisatie gedeactiveerd
-      reactivated: Autorisatie gereactiveerd
-      reserved: Autorisatie gereserveerd
-      released: Autorisatie vrijgegeven
+      added: Rol toegewezen
+      changed: Roltoewijzing gewijzigd
+      removed: Roltoewijzing verwijderd
+      deactivated: Roltoewijzing gedeactiveerd
+      reactivated: Roltoewijzing opnieuw geactiveerd
+      reserved: Roltoewijzing gereserveerd
+      released: Roltoewijzing vrijgegeven
       cascade:
-        removed: Autorisatie cascade verwijderd
-        changed: Autorisatie gewijzigd
+        removed: Roltoewijzing verwijderd
+        changed: Roltoewijzing gewijzigd
     metadata:
       set: Gebruikersmetadata ingesteld
       removed: Gebruikersmetadata verwijderd

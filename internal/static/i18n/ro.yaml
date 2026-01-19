@@ -438,10 +438,10 @@ Errors:
             WarnColorDark: Culoarea de avertizare (modul întunecat) nu este o valoare de culoare Hex validă
             FontColorDark: Culoarea fontului (modul întunecat) nu este o valoare de culoare Hex validă
       UserGrant:
-        AlreadyExists: Acordarea utilizatorului există deja
-        NotFound: Acordarea utilizatorului nu a fost găsită
-        Invalid: Acordarea utilizatorului este invalidă
-        NotChanged: Acordarea utilizatorului nu a fost schimbată
+        AlreadyExists: Atribuirea de rol există deja
+        NotFound: Atribuirea de rol nu a fost găsită
+        Invalid: Atribuirea de rol este invalidă
+        NotChanged: Atribuirea de rol nu a fost modificată
         IDMissing: Id lipsă
         NoPermissionForProject: Utilizatorul nu are permisiuni pentru acest proiect
         RoleKeyNotFound: Rolul nu a fost găsit
@@ -625,7 +625,7 @@ Errors:
       org: Organizație
       project: Proiect
       user: Utilizator
-      usergrant: Acordare de utilizator
+      usergrant: Atribuire de rol
       quota: Cotă
       feature: Caracteristică
       target: Țintă
@@ -868,16 +868,16 @@ Errors:
         signed:
           out: Utilizator deconectat
         grant:
-          added: Autorizație adăugată
-          changed: Autorizație schimbată
-          removed: Autorizație ștearsă
-          deactivated: Autorizație dezactivată
-          reactivated: Autorizație reactivată
-          reserved: Autorizație rezervată
-          released: Autorizație eliberată
+          added: Rol atribuit
+          changed: Atribuirea de rol a fost modificată
+          removed: Atribuirea de rol a fost eliminată
+          deactivated: Atribuirea de rol a fost dezactivată
+          reactivated: Atribuirea de rol a fost reactivată
+          reserved: Atribuirea de rol a fost rezervată
+          released: Atribuirea de rol a fost eliberată
           cascade:
-            removed: Autorizație ștearsă
-            changed: Autorizație schimbată
+            removed: Atribuirea de rol a fost eliminată
+            changed: Atribuirea de rol a fost modificată
         metadata:
           set: Metadate de utilizator setate
           removed: Metadate de utilizator șterse

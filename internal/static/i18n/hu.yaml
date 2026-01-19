@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: A figyelmeztető szín (sötét mód) nem érvényes Hex színérték
         FontColorDark: A betűszín (sötét mód) nem érvényes Hex színérték
   UserGrant:
-    AlreadyExists: A felhasználói jogosultság már létezik
-    NotFound: A felhasználói jogosultság nem található
-    Invalid: A felhasználói jogosultság érvénytelen
-    NotChanged: A felhasználói jogosultság nem lett módosítva
+    AlreadyExists: A szerepkör-hozzárendelés már létezik
+    NotFound: A szerepkör-hozzárendelés nem található
+    Invalid: A szerepkör-hozzárendelés érvénytelen
+    NotChanged: A szerepkör-hozzárendelés nem változott
     IDMissing: Hiányzó azonosító
     NoPermissionForProject: A felhasználónak nincs jogosultsága ebben a projektben
     RoleKeyNotFound: Szerepkör nem található
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Szervezet
   project: Projekt
   user: Felhasználó
-  usergrant: Felhasználói jogosultság
+  usergrant: Szerepkör hozzárendelés
   quota: Kvóta
   feature: Funkció
   target: Cél
@@ -871,16 +871,16 @@ EventTypes:
     signed:
       out: Felhasználó kijelentkezett
     grant:
-      added: Engedély hozzáadva
-      changed: Engedély megváltoztatva
-      removed: Engedély eltávolítva
-      deactivated: Engedély deaktiválva
-      reactivated: Engedély újraaktiválva
-      reserved: Engedély fenntartva
-      released: Engedély felszabadítva
+      added: Szerepkör hozzárendelve
+      changed: A szerepkör-hozzárendelés megváltozott
+      removed: A szerepkör-hozzárendelés eltávolítva
+      deactivated: A szerepkör-hozzárendelés deaktiválva
+      reactivated: A szerepkör-hozzárendelés újraaktiválva
+      reserved: Szerepkör-hozzárendelés fenntartva
+      released: Szerepkör-hozzárendelés feloldva
       cascade:
-        removed: Engedély visszavonva
-        changed: Engedély megváltoztatva
+        removed: A szerepkör-hozzárendelés eltávolítva
+        changed: A szerepkör-hozzárendelés megváltozott
     metadata:
       set: Felhasználói metaadatok beállítva
       removed: Felhasználói metaadatok törölve

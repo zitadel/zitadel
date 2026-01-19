@@ -436,10 +436,10 @@ Errors:
         WarnColorDark: A cor de aviso (modo escuro) não é um valor hexadecimal válido
         FontColorDark: A cor da fonte (modo escuro) não é um valor hexadecimal válido
   UserGrant:
-    AlreadyExists: A concessão de usuário já existe
-    NotFound: A concessão de usuário não foi encontrada
-    Invalid: A concessão de usuário é inválida
-    NotChanged: A concessão de usuário não foi alterada
+    AlreadyExists: A atribuição de função já existe
+    NotFound: Atribuição de função não encontrada
+    Invalid: A atribuição de função é inválida
+    NotChanged: A atribuição de função não foi alterada
     IDMissing: ID faltando
     NoPermissionForProject: O usuário não possui permissões neste projeto
     RoleKeyNotFound: Função não encontrada
@@ -628,7 +628,7 @@ AggregateTypes:
   org: Organização
   project: Projeto
   user: Usuário
-  usergrant: Concessão de usuário
+  usergrant: Atribuição de função
   quota: Cota
   feature: Recurso
   target: Objetivo
@@ -871,16 +871,16 @@ EventTypes:
     signed:
       out: Usuário desconectado
     grant:
-      added: Autorização adicionada
-      changed: Autorização alterada
-      removed: Autorização removida
-      deactivated: Autorização desativada
-      reactivated: Autorização reativada
-      reserved: Autorização reservada
-      released: Autorização liberada
+      added: Função atribuída
+      changed: Atribuição de função alterada
+      removed: Atribuição de função removida
+      deactivated: Atribuição de função desativada
+      reactivated: Atribuição de função reativada
+      reserved: Atribuição de função reservada
+      released: Atribuição de função liberada
       cascade:
-        removed: Autorização removida
-        changed: Autorização alterada
+        removed: Atribuição de função removida
+        changed: Atribuição de função alterada
     metadata:
       set: Metadados do usuário definidos
       removed: Metadados do usuário removidos

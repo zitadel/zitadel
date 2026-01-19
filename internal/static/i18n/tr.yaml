@@ -438,10 +438,10 @@ Errors:
         WarnColorDark: Uyarı rengi (karanlık mod) geçerli bir Hex renk değeri değil
         FontColorDark: Yazı tipi rengi (karanlık mod) geçerli bir Hex renk değeri değil
   UserGrant:
-    AlreadyExists: Kullanıcı yetkisi zaten mevcut
-    NotFound: Kullanıcı yetkisi bulunamadı
-    Invalid: Kullanıcı yetkisi geçersiz
-    NotChanged: Kullanıcı yetkisi değişmedi
+    AlreadyExists: Rol ataması zaten mevcut
+    NotFound: Rol ataması bulunamadı
+    Invalid: Rol ataması geçersiz
+    NotChanged: Rol ataması değiştirilmedi
     IDMissing: Id eksik
     NoPermissionForProject: Kullanıcının bu proje üzerinde izni yok
     RoleKeyNotFound: Rol bulunamadı
@@ -630,7 +630,7 @@ AggregateTypes:
   org: Organizasyon
   project: Proje
   user: Kullanıcı
-  usergrant: Kullanıcı yetkisi
+  usergrant: Rol Ataması
   quota: Kota
   feature: Özellik
   target: Hedef
@@ -873,16 +873,16 @@ EventTypes:
     signed:
       out: Kullanıcı çıkış yaptı
     grant:
-      added: Yetkilendirme eklendi
-      changed: Yetkilendirme değiştirildi
-      removed: Yetkilendirme kaldırıldı
-      deactivated: Yetkilendirme devre dışı bırakıldı
-      reactivated: Yetkilendirme yeniden etkinleştirildi
-      reserved: Yetkilendirme rezerve edildi
-      released: Yetkilendirme serbest bırakıldı
+      added: Rol atandı
+      changed: Rol ataması değiştirildi
+      removed: Rol ataması kaldırıldı
+      deactivated: Rol ataması devre dışı bırakıldı
+      reactivated: Rol ataması yeniden etkinleştirildi
+      reserved: Rol ataması rezerve edildi
+      released: Rol ataması serbest bırakıldı
       cascade:
-        removed: Yetkilendirme kaldırıldı
-        changed: Yetkilendirme değiştirildi
+        removed: Rol ataması kaldırıldı
+        changed: Rol ataması değiştirildi
     metadata:
       set: Kullanıcı metadata'sı ayarlandı
       removed: Kullanıcı metadata'sı kaldırıldı

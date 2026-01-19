@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Upozornění barva (tmavý režim) nemá platnou hodnotu Hex barvy
         FontColorDark: Barva písma (tmavý režim) nemá platnou hodnotu Hex barvy
   UserGrant:
-    AlreadyExists: Uživatelský grant již existuje
-    NotFound: Uživatelský grant nenalezen
-    Invalid: Uživatelský grant je neplatný
-    NotChanged: Uživatelský grant nebyl změněn
+    AlreadyExists: Přiřazení role již existuje
+    NotFound: Přiřazení role nebylo nalezeno
+    Invalid: Přiřazení role je neplatné
+    NotChanged: Přiřazení role nebylo změněno
     IDMissing: Chybí Id
     NoPermissionForProject: Uživatel nemá na tomto projektu žádná oprávnění
     RoleKeyNotFound: Role nenalezena
@@ -627,7 +627,7 @@ AggregateTypes:
   org: Organizace
   project: Projekt
   user: Uživatel
-  usergrant: Uživatelský grant
+  usergrant: Přiřazení role
   quota: Kvóta
   feature: Funkce
   target: Cíl
@@ -870,16 +870,16 @@ EventTypes:
     signed:
       out: Uživatel odhlášen
     grant:
-      added: Autorizace přidána
-      changed: Autorizace změněna
-      removed: Autorizace odstraněna
-      deactivated: Autorizace deaktivována
-      reactivated: Autorizace reaktivována
-      reserved: Autorizace rezervována
-      released: Autorizace uvolněna
+      added: Přiřazení role přidáno
+      changed: Přiřazení role změněno
+      removed: Přiřazení role odebráno
+      deactivated: Přiřazení role deaktivováno
+      reactivated: Přiřazení role reaktivováno
+      reserved: Přiřazení role rezervováno
+      released: Přiřazení role uvolněno
       cascade:
-        removed: Autorizace odstraněna
-        changed: Autorizace změněna
+        removed: Přiřazení role odebráno
+        changed: Přiřazení role změněno
     metadata:
       set: Metadata uživatele nastavena
       removed: Metadata uživatele odstraněna
