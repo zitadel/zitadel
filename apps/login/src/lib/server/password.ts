@@ -108,7 +108,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
 
   const userId = user.userId;
-
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return passwordReset({
