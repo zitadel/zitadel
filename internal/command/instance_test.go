@@ -34,17 +34,17 @@ import (
 
 func instanceSetupZitadelIDs() ZitadelConfig {
 	return ZitadelConfig{
-		instanceID:   "INSTANCE",
-		orgID:        "ORG",
-		projectID:    "PROJECT",
-		consoleAppID: "console-id",
-		authAppID:    "auth-id",
-		mgmtAppID:    "mgmt-id",
-		adminAppID:   "admin-id",
+		instanceID:             "INSTANCE",
+		orgID:                  "ORG",
+		projectID:              "PROJECT",
+		managementConsoleAppID: "console-id",
+		authAppID:              "auth-id",
+		mgmtAppID:              "mgmt-id",
+		adminAppID:             "admin-id",
 	}
 }
 
-func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string, externalSecure bool) []eventstore.Command {
+func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, externalSecure bool) []eventstore.Command {
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(ctx,
 			&project.NewAggregate(id, orgID).Aggregate,
@@ -65,7 +65,7 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 
 	consoleAppID := "console-id"
 	consoleClientID := "clientID"
-	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Console", consoleClientID, externalSecure)...)
+	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Management Console", consoleClientID, externalSecure)...)
 	events = append(events,
 		instance.NewIAMConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
@@ -170,23 +170,20 @@ func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultD
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
 
-	owner := ""
 	if machine {
 		machineID := "USER-MACHINE"
 		events = append(events, machineEvents(ctx, instanceID, orgID, machineID, "PAT")...)
-		owner = machineID
 	}
 	if human {
 		userID := "USER"
 		events = append(events, humanEvents(ctx, instanceID, orgID, userID)...)
-		owner = userID
 	}
 	if loginClient {
 		userID := "USER-LOGIN-CLIENT"
 		events = append(events, loginClientEvents(ctx, instanceID, orgID, userID, "LOGIN-CLIENT-PAT")...)
 	}
 
-	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, owner, externalSecure)...)
+	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, externalSecure)...)
 	return events
 }
 
@@ -194,7 +191,7 @@ func orgIDs() []string {
 	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER", "USER-LOGIN-CLIENT", "LOGIN-CLIENT-PAT"}, projectClientIDs())
 }
 
-func instancePoliciesFilters(instanceID string) []expect {
+func instancePoliciesFilters(_ string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(),
@@ -774,7 +771,6 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 									"INSTANCE",
 									"ORG",
 									"PROJECT",
-									"owner",
 									false,
 								)...,
 							),
@@ -1180,13 +1176,13 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 					},
 				},
 				ids: ZitadelConfig{
-					instanceID:   "INSTANCE",
-					orgID:        "ORG",
-					projectID:    "PROJECT",
-					consoleAppID: "console-id",
-					authAppID:    "auth-id",
-					mgmtAppID:    "mgmt-id",
-					adminAppID:   "admin-id",
+					instanceID:             "INSTANCE",
+					orgID:                  "ORG",
+					projectID:              "PROJECT",
+					managementConsoleAppID: "console-id",
+					authAppID:              "auth-id",
+					mgmtAppID:              "mgmt-id",
+					adminAppID:             "admin-id",
 				},
 			},
 			res: res{

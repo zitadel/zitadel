@@ -25,7 +25,7 @@ type systemConfigChangesInstanceModel struct {
 	Domains                []string
 	GeneratedDomain        string
 	ProjectID              string
-	ConsoleAppID           string
+	ManagementConsoleAppID string
 	RedirectUris           []string
 	PostLogoutRedirectUris []string
 }
@@ -75,15 +75,15 @@ func (wm *SystemConfigWriteModel) Reduce() error {
 		case *instance.ProjectSetEvent:
 			wm.Instances[e.Aggregate().InstanceID].ProjectID = e.ProjectID
 		case *instance.ConsoleSetEvent:
-			wm.Instances[e.Aggregate().InstanceID].ConsoleAppID = e.AppID
+			wm.Instances[e.Aggregate().InstanceID].ManagementConsoleAppID = e.AppID
 		case *project.OIDCConfigAddedEvent:
-			if wm.Instances[e.Aggregate().InstanceID].ConsoleAppID != e.AppID {
+			if wm.Instances[e.Aggregate().InstanceID].ManagementConsoleAppID != e.AppID {
 				continue
 			}
 			wm.Instances[e.Aggregate().InstanceID].RedirectUris = e.RedirectUris
 			wm.Instances[e.Aggregate().InstanceID].PostLogoutRedirectUris = e.PostLogoutRedirectUris
 		case *project.OIDCConfigChangedEvent:
-			if wm.Instances[e.Aggregate().InstanceID].ConsoleAppID != e.AppID {
+			if wm.Instances[e.Aggregate().InstanceID].ManagementConsoleAppID != e.AppID {
 				continue
 			}
 			if e.RedirectUris != nil {
@@ -119,10 +119,10 @@ func (wm *SystemConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 type SystemConfigChangesValidation struct {
-	ProjectID    string
-	ConsoleAppID string
-	Validations  []preparation.Validation
-	InstanceID   string
+	ProjectID              string
+	ManagementConsoleAppID string
+	Validations            []preparation.Validation
+	InstanceID             string
 }
 
 func (wm *SystemConfigWriteModel) NewChangedEvents(commands *Commands) map[string]*SystemConfigChangesValidation {
@@ -131,9 +131,9 @@ func (wm *SystemConfigWriteModel) NewChangedEvents(commands *Commands) map[strin
 	cmds := make(map[string]*SystemConfigChangesValidation)
 	for i, inst := range wm.Instances {
 		cmds[i] = &SystemConfigChangesValidation{
-			InstanceID:   i,
-			ProjectID:    inst.ProjectID,
-			ConsoleAppID: inst.ConsoleAppID,
+			InstanceID:             i,
+			ProjectID:              inst.ProjectID,
+			ManagementConsoleAppID: inst.ManagementConsoleAppID,
 		}
 		//check each instance separately for changes (using the generated domain) and check if there's an existing custom domain
 		newCustomDomainExists, isInstanceOfCustomDomain = wm.changeConfig(cmds[i], inst, commands)
@@ -143,7 +143,7 @@ func (wm *SystemConfigWriteModel) NewChangedEvents(commands *Commands) map[strin
 	}
 	//handle the custom domain at last
 	if newCustomDomainExists {
-		//if the domain itself already exists, then only check if the uris of the console app exist as well
+		// if the domain itself already exists, then only check if the uris of the Management Console app exist as well
 		wm.changeURIs(cmds[instanceOfCustomDomain], wm.Instances[instanceOfCustomDomain], commands, wm.newExternalDomain)
 		return cmds
 	}
@@ -171,7 +171,7 @@ func (wm *SystemConfigWriteModel) changeConfig(validation *SystemConfigChangesVa
 		}
 	}
 	if newGeneratedDomainExists {
-		//if the domain itself already exists, then only check if the uris of the console app exist as well
+		//if the domain itself already exists, then only check if the uris of the Management Console app exist as well
 		wm.changeURIs(validation, inst, commands, newGeneratedDomain)
 		return newCustomDomainExists, isInstanceOfCustomDomain
 	}
