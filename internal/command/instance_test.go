@@ -1783,7 +1783,7 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 		EnableBackChannelLogout        *bool
 		LoginV2                        *InstanceSetupFeatureLoginV2
 		PermissionCheckV2              *bool
-		ConsoleUseV2UserApi            *bool
+		ManagementConsoleUseV2UserApi  *bool
 		EnableRelationalTables         *bool
 	}
 
@@ -1812,7 +1812,7 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 				OIDCSingleV1SessionTermination: gu.Ptr(false),
 				EnableBackChannelLogout:        gu.Ptr(true),
 				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
+				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
 				EnableRelationalTables:         gu.Ptr(true),
 			},
 			want: &InstanceFeatures{
@@ -1825,7 +1825,7 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 				EnableBackChannelLogout:        gu.Ptr(true),
 				LoginV2:                        nil,
 				PermissionCheckV2:              gu.Ptr(true),
-				ConsoleUseV2UserApi:            gu.Ptr(false),
+				ManagementConsoleUseV2UserApi:  gu.Ptr(false),
 				EnableRelationalTables:         gu.Ptr(true),
 			},
 		},
@@ -1882,7 +1882,7 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 				EnableBackChannelLogout:        tc.fields.EnableBackChannelLogout,
 				LoginV2:                        tc.fields.LoginV2,
 				PermissionCheckV2:              tc.fields.PermissionCheckV2,
-				ConsoleUseV2UserApi:            tc.fields.ConsoleUseV2UserApi,
+				ManagementConsoleUseV2UserApi:  tc.fields.ManagementConsoleUseV2UserApi,
 				EnableRelationalTables:         tc.fields.EnableRelationalTables,
 			}
 			got, err := f.ToInstanceFeatures()

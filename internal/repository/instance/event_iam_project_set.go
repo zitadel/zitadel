@@ -9,7 +9,7 @@ import (
 
 const (
 	ProjectSetEventType eventstore.EventType = "instance.iam.project.set"
-	ConsoleSetEventType eventstore.EventType = "instance.iam.console.set"
+	ManagementConsoleSetEventType eventstore.EventType = "instance.iam.console.set"
 )
 
 type ProjectSetEvent struct {
@@ -78,7 +78,7 @@ func NewIAMConsoleSetEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			ConsoleSetEventType,
+			ManagementConsoleSetEventType,
 		),
 		ClientID: *clientID,
 		AppID:    *appID,

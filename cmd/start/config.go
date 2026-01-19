@@ -68,7 +68,7 @@ type Config struct {
 	SAML                saml.Config
 	SCIM                scim_config.Config
 	Login               login.Config
-	Console             console.Config
+	ManagementConsole   console.Config
 	AssetStorage        static_config.AssetStorageConfig
 	InternalAuthZ       authz.Config
 	SystemAuthZ         authz.Config

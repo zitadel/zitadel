@@ -140,7 +140,7 @@ type InstanceSetupFeatures struct {
 	EnableBackChannelLogout        *bool
 	LoginV2                        *InstanceSetupFeatureLoginV2
 	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
+	ManagementConsoleUseV2UserApi  *bool
 	EnableRelationalTables         *bool
 }
 
@@ -174,7 +174,7 @@ func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err e
 		EnableBackChannelLogout:        f.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              f.PermissionCheckV2,
-		ConsoleUseV2UserApi:            f.ConsoleUseV2UserApi,
+		ManagementConsoleUseV2UserApi:  f.ManagementConsoleUseV2UserApi,
 		EnableRelationalTables:         f.EnableRelationalTables,
 	}, nil
 }

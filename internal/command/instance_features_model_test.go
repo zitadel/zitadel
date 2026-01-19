@@ -117,7 +117,7 @@ func Test_reduceInstanceFeature(t *testing.T) {
 				key:      feature.KeyConsoleUseV2UserApi,
 				value:    true,
 			},
-			expected: &InstanceFeatures{ConsoleUseV2UserApi: gu.Ptr(true)},
+			expected: &InstanceFeatures{ManagementConsoleUseV2UserApi: gu.Ptr(true)},
 		},
 		{
 			name: "enable relational tables",

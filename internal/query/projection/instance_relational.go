@@ -52,7 +52,7 @@ func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIAMProjectSet,
 				},
 				{
-					Event:  instance.ConsoleSetEventType,
+					Event:  instance.ManagementConsoleSetEventType,
 					Reduce: p.reduceConsoleSet,
 				},
 				{
@@ -148,7 +148,7 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ConsoleSetEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ManagementConsoleSetEventType)
 	}
 
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {

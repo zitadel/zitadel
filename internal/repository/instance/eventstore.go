@@ -7,7 +7,7 @@ import (
 func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, DefaultOrgSetEventType, DefaultOrgSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, ProjectSetEventType, ProjectSetMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, ConsoleSetEventType, ConsoleSetMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, ManagementConsoleSetEventType, ConsoleSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, DefaultLanguageSetEventType, DefaultLanguageSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SecretGeneratorAddedEventType, SecretGeneratorAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SecretGeneratorChangedEventType, SecretGeneratorChangedEventMapper)

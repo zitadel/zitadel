@@ -18,7 +18,7 @@ type InstanceFeatures struct {
 	EnableBackChannelLogout        FeatureSource[bool]
 	LoginV2                        FeatureSource[*feature.LoginV2]
 	PermissionCheckV2              FeatureSource[bool]
-	ConsoleUseV2UserApi            FeatureSource[bool]
+	ManagementConsoleUseV2UserApi            FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
 }
 

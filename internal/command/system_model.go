@@ -107,7 +107,7 @@ func (wm *SystemConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.InstanceDomainAddedEventType,
 			instance.InstanceDomainRemovedEventType,
 			instance.ProjectSetEventType,
-			instance.ConsoleSetEventType,
+			instance.ManagementConsoleSetEventType,
 		).
 		Or().
 		AggregateTypes(project.AggregateType).

@@ -128,7 +128,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				ConsoleUseV2UserApi: gu.Ptr(true),
+				ManagementConsoleUseV2UserApi: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},
