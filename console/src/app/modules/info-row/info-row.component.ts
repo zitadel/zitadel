@@ -10,6 +10,7 @@ import { User as UserV1 } from '@zitadel/proto/zitadel/user_pb';
 import { User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { LoginPolicy as LoginPolicyV2 } from '@zitadel/proto/zitadel/policy_pb';
 import { Organization as OrgV2 } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org as OrgV1 } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-info-row',
@@ -19,7 +20,7 @@ import { Organization as OrgV2 } from '@zitadel/proto/zitadel/org/v2/org_pb';
 })
 export class InfoRowComponent {
   @Input() public user?: User.AsObject | UserV2 | UserV1;
-  @Input() public org!: Org.AsObject | OrgV2;
+  @Input() public org!: Org.AsObject | OrgV2 | OrgV1;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
   @Input() public idp!: IDP.AsObject;

@@ -1,13 +1,13 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ActionKeysType } from '../action-keys/action-keys.component';
-import { NewOrganizationService } from '../../services/new-organization.service';
 import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-header',
@@ -20,11 +20,12 @@ export class HeaderComponent {
   @Input({ required: true }) public user!: User.AsObject;
   public showOrgContext: boolean = false;
 
-  @Input() public org?: Organization | null;
+  public org = input<Organization | Org | null>();
+
   @Output() public changedActiveOrg = new EventEmitter<void>();
   public showAccount: boolean = false;
-  protected readonly BreadcrumbType = BreadcrumbType;
-  protected readonly ActionKeysType = ActionKeysType;
+  public BreadcrumbType = BreadcrumbType;
+  public ActionKeysType = ActionKeysType;
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -40,11 +41,10 @@ export class HeaderComponent {
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,
-    private readonly newOrganizationService: NewOrganizationService,
   ) {}
 
   public async setActiveOrg(orgId: string): Promise<void> {
-    await this.newOrganizationService.setOrgId(orgId);
+    await this.authService.getActiveOrg(orgId);
     this.changedActiveOrg.emit();
   }
 
