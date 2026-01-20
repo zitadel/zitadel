@@ -1242,7 +1242,7 @@ EventTypes:
       removed: 域名已删除
     iam:
       console:
-        set: ZITADEL 控制台应用程序集
+        set: ZITADEL管理控制台应用程序已设置
       project:
         set: ZITADEL 项目集
     mail:

@@ -1242,7 +1242,7 @@ EventTypes:
       removed: 도메인 삭제됨
     iam:
       console:
-        set: ZITADEL 콘솔 애플리케이션 설정됨
+        set: ZITADEL 관리 콘솔 애플리케이션 설정됨
       project:
         set: ZITADEL 프로젝트 설정됨
     mail:

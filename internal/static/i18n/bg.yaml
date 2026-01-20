@@ -1265,7 +1265,7 @@ EventTypes:
       removed: Домейнът премахнат
     iam:
       console:
-        set: Комплект конзолни приложения ZITADEL
+        set: Комплект Management Console приложения ZITADEL
       project:
         set: Комплект проект ZITADEL
     mail:

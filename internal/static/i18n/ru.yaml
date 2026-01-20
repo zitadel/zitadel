@@ -1227,7 +1227,7 @@ EventTypes:
       removed: Домен удалён
     iam:
       console:
-        set: Приложение консоли ZITADEL установлено
+        set: Приложение Management Console ZITADEL установлено
       project:
         set: Проект ZITADEL установлен
     mail:

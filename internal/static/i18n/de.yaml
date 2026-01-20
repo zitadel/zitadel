@@ -1241,7 +1241,7 @@ EventTypes:
       removed: Domain gelöscht
     iam:
       console:
-        set: ZITADEL Console Applikation gesetzt
+        set: ZITADEL Management Console Applikation gesetzt
       project:
         set: ZITADEL Projekt gesetzt
     mail:

@@ -1242,7 +1242,7 @@ EventTypes:
       removed: Domain kaldırıldı
     iam:
       console:
-        set: ZITADEL Konsol uygulaması ayarlandı
+        set: ZITADEL Yönetim Konsolu uygulaması ayarlandı
       project:
         set: ZITADEL projesi ayarlandı
     mail:

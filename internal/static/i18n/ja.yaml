@@ -1242,7 +1242,7 @@ EventTypes:
       removed: ドメインの削除
     iam:
       console:
-        set: ZITADELコンソールアプリケーションのセット
+        set: ZITADEL管理コンソールアプリケーションのセット
       project:
         set: ZITADELプロジェクトのセット
     mail:

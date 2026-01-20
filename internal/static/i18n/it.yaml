@@ -1237,7 +1237,7 @@ EventTypes:
       removed: Dominio rimosso
     iam:
       console:
-        set: Set di applicazioni per console ZITADEL
+        set: Set di applicazioni per la console di gestione ZITADEL
       project:
         set: Set progetto ZITADEL
     mail:

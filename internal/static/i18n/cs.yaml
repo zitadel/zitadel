@@ -1239,7 +1239,7 @@ EventTypes:
       removed: Doména odstraněna
     iam:
       console:
-        set: Aplikace ZITADEL Console nastavena
+        set: Aplikace ZITADEL Konzole pro správu nastavena
       project:
         set: Projekt ZITADEL nastaven
     mail:

@@ -1242,7 +1242,7 @@ EventTypes:
       removed: Domain removed
     iam:
       console:
-        set: ZITADEL Console application set
+        set: ZITADEL Management Console application set
       project:
         set: ZITADEL project set
     mail:

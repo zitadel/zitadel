@@ -1235,7 +1235,7 @@ EventTypes:
       removed: Domain dihapus
     iam:
       console:
-        set: Kumpulan aplikasi Konsol ZITADEL
+        set: Aplikasi Konsol Manajemen ZITADEL diatur
       project:
         set: Kumpulan proyek ZITADEL
     mail:

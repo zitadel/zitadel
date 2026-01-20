@@ -1237,7 +1237,7 @@ Errors:
               removed: Domeniu șters
             iam:
               console:
-                set: Aplicația ZITADEL Console setată
+                set: Aplicație Consolă de Gestionare ZITADEL configurată
               project:
                 set: Proiectul ZITADEL setat
             mail:

@@ -1240,7 +1240,7 @@ EventTypes:
       removed: Domain eltávolítva
     iam:
       console:
-        set: ZITADEL Konzolalkalmazás beállítva
+        set: ZITADEL Felügyeleti Konzol alkalmazás beállítva
       project:
         set: ZITADEL projekt beállítva
     mail:
