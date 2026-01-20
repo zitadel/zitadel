@@ -117,7 +117,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			events := []eventstore.Command{
 				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
 			}
-			managementConsoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
+			managementConsoleChangeEvent, err := c.updateManagementConsoleRedirectURIs(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -129,13 +129,13 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 	}
 }
 
-func (c *Commands) prepareUpdateConsoleRedirectURIs(instanceDomain string) preparation.Validation {
+func (c *Commands) prepareUpdateManagementConsoleRedirectURIs(instanceDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-E3j3s", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			managementConsoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
+			managementConsoleChangeEvent, err := c.updateManagementConsoleRedirectURIs(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -149,7 +149,7 @@ func (c *Commands) prepareUpdateConsoleRedirectURIs(instanceDomain string) prepa
 	}
 }
 
-func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter preparation.FilterToQueryReducer, instanceDomain string) (*project.OIDCConfigChangedEvent, error) {
+func (c *Commands) updateManagementConsoleRedirectURIs(ctx context.Context, filter preparation.FilterToQueryReducer, instanceDomain string) (*project.OIDCConfigChangedEvent, error) {
 	appWriteModel, err := getOIDCAppWriteModel(ctx, filter, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ManagementConsoleApplicationID(), "")
 	if err != nil {
 		return nil, err

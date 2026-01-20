@@ -74,7 +74,7 @@ func (wm *SystemConfigWriteModel) Reduce() error {
 			}
 		case *instance.ProjectSetEvent:
 			wm.Instances[e.Aggregate().InstanceID].ProjectID = e.ProjectID
-		case *instance.ConsoleSetEvent:
+		case *instance.ManagementConsoleSetEvent:
 			wm.Instances[e.Aggregate().InstanceID].ManagementConsoleAppID = e.AppID
 		case *project.OIDCConfigAddedEvent:
 			if wm.Instances[e.Aggregate().InstanceID].ManagementConsoleAppID != e.AppID {
@@ -181,5 +181,5 @@ func (wm *SystemConfigWriteModel) changeConfig(validation *SystemConfigChangesVa
 }
 
 func (wm *SystemConfigWriteModel) changeURIs(validation *SystemConfigChangesValidation, inst *systemConfigChangesInstanceModel, commands *Commands, domain string) {
-	validation.Validations = append(validation.Validations, commands.prepareUpdateConsoleRedirectURIs(domain))
+	validation.Validations = append(validation.Validations, commands.prepareUpdateManagementConsoleRedirectURIs(domain))
 }

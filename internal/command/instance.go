@@ -312,7 +312,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, managementConsoleAppID, externalDomain string, defaultLanguage language.Tag) context.Context {
 	return authz.WithDefaultLanguage(
-		authz.WithConsole(
+		authz.WithManagementConsole(
 			authz.SetCtxData(
 				http.WithRequestedHost(
 					authz.WithInstanceID(
@@ -811,7 +811,7 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 		if len(instanceValidations.Validations) == 0 {
 			continue
 		}
-		ctx := authz.WithConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ManagementConsoleAppID)
+		ctx := authz.WithManagementConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ManagementConsoleAppID)
 		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
 		if err != nil {
 			return err
@@ -867,7 +867,7 @@ func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
+				instance.NewIAMManagementConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
 			}, nil
 		}, nil
 	}

@@ -15,7 +15,7 @@ func WebAuthNsToCredentials(ctx context.Context, webAuthNs []*domain.WebAuthNTok
 	for _, webAuthN := range webAuthNs {
 		// only add credentials that are ready and
 		// either match the rpID or
-		// if they were added through Console / old login UI, there is no stored rpID set;
+		// if they were added through management Console / old login UI, there is no stored rpID set;
 		// then we check if the requested rpID matches the instance domain
 		if webAuthN.State == domain.MFAStateReady &&
 			(webAuthN.RPID == rpID ||

@@ -75,7 +75,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
-			feature_v2.InstanceConsoleUseV2UserApi,
+			feature_v2.InstanceManagementConsoleUseV2UserApi,
 			feature_v2.InstanceEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
@@ -115,7 +115,7 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
-	case feature.KeyConsoleUseV2UserApi:
+	case feature.KeyManagementConsoleUseV2UserApi:
 		v := value.(bool)
 		features.ManagementConsoleUseV2UserApi = &v
 	case feature.KeyEnableRelationalTables:
@@ -136,7 +136,7 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.InstanceEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceConsoleUseV2UserApi)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceManagementConsoleUseV2UserApi)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.InstanceEnableRelationalTables)
 	return cmds
 }

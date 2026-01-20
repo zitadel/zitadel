@@ -67,7 +67,7 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, exter
 	managementConsoleClientID := "clientID"
 	events = append(events, oidcAppEvents(ctx, orgID, id, managementConsoleAppID, "Management Console", managementConsoleClientID, externalSecure)...)
 	events = append(events,
-		instance.NewIAMConsoleSetEvent(ctx,
+		instance.NewIAMManagementConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
 			&managementConsoleClientID,
 			&managementConsoleAppID,

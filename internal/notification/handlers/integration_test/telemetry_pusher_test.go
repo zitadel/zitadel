@@ -56,7 +56,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	// create the session to be used for the authN of the clients
 	sessionID, sessionToken, _, _ := instance.CreatePasswordSession(t, iamOwnerCtx, instance.AdminUserID, "Password1!")
 
-	managementConsole := consoleOIDCConfig(t, instance)
+	managementConsole := managementConsoleOIDCConfig(t, instance)
 	loginToClient(t, instance, managementConsole.GetClientId(), managementConsole.GetRedirectUris()[0], sessionID, sessionToken)
 	awaitMilestone(t, sub, instance.ID(), milestone.AuthenticationSucceededOnInstance)
 
@@ -98,7 +98,7 @@ func loginToClient(t *testing.T, instance *integration.Instance, clientID, redir
 	require.NoError(t, err)
 }
 
-func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCConfig {
+func managementConsoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCConfig {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	projects, err := instance.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{

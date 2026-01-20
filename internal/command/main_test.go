@@ -194,11 +194,11 @@ func (m *mockInstance) ProjectID() string {
 }
 
 func (m *mockInstance) ManagementConsoleClientID() string {
-	return "consoleID"
+	return "managementConsoleID"
 }
 
 func (m *mockInstance) ManagementConsoleApplicationID() string {
-	return "consoleApplicationID"
+	return "managementConsoleApplicationID"
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {

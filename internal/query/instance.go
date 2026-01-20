@@ -67,11 +67,11 @@ var (
 		table: instanceTable,
 	}
 	InstanceColumnManagementConsoleID = Column{
-		name:  projection.InstanceColumnConsoleID,
+		name:  projection.InstanceColumnManagementConsoleID,
 		table: instanceTable,
 	}
 	InstanceColumnManagementConsoleAppID = Column{
-		name:  projection.InstanceColumnConsoleAppID,
+		name:  projection.InstanceColumnManagementConsoleAppID,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultLanguage = Column{

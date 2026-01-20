@@ -53,7 +53,7 @@ func (p *instanceRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.ManagementConsoleSetEventType,
-					Reduce: p.reduceConsoleSet,
+					Reduce: p.reduceManagementConsoleSet,
 				},
 				{
 					Event:  instance.DefaultLanguageSetEventType,
@@ -145,8 +145,8 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 	}), nil
 }
 
-func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.ConsoleSetEvent)
+func (p *instanceRelationalProjection) reduceManagementConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.ManagementConsoleSetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ManagementConsoleSetEventType)
 	}

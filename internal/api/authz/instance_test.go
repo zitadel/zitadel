@@ -57,7 +57,7 @@ func Test_Instance(t *testing.T) {
 			res{
 				instanceID: "instanceID",
 				projectID:  "projectID",
-				consoleID:  "consoleID",
+				consoleID:  "managementConsoleID",
 			},
 		},
 		{
@@ -104,7 +104,7 @@ func (m *mockInstance) ProjectID() string {
 }
 
 func (m *mockInstance) ManagementConsoleClientID() string {
-	return "consoleID"
+	return "managementConsoleID"
 }
 
 func (m *mockInstance) ManagementConsoleApplicationID() string {

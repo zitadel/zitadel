@@ -19,11 +19,11 @@ type OIDCConfigurationUpdate struct {
 // RequiresTransaction implements [Transactional].
 func (o *OIDCConfigurationUpdate) RequiresTransaction() {}
 
-func NewOIDCConfigurationUpdate(instanceDomainName, projectID, consoleAppID string) *OIDCConfigurationUpdate {
+func NewOIDCConfigurationUpdate(instanceDomainName, projectID, managementConsoleAppID string) *OIDCConfigurationUpdate {
 	return &OIDCConfigurationUpdate{
 		instanceDomainName:     instanceDomainName,
 		projectID:              projectID,
-		managementConsoleAppID: consoleAppID,
+		managementConsoleAppID: managementConsoleAppID,
 	}
 }
 

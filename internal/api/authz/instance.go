@@ -124,7 +124,7 @@ func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) cont
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsole(ctx context.Context, projectID, appID string) context.Context {
+func WithManagementConsole(ctx context.Context, projectID, appID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
@@ -135,7 +135,7 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsoleClientID(ctx context.Context, clientID string) context.Context {
+func WithManagementConsoleClientID(ctx context.Context, clientID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
