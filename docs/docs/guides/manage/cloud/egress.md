@@ -10,12 +10,26 @@ This page lists the static Egress (outgoing) IP addresses used by ZITADEL Cloud 
 
 ## When do I need this?
 
-You need to allowlist these IP addresses if you use features where ZITADEL initiates a connection to your systems, such as:
+You need to allowlist these IP addresses if you use features where ZITADEL initiates a connection to your systems. This is commonly required for the following scenarios:
 
+### [Identity Providers & Federation](/docs/guides/integrate/identity-providers/introduction)
+If you are federating an external Identity Provider (IdP) that sits behind a firewall:
+* **LDAP / Active Directory:** When ZITADEL connects to your LDAP server (typically port `636` for LDAPS).
+* **OIDC / OAuth:** When ZITADEL connects to your IdP for:
+  * **Discovery:** Fetching configuration from `/.well-known/openid-configuration`.
+  * **Token Exchange:** Exchanging the authorization code at the `token_endpoint`.
+  * **User Info:** Retrieving user details from the `userinfo_endpoint`.
+  * **Keys:** Fetching signing keys from the `jwks_uri`.
+* **SAML:** If ZITADEL needs to fetch the `metadata.xml` or artifact resolution services from an internal SAML IdP.
+
+### [Notification Providers](/docs/guides/manage/customize/notification-providers)
+* [**SMTP:**](/docs/guides/manage/customize/notification-providers#smtp-providers) If you configured a custom SMTP sender pointing to your own mail server.
+* [**Webhook / HTTP provider:**](/docs/guides/manage/customize/notification-providers#webhook--http-provider) If you use a custom gateway for SMS or Emails.
+
+
+### Custom Logic
 * **[Actions V1](/docs/concepts/features/actions)**
 * **[Actions V2](/docs/concepts/features/actions_v2)**
-* **[Notification Providers](/docs/guides/manage/customize/notification-providers)**
-* **[External Identity Providers](/docs/guides/integrate/identity-providers/introduction)**
 
 ## IP Addresses by Region
 
