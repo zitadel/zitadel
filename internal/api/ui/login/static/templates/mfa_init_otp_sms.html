@@ -39,7 +39,7 @@
         <div class="field lgn-actions">
             <p>{{.Phone}}</p>
             <span class="fill-space"></span>
-            <button type="button" id="edit" name="edit" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitMFAOTPSMS.EditButtonText"}}</button>
+            <button type="submit" id="edit" name="edit" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitMFAOTPSMS.EditButtonText"}}</button>
         </div>
         {{end}}
         {{if and .Phone (not .Edit) }}
