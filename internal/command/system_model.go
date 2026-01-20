@@ -171,7 +171,7 @@ func (wm *SystemConfigWriteModel) changeConfig(validation *SystemConfigChangesVa
 		}
 	}
 	if newGeneratedDomainExists {
-		//if the domain itself already exists, then only check if the uris of the Management Console app exist as well
+		// if the domain itself already exists, then only check if the uris of the Management Console app exist as well
 		wm.changeURIs(validation, inst, commands, newGeneratedDomain)
 		return newCustomDomainExists, isInstanceOfCustomDomain
 	}
