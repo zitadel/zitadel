@@ -91,7 +91,7 @@ In case you've created your own application and depending on your development se
 mvn clean package -DskipTests
 ```
 
-You will need to provide the `introspection-uri` (your ZITADEL domain> /oauth/v2/introspect), the `client-id` and `client-secret` previously created:
+You will need to provide the `introspection-uri` ($CUSTOM_DOMAIN/oauth/v2/introspect), the `client-id` and `client-secret` previously created:
 
 ```bash
 java \

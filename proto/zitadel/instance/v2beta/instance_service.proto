@@ -42,7 +42,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -55,8 +55,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -241,7 +241,7 @@ service InstanceService {
   //
   // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
-  // Adds a custom domain to the instance in context.
+  // Adds a Custom Domain to the instance in context.
   //
   // The instance_id in the input message will be used in the future
   //
@@ -253,7 +253,7 @@ service InstanceService {
       responses: {
         key: "200";
         value: {
-          description: "The added custom domain.";
+          description: "The added Custom Domain.";
         }
       };
     };
@@ -274,7 +274,7 @@ service InstanceService {
   //
   // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
-  // Removes a custom domain from the instance.
+  // Removes a Custom Domain from the instance.
   //
   // The instance_id in the input message will be used in the future.
   //
@@ -286,7 +286,7 @@ service InstanceService {
       responses: {
         key: "200";
         value: {
-          description: "The removed custom domain.";
+          description: "The removed Custom Domain.";
         }
       };
     };
@@ -306,7 +306,7 @@ service InstanceService {
   //
   // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
-  // Lists custom domains of the instance.
+  // Lists Custom Domains of the instance.
   //
   // The instance_id in the input message will be used in the future.
   //
@@ -318,7 +318,7 @@ service InstanceService {
       responses: {
         key: "200";
         value: {
-          description: "The list of custom domains.";
+          description: "The list of Custom Domains.";
         }
       };
     };
