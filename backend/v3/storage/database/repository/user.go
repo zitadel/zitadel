@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -169,25 +168,15 @@ func (u user) Update(ctx context.Context, client database.QueryExecutor, conditi
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
+	if !database.Changes(changes).IsOnColumn(u.updatedAtColumn()) {
+		changes = append(changes, u.clearUpdatedAt())
+	}
 
 	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT id, instance_id FROM zitadel.users")
 	writeCondition(builder, condition)
-	builder.WriteRune(')')
-
+	builder.WriteString(") ")
 	for i, change := range changes {
-		if cteChange, ok := change.(database.CTEChange); ok {
-			builder.WriteString(", ")
-			cteName := fmt.Sprintf("cte_%d", i)
-			builder.WriteString(cteName)
-			builder.WriteString(" AS (")
-			cteChange.SetName(cteName)
-			cteChange.WriteCTE(builder)
-			builder.WriteRune(')')
-		}
-	}
-
-	if !database.Changes(changes).IsOnColumn(u.updatedAtColumn()) {
-		changes = append(changes, u.clearUpdatedAt())
+		sessionCTE(change, i, 0, builder)
 	}
 
 	builder.WriteString(" UPDATE zitadel.users SET ")
