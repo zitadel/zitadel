@@ -91,9 +91,9 @@ type CountryCode struct {
 }
 
 // GetCountryCodes returns a list of country codes for phone number input using libphonenumber
-func GetCountryCodes() []CountryCode {
+func GetCountryCodes(lang language.Tag) []CountryCode {
 	regions := libphonenumber.GetSupportedRegions()
-	namer := display.English.Regions()
+	namer := display.Regions(lang)
 
 	codes := make([]CountryCode, 0, len(regions))
 	for region := range regions {

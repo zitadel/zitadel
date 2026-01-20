@@ -60,7 +60,7 @@ func (l *Login) renderRegisterSMS(w http.ResponseWriter, r *http.Request, authRe
 	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", err)
 	data.profileData = l.getProfileData(authReq)
 	data.MFAType = domain.MFATypeOTPSMS
-	data.CountryCodes = domain.GetCountryCodes()
+	data.CountryCodes = domain.GetCountryCodes(translator.Lang(r))
 	if data.CountryCode == "" {
 		data.CountryCode = "CH" // default to Switzerland
 	}

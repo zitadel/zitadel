@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -108,7 +110,7 @@ func TestFormatPhoneNumber(t *testing.T) {
 }
 
 func TestGetCountryCodes(t *testing.T) {
-	codes := GetCountryCodes()
+	codes := GetCountryCodes(language.English)
 
 	t.Run("returns non-empty list", func(t *testing.T) {
 		if len(codes) == 0 {
@@ -151,7 +153,7 @@ func TestGetCountryCodes(t *testing.T) {
 }
 
 func TestGetCountryCodes_ContainsExpectedCountries(t *testing.T) {
-	codes := GetCountryCodes()
+	codes := GetCountryCodes(language.English)
 
 	// Build a map for easier lookup
 	codeMap := make(map[string]CountryCode)
