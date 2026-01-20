@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "External Links",
-        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the console. Add a custom external link and a custom text for that link in the console, or set them empty to hide that button."
+        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the management console. Add a custom external link and a custom text for that link in the management console, or set them empty to hide that button."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP Settings",
@@ -677,7 +677,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
+      "TEXT": "All organization settings and tables in management console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
       "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
@@ -1227,7 +1227,7 @@
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warning",
-      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the management console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
@@ -1664,8 +1664,8 @@
         "DISABLED": "\"Disabled\" is inherited"
       },
       "RESET": "Set all to inherit",
-      "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in Management Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the management console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
       "LOGINV2_BASEURI": "Base URI",
@@ -1712,7 +1712,7 @@
       "RELEASE": "Release",
       "DROPFONT": "Drop font file here",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
+      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in management console",
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
@@ -1768,9 +1768,9 @@
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
       "SUPPORTEMAIL": "Support Email",
-      "DOCSLINK": "Docs Link (Console)",
-      "CUSTOMLINK": "Custom Link (Console)",
-      "CUSTOMLINKTEXT": "Custom Link Text (Console)",
+      "DOCSLINK": "Docs Link (Management Console)",
+      "CUSTOMLINK": "Custom Link (Management Console)",
+      "CUSTOMLINKTEXT": "Custom Link Text (Management Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"

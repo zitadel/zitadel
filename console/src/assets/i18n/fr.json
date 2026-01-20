@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Liens Externes",
-        "DESCRIPTION": "Guidez vos utilisateurs vers des ressources externes personnalisées affichées sur la page de connexion. Les utilisateurs doivent accepter les conditions d'utilisation et la politique de confidentialité avant de pouvoir s'inscrire. Modifiez le lien vers votre documentation ou définissez une chaîne vide pour masquer le bouton de documentation de la console. Ajoutez un lien externe personnalisé et un texte personnalisé pour ce lien dans la console, ou définissez-les vides pour masquer ce bouton."
+        "DESCRIPTION": "Guidez vos utilisateurs vers des ressources externes personnalisées affichées sur la page de connexion. Les utilisateurs doivent accepter les conditions d'utilisation et la politique de confidentialité avant de pouvoir s'inscrire. Modifiez le lien vers votre documentation ou définissez une chaîne vide pour masquer le bouton de documentation de la console de gestion. Ajoutez un lien externe personnalisé et un texte personnalisé pour ce lien dans la console de gestion, ou définissez-les vides pour masquer ce bouton."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Paramètres SMTP",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Autorisé à échouer",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Avertissement",
-      "DESCRIPTION": "Si vous désactivez ce paramètre, cela peut empêcher les utilisateurs de votre organisation de se connecter. De plus, vous ne pourrez plus accéder à la console pour désactiver l'action. Nous vous recommandons de créer un utilisateur administrateur dans une organisation distincte ou de tester les scripts d'abord dans un environnement de développement ou une organisation de développement."
+      "DESCRIPTION": "Si vous désactivez ce paramètre, cela peut empêcher les utilisateurs de votre organisation de se connecter. De plus, vous ne pourrez plus accéder à la console de gestion pour désactiver l'action. Nous vous recommandons de créer un utilisateur administrateur dans une organisation distincte ou de tester les scripts d'abord dans un environnement de développement ou une organisation de développement."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Type de flux",
@@ -1660,8 +1660,8 @@
         "DISABLED": "\"Désactivé\" est hérité"
       },
       "RESET": "Réinitialiser tout sur hérité",
-      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial.",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console de gestion pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console de gestion utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial.",
       "LOGINV2": "Connexion V2",
       "LOGINV2_DESCRIPTION": "L’activation de cette option lance la nouvelle interface de connexion basée sur TypeScript, avec une sécurité, des performances et une personnalisation améliorées.",
       "LOGINV2_BASEURI": "URI de base",
@@ -1708,7 +1708,7 @@
       "RELEASE": "Communiqué",
       "DROPFONT": "Déposer le fichier de la police ici",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Votre logo sera utilisé dans la connexion ainsi que dans les courriels, tandis que l'icône est utilisée pour les petits éléments de l'interface utilisateur, comme le sélecteur d'organisation dans la console.",
+      "USEOFLOGO": "Votre logo sera utilisé dans la connexion ainsi que dans les courriels, tandis que l'icône est utilisée pour les petits éléments de l'interface utilisateur, comme le sélecteur d'organisation dans la console de gestion.",
       "MAXSIZE": "La taille maximale est limitée à 524 Ko.",
       "EMAILNOSVG": "Le format de fichier SVG n'est pas supporté dans les e-mails. Téléchargez donc votre logo en PNG ou dans un autre format pris en charge.",
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
@@ -1764,9 +1764,9 @@
       "POLICYLINK": "Lien vers la politique de confidentialité",
       "HELPLINK": "Lien vers l'aide",
       "SUPPORTEMAIL": "E-mail d'assistance",
-      "DOCSLINK": "Lien Docs (Console)",
-      "CUSTOMLINK": "Lien personnalisé (Console)",
-      "CUSTOMLINKTEXT": "Texte de lien personnalisé (Console)",
+      "DOCSLINK": "Lien Docs (Console de Gestion)",
+      "CUSTOMLINK": "Lien personnalisé (Console de Gestion)",
+      "CUSTOMLINKTEXT": "Texte de lien personnalisé (Console de Gestion)",
       "SAVED": "Enregistré avec succès !",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer les liens par défaut pour les CGS et la politique de confidentialité. Voulez-vous vraiment continuer ?"

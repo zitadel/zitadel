@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Harici Bağlantılar",
-        "DESCRIPTION": "Kullanıcılarınızı giriş sayfasında gösterilen özel harici kaynaklara yönlendirin. Kullanıcıların kaydolabilmeleri için Hizmet Şartları ve Gizlilik Politikasını kabul etmeleri gerekir. Belgelerinize olan bağlantıyı değiştirin veya belgeler düğmesini konsoldan gizlemek için boş bir dize ayarlayın. Konsolda özel bir harici bağlantı ve o bağlantı için özel bir metin ekleyin, veya bu düğmeyi gizlemek için boş bırakın."
+        "DESCRIPTION": "Kullanıcılarınızı giriş sayfasında gösterilen özel harici kaynaklara yönlendirin. Kullanıcıların kaydolabilmeleri için Hizmet Şartları ve Gizlilik Politikasını kabul etmeleri gerekir. Belgelerinize olan bağlantıyı değiştirin veya belgeler düğmesini yönetim konsolundan gizlemek için boş bir dize ayarlayın. Yönetim konsolunda özel bir harici bağlantı ve o bağlantı için özel bir metin ekleyin, veya bu düğmeyi gizlemek için boş bırakın."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP Ayarları",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Başarısız Olmasına İzin Ver",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Uyarı",
-      "DESCRIPTION": "Bu ayarı devre dışı bırakırsanız, organizasyonunuzdaki kullanıcıların oturum açamamasına neden olabilir. Ayrıca, eylemi devre dışı bırakmak için konsola erişemeyeceksiniz. Ayrı bir organizasyonda yönetici kullanıcı oluşturmanızı veya önce geliştirme ortamında veya geliştirme organizasyonunda betikleri test etmenizi öneririz."
+      "DESCRIPTION": "Bu ayarı devre dışı bırakırsanız, organizasyonunuzdaki kullanıcıların oturum açamamasına neden olabilir. Ayrıca, eylemi devre dışı bırakmak için yönetim konsoluna erişemeyeceksiniz. Ayrı bir organizasyonda yönetici kullanıcı oluşturmanızı veya önce geliştirme ortamında veya geliştirme organizasyonunda betikleri test etmenizi öneririz."
     },
     "SCRIPT": "Betik",
     "FLOWTYPE": "Akış Türü",
@@ -1663,8 +1663,8 @@
         "DISABLED": "\"Devre Dışı\" miras alınır"
       },
       "RESET": "Tümünü miras almaya ayarla",
-      "CONSOLEUSEV2USERAPI": "Kullanıcı oluşturma için Konsolda V2 Api'yi kullan",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Bu bayrak etkinleştirildiğinde, konsol yeni kullanıcılar oluşturmak için V2 Kullanıcı API'sini kullanır. V2 API ile yeni oluşturulan kullanıcılar başlangıç durumu olmadan başlar.",
+      "CONSOLEUSEV2USERAPI": "Kullanıcı oluşturma için yönetim konsolunda V2 Api'yi kullan",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Bu bayrak etkinleştirildiğinde, yönetim konsolu yeni kullanıcılar oluşturmak için V2 Kullanıcı API'sini kullanır. V2 API ile yeni oluşturulan kullanıcılar başlangıç durumu olmadan başlar.",
       "LOGINV2": "Giriş V2",
       "LOGINV2_DESCRIPTION": "Bunu etkinleştirmek, gelişmiş güvenlik, performans ve özelleştirme ile yeni TypeScript tabanlı giriş UI'ını etkinleştirir.",
       "LOGINV2_BASEURI": "Temel URI",
@@ -1711,7 +1711,7 @@
       "RELEASE": "Bırak",
       "DROPFONT": "Yazı tipi dosyasını buraya bırakın",
       "RELEASEFONT": "Bırak",
-      "USEOFLOGO": "Logonuz Giriş'te ve e-postalarda kullanılacaktır, ikon ise konsoldaki organizasyon değiştirici gibi daha küçük UI öğeleri için kullanılır",
+      "USEOFLOGO": "Logonuz Giriş'te ve e-postalarda kullanılacaktır, ikon ise yönetim konsolundaki organizasyon değiştirici gibi daha küçük UI öğeleri için kullanılır",
       "MAXSIZE": "Maksimum boyut 524kB ile sınırlıdır",
       "EMAILNOSVG": "SVG dosya formatı e-postalarda desteklenmez. Bu nedenle logonuzu PNG veya diğer desteklenen formatlarda yükleyin.",
       "MAXSIZEEXCEEDED": "524kB maksimum boyutu aşıldı.",
@@ -1767,9 +1767,9 @@
       "POLICYLINK": "Gizlilik Politikası bağlantısı",
       "HELPLINK": "Yardım bağlantısı",
       "SUPPORTEMAIL": "Destek E-postası",
-      "DOCSLINK": "Dokümanlar Bağlantısı (Konsol)",
-      "CUSTOMLINK": "Özel Bağlantı (Konsol)",
-      "CUSTOMLINKTEXT": "Özel Bağlantı Metni (Konsol)",
+      "DOCSLINK": "Dokümanlar Bağlantısı (Yönetim Konsolu)",
+      "CUSTOMLINK": "Özel Bağlantı (Yönetim Konsolu)",
+      "CUSTOMLINKTEXT": "Özel Bağlantı Metni (Yönetim Konsolu)",
       "SAVED": "Başarıyla kaydedildi!",
       "RESET_TITLE": "Varsayılan Değerleri Geri Yükle",
       "RESET_DESCRIPTION": "Hizmet Şartları ve Gizlilik Politikası için varsayılan Bağlantıları geri yüklemek üzeresiniz. Gerçekten devam etmek istiyor musunuz?"

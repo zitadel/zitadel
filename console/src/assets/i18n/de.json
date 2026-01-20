@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe Links",
-        "DESCRIPTION": "Leite die Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändere den Link zur Dokumentation oder lege eine leere Zeichenfolge fest, um den Dokumentations-Button in der Konsole auszublenden. Füge in der Konsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder lasse ihn leer, um diesen Button auszublenden."
+        "DESCRIPTION": "Leite die Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändere den Link zur Dokumentation oder lege eine leere Zeichenfolge fest, um den Dokumentations-Button in der Verwaltungskonsole auszublenden. Füge in der Verwaltungskonsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder lasse ihn leer, um diesen Button auszublenden."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-Einstellungen",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Scheitern erlaubt",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warnung",
-      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann dies dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Außerdem kannst du dann nicht mehr auf die Konsole zugreifen, um die Aktion zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
+      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann dies dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Außerdem kannst du dann nicht mehr auf die Verwaltungskonsole zugreifen, um die Aktion zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
@@ -1660,8 +1660,8 @@
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
       "RESET": "Alle auf Erben setzen",
-      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Verwaltungskonsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Verwaltungskonsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
       "LOGINV2_BASEURI": "Basis-URI",
@@ -1708,7 +1708,7 @@
       "RELEASE": "Jetzt loslassen",
       "DROPFONT": "Fontdatei hier ablegen",
       "RELEASEFONT": "Jetzt loslassen",
-      "USEOFLOGO": "Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Konsole verwendet wird",
+      "USEOFLOGO": "Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Verwaltungskonsole verwendet wird",
       "MAXSIZE": "Die maximale Grösse von Uploads ist mit 524kB begrenzt",
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in E-Mails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
@@ -1764,9 +1764,9 @@
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
       "SUPPORTEMAIL": "Support E-Mail",
-      "DOCSLINK": "Link zu Dokumenten (Console)",
-      "CUSTOMLINK": "Benutzerdefinierter Link (Console)",
-      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Console)",
+      "DOCSLINK": "Link zu Dokumenten (Verwaltungskonsole)",
+      "CUSTOMLINK": "Benutzerdefinierter Link (Verwaltungskonsole)",
+      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Verwaltungskonsole)",
       "SAVED": "Gespeichert!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"

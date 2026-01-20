@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Link Esterni",
-        "DESCRIPTION": "Guida i tuoi utenti alle risorse esterne personalizzate mostrate nella pagina di accesso. Gli utenti devono accettare i Termini di servizio e l'Informativa sulla privacy prima di potersi registrare. Cambia il collegamento alla tua documentazione o imposta una stringa vuota per nascondere il pulsante della documentazione dalla console. Aggiungi un collegamento esterno personalizzato e un testo personalizzato per quel collegamento nella console oppure impostali vuoti per nascondere quel pulsante."
+        "DESCRIPTION": "Guida i tuoi utenti alle risorse esterne personalizzate mostrate nella pagina di accesso. Gli utenti devono accettare i Termini di servizio e l'Informativa sulla privacy prima di potersi registrare. Cambia il collegamento alla tua documentazione o imposta una stringa vuota per nascondere il pulsante della documentazione dalla console di gestione. Aggiungi un collegamento esterno personalizzato e un testo personalizzato per quel collegamento nella console di gestione oppure impostali vuoti per nascondere quel pulsante."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Impostazioni SMTP",
@@ -1225,7 +1225,7 @@
     "ALLOWEDTOFAIL": "Può fallire",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Attenzione",
-      "DESCRIPTION": "Se disabiliti questa impostazione, potrebbe impedire agli utenti della tua organizzazione di accedere. Inoltre, non sarai più in grado di accedere alla console per disabilitare l'azione. Ti consigliamo di creare un utente amministratore in un'organizzazione separata o di testare gli script prima in un ambiente di sviluppo o in un'organizzazione di sviluppo."
+      "DESCRIPTION": "Se disabiliti questa impostazione, potrebbe impedire agli utenti della tua organizzazione di accedere. Inoltre, non sarai più in grado di accedere alla console di gestione per disabilitare l'azione. Ti consigliamo di creare un utente amministratore in un'organizzazione separata o di testare gli script prima in un ambiente di sviluppo o in un'organizzazione di sviluppo."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo processo",
@@ -1644,7 +1644,7 @@
       "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Terminazione sessione",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se il flag è abilitato, sarai in grado di terminare una singola sessione dall'interfaccia utente di accesso fornendo un id_token con una richiesta `sid` come id_token_hint nel punto finale di end_session. Tieni presente che attualmente tutte le sessioni dello stesso agente utente (browser) vengono terminate nell'interfaccia utente di accesso. Le sessioni gestite tramite l'API di sessione consentono già la terminazione di singole sessioni.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
-      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se il flag è abilitato, l'errore del genitore OIDC verrà registrato nella console.",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se il flag è abilitato, l'errore OIDC originante verrà registrato nella console.",
       "ENABLEBACKCHANNELLOGOUT": "Abilita Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare ai client la terminazione della sessione presso il provider OpenID.",
       "PERMISSIONCHECKV2": "Controllo permessi V2",
@@ -1660,8 +1660,8 @@
         "DISABLED": "\"Disabilitato\" viene ereditato"
       },
       "RESET": "Imposta tutto su predefinito",
-      "CONSOLEUSEV2USERAPI": "Utilizza l'API V2 nella console per la creazione degli utenti",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale.",
+      "CONSOLEUSEV2USERAPI": "Utilizza l'API V2 nella console di gestione per la creazione degli utenti",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console di gestione utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale.",
       "LOGINV2": "Accesso V2",
       "LOGINV2_DESCRIPTION": "Abilitando questa opzione si attiva la nuova interfaccia di login basata su TypeScript con sicurezza, prestazioni e personalizzazione migliorate.",
       "LOGINV2_BASEURI": "URI di base",
@@ -1708,7 +1708,7 @@
       "RELEASE": "Rilascia",
       "DROPFONT": "Rilascia qui il file di font",
       "RELEASEFONT": "Rilascia",
-      "USEOFLOGO": "Il tuo logo sarà usato nel login e nelle email, mentre l'icona è usata per gli elementi più piccoli dell'interfaccia, come il selettore di organizzazione nella console.",
+      "USEOFLOGO": "Il tuo logo sarà usato nel login e nelle email, mentre l'icona è usata per gli elementi più piccoli dell'interfaccia, come il selettore di organizzazione nella console di gestione.",
       "MAXSIZE": "La dimensione massima è limitata a 524kB",
       "EMAILNOSVG": "Il formato di file SVG non è supportato nelle email. Perciò carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
@@ -1764,9 +1764,9 @@
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
       "SUPPORTEMAIL": "e-mail di supporto",
-      "DOCSLINK": "Collegamento a Documenti (Console)",
-      "CUSTOMLINK": "Collegamento personalizzato (Console)",
-      "CUSTOMLINKTEXT": "Testo del collegamento personalizzato (Console)",
+      "DOCSLINK": "Collegamento a Documenti (Console di Gestione)",
+      "CUSTOMLINK": "Collegamento personalizzato (Console di Gestione)",
+      "CUSTOMLINKTEXT": "Testo del collegamento personalizzato (Console di Gestione)",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"

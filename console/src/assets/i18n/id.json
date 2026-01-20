@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Tautan Eksternal",
-        "DESCRIPTION": "Pandu pengguna Anda ke sumber daya eksternal khusus yang ditampilkan di halaman login. Pengguna harus menerima Ketentuan Layanan dan Kebijakan Privasi sebelum mereka dapat mendaftar. Ubah tautan ke dokumentasi Anda atau setel string kosong untuk menyembunyikan tombol dokumentasi dari konsol. Tambahkan tautan eksternal khusus dan teks khusus untuk tautan tersebut di konsol, atau kosongkan untuk menyembunyikan tombol tersebut."
+        "DESCRIPTION": "Pandu pengguna Anda ke sumber daya eksternal khusus yang ditampilkan di halaman login. Pengguna harus menerima Ketentuan Layanan dan Kebijakan Privasi sebelum mereka dapat mendaftar. Ubah tautan ke dokumentasi Anda atau setel string kosong untuk menyembunyikan tombol dokumentasi dari konsol manajemen. Tambahkan tautan eksternal khusus dan teks khusus untuk tautan tersebut di konsol manajemen, atau kosongkan untuk menyembunyikan tombol tersebut."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Pengaturan SMTP",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Diizinkan Gagal",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Peringatan",
-      "DESCRIPTION": "Jika Anda menonaktifkan setelan ini, hal ini dapat menyebabkan pengguna di organisasi Anda tidak dapat masuk. Selain itu, Anda tidak lagi dapat mengakses konsol untuk menonaktifkan tindakan tersebut. Kami menyarankan untuk membuat pengguna administrator di organisasi terpisah atau menguji skrip terlebih dahulu di lingkungan pengembangan atau organisasi pengembangan."
+      "DESCRIPTION": "Jika Anda menonaktifkan setelan ini, hal ini dapat menyebabkan pengguna di organisasi Anda tidak dapat masuk. Selain itu, Anda tidak lagi dapat mengakses konsol manajemen untuk menonaktifkan tindakan tersebut. Kami menyarankan untuk membuat pengguna administrator di organisasi terpisah atau menguji skrip terlebih dahulu di lingkungan pengembangan atau organisasi pengembangan."
     },
     "SCRIPT": "Naskah",
     "FLOWTYPE": "Tipe Aliran",
@@ -1657,8 +1657,8 @@
         "DISABLED": "\"Dinonaktifkan\" diwariskan"
       },
       "RESET": "Tetapkan semua untuk diwarisi",
-      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
+      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol manajemen untuk pembuatan pengguna",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol manajemen menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
       "LOGINV2_BASEURI": "URI dasar",
@@ -1705,7 +1705,7 @@
       "RELEASE": "Melepaskan",
       "DROPFONT": "Letakkan file font di sini",
       "RELEASEFONT": "Melepaskan",
-      "USEOFLOGO": "Logo Anda akan digunakan di Login dan juga email, sedangkan ikon digunakan untuk elemen UI yang lebih kecil seperti pada pengalih organisasi di konsol",
+      "USEOFLOGO": "Logo Anda akan digunakan di Login dan juga email, sedangkan ikon digunakan untuk elemen UI yang lebih kecil seperti pada pengalih organisasi di konsol manajemen",
       "MAXSIZE": "Ukuran maksimum dibatasi hingga 524kB",
       "EMAILNOSVG": "Format file SVG tidak didukung di email. Oleh karena itu unggah logo Anda dalam PNG atau format lain yang didukung.",
       "MAXSIZEEXCEEDED": "Ukuran maksimum terlampaui 524kB.",
@@ -1761,9 +1761,9 @@
       "POLICYLINK": "Tautan ke Kebijakan Privasi",
       "HELPLINK": "Tautan ke Bantuan",
       "SUPPORTEMAIL": "Email Dukungan",
-      "DOCSLINK": "Tautan Dokumen (Konsol)",
-      "CUSTOMLINK": "Tautan Khusus (Konsol)",
-      "CUSTOMLINKTEXT": "Teks Tautan Khusus (Konsol)",
+      "DOCSLINK": "Tautan Dokumen (Konsol Manajemen)",
+      "CUSTOMLINK": "Tautan Khusus (Konsol Manajemen)",
+      "CUSTOMLINKTEXT": "Teks Tautan Khusus (Konsol Manajemen)",
       "SAVED": "Berhasil disimpan!",
       "RESET_TITLE": "Kembalikan Nilai Default",
       "RESET_DESCRIPTION": "Anda akan memulihkan Tautan default untuk TOS dan Kebijakan Privasi. Apakah Anda benar-benar ingin melanjutkan?"

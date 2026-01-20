@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部链接",
-        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在控制台中隐藏文档按钮。在控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
+        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在管理控制台中隐藏文档按钮。在管理控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP设置",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "允许失败",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "警告",
-      "DESCRIPTION": "如果您禁用此设置，可能会导致您的组织中的用户无法登录。此外，您将无法再访问控制台以禁用该操作。我们建议您在单独的组织中创建管理员用户，或在开发环境或开发组织中先测试脚本。"
+      "DESCRIPTION": "如果您禁用此设置，可能会导致您的组织中的用户无法登录。此外，您将无法再访问管理控制台以禁用该操作。我们建议您在单独的组织中创建管理员用户，或在开发环境或开发组织中先测试脚本。"
     },
     "SCRIPT": "脚本",
     "FLOWTYPE": "流程类型",
@@ -1663,8 +1663,8 @@
         "DISABLED": "“已禁用” 是继承的"
       },
       "RESET": "全部设置为继承",
-      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
+      "CONSOLEUSEV2USERAPI": "在管理控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，管理控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
       "LOGINV2": "登录 V2",
       "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
       "LOGINV2_BASEURI": "基础 URI",
@@ -1711,7 +1711,7 @@
       "RELEASE": "Release",
       "DROPFONT": "将字体文件放入这里",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "您的徽标将用于登录和电子邮件，而图标用于较小的 UI 元素，例如控制台中的组织切换器",
+      "USEOFLOGO": "您的徽标将用于登录和电子邮件，而图标用于较小的 UI 元素，例如管理控制台中的组织切换器",
       "MAXSIZE": "图片最大支持 524kB",
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
@@ -1767,9 +1767,9 @@
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SUPPORTEMAIL": "支持邮箱",
-      "DOCSLINK": "文档链接（Console）",
-      "CUSTOMLINK": "自定义链接（Console）",
-      "CUSTOMLINKTEXT": "自定义链接文本（Console）",
+      "DOCSLINK": "文档链接（管理控制台）",
+      "CUSTOMLINK": "自定义链接（管理控制台）",
+      "CUSTOMLINKTEXT": "自定义链接文本（管理控制台）",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"

@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Enlaces Externos",
-        "DESCRIPTION": "Guía a tus usuarios a recursos externos personalizados que se muestran en la página de inicio de sesión. Los usuarios deben aceptar los Términos de servicio y la Política de privacidad antes de poder registrarse. Cambia el enlace a tu documentación o introduce una cadena de texto vacía para ocultar el botón de documentación de la consola. Agrega un enlace externo personalizado y un texto personalizado para dicho enlace en la consola, o déjalos vacíos para ocultar ese botón."
+        "DESCRIPTION": "Guía a tus usuarios a recursos externos personalizados que se muestran en la página de inicio de sesión. Los usuarios deben aceptar los Términos de servicio y la Política de privacidad antes de poder registrarse. Cambia el enlace a tu documentación o introduce una cadena de texto vacía para ocultar el botón de documentación de la consola de administración. Agrega un enlace externo personalizado y un texto personalizado para dicho enlace en la consola de administración, o déjalos vacíos para ocultar ese botón."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configuración de SMTP",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Permitido el fallo",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Advertencia",
-      "DESCRIPTION": "Si desactiva esta configuración, puede hacer que los usuarios de su organización no puedan iniciar sesión. Además, ya no podrá acceder a la consola para desactivar la acción. Recomendamos crear un usuario administrador en una organización separada o probar scripts primero en un entorno de desarrollo o una organización de desarrollo."
+      "DESCRIPTION": "Si desactiva esta configuración, puede hacer que los usuarios de su organización no puedan iniciar sesión. Además, ya no podrá acceder a la consola de administración para desactivar la acción. Recomendamos crear un usuario administrador en una organización separada o probar scripts primero en un entorno de desarrollo o una organización de desarrollo."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de flujo",
@@ -1661,8 +1661,8 @@
         "DISABLED": "\"Deshabilitado\" se hereda"
       },
       "RESET": "Establecer todo a heredado",
-      "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola para la creación de usuarios",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial.",
+      "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola de administración para la creación de usuarios",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola de administración utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial.",
       "LOGINV2": "Inicio de sesión V2",
       "LOGINV2_DESCRIPTION": "Al habilitar esto, se activa la nueva interfaz de inicio de sesión basada en TypeScript con mejoras en seguridad, rendimiento y personalización.",
       "LOGINV2_BASEURI": "URI base",
@@ -1709,7 +1709,7 @@
       "RELEASE": "Suéltala",
       "DROPFONT": "Lleva aquí el fichero de fuente",
       "RELEASEFONT": "Suéltalo",
-      "USEOFLOGO": "Tu logo será utilizado tanto en el inicio de sesión como en los emails, mientras que el icono se usará para elementos de la interfaz más pequeños como el menú de cambio de organizaciones",
+      "USEOFLOGO": "Tu logo será utilizado tanto en el inicio de sesión como en los emails, mientras que el icono se usará para elementos de la interfaz más pequeños como el menú de cambio de organizaciones en la consola de administración",
       "MAXSIZE": "El tamaño máximo está limitado a 524kB",
       "EMAILNOSVG": "El formato de fichero SVG no está soportado en correos electrónicos. Por tanto, sube tu logo en PNG o en otro formato soportado.",
       "MAXSIZEEXCEEDED": "Tamaño máximo de 524kB superado.",
@@ -1765,9 +1765,9 @@
       "POLICYLINK": "Enlace a Política de privacidad",
       "HELPLINK": "Enlace de ayuda",
       "SUPPORTEMAIL": "Email de soporte",
-      "DOCSLINK": "Enlace de documentos (Console)",
-      "CUSTOMLINK": "Enlace personalizado (Console)",
-      "CUSTOMLINKTEXT": "Texto de enlace personalizado (Console)",
+      "DOCSLINK": "Enlace de documentos (Consola de Administración)",
+      "CUSTOMLINK": "Enlace personalizado (Consola de Administración)",
+      "CUSTOMLINKTEXT": "Texto de enlace personalizado (Consola de Administración)",
       "SAVED": "¡Se guardó con éxito!",
       "RESET_TITLE": "Restaurar valores por defecto",
       "RESET_DESCRIPTION": "Estás a punto de restaurar los enlaces por defecto para los TDS y la política de privacida. ¿Quieres continuar?"

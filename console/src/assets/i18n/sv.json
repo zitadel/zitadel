@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externa länkar",
-        "DESCRIPTION": "Guida dina användare till anpassade externa resurser som visas på inloggningssidan. Användare måste acceptera användarvillkoren och integritetspolicyn innan de kan registrera sig. Ändra länken till din dokumentation eller ställ in en tom sträng för att dölja dokumentationsknappen från konsolen. Lägg till en anpassad extern länk och en anpassad text för den länken i konsolen, eller ställ in dem tomma för att dölja den knappen."
+        "DESCRIPTION": "Guida dina användare till anpassade externa resurser som visas på inloggningssidan. Användare måste acceptera användarvillkoren och integritetspolicyn innan de kan registrera sig. Ändra länken till din dokumentation eller ställ in en tom sträng för att dölja dokumentationsknappen från hanteringskonsolen. Lägg till en anpassad extern länk och en anpassad text för den länken i hanteringskonsolen, eller ställ in dem tomma för att dölja den knappen."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-inställningar",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Tillåtet att misslyckas",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Varning",
-      "DESCRIPTION": "Om du inaktiverar denna inställning kan det leda till att användare i din organisation inte kan logga in. Dessutom kommer du inte längre att kunna komma åt konsolen för att inaktivera åtgärden. Vi rekommenderar att skapa en administratörsanvändare i en separat organisation eller testa skript först i en utvecklingsmiljö eller en utvecklingsorganisation."
+      "DESCRIPTION": "Om du inaktiverar denna inställning kan det leda till att användare i din organisation inte kan logga in. Dessutom kommer du inte längre att kunna komma åt hanteringskonsolen för att inaktivera åtgärden. Vi rekommenderar att skapa en administratörsanvändare i en separat organisation eller testa skript först i en utvecklingsmiljö eller en utvecklingsorganisation."
     },
     "SCRIPT": "Skript",
     "FLOWTYPE": "Flödestyp",
@@ -1664,8 +1664,8 @@
         "DISABLED": "\"Inaktiverad\" ärvs"
       },
       "RESET": "Återställ allt till arv",
-      "CONSOLEUSEV2USERAPI": "Använd V2 API i konsolen för att skapa användare",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd.",
+      "CONSOLEUSEV2USERAPI": "Använd V2 API i hanteringskonsolen för att skapa användare",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder hanteringskonsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd.",
       "LOGINV2": "Inloggning V2",
       "LOGINV2_DESCRIPTION": "Att aktivera detta startar det nya inloggningsgränssnittet baserat på TypeScript med förbättrad säkerhet, prestanda och anpassning.",
       "LOGINV2_BASEURI": "Bas-URI",
@@ -1712,7 +1712,7 @@
       "RELEASE": "Släpp",
       "DROPFONT": "Släpp typsnittsfil här",
       "RELEASEFONT": "Släpp",
-      "USEOFLOGO": "Din logotyp kommer att användas i inloggningen samt i e-postmeddelanden, medan ikonen används för mindre UI-element som i organisationsväxlaren i konsolen",
+      "USEOFLOGO": "Din logotyp kommer att användas i inloggningen samt i e-postmeddelanden, medan ikonen används för mindre UI-element som i organisationsväxlaren i hanteringskonsolen",
       "MAXSIZE": "Den maximala storleken är begränsad till 524kB",
       "EMAILNOSVG": "SVG-filformatet stöds inte i e-postmeddelanden. Ladda därför upp din logotyp i PNG eller annat stöds format.",
       "MAXSIZEEXCEEDED": "Maximal storlek på 524kB överskriden.",
@@ -1768,9 +1768,9 @@
       "POLICYLINK": "Länk till integritetspolicy",
       "HELPLINK": "Länk till hjälp",
       "SUPPORTEMAIL": "Support-e-post",
-      "DOCSLINK": "Dokumentationslänk (Konsol)",
-      "CUSTOMLINK": "Anpassad länk (Konsol)",
-      "CUSTOMLINKTEXT": "Anpassad länktext (Konsol)",
+      "DOCSLINK": "Dokumentationslänk (Hanteringskonsol)",
+      "CUSTOMLINK": "Anpassad länk (Hanteringskonsol)",
+      "CUSTOMLINKTEXT": "Anpassad länktext (Hanteringskonsol)",
       "SAVED": "Sparat framgångsrikt!",
       "RESET_TITLE": "Återställ standardvärden",
       "RESET_DESCRIPTION": "Du håller på att återställa standardlänkarna för användarvillkor och integritetspolicy. Vill du verkligen fortsätta?"

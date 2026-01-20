@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Links Externos",
-        "DESCRIPTION": "Oriente seus usuários sobre recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de se inscreverem. Altere o link para sua documentação ou defina uma string vazia para ocultar o botão de documentação do console. Adicione um link externo personalizado e um texto personalizado para esse link no console ou deixe-os vazios para ocultar esse botão."
+        "DESCRIPTION": "Oriente seus usuários sobre recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de se inscreverem. Altere o link para sua documentação ou defina uma string vazia para ocultar o botão de documentação do console de gerenciamento. Adicione um link externo personalizado e um texto personalizado para esse link no console de gerenciamento ou deixe-os vazios para ocultar esse botão."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configurações de SMTP",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Permitido Falhar",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Aviso",
-      "DESCRIPTION": "Se você desabilitar esta configuração, pode fazer com que os usuários da sua organização não possam fazer login. Além disso, você não poderá mais acessar a console para desabilitar a ação. Recomendamos criar um usuário administrador em uma organização separada ou testar scripts primeiro em um ambiente de desenvolvimento ou uma organização de desenvolvimento."
+      "DESCRIPTION": "Se você desabilitar esta configuração, pode fazer com que os usuários da sua organização não possam fazer login. Além disso, você não poderá mais acessar o console de gerenciamento para desabilitar a ação. Recomendamos criar um usuário administrador em uma organização separada ou testar scripts primeiro em um ambiente de desenvolvimento ou uma organização de desenvolvimento."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de Fluxo",
@@ -1661,8 +1661,8 @@
         "DISABLED": "\"Desabilitado\" é herdado"
       },
       "RESET": "Definir tudo para herdar",
-      "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial.",
+      "CONSOLEUSEV2USERAPI": "Use a API V2 no console de gerenciamento para criação de usuários",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console de gerenciamento utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Ativar esta opção ativa a nova interface de login baseada em TypeScript, com melhorias na segurança, desempenho e personalização.",
       "LOGINV2_BASEURI": "URI base",
@@ -1709,7 +1709,7 @@
       "RELEASE": "Liberar",
       "DROPFONT": "Solte o arquivo de fonte aqui",
       "RELEASEFONT": "Liberar",
-      "USEOFLOGO": "Seu logotipo será usado no login e nos emails, enquanto o ícone é usado para elementos de IU menores, como o seletor de organização no console",
+      "USEOFLOGO": "Seu logotipo será usado no login e nos emails, enquanto o ícone é usado para elementos de IU menores, como o seletor de organização no console de gerenciamento",
       "MAXSIZE": "O tamanho máximo é limitado a 524kB",
       "EMAILNOSVG": "O formato de arquivo SVG não é suportado em emails. Portanto, faça o upload do seu logotipo em PNG ou em outro formato suportado.",
       "MAXSIZEEXCEEDED": "Tamanho máximo de 524kB excedido.",
@@ -1765,9 +1765,9 @@
       "POLICYLINK": "Link para a Política de Privacidade",
       "HELPLINK": "Link para Ajuda",
       "SUPPORTEMAIL": "E-mail de suporte",
-      "DOCSLINK": "Link do Documentos (Console)",
-      "CUSTOMLINK": "Link personalizado (Console)",
-      "CUSTOMLINKTEXT": "Texto do link personalizado (Console)",
+      "DOCSLINK": "Link do Documentos (Console de Gerenciamento)",
+      "CUSTOMLINK": "Link personalizado (Console de Gerenciamento)",
+      "CUSTOMLINKTEXT": "Texto do link personalizado (Console de Gerenciamento)",
       "SAVED": "Salvo com sucesso!",
       "RESET_TITLE": "Restaurar valores padrão",
       "RESET_DESCRIPTION": "Você está prestes a restaurar os Links padrão para TOS e Política de Privacidade. Deseja realmente continuar?"

@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linki zewnętrzne",
-        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli lub ustaw je puste, aby ukryć ten przycisk."
+        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli zarządzania. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli zarządzania lub ustaw je puste, aby ukryć ten przycisk."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Ustawienia SMTP",
@@ -1225,7 +1225,7 @@
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Ostrzeżenie",
-      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
+      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli zarządzania, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
     },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
@@ -1659,8 +1659,8 @@
         "DISABLED": "„Wyłączony” jest dziedziczone"
       },
       "RESET": "Ustaw wszystko na dziedziczone",
-      "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli do tworzenia użytkowników",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
+      "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli zarządzania do tworzenia użytkowników",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola zarządzania używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
       "LOGINV2": "Logowanie V2",
       "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
       "LOGINV2_BASEURI": "Podstawowy URI",
@@ -1707,7 +1707,7 @@
       "RELEASE": "Zwolnij",
       "DROPFONT": "Upuść plik czcionki tutaj",
       "RELEASEFONT": "Zwolnij",
-      "USEOFLOGO": "Twój logo będzie używane w logowaniu oraz wiadomościach e-mail, natomiast ikona jest używana do mniejszych elementów interfejsu użytkownika, takich jak w przełączniku organizacji w konsoli",
+      "USEOFLOGO": "Twój logo będzie używane w logowaniu oraz wiadomościach e-mail, natomiast ikona jest używana do mniejszych elementów interfejsu użytkownika, takich jak w przełączniku organizacji w konsoli zarządzania",
       "MAXSIZE": "Maksymalny rozmiar jest ograniczony do 524kB",
       "EMAILNOSVG": "Format pliku SVG nie jest obsługiwany w wiadomościach e-mail. Dlatego prześlij swoje logo w formacie PNG lub innym obsługiwanym formacie.",
       "MAXSIZEEXCEEDED": "Przekroczony maksymalny rozmiar 524kB.",
@@ -1763,9 +1763,9 @@
       "POLICYLINK": "Link do polityki prywatności",
       "HELPLINK": "Link do pomocy",
       "SUPPORTEMAIL": "E-mail wsparcia",
-      "DOCSLINK": "Link do Dokumentów (Console)",
-      "CUSTOMLINK": "Link niestandardowy (Console)",
-      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Console)",
+      "DOCSLINK": "Link do Dokumentów (Konsola Zarządzania)",
+      "CUSTOMLINK": "Link niestandardowy (Konsola Zarządzania)",
+      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Konsola Zarządzania)",
       "SAVED": "Pomyślnie zapisano!",
       "RESET_TITLE": "Przywróć wartości domyślne",
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?"

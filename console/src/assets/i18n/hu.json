@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Külső linkek",
-        "DESCRIPTION": "Irányítsd felhasználóidat egyedi külső forrásokhoz, amelyek a bejelentkezési oldalon jelennek meg. A felhasználóknak el kell fogadniuk a Szolgáltatási feltételeket és az Adatvédelmi irányelveket, mielőtt regisztrálhatnának. Módosítsd a linket a dokumentációdra, vagy állítsd be üres szövegre, hogy elrejtsd a dokumentáció gombot a konzolból. Adj hozzá egyedi külső linket és egyedi szöveget ehhez a linkhez a konzolban, vagy állítsd be üresre, hogy elrejtsd ezt a gombot."
+        "DESCRIPTION": "Irányítsd felhasználóidat egyedi külső forrásokhoz, amelyek a bejelentkezési oldalon jelennek meg. A felhasználóknak el kell fogadniuk a Szolgáltatási feltételeket és az Adatvédelmi irányelveket, mielőtt regisztrálhatnának. Módosítsd a linket a dokumentációdra, vagy állítsd be üres szövegre, hogy elrejtsd a dokumentáció gombot a felügyeleti konzolból. Adj hozzá egyedi külső linket és egyedi szöveget ehhez a linkhez a felügyeleti konzolban, vagy állítsd be üresre, hogy elrejtsd ezt a gombot."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP beállítások",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Megengedett a hibázás",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Figyelmeztetés",
-      "DESCRIPTION": "Ha letiltod ezt a beállítást, azzal azt okozhatod, hogy a szervezeted felhasználói nem tudnak bejelentkezni. Emellett nem fogsz tudni hozzáférni a konzolhoz, hogy letiltsd a műveletet. Javasoljuk, hogy hozz létre egy adminisztrátori felhasználót egy külön szervezetben, vagy először tesztelj scripteket egy fejlesztési környezetben vagy egy fejlesztési szervezetben."
+      "DESCRIPTION": "Ha letiltod ezt a beállítást, azzal azt okozhatod, hogy a szervezeted felhasználói nem tudnak bejelentkezni. Emellett nem fogsz tudni hozzáférni a felügyeleti konzolhoz, hogy letiltsd a műveletet. Javasoljuk, hogy hozz létre egy adminisztrátori felhasználót egy külön szervezetben, vagy először tesztelj scripteket egy fejlesztési környezetben vagy egy fejlesztési szervezetben."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Folyamat típus",
@@ -1658,8 +1658,8 @@
         "DISABLED": "\"Letiltva\" öröklődik"
       },
       "RESET": "Mindent állíts öröklésre",
-      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
+      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a felügyeleti konzolban felhasználók létrehozásához",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a felügyeleti konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
       "LOGINV2": "Bejelentkezés V2",
       "LOGINV2_DESCRIPTION": "Ennek engedélyezésével aktiválódik az új, TypeScript-alapú bejelentkezési felület, amely jobb biztonságot, teljesítményt és testreszabhatóságot nyújt.",
       "LOGINV2_BASEURI": "Alap URI",
@@ -1706,7 +1706,7 @@
       "RELEASE": "Engedélyezés",
       "DROPFONT": "Húzd ide a betűfájlokat",
       "RELEASEFONT": "Engedélyezés",
-      "USEOFLOGO": "A logódat a bejelentkezésnél és az e-mailekben használjuk, míg az ikont kisebb UI elemekhez, például a konzolban lévő szervezetváltóban használjuk",
+      "USEOFLOGO": "A logódat a bejelentkezésnél és az e-mailekben használjuk, míg az ikont kisebb UI elemekhez, például a felügyeleti konzolban lévő szervezetváltóban használjuk",
       "MAXSIZE": "A maximális méret 524 kB-ig van korlátozva",
       "EMAILNOSVG": "Az SVG fájlformátum nem támogatott az e-mailekben. Ezért töltsd fel a logódat PNG vagy más támogatott formátumban.",
       "MAXSIZEEXCEEDED": "A maximális méret, 524kB, túllépve.",
@@ -1762,9 +1762,9 @@
       "POLICYLINK": "Adatvédelmi Szabályzat Linkje",
       "HELPLINK": "Segítség Link",
       "SUPPORTEMAIL": "Támogatási E-mail",
-      "DOCSLINK": "Dokumentáció Link (Konzol)",
-      "CUSTOMLINK": "Egyéni Link (Konzol)",
-      "CUSTOMLINKTEXT": "Egyéni Link Szöveg (Konzol)",
+      "DOCSLINK": "Dokumentáció Link (Felügyeleti Konzol)",
+      "CUSTOMLINK": "Egyéni Link (Felügyeleti Konzol)",
+      "CUSTOMLINKTEXT": "Egyéni Link Szöveg (Felügyeleti Konzol)",
       "SAVED": "Sikeresen mentve!",
       "RESET_TITLE": "Alapértelmezett értékek visszaállítása",
       "RESET_DESCRIPTION": "Az ÁSZF és az Adatvédelmi Szabályzat alapértelmezett linkjeit készülsz visszaállítani. Tényleg folytatni szeretnéd?"

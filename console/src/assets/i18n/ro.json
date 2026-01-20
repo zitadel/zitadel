@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linkuri externe",
-        "DESCRIPTION": "Ghidați utilizatorii către resurse externe personalizate afișate pe pagina de autentificare. Utilizatorii trebuie să accepte Termenii și condițiile și Politica de confidențialitate înainte de a se putea înregistra. Modificați linkul către documentația dvs. sau setați un șir gol pentru a ascunde butonul de documentație din consolă. Adăugați un link extern personalizat și un text personalizat pentru acel link în consolă sau setați-le goale pentru a ascunde acel buton."
+        "DESCRIPTION": "Ghidați utilizatorii către resurse externe personalizate afișate pe pagina de autentificare. Utilizatorii trebuie să accepte Termenii și condițiile și Politica de confidențialitate înainte de a se putea înregistra. Modificați linkul către documentația dvs. sau setați un șir gol pentru a ascunde butonul de documentație din consola de administrare. Adăugați un link extern personalizat și un text personalizat pentru acel link în consola de administrare sau setați-le goale pentru a ascunde acel buton."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Setări SMTP",
@@ -1224,7 +1224,7 @@
     "ALLOWEDTOFAIL": "Permis să eșueze",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Avertisment",
-      "DESCRIPTION": "Dacă dezactivați această setare, este posibil ca utilizatorii din organizația dvs. să nu se poată conecta. În plus, nu veți mai putea accesa consola pentru a dezactiva acțiunea. Vă recomandăm să creați un utilizator administrator într-o organizație separată sau să testați mai întâi scripturile într-un mediu de dezvoltare sau într-o organizație de dezvoltare."
+      "DESCRIPTION": "Dacă dezactivați această setare, este posibil ca utilizatorii din organizația dvs. să nu se poată conecta. În plus, nu veți mai putea accesa consola de administrare pentru a dezactiva acțiunea. Vă recomandăm să creați un utilizator administrator într-o organizație separată sau să testați mai întâi scripturile într-un mediu de dezvoltare sau într-o organizație de dezvoltare."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tip flux",
@@ -1658,8 +1658,8 @@
         "DISABLED": "\"Dezactivat\" este moștenit"
       },
       "RESET": "Setați totul pentru a moșteni",
-      "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în Consola pentru crearea utilizatorului",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
+      "CONSOLEUSEV2USERAPI": "Utilizați API-ul V2 în consola de administrare pentru crearea utilizatorului",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Când acest indicator este activat, consola de administrare utilizează API-ul de utilizator V2 pentru a crea utilizatori noi. Cu API-ul V2, utilizatorii nou creați încep fără o stare inițială.",
       "LOGINV2": "Autentificare V2",
       "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
       "LOGINV2_BASEURI": "URI de bază",
@@ -1706,7 +1706,7 @@
       "RELEASE": "Eliberați",
       "DROPFONT": "Trageți fișierul fontului aici",
       "RELEASEFONT": "Eliberați",
-      "USEOFLOGO": "Logo-ul dvs. va fi utilizat în conectare, precum și în e-mailuri, în timp ce pictograma este utilizată pentru elemente UI mai mici, cum ar fi în comutatorul organizației în consolă",
+      "USEOFLOGO": "Logo-ul dvs. va fi utilizat în conectare, precum și în e-mailuri, în timp ce pictograma este utilizată pentru elemente UI mai mici, cum ar fi în comutatorul organizației în consola de administrare",
       "MAXSIZE": "Dimensiunea maximă este limitată la 524 kB",
       "EMAILNOSVG": "Formatul de fișier SVG nu este acceptat în e-mailuri. Prin urmare, încărcați-vă logo-ul în PNG sau în alt format acceptat.",
       "MAXSIZEEXCEEDED": "Dimensiune maximă de 524 kB depășită.",
@@ -1762,9 +1762,9 @@
       "POLICYLINK": "Link către Politica de confidențialitate",
       "HELPLINK": "Link către Ajutor",
       "SUPPORTEMAIL": "E-mail de asistență",
-      "DOCSLINK": "Link către Documente (Consolă)",
-      "CUSTOMLINK": "Link personalizat (Consolă)",
-      "CUSTOMLINKTEXT": "Text link personalizat (Consolă)",
+      "DOCSLINK": "Link către Documente (Consolă de Administrare)",
+      "CUSTOMLINK": "Link personalizat (Consolă de Administrare)",
+      "CUSTOMLINKTEXT": "Text link personalizat (Consolă de Administrare)",
       "SAVED": "Salvat cu succes!",
       "RESET_TITLE": "Restabiliți valorile implicite",
       "RESET_DESCRIPTION": "Sunteți pe cale să restabiliți linkurile implicite pentru TOS și Politica de confidențialitate. Doriți cu adevărat să continuați?"

@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe links",
-        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de console te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de console, of stel ze leeg om die knop te verbergen."
+        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de beheerconsole te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de beheerconsole, of stel ze leeg om die knop te verbergen."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-instellingen",
@@ -676,7 +676,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "Alle organisatie-instellingen en tabellen in console zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
+      "TEXT": "Alle organisatie-instellingen en tabellen in beheerconsole zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
     },
     "INSTANCE": {
       "TEXT": "Klik hier om naar de instantie-instellingen te gaan. Merk op dat u alleen toegang heeft tot deze knop als u uitgebreide machtigingen heeft."
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Mislukken toegestaan",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Waarschuwing",
-      "DESCRIPTION": "Als u deze instelling uitschakelt, kan dit ertoe leiden dat gebruikers in uw organisatie zich niet kunnen aanmelden. Bovendien kunt u de console niet meer bereiken om de actie uit te schakelen. Wij raden aan om eerst scripts te testen in een ontwikkelomgeving of een ontwikkelorganisatie."
+      "DESCRIPTION": "Als u deze instelling uitschakelt, kan dit ertoe leiden dat gebruikers in uw organisatie zich niet kunnen aanmelden. Bovendien kunt u de beheerconsole niet meer bereiken om de actie uit te schakelen. Wij raden aan om eerst scripts te testen in een ontwikkelomgeving of een ontwikkelorganisatie."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flowtype",
@@ -1660,8 +1660,8 @@
         "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
       },
       "RESET": "Alles instellen op overgenomen",
-      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de console voor het aanmaken van gebruikers",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
+      "CONSOLEUSEV2USERAPI": "Gebruik de V2 API in de beheerconsole voor het aanmaken van gebruikers",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de beheerconsole de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
       "LOGINV2": "Inloggen V2",
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
       "LOGINV2_BASEURI": "Basis-URI",
@@ -1708,7 +1708,7 @@
       "RELEASE": "Laat los",
       "DROPFONT": "Sleep lettertype bestand hier",
       "RELEASEFONT": "Laat los",
-      "USEOFLOGO": "Uw Logo zal worden gebruikt in de Login evenals e-mails, terwijl het pictogram wordt gebruikt voor kleinere UI-elementen zoals in de organisatieschakelaar in de console",
+      "USEOFLOGO": "Uw Logo zal worden gebruikt in de Login evenals e-mails, terwijl het pictogram wordt gebruikt voor kleinere UI-elementen zoals in de organisatieschakelaar in de beheerconsole",
       "MAXSIZE": "De maximale grootte is beperkt tot 524kB",
       "EMAILNOSVG": "Het SVG bestandsformaat wordt niet ondersteund in e-mails. Daarom moet u uw logo uploaden in PNG of een ander ondersteund formaat.",
       "MAXSIZEEXCEEDED": "Maximale grootte van 524kB overschreden.",
@@ -1764,9 +1764,9 @@
       "POLICYLINK": "Link naar Privacybeleid",
       "HELPLINK": "Link naar Help",
       "SUPPORTEMAIL": "Ondersteuning Email",
-      "DOCSLINK": "Documentenlink (Console)",
-      "CUSTOMLINK": "Aangepaste link (Console)",
-      "CUSTOMLINKTEXT": "Aangepaste linktekst (Console)",
+      "DOCSLINK": "Documentenlink (Beheerconsole)",
+      "CUSTOMLINK": "Aangepaste link (Beheerconsole)",
+      "CUSTOMLINKTEXT": "Aangepaste linktekst (Beheerconsole)",
       "SAVED": "Succesvol opgeslagen!",
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt de standaard Links voor TOS en Privacybeleid te herstellen. Weet u zeker dat u wilt doorgaan?"

@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externí odkazy",
-        "DESCRIPTION": "Naveďte své uživatele k vlastním externím zdrojům zobrazeným na přihlašovací stránce. Než se uživatelé mohou zaregistrovat, musí přijmout podmínky služby a zásady ochrany osobních údajů. Změňte odkaz na dokumentaci nebo nastavte prázdný řetězec, abyste skryli tlačítko dokumentace z konzoly. Přidejte vlastní externí odkaz a vlastní text pro tento odkaz v konzole nebo je nastavte na prázdné, abyste toto tlačítko skryli."
+        "DESCRIPTION": "Naveďte své uživatele k vlastním externím zdrojům zobrazeným na přihlašovací stránce. Než se uživatelé mohou zaregistrovat, musí přijmout podmínky služby a zásady ochrany osobních údajů. Změňte odkaz na dokumentaci nebo nastavte prázdný řetězec, abyste skryli tlačítko dokumentace z konzoly pro správu. Přidejte vlastní externí odkaz a vlastní text pro tento odkaz v konzole pro správu nebo je nastavte na prázdné, abyste toto tlačítko skryli."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Nastavení SMTP",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Povoleno selhat",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Varování",
-      "DESCRIPTION": "Pokud tuto nastavení zrušíte, může to způsobit, že uživatelé vaší organizace nebudou moci přihlašovat. Dále nebudete moci přístupovat do konzoly pro zrušení akce. Doporučujeme vytvořit administrátorského uživatele v samostatné organizaci nebo nejprve testovat skripty v prostředí pro vývoj nebo vývojové organizaci."
+      "DESCRIPTION": "Pokud tuto nastavení zrušíte, může to způsobit, že uživatelé vaší organizace nebudou moci přihlašovat. Dále nebudete moci přístupovat do konzoly pro správu pro zrušení akce. Doporučujeme vytvořit administrátorského uživatele v samostatné organizaci nebo nejprve testovat skripty v prostředí pro vývoj nebo vývojové organizaci."
     },
     "SCRIPT": "Skript",
     "FLOWTYPE": "Typ toku",
@@ -1660,8 +1660,8 @@
         "DISABLED": "„Zakázáno“ je zděděno"
       },
       "RESET": "Nastavit vše na děděné",
-      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu.",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro správu pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole pro správu používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu.",
       "LOGINV2": "Přihlášení V2",
       "LOGINV2_DESCRIPTION": "Povolením této možnosti se aktivuje nové přihlašovací rozhraní založené na TypeScriptu s vylepšeným zabezpečením, výkonem a přizpůsobitelností.",
       "LOGINV2_BASEURI": "Základní URI",
@@ -1708,7 +1708,7 @@
       "RELEASE": "Uvolněte",
       "DROPFONT": "Přetáhněte soubor s fontem sem",
       "RELEASEFONT": "Uvolněte",
-      "USEOFLOGO": "Vaše logo bude použito jak na přihlašovací stránce, tak v e-mailech, zatímco ikona je používána pro menší prvky uživatelského rozhraní, jako je přepínač organizací v konzole",
+      "USEOFLOGO": "Vaše logo bude použito jak na přihlašovací stránce, tak v e-mailech, zatímco ikona je používána pro menší prvky uživatelského rozhraní, jako je přepínač organizací v konzole pro správu",
       "MAXSIZE": "Maximální velikost je omezena na 524 kB",
       "EMAILNOSVG": "Formát souboru SVG není podporován v e-mailech. Proto nahrajte své logo ve formátu PNG nebo jiném podporovaném formátu.",
       "MAXSIZEEXCEEDED": "Překročena maximální velikost 524 kB.",
@@ -1764,9 +1764,9 @@
       "POLICYLINK": "Odkaz na Zásady ochrany osobních údajů",
       "HELPLINK": "Odkaz na pomoc",
       "SUPPORTEMAIL": "E-mailová podpora",
-      "DOCSLINK": "Odkaz na Dokumenty (Console)",
-      "CUSTOMLINK": "Vlastní odkaz (Console)",
-      "CUSTOMLINKTEXT": "Text vlastního odkazu (Console)",
+      "DOCSLINK": "Odkaz na Dokumenty (Konzole pro správu)",
+      "CUSTOMLINK": "Vlastní odkaz (Konzole pro správu)",
+      "CUSTOMLINKTEXT": "Text vlastního odkazu (Konzole pro správu)",
       "SAVED": "Úspěšně uloženo!",
       "RESET_TITLE": "Obnovit výchozí hodnoty",
       "RESET_DESCRIPTION": "Chystáte se obnovit výchozí odkazy pro Podmínky služby a Zásady ochrany osobních údajů. Opravdu chcete pokračovat?"
