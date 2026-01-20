@@ -132,6 +132,7 @@
   --input-border: #1a191954;
   --input-hover-border: #000000;
   --input-background: #00000004;
+  --ifm-global-radius: 12px;
 }
 
 .tile-wrapper {
@@ -175,6 +176,7 @@ pre code {
   text-transform: uppercase;
   color: #6b7280;
 }
+
 
 .navbar:not(.navbar-sidebar--show) {
   background-color: hsla(0, 0%, 100%, 0.8);
@@ -239,13 +241,23 @@ pre code {
   background-color: #737c8850;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Lato", sans-serif;
+  letter-spacing: -0.025em; /* Tighter tracking for a modern look */
+  margin-bottom: 1rem;
+}
+
 h1 {
-  font-size: 3rem;
+  font-weight: 900; /* Use that Black weight you imported */
+  font-size: 3.5rem;
 }
 
 h2 {
-  font-size: 2.5rem;
-  margin-top: 2.5rem;
+  font-weight: 700;
+  font-size: 2.25rem;
+  margin-top: 3rem; /* More breathing room */
+  border-bottom: 1px solid var(--ifm-color-emphasis-200); /* subtle divider */
+  padding-bottom: 0.5rem;
 }
 
 h3 {
@@ -513,10 +525,40 @@ a {
 }
 
 .alert {
-  font-size: 14px;
-  border: none;
-  font-weight: 600;
+  border-radius: 8px;
+  border-left-width: 4px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
+
+.alert--info {
+  background-color: #eff6ff;
+  border-left-color: var(--ifm-color-info);
+}
+.alert--warning {
+  background-color: #fffbeb;
+  border-left-color: var(--ifm-color-warning);
+}
+.alert--secondary {
+  background-color: #f9fafb;
+  border-left-color: var(--ifm-color-secondary);
+}
+.alert--danger {
+  background-color: #fef2f2;
+  border-left-color: var(--ifm-color-danger);
+}
+.alert--success {
+  background-color: #ecfdf3;
+  border-left-color: var(--ifm-color-success);
+}
+/* Dark mode adjustments for alerts */
+[data-theme='dark'] .alert--info { background-color: rgba(59, 130, 246, 0.1); }
+[data-theme='dark'] .alert--warning { background-color: rgba(245, 158, 11, 0.1); }
+[data-theme='dark'] .alert--secondary { background-color: rgba(148, 163, 184, 0.12); }
+[data-theme='dark'] .alert--danger { background-color: rgba(239, 68, 68, 0.12); }
+[data-theme='dark'] .alert--success { background-color: rgba(34, 197, 94, 0.12); }
 
 p strong {
   color: var(--font-color-strong);
@@ -644,4 +686,68 @@ p strong {
 
 table#zitadel-versions td {
   vertical-align: top;
+}
+
+.theme-code-block {
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.1);
+  background-color: var(--ifm-pre-background); 
+  position: relative;
+}
+
+[data-theme='dark'] .theme-code-block {
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+div[class*="codeBlockTitle_"] {
+  padding-left: 1rem !important; 
+  background-color: var(--ifm-pre-background) !important;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+  margin-bottom: 0 !important;
+  font-family: "Lato", sans-serif;
+  font-weight: 600;
+  color: var(--ifm-heading-color);
+}
+
+.theme-code-block pre {
+  background-color: var(--ifm-pre-background) !important;
+  border: none;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  margin: 0 !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.theme-code-block code {
+  font-size: 14.5px !important;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.theme-code-block button {
+  top: 12px !important;
+  right: 12px !important;
+  background: var(--ifm-color-emphasis-200);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-content-secondary);
+  transition: all 0.2s;
+}
+
+.theme-code-block button:hover {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-primary);
+  transform: scale(1.05);
+}
+
+.docusaurus-highlight-code-line {
+  background-color: var(--ifm-color-emphasis-200);
+  border-left: 3px solid var(--ifm-color-primary);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
 }
