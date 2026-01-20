@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Pengguna Layanan",
     "LOGOUT": "Logout Semua Pengguna",
     "NEWORG": "Organisasi Baru",
-    "IAMADMIN": "Anda adalah Administrator IAM. Perhatikan bahwa Anda memiliki izin yang diperluas.",
+    "IAMADMIN": "Anda adalah Administrator Contoh. Perhatikan bahwa Anda memiliki izin yang diperluas.",
     "SHOWORGS": "Tampilkan Semua Organisasi",
     "GRANTS": "Otorisasi",
     "ACTIONS": "Tindakan",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Peran Manajer ZITADEL",
-      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
+      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau Contoh.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
       "CREATIONDATE": "Tanggal Pembuatan",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Kelola Kebijakan global dan Pengaturan Akses Manajemen Anda."
     },
     "EVENTSTORE": {
-      "TITLE": "Administrasi Penyimpanan IAM",
+      "TITLE": "Administrasi Penyimpanan Contoh",
       "DESCRIPTION": "Kelola tampilan ZITADEL Anda dan acara yang gagal."
     },
     "MEMBER": {

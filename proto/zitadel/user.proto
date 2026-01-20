@@ -77,7 +77,7 @@ message Machine {
     ];
     string description = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"The one and only IAM\"";
+            example: "\"The one and only instance\"";
         }
     ];
     bool has_secret = 3 [
@@ -504,22 +504,22 @@ message Membership {
     oneof type {
         bool iam = 5 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string org_id = 6 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string project_id = 7 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string project_grant_id = 8 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
     }

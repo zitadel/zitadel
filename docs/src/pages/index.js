@@ -162,13 +162,13 @@ const features = [
             link="/docs/apis/resources/mgmt/management-api"
             type={ICONTYPE.APIS}
             title="Organization Objects"
-            description="Mutate IAM objects like organizations, projects, clients, users etc."
+            description="Mutate instance objects like organizations, projects, clients, users etc."
           />
           <ListElement
             link="/docs/apis/resources/admin/administration-api-aka-admin"
             type={ICONTYPE.APIS}
             title="Instance Objects"
-            description="Configure and manage the IAM instance."
+            description="Configure and manage the instance."
           />
           <ListElement
             link="/docs/apis/openidoauth/endpoints"

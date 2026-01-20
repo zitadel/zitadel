@@ -31,7 +31,7 @@ Simply steer traffic by path, hostname, IP address or any other metadata to the 
 
 ### Single Cluster / Region
 
-A Zitadel Cluster is a highly available IAM system with each component critical for serving traffic laid out at least three times.
+A Zitadel Cluster is a highly available instance system with each component critical for serving traffic laid out at least three times.
 Our storage layer (Postgres) is built for single region deployments.
 Hence our reference design for Kubernetes is to have three application nodes and one storage node.
 

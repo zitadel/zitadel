@@ -143,7 +143,7 @@ func (c *Commands) AddLogoLabelPolicy(ctx context.Context, orgID string, upload 
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-4N3nf", "Errors.Assets.Object.PutFailed")
+		return nil, zerrors.ThrowInternal(err, "INST-4N3nf", "Errors.Assets.Object.PutFailed")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyLogoAddedEvent(ctx, orgAgg, asset.Name))
@@ -199,7 +199,7 @@ func (c *Commands) AddIconLabelPolicy(ctx context.Context, orgID string, upload 
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-4BS7f", "Errors.Assets.Object.PutFailed")
+		return nil, zerrors.ThrowInternal(err, "INST-4BS7f", "Errors.Assets.Object.PutFailed")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyIconAddedEvent(ctx, orgAgg, asset.Name))
@@ -256,7 +256,7 @@ func (c *Commands) AddLogoDarkLabelPolicy(ctx context.Context, orgID string, upl
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-3S7fN", "Errors.Assets.Object.PutFailed")
+		return nil, zerrors.ThrowInternal(err, "INST-3S7fN", "Errors.Assets.Object.PutFailed")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyLogoDarkAddedEvent(ctx, orgAgg, asset.Name))
@@ -312,7 +312,7 @@ func (c *Commands) AddIconDarkLabelPolicy(ctx context.Context, orgID string, upl
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-4B7cs", "Errors.Assets.Object.PutFailed")
+		return nil, zerrors.ThrowInternal(err, "INST-4B7cs", "Errors.Assets.Object.PutFailed")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyIconDarkAddedEvent(ctx, orgAgg, asset.Name))

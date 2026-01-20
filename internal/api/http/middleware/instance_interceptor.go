@@ -89,7 +89,7 @@ func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ contex
 
 	requestContext := zitadel_http.DomainContext(ctx)
 	if requestContext.InstanceDomain() == "" {
-		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.IAM.NotFound")
+		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
 	}
 	instance, err := verifier.InstanceByHost(authCtx, requestContext.InstanceDomain(), requestContext.RequestedDomain())
 	if err != nil {

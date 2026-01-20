@@ -456,7 +456,7 @@ This gives us a response with the ID token in the `access_token` field and the `
 With impersonation we can let one user assume the role of another user.
 
 :::info
-Currently impersonated tokens cannot be used for the ZITADEL API. This is to prevent privilege escalation where a impersonator could become an IAM owner, for example. We might enable the use of impersonated tokens in the future.
+Currently impersonated tokens cannot be used for the ZITADEL API. This is to prevent privilege escalation where a impersonator could become an instance owner, for example. We might enable the use of impersonated tokens in the future.
 :::
 
 ### Preparation
@@ -475,8 +475,8 @@ Next we need to configure which users are allowed to impersonate other users. ZI
 
 | Name                   | Role                      | Description                                                       |
 | ---------------------- | ------------------------- | ----------------------------------------------------------------- |
-| IAM Admin Impersonator | IAM_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from all organizations |
-| IAM Impersonator       | IAM_END_USER_IMPERSONATOR | Allow impersonation of end users from all organizations           |
+| Instance Admin Impersonator | IAM_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from all organizations |
+| Instance Impersonator       | IAM_END_USER_IMPERSONATOR | Allow impersonation of end users from all organizations           |
 | Org Admin Impersonator | ORG_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from the organization  |
 | Org Impersonator       | ORG_END_USER_IMPERSONATOR | Allow impersonation of end users from the organization            |
 

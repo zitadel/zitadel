@@ -14,7 +14,7 @@ This guide explains how to migrate from ZITADEL, this includes
 The following scripts don't include:
 
 - Global policies
-- IAM members
+- Instance members
 - Global IDPs
 - Global second factor / multi-factors
 - Machine keys
@@ -30,7 +30,7 @@ Note that the resources will be migrated without the event stream. This means th
 
 ## Authorization
 
-You need a PAT from a service user with IAM Owner permissions in both the source and target system.
+You need a PAT from a service user with instance Owner permissions in both the source and target system.
 
 ### Source system
 
@@ -38,7 +38,7 @@ You need a PAT from a service user with IAM Owner permissions in both the source
 2. Create a service user "import_user" with Access Token Type "Bearer"
 3. Create a [personal access token](/docs/guides/integrate/service-users/personal-access-token)
 4. Go to the Default settings
-5. Add the import_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
+5. Add the import_user as [manager](/docs/guides/manage/console/managers) with the role "instance Owner"
 
 Save the PAT to the environment variable `PAT_EXPORT_TOKEN` and the source domain as `ZITADEL_EXPORT_DOMAIN` to run the following scripts.
 
@@ -48,7 +48,7 @@ Save the PAT to the environment variable `PAT_EXPORT_TOKEN` and the source domai
 2. Create a service user "export_user" with Access Token Type "Bearer"
 3. Create a [personal access token](/docs/guides/integrate/service-users/personal-access-token)
 4. Go to the Default settings
-5. Add the export_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
+5. Add the export_user as [manager](/docs/guides/manage/console/managers) with the role "instance Owner"
 
 Save the PAT to the environment variable `PAT_IMPORT_TOKEN` and the source domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
 

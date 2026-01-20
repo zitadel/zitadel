@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Szolgáltatási Felhasználók",
     "LOGOUT": "Minden Felhasználó Kijelentkezése",
     "NEWORG": "Új Szervezet",
-    "IAMADMIN": "Te egy IAM Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
+    "IAMADMIN": "Te egy Példány Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Engedélyek",
     "ACTIONS": "Műveletek",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL kezelői szerepkörök",
-      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
+      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy Példány részletező oldalakon is.",
       "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
       "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
       "CREATIONDATE": "Létrehozás dátuma",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Kezeld a globális szabályzatokat és a hozzáférési beállításokat."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM tárhely adminisztráció",
+      "TITLE": "Példány tárhely adminisztráció",
       "DESCRIPTION": "Kezeld a ZITADEL nézeteidet és a sikertelen eseményeket."
     },
     "MEMBER": {
@@ -2793,7 +2793,7 @@
     "ADD": "Hozzáadás egy menedzsert",
     "CREATIONTYPE": "Létrehozás típusa",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Példány",
       "2": "Szervezet",
       "0": "Saját projekt",
       "1": "Engedélyezett Projekt",

@@ -48,7 +48,7 @@ func DefaultLanguageSetMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-3j9fs", "unable to unmarshal default language set")
+		return nil, zerrors.ThrowInternal(err, "INST-3j9fs", "unable to unmarshal default language set")
 	}
 
 	return e, nil

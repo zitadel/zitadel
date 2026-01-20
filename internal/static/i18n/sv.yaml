@@ -283,10 +283,6 @@ Errors:
       Empty: Lösenordsålderpolicy är tom
       NotExisting: Lösenordsålderpolicy finns inte
       AlreadyExists: Lösenordsålderpolicy finns redan
-    OrgIAMPolicy:
-      Empty: Org IAM-policy är tom
-      NotExisting: Org IAM-policy finns inte
-      AlreadyExists: Org IAM-policy finns redan
     NotificationPolicy:
       NotFound: Notifikationspolicy hittades inte
       NotChanged: Notifikationspolicy har inte ändrats
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: En roll existerar inte i projektet
       NotActive: Projektets medgivande är inte aktivt
       NotInactive: Projektets medgivande är inte inaktivt
-  IAM:
+  Instance:
     NotFound: Instansen hittades inte. Se till att du har rätt domän. Kolla https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roller har inte ändrats
@@ -415,11 +411,11 @@ Errors:
       Empty: Standardlösenordslåspolicy är tom
       NotChanged: Standardlösenordslåspolicy har inte ändrats
     DomainPolicy:
-      NotFound: Org IAM-policy hittades inte
-      Empty: Org IAM-policy är tom
-      NotExisting: Org IAM-policy existerar inte
-      AlreadyExists: Org IAM-policy finns redan
-      NotChanged: Org IAM-policy har inte ändrats
+      NotFound: Organisationsdomänpolicy hittades inte
+      Empty: Organisationsdomänpolicy är tom
+      NotExisting: Organisationsdomänpolicy finns inte
+      AlreadyExists: Organisationsdomänpolicy finns redan
+      NotChanged: Organisationsdomänpolicy har inte ändrats
     NotificationPolicy:
       NotFound: Standardnotifikationspolicy hittades inte
       NotChanged: Standardnotifikationspolicy har inte ändrats

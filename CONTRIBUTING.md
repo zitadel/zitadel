@@ -423,7 +423,7 @@ If you don't want to build and run a local API, you can just run the Login devel
 
 ```env
 ZITADEL_API_URL=https://[your-cloud-instance-domain]
-ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
+ZITADEL_SERVICE_USER_TOKEN=[personal access token for an instance Login Client]
 ```
 
 3. Start the development server.

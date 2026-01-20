@@ -283,10 +283,6 @@ Errors:
       Empty: A jelszó korhatár szabályzat üres
       NotExisting: A jelszó korhatár szabályzat nem létezik
       AlreadyExists: A jelszó korhatár szabályzat már létezik
-    OrgIAMPolicy:
-      Empty: Az Org IAM Policy üres
-      NotExisting: Az Org IAM Policy nem létezik
-      AlreadyExists: Az Org IAM Policy már létezik
     NotificationPolicy:
       NotFound: A Notification Policy nem található
       NotChanged: A Notification Policy nem változott
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: Egy szerepkör nem létezik a projektben
       NotActive: A projekt engedélye nem aktív
       NotInactive: A projekt engedélye nem inaktív
-  IAM:
+  Instance:
     NotFound: 'Instance nem található. Győződj meg róla, hogy a domain helyes. Nézd meg itt: https://zitadel.com/docs/apis/introduction#domains'
     Member:
       RolesNotChanged: A szerepkörök nem változtak
@@ -415,11 +411,11 @@ Errors:
       Empty: Az alapértelmezett jelszó kizárás szabályzat üres
       NotChanged: Az alapértelmezett jelszó kizárás szabályzat nem lett megváltoztatva
     DomainPolicy:
-      NotFound: Org IAM Policy nem található
-      Empty: Org IAM Policy üres
-      NotExisting: Org IAM Policy nem létezik
-      AlreadyExists: Org IAM Policy már létezik
-      NotChanged: Org IAM Policy nem lett módosítva
+      NotFound: Szervezeti tartományi házirend nem található
+      Empty: Szervezeti tartományi házirend üres
+      NotExisting: Szervezeti tartományi házirend nem létezik
+      AlreadyExists: Szervezeti tartományi házirend már létezik
+      NotChanged: Szervezeti tartományi házirend nem változott
     NotificationPolicy:
       NotFound: Default Notification Policy nem található
       NotChanged: Default Notification Policy nem lett módosítva

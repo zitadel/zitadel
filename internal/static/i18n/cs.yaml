@@ -283,10 +283,6 @@ Errors:
       Empty: Politika stáří hesla je prázdná
       NotExisting: Politika stáří hesla neexistuje
       AlreadyExists: Politika stáří hesla již existuje
-    OrgIAMPolicy:
-      Empty: Politika IAM organizace je prázdná
-      NotExisting: Politika IAM organizace neexistuje
-      AlreadyExists: Politika IAM organizace již existuje
     NotificationPolicy:
       NotFound: Politika oznámení nenalezena
       NotChanged: Politika oznámení nezměněna
@@ -348,7 +344,7 @@ Errors:
       HasNotExistingRole: Jedna z rolí v projektu neexistuje
       NotActive: Grant projektu není aktivní
       NotInactive: Grant projektu není neaktivní
-  IAM:
+  Instance:
     NotFound: Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nebyly změněny
@@ -415,11 +411,11 @@ Errors:
       Empty: Výchozí zásady uzamčení hesla jsou prázdné
       NotChanged: Výchozí zásady uzamčení hesla nebyly změněny
     DomainPolicy:
-      NotFound: Zásady IAM organizace nenalezeny
-      Empty: Zásady IAM organizace jsou prázdné
-      NotExisting: Zásady IAM organizace neexistují
-      AlreadyExists: Zásady IAM organizace již existují
-      NotChanged: Zásady IAM organizace nebyly změněny
+      NotFound: Zásady domény organizace nenalezeny
+      Empty: Zásady domény organizace jsou prázdné
+      NotExisting: Zásady domény organizace neexistují
+      AlreadyExists: Zásady domény organizace již existují
+      NotChanged: Zásady domény organizace nebyly změněny
     NotificationPolicy:
       NotFound: Výchozí zásady oznámení nenalezeny
       NotChanged: Výchozí zásady oznámení nebyly změněny

@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
-    "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
+    "IAMADMIN": "Du bist ein Instanz-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
-      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
+      "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder Instanz-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstellungsdatum",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Speicher Administration",
+      "TITLE": "Instanz Speicher Administration",
       "DESCRIPTION": "Verwalte Speicher-Einstellungen von ZITADEL."
     },
     "MEMBER": {
@@ -2769,7 +2769,7 @@
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
     "CREATIONTYPES": {
-      "3": "IAM",
+      "3": "Instanz",
       "2": "Organisation",
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",

@@ -284,10 +284,6 @@ Errors:
       Empty: Politica de vârstă a parolei este goală
       NotExisting: Politica de vârstă a parolei nu există
       AlreadyExists: Politica de vârstă a parolei există deja
-    OrgIAMPolicy:
-      Empty: Politica IAM a organizației este goală
-      NotExisting: Politica IAM a organizației nu există
-      AlreadyExists: Politica IAM a organizației există deja
     NotificationPolicy:
       NotFound: Politica de notificare nu a fost găsită
       NotChanged: Politica de notificare nu a fost schimbată
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: Un rol nu există în proiect
       NotActive: Acordarea proiectului nu este activă
       NotInactive: Acordarea proiectului nu este inactivă
-  IAM:
+  Instance:
     NotFound: Instanța nu a fost găsită. Asigurați-vă că aveți domeniul corect. Consultați https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rolurile nu au fost schimbate
@@ -416,11 +412,11 @@ Errors:
         Empty: Politica implicită de blocare a parolei este goală
         NotChanged: Politica implicită de blocare a parolei nu a fost schimbată
       DomainPolicy:
-        NotFound: Politica IAM a organizației nu a fost găsită
-        Empty: Politica IAM a organizației este goală
-        NotExisting: Politica IAM a organizației nu există
-        AlreadyExists: Politica IAM a organizației există deja
-        NotChanged: Politica IAM a organizației nu a fost schimbată
+        NotFound: Politica de domeniu a organizației nu a fost găsită
+        Empty: Politica de domeniu a organizației este goală
+        NotExisting: Politica de domeniu a organizației nu există
+        AlreadyExists: Politica de domeniu a organizației există deja
+        NotChanged: Politica de domeniu a organizației nu a fost schimbată
       NotificationPolicy:
         NotFound: Politica de notificare implicită nu a fost găsită
         NotChanged: Politica de notificare implicită nu a fost schimbată

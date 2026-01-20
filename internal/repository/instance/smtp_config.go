@@ -108,7 +108,7 @@ func NewSMTPConfigChangeEvent(
 	changes []SMTPConfigChanges,
 ) (*SMTPConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-o0pWf", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-o0pWf", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMTPConfigChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -282,7 +282,7 @@ func NewSMTPConfigHTTPChangeEvent(
 	changes []SMTPConfigHTTPChanges,
 ) (*SMTPConfigHTTPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-o0pWf", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-o0pWf", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMTPConfigHTTPChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(

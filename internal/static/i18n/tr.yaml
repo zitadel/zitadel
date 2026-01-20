@@ -284,10 +284,6 @@ Errors:
       Empty: Şifre Yaş Politikası boş
       NotExisting: Şifre Yaş Politikası mevcut değil
       AlreadyExists: Şifre Yaş Politikası zaten mevcut
-    OrgIAMPolicy:
-      Empty: Org IAM Politikası boş
-      NotExisting: Org IAM Politikası mevcut değil
-      AlreadyExists: Org IAM Politikası zaten mevcut
     NotificationPolicy:
       NotFound: Bildirim Politikası bulunamadı
       NotChanged: Bildirim Politikası değişmedi
@@ -349,7 +345,7 @@ Errors:
       HasNotExistingRole: Projede bulunmayan bir rol var
       NotActive: Proje yetkisi aktif değil
       NotInactive: Proje yetkisi pasif değil
-  IAM:
+  Instance:
     NotFound: Instance bulunamadı. Domain'in doğru olduğundan emin olun. Kontrol edin https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roller değişmedi
@@ -416,11 +412,11 @@ Errors:
       Empty: Varsayılan Şifre Kilitleme Politikası boş
       NotChanged: Varsayılan Şifre Kilitleme Politikası değişmedi
     DomainPolicy:
-      NotFound: Org IAM Politikası bulunamadı
-      Empty: Org IAM Politikası boş
-      NotExisting: Org IAM Politikası mevcut değil
-      AlreadyExists: Org IAM Politikası zaten mevcut
-      NotChanged: Org IAM Politikası değişmedi
+      NotFound: Organizasyon etki alanı politikası bulunamadı
+      Empty: Organizasyon etki alanı politikası boş
+      NotExisting: Organizasyon etki alanı politikası mevcut değil
+      AlreadyExists: Organizasyon etki alanı politikası zaten mevcut
+      NotChanged: Organizasyon etki alanı politikası değiştirilmedi
     NotificationPolicy:
       NotFound: Varsayılan Bildirim Politikası bulunamadı
       NotChanged: Varsayılan Bildirim Politikası değişmedi
