@@ -1,10 +1,10 @@
 ---
-title: External user grant
+title: External User Role Assignments
 ---
 
-ZITADEL's external user grant is a feature that allows you to grant access to projects within your organization to users from other organizations.
+ZITADEL's external user role assignment is a feature that allows you to grant access to projects within your organization to users from other organizations.
 This is useful in scenarios where you want to collaborate with external users without needing them to be part of your organization.
-By using external user grants, you can streamline collaboration with external users while maintaining control over access to your projects within ZITADEL.
+By using external user role assignments, you can streamline collaboration with external users while maintaining control over access to your projects within ZITADEL.
 
 ![](/img/concepts/features/external-user-grant.png)
 
