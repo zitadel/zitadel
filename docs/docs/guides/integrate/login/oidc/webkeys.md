@@ -95,7 +95,7 @@ two web key pairs are created with one activated.
 
 ### Creation
 
-The web key [create](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-create-web-key) endpoint generates a new web key pair,
+The web key [create](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-create-web-key) endpoint generates a new web key pair,
 using the passed generator configuration from the request. This config is a one-of field of:
 
 - RSA
@@ -192,7 +192,7 @@ curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 
 ### Activation
 
-When a generated web key is [activated](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-activate-web-key),
+When a generated web key is [activated](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-activate-web-key),
 its private key will be used to sign new tokens.
 There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
@@ -203,7 +203,7 @@ at least for the duration of the max-age setting plus any time it might take for
 
 ### Deletion
 
-Non-active keys may be [deleted](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-delete-web-key).
+Non-active keys may be [deleted](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-delete-web-key).
 Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,
