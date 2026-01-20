@@ -16,7 +16,7 @@ message DomainSettings {
   // If disabled, organization domains will be created as already verified automatically.
   bool require_org_domain_verification = 2;
 
-  // If enabled, the SMTP sender address domain must match custom domain on the instance.
+  // If enabled, the SMTP sender address domain must match Custom Domain on the instance.
   bool smtp_sender_address_matches_instance_domain = 3;
 
   // ResourceOwnerType returns if the setting is managed on the organization explicitly or

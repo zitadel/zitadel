@@ -70,7 +70,7 @@ Errors:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
     AlreadyDeactivated: SMTP configuration already deactivated
-    SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
+    SenderAdressNotCustomDomain: The sender address must be configured as Custom Domain on the instance.
     TestEmailNotFound: Email address for test not found
   Notification:
     NoDomain: No Domain found for message
