@@ -22,7 +22,7 @@ First we need to create an organization that holds the Vendor's users, projects 
 
 ### Vendor Organization
 
-Navigate to `https://{YourDomain}.zitadel.cloud/ui/console/orgs` (replace \{YourDomain}), and click on the button "New".
+Navigate to `https://$CUSTOM_DOMAIN.zitadel.cloud/ui/console/orgs` (replace $CUSTOM_DOMAIN), and click on the button "New".
 Toggle the setting "Use your personal account as organization owner".
 
 Enter the name `Demo-Vendor`, and click "Create". Then click on that organization.
@@ -31,7 +31,7 @@ Enter the name `Demo-Vendor`, and click "Create". Then click on that organizatio
 
 To setup this sample you have to create a project and an application in the vendor organization (`Demo-Vendor`) first.
 
-Open the Console (`https://{YourDomain}.zitadel.cloud/ui/console/projects`) and create a new project. Let's call it `Portal`.
+Open the Console (`https://$CUSTOM_DOMAIN.zitadel.cloud/ui/console/projects`) and create a new project. Let's call it `Portal`.
 
 Then on the project detail page click on new application and enter a name for this app.
 Let's call this one `portal-web`.
@@ -81,12 +81,12 @@ Create a file `.env.local` and copy paste the following:
 
 ```text
 NEXTAUTH_URL=http://localhost:3000
-NEXT_PUBLIC_ZITADEL_ISSUER=https://{YourDomain}.zitadel.cloud
-ZITADEL_API=https://{YourDomain}.zitadel.cloud
-ORG_ID={YourOrgId}
-PROJECT_ID={YourProjectId}
-ZITADEL_CLIENT_ID={YourClientID}
-SERVICE_ACCOUNT_ACCESS_TOKEN={YourServiceAccountSecret}
+NEXT_PUBLIC_ZITADEL_ISSUER=https://$CUSTOM_DOMAIN.zitadel.cloud
+ZITADEL_API=https://$CUSTOM_DOMAIN.zitadel.cloud
+ORG_ID=${YOUR_ORG_ID}
+PROJECT_ID=${PROJECT_ID}
+ZITADEL_CLIENT_ID=${CLIENT_ID}
+SERVICE_ACCOUNT_ACCESS_TOKEN=${SERVICE_ACCOUNT_SECRET}
 NEXTAUTH_SECRET=randomsecret
 ```
 
@@ -98,13 +98,13 @@ Replace the values as follows
 
 `ZITADEL_API`: URL of the Management API. Typically the same as `ZITADEL_ISSUER`.
 
-`ORG_ID`: We will create an organization during later steps. You can find `{YourOrgId}` by selecting the `Demo-Vendor` organization in Console. `{YourOrgId}` is displayed on top of the organization detail page as "Resource Id".
+`ORG_ID`: We will create an organization during later steps. You can find `${YOUR_ORG_ID}` by selecting the `Demo-Vendor` organization in Console. `${YOUR_ORG_ID}` is displayed on top of the organization detail page as "Resource Id".
 
-`PROJECT_ID`: You can find `{YourProjectId}` by clicking on "Projects" in the navigation and select the Project `Portal`. `{YourProjectId}` is displayed on the top as "Resource Id".
+`PROJECT_ID`: You can find `${PROJECT_ID}` by clicking on "Projects" in the navigation and select the Project `Portal`. `${PROJECT_ID}` is displayed on the top as "Resource Id".
 
-`ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `{YourClientID}` is displayed as a field in the OIDC configuration, labelled "Client ID" and has the format `12345678@portal`.
+`ZITADEL_CLIENT_ID`: Having the project `Portal` selected, click on the Application `portal-web`. `${CLIENT_ID}` is displayed as a field in the OIDC configuration, labelled "Client ID" and has the format `12345678@portal`.
 
-`SERVICE_ACCOUNT_ACCESS_TOKEN`: Setup a service user, add a Personal Access Token and copy the secret here (see below).
+`SERVICE_ACCOUNT_ACCESS_TOKEN`: Set up a service user, add a Personal Access Token and copy the secret here (see below).
 
 ## Install and Run
 
@@ -152,7 +152,7 @@ Login with your user on the customer organization to validate the setup.
 ### Organization Grant
 
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
-[Grant all roles of the Project](/guides/manage/console/projects-overview#granted-projects-b2b) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
+[Grant all roles of the Project](/guides/manage/console/projects-overview#granted-projects-b2b) to the organization `demo-customer.$CUSTOM_DOMAIN.zitadel.cloud`.
 
 ### Authorization
 

@@ -76,7 +76,7 @@ While the hosted login page provides a default authentication interface out-of-t
 Developers can customize elements such as logos, colors, and messaging to ensure a seamless integration with their application's user interface.
 
 :::info Customization and Branding
-The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
+The login page can be changed by customizing different branding aspects and you can define a Custom Domain for the login (eg, login.acme.com).
 
 By default, the displayed branding is defined [based on the user's domain](/docs/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 :::
@@ -157,7 +157,7 @@ For the first implementation we have excluded the following features:
 
 #### Step-by-step Guide
 
-**Using the new login:** To use the new login without changing your current setup, the easiest way is to visit `https://<CUSTOM_DOMAIN>/ui/v2/login` on your Zitadel Cloud custom domain.
+**Using the new login:** To use the new login without changing your current setup, the easiest way is to visit `https://${CUSTOM_DOMAIN}/ui/v2/login` on your Zitadel Cloud Custom Domain.
 You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/zitadel repo and use the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to run your login code on Vercel.
