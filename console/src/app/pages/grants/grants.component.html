@@ -6,7 +6,9 @@
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
-    <p class="sub cnsl-secondary-text max-width-description">{{ 'DESCRIPTIONS.ROLE_ASSIGNMENTS.DESCRIPTION' | translate }}</p>
+    <p class="sub cnsl-secondary-text max-width-description">
+      {{ 'DESCRIPTIONS.ROLE_ASSIGNMENTS.DESCRIPTION' | translate }}
+    </p>
     <cnsl-user-grants
       *ngIf="grantContext === UserGrantContext.NONE"
       [displayedColumns]="[

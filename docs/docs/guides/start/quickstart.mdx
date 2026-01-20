@@ -172,7 +172,7 @@ We recommend using the Authentication Code Flow with Proof Key for Code Exchange
 7. We will now configure the Redirect URLs for our application.
 These are the allowed URLs where ZITADEL redirects the users they have been authenticated.
 Enable the "Development Mode" if you are developing locally.
-The "Redirect URI" is preconfigured to http://localhost:3000/callback and the “Post Logout URI” to http://localhost:3000/ for the [React App example](docs/docs/guides/start/quickstart.mdx#create-your-react-application-with-zitadel-oidc-pkce-authentication).
+The "Redirect URI" is preconfigured to http://localhost:3000/callback and the “Post Logout URI” to http://localhost:3000/ for the React App example.
 
 ![Configure Redirect URLs](/img/guides/quickstart/create_react_app_redirect_urls.png)
 
@@ -310,7 +310,7 @@ To install Visual Studio Code, go to their [website](https://code.visualstudio.c
 
 1. Open a new terminal window in Visual Studio Code.
 2. Navigate to the folder where you want to create the React app.
-3. Run the following command to create a new React app named "react-oidc-zitadel":
+3. Run the following command to create a new React Appnamed "react-oidc-zitadel":
 
    `yarn create react-app react-oidc-zitadel --template typescript`
 
@@ -342,7 +342,7 @@ The code needed to run this project can be found [here](https://github.com/zitad
   ...
 ```
 
-The App.tsx file is the root component of the React app that initializes the OIDC flow and manages the user's session. It does this by:
+The App.tsx file is the root component of the React App that initializes the OIDC flow and manages the user's session. It does this by:
 
 - Importing the necessary libraries and components from the dependencies, including the `@zitadel/react` library and the Login and Callback components.
 - Initializing a new `zitadel` instance with the OIDC configuration values. The `zitadel` instance manages the OIDC flow and stores the user's session information.

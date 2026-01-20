@@ -5,8 +5,8 @@ sidebar_label: Retrieve User Roles
 
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
 
-## What are roles/authorizations/grants in ZITADEL? 
-User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
+## What are roles and role assignments in ZITADEL? 
+User roles, or role assignments refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as role assignments, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
 
 Roles are critical to managing permissions in a single-tenant or multi-tenant application. It can, however, be tricky to retrieve them, especially when spanning multiple organizations and projects. 
 
@@ -218,7 +218,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the machine user’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 

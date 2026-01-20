@@ -140,8 +140,8 @@ Managers can be assigned to both human users and service users eg, for managing 
 
 ### Managers in isolation
 
-An user with the Manager roles `IAM_OWNER` or `ORG_OWNER` might want to assign other users from their organization elevated permissions to handle certain aspects of the IAM tasks.
-This could be permission to assign authorizations within this isolated organization (`ORG_USER_MANAGER`) or handling setup of projects and applications (`PROJECT_OWNER`).
+A user with the Manager roles `IAM_OWNER` or `ORG_OWNER` might want to assign other users from their organization elevated permissions to handle certain aspects of the IAM tasks.
+This could be permission to assign roles within this isolated organization (`ORG_USER_MANAGER`) or handling setup of projects and applications (`PROJECT_OWNER`).
 
 ### Managers in delegation
 

@@ -154,20 +154,20 @@ Login with your user on the customer organization to validate the setup.
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
 [Grant all roles of the Project](/guides/manage/console/projects-overview#granted-projects-b2b) to the organization `demo-customer.$CUSTOM_DOMAIN.zitadel.cloud`.
 
-### Authorization
+### Role Assignments
 
 As you have guessed, these two users need to be authorized.
 On the `Demo-Customer` organization, navigate to Projects and select "Granted Projects" in the sub-navigation.
-Select the project portal `Portal` and navigate to "Authorizations".
+Select the project portal `Portal` and navigate to "Role Assignments".
 
 Give `Alice Admin` the roles `reader` and `admin`.
 `Eric Employee` will get only the role `reader`.
 
 ### Login
 
-You should be able to login to the Demo Application with `Alice Admin` and see all granted projects.
+You should be able to log in to the Demo Application with `Alice Admin` and see all granted projects.
 
-You can log out and log in with `Eric Employee` and you should only have access to the granted projects, but not to the Authorizations tab.
+You can log out and log in with `Eric Employee` and you should only have access to the granted projects, but not to the "Role Assignments" tab.
 
 ## What next
 
