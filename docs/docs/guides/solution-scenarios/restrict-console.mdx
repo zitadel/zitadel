@@ -57,10 +57,10 @@ More detailed information about creating a PAT and manager roles you can find [h
 
 Then you have to send the following request:
 ```bash
-curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/$PROJECT_ID" \
+curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/${PROJECT_ID}" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
--H "Authorization: Bearer $PAT" \
+-H "Authorization: Bearer ${PAT}" \
 --data-raw '{
   "name": "ZITADEL",
   "projectRoleAssertion": false,
@@ -71,9 +71,9 @@ curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/$PROJECT_ID" \
 ```
 
 Where
-- CUSTOM_DOMAIN is your domain, f.e. mydemo.zitadel.cloud
-- PAT is your service user's personal access token
-- PROJECT_ID is the default-project's ID that can be found in Console, see screenshot above
+- `${CUSTOM_DOMAIN}` is your Custom Domain, f.e. mydemo.zitadel.cloud
+- `${PAT}` is your service user's personal access token
+- `${PROJECT_ID}` is the default-project's ID that can be found in Console, see screenshot above
 
 You should now be able to login with users of organization that have the grant (in this example users of the organization "Customer-A").
 All other users should see the following error message after authentication:

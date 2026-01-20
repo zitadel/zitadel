@@ -36,7 +36,7 @@ The same view is available on several other objects such as organization or proj
 ### Event View
 
 Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/console-overview).
-Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events
+Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM_DOMAIN/ui/console/events
 
 ![Event viewer](/img/concepts/audit-trail/event-viewer.png)
 
