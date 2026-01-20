@@ -48,6 +48,14 @@ func (u userMachine) create(ctx context.Context, builder *database.StatementBuil
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 }
 
+// Update implements [domain.MachineUserRepository].
+func (u userMachine) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if !condition.IsRestrictingColumn(u.TypeColumn()) {
+		condition = database.And(condition, u.TypeCondition(domain.UserTypeMachine))
+	}
+	return u.user.Update(ctx, client, condition, changes...)
+}
+
 // SetAccessTokenType implements [domain.MachineUserRepository].
 func (u userMachine) SetAccessTokenType(tokenType domain.PersonalAccessTokenType) database.Change {
 	return database.NewChange(u.accessTokenTypeColumn(), tokenType)
@@ -66,11 +74,6 @@ func (u userMachine) SetName(name string) database.Change {
 // SetSecret implements [domain.MachineUserRepository].
 func (u userMachine) SetSecret(secret *string) database.Change {
 	return database.NewChangePtr(u.secretColumn(), secret)
-}
-
-// Update implements [domain.MachineUserRepository].
-func (u userMachine) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	panic("unimplemented")
 }
 
 var _ domain.MachineUserRepository = (*userMachine)(nil)
