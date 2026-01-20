@@ -157,36 +157,37 @@ Because applications are always associated with a project, and as they are the e
 
 4. Next, you'll create an application within your newly created project. Click on "New" to start creating your application.
 
-![Create Application](/img/guides/quickstart/create_app_1.png)
-
-5. Provide a name for your application (e.g., "App1") and choose the type of your application.
+5. Provide a name for your application (e.g., "React App") and choose the type of your application.
 There are five different application types to choose from.
 For this quick start guide, we will select "User Agent" as our application type, and click "Continue".
 
-![Select Application Type](/img/guides/quickstart/create_app_2.png)
+![Select Application Type](/img/guides/quickstart/create_react_app_1.png)
 
-6. In the next step, choose the Authentication Method for your application. For this example, we will select "PKCE" (recommended because it's the most secure.) and click "Continue".
+6. In the next step, choose the Authentication Method for your application.
+For this example, we will select "PKCE" and click "Continue".
+We recommend using the Authentication Code Flow with Proof Key for Code Exchange (PKCE) for secure OIDC configuration.
 
-![Select Authentication Method](/img/guides/quickstart/create_app_3.png)
+![Select Authentication Method](/img/guides/quickstart/create_react_app_2.png)
 
-7. Now, we will configure the Redirect URLs for our application.
+7. We will now configure the Redirect URLs for our application.
 These are the allowed URLs where ZITADEL redirects the users they have been authenticated.
 Enable the "Development Mode" if you are developing locally.
+The "Redirect URI" is preconfigured to http://localhost:3000/callback and the “Post Logout URI” to http://localhost:3000/ for the [React App example](docs/docs/guides/start/quickstart.mdx#create-your-react-application-with-zitadel-oidc-pkce-authentication).
 
-![Configure Redirect URLs](/img/guides/quickstart/create_app_4.png)
+![Configure Redirect URLs](/img/guides/quickstart/create_react_app_redirect_urls.png)
 
 8. Click on "Continue" to proceed further, and you will see an overview of your application configuration.
 
-![Application Configuration Overview](/img/guides/quickstart/create_app_5.png)
+![Application Configuration Overview](/img/guides/quickstart/create_react_app_overview.png)
 
 9. Finally, click on "Create" to complete the application setup. The client ID and client secret (if necessary) are displayed after the successful creation of the application.
 Please make sure to copy and securely store the client secret.
 
-![Client ID and Secret](/img/guides/quickstart/create_app_6.png)
+![Client ID and Secret](/img/guides/quickstart/create_react_app_client_id_secret.png)
 
 10. After creating the application, you will see a summary of your application's configuration.
 
-![Application Summary](/img/guides/quickstart/create_app_8.png)
+![Application Summary](/img/guides/quickstart/react_app_overview.png)
 
 More detailed information about creating applications can be found in [here](docs/docs/guides/manage/console/applications.mdx).
 
@@ -256,19 +257,24 @@ More detailed information about creating applications can be found in [here](doc
 
 ![Add Role Assignment](/img/guides/quickstart/additional_roles_view.png)
 
-### 8. Obtain ClientId and OIDC endpoints for your application {#referred1}
+### 8. Obtain ClientID and OIDC endpoints for your application {#referred1}
 
-You will need the ClientID and the OIDC endpoints (issuer and userinfo) when building your React application. The issuer URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints. By providing the issuer URL, you can use the OIDC library to automatically determine the endpoints for these requests.
+You will need the `Client ID` and the `OIDC endpoints` (`issuer` and `Userinfo Endpoint`) when building your application.
+The `issuer` URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints.
+By providing the `issuer` URL, you can use the OIDC library to automatically determine the endpoints for these requests.
 
-The authorization endpoint is used to initiate the authorization process, the token endpoint is used to exchange authorization codes for access tokens, and the userinfo endpoint is used to retrieve information about the user. You need an access token to access the userinfo endpoint and other protected resources.
+* The `Authorization Endpoint` is used to initiate the authorization process
+* The `Token Endpoint` is used to exchange authorization codes for access tokens
+* The `Userinfo Endpoint` is used to retrieve information about the user. You need an access token to access the `Userinfo Endpoint` and other protected resources.
 
-1. Click on “Configurations” to access the Client ID as shown below:
+1. Click on “Configuration” to access the `Client ID` as shown below:
 
 ![Get URLs](/img/guides/quickstart/project_app_config.png)
 
-2. The issuer URL and userinfo endpoint can be accessed by clicking on “URLs” on the left. Make note of the corresponding values for “issuer” and “userinfo_endpoint”.
+2. The `issuer` URL and the `Userinfo Endpoint` can be accessed under the “URLs” section on the left.
+Specifically, the `issuer` URL can be retrieved from the discovery endpoint.
 
-![Get URLs](/img/guides/quickstart/app_urls.png)
+![Get URLs](/img/guides/quickstart/react_app_urls.png)
 
 And with that, configuring ZITADEL for our application is complete. Now we can move on to building our React application. Let's get coding!
 
