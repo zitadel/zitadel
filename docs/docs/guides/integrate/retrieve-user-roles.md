@@ -6,7 +6,7 @@ sidebar_label: Retrieve User Roles
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
 
 ## What are roles and role assignments in ZITADEL? 
-User roles, or role assignments refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as role assignments, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
+User roles or grants refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as role assignments, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
 
 Roles are critical to managing permissions in a single-tenant or multi-tenant application. It can, however, be tricky to retrieve them, especially when spanning multiple organizations and projects. 
 
@@ -18,8 +18,6 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
-- [Add application roles via the ZITADEL Management API](/docs/apis/resources/mgmt/project-roles)
-- [Add manager roles to users via the ZITADEL Management API](/docs/apis/resources/mgmt/members)
 
 ## Retrieve roles
 
@@ -34,7 +32,7 @@ How to generate a token:
 - [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service users](/docs/guides/integrate/service-users/authenticate-service-users)
 
-In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
+To access role information via the token, you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
 
 ### Determine the audience
 

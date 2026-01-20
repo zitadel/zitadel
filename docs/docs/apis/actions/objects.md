@@ -20,19 +20,19 @@ title: Objects
   - `phone` *string*
   - `isPhoneVerified` *boolean*
 
-## metadata with value as bytes
+## Metadata with value as bytes
 
 - `key` *string*
 - `value` Array of *byte*
 
-## metadata result
+## Metadata result
 
 - `count` *number*
 - `sequence` *number*
 - `timestamp` *Date*
 - `metadata` Array of [*metadata*](#metadata)
 
-## metadata
+## Metadata
 
 - `creationDate` *Date*
 - `changeDate` *Date*
@@ -41,16 +41,16 @@ title: Objects
 - `key` *string*
 - `value` `Any`
 
-## user grant
+## Role Assignment
 
 - `projectID` *string*  
-  Required. Id of the project to be granted
+  Required. ID of the project for the role assignment. 
 - `projectGrantID` *string*  
-  Optional. If the grant is for a project grant, include projectGrantID
+  Optional. If the role assignment is for a project grant, include projectGrantID
 - `roles` Array of *string*  
-  Containing the roles
+  Roles to assign to the user.
 
-## user
+## User
 
 - `id` *string*
 - `creationDate` *Date*
@@ -83,7 +83,7 @@ title: Objects
   - `name` *string*
   - `description` *string*
 
-## human user
+## Human User
 
 - `id` *string*
 - `creationDate` *Date*
@@ -182,9 +182,9 @@ This object represents [the claims](../openidoauth/claims) which will be written
 - `email_verified` *bool*
 - `updated_at` *Number*
 
-Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects-overview#role-settings) and your [application](../../guides/manage/console/applications-overview#token-settings)
+There could be additional fields depending on the configuration of your [project](../../guides/manage/console/projects-overview#role-settings) and your [application](../../guides/manage/console/applications-overview#token-settings)
 
-## role assignments list
+## Role Assignments
 
 This object represents a list of roles assigned to a user stored in ZITADEL.
 
