@@ -159,7 +159,7 @@ service InstanceService {
   // email templates, and more.
   // This can be used in cases where the API is accessed through a different domain
   // than the Custom Domain, e.g. proxy setups and custom login UIs.
-  // Unlike Custom Domain, Trusted Domains are not used to route requests to this instance
+  // Unlike Custom Domains, Trusted Domains are not used to route requests to this instance
   // and therefore do not need to be uniquely assigned to an instance.
   //
   // Required permissions:
