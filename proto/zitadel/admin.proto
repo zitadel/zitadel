@@ -50,7 +50,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Branding",
-            description: "Defines the look of the login UI, E-Mails, and ZITADEL Console. For adding assets like logo, icon and font, have a look at the assets API."
+            description: "Defines the look of the login UI, E-Mails, and ZITADEL Management Console. For adding assets like logo, icon and font, have a look at the assets API."
         },
         {
             name: "Domain Settings"
@@ -2540,7 +2540,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Private Labeling/Branding Settings";
-            description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2563,7 +2563,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Preview Private Labeling/Branding Settings";
-            description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2587,7 +2587,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Update Labeling/Branding Settings";
-            description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             responses: {
                 key: "200";
                 value: {
@@ -2611,7 +2611,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Activate Labeling/Branding Settings";
-            description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
         };
     }
 
@@ -7912,13 +7912,13 @@ message UpdatePrivacyPolicyRequest {
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in management console pointing to custom link.";
             example: "\"External\"";
         }
     ];

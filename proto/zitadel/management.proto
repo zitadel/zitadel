@@ -5803,7 +5803,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Private Labeling/Branding Settings";
-            description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5828,7 +5828,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Preview Private Labeling/Branding Settings";
-            description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5853,7 +5853,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Default Private Labeling/Branding Settings";
-            description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5879,7 +5879,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Create Labeling/Branding Settings";
-            description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5905,7 +5905,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Update Labeling/Branding Settings";
-            description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5932,7 +5932,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Activate Labeling/Branding Settings";
-            description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Management Console."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -11435,19 +11435,19 @@ message AddCustomPrivacyPolicyRequest {
     ];
     string docs_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to documentation to be shown in the console.";
+            description: "Link to documentation to be shown in the management console.";
             example: "\"https://zitadel.com/docs\"";
         }
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in management console pointing to custom link.";
             example: "\"External\"";
         }
     ];
@@ -11485,19 +11485,19 @@ message UpdateCustomPrivacyPolicyRequest {
     ];
     string docs_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to documentation to be shown in the console.";
+            description: "Link to documentation to be shown in the management console.";
             example: "\"https://zitadel.com/docs\"";
         }
     ];
     string custom_link = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in management console pointing to custom link.";
             example: "\"External\"";
         }
     ];
