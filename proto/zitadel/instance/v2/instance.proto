@@ -113,7 +113,7 @@ message Filter {
         // Filter for one or more specific instance IDs.
         zitadel.filter.v2.InIDsFilter in_ids_filter = 1;
 
-        // Filter for instances that have at least one of the specified custom domains.
+        // Filter for instances that have at least one of the specified Custom Domains.
         CustomDomainsFilter custom_domains_filter = 2;
     }
 }
@@ -134,7 +134,7 @@ message CustomDomainFilter {
     oneof filter {
         option (validate.required) = true;
 
-        // Filter for a specific custom domain.
+        // Filter for a specific Custom Domain.
         DomainFilter domain_filter = 1;
 
         // Filter whether the domain is auto-generated.
