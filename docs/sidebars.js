@@ -215,7 +215,6 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/restrictions",
-            "guides/manage/customize/user-schema",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/notification-providers",
             "concepts/features/custom-domain",
