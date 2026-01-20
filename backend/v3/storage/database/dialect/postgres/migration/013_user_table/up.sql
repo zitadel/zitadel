@@ -63,11 +63,7 @@ CREATE TABLE zitadel.users(
     , unverified_totp_id TEXT -- reference to a verification that holds the new secret during change
     , last_successful_totp_check TIMESTAMPTZ
 
-    , FOREIGN KEY (instance_id, unverified_password_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_password_id)
-    , FOREIGN KEY (instance_id, unverified_email_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_email_id)
-    , FOREIGN KEY (instance_id, unverified_phone_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (unverified_phone_id)
-    , FOREIGN KEY (instance_id, email_otp_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (email_otp_verification_id)
-    , FOREIGN KEY (instance_id, sms_otp_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (sms_otp_verification_id)
+    -- foreign keys for verifications are created in the verification migration
 
     -- machine
     
@@ -314,7 +310,6 @@ CREATE TABLE zitadel.human_passkeys(
 
     , PRIMARY KEY (instance_id, token_id)
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
-    , FOREIGN KEY (instance_id, init_verification_id) REFERENCES zitadel.verifications(instance_id, id) ON DELETE SET NULL (init_verification_id)
 );
 
 -- ----------------------------------------------------------------

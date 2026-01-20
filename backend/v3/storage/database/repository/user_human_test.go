@@ -26,6 +26,7 @@ func Test_humanUser_create(t *testing.T) {
 	createdAt := time.Now().Round(time.Second)
 
 	// existingUserID := createMachineUser(t, tx, instanceID, orgID)
+	password := []byte("my-password")
 
 	type args struct {
 		user *domain.User
@@ -61,7 +62,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         "my-password",
+								Password:         password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -84,6 +85,10 @@ func Test_humanUser_create(t *testing.T) {
 							LastName:  lastName,
 							Email: domain.HumanEmail{
 								Address: email,
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
 							},
 						},
 					},
@@ -117,7 +122,7 @@ func Test_humanUser_create(t *testing.T) {
 							AvatarKey:                          "http://localhost:8080/my/profile/picture",
 							MultifactorInitializationSkippedAt: createdAt,
 							Password: domain.HumanPassword{
-								Password:         "my-password",
+								Password:         password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -147,6 +152,10 @@ func Test_humanUser_create(t *testing.T) {
 							Email: domain.HumanEmail{
 								Address: email,
 							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
 						},
 					},
 				},
@@ -173,7 +182,7 @@ func Test_humanUser_create(t *testing.T) {
 							FirstName: firstName,
 							LastName:  lastName,
 							Password: domain.HumanPassword{
-								Password:         "my-password",
+								Password:         password,
 								IsChangeRequired: true,
 							},
 							Email: domain.HumanEmail{
@@ -202,6 +211,295 @@ func Test_humanUser_create(t *testing.T) {
 								Unverified: &domain.Verification{
 									Value: &email,
 									Code:  []byte("verification-code"),
+								},
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+						},
+					},
+				},
+			}
+		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+			phone := gofakeit.Phone()
+
+			return test{
+				name: "with unverified phone without expiry",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Phone: &domain.HumanPhone{
+								Number: phone,
+								Unverified: &domain.Verification{
+									Code: []byte("verification-code"),
+								},
+							},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Phone: &domain.HumanPhone{
+								Unverified: &domain.Verification{
+									Value: &phone,
+									Code:  []byte("verification-code"),
+								},
+							},
+						},
+					},
+				},
+			}
+		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+			passkeys := []*domain.Passkey{
+				{
+					ID:                           gofakeit.UUID(),
+					KeyID:                        []byte(gofakeit.UUID()),
+					Type:                         domain.PasskeyTypePasswordless,
+					Name:                         "passwordless",
+					PublicKey:                    []byte("public key"),
+					AttestationType:              "don't know",
+					AuthenticatorAttestationGUID: []byte("aaguid"),
+					CreatedAt:                    createdAt,
+					UpdatedAt:                    createdAt,
+					Challenge:                    []byte("challenge"),
+					VerifiedAt:                   createdAt,
+					RelyingPartyID:               "rpid",
+				},
+				{
+					ID:                           gofakeit.UUID(),
+					KeyID:                        []byte(gofakeit.UUID()),
+					Type:                         domain.PasskeyTypeU2F,
+					Name:                         "u2f",
+					PublicKey:                    []byte("public key"),
+					AttestationType:              "don't know",
+					AuthenticatorAttestationGUID: []byte("aaguid"),
+					CreatedAt:                    createdAt,
+					UpdatedAt:                    createdAt,
+					Challenge:                    []byte("challenge"),
+					VerifiedAt:                   createdAt,
+					RelyingPartyID:               "rpid",
+				},
+			}
+
+			return test{
+				name: "with verified passkeys",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Passkeys: passkeys,
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Passkeys: passkeys,
+						},
+					},
+				},
+			}
+		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+			verifications := []*domain.Verification{
+				{
+					ID:   gofakeit.UUID(),
+					Code: []byte("code"),
+				},
+				{
+					ID:   gofakeit.UUID(),
+					Code: []byte("code"),
+				},
+			}
+
+			return test{
+				name: "with verifications",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Verifications: verifications,
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Verifications: verifications,
+						},
+					},
+				},
+			}
+		}(),
+		func() test {
+			username := gofakeit.Username()
+			id := gofakeit.UUID()
+			firstName := gofakeit.FirstName()
+			lastName := gofakeit.LastName()
+			email := gofakeit.Email()
+
+			return test{
+				name: "with totp",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							TOTP: domain.HumanTOTP{
+								Unverified: &domain.Verification{
+									ID:   gofakeit.UUID(),
+									Code: []byte("code"),
+								},
+							},
+						},
+					},
+				},
+				want: want{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             id,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						UpdatedAt:      createdAt,
+						Human: &domain.HumanUser{
+							FirstName: firstName,
+							LastName:  lastName,
+							Email: domain.HumanEmail{
+								Address: email,
+							},
+							Password: domain.HumanPassword{
+								Password:         password,
+								IsChangeRequired: true,
+							},
+							TOTP: domain.HumanTOTP{
+								Unverified: &domain.Verification{
+									ID:   gofakeit.UUID(),
+									Code: []byte("code"),
 								},
 							},
 						},

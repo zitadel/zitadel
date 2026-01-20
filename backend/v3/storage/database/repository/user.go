@@ -31,6 +31,8 @@ type user struct {
 	personalAccessTokenRepo
 	shouldLoadMetadata bool
 	userMetadataRepo
+	userVerificationRepo
+	userPasskeyRepo
 }
 
 func (u user) HumanRepository() domain.HumanUserRepository {
@@ -62,7 +64,7 @@ func (u user) Delete(ctx context.Context, client database.QueryExecutor, conditi
 	return client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
+var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
 	", users.state, users.created_at, users.updated_at" +
 	// metadata
 	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'userId', user_metadata.user_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
@@ -79,18 +81,34 @@ const queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id
 	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
 	`, 'avatarKey', users.avatar_key` +
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
-	`, password, jsonb_build_object('password', encode(users.password, 'base64'), 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts)` +
-	// -- users.password_verification_id
-	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check), 'pendingVerification', CASE WHEN users.unverified_email_id IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT value, encode(code, 'base64') AS code, created_at+expiry AS "expiresAt", failed_attempts AS "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = users.unverified_email_id) AS res) ELSE NULL END)` + //TODO: handle nullable
-	// -- , users.unverified_email_id
-	// -- , users.email_otp_verification_id
-	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check)) ELSE NULL END` + //TODO: handle nullable
-	// -- , users.unverified_phone_id
-	// -- , users.sms_otp_verification_id
+	`, 'password', jsonb_build_object('password', encode(users.password, 'base64'), 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts, 'pendingVerification', ` + verificationQuery(userHuman{}.unverifiedPasswordIDColumn()) + `)` +
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check, 'pendingVerification', ` + verificationQuery(userHuman{}.emailOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` + //TODO: handle nullable
+	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check, 'check', ` + checkQuery(userHuman{}.smsOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` + //TODO: handle nullable
 	// -- , totp_secret_id
-	`, 'totp', jsonb_build_object('verifiedAt', users.totp_verified_at,'lastSuccessfullyCheckedAt', users.last_successful_totp_check)` +
+	`, 'totp', jsonb_build_object('verifiedAt', users.totp_verified_at,'lastSuccessfullyCheckedAt', users.last_successful_totp_check, 'check', ` + checkQuery(userHuman{}.totpSecretIDColumn()) + `)` +
 	// -- , unverified_totp_id
+	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'publicKey', encode(human_passkeys.public_key::BYTEA, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'type', human_passkeys.type, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at, 'challenge', encode(human_passkeys.challenge, 'base64'), 'rpId', human_passkeys.relying_party_id)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
+	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'value', verifications.value, 'code', encode(verifications.code, 'base64'), 'createdAt', verifications.created_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.unverified_password_id, ''), COALESCE(users.unverified_email_id, ''), COALESCE(users.email_otp_verification_id, ''), COALESCE(users.totp_secret_id, ''), COALESCE(users.unverified_phone_id, ''), COALESCE(users.sms_otp_verification_id, ''), COALESCE(users.totp_secret_id, ''), COALESCE(users.unverified_totp_id, '')))` +
 	`) END AS human FROM zitadel.users`
+
+func verificationQuery(column database.Column) string {
+	var builder database.StatementBuilder
+	builder.WriteString("CASE WHEN ")
+	column.WriteQualified(&builder)
+	builder.WriteString(` IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT value, encode(code, 'base64') AS code, created_at+expiry AS "expiresAt", failed_attempts as "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = `)
+	column.WriteQualified(&builder)
+	builder.WriteString(`) AS res) ELSE NULL END`)
+	return builder.String()
+}
+func checkQuery(column database.Column) string {
+	var builder database.StatementBuilder
+	builder.WriteString("CASE WHEN ")
+	column.WriteQualified(&builder)
+	builder.WriteString(` IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT encode(code, 'base64') AS code, created_at+expiry AS "expiresAt", failed_attempts as "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = `)
+	column.WriteQualified(&builder)
+	builder.WriteString(`) AS res) ELSE NULL END`)
+	return builder.String()
+}
 
 // Get implements [domain.UserRepository.Get].
 func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
@@ -98,6 +116,8 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 		u.joinMachineKeys(),
 		u.joinPATs(),
 		u.joinMetadata(),
+		// u.joinVerifications(),
+		u.joinPasskeys(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 	options := new(database.QueryOpts)
@@ -121,6 +141,8 @@ func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...d
 		u.joinMachineKeys(),
 		u.joinPATs(),
 		u.joinMetadata(),
+		u.joinVerifications(),
+		u.joinPasskeys(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)
 
@@ -488,20 +510,37 @@ func (u user) LoadPasskeys() domain.UserRepository {
 	panic("unimplemented")
 }
 
+func (u user) joinPasskeys() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.userPasskeyRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), u.userPasskeyRepo.userIDColumn()),
+	)
+	// if !u.shouldLoadPasskeys {
+	// 	conditions = append(conditions, database.IsNull(u.userPasskeyRepo.userIDColumn()))
+	// }
+	return database.WithLeftJoin(
+		u.userPasskeyRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
 // LoadVerifications implements [domain.UserRepository.LoadVerifications].
 func (u user) LoadVerifications() domain.UserRepository {
 	panic("unimplemented")
 }
 
-// func (u user) joinVerifications() database.QueryOption {
-// 	conditions := make([]database.Condition, 0, 3)
-// 	conditions = append(conditions,
-// 		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.instanceIDColumn()),
-// 		database.NewInCondition(u.verification.IDColumn(),
-// 		 	u.emailVerificationIDColumn(),
-// 		 	u.phoneVerificationIDColumn(),
-// 		 	u.totpVerificationIDColumn(),
-// 	),
+func (u user) joinVerifications() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.userVerificationRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.idColumn(), u.userVerificationRepo.userIDColumn()),
+	)
+	return database.WithLeftJoin(
+		u.userVerificationRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
 
 // Machine implements [domain.UserRepository.Machine].
 func (u user) Machine() domain.MachineUserRepository {

@@ -144,7 +144,7 @@ type humanChanges interface {
 	CheckPassword(check PasswordCheckType) database.Change
 
 	// SetVerification sets the verification based on the verification type
-	SetVerification(id string, verification VerificationType) database.Change
+	SetVerification(verification VerificationType) database.Change
 
 	humanEmailChanges
 	humanPhoneChanges

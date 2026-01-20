@@ -65,37 +65,33 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 		if !typ.CreatedAt.IsZero() {
 			createdAt = typ.CreatedAt
 		}
-		return database.NewChanges(
-			database.NewCTEChange(func(builder *database.StatementBuilder) {
-				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, value, code, created_at, expiry) SELECT")
-				builder.WriteArgs(
-					existingHumanUser.InstanceIDColumn(),
-					existingHumanUser.idColumn(),
-					typ.Value,
-					typ.Code,
-					createdAt,
-					typ.Expiry,
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, value, code, created_at, expiry) SELECT existing_user.instance_id, existing_user.id, ")
+			builder.WriteArgs(
+				typ.Value,
+				typ.Code,
+				createdAt,
+				typ.Expiry,
+			)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			builder.WriteString(" RETURNING verifications.*")
+		},
+			func(name string) database.Change {
+				return database.NewChangeToStatement(
+					u.unverifiedPasswordIDColumn(),
+					func(builder *database.StatementBuilder) {
+						builder.WriteString(" SELECT ")
+						existingHumanUser.verification.IDColumn().WriteQualified(builder)
+						builder.WriteString(" FROM ")
+						builder.WriteString(name)
+						writeCondition(builder, database.And(
+							database.NewColumnCondition(u.InstanceIDColumn(), database.NewColumn(name, "instance_id")),
+							database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
+						))
+					},
 				)
-				builder.WriteString(" FROM ")
-				builder.WriteString(existingHumanUser.unqualifiedTableName())
-				builder.WriteString(" RETURNING verification.*")
 			},
-				func(name string) database.Change {
-					return database.NewChangeToStatement(
-						u.unverifiedPasswordIDColumn(),
-						func(builder *database.StatementBuilder) {
-							builder.WriteString(" SELECT ")
-							existingHumanUser.verification.IDColumn().WriteQualified(builder)
-							builder.WriteString(" FROM ")
-							builder.WriteString(name)
-							writeCondition(builder, database.And(
-								database.NewColumnCondition(u.InstanceIDColumn(), database.NewColumn(name, "instance_id")),
-								database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
-							))
-						},
-					)
-				},
-			),
 		)
 	case *domain.VerificationTypeVerified:
 		verifiedAtChange := database.NewChange(u.totpVerifiedAtColumn(), database.NowInstruction)
@@ -140,7 +136,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 		return database.NewCTEChange(
 			func(builder *database.StatementBuilder) {
 				builder.WriteString("INSERT INTO ")
-				u.verification.qualifiedTableName()
+				builder.WriteString(u.verification.qualifiedTableName())
 				builder.WriteString(" (")
 				database.Columns{
 					u.verification.InstanceIDColumn(),
@@ -153,7 +149,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 				builder.WriteArgs(typ.Value, skippedAt)
 				builder.WriteString(" FROM ")
 				builder.WriteString(existingHumanUser.unqualifiedTableName())
-				builder.WriteString(" RETURNING verification.*")
+				builder.WriteString(" RETURNING verifications.*")
 			},
 			func(name string) database.Change {
 				return database.NewChanges(

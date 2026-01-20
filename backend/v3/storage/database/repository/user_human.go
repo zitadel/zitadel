@@ -64,7 +64,6 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 		columnValues["preferred_language"] = user.Human.PreferredLanguage
 	}
 	if user.Human.Password.IsChangeRequired {
-		// changes = append(changes, u.SetPasswordChangeRequired(user.Human.Password.IsChangeRequired))
 		columnValues["password_change_required"] = true
 	}
 	if user.Human.DisplayName != "" {
@@ -99,7 +98,6 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 		}
 
 		change := u.SetEmail(verification).(database.CTEChange)
-		change.SetName("email_verification")
 		ctes["email_verification"] = change
 		columnValues["unverified_email_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM email_verification)`)
@@ -110,7 +108,6 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 			verification := &domain.VerificationTypeInit{
 				Value:     &user.Human.Phone.Number,
 				CreatedAt: user.CreatedAt,
-				Expiry:    gu.Ptr(time.Since(*user.Human.Phone.Unverified.ExpiresAt)),
 				Code:      user.Human.Phone.Unverified.Code,
 			}
 			if user.Human.Phone.Unverified.Value != nil {
@@ -121,7 +118,6 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 			}
 
 			change := u.SetPhone(verification).(database.CTEChange)
-			change.SetName("phone_verification")
 			ctes["phone_verification"] = change
 			columnValues["unverified_phone_id"] = func(builder *database.StatementBuilder) {
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
@@ -131,24 +127,36 @@ func (u userHuman) create(ctx context.Context, client database.QueryExecutor, us
 			columnValues["phone_verified_at"] = user.Human.Phone.VerifiedAt
 		}
 	}
-	// TODO: add passkeys
-	// for _, passkey := range user.Human.Passkeys {
-	// }
 
-	// TODO: set TOTP
-	// TODO: add identity provider links
+	for i, passkey := range user.Human.Passkeys {
+		ctes[fmt.Sprintf("passkey_%d", i)] = u.AddPasskey(passkey).(database.CTEChange)
+	}
+
+	if user.Human.TOTP.Unverified != nil {
+		ctes["totp"] = u.SetTOTP(&domain.VerificationTypeInit{
+			CreatedAt: user.CreatedAt,
+			Code:      user.Human.TOTP.Unverified.Code,
+			Value:     user.Human.TOTP.Unverified.Value,
+		}).(database.CTEChange)
+	}
+
 	for i, link := range user.Human.IdentityProviderLinks {
 		name := fmt.Sprintf("idp_link_%d", i)
 		ctes[name] = u.AddIdentityProviderLink(link).(database.CTEChange)
-		ctes[name].SetName(name)
 	}
-	// TODO: add verifications
-	// for _, verification := range user.Human.Verifications {
-	// 	changes = append(changes, u.SetVerification("", verification))
-	// }
+
+	for i, verification := range user.Human.Verifications {
+		ctes[fmt.Sprintf("verification_%d", i)] = u.SetVerification(&domain.VerificationTypeInit{
+			ID:        gu.Ptr(verification.ID),
+			CreatedAt: user.CreatedAt,
+			Code:      verification.Code,
+			Value:     verification.Value,
+		}).(database.CTEChange)
+	}
 
 	// write CTE changes
 	for name, cte := range ctes {
+		cte.SetName(name)
 		builder.WriteString(", ")
 		builder.WriteString(name)
 		builder.WriteString(" AS (")
@@ -254,7 +262,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 				)
 				builder.WriteString(" FROM ")
 				builder.WriteString(existingHumanUser.unqualifiedTableName())
-				builder.WriteString(" RETURNING verification.*")
+				builder.WriteString(" RETURNING verifications.*")
 			},
 			func(name string) database.Change {
 				return database.NewChangeToStatement(
@@ -365,8 +373,87 @@ func (u userHuman) SetPreferredLanguage(preferredLanguage language.Tag) database
 }
 
 // SetVerification implements [domain.HumanUserRepository.SetVerification].
-func (u userHuman) SetVerification(id string, verification domain.VerificationType) database.Change {
-	panic("unimplemented")
+func (u userHuman) SetVerification(verification domain.VerificationType) database.Change {
+	// panic("not implemented")
+	switch typ := verification.(type) {
+	case *domain.VerificationTypeInit:
+		var createdAt any = database.NowInstruction
+		if !typ.CreatedAt.IsZero() {
+			createdAt = typ.CreatedAt
+		}
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, user_id, id, value, code, created_at, expiry) SELECT existing_user.instance_id, existing_user.id, ")
+				builder.WriteArgs(
+					typ.ID,
+					typ.Value,
+					typ.Code,
+					createdAt,
+					typ.Expiry,
+				)
+				builder.WriteString(" FROM ")
+				builder.WriteString(existingHumanUser.unqualifiedTableName())
+				builder.WriteString(" RETURNING verifications.*")
+			}, nil,
+		)
+	case *domain.VerificationTypeVerified:
+		verifiedAtChange := database.NewChange(u.passwordVerifiedAtColumn(), database.NowInstruction)
+		if !typ.VerifiedAt.IsZero() {
+			verifiedAtChange = database.NewChange(u.passwordVerifiedAtColumn(), typ.VerifiedAt)
+		}
+
+		return database.NewChanges(
+			verifiedAtChange,
+			database.NewChangeToNull(u.unverifiedPasswordIDColumn()),
+			database.NewChange(u.failedPasswordAttemptsColumn(), 0),
+			database.NewChangeToStatement(u.passwordColumn(), func(builder *database.StatementBuilder) {
+				builder.WriteString("DELETE FROM zitadel.verifications USING existing_user")
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+					database.NewTextCondition(u.verification.IDColumn(), database.TextOperationEqual, *typ.ID),
+				))
+				builder.WriteString(" RETURNING value")
+			}),
+		)
+	case *domain.VerificationTypeUpdate:
+		changes := make(database.Changes, 0, 3)
+		if typ.Code != nil {
+			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
+		}
+		if typ.Expiry != nil {
+			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))
+		}
+		if typ.Value != nil {
+			changes = append(changes, database.NewChange(u.verification.ValueColumn(), *typ.Value))
+		}
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("UPDATE zitadel.verifications SET ")
+				changes.Write(builder)
+				builder.WriteString(" FROM existing_user")
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+					database.NewTextCondition(u.verification.IDColumn(), database.TextOperationEqual, *typ.ID),
+				))
+			},
+			nil,
+		)
+	case *domain.VerificationTypeSkipped:
+		panic("skip verification is not supported for verifications")
+	case *domain.VerificationTypeFailed:
+		return database.NewCTEChange(
+			func(builder *database.StatementBuilder) {
+				builder.WriteString("UPDATE zitadel.verifications SET verifications.failed_attempts = verifications.failed_attempts + 1")
+				builder.WriteString("FROM existing_user")
+				writeCondition(builder, database.And(
+					database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+					database.NewTextCondition(u.verification.IDColumn(), database.TextOperationEqual, *typ.ID),
+				))
+			},
+			nil,
+		)
+	}
+	panic(fmt.Sprintf("undefined verification type %T", verification))
 }
 
 // -------------------------------------------------------------

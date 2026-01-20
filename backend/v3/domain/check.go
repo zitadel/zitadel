@@ -7,9 +7,9 @@ import (
 )
 
 type Check struct {
-	Code           *crypto.CryptoValue `db:"code"`
-	ExpiresAt      *time.Time          `db:"expires_at"`
-	FailedAttempts uint8               `db:"failed_attempts"`
+	Code           *crypto.CryptoValue `json:"code" db:"code"`
+	ExpiresAt      *time.Time          `json:"expiresAt" db:"expires_at"`
+	FailedAttempts uint8               `json:"failedAttempts" db:"failed_attempts"`
 }
 
 type CheckType interface {

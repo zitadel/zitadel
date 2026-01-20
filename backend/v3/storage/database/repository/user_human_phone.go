@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -24,7 +25,67 @@ func (u userHuman) RemovePhone() database.Change {
 
 // SetPhone implements [domain.HumanUserRepository.SetPhone].
 func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
-	panic("unimplemented")
+	switch typ := verification.(type) {
+	case *domain.VerificationTypeSkipped:
+		skippedAt := database.NewChange(u.phoneVerifiedAtColumn(), database.NowInstruction)
+		if !typ.SkippedAt.IsZero() {
+			skippedAt = database.NewChange(u.phoneVerifiedAtColumn(), typ.SkippedAt)
+		}
+		return database.NewChanges(
+			database.NewChange(u.phoneColumn(), *typ.Value),
+			skippedAt,
+		)
+	case *domain.VerificationTypeFailed:
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("UPDATE ")
+			builder.WriteString(u.verification.qualifiedTableName())
+			builder.WriteString(" SET ")
+			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.smsOTPVerificationIDColumn()),
+			))
+		}, nil)
+	case *domain.VerificationTypeInit:
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
+			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			builder.WriteString(" RETURNING id")
+		}, func(name string) database.Change {
+			return database.NewChangeToStatement(u.phoneVerificationIDColumn(), func(builder *database.StatementBuilder) {
+				builder.WriteString("SELECT id FROM ")
+				builder.WriteString(name)
+			})
+		})
+	case *domain.VerificationTypeUpdate:
+		changes := make(database.Changes, 0, 3)
+		if typ.Value != nil {
+			changes = append(changes, database.NewChange(u.phoneColumn(), *typ.Value))
+		}
+		if typ.Code != nil {
+			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
+		}
+		if typ.Expiry != nil {
+			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))
+		}
+		return database.NewCTEChange(func(builder *database.StatementBuilder) {
+			builder.WriteString("UPDATE ")
+			builder.WriteString(u.verification.qualifiedTableName())
+			builder.WriteString(" SET ")
+			changes.Write(builder)
+			builder.WriteString(" FROM ")
+			builder.WriteString(existingHumanUser.unqualifiedTableName())
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.phoneVerificationIDColumn()),
+			))
+		}, nil)
+	}
+	panic(fmt.Sprintf("type not allowed for phone verification change %T", verification))
 }
 
 // CheckSMSOTP implements [domain.HumanUserRepository.CheckSMSOTP].
@@ -63,8 +124,13 @@ func (u userHuman) PhoneCondition(op database.TextOperation, phone string) datab
 func (u userHuman) phoneColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone")
 }
+
 func (u userHuman) phoneVerifiedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "phone_verified_at")
+}
+
+func (u userHuman) phoneVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "unverified_phone_id")
 }
 
 func (u userHuman) smsOTPEnabledAtColumn() database.Column {

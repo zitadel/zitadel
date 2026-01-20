@@ -84,14 +84,14 @@ const (
 
 type HumanPassword struct {
 	// Password is the hashed password
-	Password string `json:"password" db:"password"` //TODO: make sure password is not marshalled
+	Password []byte `json:"password" db:"password"` //TODO: make sure password is not marshalled
 	// IsChangeRequired indicates if the user must change their password
 	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
 	// VerifiedAt is the time when the current password was verified
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
 	// Unverified is the verification data for setting a new password
 	// If nil, no password change is in progress
-	Unverified *Verification `json:"-"`
+	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 	// FailedAttempts is the number of consecutive failed password attempts
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
@@ -120,9 +120,9 @@ type HumanTOTP struct {
 
 	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
 	// Check is the verified secret
-	Check *Check `json:"-"`
+	Check *Check `json:"check,omitempty" db:"-"`
 	// Unverified is the unverified secret
-	Unverified *Verification `json:"-"`
+	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type OTP struct {
@@ -130,7 +130,7 @@ type OTP struct {
 	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
 	// Check is the currently active OTP check
 	// If nil, no OTP check is active
-	Check *Check `json:"-"`
+	Check *Check `json:"check,omitempty" db:"-"`
 }
 
 type PersonalAccessToken struct {
@@ -172,10 +172,10 @@ const (
 
 type Passkey struct {
 	ID                           string      `json:"id" db:"id"`
-	KeyID                        []byte      `json:"-" db:"key_id"`
+	KeyID                        []byte      `json:"keyId" db:"key_id"`
 	Name                         string      `json:"name" db:"name"`
-	SignCount                    uint32      `json:"-" db:"sign_count"`
-	PublicKey                    []byte      `json:"-" db:"public_key"`
+	SignCount                    uint32      `json:"signCount" db:"sign_count"`
+	PublicKey                    []byte      `json:"publicKey" db:"public_key"`
 	AttestationType              string      `json:"attestationType" db:"attestation_type"`
 	AuthenticatorAttestationGUID []byte      `json:"aaGuid" db:"authenticator_attestation_guid"`
 	Type                         PasskeyType `json:"type" db:"type"`
@@ -185,15 +185,15 @@ type Passkey struct {
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
 
 	// Challenge is used during device registration
-	Challenge []byte `json:"-" db:"challenge"`
+	Challenge []byte `json:"challenge" db:"challenge"`
 	// RelyingPartyID is used during device registration
-	RelyingPartyID string `json:"-" db:"relying_party_id"`
+	RelyingPartyID string `json:"rpId" db:"relying_party_id"`
 
 	// Initialization is used during user registration
 	Initialization *Verification `json:"-" db:"initialization"`
 }
 
-//go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType
+//go:generate enumer -type PasskeyType -transform lower -trimprefix PasskeyType -json -sql
 
 type PasskeyType uint8
 

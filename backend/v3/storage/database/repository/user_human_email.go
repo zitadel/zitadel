@@ -110,7 +110,7 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 		}, nil)
 	case *domain.VerificationTypeInit:
 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, value, code, created_at, expiry) SELECT instance_id, ")
+			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
 			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
