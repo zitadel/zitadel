@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Zweitfaktor hinzufügen
   DescriptionPhone: Erstelle deinen Zweitfaktor. Gib deine Telefonnummer ein, um sie zu verifizieren.
   DescriptionCode: Erstelle deinen Zweitfaktor. Gib den erhaltenen Code ein, um deine Telefonnummer zu verifizieren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefonnummer
   CodeLabel: Code
   EditButtonText: Bearbeiten

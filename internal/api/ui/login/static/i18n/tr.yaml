@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktör Doğrulama
   DescriptionPhone: 2-faktörünüzü oluşturun. Doğrulamak için telefon numaranızı girin.
   DescriptionCode: 2-faktörünüzü oluşturun. Telefon numaranızı doğrulamak için aldığınız kodu girin.
+  CountryCodeLabel: Ülke
   PhoneLabel: Telefon
   CodeLabel: Kod
   EditButtonText: Düzenle

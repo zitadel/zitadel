@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verificatie
   DescriptionPhone: Maak uw 2-factor aan. Voer uw telefoonnummer in om te verifiëren.
   DescriptionCode: Maak uw 2-factor aan. Voer de ontvangen code in om uw telefoonnummer te verifiëren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefoon
   CodeLabel: Code
   EditButtonText: Bewerken
