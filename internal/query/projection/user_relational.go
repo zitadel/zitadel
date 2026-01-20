@@ -1689,7 +1689,8 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetVerification(e.ID, &domain.VerificationTypeInit{
+			repo.SetVerification(&domain.VerificationTypeInit{
+				ID:        &e.ID,
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
@@ -1713,7 +1714,8 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckFailed(event events
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetVerification(e.ID, &domain.VerificationTypeFailed{
+			repo.SetVerification(&domain.VerificationTypeFailed{
+				ID:       &e.ID,
 				FailedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1735,7 +1737,8 @@ func (p *userRelationalProjection) reducePasskeyInitCodeCheckSucceeded(event eve
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetVerification(e.ID, &domain.VerificationTypeVerified{
+			repo.SetVerification(&domain.VerificationTypeVerified{
+				ID:         &e.ID,
 				VerifiedAt: e.CreatedAt(),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1757,7 +1760,8 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetVerification(e.ID, &domain.VerificationTypeInit{
+			repo.SetVerification(&domain.VerificationTypeInit{
+				ID:        &e.ID,
 				Code:      e.Code.Crypted,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
