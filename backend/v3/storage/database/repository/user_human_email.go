@@ -20,12 +20,12 @@ func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
 			builder.WriteString("UPDATE ")
 			builder.WriteString(u.verification.qualifiedTableName())
 			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
 			))
 		}, nil)
 	case *domain.CheckTypeSucceeded:
@@ -100,12 +100,12 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			builder.WriteString("UPDATE ")
 			builder.WriteString(u.verification.qualifiedTableName())
 			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
 			))
 		}, nil)
 	case *domain.VerificationTypeInit:
@@ -127,10 +127,10 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			changes = append(changes, database.NewChange(u.EmailColumn(), *typ.Value))
 		}
 		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
+			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
 		}
 		if typ.Expiry != nil {
-			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))
+			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
 		}
 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
 			builder.WriteString("UPDATE ")
@@ -140,8 +140,8 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.emailVerificationIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailVerificationIDColumn()),
 			))
 		}, nil)
 	}

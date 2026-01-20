@@ -40,12 +40,12 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 			builder.WriteString("UPDATE ")
 			builder.WriteString(u.verification.qualifiedTableName())
 			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.smsOTPVerificationIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.smsOTPVerificationIDColumn()),
 			))
 		}, nil)
 	case *domain.VerificationTypeInit:
@@ -67,10 +67,10 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 			changes = append(changes, database.NewChange(u.phoneColumn(), *typ.Value))
 		}
 		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
+			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
 		}
 		if typ.Expiry != nil {
-			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))
+			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
 		}
 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
 			builder.WriteString("UPDATE ")
@@ -80,8 +80,8 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.phoneVerificationIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.phoneVerificationIDColumn()),
 			))
 		}, nil)
 	}

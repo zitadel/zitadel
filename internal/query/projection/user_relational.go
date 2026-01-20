@@ -956,7 +956,7 @@ func (p *userRelationalProjection) reduceHumanPhoneCodeAdded(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPhone(&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   e.Code,
 				Expiry: &e.Expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1057,7 +1057,7 @@ func (p *userRelationalProjection) reduceHumanEmailCodeAdded(event eventstore.Ev
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetEmail(&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   e.Code,
 				Expiry: expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1179,7 +1179,7 @@ func (p *userRelationalProjection) reduceHumanPasswordCodeAdded(event eventstore
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetPassword(&domain.VerificationTypeUpdate{
-				Code:   e.Code.Crypted,
+				Code:   e.Code,
 				Expiry: expiry,
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -1691,7 +1691,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeAdded(event eventstore.E
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetVerification(&domain.VerificationTypeInit{
 				ID:        &e.ID,
-				Code:      e.Code.Crypted,
+				Code:      e.Code,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),
@@ -1762,7 +1762,7 @@ func (p *userRelationalProjection) reducePasskeyInitCodeRequested(event eventsto
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetVerification(&domain.VerificationTypeInit{
 				ID:        &e.ID,
-				Code:      e.Code.Crypted,
+				Code:      e.Code,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),
@@ -1944,7 +1944,7 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetTOTP(&domain.VerificationTypeInit{
 				CreatedAt: e.CreatedAt(),
-				Code:      e.Secret.Crypted,
+				Code:      e.Secret,
 				Value:     gu.Ptr(string(e.Secret.Crypted)),
 			}),
 			repo.SetUpdatedAt(e.CreatedAt()),
@@ -2095,7 +2095,7 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.CheckSMSOTP(&domain.CheckTypeInit{
-				// Code:      e.Code.Crypted,
+				Code:      e.Code,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),
@@ -2203,7 +2203,7 @@ func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Even
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.CheckEmailOTP(&domain.CheckTypeInit{
-				// Code:      e.Code.Crypted,
+				Code:      e.Code,
 				CreatedAt: e.CreatedAt(),
 				Expiry:    &e.Expiry,
 			}),

@@ -26,9 +26,6 @@ import (
 	v2beta_user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
-//go:embed picture.png
-var picture []byte
-
 func TestServer_TestHumanUserReduces(t *testing.T) {
 	instanceID := Instance.ID()
 	orgID := Instance.DefaultOrg.Id

@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 type User struct {
@@ -84,7 +86,7 @@ const (
 
 type HumanPassword struct {
 	// Password is the hashed password
-	Password []byte `json:"password" db:"password"` //TODO: make sure password is not marshalled
+	Password *crypto.CryptoValue `json:"password" db:"password"` //TODO: make sure password is not marshalled
 	// IsChangeRequired indicates if the user must change their password
 	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
 	// VerifiedAt is the time when the current password was verified

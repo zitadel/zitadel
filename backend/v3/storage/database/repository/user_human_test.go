@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 func Test_humanUser_create(t *testing.T) {
@@ -26,7 +27,12 @@ func Test_humanUser_create(t *testing.T) {
 	createdAt := time.Now().Round(time.Second)
 
 	// existingUserID := createMachineUser(t, tx, instanceID, orgID)
-	password := []byte("my-password")
+	password := &crypto.CryptoValue{
+		CryptoType: crypto.TypeEncryption,
+		Algorithm:  "aes256",
+		KeyID:      "key-id",
+		Crypted:    []byte("crypted"),
+	}
 
 	type args struct {
 		user *domain.User
@@ -167,6 +173,12 @@ func Test_humanUser_create(t *testing.T) {
 			firstName := gofakeit.FirstName()
 			lastName := gofakeit.LastName()
 			email := gofakeit.Email()
+			code := &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "aes256",
+				KeyID:      "key-id",
+				Crypted:    []byte("crypted"),
+			}
 
 			return test{
 				name: "with unverified email without expiry",
@@ -188,7 +200,7 @@ func Test_humanUser_create(t *testing.T) {
 							Email: domain.HumanEmail{
 								Address: email,
 								Unverified: &domain.Verification{
-									Code: []byte("verification-code"),
+									Code: code,
 								},
 							},
 						},
@@ -210,7 +222,7 @@ func Test_humanUser_create(t *testing.T) {
 								Address: email,
 								Unverified: &domain.Verification{
 									Value: &email,
-									Code:  []byte("verification-code"),
+									Code:  code,
 								},
 							},
 							Password: domain.HumanPassword{
@@ -229,6 +241,12 @@ func Test_humanUser_create(t *testing.T) {
 			lastName := gofakeit.LastName()
 			email := gofakeit.Email()
 			phone := gofakeit.Phone()
+			code := &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "aes256",
+				KeyID:      "key-id",
+				Crypted:    []byte("crypted"),
+			}
 
 			return test{
 				name: "with unverified phone without expiry",
@@ -253,7 +271,7 @@ func Test_humanUser_create(t *testing.T) {
 							Phone: &domain.HumanPhone{
 								Number: phone,
 								Unverified: &domain.Verification{
-									Code: []byte("verification-code"),
+									Code: code,
 								},
 							},
 						},
@@ -281,7 +299,7 @@ func Test_humanUser_create(t *testing.T) {
 							Phone: &domain.HumanPhone{
 								Unverified: &domain.Verification{
 									Value: &phone,
-									Code:  []byte("verification-code"),
+									Code:  code,
 								},
 							},
 						},
@@ -381,14 +399,20 @@ func Test_humanUser_create(t *testing.T) {
 			firstName := gofakeit.FirstName()
 			lastName := gofakeit.LastName()
 			email := gofakeit.Email()
+			code := &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "aes256",
+				KeyID:      "key-id",
+				Crypted:    []byte("crypted"),
+			}
 			verifications := []*domain.Verification{
 				{
 					ID:   gofakeit.UUID(),
-					Code: []byte("code"),
+					Code: code,
 				},
 				{
 					ID:   gofakeit.UUID(),
-					Code: []byte("code"),
+					Code: code,
 				},
 			}
 
@@ -447,6 +471,12 @@ func Test_humanUser_create(t *testing.T) {
 			firstName := gofakeit.FirstName()
 			lastName := gofakeit.LastName()
 			email := gofakeit.Email()
+			code := &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "aes256",
+				KeyID:      "key-id",
+				Crypted:    []byte("crypted"),
+			}
 
 			return test{
 				name: "with totp",
@@ -471,7 +501,7 @@ func Test_humanUser_create(t *testing.T) {
 							TOTP: domain.HumanTOTP{
 								Unverified: &domain.Verification{
 									ID:   gofakeit.UUID(),
-									Code: []byte("code"),
+									Code: code,
 								},
 							},
 						},
@@ -499,7 +529,7 @@ func Test_humanUser_create(t *testing.T) {
 							TOTP: domain.HumanTOTP{
 								Unverified: &domain.Verification{
 									ID:   gofakeit.UUID(),
-									Code: []byte("code"),
+									Code: code,
 								},
 							},
 						},

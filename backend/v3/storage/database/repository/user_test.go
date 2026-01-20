@@ -149,12 +149,18 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 	assert.Empty(t, actual.Metadata, "unmatched metadata")
 
 	if expected.Machine != nil {
+		require.Nil(t, expected.Human)
 		assertMachineUser(t, expected.Machine, actual.Machine)
+		return
 	}
 
 	if expected.Human != nil {
+		require.Nil(t, expected.Machine)
 		assertHumanUser(t, expected.Human, actual.Human)
+		return
 	}
+	t.Log("either machine or human must be set")
+	t.Fail()
 }
 
 func assertMachineUser(t *testing.T, expected, actual *domain.MachineUser) {
@@ -220,21 +226,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 	if expected.Email.OTP.Check != nil {
 		t.Error("human.email.otp.check not asserted")
 	}
-	if expected.Email.Unverified != nil {
-		require.NotNil(t, actual.Email.Unverified, "human email unverified not nil")
-		assert.Equal(t, expected.Email.Unverified.Value, actual.Email.Unverified.Value, "human email unverified value")
-		assert.Equal(t, expected.Email.Unverified.Code, actual.Email.Unverified.Code, "human email unverified code")
-		if expected.Email.Unverified.ExpiresAt != nil {
-			require.NotNil(t, actual.Email.Unverified.ExpiresAt, "human email unverified expires at not nil")
-			assert.True(t, expected.Email.Unverified.ExpiresAt.Equal(*actual.Email.Unverified.ExpiresAt), "human email unverified expires at")
-		} else {
-			assert.Nil(t, actual.Email.Unverified.ExpiresAt, "human email unverified expires at nil")
-		}
-		assert.Equal(t, expected.Email.Unverified.FailedAttempts, actual.Email.Unverified.FailedAttempts, "human email unverified failed attempts")
-		assert.True(t, expected.Email.Unverified.VerifiedAt.Equal(actual.Email.Unverified.VerifiedAt), "human email unverified verified at")
-	} else {
-		assert.Nil(t, actual.Email.Unverified, "human email unverified nil")
-	}
+	assertVerification(t, expected.Email.Unverified, actual.Email.Unverified, "human email unverified")
 
 	if expected.Phone == nil {
 		assert.Nil(t, actual.Phone, "human phone nil")
@@ -248,21 +240,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 		if expected.Phone.OTP.Check != nil {
 			t.Error("human.phone.otp.check not asserted")
 		}
-		if expected.Phone.Unverified != nil {
-			require.NotNil(t, actual.Phone.Unverified, "human phone unverified not nil")
-			assert.Equal(t, expected.Phone.Unverified.Value, actual.Phone.Unverified.Value, "human phone unverified value")
-			assert.Equal(t, expected.Phone.Unverified.Code, actual.Phone.Unverified.Code, "human phone unverified code")
-			if expected.Phone.Unverified.ExpiresAt != nil {
-				require.NotNil(t, actual.Phone.Unverified.ExpiresAt, "human phone unverified expires at not nil")
-				assert.True(t, expected.Phone.Unverified.ExpiresAt.Equal(*actual.Phone.Unverified.ExpiresAt), "human phone unverified expires at")
-			} else {
-				assert.Nil(t, actual.Phone.Unverified.ExpiresAt, "human phone unverified expires at nil")
-			}
-			assert.Equal(t, expected.Phone.Unverified.FailedAttempts, actual.Phone.Unverified.FailedAttempts, "human phone unverified failed attempts")
-			assert.True(t, expected.Phone.Unverified.VerifiedAt.Equal(actual.Phone.Unverified.VerifiedAt), "human phone unverified verified at")
-		} else {
-			assert.Nil(t, actual.Phone.Unverified, "human phone unverified nil")
-		}
+		assertVerification(t, expected.Phone.Unverified, actual.Phone.Unverified, "human phone unverified")
 	}
 
 	for i, expectedPasskey := range expected.Passkeys {
@@ -294,19 +272,25 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 	assert.Equal(t, expected.Password.Password, actual.Password.Password, "human password password")
 	assert.Equal(t, expected.Password.IsChangeRequired, actual.Password.IsChangeRequired, "human password is change required")
 	assert.True(t, expected.Password.VerifiedAt.Equal(actual.Password.VerifiedAt), "human password verified at")
-	if expected.Password.Unverified != nil {
-		t.Error("human.password.unverified not asserted")
-	}
+	assertVerification(t, expected.Password.Unverified, actual.Password.Unverified, "human password unverified")
 	assert.Equal(t, expected.Password.FailedAttempts, actual.Password.FailedAttempts, "human password failed attempts")
 
 	assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
 	assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
 	if expected.TOTP.Check != nil {
-		t.Error("human.totp.check not asserted")
+		require.NotNil(t, actual.TOTP.Check, "human totp check not found")
+		assert.Equal(t, expected.TOTP.Check.Code, actual.TOTP.Check.Code, "human totp check code")
+		if expected.TOTP.Check.ExpiresAt != nil {
+			require.NotNil(t, actual.TOTP.Check.ExpiresAt, "human totp check expires at not nil")
+			assert.True(t, expected.TOTP.Check.ExpiresAt.Equal(*actual.TOTP.Check.ExpiresAt), "human totp check expires at")
+		} else {
+			assert.Nil(t, actual.TOTP.Check.ExpiresAt, "human totp check expires at nil")
+		}
+		assert.Equal(t, expected.TOTP.Check.FailedAttempts, actual.TOTP.Check.FailedAttempts, "human totp check failed attempts")
+	} else {
+		assert.Nil(t, actual.TOTP.Check, "human totp check nil")
 	}
-	if expected.TOTP.Unverified != nil {
-		t.Error("human.totp.unverified not asserted")
-	}
+	assertVerification(t, expected.TOTP.Unverified, actual.TOTP.Unverified, "human totp unverified")
 
 	if len(expected.IdentityProviderLinks) > 0 {
 		t.Error("human.identityProviders not asserted")
@@ -340,4 +324,25 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 		assert.True(t, expectedVerification.VerifiedAt.Equal(actualVerification.VerifiedAt), "human verification[%d] verified at", i)
 	}
 	assert.Empty(t, actual.Verifications, "unmatched human verifications")
+}
+
+func assertVerification(t *testing.T, expected, actual *domain.Verification, field string) {
+	t.Helper()
+
+	if expected == nil {
+		assert.Nil(t, actual, "verification nil")
+		return
+	}
+
+	require.NotNil(t, actual, "human phone unverified not nil")
+	assert.Equal(t, expected.Value, actual.Value, "human phone unverified value")
+	assert.Equal(t, expected.Code, actual.Code, "human phone unverified code")
+	if expected.ExpiresAt != nil {
+		require.NotNil(t, actual.ExpiresAt, "human phone unverified expires at not nil")
+		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "human phone unverified expires at")
+	} else {
+		assert.Nil(t, actual.ExpiresAt, "human phone unverified expires at nil")
+	}
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human phone unverified failed attempts")
+	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human phone unverified verified at")
 }

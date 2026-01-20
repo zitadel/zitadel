@@ -19,7 +19,7 @@ func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 			builder.WriteString("UPDATE ")
 			builder.WriteString(u.verification.qualifiedTableName())
 			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.FailedAttemptsColumn())
+			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
 		}, nil)
 	case *domain.CheckTypeSucceeded:
 		lastSucceededChange := database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction)
@@ -32,12 +32,12 @@ func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 					builder.WriteString("UPDATE ")
 					builder.WriteString(u.verification.qualifiedTableName())
 					builder.WriteString(" SET ")
-					database.NewChange(u.verification.FailedAttemptsColumn(), 0)
+					database.NewChange(u.verification.failedAttemptsColumn(), 0)
 					builder.WriteString(" FROM ")
 					builder.WriteString(existingHumanUser.unqualifiedTableName())
 					writeCondition(builder, database.And(
-						database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-						database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.totpSecretIDColumn()),
+						database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+						database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.totpSecretIDColumn()),
 					))
 				},
 				nil,
@@ -82,12 +82,12 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 					u.unverifiedPasswordIDColumn(),
 					func(builder *database.StatementBuilder) {
 						builder.WriteString(" SELECT ")
-						existingHumanUser.verification.IDColumn().WriteQualified(builder)
+						existingHumanUser.verification.idColumn().WriteQualified(builder)
 						builder.WriteString(" FROM ")
 						builder.WriteString(name)
 						writeCondition(builder, database.And(
 							database.NewColumnCondition(u.InstanceIDColumn(), database.NewColumn(name, "instance_id")),
-							database.NewColumnCondition(u.idColumn(), database.NewColumn(name, "user_id")),
+							database.NewColumnCondition(u.IDColumn(), database.NewColumn(name, "user_id")),
 						))
 					},
 				)
@@ -106,13 +106,13 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 	case *domain.VerificationTypeUpdate:
 		changes := make(database.Changes, 0, 3)
 		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.CodeColumn(), typ.Code))
+			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
 		}
 		if typ.Value != nil {
-			changes = append(changes, database.NewChange(u.verification.ValueColumn(), *typ.Value))
+			changes = append(changes, database.NewChange(u.verification.valueColumn(), *typ.Value))
 		}
 		if typ.Expiry != nil {
-			changes = append(changes, database.NewChange(u.verification.ExpiryColumn(), *typ.Expiry))
+			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
 		}
 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
 			builder.WriteString("UPDATE ")
@@ -122,8 +122,8 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 			builder.WriteString(" FROM ")
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.InstanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.IDColumn(), existingHumanUser.unverifiedTOTPIDColumn()),
+				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
+				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedTOTPIDColumn()),
 			))
 		}, nil)
 	case *domain.VerificationTypeSkipped:
@@ -139,9 +139,9 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 				builder.WriteString(u.verification.qualifiedTableName())
 				builder.WriteString(" (")
 				database.Columns{
-					u.verification.InstanceIDColumn(),
-					u.verification.ValueColumn(),
-					u.verification.CreationDateColumn(),
+					u.verification.instanceIDColumn(),
+					u.verification.valueColumn(),
+					u.verification.creationDateColumn(),
 				}.WriteUnqualified(builder)
 				builder.WriteString(") SELECT ")
 				existingHumanUser.InstanceIDColumn().WriteQualified(builder)

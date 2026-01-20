@@ -60,7 +60,7 @@ func (u userMetadataRepo) RemoveMetadata(condition database.Condition) database.
 			builder.WriteString(existingUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
 				database.NewColumnCondition(existingUser.InstanceIDColumn(), u.instanceIDColumn()),
-				database.NewColumnCondition(existingUser.idColumn(), u.userIDColumn()),
+				database.NewColumnCondition(existingUser.IDColumn(), u.userIDColumn()),
 				condition,
 			))
 		},

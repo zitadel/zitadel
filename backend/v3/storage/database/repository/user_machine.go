@@ -13,23 +13,7 @@ type userMachine struct {
 	personalAccessTokenRepo
 }
 
-func (u userMachine) create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-	var createdAt any = database.NowInstruction
-	if !user.CreatedAt.IsZero() {
-		createdAt = user.CreatedAt
-	}
-
-	builder := database.NewStatementBuilder(
-		"WITH existing_user AS (INSERT INTO zitadel.users ("+
-			"instance_id, organization_id, id, username, state, type"+
-			", name, description, secret, access_token_type, created_at, updated_at)"+
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, ",
-		user.InstanceID, user.OrganizationID, user.ID, user.Username, user.State, "machine",
-		user.Machine.Name, user.Machine.Description, user.Machine.Secret, uint8(user.Machine.AccessTokenType),
-	)
-	builder.WriteArgs(createdAt, createdAt)
-	builder.WriteString(") RETURNING *)")
-
+func (u userMachine) create(ctx context.Context, builder *database.StatementBuilder, client database.QueryExecutor, user *domain.User) error {
 	changes := make(database.Changes, 0, len(user.Machine.Keys)+len(user.Machine.PATs))
 	for _, key := range user.Machine.Keys {
 		changes = append(changes, u.AddKey(key))
@@ -43,7 +27,23 @@ func (u userMachine) create(ctx context.Context, client database.QueryExecutor, 
 	for i, change := range changes {
 		sessionCTE(change, i, 0, builder)
 	}
-	builder.WriteString("SELECT created_at, updated_at FROM existing_user")
+
+	builder.WriteString("INSERT INTO zitadel.users (" +
+		"instance_id, organization_id, id, username, state, type" +
+		", name, description, secret, access_token_type, created_at, updated_at) VALUES (",
+	)
+
+	var createdAt any = database.NowInstruction
+	if !user.CreatedAt.IsZero() {
+		createdAt = user.CreatedAt
+	}
+	builder.WriteArgs(
+		user.InstanceID, user.OrganizationID, user.ID, user.Username, user.State, "machine",
+		user.Machine.Name, user.Machine.Description, user.Machine.Secret, uint8(user.Machine.AccessTokenType),
+		createdAt, createdAt,
+	)
+
+	builder.WriteString(") RETURNING created_at, updated_at")
 
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 }

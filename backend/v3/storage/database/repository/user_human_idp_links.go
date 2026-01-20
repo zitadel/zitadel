@@ -33,7 +33,7 @@ func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) da
 			builder.WriteString("(instance_id, user_id, provided_user_id, provided_username, provider_id, created_at, updated_at) SELECT ")
 			database.Columns{
 				existingHumanUser.InstanceIDColumn(),
-				existingHumanUser.idColumn(),
+				existingHumanUser.IDColumn(),
 			}.WriteQualified(builder)
 			builder.WriteArgs(
 				link.ProvidedUserID,
@@ -63,7 +63,7 @@ func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID 
 					u.linkedIdentityProviderInstanceIDColumn(),
 				),
 				database.NewColumnCondition(
-					existingHumanUser.idColumn(),
+					existingHumanUser.IDColumn(),
 					u.linkedIdentityProviderInstanceIDColumn(),
 				),
 				database.NewTextCondition(
@@ -99,7 +99,7 @@ func (u userHuman) UpdateIdentityProviderLink(condition database.Condition, chan
 			database.Changes(changes).Write(builder)
 			writeCondition(builder, database.And(
 				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.idColumn(), u.linkedIdentityProviderInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.IDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
 				condition,
 			))
 		}, nil,

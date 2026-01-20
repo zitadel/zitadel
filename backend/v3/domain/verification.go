@@ -1,14 +1,18 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+)
 
 type Verification struct {
-	ID             string     `json:"id" db:"id"`
-	Value          *string    `json:"value" db:"value"`
-	Code           []byte     `json:"code" db:"code"`
-	ExpiresAt      *time.Time `json:"expiresAt" db:"expires_at"`
-	FailedAttempts uint8      `json:"failedAttempts" db:"failed_attempts"`
-	VerifiedAt     time.Time  `json:"verifiedAt" db:"verified_at"`
+	ID             string              `json:"id" db:"id"`
+	Value          *string             `json:"value" db:"value"`
+	Code           *crypto.CryptoValue `json:"code" db:"code"`
+	ExpiresAt      *time.Time          `json:"expiresAt" db:"expires_at"`
+	FailedAttempts uint8               `json:"failedAttempts" db:"failed_attempts"`
+	VerifiedAt     time.Time           `json:"verifiedAt" db:"verified_at"`
 }
 
 type VerificationType interface {
@@ -26,7 +30,7 @@ type VerificationTypeInit struct {
 	// Expiry is the duration after which the verification expires.
 	Expiry *time.Duration
 	// Code is the code to be used for verification.
-	Code []byte
+	Code *crypto.CryptoValue
 	// Value is the value to be set after successful verification.
 	Value *string
 }
@@ -57,7 +61,7 @@ type VerificationTypeUpdate struct {
 	// ID is the ID of the verification.
 	// The id must be set if the the object can have multiple verifications.
 	ID     *string
-	Code   []byte
+	Code   *crypto.CryptoValue
 	Value  *string
 	Expiry *time.Duration
 }
