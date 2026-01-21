@@ -60,6 +60,21 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 				request: &org.AddOrganizationRequest{
 					Name:           "custom org ID",
 					OrganizationId: gu.Ptr("organization-ID"),
+				},
+			},
+			want: &command.OrgSetup{
+				Name:         "custom org ID",
+				CustomDomain: "",
+				Admins:       []*command.OrgSetupAdmin{},
+				OrgID:        "organization-ID",
+			},
+		},
+		{
+			name: "custom organization ID (precedence over org ID)",
+			args: args{
+				request: &org.AddOrganizationRequest{
+					Name:           "custom org ID",
+					OrganizationId: gu.Ptr("organization-ID"),
 					OrgId:          gu.Ptr("org-ID"), // will be ignored in favor of OrganizationId
 				},
 			},
