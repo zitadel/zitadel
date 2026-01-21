@@ -4,33 +4,15 @@ import (
 	"context"
 	"crypto/sha256"
 	"net/smtp"
-	"time"
 
+	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var tokenSourceCache = TokenSourceCache{}
-
-type TokenSourceCache map[string]tokenSourceCacheEntry
-
-type tokenSourceCacheEntry struct {
-	lastUsedAt  time.Time
-	tokenSource oauth2.TokenSource
-}
-
-func (cache TokenSourceCache) Cleanup() {
-	maxAge := 7 * 24 * time.Hour
-	now := time.Now().UTC()
-	oldestAllowed := now.Add(maxAge)
-	for k, v := range tokenSourceCache {
-		if v.lastUsedAt.Before(oldestAllowed) {
-			delete(tokenSourceCache, k)
-		}
-	}
-}
+var tokenSourceCache *lru.TwoQueueCache[string, oauth2.TokenSource]
 
 type XOAuth2AuthConfig struct {
 	User                  string
@@ -74,22 +56,30 @@ func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 		return "", nil, zerrors.ThrowInternal(nil, "SMTP-eRJLyi", "wrong host name")
 	}
 
-	hash := a.config.Hash()
-	entry, ok := tokenSourceCache[hash]
-	if !ok {
-		config := &clientcredentials.Config{
-			ClientID:     a.config.ClientCredentialsAuth.ClientId,
-			ClientSecret: a.config.ClientCredentialsAuth.ClientSecret,
-			Scopes:       a.config.Scopes,
-			TokenURL:     a.config.TokenEndpoint,
+	var err error
+	if tokenSourceCache == nil {
+		tokenSourceCache, err = lru.New2Q[string, oauth2.TokenSource](100)
+		if err != nil {
+			return "", nil, zerrors.ThrowInternal(nil, "SMTP-xcQ4WA", "failed to create token source cache")
 		}
-		entry.tokenSource = config.TokenSource(context.Background())
 	}
 
-	entry.lastUsedAt = time.Now().UTC()
-	tokenSourceCache[hash] = entry
+	hash := a.config.Hash()
+	tokenSource, ok := tokenSourceCache.Get(hash)
+	if !ok {
+		if a.config.ClientCredentialsAuth != nil {
+			config := &clientcredentials.Config{
+				ClientID:     a.config.ClientCredentialsAuth.ClientId,
+				ClientSecret: a.config.ClientCredentialsAuth.ClientSecret,
+				Scopes:       a.config.Scopes,
+				TokenURL:     a.config.TokenEndpoint,
+			}
+			tokenSource = config.TokenSource(context.Background())
+			tokenSourceCache.Add(hash, tokenSource)
+		}
+	}
 
-	token, err := entry.tokenSource.Token()
+	token, err := tokenSource.Token()
 	if err != nil {
 		return "", nil, zerrors.ThrowInternal(err, "SMTP-fjHcJu", "Failed to get token to connect with smtp server")
 	}
