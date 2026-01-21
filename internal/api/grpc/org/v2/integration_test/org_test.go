@@ -113,11 +113,11 @@ func TestServer_AddOrganization(t *testing.T) {
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
 				Name:           integration.OrganizationName(),
-				OrganizationId: gu.Ptr("custom-organization-ID"),
+				OrganizationId: gu.Ptr("custom-organization-ID2"),
 				OrgId:          gu.Ptr("custom-org-ID"), // will be ignored in favor of OrganizationId
 			},
 			want: &org.AddOrganizationResponse{
-				OrganizationId: "custom-organization-ID",
+				OrganizationId: "custom-organization-ID2",
 				CreatedAdmins:  []*org.AddOrganizationResponse_CreatedAdmin{},
 			},
 		},
