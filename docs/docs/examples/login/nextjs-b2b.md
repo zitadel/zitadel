@@ -138,12 +138,12 @@ Let's call this new organization `Demo-Customer`.
 Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users-overview#create-user) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
-### Manager Role
+### Administrator Role
 
 We want to enable Alice to assign roles to users in her organization in a self-service manner.
-To make this happen, we need give Alice an [Manager Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
+To make this happen, we need to assign Alice an [Administrator Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
 
-Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Manager Role `Org Owner`.
+Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Administrator Role `Org Owner`.
 
 Login with your user on the customer organization to validate the setup.
 

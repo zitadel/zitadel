@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Segredo removido com sucesso!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Funções de Gerente do ZITADEL",
+      "TITLE": "Rolhas de administrador do ZITADEL",
       "DESCRIPTION": "Essas são todas as permissões de membros do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
       "ORGCONTEXT": "Você vê todas as organizações e projetos relacionados à organização atualmente selecionada.",
       "USERCONTEXT": "Você vê todas as organizações e projetos para os quais está autorizado. Incluindo outras organizações.",
