@@ -219,7 +219,7 @@
           "DC": "Gdy zgłosisz domenę dla swojej organizacji, użytkownicy, którzy nie używają tej domeny w swojej nazwie logowania, zostaną poproszeni o zmianę swojej nazwy logowania, aby pasowała do zgłoszonej domeny.",
           "INIT": "Gdy użytkownik zostanie utworzony, otrzyma e-mail z linkiem do ustawienia swojego hasła.",
           "PC": "Gdy użytkownik zmieni swoje hasło, otrzyma powiadomienie o tej zmianie, jeśli włączyłeś to w ustawieniach powiadomień.",
-          "PL": "Gdy użytkownik doda metodę uwierzytelniania bez hasła, musi ją aktywować, klikając link w e-mailu.",
+          "PL": "Gdy użytkownik doda metodę uwierzytelniania passkey, musi ją aktywować, klikając link w e-mailu.",
           "PR": "Gdy użytkownik zresetuje swoje hasło, otrzyma e-mail z linkiem do ustawienia nowego hasła.",
           "VE": "Gdy użytkownik zmieni swój adres e-mail, otrzyma e-mail z linkiem do weryfikacji nowego adresu.",
           "VP": "Gdy użytkownik zmieni swój numer telefonu, otrzyma SMS z kodem do weryfikacji nowego numeru.",
@@ -841,13 +841,13 @@
       "TABLESTATE": "Status",
       "NAME": "Nazwa",
       "EMPTY": "Brak ustawionego urządzenia",
-      "TITLE": "Uwierzytelnianie bez hasła",
-      "DESCRIPTION": "Dodaj Metody Uwierzytelniania oparte na WebAuthn, aby zalogować się do ZITADEL bez hasła.",
+      "TITLE": "Uwierzytelnianie passkey",
+      "DESCRIPTION": "Dodaj Metody Uwierzytelniania oparte na WebAuthn, aby zalogować się do ZITADEL passkey.",
       "MANAGE_DESCRIPTION": "Zarządzaj drugim czynnikiem uwierzytelniania swoich użytkowników.",
       "U2F": "Dodaj metodę",
       "U2F_DIALOG_TITLE": "Zweryfikuj uwierzytelniającego",
-      "U2F_DIALOG_DESCRIPTION": "Wprowadź nazwę dla używanego logowania bez hasła",
-      "U2F_SUCCESS": "Uwierzytelnianie bez hasła utworzone pomyślnie!",
+      "U2F_DIALOG_DESCRIPTION": "Wprowadź nazwę dla używanego logowania passkey",
+      "U2F_SUCCESS": "Uwierzytelnianie passkey utworzone pomyślnie!",
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa urządzenia uwierzytelniającego",
       "TYPE": {
@@ -862,17 +862,17 @@
         "3": "Usunięty"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Usuń metodę uwierzytelniania bez hasła",
-        "DELETE_DESCRIPTION": "Zamierzasz usunąć metodę uwierzytelniania bez hasła. Czy na pewno?",
-        "ADD_TITLE": "Uwierzytelnianie bez hasła",
-        "ADD_DESCRIPTION": "Wybierz jedną z dostępnych opcji tworzenia metody uwierzytelniania bez hasła.",
+        "DELETE_TITLE": "Usuń metodę uwierzytelniania passkey",
+        "DELETE_DESCRIPTION": "Zamierzasz usunąć metodę uwierzytelniania passkey. Czy na pewno?",
+        "ADD_TITLE": "Uwierzytelnianie passkey",
+        "ADD_DESCRIPTION": "Wybierz jedną z dostępnych opcji tworzenia metody uwierzytelniania passkey.",
         "SEND_DESCRIPTION": "Wyślij link rejestracyjny na swój adres e-mail.",
         "SEND": "Wyślij link rejestracyjny",
         "SENT": "E-mail został pomyślnie dostarczony. Sprawdź swoją skrzynkę, aby kontynuować konfigurację.",
         "QRCODE_DESCRIPTION": "Wygeneruj kod QR do skanowania z innym urządzeniem.",
         "QRCODE": "Wygeneruj kod QR",
         "QRCODE_SCAN": "Zeskanuj ten kod QR, aby kontynuować konfigurację na swoim urządzeniu.",
-        "NEW_DESCRIPTION": "Użyj tego urządzenia do skonfigurowania uwierzytelniania bez hasła.",
+        "NEW_DESCRIPTION": "Użyj tego urządzenia do skonfigurowania uwierzytelniania passkey.",
         "NEW": "Dodaj nowy"
       }
     },
@@ -1143,7 +1143,7 @@
       "EMAILVERIFICATIONSENT": "Wysłano kod weryfikacyjny e-maila.",
       "OTPREMOVED": "OTP został usunięty.",
       "U2FREMOVED": "Czynnik został usunięty.",
-      "PASSWORDLESSREMOVED": "Usunięto hasło.",
+      "PASSWORDLESSREMOVED": "Usunięto Passkey.",
       "INITIALPASSWORDSET": "Ustawiono hasło początkowe.",
       "PASSWORDNOTIFICATIONSENT": "Wysłano powiadomienie o zmianie hasła.",
       "PASSWORDCHANGED": "Hasło zostało zmienione pomyślnie.",
@@ -1156,12 +1156,12 @@
       "MACHINEADDED": "Utworzono użytkownika serwisu!",
       "DELETED": "Użytkownik został usunięty pomyślnie!",
       "UNLOCKED": "Użytkownik został odblokowany pomyślnie!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link rejestracyjny został wysłany pomyślnie.",
+      "PASSWORDLESSREGISTRATIONSENT": "Link rejestracyjny Passkey został wysłany pomyślnie.",
       "SECRETGENERATED": "Sekret wygenerowany pomyślnie!",
       "SECRETREMOVED": "Sekret usunięty pomyślnie!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Role menedżera ZITADEL",
+      "TITLE": "Role administratora ZITADEL",
       "DESCRIPTION": "To są wszystkie uprawnienia członków użytkownika. Możesz je również modyfikować na stronach szczegółów organizacji, projektu lub IAM.",
       "ORGCONTEXT": "Widzisz wszystkie organizacje i projekty, które są związane z aktualnie wybraną organizacją.",
       "USERCONTEXT": "Widzisz wszystkie organizacje i projekty, do których masz dostęp. Włączając inne organizacje.",
@@ -1613,7 +1613,7 @@
         "2": "Weryfikacja e-mail",
         "3": "Weryfikacja telefonu",
         "4": "Resetowanie hasła",
-        "5": "Inicjalizacja bez hasła",
+        "5": "Inicjalizacja passkey",
         "6": "Sekret aplikacji",
         "7": "Hasło jednorazowe (OTP) - SMS",
         "8": "Hasło jednorazowe (OTP) — e-mail"
@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Powiadomienie",
       "DESCRIPTION": "Określa, na jakie zmiany będą wysyłane powiadomienia.",
-      "PASSWORDCHANGE": "Zmiana hasła"
+      "PASSWORDCHANGE": "Hasło zmienione"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Nadaj logowaniu swój indywidualny styl i modyfikuj jego zachowanie.",
@@ -1842,10 +1842,10 @@
         "usernameChangeText": "Zmiana nazwy użytkownika",
         "verifyMfaOtpText": "Zweryfikuj OTP",
         "verifyMfaU2fText": "Zweryfikuj Universal Second Factor",
-        "passwordlessPromptText": "Prompt bez hasła",
-        "passwordlessRegistrationDoneText": "Rejestracja bez hasła zakończona",
-        "passwordlessRegistrationText": "Rejestracja bez hasła",
-        "passwordlessText": "Bez hasła",
+        "passwordlessPromptText": "Prompt passkey",
+        "passwordlessRegistrationDoneText": "Rejestracja passkey zakończona",
+        "passwordlessRegistrationText": "Rejestracja passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Przegląd zewnętrznej rejestracji użytkownika"
       }
     },
@@ -1859,7 +1859,7 @@
         "VEO": "Zweryfikuj Email OTP",
         "PR": "Resetowanie hasła",
         "DC": "Rejestracja domeny",
-        "PL": "Bez hasła",
+        "PL": "Passkey",
         "PC": "Zmiana hasła",
         "IU": "Zaproś użytkownika"
       },
@@ -2342,8 +2342,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Atrybut imienia",
+    "LASTNAMEATTRIBUTE": "Atrybut nazwiska",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2415,8 +2415,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Bez hasła",
-      "MULTIFACTORDESCRIPTION": "Zdefiniuj tutaj swoje metody wieloskładnikowe do uwierzytelniania bez hasła.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Zdefiniuj tutaj swoje metody wieloskładnikowe do uwierzytelniania passkey.",
       "SECONDFACTORTITLE": "Uwierzytelnianie wieloskładnikowe",
       "SECONDFACTORDESCRIPTION": "Zdefiniuj dalsze możliwe składniki, za pomocą których możesz zabezpieczyć uwierzytelnianie hasłem."
     },
@@ -2458,7 +2458,7 @@
       "DESCRIPTION": "Możesz wybrać predefiniowane lub samodzielnie utworzone dostawców do uwierzytelniania.",
       "SELECTIDPS": "Dostawcy tożsamości"
     },
-    "PASSWORDLESS": "Logowanie bez hasła",
+    "PASSWORDLESS": "Logowanie passkey",
     "PASSWORDLESSTYPE": {
       "0": "Niedozwolone",
       "1": "Dozwolone"

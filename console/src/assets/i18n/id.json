@@ -219,7 +219,7 @@
           "DC": "Saat Anda mengklaim domain untuk organisasi Anda, pengguna yang tidak menggunakan domain ini dalam nama loginnya akan diminta untuk mengubah nama loginnya agar sesuai dengan domain yang diklaim.",
           "INIT": "Saat pengguna dibuat, mereka akan menerima email berisi tautan untuk menyetel kata sandinya.",
           "PC": "Ketika pengguna mengubah kata sandinya, mereka akan menerima pemberitahuan tentang perubahan tersebut jika Anda telah mengaktifkannya di pengaturan pemberitahuan.",
-          "PL": "Saat pengguna menambahkan metode autentikasi tanpa kata sandi, mereka harus mengaktifkannya dengan mengeklik tautan di email.",
+          "PL": "Saat pengguna menambahkan metode autentikasi Passkey, mereka harus mengaktifkannya dengan mengeklik tautan di email.",
           "PR": "Saat pengguna menyetel ulang kata sandinya, mereka akan menerima email berisi tautan untuk menyetel kata sandi baru.",
           "VE": "Saat pengguna mengubah alamat emailnya, mereka akan menerima email berisi tautan untuk memverifikasi alamat baru.",
           "VP": "Saat pengguna mengganti nomor teleponnya, mereka akan menerima SMS berisi kode untuk memverifikasi nomor baru.",
@@ -841,19 +841,19 @@
       "TABLESTATE": "Status",
       "NAME": "Nama",
       "EMPTY": "Tidak ada perangkat yang disetel",
-      "TITLE": "Otentikasi Tanpa Kata Sandi",
-      "DESCRIPTION": "Tambahkan Metode Otentikasi berbasis WebAuthn untuk masuk ke ZITADEL tanpa kata sandi.",
+      "TITLE": "Otentikasi Passkey",
+      "DESCRIPTION": "Tambahkan Metode Otentikasi berbasis WebAuthn untuk masuk ke ZITADEL dengan Passkey.",
       "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
       "U2F": "Tambahkan metode",
       "U2F_DIALOG_TITLE": "Verifikasi pengautentikasi",
-      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Login tanpa kata sandi yang Anda gunakan",
-      "U2F_SUCCESS": "Auth Tanpa Kata Sandi berhasil dibuat!",
+      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Login Passkey yang Anda gunakan",
+      "U2F_SUCCESS": "Auth Passkey berhasil dibuat!",
       "U2F_ERROR": "Terjadi kesalahan saat penyiapan!",
       "U2F_NAME": "Nama Pengautentikasi",
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
         "1": "Kata Sandi Satu Kali (OTP)",
-        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Tidak ada negara bagian",
@@ -862,17 +862,17 @@
         "3": "Dihapus"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Hapus Metode Otentikasi Tanpa Kata Sandi",
-        "DELETE_DESCRIPTION": "Anda akan menghapus metode Otentikasi tanpa kata sandi. Apa kamu yakin?",
-        "ADD_TITLE": "Otentikasi Tanpa Kata Sandi",
-        "ADD_DESCRIPTION": "Pilih salah satu opsi yang tersedia untuk membuat metode autentikasi tanpa kata sandi.",
+        "DELETE_TITLE": "Hapus Passkey",
+        "DELETE_DESCRIPTION": "Anda akan menghapus Passkey. Apa kamu yakin?",
+        "ADD_TITLE": "Otentikasi Passkey",
+        "ADD_DESCRIPTION": "Pilih salah satu opsi yang tersedia untuk membuat Passkey.",
         "SEND_DESCRIPTION": "Kirimkan sendiri tautan pendaftaran ke alamat email Anda.",
         "SEND": "Kirim tautan pendaftaran",
         "SENT": "Email berhasil terkirim. Periksa kotak surat Anda untuk melanjutkan pengaturan.",
         "QRCODE_DESCRIPTION": "Hasilkan kode QR untuk dipindai dengan perangkat lain.",
         "QRCODE": "Hasilkan kode QR",
         "QRCODE_SCAN": "Pindai kode QR ini untuk melanjutkan penyiapan di perangkat Anda.",
-        "NEW_DESCRIPTION": "Gunakan perangkat ini untuk mengatur Tanpa Kata Sandi.",
+        "NEW_DESCRIPTION": "Gunakan perangkat ini untuk mengatur Passkey.",
         "NEW": "Tambahkan Baru"
       }
     },
@@ -888,7 +888,7 @@
       "OTP": "Aplikasi Authenticator untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
       "OTP_DIALOG_TITLE": "Tambahkan OTP",
       "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi autentikator dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
-      "U2F": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifikasi Faktor",
       "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Multifaktor universal yang Anda gunakan.",
       "U2F_SUCCESS": "Faktor berhasil ditambahkan!",
@@ -903,7 +903,7 @@
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
         "1": "Kata Sandi Satu Kali (OTP)",
-        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Tidak ada negara bagian",
@@ -971,8 +971,8 @@
       "CHANGEUSERNAME": "memodifikasi",
       "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
       "CHANGEUSERNAME_DESC": "Masukkan nama baru pada kolom di bawah.",
-      "FIRSTNAME": "Nama Pemberian",
-      "LASTNAME": "Nama keluarga",
+      "FIRSTNAME": "Nama depan",
+      "LASTNAME": "Nama belakang",
       "NICKNAME": "Nama panggilan",
       "DISPLAYNAME": "Nama Tampilan",
       "PREFERREDLOGINNAME": "Nama login pilihan",
@@ -1143,7 +1143,7 @@
       "EMAILVERIFICATIONSENT": "Kode verifikasi email terkirim.",
       "OTPREMOVED": "OTP dihapus.",
       "U2FREMOVED": "Faktor dihilangkan.",
-      "PASSWORDLESSREMOVED": "Tanpa kata sandi dihapus.",
+      "PASSWORDLESSREMOVED": "Passkey dihapus.",
       "INITIALPASSWORDSET": "Kata sandi awal ditetapkan.",
       "PASSWORDNOTIFICATIONSENT": "Pemberitahuan perubahan kata sandi terkirim.",
       "PASSWORDCHANGED": "Kata sandi berhasil diubah.",
@@ -1161,7 +1161,7 @@
       "SECRETREMOVED": "Rahasia berhasil dihapus!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Peran Manajer ZITADEL",
+      "TITLE": "Peran Administrator ZITADEL",
       "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
@@ -1613,7 +1613,7 @@
         "2": "Verifikasi email",
         "3": "Verifikasi telepon",
         "4": "Reset Kata Sandi",
-        "5": "Inisialisasi Tanpa Kata Sandi",
+        "5": "Inisialisasi Passkey",
         "6": "Rahasia Aplikasi",
         "7": "Kata Sandi Satu Kali (OTP) - SMS",
         "8": "Kata Sandi Sekali Pakai (OTP) - Email"
@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Pemberitahuan",
       "DESCRIPTION": "Menentukan perubahan apa, pemberitahuan akan dikirim.",
-      "PASSWORDCHANGE": "Perubahan kata sandi"
+      "PASSWORDCHANGE": "Kata sandi diubah"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Berikan login gaya pribadi Anda dan ubah perilakunya.",
@@ -1843,10 +1843,10 @@
         "usernameChangeText": "Perubahan nama pengguna",
         "verifyMfaOtpText": "Verifikasi OTP",
         "verifyMfaU2fText": "Verifikasi Faktor Kedua Universal",
-        "passwordlessPromptText": "Perintah Tanpa Kata Sandi",
-        "passwordlessRegistrationDoneText": "Pendaftaran Tanpa Kata Sandi Selesai",
-        "passwordlessRegistrationText": "Pendaftaran Tanpa Kata Sandi",
-        "passwordlessText": "Tanpa kata sandi",
+        "passwordlessPromptText": "Instruksi Passkey",
+        "passwordlessRegistrationDoneText": "Pendaftaran Passkey Selesai",
+        "passwordlessRegistrationText": "Pendaftaran Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Ikhtisar Pengguna Registrasi Eksternal"
       }
     },
@@ -1860,13 +1860,13 @@
         "VEO": "Verifikasi OTP Email",
         "PR": "Reset Kata Sandi",
         "DC": "Klaim Domain",
-        "PL": "Tanpa kata sandi",
+        "PL": "Passkey",
         "PC": "Perubahan Kata Sandi",
         "IU": "Mengundang Pengguna"
       },
       "CHIPS": {
-        "firstname": "Nama yang diberikan",
-        "lastname": "Nama keluarga",
+        "firstname": "Nama depan",
+        "lastname": "Nama belakang",
         "code": "Kode",
         "preferredLoginName": "Nama Login Pilihan",
         "displayName": "Nama tampilan",
@@ -2338,8 +2338,8 @@
     "DISPLAYNAMEATTRIBUTE": "Atribut nama tampilan",
     "EMAILATTRIBUTEATTRIBUTE": "Atribut email",
     "EMAILVERIFIEDATTRIBUTE": "Atribut terverifikasi email",
-    "FIRSTNAMEATTRIBUTE": "Atribut nama yang diberikan",
-    "LASTNAMEATTRIBUTE": "Atribut nama keluarga",
+    "FIRSTNAMEATTRIBUTE": "Atribut nama depan",
+    "LASTNAMEATTRIBUTE": "Atribut nama belakang",
     "NICKNAMEATTRIBUTE": "Atribut nama panggilan",
     "PHONEATTRIBUTE": "Atribut telepon",
     "PHONEVERIFIEDATTRIBUTE": "Atribut terverifikasi telepon",
@@ -2411,8 +2411,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Tanpa kata sandi",
-      "MULTIFACTORDESCRIPTION": "Tentukan Multifaktor Anda untuk Otentikasi tanpa kata sandi Anda di sini.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Tentukan Multifaktor Anda untuk Otentikasi Passkey Anda di sini.",
       "SECONDFACTORTITLE": "Otentikasi Multifaktor",
       "SECONDFACTORDESCRIPTION": "Tentukan lebih lanjut kemungkinan faktor yang dapat digunakan untuk mengamankan otentikasi kata sandi Anda."
     },
@@ -2432,12 +2432,12 @@
     "TYPE": "Jenis",
     "MULTIFACTORTYPES": {
       "0": "Tidak dikenal",
-      "1": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Tidak dikenal",
       "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
-      "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
+      "2": "Passkey",
       "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
       "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)",
       "5": "Kode Pemulihan"
@@ -2454,7 +2454,7 @@
       "DESCRIPTION": "Anda dapat memilih penyedia yang telah ditentukan sebelumnya atau dibuat sendiri untuk autentikasi.",
       "SELECTIDPS": "Penyedia identitas"
     },
-    "PASSWORDLESS": "Login Tanpa Kata Sandi",
+    "PASSWORDLESS": "Login Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Tidak diperbolehkan",
       "1": "Diizinkan"

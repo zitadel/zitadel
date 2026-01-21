@@ -146,7 +146,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     consumes: "application/grpc-web+proto";
     produces: "application/grpc-web+proto";
 
-    host: "$CUSTOM-DOMAIN";
+    host: "$CUSTOM_DOMAIN";
     base_path: "/management/v1";
 
     external_docs: {
@@ -166,8 +166,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             value: {
                 type: TYPE_OAUTH2;
                 flow: FLOW_ACCESS_CODE;
-                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+                authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
                 scopes: {
                     scope: {
                         key: "openid";
@@ -193,7 +193,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     extensions: {
         key: "x-zitadel-orgid";
         value: {
-            string_value: "$YOUR-ORGANIZATION";
+            string_value: "$YOUR_ORGANIZATION";
         }
     }
 };
@@ -1590,11 +1590,11 @@ service ManagementService {
         };
     }
 
-    // Search Passwordless/Passkey authentication
+    // Search Passkey authentication
     //
     // Deprecated: use [user service v2 ListPasskeys](apis/resources/user_service_v2/user-service-list-passkeys.api.mdx) instead.
     //
-    // Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
+    // Get a list of configured passkey authentication methods from the user. Passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1625,11 +1625,11 @@ service ManagementService {
         };
     }
 
-    // Add Passwordless/Passkey Registration Link
+    // Add Passkey Registration Link
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1659,11 +1659,11 @@ service ManagementService {
         };
     }
 
-    // Send Passwordless/Passkey Registration Link
+    // Send Passkey Registration Link
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1694,11 +1694,11 @@ service ManagementService {
         };
     }
 
-    // Delete Passwordless/Passkey
+    // Delete Passkey
     //
     // Deprecated: use [user service v2 RemovePasskey](apis/resources/user_service_v2/user-service-remove-passkey.api.mdx) instead.
     //
-    // Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
+    // Remove a configured passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -2285,7 +2285,7 @@ service ManagementService {
     //
     // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2/zitadel-org-v-2-organization-service-add-organization.api.mdx) instead
     //
-    // Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization.
+    // Create a new organization. Based on the provided name a domain will be generated to be able to identify users within an organization.
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -6881,7 +6881,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Custom Password Change Message Text";
+            summary: "Get Custom Password Changed Message Text";
             description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {
@@ -6905,7 +6905,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
-            summary: "Get Default Password Change Message Text";
+            summary: "Get Default Password Changed Message Text";
             description: "Get the default text of the password-changed message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when the password of a user has been changed."
             parameters: {
                 headers: {

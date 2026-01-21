@@ -43,7 +43,7 @@ By default, all of these login methods are allowed and can be adjusted by [Manag
 
 ### Support for multiple authentication methods
 
-The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
+The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passkey authentication method.
 The second factor (2FA) and multi-factor authentication methods (MFA) available in ZITADEL include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
@@ -76,7 +76,7 @@ While the hosted login page provides a default authentication interface out-of-t
 Developers can customize elements such as logos, colors, and messaging to ensure a seamless integration with their application's user interface.
 
 :::info Customization and Branding
-The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
+The login page can be changed by customizing different branding aspects and you can define a Custom Domain for the login (eg, login.acme.com).
 
 By default, the displayed branding is defined [based on the user's domain](/docs/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 :::
@@ -122,9 +122,9 @@ You can disable the prompt, in case multifactor authentication is not enforced b
 
 #### Enroll passkeys
 
-Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
+Users can select a button to initiate passkey login or use a fall-back method (ie. login with username/password), if available.
 
-The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
+The [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the operating system and browser.
@@ -150,14 +150,14 @@ For the first implementation we have excluded the following features:
 
 - **Create Users:** The new TypeScript Login app is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
-- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
+- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passkey authentication (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem
   can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
 
 #### Step-by-step Guide
 
-**Using the new login:** To use the new login without changing your current setup, the easiest way is to visit `https://<CUSTOM_DOMAIN>/ui/v2/login` on your Zitadel Cloud custom domain.
+**Using the new login:** To use the new login without changing your current setup, the easiest way is to visit `https://${CUSTOM_DOMAIN}/ui/v2/login` on your Zitadel Cloud Custom Domain.
 You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/zitadel repo and use the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to run your login code on Vercel.
@@ -186,7 +186,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
            - PAT
            - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
-        5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
+        5. Add the domain where your login UI is hosted to the [Trusted Domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
         6. Use the new login in your application.
             <PreventLockout/>
             You have three different options on how to achieve this:

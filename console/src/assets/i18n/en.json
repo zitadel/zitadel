@@ -219,7 +219,7 @@
           "DC": "When you claim a domain for your organization, users who don't use this domain in their login name will be prompted to change their login name to match the claimed domain.",
           "INIT": "When a user is created, they will receive an email with a link to set their password.",
           "PC": "When a user changes their password, they will receive a notification about the change if you have enabled this in the notification settings.",
-          "PL": "When a user adds a passwordless authentication method, they need to activate it by clicking a link in an email.",
+          "PL": "When a user adds a passkey authentication method, they need to activate it by clicking a link in an email.",
           "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Customize the login form.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Username and Password allowed",
-            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passwordless authentication or with an external identity provider."
+            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passkey authentication or with an external identity provider."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "User Registration allowed",
@@ -841,19 +841,19 @@
       "TABLESTATE": "Status",
       "NAME": "Name",
       "EMPTY": "No device set",
-      "TITLE": "Passwordless Authentication",
-      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
+      "TITLE": "Passkey Authentication",
+      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL with a passkey.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "U2F": "Add method",
       "U2F_DIALOG_TITLE": "Verify authenticator",
-      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
-      "U2F_SUCCESS": "Passwordless Auth created successfully!",
+      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passkey Login",
+      "U2F_SUCCESS": "Passkey Auth created successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
-        "2": "Fingerprint, Security Keys, Face ID and other"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "No State",
@@ -862,17 +862,17 @@
         "3": "Deleted"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Remove Passwordless Authentication Method",
-        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?",
-        "ADD_TITLE": "Passwordless Authentication",
-        "ADD_DESCRIPTION": "Select one of the available options for creating a passwordless authentication method.",
+        "DELETE_TITLE": "Remove Passkey",
+        "DELETE_DESCRIPTION": "You are about to delete a passkey. Are you sure?",
+        "ADD_TITLE": "Passkey Authentication",
+        "ADD_DESCRIPTION": "Select one of the available options for creating a passkey.",
         "SEND_DESCRIPTION": "Send yourself a registration link to your email address.",
         "SEND": "Send registration link",
         "SENT": "The email was successfully delivered. Check your mailbox to continue with the setup.",
         "QRCODE_DESCRIPTION": "Generate QR code for scanning with another device.",
         "QRCODE": "Generate QR code",
         "QRCODE_SCAN": "Scan this QR code to continue with the setup on your device.",
-        "NEW_DESCRIPTION": "Use this device to set up Passwordless.",
+        "NEW_DESCRIPTION": "Use this device to set up passkey.",
         "NEW": "Add New"
       }
     },
@@ -888,7 +888,7 @@
       "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-      "U2F": "Fingerprint, Security Keys, Face ID and other",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
       "U2F_SUCCESS": "Factor added successfully!",
@@ -903,7 +903,7 @@
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
-        "2": "Fingerprint, Security Keys, Face ID and other"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "No State",
@@ -971,8 +971,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "Given Name",
-      "LASTNAME": "Family Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERREDLOGINNAME": "Preferred login name",
@@ -1143,7 +1143,7 @@
       "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
       "OTPREMOVED": "OTP removed.",
       "U2FREMOVED": "Factor removed.",
-      "PASSWORDLESSREMOVED": "Passwordless removed.",
+      "PASSWORDLESSREMOVED": "Passkey removed.",
       "INITIALPASSWORDSET": "Initial password set.",
       "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
       "PASSWORDCHANGED": "Password changed successfully.",
@@ -1161,7 +1161,7 @@
       "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roles",
+      "TITLE": "ZITADEL Administrator Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
@@ -1613,7 +1613,7 @@
         "2": "Email verification",
         "3": "Phone verification",
         "4": "Password Reset",
-        "5": "Passwordless Initialization",
+        "5": "Passkey Initialization",
         "6": "App Secret",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
@@ -1692,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Determines on which changes, notifications will be sent.",
-      "PASSWORDCHANGE": "Password change"
+      "PASSWORDCHANGE": "Password changed"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
@@ -1842,10 +1842,10 @@
         "usernameChangeText": "Username change",
         "verifyMfaOtpText": "Verify OTP",
         "verifyMfaU2fText": "Verify Universal Second Factor",
-        "passwordlessPromptText": "Passwordless Prompt",
-        "passwordlessRegistrationDoneText": "Passwordless Registration Done",
-        "passwordlessRegistrationText": "Passwordless Registration",
-        "passwordlessText": "Passwordless",
+        "passwordlessPromptText": "Passkey Prompt",
+        "passwordlessRegistrationDoneText": "Passkey Registration Done",
+        "passwordlessRegistrationText": "Passkey Registration",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "External Registration User Overview"
       }
     },
@@ -1859,13 +1859,13 @@
         "VEO": "Verify Email OTP",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "Passwordless",
+        "PL": "Passkey",
         "PC": "Password Change",
         "IU": "Invite User"
       },
       "CHIPS": {
-        "firstname": "Given name",
-        "lastname": "Family name",
+        "firstname": "First name",
+        "lastname": "Last name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -2337,8 +2337,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Given name attribute",
-    "LASTNAMEATTRIBUTE": "Family name attribute",
+    "FIRSTNAMEATTRIBUTE": "First name attribute",
+    "LASTNAMEATTRIBUTE": "Last name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2410,8 +2410,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Passwordless",
-      "MULTIFACTORDESCRIPTION": "Define your Multifactors for your passwordless Authentication here.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Define your Multifactors for your Passkey here.",
       "SECONDFACTORTITLE": "Multifactor Authentication",
       "SECONDFACTORDESCRIPTION": "Define further possible factors with which you can secure your password authentication."
     },
@@ -2431,12 +2431,12 @@
     "TYPE": "Type",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "Fingerprint, Security Keys, Face ID and other"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
       "1": "One Time Password by Authenticator App (TOTP)",
-      "2": "Fingerprint, Security Keys, Face ID and other",
+      "2": "Passkey",
       "3": "One Time Password by Email (Email OTP)",
       "4": "One Time Password by SMS (SMS OTP)",
       "5": "Recovery Codes"
@@ -2453,7 +2453,7 @@
       "DESCRIPTION": "You can select predefined or self-created providers for authentication.",
       "SELECTIDPS": "Identity providers"
     },
-    "PASSWORDLESS": "Passwordless Login",
+    "PASSWORDLESS": "Passkey Login",
     "PASSWORDLESSTYPE": {
       "0": "Not allowed",
       "1": "Allowed"

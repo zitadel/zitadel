@@ -25,31 +25,6 @@
       "destination": "/docs"
     },
     {
-      "source": "/docs/category/apis/:slug*",
-      "destination": "/docs/apis/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/mgmt/:slug*",
-      "destination": "/docs/apis/resources/mgmt/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/auth/:slug*",
-      "destination": "/docs/apis/resources/auth/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/system/:slug*",
-      "destination": "/docs/apis/resources/system/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/admin/:slug*",
-      "destination": "/docs/apis/resources/admin/:slug*",
-      "permanent": true
-    },
-    {
       "source": "/docs/apis/actionsv2/introduction",
       "destination": "/docs/apis/actions/v2/usage",
       "permanent": true
