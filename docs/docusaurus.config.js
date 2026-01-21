@@ -1,3 +1,5 @@
+const { themes } = require('prism-react-renderer');
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: "ZITADEL Docs",
@@ -182,6 +184,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     prism: {
+      theme: themes.github,
+      darkTheme: themes.dracula,
       additionalLanguages: [
         "csharp",
         "dart",
