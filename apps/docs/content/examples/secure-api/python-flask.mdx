@@ -7,12 +7,12 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 ## Overview
 
-![](../../../public/img/python-flask/1.png)
+![Overview](/img/python-flask/1.png)
 
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
-The API will validate the access token on the [introspect endpoint](/apis/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from ZITADEL.
+The API will validate the access token on the [introspect endpoint](/apis/openidoauth/endpoints#introspection_endpoint) and will receive the user's roles from ZITADEL.
 
 The API application uses [Client Secret Basic](/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
@@ -27,13 +27,13 @@ In order to run the example you need to have `python3` and `pip3` installed.
 
 ### ZITADEL configuration for the API
 
-![](../../../public/img/python-flask/2.png)
+![Create API application](/img/python-flask/2.png)
 
 You need to setup a couple of things in ZITADEL. 
 
-1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/guides/start/quickstart#3-create-your-first-instance). Also, create a new project by following the steps [here](/guides/start/quickstart#4-create-your-first-project-and-app).
+1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/guides/start/quickstart#3-create-your-zitadel-instance). Also, create a new project by following the steps [here](/guides/start/quickstart#4-create-your-project-and-application).
 
-2. You must create an API application in your project. Follow [this guide](/guides/manage/console/applications-overview) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application. 
+2. You must create an API application in your project. Follow [this guide](/guides/manage/console/applications-overview) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application.
 
 ### Create the API
 
@@ -64,7 +64,7 @@ def handle_auth_error(ex: ValidatorError) -> Response:
     response.status_code = ex.status_code
     return response
 
-@APP.route("/img/api/public")
+@APP.route("/api/public")
 def public():
     """No access token required."""
     response = (
@@ -73,7 +73,7 @@ def public():
     return jsonify(message=response)
 
 
-@APP.route("/img/api/private")
+@APP.route("/api/private")
 @require_auth(None)
 def private():
     """A valid access token is required."""
@@ -83,7 +83,7 @@ def private():
     return jsonify(message=response)
 
 
-@APP.route("/img/api/private-scoped")
+@APP.route("/api/private-scoped")
 @require_auth(["read:messages"])
 def private_scoped():
     """A valid access token and scope are required."""
@@ -99,9 +99,9 @@ if __name__ == "__main__":
 The API has three routes:
 
 <ul>
-<li> "/img/api/public" - No access token is required.</li>
-<li>"/img/api/private" - A valid access token is required.</li>
-<li>"/img/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
+<li> "/api/public" - No access token is required.</li>
+<li>"/api/private" - A valid access token is required.</li>
+<li>"/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
 </ul>
 
 The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from ZITADEL using ZITADEL's introspection endpoint.
@@ -180,7 +180,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         return res
 ```
 
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart).
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart#5-collect-your-integration-keys).
 
 ```python
 ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"
@@ -190,11 +190,11 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ### ZITADEL configuration to create a service user
 
-![](../../../public/img/python-flask/3.png)
+![Create a service user](/img/python-flask/3.png)
 
-1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
-2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project. 
-3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
+1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat).
+2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
+3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization.
 
 
 ### Run the API
