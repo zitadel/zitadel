@@ -19,10 +19,6 @@ vi.mock("@zitadel/client", () => ({
   timestampDate: (ts: any) => new Date(ts.seconds * 1000),
 }));
 
-vi.mock("@zitadel/client/v2", () => ({
-  createUserServiceClient: vi.fn(),
-}));
-
 vi.mock("../service-url", () => ({
   getServiceConfig: vi.fn(),
 }));
@@ -74,8 +70,6 @@ describe("checkSessionAndSetPassword", () => {
   let mockListAuthenticationMethodTypes: any;
   let mockGetLoginSettings: any;
   let mockSetPassword: any; // Service account
-  let mockCreateUserServiceClient: any; // User session
-  let mockSetPasswordUser: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -84,7 +78,6 @@ describe("checkSessionAndSetPassword", () => {
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieById } = await import("../cookies");
     const { getSession, listAuthenticationMethodTypes, getLoginSettings, setPassword } = await import("../zitadel");
-    const { createUserServiceClient } = await import("@zitadel/client/v2");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
@@ -93,7 +86,6 @@ describe("checkSessionAndSetPassword", () => {
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockSetPassword = vi.mocked(setPassword);
-    mockCreateUserServiceClient = vi.mocked(createUserServiceClient);
 
     mockHeaders.mockResolvedValue({});
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
@@ -118,20 +110,14 @@ describe("checkSessionAndSetPassword", () => {
     mockGetLoginSettings.mockResolvedValue({ forceMfa: false });
 
     // Mock user service client
-    mockSetPasswordUser = vi.fn().mockResolvedValue({});
-    mockCreateUserServiceClient.mockReturnValue({
-      setPassword: mockSetPasswordUser,
-    });
 
     mockSetPassword.mockResolvedValue({});
   });
 
-  test("should use user session when no MFA is configured", async () => {
+  test("should use service account when no MFA is configured", async () => {
     await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
 
-    expect(mockCreateUserServiceClient).toHaveBeenCalled();
-    expect(mockSetPasswordUser).toHaveBeenCalled();
-    expect(mockSetPassword).not.toHaveBeenCalled();
+    expect(mockSetPassword).toHaveBeenCalled();
   });
 
   test("should use service account when MFA is configured but NOT verified in session", async () => {
@@ -154,13 +140,10 @@ describe("checkSessionAndSetPassword", () => {
 
     await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
 
-    // EXPECTATION: Should use service account (mockSetPassword)
-    // CURRENTLY: Will fail this test and use user session
     expect(mockSetPassword).toHaveBeenCalled();
-    expect(mockCreateUserServiceClient).not.toHaveBeenCalled();
   });
 
-  test("should use user session when MFA is configured AND verified in session", async () => {
+  test("should use service account when MFA is configured AND verified in session", async () => {
     // User has TOTP configured
     mockListAuthenticationMethodTypes.mockResolvedValue({
       authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
@@ -179,8 +162,7 @@ describe("checkSessionAndSetPassword", () => {
 
     await checkSessionAndSetPassword({ sessionId: "session123", password: "newpassword" });
 
-    expect(mockCreateUserServiceClient).toHaveBeenCalled();
-    expect(mockSetPassword).not.toHaveBeenCalled();
+    expect(mockSetPassword).toHaveBeenCalled();
   });
 
   test("should fail when MFA is configured but not verified, and password verification is too old", async () => {
