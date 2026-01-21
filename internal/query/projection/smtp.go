@@ -85,7 +85,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientId, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthScope, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SMTPConfigSMTPColumnXOAuth2AuthScope, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SMTPConfigSMTPColumnInstanceID, SMTPConfigSMTPColumnID),
 			smtpConfigSMTPTableSuffix,
