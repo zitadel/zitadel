@@ -1,0 +1,490 @@
+Login:
+  Title: Velkommen tilbake!
+  Description: Skriv inn påloggingsinformasjonen din.
+  TitleLinking: Pålogging for brukerkobling
+  DescriptionLinking: Skriv inn påloggingsinformasjonen din for å koble din eksterne bruker.
+  LoginNameLabel: Påloggingsnavn
+  UsernamePlaceHolder: brukernavn
+  LoginnamePlaceHolder: brukernavn@domene
+  ExternalUserDescription: Logg inn med en ekstern bruker.
+  MustBeMemberOfOrg: Brukeren må være medlem av organisasjonen {{.OrgName}}.
+  RegisterButtonText: Registrer
+  NextButtonText: Neste
+LDAP:
+  Title: Pålogging
+  Description: Skriv inn påloggingsinformasjonen din.
+  LoginNameLabel: Påloggingsnavn
+  PasswordLabel: Passord
+  NextButtonText: Neste
+SelectAccount:
+  Title: Velg konto
+  Description: Bruk kontoen din
+  TitleLinking: Velg konto for brukerkobling
+  DescriptionLinking: Velg kontoen din for å koble med din eksterne bruker.
+  OtherUser: Annen bruker
+  SessionState0: aktiv
+  SessionState1: Logget ut
+  MustBeMemberOfOrg: Brukeren må være medlem av organisasjonen {{.OrgName}}.
+Password:
+  Title: Passord
+  Description: Skriv inn påloggingsinformasjonen din.
+  PasswordLabel: Passord
+  MinLength: Må være minst
+  MinLengthp2: tegn langt.
+  MaxLength: Må være under 70 tegn langt.
+  HasUppercase: Må inneholde en stor bokstav.
+  HasLowercase: Må inneholde en liten bokstav.
+  HasNumber: Må inneholde et tall.
+  HasSymbol: Må inneholde et symbol.
+  Confirmation: Passordbekreftelse samsvarer.
+  ResetLinkText: Tilbakestill passord
+  BackButtonText: Tilbake
+  NextButtonText: Neste
+UsernameChange:
+  Title: Endre brukernavn
+  Description: Angi ditt nye brukernavn
+  UsernameLabel: Brukernavn
+  CancelButtonText: Avbryt
+  NextButtonText: Neste
+UsernameChangeDone:
+  Title: Brukernavn endret
+  Description: Brukernavnet ditt ble endret.
+  NextButtonText: Neste
+InitPassword:
+  Title: Angi passord
+  Description: Du har mottatt en kode som du må skrive inn i skjemaet nedenfor.
+  CodeLabel: Kode
+  NewPasswordLabel: Nytt passord
+  NewPasswordConfirmLabel: Bekreft passord
+  ResendButtonText: Send kode på nytt
+  NextButtonText: Neste
+InitPasswordDone:
+  Title: Passord angitt
+  Description: Passordet ble angitt
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+InitUser:
+  Title: Aktiver bruker
+  Description: Verifiser e-posten din med koden nedenfor og angi passordet ditt.
+  CodeLabel: Kode
+  NewPasswordLabel: Nytt passord
+  NewPasswordConfirm: Bekreft passord
+  NextButtonText: Neste
+  ResendButtonText: Send kode på nytt
+InitUserDone:
+  Title: Bruker aktivert
+  Description: E-post verifisert og passord angitt
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+InviteUser:
+  Title: Invitasjon til {{.ApplicationName}}
+  Description: Verifiser e-posten din med koden nedenfor og angi passordet ditt.
+  CodeLabel: Kode
+  NewPasswordLabel: Nytt passord
+  NewPasswordConfirm: Bekreft passord
+  NextButtonText: Neste
+  ResendButtonText: Send kode på nytt
+InitMFAPrompt:
+  Title: Oppsett av 2-faktor
+  Description: 2-faktorautentisering gir deg ekstra sikkerhet for kontoen din.
+  Provider0: Autentiseringsapp (f.eks. Google/Microsoft Authenticator, Authy)
+  Provider1: Enhetsavhengig (f.eks. FaceID, Windows Hello, fingeravtrykk)
+  Provider3: OTP via SMS
+  Provider4: OTP via e-post
+  NextButtonText: Neste
+  SkipButtonText: Hopp over
+InitMFAOTP:
+  Title: 2-faktorverifisering
+  Description: Opprett din 2-faktor. Last ned en autentiseringsapp hvis du ikke allerede har en.
+  OTPDescription: Skann koden med autentiseringsappen din (f.eks. Google/Microsoft Authenticator, Authy).
+  SecretLabel: Hemmelighet
+  CodeLabel: Kode
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+InitMFAOTPSMS:
+  Title: 2-faktorverifisering
+  DescriptionPhone: Opprett din 2-faktor. Skriv inn telefonnummeret ditt for å verifisere det.
+  DescriptionCode: Opprett din 2-faktor. Skriv inn den mottatte koden for å verifisere telefonnummeret ditt.
+  PhoneLabel: Telefon
+  CodeLabel: Kode
+  EditButtonText: Rediger
+  ResendButtonText: Send kode på nytt
+  NextButtonText: Neste
+InitMFAU2F:
+  Title: Legg til sikkerhetsnøkkel
+  Description: En sikkerhetsnøkkel er en verifiseringsmetode som kan være innebygd i enheten din eller en fysisk nøkkel.
+  TokenNameLabel: Navn på sikkerhetsnøkkel / enhet
+  NotSupported: WebAuthN støttes ikke av nettleseren din. Sørg for at den er oppdatert eller bruk en annen metode.
+  RegisterTokenButtonText: Legg til sikkerhetsnøkkel
+  ErrorRetry: Prøv igjen, opprett en ny utfordring eller velg en annen metode.
+InitMFADone:
+  Title: 2-faktor verifisert
+  Description: Flott! Du har satt opp 2-faktor og gjort kontoen din sikrere.
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+MFAProvider:
+  Provider0: Autentiseringsapp (f.eks. Google/Microsoft Authenticator, Authy)
+  Provider1: Enhetsavhengig (f.eks. FaceID, Windows Hello, fingeravtrykk)
+  Provider3: OTP via SMS
+  Provider4: OTP via e-post
+  ChooseOther: eller velg et annet alternativ
+VerifyMFAOTP:
+  Title: Verifiser 2-faktor
+  Description: Verifiser din andre faktor
+  CodeLabel: Kode
+  NextButtonText: Neste
+VerifyOTP:
+  Title: Verifiser 2-faktor
+  Description: Verifiser din andre faktor
+  CodeLabel: Kode
+  ResendButtonText: Send kode på nytt
+  NextButtonText: Neste
+VerifyMFAU2F:
+  Title: 2-faktorverifisering
+  Description: Verifiser din 2-faktor med den registrerte enheten (f.eks. FaceID, Windows Hello, fingeravtrykk).
+  NotSupported: WebAuthN støttes ikke av nettleseren din. Sørg for at den er oppdatert eller bruk en annen metode.
+  ErrorRetry: Prøv igjen, opprett en ny forespørsel eller velg en annen metode.
+  ValidateTokenButtonText: Verifiser 2-faktor
+Passwordless:
+  Title: Logg inn uten passord
+  Description: Logg inn med autentiseringsmetoder levert av enheten din, som FaceID, Windows Hello eller fingeravtrykk.
+  NotSupported: WebAuthN støttes ikke av nettleseren din. Sørg for at den er oppdatert eller bruk en annen metode.
+  ErrorRetry: Prøv igjen, opprett en ny utfordring eller velg en annen metode.
+  LoginWithPwButtonText: Logg inn med passord
+  ValidateTokenButtonText: Logg inn uten passord
+PasswordlessPrompt:
+  Title: Oppsett av passordløs pålogging
+  Description: Vil du sette opp passordløs pålogging? (Autentisering med FaceID, Windows Hello, fingeravtrykk osv.)
+  DescriptionInit: Du må sette opp passordløs pålogging. Bruk lenken du ble sendt for å fullføre oppsettet.
+  PasswordlessButtonText: Bruk passordløs
+  NextButtonText: Neste
+  SkipButtonText: Hopp over
+PasswordlessRegistration:
+  Title: Legg til passordløs innlogging
+  Description: Legg til autentiseringen din ved å oppgi et navn (f.eks. MinMobiltelefon) og autentisere med enheten din.
+  TokenNameLabel: Navn på enheten
+  NotSupported: WebAuthN støttes ikke av nettleseren din. Sørg for at den er oppdatert eller bruk en annen metode.
+  RegisterTokenButtonText: Registrer passordløs
+  ErrorRetry: Prøv igjen, opprett en ny utfordring eller velg en annen metode.
+PasswordlessRegistrationDone:
+  Title: Passordløs pålogging konfigurert
+  Description: Enhet for passordløs pålogging lagt til.
+  DescriptionClose: Du kan nå lukke dette vinduet.
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+PasswordChange:
+  Title: Passordet til brukeren er endret
+  Description: Endre passordet ditt. Skriv inn ditt gamle og nye passord.
+  ExpiredDescription: Passordet ditt har utløpt og må endres. Skriv inn ditt gamle og nye passord.
+  OldPasswordLabel: Gammelt passord
+  NewPasswordLabel: Nytt passord
+  NewPasswordConfirmLabel: Passordbekreftelse
+  CancelButtonText: Avbryt
+  NextButtonText: Neste
+  Footer: Bunntekst
+PasswordChangeDone:
+  Title: Endre passord
+  Description: Passordet ditt ble endret.
+  NextButtonText: Neste
+PasswordResetDone:
+  Title: Lenke for tilbakestilling av passord sendt
+  Description: Sjekk e-posten din for å tilbakestille passordet.
+  NextButtonText: Neste
+EmailVerification:
+  Title: E-postverifisering
+  Description: Vi har sendt deg en e-post for å verifisere adressen din. Skriv inn koden fra e-posten.
+  CodeLabel: Kode
+  NextButtonText: Neste
+  ResendButtonText: Send kode på nytt
+EmailVerificationDone:
+  Title: E-postverifisering
+  Description: E-postadressen din er verifisert.
+  NextButtonText: Neste
+  CancelButtonText: Avbryt
+  LoginButtonText: Logg inn
+RegisterOption:
+  Title: Registreringsalternativer
+  Description: Velg hvordan du vil registrere deg
+  RegisterUsernamePasswordButtonText: Med brukernavn og passord
+  ExternalLoginDescription: eller registrer med en ekstern bruker
+  LoginButtonText: Logg inn
+RegistrationUser:
+  Title: Registrering
+  Description: Skriv inn brukerinformasjonen din. E-postadressen din vil bli brukt som påloggingsnavn.
+  DescriptionOrgRegister: Skriv inn brukerinformasjonen din.
+  EmailLabel: E-post
+  UsernameLabel: Brukernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Etternavn
+  LanguageLabel: Språk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  GenderLabel: Kjønn
+  Female: Kvinne
+  Male: Mann
+  Diverse: mangfoldig / X
+  PasswordLabel: Passord
+  PasswordConfirmLabel: Passordbekreftelse
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg godtar
+  TosLinkText: brukervilkårene
+  PrivacyConfirm: Jeg godtar
+  PrivacyLinkText: personvernerklæringen
+  ExternalLogin: eller registrer med en ekstern bruker
+  BackButtonText: Logg inn
+  NextButtonText: Neste
+ExternalRegistrationUserOverview:
+  Title: Registrering av ekstern bruker
+  Description: Vi har hentet brukerdetaljene dine fra den valgte leverandøren. Rett opp ved behov.
+  EmailLabel: E-post
+  UsernameLabel: Brukernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Etternavn
+  NicknameLabel: Kallenavn
+  PhoneLabel: Telefonnummer
+  LanguageLabel: Språk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg godtar
+  TosLinkText: brukervilkårene
+  PrivacyConfirm: Jeg godtar
+  PrivacyLinkText: personvernerklæringen
+  ExternalLogin: eller registrer med en ekstern bruker
+  BackButtonText: Tilbake
+  NextButtonText: Lagre
+RegistrationOrg:
+  Title: Organisasjonsregistrering
+  Description: Skriv inn organisasjonsnavnet og brukerinformasjonen din.
+  OrgNameLabel: Organisasjonsnavn
+  EmailLabel: E-post
+  UsernameLabel: Brukernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Etternavn
+  PasswordLabel: Passord
+  PasswordConfirmLabel: Passordbekreftelse
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg godtar
+  TosLinkText: brukervilkårene
+  PrivacyConfirm: Jeg godtar
+  PrivacyLinkText: personvernerklæringen
+  SaveButtonText: Opprett organisasjon
+LoginSuccess:
+  Title: Pålogging vellykket
+  AutoRedirectDescription: Du blir automatisk sendt tilbake til applikasjonen din.
+  RedirectedDescription: Du kan nå lukke dette vinduet.
+  NextButtonText: Neste
+LogoutDone:
+  Title: Logget ut
+  Description: Du har logget ut.
+  LoginButtonText: Logg inn
+LinkingUserPrompt:
+  Title: Eksisterende bruker funnet
+  Description: "Vil du koble til din eksisterende konto:"
+  LinkButtonText: Koble
+  OtherButtonText: Andre alternativer
+LinkingUsersDone:
+  Title: Kobling av bruker
+  Description: Bruker koblet.
+  CancelButtonText: Avbryt
+  NextButtonText: Neste
+ExternalNotFound:
+  Title: Ekstern bruker ikke funnet
+  Description: Ekstern bruker ikke funnet. Vil du koble brukeren din eller registrere automatisk?
+  LinkButtonText: Koble
+  AutoRegisterButtonText: Registrer
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg godtar
+  TosLinkText: brukervilkårene
+  PrivacyConfirm: Jeg godtar
+  PrivacyLinkText: personvernerklæringen
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+DeviceAuth:
+  Title: Enhetsautorisasjon
+  UserCode:
+    Label: Brukerkode
+    Description: Skriv inn brukerkoden som vises på enheten.
+    ButtonNext: Neste
+  Action:
+    Description: Gi enhetstilgang.
+    GrantDevice: du er i ferd med å gi enheten
+    AccessToScopes: tilgang til følgende omfang
+    Button:
+      Allow: Tillat
+      Deny: Avslå
+  Done:
+    Description: Ferdig.
+    Approved: Enhetsautorisasjon godkjent. Du kan nå gå tilbake til enheten.
+    Denied: Enhetsautorisasjon avslått. Du kan nå gå tilbake til enheten.
+Footer:
+  PoweredBy: Drevet av
+  Tos: Brukervilkår
+  PrivacyPolicy: Personvernerklæring
+  Help: Hjelp
+  SupportEmail: E-post for brukerstøtte
+SignIn: Logg inn med {{.Provider}}
+Errors:
+  Internal: En intern feil oppstod
+  AuthRequest:
+    NotFound: Kunne ikke finne autentiseringsforespørsel
+    UserAgentNotCorresponding: Brukeragent samsvarer ikke
+    UserAgentNotFound: Brukeragent-ID ikke funnet
+    TokenNotFound: Token ikke funnet
+    RequestTypeNotSupported: Forespørselstype støttes ikke
+    MissingParameters: Påkrevde parametere mangler
+  User:
+    NotFound: Bruker kunne ikke finnes
+    AlreadyExists: Bruker eksisterer allerede
+    Inactive: Bruker er inaktiv
+    NotFoundOnOrg: Bruker kunne ikke finnes i valgt organisasjon
+    NotAllowedOrg: Bruker er ikke medlem av den påkrevde organisasjonen
+    NotMatchingUserID: Bruker og bruker i autentiseringsforespørsel samsvarer ikke
+    UserIDMissing: Bruker-ID mangler
+    Invalid: Brukerdata er ugyldig
+    DomainNotAllowedAsUsername: Domene er allerede reservert og kan ikke brukes
+    NotAllowedToLink: Bruker har ikke tillatelse til å koble med ekstern påloggingsleverandør
+    Profile:
+      NotFound: Profil ikke funnet
+      NotChanged: Profilen er ikke endret
+      Empty: Profilen er tom
+      FirstNameEmpty: Fornavn i profilen er tomt
+      LastNameEmpty: Etternavn i profilen er tomt
+      IDMissing: Profil-ID mangler
+    Email:
+      NotFound: E-post ikke funnet
+      Invalid: E-postadressen er ugyldig
+      AlreadyVerified: E-postadressen er allerede verifisert
+      NotChanged: E-post ikke endret
+      Empty: E-post er tom
+      IDMissing: E-post-ID mangler
+    Phone:
+      NotFound: Telefon ikke funnet
+      Invalid: Telefon er ugyldig
+      AlreadyVerified: Telefon er allerede verifisert
+      Empty: Telefon er tom
+      NotChanged: Telefon ikke endret
+    Address:
+      NotFound: Adresse ikke funnet
+      NotChanged: Adresse ikke endret
+    Username:
+      AlreadyExists: Brukernavn er allerede tatt
+      Reserved: Brukernavn er allerede tatt
+      Empty: Brukernavn er tomt
+    Password:
+      ConfirmationWrong: Passordbekreftelse er feil
+      Empty: Passord er tomt
+      Invalid: Passord er ugyldig
+      InvalidAndLocked: Passord er ugyldig og bruker er låst, kontakt administratoren din
+      NotChanged: Nytt passord kan ikke være det samme som ditt nåværende passord
+    UsernameOrPassword:
+      Invalid: Brukernavn eller passord er ugyldig
+    PasswordComplexityPolicy:
+      NotFound: Passordpolicy ikke funnet
+      MinLength: Passordet er for kort
+      HasLower: Passordet må inneholde små bokstaver
+      HasUpper: Passordet må inneholde store bokstaver
+      HasNumber: Passordet må inneholde tall
+      HasSymbol: Passordet må inneholde symbol
+    Code:
+      Expired: Koden er utløpt
+      Invalid: Koden er ugyldig
+      Empty: Koden er tom
+      CryptoCodeNil: Kryptokode er tom
+      NotFound: Kunne ikke finne koden
+      GeneratorAlgNotSupported: Generatoralgoritme støttes ikke
+    EmailVerify:
+      UserIDEmpty: Bruker-ID er tom
+    ExternalData:
+      CouldNotRead: Kunne ikke lese eksterne data
+    MFA:
+      NoProviders: Ingen tilgjengelige flerfaktor-leverandører
+      OTP:
+        AlreadyReady: Flerfaktor OTP (engangspassord) er allerede konfigurert
+        NotExisting: Flerfaktor OTP (engangspassord) eksisterer ikke
+        InvalidCode: Ugyldig kode
+        NotReady: Flerfaktor OTP (engangspassord) er ikke klar
+    Locked: Brukeren er låst
+    SomethingWentWrong: Noe gikk galt
+    NotActive: Brukeren er ikke aktiv
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP-type er ikke implementert
+      NotAllowed: Ekstern innloggingsleverandør er ikke tillatt
+      IDPConfigIDEmpty: Identitetsleverandør-ID er tom
+      ExternalUserIDEmpty: Ekstern bruker-ID er tom
+      UserDisplayNameEmpty: Brukerens visningsnavn er tomt
+      NoExternalUserData: Ingen eksterne brukerdata mottatt
+      CreationNotAllowed: Oppretting av ny bruker er ikke tillatt hos denne leverandøren
+      LinkingNotAllowed: Kobling av bruker er ikke tillatt hos denne leverandøren
+      NoOptionAllowed: Verken oppretting eller kobling er tillatt hos denne leverandøren. Vennligst kontakt administratoren.
+      LoginFailedSwitchLocal: Innlogging hos ekstern IDP feilet. Faller tilbake til lokal innlogging.
+    GrantRequired: Innlogging ikke mulig. Brukeren må ha minst én tildeling på den forespurte applikasjonen.
+    ProjectRequired: Innlogging ikke mulig. Brukerens organisasjon må ha tilgang til det forespurte prosjektet.
+  IdentityProvider:
+    InvalidConfig: Identitetsleverandør-konfigurasjonen er ugyldig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Utestengingspolicy eksisterer ikke
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrering er ikke tillatt
+  DeviceAuth:
+    NotExisting: Brukerkode eksisterer ikke
+optional: (valgfritt)
