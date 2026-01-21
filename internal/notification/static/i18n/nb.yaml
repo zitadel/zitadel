@@ -1,0 +1,65 @@
+InitCode:
+  Title: Initialiser bruker
+  PreHeader: Initialiser bruker
+  Subject: Initialiser bruker
+  Greeting: Hei {{.DisplayName}},
+  Text: Denne brukeren ble opprettet. Bruk brukernavnet {{.PreferredLoginName}} for å logge inn. Klikk på knappen nedenfor for å fullføre initialiseringen.
+  ButtonText: Fullfør initialisering
+PasswordReset:
+  Title: Tilbakestill passord
+  PreHeader: Tilbakestill passord
+  Subject: Tilbakestill passord
+  Greeting: Hei {{.DisplayName}},
+  Text: Vi mottok en forespørsel om tilbakestilling av passord. Vennligst bruk knappen nedenfor for å tilbakestille passordet ditt.
+  ButtonText: Tilbakestill passord
+VerifyEmail:
+  Title: Bekreft e-post
+  PreHeader: Bekreft e-post
+  Subject: Bekreft e-post
+  Greeting: Hei {{.DisplayName}},
+  Text: En ny e-postadresse har blitt lagt til. Vennligst bruk knappen nedenfor for å bekrefte e-postadressen din.
+  ButtonText: Bekreft e-post
+VerifyPhone:
+  Title: Bekreft telefon
+  PreHeader: Bekreft telefon
+  Subject: Bekreft telefon
+  Greeting: Hei {{.DisplayName}},
+  Text: Et nytt telefonnummer har blitt lagt til. Vennligst bruk følgende kode for å bekrefte telefonnummeret ditt.
+  ButtonText: Bekreft telefon
+VerifyEmailOTP:
+  Title: Bekreft engangspassord
+  PreHeader: Bekreft engangspassord
+  Subject: Bekreft engangspassord
+  Greeting: Hei {{.DisplayName}},
+  Text: Vennligst bruk engangspassordet {{.OTP}} for å autentisere deg.
+  ButtonText: Autentiser
+VerifySMSOTP:
+  Text: "{{.OTP}} er ditt engangspassord for {{ .Domain }}. Bruk det til å fullføre autentiseringen."
+DomainClaimed:
+  Title: Domene er krevd
+  PreHeader: Endre e-post / brukernavn
+  Subject: Domene er krevd
+  Greeting: Hei {{.DisplayName}},
+  Text: Domenet {{.Domain}} har blitt krevd av en organisasjon. Din bruker har blitt flyttet og brukernavnet ditt har blitt endret.
+  ButtonText: Logg inn
+PasswordlessRegistration:
+  Title: Legg til passordløs innlogging
+  PreHeader: Legg til passordløs innlogging
+  Subject: Legg til passordløs innlogging
+  Greeting: Hei {{.DisplayName}},
+  Text: Vi mottok en forespørsel om å legge til en nøkkel for passordløs innlogging. Vennligst bruk knappen nedenfor for å fullføre registreringen.
+  ButtonText: Legg til passordløs innlogging
+PasswordChange:
+  Title: Passordet til brukeren er endret
+  PreHeader: Endre passord
+  Subject: Passordet til brukeren er endret
+  Greeting: Hei {{.DisplayName}},
+  Text: Passordet til brukeren din har blitt endret. Hvis denne endringen ikke ble gjort av deg, vennligst kontakt administratoren.
+  ButtonText: Logg inn
+InviteUser:
+  Title: Invitasjon til {{.ApplicationName}}
+  PreHeader: Invitasjon til {{.ApplicationName}}
+  Subject: Invitasjon til {{.ApplicationName}}
+  Greeting: Hei {{.DisplayName}},
+  Text: Din bruker har blitt invitert til {{.ApplicationName}}. Vennligst klikk på knappen nedenfor for å godta invitasjonen.
+  ButtonText: Godta invitasjon

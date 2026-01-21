@@ -1,0 +1,1422 @@
+Errors:
+  Internal: En intern feil oppstod
+  NoChangesFound: Ingen endringer
+  OriginNotAllowed: Denne «Origin» er ikke tillatt
+  IDMissing: ID mangler
+  ResourceOwnerMissing: Ressurseier-organisasjon mangler
+  RemoveFailed: Kunne ikke fjernes
+  ProjectionName:
+    Invalid: Ugyldig projeksjonsnavn
+  Assets:
+    EmptyKey: Ressursnøkkel er tom
+    Store:
+      NotInitialized: Ressurslagring er ikke initialisert
+      NotConfigured: Ressurslagring er ikke konfigurert
+    Bucket:
+      Internal: Intern feil ved opprettelse av bøtte
+      AlreadyExists: Bøtte eksisterer allerede
+      CreateFailed: Bøtte ble ikke opprettet
+      ListFailed: Bøtter kunne ikke leses
+      RemoveFailed: Bøtte ble ikke slettet
+      SetPublicFailed: Kunne ikke sette bøtte til offentlig
+    Object:
+      PutFailed: Objekt ble ikke opprettet
+      GetFailed: Objekt kunne ikke leses
+      NotFound: Objekt kunne ikke finnes
+      PresignedTokenFailed: Signert token kunne ikke opprettes
+      ListFailed: Objektliste kunne ikke leses
+      RemoveFailed: Objekt kunne ikke fjernes
+  Limit:
+    ExceedsDefault: Grense overstiger standardgrense
+  Limits:
+    NotFound: Grenser ikke funnet
+    NoneSpecified: Ingen grenser spesifisert
+    Instance:
+      Blocked: Instans er blokkert
+  Restrictions:
+    NoneSpecified: Ingen begrensninger spesifisert
+    DefaultLanguageMustBeAllowed: Standardspråket må være tillatt
+  Language:
+    NotParsed: Kunne ikke tolke språk
+    NotSupported: Språk er ikke støttet
+    NotAllowed: Språk er ikke tillatt
+    Undefined: Språk er udefinert
+    Duplicate: Språk har duplikater
+  OIDCSettings:
+    NotFound: OIDC-konfigurasjon ikke funnet
+    AlreadyExists: OIDC-konfigurasjon eksisterer allerede
+  SecretGenerator:
+    AlreadyExists: Hemmelig generator eksisterer allerede
+    TypeMissing: Type for hemmelig generator mangler
+    NotFound: Hemmelig generator ikke funnet
+  SMSConfig:
+    NotFound: SMS-konfigurasjon ikke funnet
+    AlreadyActive: SMS-konfigurasjon er allerede aktiv
+    AlreadyDeactivated: SMS-konfigurasjon er allerede deaktivert
+    NotExternalVerification: SMS-konfigurasjon støtter ikke kodeverifisering
+  SMTP:
+    NotEmailMessage: Meldingen er ikke en e-postmelding
+    RequiredAttributes: Emne, mottakere og innhold må være satt, men noen eller alle mangler
+    CouldNotSplit: Kunne ikke dele vert og port for tilkobling til SMTP
+    CouldNotDial: Kunne ikke kontakte SMTP-serveren, sjekk port, brannmur og at SMTP-serveren er tilgjengelig
+    CouldNotDialTLS: Kunne ikke kontakte SMTP-serveren med TLS, sjekk port og om SMTP-serveren støtter TLS
+    CouldNotCreateClient: Kunne ikke opprette SMTP-klient
+    CouldNotStartTLS: Kunne ikke starte TLS
+    CouldNotAuth: Kunne ikke legge til SMTP-autentisering, sjekk at både brukernavn og passord er satt
+    CouldNotSetSender: Kunne ikke sette avsender
+    CouldNotSetRecipient: Kunne ikke sette mottaker
+  SMTPConfig:
+    TestPassword: Passord for test ikke funnet
+    NotFound: SMTP-konfigurasjon ikke funnet
+    AlreadyExists: SMTP-konfigurasjon eksisterer allerede
+    AlreadyDeactivated: SMTP-konfigurasjon er allerede deaktivert
+    SenderAdressNotCustomDomain: Avsenderadressen må være konfigurert som egendefinert domene på instansen
+    TestEmailNotFound: E-postadresse for test ikke funnet
+  Notification:
+    NoDomain: Ingen domene funnet for melding
+  User:
+    NotFound: Bruker kunne ikke finnes
+    AlreadyExists: Bruker eksisterer allerede
+    NotFoundOnOrg: Bruker kunne ikke finnes i valgt organisasjon
+    NotAllowedOrg: Bruker er ikke medlem av den påkrevde organisasjonen
+    UserIDMissing: Bruker-ID mangler
+    UserIDWrong: Forespurt bruker er ikke lik autentisert bruker
+    DomainPolicyNil: Organisasjonspolicy er tom
+    EmailAsUsernameNotAllowed: E-post er ikke tillatt som brukernavn
+    Invalid: Brukerdata er ugyldig
+    DomainNotAllowedAsUsername: Domene er allerede reservert og kan ikke brukes
+    AlreadyInactive: Bruker er allerede inaktiv
+    NotInactive: Bruker er ikke inaktiv
+    CantDeactivateInitial: Bruker med tilstanden initial kan bare slettes, ikke deaktiveres
+    ShouldBeActiveOrInitial: Bruker er ikke aktiv eller initial
+    AlreadyInitialised: Bruker er allerede initialisert
+    NotInitialised: Bruker er ikke initialisert ennå
+    NotLocked: Bruker er ikke låst
+    NoChanges: Ingen endringer funnet
+    InitCodeNotFound: Initialiseringskode ikke funnet
+    UsernameNotChanged: Brukernavn ikke endret
+    InvalidURLTemplate: URL-mal er ugyldig
+    Locked: Brukeren er låst
+    Profile:
+      NotFound: Profil ikke funnet
+      NotChanged: Profilen er ikke endret
+      Empty: Profilen er tom
+      FirstNameEmpty: Fornavn i profilen er tomt
+      LastNameEmpty: Etternavn i profilen er tomt
+      IDMissing: Profil-ID mangler
+    Email:
+      NotFound: E-post ikke funnet
+      Invalid: E-postadressen er ugyldig
+      AlreadyVerified: E-postadressen er allerede verifisert
+      NotChanged: E-postadressen er ikke endret
+      Empty: E-postadressen er tom
+      IDMissing: E-post-ID mangler
+    Phone:
+      NotFound: Telefonnummer ikke funnet
+      Invalid: Telefonnummeret er ugyldig
+      AlreadyVerified: Telefonnummeret er allerede verifisert
+      Empty: Telefonnummeret er tomt
+      NotChanged: Telefonnummeret er ikke endret
+      VerifyingRemovalIsNotSupported: Verifisering av fjerning av telefonnummer støttes ikke
+    Address:
+      NotFound: Adresse ikke funnet
+      NotChanged: Adressen er ikke endret
+    Machine:
+      Key:
+        NotFound: Maskinnøkkel ikke funnet
+        AlreadyExisting: Maskinnøkkel eksisterer allerede
+        Invalid: Offentlig nøkkel er ikke en gyldig RSA offentlig nøkkel i PKIX-format med PEM-koding
+      Secret:
+        NotExisting: Hemmelighet eksisterer ikke
+        Invalid: Hemmelighet er ugyldig
+        CouldNotGenerate: Hemmelighet kunne ikke genereres
+    PAT:
+      NotFound: Personlig tilgangstoken ikke funnet
+    NotHuman: Brukeren må være en person
+    NotMachine: Brukeren må være teknisk
+    WrongType: Ikke tillatt for denne brukertypen
+    NotAllowedToLink: Brukeren har ikke tillatelse til å koble til ekstern påloggingsleverandør
+    Username:
+      AlreadyExists: Brukernavnet er allerede tatt
+      Reserved: Brukernavnet er allerede tatt
+      Empty: Brukernavnet er tomt
+    Code:
+      Empty: Koden er tom
+      NotFound: Kode ikke funnet
+      Expired: Koden er utløpt
+      GeneratorAlgNotSupported: Generatoralgoritmen støttes ikke
+      Invalid: Koden er ugyldig
+    Password:
+      NotFound: Passord ikke funnet
+      Empty: Passordet er tomt
+      Invalid: Passordet er ugyldig
+      NotSet: Brukeren har ikke satt et passord
+      NotChanged: Nytt passord kan ikke være det samme som ditt nåværende passord
+      NotSupported: Passord-hash-koding støttes ikke. Sjekk https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+    PasswordComplexityPolicy:
+      NotFound: Passordpolicy ikke funnet
+      MinLength: Passordet er for kort
+      MinLengthNotAllowed: Angitt minimumslengde er ikke tillatt
+      HasLower: Passordet må inneholde små bokstaver
+      HasUpper: Passordet må inneholde store bokstaver
+      HasNumber: Passordet må inneholde tall
+      HasSymbol: Passordet må inneholde symbol
+    ExternalIDP:
+      Invalid: Ekstern IDP ugyldig
+      IDPConfigNotExisting: IDP-leverandør er ugyldig for denne organisasjonen
+      NotAllowed: Ekstern IDP ikke tillatt
+      MinimumExternalIDPNeeded: Minst én IDP må legges til
+      AlreadyExists: Ekstern IDP er allerede tatt
+      NotFound: Ekstern IDP ikke funnet
+      LoginFailed: Pålogging hos ekstern IDP mislyktes
+    MFA:
+      OTP:
+        AlreadyReady: Multifaktor OTP (engangspassord) er allerede satt opp
+        NotExisting: Multifaktor OTP (engangspassord) eksisterer ikke
+        NotReady: Multifaktor OTP (engangspassord) er ikke klar
+        InvalidCode: Ugyldig kode
+      U2F:
+        NotExisting: U2F eksisterer ikke
+      Passwordless:
+        NotExisting: Passnøkkel eksisterer ikke
+      RecoveryCodes:
+        InvalidCode: Ugyldig gjenopprettingskode oppgitt
+        MaxCountExceeded: Maksimalt antall gjenopprettingskoder overskredet
+        NotReady: Gjenopprettingskoder er ikke klare til bruk
+        ConfigInvalid: Konfigurasjon for gjenopprettingskoder er ugyldig
+    WebAuthN:
+      NotFound: WebAuthN-token kunne ikke finnes
+      BeginRegisterFailed: WebAuthN-registrering mislyktes
+      MarshalError: Feil ved serialisering av data
+      ErrorOnParseCredential: Feil ved parsing av legitimasjonsdata
+      CreateCredentialFailed: Feil ved opprettelse av legitimasjon
+      BeginLoginFailed: WebAuthN-pålogging mislyktes
+      ValidateLoginFailed: Feil ved validering av påloggingslegitimasjon
+      CloneWarning: Legitimasjon kan være klonet
+    RefreshToken:
+      Invalid: Oppdateringstoken er ugyldig
+      NotFound: Oppdateringstoken ikke funnet
+  Instance:
+    NotFound: Instans ikke funnet
+    AlreadyExists: Instans eksisterer allerede
+    NotChanged: Instans ikke endret
+  Org:
+    AlreadyExists: Organisasjonens navn eller ID er allerede tatt
+    Invalid: Organisasjon er ugyldig
+    AlreadyDeactivated: Organisasjon er allerede deaktivert
+    AlreadyActive: Organisasjon er allerede aktiv
+    Empty: Organisasjon er tom
+    NotFound: Organisasjon ikke funnet
+    NotChanged: Organisasjon ikke endret
+    DefaultOrgNotDeletable: Standard organisasjon kan ikke slettes
+    ZitadelOrgNotDeletable: Organisasjon med ZITADEL-prosjekt kan ikke slettes
+    InvalidDomain: Ugyldig domene
+    DomainMissing: Domene mangler
+    DomainNotOnOrg: Domene eksisterer ikke på organisasjonen
+    DomainNotVerified: Domene er ikke verifisert
+    DomainAlreadyVerified: Domene er allerede verifisert
+    DomainVerificationTypeInvalid: Domeneverifiseringstype er ugyldig
+    DomainVerificationMissing: Domeneverifisering er ikke startet ennå
+    DomainVerificationFailed: Domeneverifisering mislyktes
+    DomainVerificationTXTNotFound: _zitadel-challenge TXT-oppføringen ble ikke funnet for domenet ditt. Sjekk at du har lagt den til i DNS-serveren din eller vent til den nye oppføringen er propagert
+    DomainVerificationTXTNoMatch: _zitadel-challenge TXT-oppføringen ble funnet for domenet ditt, men inneholder ikke riktig token-tekst. Sjekk at du har lagt til riktig token i DNS-serveren din eller vent til den nye oppføringen er propagert
+    DomainVerificationHTTPNotFound: Filen som inneholder utfordringen ble ikke funnet på forventet URL. Sjekk at du har lastet opp filen på riktig sted med lesetillatelser
+    DomainVerificationHTTPNoMatch: Filen som inneholder utfordringen ble funnet på forventet URL, men inneholder ikke riktig token-tekst. Sjekk innholdet
+    DomainVerificationTimeout: Det oppstod tidsavbrudd ved forespørsel til DNS-serveren
+    PrimaryDomainNotDeletable: Primærdomene kan ikke slettes
+    DomainNotFound: Domene ikke funnet
+    MemberIDMissing: Medlem-ID mangler
+    MemberNotFound: Organisasjonsmedlem ikke funnet
+    InvalidMember: Organisasjonsmedlem er ugyldig
+    UserIDMissing: Bruker-ID mangler
+    PolicyAlreadyExists: Policy eksisterer allerede
+    PolicyNotExisting: Policy eksisterer ikke
+    IdpInvalid: IDP-konfigurasjon er ugyldig
+    IdpNotExisting: IDP-konfigurasjon eksisterer ikke
+    OIDCConfigInvalid: OIDC IDP-konfigurasjon er ugyldig
+    IdpIsNotOIDC: IDP-konfigurasjon er ikke av typen OIDC
+    Domain:
+      AlreadyExists: Domene eksisterer allerede
+      InvalidCharacter: Bare alfanumeriske tegn, . og - er tillatt for et domene
+      EmptyString: Ugyldige ikke-numeriske og ikke-alfabetiske tegn ble erstattet med tomme mellomrom og resulterende domene er en tom streng
+    IDP:
+      InvalidSearchQuery: Ugyldig søkespørring
+      ClientIDMissing: ClientID mangler
+      TeamIDMissing: TeamID mangler
+      KeyIDMissing: KeyID mangler
+      PrivateKeyMissing: Privat nøkkel mangler
+    LoginPolicy:
+      NotFound: Påloggingspolicy ikke funnet
+      Invalid: Påloggingspolicy er ugyldig
+      RedirectURIInvalid: Standard omdirigerings-URI er ugyldig
+      NotExisting: Påloggingspolicy eksisterer ikke
+      AlreadyExists: Påloggingspolicy eksisterer allerede
+      IdpProviderAlreadyExisting: Identitetsleverandør eksisterer allerede
+      IdpProviderNotExisting: Identitetsleverandør eksisterer ikke
+      RegistrationNotAllowed: Registrering er ikke tillatt
+      UsernamePasswordNotAllowed: Pålogging med brukernavn/passord er ikke tillatt
+      MFA:
+        AlreadyExists: Multifaktor eksisterer allerede
+        NotExisting: Multifaktor eksisterer ikke
+        Unspecified: Multifaktor ugyldig
+    MailTemplate:
+      NotFound: Standard e-postmal ikke funnet
+      NotChanged: Standard e-postmal er ikke endret
+      AlreadyExists: Standard e-postmal eksisterer allerede
+      Invalid: Standard e-postmal er ugyldig
+    CustomMessageText:
+      NotFound: Standard meldingstekst ikke funnet
+      NotChanged: Standard meldingstekst er ikke endret
+      AlreadyExists: Standard meldingstekst eksisterer allerede
+      Invalid: Standard meldingstekst er ugyldig
+    PasswordComplexityPolicy:
+      NotFound: Passordkompleksitetspolicy ikke funnet
+      Empty: Passordkompleksitetspolicy er tom
+      NotExisting: Passordkompleksitetspolicy eksisterer ikke
+      AlreadyExists: Passordkompleksitetspolicy eksisterer allerede
+    PasswordLockoutPolicy:
+      NotFound: Passordlåsningspolicy ikke funnet
+      Empty: Passordlåsningspolicy er tom
+      NotExisting: Passordlåsningspolicy eksisterer ikke
+      AlreadyExists: Passordlåsningspolicy eksisterer allerede
+    PasswordAgePolicy:
+      NotFound: Passordalderspolicy ikke funnet
+      Empty: Passordalderspolicy er tom
+      NotExisting: Passordalderspolicy eksisterer ikke
+      AlreadyExists: Passordalderspolicy eksisterer allerede
+    OrgIAMPolicy:
+      Empty: Org IAM-policy er tom
+      NotExisting: Org IAM-policy eksisterer ikke
+      AlreadyExists: Org IAM-policy eksisterer allerede
+    NotificationPolicy:
+      NotFound: Varslingspolicy ikke funnet
+      NotChanged: Varslingspolicy er ikke endret
+      AlreadyExists: Varslingspolicy eksisterer allerede
+    LabelPolicy:
+      NotFound: Privat etikettpolicy ikke funnet
+      NotChanged: Privat etikettpolicy er ikke endret
+  Project:
+    ProjectIDMissing: Prosjekt-ID mangler
+    AlreadyExists: Prosjekt eksisterer allerede på organisasjonen
+    OrgNotExisting: Organisasjon eksisterer ikke
+    UserNotExisting: Bruker eksisterer ikke
+    CouldNotGenerateClientSecret: Kunne ikke generere klienthemmelighet
+    Invalid: Prosjekt er ugyldig
+    NotActive: Prosjekt er ikke aktivt
+    NotInactive: Prosjekt er ikke deaktivert
+    NotFound: Prosjekt ikke funnet
+    UserIDMissing: Bruker-ID mangler
+    Member:
+      NotFound: Prosjektmedlem ikke funnet
+      Invalid: Prosjektmedlem er ugyldig
+      AlreadyExists: Prosjektmedlem eksisterer allerede
+      NotExisting: Prosjektmedlem eksisterer ikke
+    MinimumOneRoleNeeded: Minst én rolle må legges til
+    Role:
+      AlreadyExists: Rolle eksisterer allerede
+      Invalid: Rolle er ugyldig
+      NotExisting: Rolle eksisterer ikke
+    IDMissing: ID mangler
+    App:
+      AlreadyExists: Applikasjon eksisterer allerede
+      NotFound: Applikasjon ikke funnet
+      Invalid: Applikasjon ugyldig
+      NotExisting: Applikasjon eksisterer ikke
+      NotActive: Applikasjon er ikke aktiv
+      NotInactive: Applikasjon er ikke inaktiv
+      OIDCConfigInvalid: OIDC-konfigurasjon er ugyldig
+      APIConfigInvalid: API-konfigurasjon er ugyldig
+      SAMLConfigInvalid: SAML-konfigurasjon er ugyldig
+      IsNotOIDC: Applikasjon er ikke av typen OIDC
+      IsNotAPI: Applikasjon er ikke av typen API
+      IsNotSAML: Applikasjon er ikke av typen SAML
+      SAMLMetadataMissing: SAML-metadata mangler
+      SAMLMetadataFormat: SAML-metadata formatfeil
+      SAMLEntityIDAlreadyExisting: SAML EntityID eksisterer allerede
+      OIDCAuthMethodNoSecret: Valgt OIDC-autentiseringsmetode krever ikke en hemmelighet
+      APIAuthMethodNoSecret: Valgt API-autentiseringsmetode krever ikke en hemmelighet
+      AuthMethodNoPrivateKeyJWT: Valgt autentiseringsmetode krever ikke en nøkkel
+      ClientSecretInvalid: Klienthemmelighet er ugyldig
+      Key:
+        AlreadyExisting: Applikasjonsnøkkel eksisterer allerede
+        NotFound: Applikasjonsnøkkel ikke funnet
+    RequiredFieldsMissing: Noen påkrevde felt mangler
+    Grant:
+      AlreadyExists: Prosjekttilgang eksisterer allerede
+      NotFound: Tilgang ikke funnet
+      Invalid: Prosjekttilgang er ugyldig
+      NotExisting: Prosjekttilgang eksisterer ikke
+      HasNotExistingRole: Én rolle eksisterer ikke på prosjektet
+      NotActive: Prosjekttilgang er ikke aktiv
+      NotInactive: Prosjekttilgang er ikke inaktiv
+  IAM:
+    NotFound: Instans ikke funnet. Sjekk at du har riktig domene. Sjekk https://zitadel.com/docs/apis/introduction#domains
+    Member:
+      RolesNotChanged: Roller er ikke endret
+    MemberInvalid: Medlem er ugyldig
+    MemberAlreadyExisting: Medlem eksisterer allerede
+    MemberNotExisting: Medlem eksisterer ikke
+    IDMissing: ID mangler
+    IAMProjectIDMissing: IAM prosjekt-ID mangler
+    IamProjectAlreadySet: IAM prosjekt-ID er allerede satt
+    IdpInvalid: IDP-konfigurasjon er ugyldig
+    IdpNotExisting: IDP-konfigurasjon eksisterer ikke
+    OIDCConfigInvalid: OIDC IDP-konfigurasjon er ugyldig
+    IdpIsNotOIDC: IDP-konfigurasjon er ikke av typen OIDC
+    LoginPolicyInvalid: Påloggingspolicy er ugyldig
+    LoginPolicyNotExisting: Påloggingspolicy eksisterer ikke
+    IdpProviderInvalid: Identitetsleverandør er ugyldig
+    LoginPolicy:
+      NotFound: Standard påloggingspolicy ikke funnet
+      NotChanged: Standard påloggingspolicy er ikke endret
+      NotExisting: Standard påloggingspolicy eksisterer ikke
+      AlreadyExists: Standard påloggingspolicy eksisterer allerede
+      RedirectURIInvalid: Standard omdirigerings-URI er ugyldig
+      MFA:
+        AlreadyExists: Multifaktor eksisterer allerede
+        NotExisting: Multifaktor eksisterer ikke
+        Unspecified: Multifaktor ugyldig
+      IDP:
+        AlreadyExists: Identitetsleverandør eksisterer allerede
+        NotExisting: Identitetsleverandør eksisterer ikke
+        Invalid: Identitetsleverandør ugyldig
+      IDPConfig:
+        AlreadyExists: Identitetsleverandør-konfigurasjon eksisterer allerede
+        NotInactive: Identitetsleverandør-konfigurasjon er ikke inaktiv
+        NotActive: Identitetsleverandør-konfigurasjon er ikke aktiv
+    LabelPolicy:
+      NotFound: Standard privat etikettpolicy ikke funnet
+      NotChanged: Standard privat etikettpolicy er ikke endret
+    MailTemplate:
+      NotFound: Standard e-postmal ikke funnet
+      NotChanged: Standard e-postmal er ikke endret
+      AlreadyExists: Standard e-postmal eksisterer allerede
+      Invalid: Standard e-postmal er ugyldig
+    CustomMessageText:
+      NotFound: Standard meldingstekst ikke funnet
+      NotChanged: Standard meldingstekst er ikke endret
+      AlreadyExists: Standard meldingstekst eksisterer allerede
+      Invalid: Standard meldingstekst er ugyldig
+    PasswordComplexityPolicy:
+      NotFound: Standard passordkompleksitetspolicy ikke funnet
+      NotExisting: Standard passordkompleksitetspolicy eksisterer ikke
+      AlreadyExists: Standard passordkompleksitetspolicy eksisterer allerede
+      Empty: Standard passordkompleksitetspolicy er tom
+      NotChanged: Standard passordkompleksitetspolicy er ikke endret
+    PasswordAgePolicy:
+      NotFound: Standard passordalderspolicy ikke funnet
+      NotExisting: Standard passordalderspolicy eksisterer ikke
+      AlreadyExists: Standard passordalderspolicy eksisterer allerede
+      Empty: Standard passordalderspolicy er tom
+      NotChanged: Standard passordalderspolicy er ikke endret
+    PasswordLockoutPolicy:
+      NotFound: Standard passordlåsningspolicy ikke funnet
+      NotExisting: Standard passordlåsningspolicy eksisterer ikke
+      AlreadyExists: Standard passordlåsningspolicy eksisterer allerede
+      Empty: Standard passordlåsningspolicy er tom
+      NotChanged: Standard passordlåsningspolicy er ikke endret
+    DomainPolicy:
+      NotFound: Org IAM-policy ikke funnet
+      Empty: Org IAM-policy er tom
+      NotExisting: Org IAM-policy eksisterer ikke
+      AlreadyExists: Org IAM-policy eksisterer allerede
+      NotChanged: Org IAM-policy er ikke endret
+    NotificationPolicy:
+      NotFound: Standard varslingspolicy ikke funnet
+      NotChanged: Standard varslingspolicy er ikke endret
+      AlreadyExists: Standard varslingspolicy eksisterer allerede
+  Policy:
+    AlreadyExists: Policy eksisterer allerede
+    Label:
+      Invalid:
+        PrimaryColor: Primærfarge er ikke en gyldig Hex-fargeverdi
+        BackgroundColor: Bakgrunnsfarge er ikke en gyldig Hex-fargeverdi
+        WarnColor: Varselfarge er ikke en gyldig Hex-fargeverdi
+        FontColor: Skriftfarge er ikke en gyldig Hex-fargeverdi
+        PrimaryColorDark: Primærfarge (mørk modus) er ikke en gyldig Hex-fargeverdi
+        BackgroundColorDark: Bakgrunnsfarge (mørk modus) er ikke en gyldig Hex-fargeverdi
+        WarnColorDark: Varselfarge (mørk modus) er ikke en gyldig Hex-fargeverdi
+        FontColorDark: Skriftfarge (mørk modus) er ikke en gyldig Hex-fargeverdi
+  UserGrant:
+    AlreadyExists: Brukerrettighet eksisterer allerede
+    NotFound: Brukerrettighet ikke funnet
+    Invalid: Brukerrettighet er ugyldig
+    NotChanged: Brukerrettighet er ikke endret
+    IDMissing: ID mangler
+    NoPermissionForProject: Bruker har ingen tillatelser på dette prosjektet
+    RoleKeyNotFound: Rolle ikke funnet
+  Member:
+    AlreadyExists: Medlem eksisterer allerede
+  IDPConfig:
+    AlreadyExists: IDP-konfigurasjon med dette navnet eksisterer allerede
+    NotExisting: Identitetsleverandør-konfigurasjon eksisterer ikke
+  Changes:
+    NotFound: Ingen historikk funnet
+    AuditRetention: Historikk er utenfor revisjonslogg-oppbevaring
+  Token:
+    NotFound: Token ikke funnet
+    Invalid: Token er ugyldig
+  UserSession:
+    NotFound: Brukerøkt ikke funnet
+  Key:
+    NotFound: Nøkkel ikke funnet
+    ExpireBeforeNow: Utløpsdatoen er i fortiden
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Flerfaktorautentisering er konfigurert som påkrevd, men ingen mulig leverandør er konfigurert på organisasjonen
+  Step:
+    Started:
+      AlreadyExists: Trinn startet finnes allerede
+    Done:
+      AlreadyExists: Trinn fullført finnes allerede
+  CustomText:
+    AlreadyExists: Egendefinert tekst finnes allerede
+    Invalid: Egendefinert tekst er ugyldig
+    NotFound: Egendefinert tekst ble ikke funnet
+  TranslationFile:
+    ReadError: Feil ved lesing av oversettelsesfil
+    MergeError: Oversettelsesfil kunne ikke slås sammen med egendefinert oversettelse
+    NotFound: Oversettelsesfil finnes ikke
+  Metadata:
+    NotFound: Metadata ble ikke funnet
+    NoData: Metadatalisten er tom
+    Invalid: Metadata er ugyldig
+    KeyNotExisting: En eller flere nøkler finnes ikke
+  Action:
+    Invalid: Handling er ugyldig
+    NotFound: Handling ble ikke funnet
+    NotActive: Handling er ikke aktiv
+    NotInactive: Handling er ikke inaktiv
+    MaxAllowed: Ingen flere aktive handlinger tillatt
+    NotEnabled: Funksjonen «Handling» er ikke aktivert
+  Flow:
+    FlowTypeMissing: FlowType mangler
+    Empty: Flyten er allerede tom
+    WrongTriggerType: TriggerType er ugyldig
+    NoChanges: Ingen endringer
+    ActionIDsNotExist: HandlingIDene finnes ikke
+  Query:
+    CloseRows: SQL-setningen kunne ikke fullføres
+    SQLStatement: SQL-setningen kunne ikke opprettes
+    InvalidRequest: Forespørselen er ugyldig
+    TooManyNestingLevels: For mange nestede spørringsnivåer (maks 20)
+    LimitExceeded: Grensen er overskredet
+  Quota:
+    AlreadyExists: Kvote finnes allerede for denne enheten
+    NotFound: Kvote ble ikke funnet for denne enheten
+    Invalid:
+      CallURL: Kvotens URL for kall er ugyldig
+      Percent: Kvoteprosent er lavere enn 1
+      Unimplemented: Kvoter er ikke implementert for denne enheten
+      Amount: Kvotebeløp er lavere enn 1
+      ResetInterval: Kvotens tilbakestillingsintervall er kortere enn ett minutt
+      Noop: En ubegrenset kvote uten varsler har ingen effekt
+    Access:
+      Exhausted: Kvoten for autentiserte forespørsler er oppbrukt
+    Execution:
+      Exhausted: Kvoten for kjøringssekunder er oppbrukt
+  LogStore:
+    Access:
+      StorageFailed: Lagring av tilgangslogg til database mislyktes
+      ScanFailed: Spørring etter bruk for autentiserte forespørsler mislyktes
+    Execution:
+      StorageFailed: Lagring av handlingsutførelseslogg til database mislyktes
+      ScanFailed: Spørring etter bruk for handlingsutførelsessekunder mislyktes
+  Session:
+    NotExisting: Økten finnes ikke
+    Terminated: Økten er allerede avsluttet
+    Expired: Økten har utløpt
+    PositiveLifetime: Øktens levetid må ikke være mindre enn 0
+    Token:
+      Invalid: Økt-token er ugyldig
+    WebAuthN:
+      NoChallenge: Økt uten WebAuthN-utfordring
+  Intent:
+    IDPMissing: IDP-ID mangler i forespørselen
+    IDPInvalid: IDP ugyldig for forespørselen
+    ResponseInvalid: IDP-respons er ugyldig
+    MissingSingleMappingAttribute: IDP-respons inneholder ikke mappingattributtet eller har flere verdier
+    SuccessURLMissing: Suksess-URL mangler i forespørselen
+    FailureURLMissing: Feil-URL mangler i forespørselen
+    StateMissing: State-parameter mangler i forespørselen
+    NotStarted: Intensjon er ikke startet eller var allerede avsluttet
+    NotSucceeded: Intensjon har ikke lyktes
+    Expired: Intensjon har utløpt
+    TokenCreationFailed: Oppretting av token mislyktes
+    InvalidToken: Intensjonstoken er ugyldig
+    OtherUser: Intensjon ment for en annen bruker
+  AuthRequest:
+    AlreadyExists: Autentiseringsforespørsel finnes allerede
+    NotExisting: Autentiseringsforespørsel finnes ikke
+    WrongLoginClient: Autentiseringsforespørsel opprettet av en annen innloggingsklient
+    AlreadyHandled: Autentiseringsforespørsel er allerede behandlet
+  OIDCSession:
+    RefreshTokenInvalid: Oppdateringstoken er ugyldig
+    Token:
+      Invalid: Token er ugyldig
+      Expired: Token har utløpt
+    InvalidClient: Token ble ikke utstedt for denne klienten
+  SAMLRequest:
+    AlreadyExists: SAMLRequest finnes allerede
+    NotExisting: SAMLRequest finnes ikke
+    WrongLoginClient: SAMLRequest opprettet av en annen innloggingsklient
+    AlreadyHandled: SAMLRequest er allerede behandlet
+  SAMLSession:
+    InvalidClient: SAMLResponse ble ikke utstedt for denne klienten
+  DeviceAuth:
+    NotFound: Enhetsautorisasjonsforespørsel finnes ikke
+    AlreadyHandled: Enhetsautorisasjonsforespørsel er allerede behandlet
+  Feature:
+    NotExisting: Funksjon finnes ikke
+    TypeNotSupported: Funksjonstype støttes ikke
+    InvalidValue: Ugyldig verdi for denne funksjonen
+  Target:
+    Invalid: Mål er ugyldig
+    NoTimeout: Mål har ingen tidsavbrudd
+    InvalidURL: Mål har en ugyldig URL
+    NotFound: Mål ble ikke funnet
+    InvalidExpirationDate: Nøkkelens utløpsdato må være i fremtiden
+    PublicKeyExpired: Målets offentlige nøkkel har utløpt
+    PublicKeyActive: Kan ikke slette aktiv offentlig nøkkel for mål
+    InvalidPublicKey: Den offentlige nøkkelen er ugyldig. Må være en PEM-kodet RSA- eller ECDSA-nøkkel
+  Execution:
+    ConditionInvalid: Kjøringsbetingelse er ugyldig
+    Invalid: Kjøring er ugyldig
+    NotFound: Kjøring ble ikke funnet
+    IncludeNotFound: Inkludering ble ikke funnet
+    NoTargets: Ingen mål definert
+    Failed: Kjøring mislyktes
+    ResponseIsNotValidJSON: Respons er ikke gyldig JSON
+    MissingEncryptionKey: Ingen krypteringsnøkkel funnet for mål
+  UserSchema:
+    NotEnabled: Funksjonen «Brukerskjema» er ikke aktivert
+    Type:
+      Missing: Brukerskjematype mangler
+      AlreadyExists: Brukerskjematype finnes allerede
+    Authenticator:
+      Invalid: Ugyldig autentiseringstype
+    NotActive: Brukerskjema er ikke aktivt
+    NotInactive: Brukerskjema er ikke inaktivt
+    NotExists: Brukerskjema finnes ikke
+    ID:
+      Missing: Brukerskjema-ID mangler
+    Invalid: Brukerskjema er ugyldig
+    Data:
+      Invalid: Data er ugyldig for brukerskjema
+  TokenExchange:
+    FeatureDisabled: Token Exchange-funksjonen er deaktivert for din instans. https://zitadel.com/docs/apis/openidoauth/token-exchange
+    Token:
+      Missing: Token mangler
+      Invalid: Token er ugyldig
+      TypeMissing: Tokentype mangler
+      TypeNotAllowed: Tokentype er ikke tillatt
+      TypeNotSupported: Tokentype støttes ikke
+      NotForAPI: Identitetsimiterte tokens er ikke tillatt for API
+    Impersonation:
+      PolicyDisabled: Identitetsimitasjon er deaktivert i instansens sikkerhetspolicy
+  WebKey:
+    ActiveDelete: Kan ikke slette aktiv webnøkkel
+    Config: Ugyldig webnøkkelkonfigurasjon
+    Duplicate: Webnøkkel-ID er ikke unik
+    FeatureDisabled: Webnøkkelfunksjon er deaktivert
+    NoActive: Ingen aktiv webnøkkel funnet
+    NotFound: Webnøkkel ble ikke funnet
+AggregateTypes:
+  action: Handling
+  instance: Instans
+  key_pair: Nøkkelpar
+  org: Organisasjon
+  project: Prosjekt
+  user: Bruker
+  usergrant: Brukertilgang
+  quota: Kvote
+  feature: Funksjon
+  target: Mål
+  execution: Kjøring
+  user_schema: Brukerskjema
+  auth_request: Autentiseringsforespørsel
+  device_auth: Enhetsautentisering
+  idpintent: IDP-intensjon
+  limits: Grenser
+  milestone: Milepæl
+  oidc_session: OIDC-økt
+  restrictions: Begrensninger
+  system: System
+  session: Økt
+  web_key: Webnøkkel
+  saml_request: SAML-forespørsel
+  saml_session: SAML-økt
+EventTypes:
+  execution:
+    set: Kjøring satt
+    removed: Kjøring slettet
+  target:
+    added: Mål opprettet
+    changed: Mål endret
+    removed: Mål slettet
+  user:
+    added: Bruker lagt til
+    selfregistered: Bruker registrerte seg selv
+    initialization:
+      code:
+        added: Initialiseringskode generert
+        sent: Initialiseringskode sendt
+      check:
+        succeeded: Initialiseringssjekk vellykket
+        failed: Initialiseringssjekk mislyktes
+    token:
+      added: Tilgangstoken opprettet
+      v2.added: Tilgangstoken opprettet
+      removed: Tilgangstoken fjernet
+    impersonated: Bruker imitert
+    username:
+      reserved: Brukernavn reservert
+      released: Brukernavn frigitt
+      changed: Brukernavn endret
+    email:
+      reserved: E-postadresse reservert
+      released: E-postadresse frigitt
+      changed: E-postadresse endret
+      verified: E-postadresse verifisert
+      verification:
+        failed: E-postadresseverifisering mislyktes
+      code:
+        added: Verifiseringskode for e-postadresse generert
+        sent: Verifiseringskode for e-postadresse sendt
+    machine:
+      added: Teknisk bruker lagt til
+      changed: Teknisk bruker endret
+      key:
+        added: Nøkkel lagt til
+        removed: Nøkkel fjernet
+      secret:
+        set: Hemmelighet satt
+        updated: Hemmelighetshash oppdatert
+        removed: Hemmelighet fjernet
+        check:
+          succeeded: Hemmelighetssjekk vellykket
+          failed: Hemmelighetssjekk mislyktes
+    human:
+      added: Person lagt til
+      selfregistered: Person registrerte seg selv
+      avatar:
+        added: Avatar lagt til
+        removed: Avatar fjernet
+      initialization:
+        code:
+          added: Initialiseringskode generert
+          sent: Initialiseringskode sendt
+        check:
+          succeeded: Initialiseringssjekk vellykket
+          failed: Initialiseringssjekk mislyktes
+      invite:
+        code:
+          added: Invitasjonskode generert
+          sent: Invitasjonskode sendt
+        check:
+          succeeded: Invitasjonssjekk vellykket
+          failed: Invitasjonssjekk mislyktes
+      username:
+        reserved: Brukernavn reservert
+        released: Brukernavn frigitt
+      email:
+        changed: E-postadresse endret
+        verified: E-postadresse verifisert
+        verification:
+          failed: E-postadresseverifisering mislyktes
+        code:
+          added: Verifiseringskode for e-postadresse generert
+          sent: Verifiseringskode for e-postadresse sendt
+      password:
+        changed: Passord endret
+        code:
+          added: Passordkode generert
+          sent: Passordkode sendt
+        check:
+          succeeded: Passordsjekk vellykket
+          failed: Passordsjekk mislyktes
+        change:
+          sent: Passordendring sendt
+        hash:
+          updated: Passordhash oppdatert
+      externallogin:
+        check:
+          succeeded: Ekstern innlogging vellykket
+      externalidp:
+        added: Ekstern IDP lagt til
+        removed: Ekstern IDP fjernet
+        cascade:
+          removed: Ekstern IDP kaskadefjernet
+        id:
+          migrated: Ekstern bruker-ID for IDP ble migrert
+      phone:
+        changed: Telefonnummer endret
+        verified: Telefonnummer verifisert
+        verification:
+          failed: Telefonnummerverifisering mislyktes
+        code:
+          added: Telefonnummerkode generert
+          sent: Telefonnummerkode sendt
+        removed: Telefonnummer fjernet
+      profile:
+        changed: Brukerprofil endret
+      address:
+        changed: Brukeradresse endret
+      mfa:
+        otp:
+          added: Flerfaktor-OTP lagt til
+          verified: Flerfaktor-OTP verifisert
+          removed: Flerfaktor-OTP fjernet
+          check:
+            succeeded: Flerfaktor-OTP-sjekk vellykket
+            failed: Flerfaktor-OTP-sjekk mislyktes
+          sms:
+            added: Flerfaktor-OTP-SMS lagt til
+            removed: Flerfaktor-OTP-SMS fjernet
+            code:
+              added: Flerfaktor-OTP-SMS-kode lagt til
+              sent: Flerfaktor-OTP-SMS-kode sendt
+            check:
+              succeeded: Flerfaktor-OTP-SMS-sjekk vellykket
+              failed: Flerfaktor-OTP-SMS-sjekk mislyktes
+          email:
+            added: Flerfaktor-OTP-e-post lagt til
+            removed: Flerfaktor-OTP-e-post fjernet
+            code:
+              added: Flerfaktor-OTP-e-postkode lagt til
+              sent: Flerfaktor-OTP-e-postkode sendt
+            check:
+              succeeded: Flerfaktor-OTP-e-postsjekk vellykket
+              failed: Flerfaktor-OTP-e-postsjekk mislyktes
+        u2f:
+          token:
+            added: Flerfaktor-U2F-token lagt til
+            verified: Flerfaktor-U2F-token verifisert
+            removed: Flerfaktor-U2F-token fjernet
+            begin:
+              login: Flerfaktor-U2F-sjekk startet
+            check:
+              succeeded: Flerfaktor-U2F-sjekk vellykket
+              failed: Flerfaktor-U2F-sjekk mislyktes
+            signcount:
+              changed: Kontrollsum for flerfaktor-U2F-token har blitt endret
+        init:
+          skipped: Flerfaktorinitialisering hoppet over
+      passwordless:
+        token:
+          added: Token for passnøkkelinnlogging lagt til
+          verified: Token for passnøkkelinnlogging verifisert
+          removed: Token for passnøkkelinnlogging fjernet
+          begin:
+            login: Passnøkkelinnloggingssjekk startet
+          check:
+            succeeded: Passnøkkelinnloggingssjekk vellykket
+            failed: Passnøkkelinnloggingssjekk mislyktes
+          signcount:
+            changed: Kontrollsum for passnøkkelinnloggingstoken har blitt endret
+        initialization:
+          code:
+            added: Passnøkkelinitialiseringskode lagt til
+            sent: Passnøkkelinitialiseringskode sendt
+            requested: Passnøkkelinitialiseringskode forespurt
+            check:
+              succeeded: Passnøkkelinitialiseringskode vellykket sjekket
+              failed: Passnøkkelinitialiseringskodesjekk mislyktes
+      signed:
+        out: Bruker logget ut
+      refresh:
+        token:
+          added: Oppdateringstoken opprettet
+          renewed: Oppdateringstoken fornyet
+          removed: Oppdateringstoken fjernet
+    locked: Bruker låst
+    unlocked: Bruker låst opp
+    deactivated: Bruker deaktivert
+    reactivated: Bruker reaktivert
+    removed: Bruker fjernet
+    password:
+      changed: Passord endret
+      code:
+        added: Passordkode generert
+        sent: Passordkode sendt
+      check:
+        succeeded: Passordsjekk vellykket
+        failed: Passordsjekk mislyktes
+    phone:
+      changed: Telefonnummer endret
+      verified: Telefonnummer verifisert
+      verification:
+        failed: Telefonnummerverifisering mislyktes
+      code:
+        added: Telefonnummerkode generert
+        sent: Telefonnummerkode sendt
+    profile:
+      changed: Brukerprofil endret
+    address:
+      changed: Brukeradresse endret
+    mfa:
+      otp:
+        added: Flerfaktor-OTP lagt til
+        verified: Flerfaktor-OTP verifisert
+        removed: Flerfaktor-OTP fjernet
+        check:
+          succeeded: Flerfaktor-OTP-sjekk vellykket
+          failed: Flerfaktor-OTP-sjekk mislyktes
+        init:
+          skipped: Flerfaktor-OTP-initialisering hoppet over
+      init:
+        skipped: Flerfaktorinitialisering hoppet over
+    signed:
+      out: Bruker logget ut
+    grant:
+      added: Autorisasjon lagt til
+      changed: Autorisasjon endret
+      removed: Autorisasjon fjernet
+      deactivated: Autorisasjon deaktivert
+      reactivated: Autorisasjon reaktivert
+      reserved: Autorisasjon reservert
+      released: Autorisasjon frigitt
+      cascade:
+        removed: Autorisasjon fjernet
+        changed: Autorisasjon endret
+    metadata:
+      set: Brukermetadata satt
+      removed: Brukermetadata fjernet
+      removed.all: All brukermetadata fjernet
+    domain:
+      claimed: Domene innkrevd
+      claimed.sent: Varsel om domeneinnkreving sendt
+    pat:
+      added: Personlig tilgangstoken lagt til
+      removed: Personlig tilgangstoken fjernet
+  org:
+    added: Organisasjon lagt til
+    changed: Organisasjon endret
+    deactivated: Organisasjon deaktivert
+    reactivated: Organisasjon reaktivert
+    removed: Organisasjon fjernet
+    domain:
+      added: Domene lagt til
+      verification:
+        added: Domeneverifisering lagt til
+        failed: Domeneverifisering mislyktes
+      verified: Domene verifisert
+      removed: Domene fjernet
+      primary:
+        set: Primærdomene satt
+      reserved: Domene reservert
+      released: Domene frigitt
+    name:
+      reserved: Organisasjonsnavn reservert
+      released: Organisasjonsnavn frigitt
+    member:
+      added: Organisasjonsmedlem lagt til
+      changed: Organisasjonsmedlem endret
+      removed: Organisasjonsmedlem fjernet
+      cascade:
+        removed: Organisasjonsmedlem kaskadefjernet
+    iam:
+      policy:
+        added: Systemretningslinje lagt til
+        changed: Systemretningslinje endret
+        removed: Systemretningslinje fjernet
+    idp:
+      config:
+        added: IDP-konfigurasjon lagt til
+        changed: IDP-konfigurasjon endret
+        removed: IDP-konfigurasjon fjernet
+        deactivated: IDP-konfigurasjon deaktivert
+        reactivated: IDP-konfigurasjon reaktivert
+      oidc:
+        config:
+          added: OIDC IDP-konfigurasjon lagt til
+          changed: OIDC IDP-konfigurasjon endret
+      saml:
+        config:
+          added: SAML IDP-konfigurasjon lagt til
+          changed: SAML IDP-konfigurasjon endret
+      jwt:
+        config:
+          added: JWT IDP-konfigurasjon lagt til
+          changed: JWT IDP-konfigurasjon endret
+    customtext:
+      set: Egendefinert tekst satt
+      removed: Egendefinert tekst fjernet
+      template:
+        removed: Egendefinert tekstmal fjernet
+    policy:
+      login:
+        added: Innloggingspolicy lagt til
+        changed: Innloggingspolicy endret
+        removed: Innloggingspolicy fjernet
+        idpprovider:
+          added: Identitetsleverandør lagt til innloggingspolicy
+          removed: Identitetsleverandør fjernet fra innloggingspolicy
+          cascade:
+            removed: Identitetsleverandør kaskadefjernet fra innloggingspolicy
+        secondfactor:
+          added: Andre faktor lagt til innloggingspolicy
+          removed: Andre faktor fjernet fra innloggingspolicy
+        multifactor:
+          added: Flerfaktor lagt til innloggingspolicy
+          removed: Flerfaktor fjernet fra innloggingspolicy
+      password:
+        complexity:
+          added: Passordkompleksitetspolicy lagt til
+          changed: Passordkompleksitetspolicy endret
+          removed: Passordkompleksitetspolicy fjernet
+        age:
+          added: Passordalderspolicy lagt til
+          changed: Passordalderspolicy endret
+          removed: Passordalderspolicy fjernet
+        lockout:
+          added: Passordutestengingspolicy lagt til
+          changed: Passordutestengingspolicy endret
+          removed: Passordutestengingspolicy fjernet
+      label:
+        added: Etikettpolicy lagt til
+        changed: Etikettpolicy endret
+        activated: Etikettpolicy aktivert
+        removed: Etikettpolicy fjernet
+        logo:
+          added: Logo lagt til etikettpolicy
+          removed: Logo fjernet fra etikettpolicy
+          dark:
+            added: Logo (mørk modus) lagt til etikettpolicy
+            removed: Logo (mørk modus) fjernet fra etikettpolicy
+        icon:
+          added: Ikon lagt til etikettpolicy
+          removed: Ikon fjernet fra etikettpolicy
+          dark:
+            added: Ikon (mørk modus) lagt til etikettpolicy
+            removed: Ikon (mørk modus) fjernet fra etikettpolicy
+        font:
+          added: Skrifttype lagt til etikettpolicy
+          removed: Skrifttype fjernet fra etikettpolicy
+        assets:
+          removed: Ressurser fjernet fra etikettpolicy
+      privacy:
+        added: Personvernregler og vilkår lagt til
+        changed: Personvernregler og vilkår endret
+        removed: Personvernregler og vilkår fjernet
+      domain:
+        added: Domenepolicy lagt til
+        changed: Domenepolicy endret
+        removed: Domenepolicy fjernet
+      lockout:
+        added: Utestengingspolicy lagt til
+        changed: Utestengingspolicy endret
+        removed: Utestengingspolicy fjernet
+      notification:
+        added: Varslingspolicy lagt til
+        changed: Varslingspolicy endret
+        removed: Varslingsregel fjernet
+    flow:
+      trigger_actions:
+        set: Handling satt
+        cascade:
+          removed: Handlingskaskade fjernet
+        removed: Handlinger fjernet
+      cleared: Flyt tømt
+    mail:
+      template:
+        added: E-postmal lagt til
+        changed: E-postmal endret
+        removed: E-postmal fjernet
+      text:
+        added: E-posttekst lagt til
+        changed: E-posttekst endret
+        removed: E-posttekst fjernet
+    metadata:
+      removed: Metadata fjernet
+      removed.all: All metadata fjernet
+      set: Metadata satt
+  project:
+    added: Prosjekt lagt til
+    changed: Prosjekt endret
+    deactivated: Prosjekt deaktivert
+    reactivated: Prosjekt reaktivert
+    removed: Prosjekt fjernet
+    member:
+      added: Prosjektmedlem lagt til
+      changed: Prosjektmedlem endret
+      removed: Prosjektmedlem fjernet
+      cascade:
+        removed: Prosjektmedlem kaskadefjernet
+    role:
+      added: Prosjektrolle lagt til
+      changed: Prosjektrolle endret
+      removed: Prosjektrolle fjernet
+    grant:
+      added: Administrasjonstilgang lagt til
+      changed: Administrasjonstilgang endret
+      removed: Administrasjonstilgang fjernet
+      deactivated: Administrasjonstilgang deaktivert
+      reactivated: Administrasjonstilgang reaktivert
+      cascade:
+        changed: Administrasjonstilgang endret
+      member:
+        added: Medlem for administrasjonstilgang lagt til
+        changed: Medlem for administrasjonstilgang endret
+        removed: Medlem for administrasjonstilgang fjernet
+        cascade:
+          removed: Administrasjonstilgang kaskadefjernet
+    application:
+      added: Applikasjon lagt til
+      changed: Applikasjon endret
+      removed: Applikasjon fjernet
+      deactivated: Applikasjon deaktivert
+      reactivated: Applikasjon reaktivert
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC-klienthemmelighetskontroll vellykket
+            failed: OIDC-klienthemmelighetskontroll mislyktes
+        key:
+          added: OIDC-appnøkkel lagt til
+          removed: OIDC-appnøkkel fjernet
+      api:
+        secret:
+          check:
+            succeeded: API-hemmelighetskontroll vellykket
+            failed: API-hemmelighetskontroll mislyktes
+        key:
+          added: Applikasjonsnøkkel lagt til
+          removed: Applikasjonsnøkkel fjernet
+      config:
+        saml:
+          added: SAML-konfigurasjon lagt til
+          changed: SAML-konfigurasjon endret
+        oidc:
+          added: OIDC-konfigurasjon lagt til
+          changed: OIDC-konfigurasjon endret
+          secret:
+            changed: OIDC-hemmelighet endret
+            updated: OIDC-hemmelighetshash oppdatert
+        api:
+          added: API-konfigurasjon lagt til
+          changed: API-konfigurasjon endret
+          secret:
+            changed: API-hemmelighet endret
+            updated: API-hemmelighetshash oppdatert
+  policy:
+    password:
+      complexity:
+        added: Passordkompleksitetsregel lagt til
+        changed: Passordkompleksitetsregel endret
+      age:
+        added: Passordalderregel lagt til
+        changed: Passordalderregel endret
+      lockout:
+        added: Passordlåsingsregel lagt til
+        changed: Passordlåsingsregel endret
+  iam:
+    setup:
+      started: ZITADEL-oppsett startet
+      done: ZITADEL-oppsett fullført
+    global:
+      org:
+        set: Global organisasjon satt
+    project:
+      iam:
+        set: ZITADEL-prosjekt satt
+    member:
+      added: ZITADEL-medlem lagt til
+      changed: ZITADEL-medlem endret
+      removed: ZITADEL-medlem fjernet
+      cascade:
+        removed: ZITADEL-medlem kaskadefjernet
+    idp:
+      config:
+        added: IDP-konfigurasjon lagt til
+        changed: IDP-konfigurasjon endret
+        removed: IDP-konfigurasjon fjernet
+        deactivated: IDP-konfigurasjon deaktivert
+        reactivated: IDP-konfigurasjon reaktivert
+      oidc:
+        config:
+          added: OIDC IDP-konfigurasjon lagt til
+          changed: OIDC IDP-konfigurasjon endret
+      saml:
+        config:
+          added: SAML IDP-konfigurasjon lagt til
+          changed: SAML IDP-konfigurasjon endret
+      jwt:
+        config:
+          added: JWT-konfigurasjon for identitetsleverandør lagt til
+          changed: JWT-konfigurasjon for identitetsleverandør fjernet
+    customtext:
+      set: Tekst ble satt
+      removed: Tekst ble fjernet
+    policy:
+      login:
+        added: Standard innloggingsregel lagt til
+        changed: Standard innloggingsregel endret
+        idpprovider:
+          added: Identitetsleverandør lagt til i standard innloggingsregel
+          removed: Identitetsleverandør fjernet fra standard innloggingsregel
+      label:
+        added: Merkeregel lagt til
+        changed: Merkeregel endret
+        activated: Merkeregel aktivert
+        logo:
+          added: Logo lagt til i merkeregel
+          removed: Logo fjernet fra merkeregel
+          dark:
+            added: Logo (mørk modus) lagt til i merkeregel
+            removed: Logo (mørk modus) fjernet fra merkeregel
+        icon:
+          added: Ikon lagt til i merkeregel
+          removed: Ikon fjernet fra merkeregel
+          dark:
+            added: Ikon (mørk modus) lagt til i merkeregel
+            removed: Ikon (mørk modus) fjernet fra merkeregel
+        font:
+          added: Skrifttype lagt til i merkeregel
+          removed: Skrifttype fjernet fra merkeregel
+        assets:
+          removed: Ressurser fjernet fra merkeregel
+    default:
+      language:
+        set: Standardspråk satt
+    oidc:
+      settings:
+        added: OIDC-konfigurasjon lagt til
+        changed: OIDC-konfigurasjon endret
+        removed: OIDC-konfigurasjon fjernet
+    secret:
+      generator:
+        added: Hemmelighetesgenerator lagt til
+        changed: Hemmelighetesgenerator endret
+        removed: Hemmelighetesgenerator fjernet
+    smtp:
+      config:
+        added: SMTP-konfigurasjon lagt til
+        changed: SMTP-konfigurasjon endret
+        activated: SMTP-konfigurasjon aktivert
+        deactivated: SMTP-konfigurasjon deaktivert
+        removed: SMTP-konfigurasjon fjernet
+        password:
+          changed: SMTP-konfigurasjonshemmelighet endret
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS-leverandør lagt til
+          changed: Twilio SMS-leverandør endret
+          token:
+            changed: Twilio SMS-leverandørtoken endret
+          removed: Twilio SMS-leverandør fjernet
+          activated: Twilio SMS-leverandør aktivert
+          deactivated: Twilio SMS-leverandør deaktivert
+  key_pair:
+    added: Nøkkelpar lagt til
+    certificate:
+      added: Sertifikat lagt til
+  action:
+    added: Handling lagt til
+    changed: Handling endret
+    deactivated: Handling deaktivert
+    reactivated: Handling reaktivert
+    removed: Handling fjernet
+  instance:
+    added: Instans lagt til
+    changed: Instans endret
+    customtext:
+      removed: Egendefinert tekst fjernet
+      set: Egendefinert tekst satt
+      template:
+        removed: Mal for egendefinert tekst fjernet
+    default:
+      language:
+        set: Standardspråk satt
+      org:
+        set: Standardorganisasjon satt
+    domain:
+      added: Domene lagt til
+      primary:
+        set: Primærdomene satt
+      removed: Domene fjernet
+    iam:
+      console:
+        set: ZITADEL-konsollapplikasjon satt
+      project:
+        set: ZITADEL-prosjekt satt
+    mail:
+      template:
+        added: E-postmal lagt til
+        changed: E-postmal endret
+      text:
+        added: E-posttekst lagt til
+        changed: E-posttekst endret
+    member:
+      added: Instansmedlem lagt til
+      changed: Instansmedlem endret
+      removed: Instansmedlem fjernet
+      cascade:
+        removed: Instansmedlem kaskadefjernet
+    notification:
+      provider:
+        debug:
+          fileadded: Fildebug-varslingsleverandør lagt til
+          filechanged: Fildebug-varslingsleverandør endret
+          fileremoved: Fildebug-varslingsleverandør fjernet
+          logadded: Loggdebug-varslingsleverandør lagt til
+          logchanged: Loggdebug-varslingsleverandør endret
+          logremoved: Loggdebug-varslingsleverandør fjernet
+    oidc:
+      settings:
+        added: OIDC-innstillinger lagt til
+        changed: OIDC-innstillinger endret
+    policy:
+      domain:
+        added: Domeneregel lagt til
+        changed: Domeneregel endret
+      label:
+        activated: Merkeregel aktivert
+        added: Merkeregel lagt til
+        assets:
+          removed: Ressurs fjernet fra merkeregel
+        changed: Merkeregel endret
+        font:
+          added: Skrifttype lagt til i merkeregel
+          removed: Skrifttype fjernet fra merkeregel
+        icon:
+          added: Ikon lagt til i merkeregel
+          removed: Ikon fjernet fra merkeregel
+          dark:
+            added: Ikon lagt til i mørk merkeregel
+            removed: Ikon fjernet fra mørk merkeregel
+        logo:
+          added: Logo lagt til i merkeregel
+          removed: Logo fjernet fra merkeregel
+          dark:
+            added: Logo lagt til i mørk merkeregel
+            removed: Logo fjernet fra mørk merkeregel
+      lockout:
+        added: Låsingsregel lagt til
+        changed: Låsingsregel endret
+      login:
+        added: Innloggingsregel lagt til
+        changed: Innloggingsregel endret
+        idpprovider:
+          added: Identitetsleverandør lagt til i innloggingsregel
+          cascade:
+            removed: Identitetsleverandør kaskadefjernet fra innloggingsregel
+          removed: Identitetsleverandør fjernet fra innloggingsregel
+        multifactor:
+          added: Flerfaktor lagt til i innloggingsregel
+          removed: Flerfaktor fjernet fra innloggingsregel
+        secondfactor:
+          added: Andrefaktor lagt til i innloggingsregel
+          removed: Andrefaktor fjernet fra innloggingsregel
+      password:
+        age:
+          added: Passordalderregel lagt til
+          changed: Passordalderregel endret
+        complexity:
+          added: Passordkompleksitetsregel lagt til
+          changed: Passordkompleksitetsregel fjernet
+      privacy:
+        added: Personvernregel lagt til
+        changed: Personvernregel endret
+      security:
+        set: Sikkerhetsregel satt
+    removed: Instans fjernet
+    secret:
+      generator:
+        added: Hemmelighetesgenerator lagt til
+        changed: Hemmelighetesgenerator endret
+        removed: Hemmelighetesgenerator fjernet
+    sms:
+      configtwilio:
+        activated: Twilio SMS-konfigurasjon aktivert
+        added: Twilio SMS-konfigurasjon lagt til
+        changed: Twilio SMS-konfigurasjon endret
+        deactivated: Twilio SMS-konfigurasjon deaktivert
+        removed: Twilio SMS-konfigurasjon fjernet
+        token:
+          changed: Token for Twilio SMS-konfigurasjon endret
+    smtp:
+      config:
+        added: SMTP-konfigurasjon lagt til
+        changed: SMTP-konfigurasjon endret
+        activated: SMTP-konfigurasjon aktivert
+        deactivated: SMTP-konfigurasjon deaktivert
+        password:
+          changed: Passord for SMTP-konfigurasjon endret
+        removed: SMTP-konfigurasjon fjernet
+  user_schema:
+    created: Brukerskjema opprettet
+    updated: Brukerskjema oppdatert
+    deactivated: Brukerskjema deaktivert
+    reactivated: Brukerskjema reaktivert
+    deleted: Brukerskjema slettet
+    user:
+      created: Bruker opprettet
+      updated: Bruker oppdatert
+      deleted: Bruker slettet
+      email:
+        updated: E-postadresse endret
+        verified: E-postadresse verifisert
+        verification:
+          failed: E-postadresseverifisering mislyktes
+        code:
+          added: Verifiseringskode for e-postadresse generert
+          sent: Verifiseringskode for e-postadresse sendt
+      phone:
+        updated: Telefonnummer endret
+        verified: Telefonnummer verifisert
+        verification:
+          failed: Telefonnummerverifisering mislyktes
+        code:
+          added: Verifiseringskode for telefonnummer generert
+          sent: Verifiseringskode for telefonnummer sendt
+  web_key:
+    added: Webnøkkel lagt til
+    activated: Webnøkkel aktivert
+    deactivated: Webnøkkel deaktivert
+    removed: Webnøkkel fjernet
+Application:
+  OIDC:
+    UnsupportedVersion: Din OIDC-versjon støttes ikke
+    V1:
+      NotCompliant: Konfigurasjonen din er ikke i samsvar og avviker fra OIDC 1.0-standarden.
+      NoRedirectUris: Minst én viderekoblings-URI må være registrert.
+      NotAllCombinationsAreAllowed: Konfigurasjonen er i samsvar, men ikke alle kombinasjoner er tillatt.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Bevilgningstype "code" tillater kun http-viderekoblings-URIer for apptypen "web".
+          CustomOnlyForNative: Bevilgningstype "code" tillater kun egendefinerte viderekoblings-URIer for apptypen "native" (f.eks. appnavn://)
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Bevilgningstype implicit tillater ikke egendefinerte viderekoblings-URIer
+          HttpNotAllowed: Bevilgningstype implicit tillater ikke http-viderekoblings-URIer
+          HttpLocalhostOnlyForNative: Http://localhost-viderekoblings-URI er kun tillatt for native applikasjoner.
+      Native:
+        AuthMethodType:
+          NotNone: Native applikasjoner bør ha authmethodtype none.
+        RedirectUris:
+          MustBeHttpLocalhost: Viderekoblings-URIer må begynne med din egen protokoll, http://127.0.0.1, http://[::1] eller http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: User agent-app bør ha authmethodtype none.
+      GrantType:
+        Refresh:
+          NoAuthCode: Oppdateringstoken er kun tillatt i kombinasjon med autorisasjonskode.
+Action:
+  Flow:
+    Type:
+      Unspecified: Uspesifisert
+      ExternalAuthentication: Ekstern autentisering
+      CustomiseToken: Komplement token
+      InternalAuthentication: Intern autentisering
+      CustomizeSAMLResponse: Komplement SAMLResponse
+  TriggerType:
+    Unspecified: Uspesifisert
+    PostAuthentication: Etter autentisering
+    PreCreation: Før opprettelse
+    PostCreation: Etter opprettelse
+    PreUserinfoCreation: Før Userinfo-opprettelse
+    PreAccessTokenCreation: Før tilgangstokenopprettelse
+    PreSAMLResponseCreation: Før SAMLResponse-opprettelse

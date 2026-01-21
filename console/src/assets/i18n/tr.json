@@ -1559,7 +1559,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       }
     },
     "SMTP": {
@@ -1807,7 +1808,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-posta doğrulama tamamlandı",
@@ -2792,7 +2794,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
   },
   "MEMBER": {
     "ADD": "Yönetici Ekle",
