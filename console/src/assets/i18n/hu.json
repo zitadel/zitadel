@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "A titok sikeresen eltávolítva!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL kezelői szerepkörök",
+      "TITLE": "ZITADEL rendszergazdai szerepkörök",
       "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
       "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
       "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
