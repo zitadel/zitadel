@@ -18,8 +18,8 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
-- [Add application roles via the ZITADEL Management API](/docs/apis/resources/mgmt/project-roles)
-- [Add manager roles to users via the ZITADEL Management API](/docs/apis/resources/mgmt/members)
+- [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
+- [Add manager roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
 
 ## Retrieve roles
 
@@ -80,6 +80,14 @@ If you need them included in your ID Token, select **’User Roles Inside ID Tok
 
 
 Alternatively, you can include the claims `urn:iam:org:project:roles` or/and `urn:zitadel:iam:org:projects:roles` in your scope to achieve the same as above. 
+
+### Determine the roles assigned to a user
+
+To determine the roles assigned to a user, you have two options:
+
+- **Token claims**: Request that the relevant roles claim (such as `urn:zitadel:iam:org:project:{projectId}:roles`) is included in the token when you authenticate. The roles assigned to the user will then be part of the token’s payload.
+- **Token introspection**: After a token is issued, you can introspect it using the [ZITADEL introspection endpoint](/docs/guides/integrate/token-introspection) to view the roles claim. This will return the roles assigned to the user according to the token.
+
 
 ### Retrieve roles from the userinfo endpoint
 
@@ -210,7 +218,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/category/apis/resources/auth/user-authorizations-grants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
@@ -394,7 +402,7 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
 
-In [APIs listed under user grants in the management API](/docs/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/docs/category/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 

@@ -59,7 +59,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
@@ -254,7 +254,7 @@ service SystemService {
   //
   // Deprecated: use [instance service v2 ListCustomDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-custom-domains.api.mdx) instead.
   //
-  // Returns the custom domains of an instance.
+  // Returns the Custom Domains of an instance.
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_search";
@@ -272,7 +272,7 @@ service SystemService {
 
   // Adds a domain to an instance
   //
-  // Deprecated: Use [AddCustomDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-custom-domain.api.mdx) instead to add a custom domain to the instance in context
+  // Deprecated: Use [AddCustomDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-custom-domain.api.mdx) instead to add a Custom Domain to the instance in context
   rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains";
@@ -290,7 +290,7 @@ service SystemService {
 
   // Removes the domain of an instance
   //
-  // Deprecated: Use [RemoveDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-custom-domain.api.mdx) instead to remove a custom domain from the instance in context
+  // Deprecated: Use [RemoveDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-custom-domain.api.mdx) instead to remove a Custom Domain from the instance in context
   rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/domains/{domain}";

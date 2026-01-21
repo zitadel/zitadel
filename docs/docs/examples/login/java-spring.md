@@ -144,7 +144,7 @@ In case you've created your own application and depending on your development se
 mvn clean package -DskipTests
 ```
 
-You will need to provide the `issuer-uri` (your ZITADEL domain) and the `client-id` previously created:
+You will need to provide the `issuer-uri` (your Custom Domain) and the `client-id` previously created:
 
 ```bash
 java \
