@@ -426,9 +426,9 @@ func newProjectionsList() {
 		ProjectRelationalProjection,
 		ProjectRoleRelationalProjection,
 		OrganizationMetadataRelationalProjection,
+		UserRelationalProjection,
 		AuthorizationRelationalProjection,
 		ProjectGrantRelationalProjection,
 		SessionRelationalProjection,
-		UserRelationalProjection,
 	}
 }

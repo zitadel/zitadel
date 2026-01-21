@@ -79,6 +79,7 @@ func transactionForRollback(t *testing.T) (tx database.Transaction, rollback fun
 	tx, err := pool.Begin(t.Context(), nil)
 	require.NoError(t, err)
 	return tx, func() {
+		// context.Background to ensure rollback does not return an error if test is already done
 		err := tx.Rollback(context.Background())
 		require.NoError(t, err)
 	}
@@ -89,6 +90,7 @@ func savepointForRollback(t *testing.T, tx database.Transaction) (savepoint data
 	savepoint, err := tx.Begin(t.Context())
 	require.NoError(t, err)
 	return savepoint, func() {
+		// context.Background to ensure rollback does not return an error if test is already done
 		err := savepoint.Rollback(context.Background())
 		require.NoError(t, err)
 	}
