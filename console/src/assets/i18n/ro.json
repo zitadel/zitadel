@@ -1158,7 +1158,7 @@
       "SECRETREMOVED": "Secret eliminat cu succes!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Rolurile administratorului ZITADEL",
+      "TITLE": "Rolurile administratorilor ZITADEL",
       "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
