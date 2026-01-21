@@ -48,11 +48,11 @@
 @import 'src/app/components/quickstart/quickstart.component.scss';
 @import 'src/app/components/framework-autocomplete/framework-autocomplete.component.scss';
 @import 'src/app/components/framework-change/framework-change.component.scss';
+@import 'src/app/components/env-vars-block/env-vars-block.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
 @import 'src/app/modules/accounts-card/accounts-card.component.scss';
 @import 'src/app/modules/onboarding-card/onboarding-card.component.scss';
-@import 'src/app/pages/app-create/app-create.component.scss';
 @import 'src/app/modules/onboarding/onboarding.component.scss';
 @import 'src/app/modules/filter/filter.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
@@ -78,6 +78,7 @@
 @import './styles/codemirror.scss';
 @import 'src/app/components/copy-row/copy-row.component.scss';
 @import 'src/app/modules/providers/provider-next/provider-next.component.scss';
+@import 'src/app/pages/app-quick-create/app-quick-create.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -101,6 +102,7 @@
   @include search-user-autocomplete-theme($theme);
   @include quickstart-theme($theme);
   @include project-role-chips-theme($theme);
+  @include env-vars-block-theme($theme);
   @include card-theme($theme);
   @include idp-settings-theme($theme);
   @include filter-events-theme($theme);
@@ -159,4 +161,5 @@
   @include copy-row-theme($theme);
   @include provider-next-theme($theme);
   @include smtp-settings-theme($theme);
+  @include app-quick-create-theme($theme);
 }

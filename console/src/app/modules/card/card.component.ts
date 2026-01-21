@@ -13,4 +13,5 @@ export class CardComponent {
   @Input() public expanded: boolean = true;
   @Input() public warn: boolean = false;
   @Input() public nomargin: boolean = false;
+  @Input() public collapsible: boolean = false;
 }

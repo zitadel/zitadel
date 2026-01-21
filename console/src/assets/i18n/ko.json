@@ -435,7 +435,8 @@
     "TOS": "이용 약관",
     "OPENSHORTCUTSTOOLTIP": "키보드 단축키 표시하려면 ? 입력",
     "SETTINGS": "설정",
-    "CUSTOMERPORTAL": "고객 포털"
+    "CUSTOMERPORTAL": "고객 포털",
+    "TARGETS": "대상"
   },
   "QUICKSTART": {
     "TITLE": "애플리케이션에 ZITADEL 통합",
@@ -706,9 +707,9 @@
     "PROJECTNAME": "프로젝트 이름",
     "RESOURCEOWNER": "리소스 소유자",
     "METHODS": {
+      "1": "와 일치",
       "5": "포함",
-      "7": "로 끝남",
-      "1": "와 일치"
+      "7": "로 끝남"
     }
   },
   "KEYBOARDSHORTCUTS": {
@@ -1510,7 +1511,9 @@
       "SECURITY": "보안 설정",
       "EVENTS": "이벤트",
       "FAILEDEVENTS": "실패한 이벤트",
-      "VIEWS": "뷰"
+      "VIEWS": "뷰",
+      "ACTIONS": "작업",
+      "TARGETS": "대상"
     },
     "GROUPS": {
       "GENERAL": "일반 정보",
@@ -1520,7 +1523,8 @@
       "TEXTS": "텍스트 및 언어",
       "APPEARANCE": "외형",
       "OTHER": "기타",
-      "STORAGE": "저장소"
+      "STORAGE": "저장소",
+      "ACTIONS": "작업"
     },
     "BETA": "베타"
   },
@@ -1979,7 +1983,6 @@
         "GRANTED_SINGULAR": "{{name}}의 허가된 프로젝트"
       },
       "PRIVATELABEL": {
-        "TITLE": "브랜딩 설정",
         "0": {
           "TITLE": "정의되지 않음",
           "DESC": "사용자가 식별되면 식별된 사용자의 조직 브랜딩이 표시되며, 그렇지 않으면 시스템 기본값이 표시됩니다."
@@ -1992,6 +1995,7 @@
           "TITLE": "사용자 조직 설정 사용",
           "DESC": "프로젝트의 조직 브랜딩이 표시되지만 사용자가 식별되면 식별된 사용자의 조직 설정이 표시됩니다."
         },
+        "TITLE": "브랜딩 설정",
         "DIALOG": {
           "TITLE": "브랜딩 설정",
           "DESCRIPTION": "프로젝트 사용 시 로그인 동작을 선택하세요."
@@ -2023,16 +2027,16 @@
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "상태",
       "0": "정의되지 않음",
       "1": "활성화",
-      "2": "비활성화"
+      "2": "비활성화",
+      "TITLE": "상태"
     },
     "TYPE": {
-      "TITLE": "유형",
       "0": "알 수 없는 유형",
       "1": "소유한 프로젝트",
-      "2": "허가된 프로젝트"
+      "2": "허가된 프로젝트",
+      "TITLE": "유형"
     },
     "NAME": "이름",
     "NAMEDIALOG": {
@@ -2182,7 +2186,8 @@
       "UPDATED": "프로젝트가 변경되었습니다.",
       "GRANTUPDATED": "권한이 변경되었습니다.",
       "DELETED": "프로젝트가 삭제되었습니다."
-    }
+    },
+    "CLICK_TO_EDIT_NAME": "프로젝트 이름을 편집하려면 클릭"
   },
   "ROLES": {
     "DIALOG": {
@@ -2282,10 +2287,10 @@
       "2": "비활성화"
     },
     "AZUREADTENANTTYPES": {
-      "3": "테넌트 ID",
       "0": "공통",
       "1": "조직",
-      "2": "소비자"
+      "2": "소비자",
+      "3": "테넌트 ID"
     },
     "AZUREADTENANTTYPE": "테넌트 유형",
     "AZUREADTENANTID": "테넌트 ID",
@@ -2554,7 +2559,6 @@
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "다음 단계",
         "0": {
           "TITLE": "역할 추가",
           "DESC": "프로젝트 역할을 입력하세요"
@@ -2566,8 +2570,24 @@
         "2": {
           "TITLE": "도움말 및 지원",
           "DESC": "애플리케이션 생성에 대한 문서를 읽거나 지원팀에 문의하세요"
-        }
-      }
+        },
+        "TITLE": "다음 단계"
+      },
+      "CREATE_PROJECT_AUTO": "자동으로 프로젝트 생성",
+      "CREATE_PROJECT_AUTO_DESC": "ZITADEL을 처음 사용하는 경우 권장됩니다. 프로젝트 설정을 대신 처리해 드립니다.",
+      "QUICK_CREATE_DESC": "세 가지 간단한 단계로 애플리케이션을 생성하세요.",
+      "QUICK_CREATE_FRAMEWORK": "프레임워크 선택",
+      "QUICK_CREATE_FRAMEWORK_DESC": "애플리케이션에 권장 구성을 제공합니다. 사용 중이거나 사용할 예정인 프레임워크를 선택하세요.",
+      "QUICK_CREATE_NAME": "애플리케이션 이름 지정",
+      "QUICK_CREATE_TITLE": "애플리케이션 생성",
+      "CUSTOM_APP_TITLE": "사용자 정의 애플리케이션",
+      "CUSTOM_APP_DESC": "아래에서 선택한 구성으로 프로젝트와 애플리케이션을 생성합니다.",
+      "CUSTOM_APP_NAME": "애플리케이션 이름",
+      "CUSTOM_APP_NAME_LABEL": "이름",
+      "CUSTOM_APP_TYPE": "애플리케이션 유형",
+      "CUSTOM_APP_AUTH_METHOD": "인증 방법",
+      "CUSTOM_APP_CANCEL": "취소",
+      "CUSTOM_APP_CREATE": "앱 만들기"
     },
     "NAMEDIALOG": {
       "TITLE": "앱 이름 변경",
@@ -2756,6 +2776,94 @@
       "CLIENTSECRETREGENERATED": "클라이언트 시크릿이 생성되었습니다.",
       "DELETED": "애플리케이션이 삭제되었습니다.",
       "CONFIGCHANGED": "변경 사항이 감지되었습니다!"
+    },
+    "QUICKSTART": "빠른 시작",
+    "OVERVIEW_DETAIL": {
+      "TITLE": "빠른 시작",
+      "DESCRIPTION": "ZITADEL 인증으로 애플리케이션을 시작하세요.",
+      "GETSTARTED": "애플리케이션 시작하기",
+      "GETSTARTED_DESC": "이 가이드는 ZITADEL 인증을 애플리케이션에 빠르고 쉽게 통합할 수 있도록 도와줍니다.",
+      "FRAMEWORK": "프레임워크",
+      "VIEWDOCS": "문서 보기",
+      "VIEWEXAMPLE": "예제 보기",
+      "ENVVARS": "환경 변수",
+      "ENVVARS_DESC": "다음 환경 변수를 애플리케이션에 추가하세요:",
+      "ENVFILE": ".env",
+      "QUICKSTART": "어디서 시작할까요?",
+      "QUICKSTART_SUBTITLE": "현재 상황에 가장 잘 맞는 옵션을 선택하세요:",
+      "OPTION1": "옵션 1: 예제 애플리케이션 클론하기",
+      "OPTION1_DESC": "작동하는 예제 애플리케이션으로 빠르게 시작하세요:",
+      "OPTION1_NOTE": "클론한 후, 환경 변수를 애플리케이션의 실제 값으로 업데이트하세요.",
+      "OPTION2": "옵션 2: 기존 애플리케이션에 통합하기",
+      "OPTION2_DESC": "ZITADEL 인증을 기존 애플리케이션에 통합하세요:",
+      "STEP1": "프레임워크용 ZITADEL SDK 설치",
+      "STEP2": "환경 변수 설정",
+      "STEP3": "애플리케이션에 인증 추가",
+      "STEP4": "통합 테스트",
+      "GENERIC": "일반 통합",
+      "GENERIC_DESC": "자세한 예제와 가이드를 확인하세요:",
+      "ALLEXAMPLES": "모든 예제",
+      "INTEGRATION_GUIDE": "통합 가이드",
+      "NEXTSTEPS": "다음 단계",
+      "CONFIGURE": "구성 설정",
+      "CONFIGURE_DESC": "애플리케이션의 OIDC 구성을 설정하세요",
+      "REDIRECTS": "리디렉션 설정",
+      "REDIRECTS_DESC": "로그인 및 로그아웃 리디렉트 URL을 구성하세요",
+      "URLS_DESC": "통합에 필요한 중요한 URL을 확인하세요",
+      "TERMINAL": "터미널",
+      "SCENARIO_NEW_TITLE": "새로운 애플리케이션을 만들고 싶어요",
+      "SCENARIO_NEW_DESC": "좋아요! ZITADEL 인증이 포함된 예제로 빠르게 시작할 수 있도록 도와드릴게요.",
+      "SCENARIO_NEW_TOGGLE": "아직 애플리케이션이 없어요",
+      "SCENARIO_EXISTING_TITLE": "기존 애플리케이션에 통합하고 싶어요",
+      "SCENARIO_EXISTING_DESC": "좋습니다! ZITADEL 인증을 추가하는 과정을 단계별로 안내해드릴게요.",
+      "SCENARIO_EXISTING_TOGGLE": "이미 애플리케이션이 있어요",
+      "CLONE_EXAMPLE": "예제 클론하기",
+      "CLONE_NOTE": "클론한 후 .env 파일을 애플리케이션 값으로 업데이트하면 바로 사용할 수 있어요!",
+      "BROWSE_EXAMPLES": "모든 예제 보기",
+      "GENERIC_NEW_NOTE": "사용 중인 기술 스택에 맞는 예제를 선택해 클론하여 빠르게 시작하세요.",
+      "EXISTING_STEP1_TITLE": "SDK 설치",
+      "EXISTING_STEP1_DESC": "프로젝트에 SDK를 추가하세요",
+      "EXISTING_STEP2_TITLE": "구성 추가",
+      "EXISTING_STEP2_DESC": "이 환경 변수를 애플리케이션의 환경 파일에 복사하여 붙여넣으세요",
+      "EXISTING_STEP3_TITLE": "인증 설정",
+      "EXISTING_STEP3_DESC": "통합 가이드를 따라 인증을 추가하세요",
+      "VIEW_SDKS": "SDK 문서 보기",
+      "AUTH_STATUS_CHECKING": "인증 상태 확인 중...",
+      "AUTH_STATUS_SUCCESS": "애플리케이션이 성공적으로 ZITADEL에 인증되었습니다.",
+      "AUTH_STATUS_PENDING": "첫 번째 사용자 인증을 기다리고 있습니다.",
+      "AUTH_STATUS_PENDING_DESC": "인증을 설정하려면 아래 통합 가이드를 따르세요.",
+      "SUCCESS_TITLE": "🎉 완료! 애플리케이션이 성공적으로 연결되었습니다",
+      "SUCCESS_DESC": "애플리케이션이 ZITADEL에 성공적으로 인증되었습니다. 아래 환경 변수를 애플리케이션에서 사용하세요.",
+      "ENVVARS_AUTHENTICATED_DESC": "다음 환경 변수를 애플리케이션에서 사용하세요:",
+      "INTEGRATION_ENVVARS_TITLE": "애플리케이션 구성",
+      "INTEGRATION_ENVVARS_DESC": "ZITADEL과 연결하려면 다음 환경 변수를 애플리케이션에 추가하세요:",
+      "NEW_STEP1_TITLE": "예제 애플리케이션 클론하기",
+      "NEW_STEP1_DESC": "ZITADEL 인증이 이미 포함된 작동 예제로 빠르게 시작하세요.",
+      "NEW_STEP2_TITLE": "환경 변수 설정",
+      "NEW_STEP2_DESC": "이 환경 변수를 애플리케이션에 추가하세요. 프로젝트 루트의 .env 파일에 붙여넣거나 파일을 다운로드하세요.",
+      "NEW_STEP2_DESC_EXAMPLE_ENV": ".env.example 파일을 이 값으로 업데이트한 다음 .env로 이름을 변경하세요.",
+      "NEW_STEP2_CLIENT_SECRET_NOTE": "'your-client-secret'을 실제 client secret으로 변경하세요. 앱 생성 시 저장하지 않았다면 ",
+      "NEW_STEP2_CLIENT_SECRET_LINK": "여기에서 새로 생성할 수 있어요",
+      "NEW_STEP3_TITLE": "애플리케이션 실행 및 테스트",
+      "NEW_STEP3_DESC": "종속성을 설치하세요.",
+      "NEW_STEP3_DESC2": "애플리케이션을 실행하고 인증 흐름을 테스트하세요.",
+      "NEW_STEP4_TITLE": "문서 보기",
+      "NEW_STEP4_DESC": "ZITADEL로 애플리케이션을 구성하고 확장하는 방법을 문서에서 확인하세요.",
+      "STEP4_ACTION": "문서 보기",
+      "GENERIC_NEW_TITLE": "시작 방식을 선택하세요",
+      "GENERIC_EXISTING_TITLE": "통합 방식을 선택하세요",
+      "GENERIC_EXISTING_NOTE": "프레임워크에 맞는 SDK가 없다면, 일반 통합 가이드를 사용하거나 직접 OIDC/OAuth2 엔드포인트를 사용할 수 있습니다.",
+      "API_DOCS": "API 문서",
+      "NEW_STEP_DOCS_TITLE": "전체 문서 보기",
+      "NEW_STEP_DOCS_DESC": "프레임워크의 고급 설정 및 모범 사례에 대해 자세히 알아보세요.",
+      "EXISTING_STEP_DOCS_TITLE": "통합에 대해 자세히 보기",
+      "EXISTING_STEP_DOCS_DESC": "고급 구성과 문제 해결을 위한 자세한 문서를 확인하세요.",
+      "SELECT_FRAMEWORK": "프레임워크 선택",
+      "SELECT_FRAMEWORK_DESC": "사용 중인 프레임워크를 선택하면 맞춤 예제와 통합 가이드를 확인할 수 있습니다."
+    },
+    "LOGINV2": {
+      "USEV2": "Use new Login UI",
+      "BASEURL": "Custom base URL for the new Login UI"
     }
   },
   "GENDERS": {
@@ -2791,10 +2899,10 @@
     "ADD": "매니저 추가",
     "CREATIONTYPE": "생성 유형",
     "CREATIONTYPES": {
-      "3": "IAM",
-      "2": "조직",
       "0": "소유 프로젝트",
       "1": "부여된 프로젝트",
+      "2": "조직",
+      "3": "IAM",
       "4": "프로젝트"
     },
     "EDITROLE": "역할 편집",

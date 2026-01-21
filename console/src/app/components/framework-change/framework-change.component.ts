@@ -1,75 +1,61 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { ActivatedRoute, Params, RouterModule } from '@angular/router';
+import { ChangeDetectionStrategy, Component, effect, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
-import { Framework } from '../quickstart/quickstart.component';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { map, ReplaySubject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { FrameworkChangeDialogComponent } from './framework-change-dialog.component';
+import {
+  FrameworkChangeDialogComponent,
+  FrameworkChangeDialogData,
+  FrameworkChangeDialogResult,
+} from './framework-change-dialog.component';
+import { outputFromObservable, takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { frameworks } from 'src/app/utils/framework';
+import { filter } from 'rxjs/operators';
+
+type Framework = (typeof frameworks)[number];
 
 @Component({
   selector: 'cnsl-framework-change',
   templateUrl: './framework-change.component.html',
   styleUrls: ['./framework-change.component.scss'],
   imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FrameworkChangeComponent implements OnInit, OnDestroy {
-  private destroy$: Subject<void> = new Subject();
-  public framework: BehaviorSubject<Framework | undefined> = new BehaviorSubject<Framework | undefined>(undefined);
-  @Output() public frameworkChanged: EventEmitter<Framework> = new EventEmitter();
-  public frameworks: Framework[] = frameworkDefinition.map((f) => {
-    return {
-      ...f,
-      fragment: '',
-      imgSrcDark: `assets${f.imgSrcDark}`,
-      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-    };
-  });
+export class FrameworkChangeComponent {
+  protected readonly frameworks = frameworks;
+  protected readonly framework$ = new ReplaySubject<Framework>(1);
+  public readonly frameworkChanged = outputFromObservable(this.framework$);
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
   ) {
-    this.framework.pipe(takeUntil(this.destroy$)).subscribe((value) => {
-      this.frameworkChanged.emit(value);
+    const frameworkSignal = toSignal(this.activatedRoute.queryParamMap.pipe(map((params) => params.get('framework'))), {
+      initialValue: null,
     });
-  }
-
-  public ngOnInit() {
-    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
-      const { framework } = params;
+    effect(() => {
+      const framework = this.frameworks.find((f) => f.id === frameworkSignal());
       if (framework) {
-        this.findFramework(framework);
+        this.framework$.next(framework);
       }
     });
   }
 
-  public ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public findFramework(id: string) {
-    const temp = this.frameworks.find((f) => f.id === id);
-    this.framework.next(temp);
-    this.frameworkChanged.emit(temp);
-  }
-
-  public openDialog(): void {
-    const ref = this.dialog.open(FrameworkChangeDialogComponent, {
-      width: '400px',
-      data: {
-        framework: this.framework.value,
-        frameworks: this.frameworks,
-      },
-    });
-
-    ref.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.framework.next(resp);
-      }
-    });
+  public openDialog(framework: Framework | null) {
+    this.dialog
+      .open<FrameworkChangeDialogComponent, FrameworkChangeDialogData, FrameworkChangeDialogResult>(
+        FrameworkChangeDialogComponent,
+        {
+          width: '400px',
+          data: framework,
+        },
+      )
+      .afterClosed()
+      .pipe(filter(Boolean), takeUntilDestroyed())
+      .subscribe((framework) => {
+        this.framework$.next(framework);
+      });
   }
 }

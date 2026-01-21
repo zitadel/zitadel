@@ -1,68 +1,73 @@
-<cnsl-top-view
-  title="{{ project?.name }}"
-  docLink="https://zitadel.com/docs/guides/manage/console/projects-overview"
-  sub="{{ 'PROJECT.PAGES.TYPE.OWNED_SINGULAR' | translate }}"
-  [isActive]="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
-  [isInactive]="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
-  [hasContributors]="true"
-  stateTooltip="{{ 'PROJECT.STATE.' + project?.state | translate }}"
-  [hasActions]="['project.app.write:' + project?.id, 'project.app.write$'] | hasRole | async"
->
-  <ng-template topActions cnslHasRole [hasRole]="['project.write:' + projectId, 'project.write']">
-    <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
-      {{ 'ACTIONS.RENAME' | translate }}
-    </button>
+<div class="top-view-wrapper" [class.zitadel-project]="isZitadel">
+  <cnsl-top-view
+    [title]="project?.name || ''"
+    [titleEditable]="!isZitadel && ((['project.write:' + projectId, 'project.write'] | hasRole | async) ?? false)"
+    [titlePlaceholder]="'PROJECT.NAMEDIALOG.NAME' | translate"
+    (titleChanged)="updateProjectName($event)"
+    docLink="https://zitadel.com/docs/guides/manage/console/projects"
+    sub="{{ 'PROJECT.PAGES.TYPE.OWNED_SINGULAR' | translate }}"
+    [isActive]="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
+    [isInactive]="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
+    [hasContributors]="true"
+    stateTooltip="{{ 'PROJECT.STATE.' + project?.state | translate }}"
+    [hasActions]="['project.app.write:' + project?.id, 'project.app.write$'] | hasRole | async"
+  >
+    <ng-template topActions cnslHasRole [hasRole]="['project.write:' + projectId, 'project.write']">
+      <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
+        {{ 'ACTIONS.RENAME' | translate }}
+      </button>
 
-    <button
-      mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
-      *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
-      (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)"
-    >
-      {{ 'PROJECT.TABLE.DEACTIVATE' | translate }}
-    </button>
-
-    <button
-      mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
-      *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
-      (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)"
-    >
-      {{ 'PROJECT.TABLE.ACTIVATE' | translate }}
-    </button>
-
-    <ng-template cnslHasRole [hasRole]="['project.delete$', 'project.delete:' + projectId]">
       <button
         mat-menu-item
-        matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-        (click)="deleteProject()"
-        aria-label="Edit project name"
-        *ngIf="isZitadel === false"
+        [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
+        *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
+        (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)"
       >
-        <span [style.color]="'var(--warn)'">{{ 'PROJECT.PAGES.DELETE' | translate }}</span>
+        {{ 'PROJECT.TABLE.DEACTIVATE' | translate }}
       </button>
+
+      <button
+        mat-menu-item
+        [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
+        *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
+        (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)"
+      >
+        {{ 'PROJECT.TABLE.ACTIVATE' | translate }}
+      </button>
+
+      <ng-template cnslHasRole [hasRole]="['project.delete$', 'project.delete:' + projectId]">
+        <button
+          mat-menu-item
+          matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+          (click)="deleteProject()"
+          aria-label="Edit project name"
+          *ngIf="isZitadel === false"
+        >
+          <span [style.color]="'var(--warn)'">{{ 'PROJECT.PAGES.DELETE' | translate }}</span>
+        </button>
+      </ng-template>
     </ng-template>
-  </ng-template>
-  <cnsl-contributors
-    topContributors
-    class="project-contributors"
-    *ngIf="project"
-    [loading]="loading$ | async"
-    [totalResult]="totalMemberResult"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['project.member.write$', 'project.member.write:' + project.id] | hasRole | async) === false"
-  >
-  </cnsl-contributors>
+    <cnsl-contributors
+      topContributors
+      class="project-contributors"
+      *ngIf="project"
+      [loading]="loading$ | async"
+      [totalResult]="totalMemberResult"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['project.member.write$', 'project.member.write:' + project.id] | hasRole | async) === false"
+    >
+    </cnsl-contributors>
 
-  <p topContent *ngIf="isZitadel" class="zitadel-warning">{{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}</p>
+    <p topContent *ngIf="isZitadel" class="zitadel-warning">{{ 'PROJECT.PAGES.ZITADELPROJECT' | translate }}</p>
 
-  <cnsl-info-row topContent *ngIf="project" [project]="project"></cnsl-info-row>
-</cnsl-top-view>
+    <cnsl-info-row topContent *ngIf="project" [project]="project"></cnsl-info-row>
+  </cnsl-top-view>
+</div>
 
 <div class="max-width-container">
   <cnsl-meta-layout>
