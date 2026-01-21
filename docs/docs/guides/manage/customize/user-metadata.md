@@ -227,4 +227,4 @@ The user that calls the management service must have [manager permissions](/docs
 A user can be either a human user or a service user.
 
 You can get [metadata of a user filtered by your query](/docs/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/docs/apis/resources/mgmt/management-service-get-user-metadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/docs/apis/resources/mgmt/users).
+The management service allows you to set and delete metadata, see the [API documentation for users](/docs/category/apis/resources/mgmt/users).

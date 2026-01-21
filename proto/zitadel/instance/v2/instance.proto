@@ -193,7 +193,7 @@ message TrustedDomainFilter {
     oneof filter {
         option (validate.required) = true;
 
-        // Filter for a specific trusted domain.
+        // Filter for a specific Trusted Domain.
         DomainFilter domain_filter = 1;
     }
 }
