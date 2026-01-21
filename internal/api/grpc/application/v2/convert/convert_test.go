@@ -87,7 +87,7 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 	validSearchByClientIDQuery, err := query.NewAppClientIDSearchQuery("clientID")
 	require.NoError(t, err)
 
-	validSearchByEntityIDQuery, err := query.NewAppClientIDSearchQuery("entityID")
+	validSearchByEntityIDQuery, err := query.NewAppSAMLEntityIDSearchQuery("entityID")
 	require.NoError(t, err)
 
 	sysDefaults := systemdefaults.SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 150}
