@@ -97,6 +97,19 @@ func TestServer_AddOrganization(t *testing.T) {
 			},
 		},
 		{
+			name: "no admin, custom organization ID",
+			ctx:  CTX,
+			req: &org.AddOrganizationRequest{
+				Name:           integration.OrganizationName(),
+				OrganizationId: gu.Ptr("custom-organization-ID"),
+				OrgId:          gu.Ptr("custom-org-ID"), // will be ignored in favor of OrganizationId
+			},
+			want: &org.AddOrganizationResponse{
+				OrganizationId: "custom-organization-ID",
+				CreatedAdmins:  []*org.AddOrganizationResponse_CreatedAdmin{},
+			},
+		},
+		{
 			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
