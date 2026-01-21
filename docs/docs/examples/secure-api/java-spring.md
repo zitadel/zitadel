@@ -218,7 +218,7 @@ Content-Length: 0
 Date: Mon, 15 Jan 2024 09:24:39 GMT
 ```
 
-### Add admin role
+### Add administrator role
 
 So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
