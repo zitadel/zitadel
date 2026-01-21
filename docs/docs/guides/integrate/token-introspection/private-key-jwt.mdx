@@ -82,10 +82,10 @@ To use Private Key JWT for introspection, you must register your client applicat
 ```
 {
   "type": "application",
-  "keyId": "<YOUR_KEY_ID>",
-  "key": "-----BEGIN RSA PRIVATE KEY-----\n<YOUR_PRIVATE_KEY>\n-----END RSA PRIVATE KEY-----\n",
-  "appId": "<YOUR_APP_ID>",
-  "clientId": "<YOUR_CLIENT_ID>"
+  "keyId": "${YOUR_KEY_ID}",
+  "key": "-----BEGIN RSA PRIVATE KEY-----\n${YOUR_PRIVATE_KEY}\n-----END RSA PRIVATE KEY-----\n",
+  "appId": "${YOUR_APP_ID}",
+  "clientId": "${YOUR_CLIENT_ID}"
 }
 ```
 
@@ -111,11 +111,11 @@ To introspect an access token in ZITADEL, your backend must authenticate by prov
 
 **Required request parameters:**
 
-| **Parameter**            | **Description**                                                                                                       |
-|------------------------- |---------------------------------------------------------------------------------------------------------------------|
-| `client_assertion`       | The JWT assertion created and signed as described below.                                                            |
-| `client_assertion_type`  | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                    |
-| `token`                  | The access token you want to introspect.                                                                            |
+| **Parameter**           | **Description**                                                  |
+|-------------------------|------------------------------------------------------------------|
+| `client_assertion`      | The JWT assertion created and signed as described below.         |
+| `client_assertion_type` | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer` |
+| `token`                 | The access token you want to introspect.                         |
 
 ### Creating the Client Assertion (JWT)
 
@@ -125,16 +125,16 @@ The `client_assertion` parameter is a signed JWT with the following structure:
 ```json
 {
   "alg": "RS256",
-  "kid": "<YOUR_KEY_ID>"
+  "kid": "${YOUR_KEY_ID}"
 }
 ```
 
 **Payload:**
 ```json
 {
-  "iss": "<YOUR_CLIENT_ID>",
-  "sub": "<YOUR_CLIENT_ID>",
-  "aud": "https://${YOUR_DOMAIN}",        // Your ZITADEL issuer URL
+  "iss": "${YOUR_CLIENT_ID}",
+  "sub": "${YOUR_CLIENT_ID}",
+  "aud": "https://${CUSTOM_DOMAIN}",     // Your ZITADEL issuer URL / Custom Domain
   "exp": 1605183582,                     // Expiry (Unix timestamp)
   "iat": 1605179982                      // Issued at (Unix timestamp, not older than 1 hour)
 }
@@ -153,7 +153,7 @@ Make a POST request to the introspection endpoint, sending the above parameters:
 
 ```bash
 curl --request POST \
-  --url ${YOUR_DOMAIN}/oauth/v2/introspect \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \

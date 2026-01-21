@@ -1091,7 +1091,7 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 }
 
 func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
-	expectMailSubject := "Add Passwordless Login"
+	expectMailSubject := "Add Passkey Login"
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)

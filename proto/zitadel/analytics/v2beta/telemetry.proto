@@ -10,7 +10,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta;analyt
 message InstanceInformation {
   // The unique identifier of the instance.
   string id = 1;
-  // The custom domains (incl. generated ones) of the instance.
+  // The Custom Domains (incl. generated ones) of the instance.
   repeated string domains = 2;
   // The creation date of the instance.
   google.protobuf.Timestamp created_at = 3;

@@ -1,27 +1,25 @@
-package zerrors_test
+package zerrors
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestErrorMethod(t *testing.T) {
-	err := zerrors.ThrowError(nil, "id", "msg")
+	err := ThrowError(nil, "id", "msg")
 	expected := "ID=id Message=msg"
 	assert.Equal(t, expected, err.Error())
 
-	err = zerrors.ThrowError(err, "subID", "subMsg")
+	err = ThrowError(err, "subID", "subMsg")
 	subExptected := "ID=subID Message=subMsg Parent=(ID=id Message=msg)"
 	assert.Equal(t, subExptected, err.Error())
 }
 
 func TestZitadelError_Is(t *testing.T) {
 	parent := errors.New("parent error")
-	target := zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "message")
+	target := newZitadelError(KindAborted, parent, "id", "message")
 	tests := []struct {
 		name string // description of this test case
 		err  error
@@ -34,27 +32,27 @@ func TestZitadelError_Is(t *testing.T) {
 		},
 		{
 			name: "different kind",
-			err:  zerrors.CreateZitadelError(zerrors.KindNotFound, parent, "id", "message"),
+			err:  newZitadelError(KindNotFound, parent, "id", "message"),
 			want: false,
 		},
 		{
 			name: "different id",
-			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "otherID", "message"),
+			err:  newZitadelError(KindAborted, parent, "otherID", "message"),
 			want: false,
 		},
 		{
 			name: "different message",
-			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "other message"),
+			err:  newZitadelError(KindAborted, parent, "id", "other message"),
 			want: false,
 		},
 		{
 			name: "different parent",
-			err:  zerrors.CreateZitadelError(zerrors.KindAborted, errors.New("other parent"), "id", "message"),
+			err:  newZitadelError(KindAborted, errors.New("other parent"), "id", "message"),
 			want: false,
 		},
 		{
 			name: "same error",
-			err:  zerrors.CreateZitadelError(zerrors.KindAborted, parent, "id", "message"),
+			err:  newZitadelError(KindAborted, parent, "id", "message"),
 			want: true,
 		},
 	}

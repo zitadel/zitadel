@@ -1146,7 +1146,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
-	expired := passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	var expired bool
+	if isInternalLogin && user.PasswordSet {
+		expired = passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	}
 	if expired || user.PasswordChangeRequired {
 		steps = append(steps, &domain.ChangePasswordStep{Expired: expired})
 	}

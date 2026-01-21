@@ -39,7 +39,7 @@ After the ZITADEL SAML provider exists, we’ll return to PingFederate and finis
 2. Make sure **SAML 2.0** Browser SSO is enabled for this connection.
 3. Proceed to **Assertion Creation**:
    - Keep the default **NameID** attribute.
-   - Add additional attributes you want to send to ZITADEL (you need at least `email`, `given_name`, `family_name`, and you can send optional attributes like `display_name`).
+   - Add additional attributes you want to send to ZITADEL (you need at least `email`, `given_name` (first name of the user), `family_name` (last name of the user), and you can send optional attributes like `display_name`).
 4. In **Attribute Mapping**, map the contract attributes to your directory/user store fields.
 
 ### Export PingFederate IdP metadata

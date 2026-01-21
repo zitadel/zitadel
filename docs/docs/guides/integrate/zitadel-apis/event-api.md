@@ -7,7 +7,7 @@ ZITADEL leverages the power of eventsourcing, meaning every action and change wi
 To provide you with greater flexibility and access to these events, ZITADEL has introduced an Event API. 
 This API allows you to easily retrieve and utilize the events generated within the system, enabling you to integrate them into your own system and respond to specific events as they occur.
 
-You need to give a user the [manager role](/docs/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
+You need to assign a user the [administrator role](/docs/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
 
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
@@ -24,7 +24,7 @@ To further restrict your result you can add the following filters:
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN"
 ```
 
@@ -34,7 +34,7 @@ To be able to filter for the different event types ZITADEL knows, you can reques
 
 ```bash
 curl --request POST \
---url $CUSTOM-DOMAIN/admin/v1/events/types/_search \
+--url ${CUSTOM_DOMAIN}/admin/v1/events/types/_search \
 --header "Authorization: Bearer $TOKEN" \
 --header 'Content-Type: application/json' \
 '
@@ -70,7 +70,7 @@ To be able to filter for the different aggregate types (resources) ZITADEL knows
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/aggregates/types/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/aggregates/types/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json'
 ```
@@ -101,7 +101,7 @@ This example shows you how to get all events from users, filtered with the creat
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
@@ -124,7 +124,7 @@ Sessions without tokens events may by created during implicit flow with ID Token
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
@@ -148,7 +148,7 @@ The following example shows you how you could use the events search to get all e
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
@@ -177,7 +177,7 @@ In this case these are the following events:
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --url ${CUSTOM_DOMAIN}/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{

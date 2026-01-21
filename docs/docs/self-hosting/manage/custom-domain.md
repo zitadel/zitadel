@@ -23,7 +23,7 @@ ExternalPort: 8080
 ExternalSecure: false
 ```
 
-For productive setups however, we recommend using HTTPS and a custom domain:
+For productive setups however, we recommend using HTTPS and a Custom Domain:
 
 ```yaml
 ExternalDomain: 'zitadel.my.domain'

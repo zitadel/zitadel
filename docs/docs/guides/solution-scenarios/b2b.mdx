@@ -71,10 +71,10 @@ In our scenario, Octagon creates a project grant for Pentagon. Pentagon is limit
 
 In this scenario, Dimitri and Michael share the same organization Pentagon, where as Bill belongs to Octagon. Octagon is owner of the Portal project with its Web App, having Bill configured as user grant with `admin` role. Dimitri owns the `writer` role, whereas Michael only is `reader`.
 
-> Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
+> Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL administrator role.
 
 If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log.
-If you had such a use case, ZITADEL manager roles must be assigned to those users.
+If you had such a use case, ZITADEL administrator roles must be assigned to those users.
 
 ### Noteworthy
 

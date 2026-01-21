@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Tajemství úspěšně odstraněno!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Manažerské role v ZITADEL",
+      "TITLE": "Role správce ZITADEL",
       "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",

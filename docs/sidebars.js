@@ -67,10 +67,24 @@ module.exports = {
         {
           type: "category",
           label: "Example Applications",
+          link: {
+            type: "generated-index",
+            title: "Example Applications",
+            slug: "/examples/introduction",
+            description:
+              "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
+          },
           items: [
             {
               type: "category",
               label: "Frontend (SPA)",
+              link: {
+                type: "generated-index",
+                title: "Frontend (SPA) Quickstart Guides",
+                slug: "/examples/introduction/frontend",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
+              },
               items: [
                 {
                   type: "link",
@@ -85,6 +99,13 @@ module.exports = {
             {
               type: "category",
               label: "Mobile & Native",
+              link: {
+                type: "generated-index",
+                title: "Mobile & Native Quickstart Guides",
+                slug: "/examples/introduction/mobile",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Mobile & Native applications.",
+              },
               items: [
                 "examples/login/flutter",
               ],
@@ -92,6 +113,13 @@ module.exports = {
             {
               type: "category",
               label: "Full-Stack / SSR",
+              link: {
+                type: "generated-index",
+                title: "Full-Stack / SSR Quickstart Guides",
+                slug: "/examples/introduction/fullstack",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
+              },
               items: [
                 "examples/login/nextjs",
                 "examples/login/nextjs-b2b",
@@ -100,6 +128,13 @@ module.exports = {
             {
               type: "category",
               label: "Web App (Server-Side)",
+              link: {
+                type: "generated-index",
+                title: "Web App (Server-Side) Quickstart Guides",
+                slug: "/examples/introduction/webapp",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
+              },
               items: [
                 "examples/login/symfony",
                 "examples/login/java-spring",
@@ -110,6 +145,13 @@ module.exports = {
             {
               type: "category",
               label: "APIs / Backend Services",
+              link: {
+                type: "generated-index",
+                title: "APIs / Backend Quickstart Guides",
+                slug: "/examples/introduction/backend",
+                description:
+                  "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
+              },
               items: [
                 "examples/secure-api/go",
                 "examples/secure-api/java-spring",
@@ -173,7 +215,6 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/restrictions",
-            "guides/manage/customize/user-schema",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/notification-providers",
             "concepts/features/custom-domain",
@@ -184,6 +225,13 @@ module.exports = {
     {
       type: "category",
       label: "Integrate & Authenticate",
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       collapsed: true,
       items: [
         {
@@ -311,13 +359,9 @@ module.exports = {
                   label: "Python",
                   items: [
                     "sdk-examples/client-libraries/python",
-                    "sdk-examples/python-flask",
-                    "sdk-examples/python-django",
-                    {
-                      type: "link",
-                      label: "FastAPI",
-                      href: "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-                    },
+                    "sdk-examples/flask",
+                    "sdk-examples/django",
+                    "sdk-examples/fastapi",
                   ],
                 },
                 {
@@ -330,6 +374,7 @@ module.exports = {
                   label: "Java",
                   items: [
                     "sdk-examples/java",
+                    "sdk-examples/spring",
                     "sdk-examples/client-libraries/java",
                   ],
                 },
@@ -338,6 +383,7 @@ module.exports = {
                   label: "PHP",
                   items: [
                     "sdk-examples/symfony",
+                    "sdk-examples/laravel",
                     "sdk-examples/client-libraries/php",
                   ],
                 },
@@ -667,6 +713,7 @@ module.exports = {
       collapsed: true,
       items: [
         "guides/manage/console/console-overview",
+        "guides/manage/cloud/egress",
         {
           type: "category",
           label: "Customer Portal",
@@ -1047,7 +1094,7 @@ module.exports = {
                 title: "Instance Service API",
                 slug: "/apis/resources/instance_service_v2",
                 description:
-                  "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
+                  "This API is intended to manage instances, Custom Domains and Trusted Domains in ZITADEL.\n" +
                   "\n" +
                   "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
                   "The whole functionality related to domains (custom and trusted) has been moved under this instance API."

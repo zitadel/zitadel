@@ -445,8 +445,8 @@ Errors:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
       Empty: 简介是空的
-      FirstNameEmpty: 简介中的名字是空的
-      LastNameEmpty: 简介中的姓氏是空的
+      FirstNameEmpty: 个人资料中的名字为空
+      LastNameEmpty: 个人资料中的姓氏为空
       IDMissing: 简介ID丢失
     Email:
       NotFound: 电子邮件没有找到

@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"log/slog"
 	"net/http"
 
 	slogctx "github.com/veqryn/slog-context"
@@ -23,25 +22,8 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 
 		next.ServeHTTP(sw, r.WithContext(ctx))
 
-		logger.Log(ctx,
-			LogLevelFromStatus(sw.status),
-			"http request served",
-			"status", sw.status,
-		)
+		logger.InfoContext(ctx, "http request", "status", sw.status)
 	})
-}
-
-func LogLevelFromStatus(status int) slog.Level {
-	if status < 200 {
-		return slog.LevelDebug
-	}
-	if status < 400 {
-		return slog.LevelInfo
-	}
-	if status < 500 {
-		return slog.LevelWarn
-	}
-	return slog.LevelError
 }
 
 // statusWriter is a [http.ResponseWriter] that captures the status code for logging.

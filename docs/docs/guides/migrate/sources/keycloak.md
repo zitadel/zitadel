@@ -128,7 +128,7 @@ Use your **access token** or **PAT** to authenticate, then call the [Management 
 
 ```bash
 curl --request POST \
-  --url https://<instance-domain>/admin/v1/import \
+  --url https://${CUSTOM_DOMAIN}/admin/v1/import \
   --header 'Content-Type: application/json' \
   --header 'Authorization: Bearer <token>' \
   --data @importBody.json
@@ -197,7 +197,7 @@ You can verify that users were imported successfully by querying the **events AP
 Use the following request:
 
 ```bash
-curl --location 'https://<instance-domain>/admin/v1/events/_search' \
+curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/events/_search' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' \
 --data '{

@@ -94,8 +94,8 @@ service InstanceService {
   
   // Add Custom Domain
   //
-  // Adds a custom domain to the instance.
-  // The custom domain must be unique across all instances.
+  // Adds a Custom Domain to the instance.
+  // The Custom Domain must be unique across all instances.
   // Once the domain is added, it will be used to route requests to this instance.
   // This method requires system level permissions and cannot be called from an instance context.
   //
@@ -111,7 +111,7 @@ service InstanceService {
 
   // Remove Custom Domain
   //
-  // Removes a custom domain from the instance.
+  // Removes a Custom Domain from the instance.
   // Be aware that this will stop routing requests from this domain to the instance and
   // might break existing setups or integrations.
   // This method requires system level permissions and cannot be called from an instance context.
@@ -128,7 +128,7 @@ service InstanceService {
 
   // List Custom Domains
   //
-  // Lists custom domains of the instance.
+  // Lists Custom Domains of the instance.
   //
   // By default the instance will be determined by the context of the request,
   // e.g. the host header.
@@ -148,7 +148,7 @@ service InstanceService {
 
   // Add Trusted Domain
   //
-  // Adds a trusted domain to the instance.
+  // Adds a Trusted Domain to the instance.
   // By default the instance will be determined by the context of the request,
   // e.g. the host header.
   // You can optionally pass an InstanceID to list the domains of a specific instance.
@@ -158,8 +158,8 @@ service InstanceService {
   // Once the domain is added, it can be used in API responses like OIDC discovery,
   // email templates, and more.
   // This can be used in cases where the API is accessed through a different domain
-  // than the instance domain, e.g. proxy setups and custom login UIs.
-  // Unlike custom domain, trusted domains are not used to route requests to this instance
+  // than the Custom Domain, e.g. proxy setups and custom login UIs.
+  // Unlike Custom Domains, Trusted Domains are not used to route requests to this instance
   // and therefore do not need to be uniquely assigned to an instance.
   //
   // Required permissions:
@@ -175,7 +175,7 @@ service InstanceService {
 
   // Remove Trusted Domain
   //
-  // Removes a trusted domain from the instance.
+  // Removes a Trusted Domain from the instance.
   // By default the instance will be determined by the context of the request,
   // e.g. the host header.
   // You can optionally pass an InstanceID to list the domains of a specific instance.
@@ -195,7 +195,7 @@ service InstanceService {
   
   // List Trusted Domains
   //
-  // Lists trusted domains of the instance.
+  // Lists Trusted Domains of the instance.
   // By default the instance will be determined by the context of the request,
   // e.g. the host header.
   // You can optionally pass an InstanceID to list the domains of a specific instance.
@@ -320,7 +320,7 @@ message AddCustomDomainRequest {
     (google.api.field_behavior) = REQUIRED
   ];
 
-  // Custom domain to add to the instance.
+  // Custom Domain to add to the instance.
   // Must be a valid domain name.
   // Once the domain is added, it will be used to route requests to this instance.
   string custom_domain = 2 [
@@ -397,7 +397,7 @@ message ListCustomDomainsRequest {
 }
 
 message ListCustomDomainsResponse {
-  // The list of custom domains matching the query.
+  // The list of Custom Domains matching the query.
   repeated CustomDomain domains = 1;
 
   // Contains the total number of domains matching the query and the applied limit.
@@ -405,7 +405,7 @@ message ListCustomDomainsResponse {
 }
 
 message AddTrustedDomainRequest {
-  // InstanceID is the unique ID of the instance to which the trusted domain will be added.
+  // InstanceID is the unique ID of the instance to which the Trusted Domain will be added.
   // If not set, the instance in the current context (e.g. identified by the host header) will be used.
   // If an ID is set, the caller must have additional permissions.
   string instance_id = 1 [
@@ -416,13 +416,13 @@ message AddTrustedDomainRequest {
     }
   ];
 
-  // Trusted domain to be added to the instance.
+  // Trusted Domain to be added to the instance.
   // Must be a valid domain name.
   // Once the domain is added, it can be used in API responses like OIDC discovery,
   // email templates, and more.
   // This can be used in cases where the API is accessed through a different domain
-  // than the instance domain, e.g. proxy setups and custom login UIs.
-  // Unlike custom domains, trusted domains are not used to route requests to this instance
+  // than the Custom Domain, e.g. proxy setups and custom login UIs.
+  // Unlike Custom Domains, Trusted Domains are not used to route requests to this instance
   // and therefore do not need to be uniquely assigned to an instance.
   string trusted_domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
@@ -436,7 +436,7 @@ message AddTrustedDomainRequest {
 }
 
 message AddTrustedDomainResponse {
-  // CreationDate is the timestamp when the trusted domain was added.
+  // CreationDate is the timestamp when the Trusted Domain was added.
   google.protobuf.Timestamp creation_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -445,7 +445,7 @@ message AddTrustedDomainResponse {
 }
 
 message RemoveTrustedDomainRequest {
-  // InstanceID is the unique ID of the instance from which the trusted domain will be removed.
+  // InstanceID is the unique ID of the instance from which the Trusted Domain will be removed.
   // If not set, the instance in the current context (e.g. identified by the host header) will be used.
   // If an ID is set, the caller must have additional permissions.
   string instance_id = 1 [
@@ -456,7 +456,7 @@ message RemoveTrustedDomainRequest {
     }
   ];
 
-  // The trusted domain to remove from the instance.
+  // The Trusted Domain to remove from the instance.
   string trusted_domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 253},
     (google.api.field_behavior) = REQUIRED,
@@ -469,7 +469,7 @@ message RemoveTrustedDomainRequest {
 }
 
 message RemoveTrustedDomainResponse {
-  // DeletionDate is the timestamp when the trusted domain was removed.
+  // DeletionDate is the timestamp when the Trusted Domain was removed.
   google.protobuf.Timestamp deletion_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
@@ -478,7 +478,7 @@ message RemoveTrustedDomainResponse {
 }
 
 message ListTrustedDomainsRequest {
-  // InstanceID is the unique ID of the instance whose trusted domains will be listed.
+  // InstanceID is the unique ID of the instance whose Trusted Domains will be listed.
   // If not set, the instance in the current context (e.g. identified by the host header) will be used.
   // If an ID is set, the caller must have additional permissions.
   string instance_id = 1 [
@@ -500,7 +500,7 @@ message ListTrustedDomainsRequest {
 }
 
 message ListTrustedDomainsResponse {
-  // The list of trusted domains matching the query.
+  // The list of Trusted Domains matching the query.
   repeated TrustedDomain trusted_domain = 1;
 
   // Contains the total number of domains matching the query and the applied limit.

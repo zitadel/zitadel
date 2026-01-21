@@ -51,25 +51,24 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
   async function submitChange(values: Inputs) {
     setLoading(true);
 
-    const changeResponse = checkSessionAndSetPassword({
+    const changeResponse = await checkSessionAndSetPassword({
       sessionId,
       password: values.password,
-    })
-      .catch(() => {
-        setError(t("change.errors.couldNotChangePassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
+      return;
+    });
 
     if (changeResponse && "error" in changeResponse && changeResponse.error) {
       setError(typeof changeResponse.error === "string" ? changeResponse.error : t("change.errors.unknownError"));
+      setLoading(false);
       return;
     }
 
     if (!changeResponse) {
       setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
       return;
     }
 

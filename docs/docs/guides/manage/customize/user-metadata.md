@@ -50,7 +50,7 @@ Request the user information by calling the [userinfo endpoint](/docs/apis/openi
 
 ```bash
 curl --request GET \
-  --url "https://$CUSTOM-DOMAIN/oidc/v1/userinfo" \
+  --url "https://${CUSTOM_DOMAIN}/oidc/v1/userinfo" \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -161,10 +161,10 @@ If you get the error "invalid audience (APP-Zxfako)", then you need to add the r
 You can request the user's metadata with the [List My Metadata](/docs/apis/resources/auth/auth-service-list-my-metadata) method:
 
 ```bash
-curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
+curl -L -X POST "https://${CUSTOM_DOMAIN}/auth/v1/users/me/metadata/_search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
--H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 --data-raw '{
   "query": {
     "offset": "0",
@@ -174,7 +174,7 @@ curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
   "queries": [
     {
       "keyQuery": {
-        "key": "$METADATA_KEY",
+        "key": "${METADATA_KEY}",
         "method": "TEXT_QUERY_METHOD_EQUALS"
       }
     }
@@ -182,9 +182,9 @@ curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
 }'
 ```
 
-Replace `$ACCESS_TOKEN` with your user's access token.  
-Replace `$CUSTOM-DOMAIN` with your ZITADEL instance's url.  
-Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
+Replace `${ACCESS_TOKEN}` with your user's access token.  
+Replace `${CUSTOM_DOMAIN}` with your ZITADEL instance's url.  
+Replace `${METADATA_KEY}` with they key you want to search for (f.e. "ContractNumber")
 
 :::info Get all metadata
 You can omit the queries array to retrieve all metadata key-value pairs.
@@ -227,4 +227,4 @@ The user that calls the management service must have [manager permissions](/docs
 A user can be either a human user or a service user.
 
 You can get [metadata of a user filtered by your query](/docs/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/docs/apis/resources/mgmt/management-service-get-user-metadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/docs/apis/resources/mgmt/users).
+The management service allows you to set and delete metadata, see the [API documentation for users](/docs/category/apis/resources/mgmt/users).

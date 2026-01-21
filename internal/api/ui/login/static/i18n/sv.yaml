@@ -445,8 +445,8 @@ Errors:
       NotFound: Profilen finns inte
       NotChanged: Profilen har inte ändrats
       Empty: Profilen saknar innehåll
-      FirstNameEmpty: Förnamnet i profilen är tomt
-      LastNameEmpty: Efternamnet i profilen är tomt
+      FirstNameEmpty: Förnamn i profilen är tomt
+      LastNameEmpty: Efternamn i profilen är tomt
       IDMissing: Profile ID saknas
     E-Post:
       NotFound: E-Post finns inte

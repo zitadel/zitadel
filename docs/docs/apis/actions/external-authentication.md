@@ -44,9 +44,9 @@ The first parameter contains the following fields
       - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
   - `setFirstName(string)`  
-    Sets the given name
+    Sets the first name
   - `setLastName(string)`  
-    Sets the family name
+    Sets the last name
   - `setNickName(string)`  
     Sets the nickname
   - `setDisplayName(string)`  
@@ -87,9 +87,9 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
   - `metadata`  
     Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
   - `setFirstName(string)`  
-    Sets the given name
+    Sets the first name
   - `setLastName(string)`  
-    Sets the family name
+    Sets the last name
   - `setNickName(string)`  
     Sets the nick name
   - `setDisplayName(string)`  

@@ -7,7 +7,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
-  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -40,7 +40,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
-  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -68,7 +68,7 @@ Content-Type: application/json
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url ${CUSTOM_DOMAIN}/management/v1/orgs/me \
   --header "Authorization: Bearer $TOKEN" 
 ```
 

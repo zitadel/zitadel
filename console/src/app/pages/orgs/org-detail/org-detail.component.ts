@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, effect, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, lastValueFrom, Observable, of } from 'rxjs';
@@ -19,7 +19,9 @@ import { ToastService } from 'src/app/services/toast.service';
 import { NewOrganizationService } from '../../../services/new-organization.service';
 import { injectMutation } from '@tanstack/angular-query-experimental';
 import { Organization, OrganizationState } from '@zitadel/proto/zitadel/org/v2/org_pb';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -53,6 +55,7 @@ export class OrgDetailComponent implements OnInit {
   protected reloadChanges = signal(true);
 
   constructor(
+    private readonly authService: GrpcAuthService,
     private readonly dialog: MatDialog,
     private readonly mgmtService: ManagementService,
     private readonly toast: ToastService,
@@ -67,17 +70,14 @@ export class OrgDetailComponent implements OnInit {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    effect(() => {
-      const orgId = this.newOrganizationService.orgId();
-      if (!orgId) {
+    authService.activeOrgChanged.pipe(takeUntilDestroyed()).subscribe((org) => {
+      if (!org) {
         return;
       }
       this.loadMembers();
       this.loadMetadata();
-    });
 
-    // force rerender changes because it is not reactive to orgId changes
-    toObservable(this.newOrganizationService.orgId).subscribe(() => {
+      // force rerender changes because it is not reactive to orgId changes
       this.reloadChanges.set(false);
       cdr.detectChanges();
       this.reloadChanges.set(true);
@@ -137,7 +137,7 @@ export class OrgDetailComponent implements OnInit {
     }
   }
 
-  public async deleteOrg(org: Organization) {
+  public async deleteOrg(org: Organization | Org) {
     const mgmtUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -265,7 +265,7 @@ export class OrgDetailComponent implements OnInit {
     });
   }
 
-  public async renameOrg(org: Organization): Promise<void> {
+  public async renameOrg(org: Organization | Org): Promise<void> {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
         name: org.name,
@@ -286,7 +286,7 @@ export class OrgDetailComponent implements OnInit {
       this.toast.showInfo('ORG.TOAST.UPDATED', true);
       const resp = await this.mgmtService.getMyOrg();
       if (resp.org) {
-        await this.newOrganizationService.setOrgId(resp.org.id);
+        await this.authService.getActiveOrg(resp.org.id);
       }
     } catch (error) {
       this.toast.showError(error);

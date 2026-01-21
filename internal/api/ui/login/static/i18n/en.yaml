@@ -244,8 +244,8 @@ RegistrationUser:
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   LanguageLabel: Language
   German: Deutsch
   English: English
@@ -288,8 +288,8 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You may now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   NicknameLabel: Nickname
   PhoneLabel: Phone number
   LanguageLabel: Language
@@ -329,8 +329,8 @@ RegistrationOrg:
   OrgNameLabel: Organization name
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
   TosAndPrivacyLabel: Terms and conditions
@@ -445,8 +445,8 @@ Errors:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: Given name in profile is empty
-      LastNameEmpty: Family name in profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found

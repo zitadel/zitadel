@@ -9,11 +9,11 @@ In some use cases you want to prevent users from accessing the console, this cou
 - Users login via SSO and should not be able to change their data in the Console
 - Only managers should be able to access Console to manage their users
 
-At the moment it is not possible to simply disable the Console but with the configuration described in this guide you can prevent users from accessing the Console.
+At the moment it is not possible to simply disable the Console, but with the configuration described in this guide, you can prevent users from accessing the Console.
 
 ## Self-hosted
 
-If you are running ZITADEL self-hosted we recommend to restrict the access to ZITADEL Console via WAF/reverse-proxy for Non-Manager users
+If you are running ZITADEL self-hosted, we recommend restricting the access to ZITADEL Console via WAF/reverse-proxy for Non-Manager users
 
 ## ZITADEL Cloud (and self-hosted)
 
@@ -27,7 +27,7 @@ Read more about how to set the default redirect URI: [Settings - Default Redirec
 
 ### Restricting Console in default-project
 
-With this workaround, you will limit users from accessing the [default-project](/docs/guides/manage/console/projects-overview#the-default-project), if they are not explicitly granted to use this project.
+With this workaround, you will limit users from accessing the [default-project](/docs/guides/manage/console/projects-overview#the-default-project) if they are not explicitly granted to use this project.
 When setting the "Check for Project on Authentication" setting on a project, only users of organizations with a grant to that project can access it.
 By default, this setting is disabled, so all users can access the project.
 
@@ -41,7 +41,7 @@ Start by granting the organization of your managers, that should be able to acce
 2. On the next screen select the organization to which you want to give the grant
   ![Project Settings: Grants - Choose Organization](/img/guides/solution-scenarios/console-create-project-grant-org.png)
 
-3. You can skip the screen with the role selection, and click save
+3. You can skip the screen with the role selection and click save
 4. Make sure the grant is in now in the overview and marked as active.
 
 To avoid accidental lock-out, the [default project](/docs/guides/manage/console/projects-overview#the-default-project) hides the checkbox "Check Project on Authentication" in the Console:
@@ -49,18 +49,18 @@ To avoid accidental lock-out, the [default project](/docs/guides/manage/console/
 
 You need to use the [update project API call](/docs/apis/resources/mgmt/management-service-update-project) to set the configuration on the project.
 
-First you need a user with manager permissions to change the project settings in that organization.
+First, you need a user with manager permissions to change the project settings in that organization.
 This means either you add the manager to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.
 After that create a Personal Access Token (PAT) for the manager.
 
-More detailed information about creating a PAT and manager roles you can find [here](/docs/guides/integrate/service-users/personal-access-token)
+More detailed information about creating a PAT and administrator roles you can find [here](/docs/guides/integrate/service-users/personal-access-token)
 
 Then you have to send the following request:
 ```bash
-curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/$PROJECT_ID" \
+curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/${PROJECT_ID}" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
--H "Authorization: Bearer $PAT" \
+-H "Authorization: Bearer ${PAT}" \
 --data-raw '{
   "name": "ZITADEL",
   "projectRoleAssertion": false,
@@ -71,11 +71,11 @@ curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/$PROJECT_ID" \
 ```
 
 Where
-- CUSTOM_DOMAIN is your domain, f.e. mydemo.zitadel.cloud
-- PAT is your service user's personal access token
-- PROJECT_ID is the default-project's ID that can be found in Console, see screenshot above
+- `${CUSTOM_DOMAIN}` is your Custom Domain, f.e. mydemo.zitadel.cloud
+- `${PAT}` is your service user's personal access token
+- `${PROJECT_ID}` is the default-project's ID that can be found in Console see screenshot above
 
-You should now be able to login with users of organization that have the grant (in this example users of the organization "Customer-A").
+You should now be able to log in with users of the organization that have the grant (in this example users of the organization "Customer-A").
 All other users should see the following error message after authentication:
 
 ![Console access restricted](/img/guides/solution-scenarios/console-access-restricted.png)

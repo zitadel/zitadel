@@ -49,7 +49,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/client/cli/cli.go
 After you have configured everything correctly, you can simply start the example by:
 
 ```bash
-go run cli.go --domain <your domain> --key <path>
+go run cli.go --domain <custom domain> --key <path>
 ```
 
 This could look like:

@@ -91,7 +91,7 @@ In case you've created your own application and depending on your development se
 mvn clean package -DskipTests
 ```
 
-You will need to provide the `introspection-uri` (your ZITADEL domain> /oauth/v2/introspect), the `client-id` and `client-secret` previously created:
+You will need to provide the `introspection-uri` ($CUSTOM_DOMAIN/oauth/v2/introspect), the `client-id` and `client-secret` previously created:
 
 ```bash
 java \
@@ -218,7 +218,7 @@ Content-Length: 0
 Date: Mon, 15 Jan 2024 09:24:39 GMT
 ```
 
-### Add admin role
+### Add administrator role
 
 So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.

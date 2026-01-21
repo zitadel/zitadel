@@ -4,12 +4,12 @@ sidebar_label: Self Service
 ---
 
 ZITADEL allows users to perform many tasks themselves.
-For these tasks we either provide an user interface, or the tasks can be initiated or completed through ZITADEL's APIs.
+For these tasks we either provide a user interface, or the tasks can be initiated or completed through ZITADEL's APIs.
 
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
-- `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Managers` are users with a [special manager role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
+- `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators, etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
+- `Managers` are users with a [special administrator role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization--i18n).
 
@@ -22,7 +22,7 @@ ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated
 :::info
 You can pre-select a given organization by passing the scope `urn:zitadel:iam:org:domain:primary:{domainname}` in the authorization request.
 This will force users to register only with the specified organization.
-Furthermore the branding and login settings (e.g. Social Login Providers) are directly shown to the user.
+Furthermore, the branding and login settings (e.g., Social Login Providers) are directly shown to the user.
 :::
 
 ### Local account
@@ -32,11 +32,11 @@ Allows anonymous users and authenticated users, who are not yet in the given org
 - Mandatory profile fields
 - Set password
 - Accept terms of service and privacy policy
-- User receives an email with an one-time code for verification purpose
+- User receives an email with a one-time code for verification purpose
 - User has to enter the one-time code to finish registration
 - User can re-request a new one-time code
 
-The user is prompted on first login to setup MFA.
+The user is prompted on the first login to set up MFA.
 This step can be made mandatory if MFA is enforced in the login policy.
 
 ### Existing Identity / SSO / Social Login
@@ -50,10 +50,10 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 #### Account Linking
 
-When you login with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options:
+When you log in with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options:
 
 - Create a new account: A new account will be created as stated above
-- Autolinking: The user is prompted to login with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now login with either the local account or any of the linked external accounts.
+- Autolink: The user is prompted to log in with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now log in with either the local account or any of the linked external accounts.
 
 ## Login
 
@@ -61,24 +61,24 @@ When you login with an external identity provider, and the user does not exist i
 
 Given an external identity provider is configured on the instance or on the organization, then:
 
-- the user will be shown a button for each identity provider as alternative to login with a [local account](#local-account)
-- when clicking the button the user will be redirected to the identity provider
-- after successful login the user will be redirected to the application
+- the user will be shown a button for each identity provider as an alternative to log in with a [local account](#local-account)
+- when clicking the button, the user will be redirected to the identity provider
+- after successful login, the user will be redirected to the application
 
 ### Machines
 
-Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
+Machine accounts can't use an interactive login but require other means of authentication, such as privately signed JWT or personal access tokens.
 Read more about [Service Users](/guides/integrate/service-users/authenticate-service-users) and recommended [OpenID Connect Flows](/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
 
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client can also implement this, by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
+A client can also implement this by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM-DOMAIN/ui/console/users/me_.
+ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM_DOMAIN/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password
@@ -88,7 +88,7 @@ The current password must be entered first.
 
 ### MFA / FIDO Passkeys
 
-Users can setup and delete a second factor and FIDO Passkeys (Passwordless).
+Users can set up and delete a second factor and FIDO Passkeys (Passwordless).
 Available authenticators are:
 
 - Time-based one-time password (TOTP) (Which are Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.)
@@ -123,24 +123,24 @@ The user receives a one-time password and can verify control over the given phon
 ### Identity providers
 
 Users can create a connection between a [local user account](#local-account) and an [external identity](#existing-identity--sso--social-login).
-The user can login with any of the linked accounts.
+The user can log in with any of the linked accounts.
 [Linking of external accounts](#account-linking) is done during the login process.
 
 ## Managers
 
 It is important to note that a `Manager` is not simply an administrative user, but can be used to create much more advanced scenarios such as delegating administration of a whole organization to a user, acting then as administrator and permission manager of that user group.
 
-Thus we will explain service for two very common scenarios in ZITADEL:
+Thus, we will explain service for two of the most common scenarios in ZITADEL:
 
 - `Managers in isolation`: Granting administrative permissions within a single organization context.
 - `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
 
-A list of [Manager Roles](../../guides/manage/console/managers#roles) is available with a description of permissions.
-Managers can be assigned to both human users and service users eg, for managing certain tasks programmatically.
+A list of [Administrator Roles](../../guides/manage/console/managers#roles) is available with a description of permissions.
+Managers can be assigned to both human users and service users, e.g., for managing certain tasks programmatically.
 
 ### Managers in isolation
 
-An user with the Manager roles `IAM_OWNER` or `ORG_OWNER` might want to assign other users from their organization elevated permissions to handle certain aspects of the IAM tasks.
+A user with Administrator roles `IAM_OWNER` or `ORG_OWNER` might want to assign other users from their organization elevated permissions to handle certain aspects of the IAM tasks.
 This could be permission to assign authorizations within this isolated organization (`ORG_USER_MANAGER`) or handling setup of projects and applications (`PROJECT_OWNER`).
 
 ### Managers in delegation
@@ -148,9 +148,9 @@ This could be permission to assign authorizations within this isolated organizat
 In a setup like described in the [B2B Scenario](/guides/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
 The project is granted to the customer organization, such that the customer can access the project and assign authorization to their users.
 
-Given such as setup the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.
-Equipped with this Manager Role, the user can perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, customize branding, or assign project or Manager roles to other users.
+Given such as set up the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.
+Equipped with this Administrator Role, the user can perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, customize branding, or assign project or Administrator roles to other users.
 
-An `ORG_OWNER` can also not only delegate Manager roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of their own organization as well as authorize users to use the granted project.
+An `ORG_OWNER` can also not only delegate Administrator roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of their own organization as well as authorize users to use the granted project.
 With ZITADEL there is no need to replicate all settings and projects across organizations.
-Instead you set-up the project in one organization, delegate it to different organizations, and then appoint users as Managers of that organization to allow for self-service in a multi-tenancy scenario.
+Instead, you could set up the project in one organization, delegate it to different organizations, and then appoint users as Managers of that organization to allow for self-service in a multi-tenancy scenario.

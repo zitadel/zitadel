@@ -144,7 +144,7 @@ There are two recommended authentication methods:
 #### Example cURL request
 
 ```bash
-curl --location 'https://<instance-domain>/admin/v1/import' \
+curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/import' \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer <access-token>' \

@@ -446,8 +446,8 @@ Errors:
       NotFound: Профилот не е пронајден
       NotChanged: Профилот не е променет
       Empty: Профилот е празен
-      FirstNameEmpty: Името во профилот е празно
-      LastNameEmpty: Презимето во профилот е празно
+      FirstNameEmpty: Полето за име на профилот е празно
+      LastNameEmpty: Полето за презиме на профилот е празно
       IDMissing: ID на профил е празно
     Email:
       NotFound: Е-поштата не е пронајдена

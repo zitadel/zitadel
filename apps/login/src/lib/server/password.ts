@@ -10,16 +10,14 @@ import {
   listAuthenticationMethodTypes,
   passwordReset,
   searchUsers,
-  ServiceConfig,
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { ConnectError, create, Duration, timestampDate } from "@zitadel/client";
-import { createUserServiceClient } from "@zitadel/client/v2";
+import { create, Duration, timestampDate } from "@zitadel/client";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
@@ -31,7 +29,6 @@ import {
   checkPasswordChangeRequired,
   checkUserVerification,
 } from "../verify-helper";
-import { createServerTransport } from "../zitadel";
 import { getPublicHostWithProtocol } from "./host";
 
 type ResetPasswordCommand = {
@@ -111,7 +108,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
 
   const userId = user.userId;
-
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return passwordReset({
@@ -497,44 +493,6 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     },
   });
 
-  // check if the user has no password set in order to set a password
-  let authmethods;
-  try {
-    authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
-  } catch (error) {
-    console.error("Error getting auth methods:", error);
-    return { error: "Could not load auth methods" };
-  }
-
-  if (!authmethods) {
-    return { error: t("errors.couldNotLoadAuthMethods") };
-  }
-
-  let loginSettings;
-  try {
-    loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors.user.organizationId });
-  } catch (error) {
-    console.error("Error getting login settings:", error);
-    return { error: "Could not load login settings" };
-  }
-
-  const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
-
-  const mfaFactors = authmethods.authMethodTypes.filter(
-    (m) =>
-      m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.OTP_SMS ||
-      m === AuthenticationMethodType.OTP_EMAIL ||
-      m === AuthenticationMethodType.U2F,
-  );
-
-  const hasMfa = mfaFactors.length > 0;
-  const mfaVerified =
-    !!session.factors?.totp?.verifiedAt ||
-    !!session.factors?.otpSms?.verifiedAt ||
-    !!session.factors?.otpEmail?.verifiedAt ||
-    !!session.factors?.webAuthN?.verifiedAt;
-
   // check if the password factor is set and not older than 5 minutes
   const passwordVerifiedAt = session.factors?.password?.verifiedAt;
   if (!passwordVerifiedAt) {
@@ -549,43 +507,11 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     return { error: t("errors.passwordVerificationTooOld") };
   }
 
-  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  // also if the user has no MFA but it is not verified, we use the service account
-  if (forceMfa || (hasMfa && !mfaVerified)) {
-    console.log("Set password using service account due to enforced MFA without existing MFA methods");
-    return setPassword({ serviceConfig, payload }).catch((error) => {
-      // throw error if failed precondition (ex. User is not yet initialized)
-      if (error.code === 9 && error.message) {
-        return { error: t("errors.failedPrecondition") };
-      }
-      return { error: "Could not set password" };
-    });
-  } else {
-    const transport = async (serviceConfig: ServiceConfig, token: string) => {
-      return createServerTransport(token, serviceConfig);
-    };
-
-    const myUserService = async (serviceConfig: ServiceConfig, sessionToken: string) => {
-      const transportPromise = await transport(serviceConfig, sessionToken);
-      return createUserServiceClient(transportPromise);
-    };
-
-    const selfService = await myUserService(serviceConfig, sessionCookie.token);
-
-    return selfService
-      .setPassword(
-        {
-          userId: session.factors.user.id,
-          newPassword: { password, changeRequired: false },
-        },
-        {},
-      )
-      .catch((error: ConnectError) => {
-        console.log(error);
-        if (error.code === 7) {
-          return { error: t("errors.sessionNotValid") };
-        }
-        return { error: "Could not set the password" };
-      });
-  }
+  return setPassword({ serviceConfig, payload }).catch((error) => {
+    // throw error if failed precondition (ex. User is not yet initialized)
+    if (error.code === 9 && error.message) {
+      return { error: t("errors.failedPrecondition") };
+    }
+    return { error: "Could not set password" };
+  });
 }

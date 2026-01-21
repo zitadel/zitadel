@@ -445,8 +445,8 @@ Errors:
       NotFound: 프로필을 찾을 수 없습니다
       NotChanged: 프로필이 변경되지 않았습니다
       Empty: 프로필이 비어 있습니다
-      FirstNameEmpty: 프로필에 이름이 비어 있습니다
-      LastNameEmpty: 프로필에 성이 비어 있습니다
+      FirstNameEmpty: 프로필의 이름 필드가 비어 있습니다
+      LastNameEmpty: 프로필의 성 필드가 비어 있습니다
       IDMissing: 프로필 ID가 없습니다
     Email:
       NotFound: 이메일을 찾을 수 없습니다

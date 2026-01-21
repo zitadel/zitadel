@@ -80,7 +80,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/grpc";
     produces: "application/grpc-web+proto";
 
-    host: "$CUSTOM-DOMAIN";
+    host: "$CUSTOM_DOMAIN";
     base_path: "/auth/v1";
 
     external_docs: {
@@ -100,8 +100,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             value: {
                 type: TYPE_OAUTH2;
                 flow: FLOW_ACCESS_CODE;
-                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+                authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
                 scopes: {
                     scope: {
                         key: "openid";
@@ -364,7 +364,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Get My Profile";
-            description: "Returns the profile information of the authenticated user, this includes given name, family name, etc."
+            description: "Returns the profile information of the authenticated user, this includes first name, last name, etc."
         };
     }
 
@@ -381,7 +381,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Update My Profile";
-            description: "Change the profile information of the authenticated user. This includes information like given name, family name, language, etc."
+            description: "Change the profile information of the authenticated user. This includes information like first name, last name, language, etc."
         };
     }
 
@@ -908,7 +908,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
             summary: "List My ZITADEL Permissions";
-            description: "Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
+            description: "Returns a list of permissions the authenticated user has in ZITADEL based on the administrator roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
         };
     }
 
@@ -944,7 +944,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
-            summary: "List My ZITADEL Manager Roles";
+            summary: "List My ZITADEL Administrator Roles";
             description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
         };
     }

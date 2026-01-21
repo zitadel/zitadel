@@ -238,7 +238,7 @@ Use metadata to store additional attributes of the users, such as organizational
 
 :::info
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](/docs/apis/resources/mgmt/user-metadata)
+[API reference: User Metadata](/docs/category/apis/resources/mgmt/user-metadata)
 :::
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 :::info
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/docs/apis/resources/auth/user-authorizations-grants)
+[API reference: User Authorization / Grants](/docs/category/apis/resources/auth/user-authorizations-grants)
 :::

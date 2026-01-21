@@ -320,8 +320,8 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/templates/profile.html
 
 #### User list
 
-The user list controller displays all users from the database, that were created during OIDC login.
-Only users with an admin role will have access to this page.
+The user list controller displays all users from the database that were created during OIDC login.
+Only users with an administrator role will have access to this page.
 
 ```php reference
 https://github.com/zitadel/example-symfony-oidc/blob/main/src/Controller/UserListController.php
@@ -375,7 +375,7 @@ OIDC_CLIENT_ID="248680248240075805@dev"
 OIDC_CLIENT_SECRET="BJPhEJULSUXseC4geqg5Yg4wWMoy7RgZKar86mbIpt8ZekC5kixMzYGcXLDeeJv7"
 ```
 
-> The well-known URL needs to be adjusted to your own custom domain.
+> The well-known URL needs to be adjusted to your own Custom Domain.
 
 Activate the route that is used as callback by the OIDC bundle:
 
@@ -392,10 +392,10 @@ symfony server:start --no-tls
 ```
 
 Visit http://localhost:8000 and click around.
-When you go to profile you will be redirected to login your user on ZITADEL.
-After login you should see some profile data of the current user.
-Upon clicking logout you are redirected to the homepage.
-Now you can click "users" and login with an account that has the admin role.
+When you go to profile, you will be redirected to login your user on ZITADEL.
+After login, you should see some profile data of the current user.
+Upon clicking logout, you are redirected to the homepage.
+Now you can click "users" and log in with an account that has the administrator role.
 
 ## Completion
 

@@ -58,7 +58,7 @@ provides the possibility to match the exact SSO session, which was terminated.
 ### Client
 
 To enable the back-channel logout on a client, they simply need to register a `backchannel_logout_uri` as part of their
-configuration, e.g. [creating an OIDC application](https://zitadel.com/docs/apis/resources/mgmt/management-service-add-oidc-app).
+configuration, e.g. [creating an OIDC application](https://zitadel.com/docs/category/apis/resources/mgmt/management-service-add-oidc-app).
 
 As soon as the URI is set, every new authorization request will register a back-channel notification to be sent once
 the session is terminated by a user sign out.
@@ -85,7 +85,7 @@ The following Claims are used within the Logout Token:
 
 | Claim  | Example                                                        | Description                                                                                                                          |
 |--------|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| iss    | `$CUSTOM-DOMAIN`                                               | Issuer Identifier                                                                                                                    |
+| iss    | `${CUSTOM_DOMAIN}`                                            | Issuer Identifier                                                                                                                    |
 | sub    | `77776025198584418`                                            | Subject Identifier (the user who signed out)                                                                                         |
 | aud    | `69234237810729019`                                            | Audience(s), will always contain your client_id                                                                                      |
 | iat    | `1311280970`                                                   | Issued at time                                                                                                                       |

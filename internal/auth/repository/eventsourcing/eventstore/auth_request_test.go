@@ -1917,6 +1917,60 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password change expiry for non local user ignored, next possible step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
+					SecondFactorVerification:  testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            false,
+					PasswordChangeRequired: false,
+					IsEmailVerified:        false,
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{
+						MaxAgeDays: 30,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{
+							IDPID:            "idpID",
+							UserID:           "userID",
+							IDPName:          "idpName",
+							ProvidedUserID:   "providedUserID",
+							ProvidedUsername: "providedUsername",
+						},
+					},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:      true,
+					SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+					PasswordCheckLifetime:      10 * 24 * time.Hour,
+					ExternalLoginCheckLifetime: 18 * time.Hour,
+					SecondFactorCheckLifetime:  18 * time.Hour,
+				},
+				PasswordAgePolicy: &domain.PasswordAgePolicy{
+					MaxAgeDays: 30,
+				},
+				SelectedIDPConfigID: "idpID",
+			}, false},
+			[]domain.NextStep{&domain.VerifyEMailStep{}},
+			nil,
+		},
+		{
 			"email verified and no password change required, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{

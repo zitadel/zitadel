@@ -406,7 +406,7 @@ Errors:
       NotChanged: Profil tidak berubah
       Empty: Profil kosong
       FirstNameEmpty: Nama depan di profil kosong
-      LastNameEmpty: Nama keluarga di profil kosong
+      LastNameEmpty: Nama belakang di profil kosong
       IDMissing: ID Profil tidak ada
     Email:
       NotFound: Email tidak ditemukan
