@@ -30,7 +30,7 @@ We can do so by calling the [create user schema endpoint](/docs/apis/resources/u
 with the following data. Make sure to provide an `access_token` with an `IAM_OWNER` role.
 
 ```bash
-curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas" \
+curl -X POST "https://${CUSTOM_DOMAIN}/v3alpha/user_schemas" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
@@ -92,7 +92,7 @@ Finally, we call the [update user schema endpoint](/docs/apis/resources/user_sch
 with the following data. Be sure to provide the id of the previously created schema.
 
 ```bash
-curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
+curl -X PUT "https://${CUSTOM_DOMAIN}/v3alpha/user_schemas/$SCHEMA_ID" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
@@ -141,7 +141,7 @@ In this case we will query for the one with state `active`. Check out the api do
 The API also allows retrieving a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
 
 ```bash
-curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \
+curl -X POST "https://${CUSTOM_DOMAIN}/v3alpha/user_schemas/search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
