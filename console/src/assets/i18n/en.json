@@ -1161,7 +1161,7 @@
       "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roles",
+      "TITLE": "ZITADEL Administrator Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
