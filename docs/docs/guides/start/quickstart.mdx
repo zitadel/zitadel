@@ -41,25 +41,14 @@ An [Instance](/docs/concepts/structure/instance) is a fully isolated identity en
 Most developers use separate instances to isolate Development, Test, and Production workflows.
 
 Follow these steps to deploy your first instance:
-1. **Start**: Click the Create Instance button on your dashboard.
+1. **Start**: Click Create Instance on your dashboard.
+2. **Identity**: Provide an Instance Name (e.g., dev-environment). This will be used to generate your default domain (e.g., dev-environment-xxxx.zitadel.cloud).
+3. **Locality**: Select your Region.
+  - Note: Choosing a region close to your users minimizes latency and helps with data residency compliance.
+4. **Admin Setup**: Create your Instance Administrator. This user has "root" permissions to manage all organizations, policies, and settings within this specific instance.
+5. **Deploy**: Review your configuration and click Create Instance.
 
 ![Create Instance](/img/guides/quickstart/cloud_create_instance.png)
-
-2. **Identity**: Provide an Instance Name (e.g., prod-customer-auth) and click Next.
-
-![Create Instance Name](/img/guides/quickstart/cloud_create_instance_name.png)
-
-3. **Locality**: Select your preferred Region.
-
-![Create Instance Region](/img/guides/quickstart/cloud_create_instance_region.png)
-
-4. **Admin Setup**: Define your Instance Administrator credentials. This user has root access to manage all settings within this specific instance.
-
-![Create Instance Admin](/img/guides/quickstart/cloud_create_instance_admin.png)
-
-5. **Deploy**: Review your settings and click Create Instance.
-
-![Create Instance Confirmation](/img/guides/quickstart/cloud_create_instance_confirmation.png)
 
 ### 4. Create your Project and Application
 
