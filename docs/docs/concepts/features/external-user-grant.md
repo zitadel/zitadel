@@ -14,27 +14,27 @@ By using external user role assignments, you can streamline collaboration with e
 
 You might typically store all users in a single ZITADEL [organization](../structure/organizations) for managing customer accounts.
 We recommend creating a second organization for your own team that also contains all the projects and applications that will be [granted](../structure/granted_projects) to the first organization with the B2C customer accounts.
-Instead of duplicating user accounts for your team members in the B2C organization, you can create external user grants on the B2C organization.
+Instead of duplicating user accounts for your team members in the B2C organization, you can create external user role assignments on the B2C organization.
 
 ### Multitenancy / Business-to-Business (B2B)
 
-ZITADEL allows you to create separate [organizations](../structure/organizations) for each of your business partner or tenant.
-There might be cases were users from one organization need access to projects from another organization.
-You can create an external user grant, that allows the inviting organization to manage the roles for the external user.
+ZITADEL allows you to create separate [organizations](../structure/organizations) for each of your business partners or tenants.
+There might be cases where users from one organization need access to projects from another organization.
+You can create an external role assignment that allows the inviting organization to manage the roles for the external user.
 
-## Project Grants vs. User Grants
+## Project Grants vs. Role Assignments
 
 Project grants are used to delegate access management of an entire project (or specific roles of the project) to another organization.
 
-User grants provide a more granular approach, allowing specific users from external organizations to access your projects.
+Role Assignments provide a more granular approach, allowing specific users from external organizations to access your projects.
 
 ## Alternative to multiple user accounts
 
 A user account is always unique across a ZITADEL instance.
-In some use cases, external user grants are a simple way to allow users access to multiple tenants.
+In some use cases, external user role assignments are a simple way to allow users access to multiple tenants.
 
 ## References
 
-* [API reference for user grants](/docs/category/apis/resources/mgmt/user-grants)
-* [How to manage user grants through ZITADEL's console](/docs/guides/manage/console/roles#authorizations)
+* [API reference to create authorization (role assignments)](/docs/apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-create-authorization)
+* [How to manage role assignments through ZITADEL's console](/docs/guides/manage/console/roles#role-assignments)
 * [More about multi-tenancy with ZITADEL](https://zitadel.com/blog/multi-tenancy-with-organizations)

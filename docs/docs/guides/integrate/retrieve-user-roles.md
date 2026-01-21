@@ -18,8 +18,8 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
-- [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
-- [Add manager roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
+- [Add application roles via the Project Service API](/docs/apis/resources/project_service_v2/zitadel-project-v-2-project-service-add-project-role)
+- [Add manager roles to users via the Internal Permission Service API](/docs/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator)
 
 ## Retrieve roles
 

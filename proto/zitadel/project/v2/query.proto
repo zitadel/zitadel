@@ -69,6 +69,7 @@ message Project {
 
   // AuthorizationRequired is a boolean flag that can be enabled to check if a user has
   // an authorization to use this project assigned when login into an application of this project.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   bool authorization_required = 8;
 

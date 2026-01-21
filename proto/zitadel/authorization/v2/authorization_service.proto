@@ -153,6 +153,7 @@ message ListAuthorizationsResponse {
   zitadel.filter.v2.PaginationResponse pagination = 1;
 
   // Authorizations contains the list of authorizations matching the request.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   repeated Authorization authorizations = 2;
 }
@@ -228,6 +229,7 @@ message CreateAuthorizationResponse {
 
 message UpdateAuthorizationRequest {
   // ID is the unique identifier of the authorization.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -268,6 +270,7 @@ message UpdateAuthorizationResponse {
 
 message DeleteAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be deleted.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -291,6 +294,7 @@ message DeleteAuthorizationResponse {
 
 message ActivateAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be activated.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -314,6 +318,7 @@ message ActivateAuthorizationResponse {
 
 message DeactivateAuthorizationRequest {
   // ID is the unique identifier of the authorization that should be deactivated.
+  //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
