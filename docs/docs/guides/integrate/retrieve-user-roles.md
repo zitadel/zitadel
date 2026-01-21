@@ -18,6 +18,8 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
 - [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
+- [Add manager roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
 
 ## Retrieve roles
 
@@ -400,7 +402,7 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
 
-In [APIs listed under user grants in the management API](/docs/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/docs/category/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
