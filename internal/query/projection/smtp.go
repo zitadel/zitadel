@@ -174,12 +174,27 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		handler.NewCol(SMTPConfigSMTPColumnUser, e.User),
 	}
 
+	resetXOAuth := func() {
+		columns = append(columns,
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, nil),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, nil),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientId, nil),
+			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientSecret, nil),
+		)
+	}
+	resetPlainAuth := func() {
+		columns = append(columns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, nil))
+	}
+
 	if e.PlainAuth != nil {
+		resetXOAuth()
 		columns = append(columns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password))
 	} else if e.Password != nil {
+		resetXOAuth()
 		columns = append(columns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.Password))
 	}
 	if e.XOAuth2Auth != nil {
+		resetPlainAuth()
 		columns = append(columns,
 			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
 			handler.NewCol(SMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
@@ -213,6 +228,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.WithTableSuffix(smtpConfigSMTPTableSuffix),
 		),
 	), nil
+
 }
 
 func (p *smtpConfigProjection) reduceSMTPConfigHTTPAdded(event eventstore.Event) (*handler.Statement, error) {
