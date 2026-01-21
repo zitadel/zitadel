@@ -431,7 +431,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs6_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.smtp_configs6_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, xoauth2auth_token_endpoint, xoauth2auth_scope, xoauth2auth_client_credentials_client_id, xoauth2auth_client_credentials_client_secret, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -441,6 +441,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"reply-to",
 								"host",
 								"user",
+								nil, nil, nil, nil,
 								anyArg{},
 							},
 						},
@@ -496,7 +497,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs6_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.smtp_configs6_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, xoauth2auth_token_endpoint, xoauth2auth_scope, xoauth2auth_client_credentials_client_id, xoauth2auth_client_credentials_client_secret, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"config-id",
@@ -506,6 +507,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"reply-to",
 								"host",
 								"user",
+								nil, nil, nil, nil,
 								anyArg{},
 							},
 						},
