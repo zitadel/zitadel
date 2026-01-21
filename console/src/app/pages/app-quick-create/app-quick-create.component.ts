@@ -36,7 +36,6 @@ import {
   NATIVE_TYPE,
   USER_AGENT_TYPE,
   API_TYPE,
-  SAML_TYPE,
   RadioItemAppType,
   AppCreateType,
 } from 'src/app/pages/projects/apps/authtypes';
@@ -49,7 +48,6 @@ import {
   BASIC_AUTH_METHOD,
   DEVICE_CODE_METHOD,
   IMPLICIT_METHOD,
-  getPartialConfigFromAuthMethod,
 } from 'src/app/pages/projects/apps/authmethods';
 import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';

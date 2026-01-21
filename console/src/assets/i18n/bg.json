@@ -2377,24 +2377,6 @@
       "JWTENDPOINT": "Крайна точка на JWT",
       "JWTKEYSENDPOINT": "Крайна точка на JWT ключове"
     },
-    "APPLE": {
-      "TEAMID": "Team ID",
-      "KEYID": "Key ID",
-      "PRIVATEKEY": "Private Key",
-      "UPDATEPRIVATEKEY": "Актуализиране на Private Key",
-      "UPLOADPRIVATEKEY": "Качване на Private Key",
-      "KEYMAXSIZEEXCEEDED": "Максималният размер от 5kB е надвишен."
-    },
-    "SAML": {
-      "METADATAXML": "Metadata Xml",
-      "METADATAURL": "Metadata URL",
-      "BINDING": "Binding",
-      "SIGNEDREQUEST": "Signed Request",
-      "SIGNATUREALGORITHM": "Signature Algorithm",
-      "NAMEIDFORMAT": "NameID Format",
-      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Алтернативно име на атрибут за съпоставяне на потребителя, в случай че върнатият `nameid-format` е `transient`, например `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
-    },
     "TOAST": {
       "SAVED": "Успешно запазено.",
       "REACTIVATED": "Idp се активира повторно.",
@@ -2418,7 +2400,6 @@
       "UPLOADPRIVATEKEY": "Upload Private Key",
       "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
     },
-    "EMPTY": "No IdP available",
     "SAML": {
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
