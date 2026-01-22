@@ -273,7 +273,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 			assert.Equal(collect, domain.IDPIntentStateFailed, retrievedRelationalIntent.State)
 			assert.NotEmpty(collect, retrievedRelationalIntent.FailReason)
 			require.NotNil(collect, retrievedRelationalIntent.FailedAt)
-			assert.WithinRange(collect, *retrievedRelationalIntent.SucceededAt, beforeCreate, afterFail)
+			assert.WithinRange(collect, *retrievedRelationalIntent.FailedAt, beforeCreate, afterFail)
 			idpIntentID = retrievedRelationalIntent.ID
 		}, retryDuration, tick)
 	})
