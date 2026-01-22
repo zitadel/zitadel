@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const TEXT_EXTENSIONS = ['.yaml', '.yml', '.conf', '.txt', '.json', '.caddyfile', '.go'];
