@@ -193,8 +193,7 @@ func xoauth2ToCmd(xoauth2 *admin_pb.UpdateEmailProviderSMTPRequest_Xoauth2) *com
 		TokenEndpoint: xoauth2.Xoauth2.TokenEndpoint,
 		Scopes:        xoauth2.Xoauth2.Scopes,
 	}
-	switch v := xoauth2.Xoauth2.OAuth2Type.(type) {
-	case *admin_pb.SMTPXOAuth2Auth_ClientCredentials_:
+	if v, ok := xoauth2.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_); ok {
 		cmd.ClientCredentialsAuth = &command.OAuth2ClientCredentials{
 			ClientId:     v.ClientCredentials.ClientId,
 			ClientSecret: v.ClientCredentials.ClientSecret,
@@ -262,8 +261,7 @@ func xoauth2ToSmtp(xoauth2 *admin_pb.TestEmailProviderSMTPRequest_Xoauth2, user 
 		TokenEndpoint: xoauth2.Xoauth2.TokenEndpoint,
 		Scopes:        xoauth2.Xoauth2.Scopes,
 	}
-	switch v := xoauth2.Xoauth2.OAuth2Type.(type) {
-	case *admin_pb.SMTPXOAuth2Auth_ClientCredentials_:
+	if v, ok := xoauth2.Xoauth2.OAuth2Type.(*admin_pb.SMTPXOAuth2Auth_ClientCredentials_); ok {
 		cfg.ClientCredentialsAuth = &smtp.OAuth2ClientCredentials{
 			ClientId:     v.ClientCredentials.ClientId,
 			ClientSecret: v.ClientCredentials.ClientSecret,
