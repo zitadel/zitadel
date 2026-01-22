@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"encoding/json"
 	"net/url"
 	"testing"
 	"time"
@@ -294,11 +295,11 @@ func TestUpdateIDPIntent(t *testing.T) {
 	err = idpIntentRepo.Create(t.Context(), tx, &intent1)
 	require.NoError(t, err)
 
-	entryAttrs := domain.NewIDPEntryAttributes(map[string][]string{
+	entryAttrs := map[string][]string{
 		"attr1": {"1", "2"},
 		"attr2": {"3", "4"},
-	})
-	marshalledAttrs, marshallErr := entryAttrs.String()
+	}
+	marshalledAttrs, marshallErr := json.Marshal(entryAttrs)
 	require.NoError(t, marshallErr)
 
 	intentID2 := gofakeit.UUID()
@@ -410,7 +411,7 @@ func TestUpdateIDPIntent(t *testing.T) {
 				toReturn.IDPUserID = "idp user id updated"
 				toReturn.IDPUsername = "idp username updated"
 				toReturn.UserID = "some-user-id"
-				toReturn.EntryAttributes = *entryAttrs
+				toReturn.EntryAttributes = entryAttrs
 				toReturn.SucceededAt = &now
 				toReturn.ExpiresAt = &tomorrow
 				toReturn.State = domain.IDPIntentStateSucceeded
