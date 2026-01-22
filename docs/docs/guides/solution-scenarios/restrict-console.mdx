@@ -3,17 +3,17 @@ title: Prevent users from accessing ZITADEL console
 sidebar_label: Limit access to console
 ---
 
-ZITADEL includes a console that allows Managers to configure all resources. All uses, including end-users, by default, view and manage their profile information.
+ZITADEL includes a console that allows Administrators to configure all resources. All uses, including end-users, by default, view and manage their profile information.
 In some use cases you want to prevent users from accessing the console, this could be:
 - User management is integrated into your own app
 - Users login via SSO and should not be able to change their data in the Console
-- Only managers should be able to access Console to manage their users
+- Only administrators should be able to access Console to manage their users
 
 At the moment it is not possible to simply disable the Console, but with the configuration described in this guide, you can prevent users from accessing the Console.
 
 ## Self-hosted
 
-If you are running ZITADEL self-hosted, we recommend restricting the access to ZITADEL Console via WAF/reverse-proxy for Non-Manager users
+If you are running ZITADEL self-hosted, we recommend restricting the access to ZITADEL Console via WAF/reverse-proxy for Non-Administrator users
 
 ## ZITADEL Cloud (and self-hosted)
 
@@ -33,7 +33,7 @@ By default, this setting is disabled, so all users can access the project.
 
 ![Project Settings: Check for Project on authentication](/img/guides/solution-scenarios/console-check-project-auth.png)
 
-Start by granting the organization of your managers, that should be able to access the Console, the [default project](/docs/guides/manage/console/projects-overview#the-default-project):
+Start by granting the organization of your administrators, that should be able to access the Console, the [default project](/docs/guides/manage/console/projects-overview#the-default-project):
 
 1. Click on the default-project > Grants > New +
    ![Project Settings: Default Project - Grants](/img/guides/solution-scenarios/console-zitadel-project-grants.png)
@@ -49,9 +49,9 @@ To avoid accidental lock-out, the [default project](/docs/guides/manage/console/
 
 You need to use the [update project API call](/docs/apis/resources/mgmt/management-service-update-project) to set the configuration on the project.
 
-First, you need a user with manager permissions to change the project settings in that organization.
-This means either you add the manager to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.
-After that create a Personal Access Token (PAT) for the manager.
+First, you need a user with administrator permissions to change the project settings in that organization.
+This means either you add the administrator to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.
+After that create a Personal Access Token (PAT) for the administrator.
 
 More detailed information about creating a PAT and administrator roles you can find [here](/docs/guides/integrate/service-users/personal-access-token)
 

@@ -17,7 +17,7 @@ Human or service users can be assigned roles. You can do this via the ZITADEL Co
 Follow the links below to assign roles to your users. 
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
-- [Add administrator roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add administrator roles via the ZITADEL Console](/docs/guides/manage/console/administrators)
 - [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
 - [Add administrator roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
 
@@ -408,7 +408,7 @@ In [APIs listed under user grants in the management API](/docs/category/apis/res
 
 #### **1. [Search user grants](/docs/apis/resources/mgmt/management-service-list-user-grants)​**
 
-Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
+Returns a list of user roles that match the search queries. A user with administrator permissions will call this API and will also have to reside in the same organization as the user. 
 
 **URL: https://`${CUSTOM_DOMAIN}`/management/v1/users/grants/_search**
 

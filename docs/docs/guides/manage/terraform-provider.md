@@ -14,7 +14,7 @@ It can be used to create, update, and delete ZITADEL resources, as well as to ma
 Make sure you create the following resources in ZITADEL and have [Terraform installed](https://learn.hashicorp.com/tutorials/terraform/install-cli):
 
 - [A ZITADEL Instance](../start/quickstart)
-- [A service user](/docs/guides/integrate/service-users/authenticate-service-users) with [enough authorization](/docs/guides/manage/console/managers) to manage the desired resources
+- [A service user](/docs/guides/integrate/service-users/authenticate-service-users) with [enough authorization](/docs/guides/manage/console/administrators) to manage the desired resources
 
 ## Manage ZITADEL resources through terraform
 

@@ -57,7 +57,7 @@ For example some organizations might use their EntraID, some other want to login
 Using an identity provider with strong multitenancy capabilities such as ZITADEL, you can configure a different set of external identity providers per organization.
 
 [Domain discovery](/docs/guides/solution-scenarios/domain-discovery) ensures that users are redirected to their external identity provider based on their email-address or username.
-[Managers](../structure/managers) can configure organization domains that are used for domain-based redirection to an external IdP.
+[Administrators](../structure/administrators) can configure organization domains that are used for domain-based redirection to an external IdP.
 
 ![Diagram explaining domain discovery](/img/concepts/features/domain-discovery.png)
 

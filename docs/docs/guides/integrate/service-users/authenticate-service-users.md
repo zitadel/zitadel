@@ -10,7 +10,7 @@ This guide explains ZITADEL service users and their role in facilitating secure 
 
 Service users in ZITADEL represent **non-human entities** within your system.
 They are ideal for scenarios involving secure communication between applications, particularly when interacting with backend services or APIs.
-Service users in combination with [Manager](/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
+Service users in combination with [administrator](/concepts/structure/administrators) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
 Unlike regular human users, service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
 
 ## Benefits of using Service Users

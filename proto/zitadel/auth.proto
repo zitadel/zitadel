@@ -943,9 +943,9 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Memberships"
+            tags: "User Administrator Roles"
             summary: "List My ZITADEL Administrator Roles";
-            description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
+            description: "Show all the management roles my user has in ZITADEL (ZITADEL Administrator)."
         };
     }
 

@@ -10,7 +10,7 @@ ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs 
 
 The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/docs/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
 
-[Actions](/docs/guides/manage/console/actions-overview) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
+[Actions](/docs/guides/manage/console/actions-overview) allow extending ZITADEL with custom code to change default behaviors or calling external systems.
 
 ## Authentication & authorization
 
@@ -19,9 +19,9 @@ The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SA
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
 Please refer to our guides how to [authenticate users](/docs/guides/integrate/login/login-users) through an interactive authentication process.
 
-For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
+For user authentication on devices with limited accessibility (eg, SmartTV, Smartwatch, etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](../apis/resources/session_service_v2/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
+Additionally, you can use the [session API](../apis/resources/session_service_v2/) to authenticate users, for example, by building a [custom login UI](/docs/guides/integrate/login-ui/).
 
 ### Authenticate service users and machines
 
@@ -45,7 +45,7 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
+ZITADEL allows authenticating users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -60,13 +60,13 @@ ZITADEL provides APIs for each [core resource](/docs/apis/v2):
 
 :::info
 We are migrating to a resource-based API approach.
-You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
+You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets, etc.
 :::
 
 ## ZITADEL APIs (service-based)
 
 :::info Prefer resource-based API
-ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
+ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization administrators.
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 

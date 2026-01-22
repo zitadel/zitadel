@@ -27,7 +27,7 @@ To assist with such requests, we will require specific information and may reque
 This policy applies to the following situations:
 
 - Loss of access to your **ZITADEL Cloud Admin Account** (customer portal)
-- Inability to access **Instance Manager accounts** for a specific instance
+- Inability to access **Instance Administrator accounts** for a specific instance
 - Need to **undo configuration changes** that caused a lockout (e.g., a misconfigured Action)
 
 
@@ -35,15 +35,15 @@ This policy applies to the following situations:
 
 The following types of access recovery requests are **not** covered by this policy:
 
-- Situations where you can request access from another **Admin** or **Instance Manager**
-- Requests made by **end-users** who should instead contact their Admin or Manager
+- Situations where you can request access from another **Admin** or **Instance Administrator**
+- Requests made by **end-users** who should instead contact their Admin or Administrator
 - Issues related to **self-hosted ZITADEL instances**
 - **Free accounts/Instances**
 
 
 ## Process
 
-Before submitting a request to restore access to your account, please ensure that you are unable to regain access through your existing **Manager** or **Admin**, or by contacting another **Manager/Admin** within your organization.
+Before submitting a request to restore access to your account, please ensure that you are unable to regain access through your existing **Administrator** or **Admin**, or by contacting another **Administrator** within your organization.
 
 
 ### ZITADEL Cloud account (Customer Portal)
@@ -57,9 +57,9 @@ Please visit the [support page in the customer portal](https://zitadel.com/admin
 Please allow us time to validate your request.  
 Our support team will follow up with additional verification steps if needed.
 
-### Instance Manager access recovery
+### Instance Administrator access recovery
 
-If you need to recover a Manager account to an instance, please make sure you can't recover the account via another user or service user with Manager permissions.
+If you need to recover an Administrator account of an instance, please make sure you can't recover the account via another user or service user with Administrator permissions.
 
 Please visit the [support page in the customer portal](https://zitadel.com/admin/support):
 

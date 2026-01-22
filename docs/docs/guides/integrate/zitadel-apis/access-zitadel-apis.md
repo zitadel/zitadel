@@ -13,7 +13,7 @@ Additionally, ZITADEL provides [SDKs for popular languages](/docs/sdk-examples/i
 Here's a breakdown of some key points about ZITADEL APIs:
 
 * **Auth API:** Used by authenticated users for tasks related to their accounts.
-* **Management API:** Used by organization managers for administrative tasks.
+* **Management API:** Used by organization administrators for administrative tasks.
 * **Admin API:** Used for administrative functions on the ZITADEL instance itself (may require separate user setup).  
 * **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific configuration).
 
@@ -64,24 +64,24 @@ Via APIs:
 
 ## 2. Grant an Administrator Role to the Service User
 
-ZITADEL Managers are Users who have permission to manage ZITADEL itself.
-There are some different levels for managers.
+ZITADEL Administrators are Users who have permission to manage ZITADEL itself.
+There are different levels for administrators.
 
-- **IAM Managers**: This is the highest level. Users with IAM Administrator roles are able to manage the whole instance.
-- **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
-- **Project Managers**: At this level, the user is able to manage a project.
-- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
+- **IAM Administrators**: This is the highest level. Users with IAM Administrator roles are able to manage the whole instance.
+- **Org Administrators**: Administrators at the Organization Level are able to manage everything within the granted Organization.
+- **Project Administrators**: At this level, the user is able to manage a project.
+- **Project Grant Administrators**: The project grant administrator manages projects that are granted by another organization.
 
-There are different roles on each level. You can find more about the different roles here: [ZITADEL Administrator Roles](/guides/manage/console/managers#roles)
+There are different roles on each level. You can find more about the different roles here: [ZITADEL Administrator Roles](/guides/manage/console/administrators#roles)
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
 1. Go to the detail page of your organization
 2. Click in the top right corner the "+" button
 3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
+4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/administrators))
 
-![Add Org Manager](/img/console_org_manager_add.gif)
+![Add Org Administrator](/img/console_org_manager_add.gif)
 
 ## 3. Authenticate service user and request token
 

@@ -22,7 +22,7 @@ SCIM provisioning in ZITADEL is accomplished by authenticating a Service User wi
 
 2. **Assign the Role**:
 
-   * Grant the Service User the **Org User Manager** role. No higher managerial role is required.
+   * Grant the Service User the **Org User Administrator** role. No higher administrator role is required.
 
 3. **Choose an Authentication Method**:
 

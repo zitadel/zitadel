@@ -6,9 +6,9 @@ sidebar_label: Onboard B2B customer
 In this guide we will explain how you can create and set up new organizations in ZITADEL to help you with your onboarding flows.
 Creating a new organization is the best choice for multi-tenancy use cases that require separation of customers, teams, or groups of users.
 
-We will also explain how to leverage [Managers](/docs/guides/manage/console/managers) to delegate self-service team management and configuration of policies to users of each organization.
+We will also explain how to leverage [Administrators](/docs/guides/manage/console/administrators) to delegate self-service team management and configuration of policies to users of each organization.
 
-When you want to build an onboarding process for your business customers you have to go through the following steps:
+When you want to build an onboarding process for your business customers, you have to go through the following steps:
 
 1. Create an organization: The organization represents the customer or a team
 2. Create the first administrator user: This user is the account for your customer, which should be able to configure settings such as SSO, MFA, etc.
@@ -27,7 +27,7 @@ ZITADEL does have multiple possibilities to achieve that process.
 
 Each ZITADEL instance does automatically bring a management console with it. The [console](/docs/guides/manage/console/console-overview) can be used to manage all your resources through a UI.
 You can access it by calling the following URL: `${CUSTOM-DOMAIN}/ui/`
-Make sure that your admins have a [Administrator role](/docs/guides/manage/console/managers) with permissions on an instance level such as "INSTANCE_OWNER"
+Make sure that your admins have a [Administrator role](/docs/guides/manage/console/administrators) with permissions on an instance level such as "INSTANCE_OWNER"
 
 ### Create a customer
 
@@ -61,33 +61,33 @@ import CreateUser from '/docs/guides/manage/console/_create-user.mdx';
 #### Add Administrator Role to User
 
 Now you need to assign the right administrator role to your user. In this case we want to give "ORG_OWNER".
-If you do want to know more about the roles check out the [ZITADEL Managers Guide with the Role List](/docs/guides/manage/console/managers)
+If you do want to know more about the roles check out the [ZITADEL Administrators Guide with the Role List](/docs/guides/manage/console/administrators)
 
-Go to the detail page of the organization and select the "+" button in the top right corner, where you already see a list of existing managers.
-<img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
+Go to the detail page of the organization and select the "+" button in the top right corner, where you already see a list of existing administrators.
+<img alt="Administrators" src="/docs/img/guides/console/managers.png" width="200px" />
 
-import AddManager from "/docs/guides/manage/console/_add_manager.mdx";
+import AddAdministrator from "/docs/guides/manage/console/_add_administrator.mdx";
 
-<AddManager name="AddManager" />
+<AddAdministrator name="AddAdministrator" />
 
 ### Invite Team Members
 
 The first user of your customer is now ready to authenticate and manage resources in ZITADEL.
-First task will be inviting a team member.
+The first task will be inviting a team member.
 
 We are now switching to the view of your customer's administrator user.
 
 :::note
 The following actions can also be configured by an Instance Administrator for their customer.
-To show how you can use the self-management possibilities it is shown from the customer's administrator.
+To show how you can use the self-management possibilities, it is shown from the customer's administrator.
 :::
 
 The Administrator user received an initialization e-mail after the user was created.
-With the link in the email the admin will be able to setup a password and optionally some multi-factors.
+With the link in the email, the admin will be able to set up a password and optionally some multi-factors.
 
-As the administrator only has permission for its own organization the ZITADEL Console UI does look slightly different.
+As the administrator only has permission for its own organization, the ZITADEL Console UI does look slightly different.
 
-To invite a team member the admin has to repeat the steps you did before.
+To invite a team member, the admin has to repeat the steps you did before.
 1. [Create User](./b2b#create-user)
 2. [Add role "ORG_OWNER" to the user](./b2b#create-user#add-administrator-role-to-user)
 
@@ -101,40 +101,40 @@ This setting does generally allow users to authenticate with an external provide
 
 1. Go to the Settings Page
 2. Navigate to Identity Providers
-   You might see already a list of activated providers here. If so, this is because some default providers are configured on the ZITADEL instances.
+   You might already see a list of activated providers here. If so, this is because some default providers are configured on the ZITADEL instances.
 3. Configure the identity provider you need.
    Follow our detailed configuration description of the different providers we have: [Configure the needed identity provider](/docs/guides/integrate/identity-providers/introduction)
 
 #### Auto-register users with SSO
 
-Let's assume you have configured Entra ID as an identity provider, and you want to allow all your employees to login with the corresponding user without having to register.
+Let's assume you have configured Entra ID as an identity provider, and you want to allow all your employees to log in with the corresponding user without having to register.
 This does need some specific configuration on your provider.
 
 1. Go to the detail page of your configured identity provider (In this example Entra ID)
-2. Enable "Automatic creation" in the optional settings. Optionally if you want to update the user information in ZITADEL, when they have changed in the Entra ID additionally enable "Automatic update"
+2. Enable "Automatic creation" in the optional settings. Optionally, if you want to update the user information in ZITADEL, when they have changed in the Entra ID additionally enable "Automatic update"
 3. Enable the "Account creation allowed" if it is not already
-4. If you also want to allow users to link to an existing account, if they already have an account in ZITADEL, enable "Account linking allowed"
+4. If you also want to allow users to link to an existing account if they already have an account in ZITADEL, enable "Account linking allowed"
 
 :::note
-It is only possible to automatically create accounts, that send all the required information to register a new user.
+It is only possible to automatically create accounts that send all the required information to register a new user.
 If your provider does not send all the required fields that ZITADEL needs to create a user, make sure to fill them in the background with an Action.
 [Example for prefilling user data automatically](/docs/guides/integrate/identity-providers/additional-information#automatically-prefill-user-data)
 :::
 
 #### Login with your user
 
-Last step is that your user can login to ZITADEL and use the SSO account.
+The last step is that your user can log in to ZITADEL and use the SSO account.
 
 import OrgLoginDescription from "./_org_login_description.mdx";
 
 <OrgLoginDescription name="OrgLodinDescription" />
 
-Your user is now ready to login with SSO.
+Your user is now ready to log in with SSO.
 <img src="/docs/img/guides/solution-scenarios/user-login-with-external-idp.png" alt="User Login with SSO"/>
 
 ## Automated onboarding for your customers
 
-If you want to start automating the process of onboarding your customers the following sections give you some guidance.
+If you want to start automating the process of onboarding your customers, the following sections give you some guidance.
 
 ### Built-in register organization form
 
@@ -143,7 +143,7 @@ A basic form that allows a customer to enter an organization name and a user acc
 
 When a user registers through this form, an organization and a user are created.
 The user will automatically get the role "ORG_OWNER" withing ZITADEL and is able to manage the whole organization.
-You can read more about the managers, roles and their meanings [here](/docs/guides/manage/console/managers)
+You can read more about the administrators, roles and their meanings [here](/docs/guides/manage/console/administrators)
 
 <img src="/docs/img/guides/solution-scenarios/register-organization.png" alt="Register Organization Form"/>
 
@@ -152,18 +152,18 @@ You can read more about the managers, roles and their meanings [here](/docs/guid
 If you do not want to allow users to register organizations with this form, you can disable it with the following request:
 [Restrict the instance features](/docs/apis/resources/admin/admin-service-set-restrictions)
 
-Disabling the form makes sense, if your administrators manage new customers themselves or if you build your own form.
+Disabling the form makes sense if your administrators manage new customers themselves or if you build your own form.
 
 ### Build your own form with setup organization request
 
-If the built-in register form doesn't fulfill your needs we recommend building your own form.
+If the built-in register form doesn't fulfill your needs, we recommend building your own form.
 
-The administration API of ZITADEL, allows you to setup a new organization with a first administrator user.
+The administration API of ZITADEL allows you to set up a new organization with a first administrator user.
 The setup organization requests, has the possibility to specify an organization with its name and a domain.
-You can directly send a human user with all the needed information like the profile, email, password. etc.
-This request allows you only to setup a user with password authentication at the moment.
-By specifying the roles you can define, which permission the user should have within ZITADEL.
-Per default the user will automatically get "ORG_OWNER".
+You can directly send a human user with all the necessary information like the profile, email, password. etc.
+This request allows you only to set up a user with password authentication at the moment.
+By specifying the roles you can define which permission the user should have within ZITADEL.
+By default, the user will automatically get "ORG_OWNER".
 
 <img src="/docs/img/guides/solution-scenarios/register-team-graphic.png" alt="Setup Organization with Admin User Graphic"/>
 
@@ -207,7 +207,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/admin/v1/orgs/_setup' \
 
 Detailed description of [Setup Organization](/docs/apis/resources/admin/admin-service-set-up-org#setup-organization)
 
-If you need to add custom data to either the organization or the user you can use the metadata.
+If you need to add custom data to either the organization or the user, you can use the metadata.
 Metadata is a key value construct that allows you to store any additional information to the resources.
 The set organization metadata request allows you to add one key value pair to an organization:
 [Set Organization Metadata](/docs/apis/resources/mgmt/management-service-set-org-metadata)
