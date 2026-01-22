@@ -2,7 +2,7 @@ package smtp
 
 import (
 	"context"
-	"crypto/sha256"
+	"hash/fnv"
 	"net/smtp"
 
 	lru "github.com/hashicorp/golang-lru/v2"
@@ -27,17 +27,17 @@ type OAuth2ClientCredentials struct {
 }
 
 func (cfg XOAuth2AuthConfig) Hash() string {
-	sha := sha256.New()
-	sha.Write([]byte(cfg.User))
-	sha.Write([]byte(cfg.TokenEndpoint))
+	hash := fnv.New128()
+	hash.Write([]byte(cfg.User))
+	hash.Write([]byte(cfg.TokenEndpoint))
 	for _, s := range cfg.Scopes {
-		sha.Write([]byte(s))
+		hash.Write([]byte(s))
 	}
 	if cfg.ClientCredentialsAuth != nil {
-		sha.Write([]byte(cfg.ClientCredentialsAuth.ClientId))
-		sha.Write([]byte(cfg.ClientCredentialsAuth.ClientSecret))
+		hash.Write([]byte(cfg.ClientCredentialsAuth.ClientId))
+		hash.Write([]byte(cfg.ClientCredentialsAuth.ClientSecret))
 	}
-	return string(sha.Sum(nil))
+	return string(hash.Sum(nil))
 }
 
 type xoauth2Auth struct {
