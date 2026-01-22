@@ -8,15 +8,16 @@
 // add logging capabilities to contexts.
 // Streams are defined using the [Stream] enumeration.
 // Log context can be created using [NewCtx], and loggers can be retrieved from contexts using [FromCtx].
-// Streams are typically initioalized at the start of different application components
+// Streams are typically initialized at the start of different application components
 // (e.g., request handling, event processing) to ensure that all logs generated within those components
 // are tagged appropriately.
 //
 // Example usage:
 //
+//	// Initialize a context for request handling, typically done in middleware
 //	ctx := logging.NewCtx(context.Background(), logging.StreamRequest, slog.String("request_id", "12345"))
-//	logger := logging.FromCtx(ctx)
-//	logger.Info("Handling request")
+//	// Somewhere deeper in the call stack
+//	logging.Info(ctx, "Something to log")
 //
 // This will produce a log entry with the stream set to "request" and include the request ID.
 package logging
@@ -34,12 +35,12 @@ type Stream int
 
 //go:generate enumer -type=Stream -trimprefix=Stream -transform=snake
 const (
-	StreamRuntime Stream = iota
-	StreamRequest
-	StreamEventPusher
-	StreamEventHandler
-	StreamAction
-	StreamNotification
+	StreamRuntime      Stream = iota // Top-level commands, such as starting the application or running migrations.
+	StreamRequest                    // API request handling.
+	StreamEventPusher                // Event pushing to the database (not implemented yet).
+	StreamEventHandler               // Event handling and processing.
+	StreamAction                     // Execution target workers (actions v2).
+	StreamNotification               // Notification sending workers.
 )
 
 // New creates a new logger with the given stream and additional arguments.
