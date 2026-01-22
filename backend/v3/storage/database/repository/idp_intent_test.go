@@ -46,7 +46,7 @@ func TestCreateIDPIntent(t *testing.T) {
 		inputIDPID       string
 		inputIDPArgs     map[string]any
 		inputCreatedAt   time.Time
-		inputUpdateddAt  time.Time
+		inputUpdatedAt   time.Time
 		inputMaxLifetime time.Duration
 
 		expectedError error
@@ -76,12 +76,12 @@ func TestCreateIDPIntent(t *testing.T) {
 			inputIDPArgs:     map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
 			inputMaxLifetime: time.Hour * 2,
 			inputCreatedAt:   time.Now(),
-			inputUpdateddAt:  time.Now(),
+			inputUpdatedAt:   time.Now(),
 		},
 		{
 			testName:        "id not set / should return check error",
 			inputCreatedAt:  time.Now(),
-			inputUpdateddAt: time.Now(),
+			inputUpdatedAt:  time.Now(),
 			inputInstanceID: instanceID,
 			inputSuccessURL: successURL,
 			inputFailureURL: emptyURL,
@@ -93,7 +93,7 @@ func TestCreateIDPIntent(t *testing.T) {
 			testName:        "instance id not found / should return foreign key error",
 			inputID:         intentID,
 			inputCreatedAt:  time.Now(),
-			inputUpdateddAt: time.Now(),
+			inputUpdatedAt:  time.Now(),
 			inputSuccessURL: successURL,
 			inputFailureURL: emptyURL,
 			inputIDPID:      idpID,
@@ -105,7 +105,7 @@ func TestCreateIDPIntent(t *testing.T) {
 			inputID:         intentID,
 			inputInstanceID: instanceID,
 			inputCreatedAt:  time.Now(),
-			inputUpdateddAt: time.Now(),
+			inputUpdatedAt:  time.Now(),
 			inputSuccessURL: successURL,
 			inputFailureURL: failURL,
 			inputIDPArgs:    map[string]any{"arg1": map[string]any{"k1": 1, "k2": "v2"}},
