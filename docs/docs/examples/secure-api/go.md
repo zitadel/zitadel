@@ -98,7 +98,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
 ```
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL custom domain, e.g. https://my-domain.zitadel.cloud
+- `domain`: Your ZITADEL Custom Domain, e.g. https://my-domain.zitadel.cloud
 - `key`: The path to the downloaded key.json
 - `port`: The port on which the API will be accessible, default it 8089
 
@@ -107,7 +107,7 @@ You will need to provide some values for the program to run:
 After you have configured everything correctly, you can simply start the example by:
 
 ```bash
-go run main.go --domain <your domain> --key <path>
+go run main.go --domain <custom domain> --key <path>
 ```
 
 This could look like:
@@ -197,7 +197,7 @@ Content-Length: 50
 permission denied: missing required role: `admin`
 ```
 
-### Add admin role
+### Add administrator role
 
 So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.

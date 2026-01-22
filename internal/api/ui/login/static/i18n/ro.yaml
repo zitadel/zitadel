@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Verificare în 2 pași
   DescriptionPhone: Creează-ți autentificarea cu 2 factori. Introdu numărul tău de telefon pentru a-l verifica.
   DescriptionCode: Creează-ți autentificarea cu 2 factori. Introdu codul primit pentru a-ți verifica numărul de telefon.
+  CountryCodeLabel: Țară
   PhoneLabel: Telefon
   CodeLabel: Cod
   EditButtonText: Editează

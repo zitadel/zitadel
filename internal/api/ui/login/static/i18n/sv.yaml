@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Tvåfaktor verifiering
   DescriptionPhone: Verifiera med en andra faktor. Ange ditt mobilnummer.
   DescriptionCode: Verifiera med en andra faktor. Ange koden du fått på SMS för att bekräfta ditt mobilnr.
+  CountryCodeLabel: Land
   PhoneLabel: Mobilnr
   CodeLabel: Kod
   EditButtonText: Ändra

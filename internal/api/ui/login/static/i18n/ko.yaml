@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2단계 인증
   DescriptionPhone: 2단계 인증을 설정하세요. 전화번호를 입력하여 인증하세요.
   DescriptionCode: 2단계 인증을 설정하세요. 받은 코드를 입력하여 전화번호를 인증하세요.
+  CountryCodeLabel: 국가
   PhoneLabel: 전화번호
   CodeLabel: 코드
   EditButtonText: 수정

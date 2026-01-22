@@ -2,4 +2,4 @@ openapi: 3.1.0
 info:
   version: v2
 servers:
-  - url: https://$CUSTOM-DOMAIN
+  - url: https://$CUSTOM_DOMAIN
