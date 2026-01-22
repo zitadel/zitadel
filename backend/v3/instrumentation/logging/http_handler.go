@@ -3,8 +3,6 @@ package logging
 import (
 	"net/http"
 
-	slogctx "github.com/veqryn/slog-context"
-
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 )
 
@@ -15,14 +13,13 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 			next.ServeHTTP(w, r)
 			return
 		}
-		logger := instrumentation.Logger()
-		ctx := instrumentation.SetHttpRequestDetails(r.Context(), service, r)
-		ctx = slogctx.NewCtx(ctx, logger)
+		ctx := NewCtx(r.Context(), StreamRequest)
+		ctx = instrumentation.SetHttpRequestDetails(ctx, service, r)
 		sw := &statusWriter{ResponseWriter: w}
 
 		next.ServeHTTP(sw, r.WithContext(ctx))
 
-		logger.InfoContext(ctx, "http request", "status", sw.status)
+		Info(ctx, "http request", "status", sw.status)
 	})
 }
 

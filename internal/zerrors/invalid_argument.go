@@ -3,11 +3,11 @@ package zerrors
 import "fmt"
 
 func ThrowInvalidArgument(parent error, id, message string) error {
-	return newZitadelError(KindInvalidArgument, parent, id, message)
+	return CreateZitadelError(KindInvalidArgument, parent, id, message, 1)
 }
 
 func ThrowInvalidArgumentf(parent error, id, format string, a ...any) error {
-	return newZitadelError(KindInvalidArgument, parent, id, fmt.Sprintf(format, a...))
+	return CreateZitadelError(KindInvalidArgument, parent, id, fmt.Sprintf(format, a...), 1)
 }
 
 func IsErrorInvalidArgument(err error) bool {

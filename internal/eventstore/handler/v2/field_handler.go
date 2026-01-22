@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -79,8 +80,8 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 			wg.Done()
 		}
 		wg.Wait()
-		h.log().OnError(err).Info("process events failed")
-		h.log().WithField("iteration", i).Debug("trigger iteration")
+		logging.OnError(ctx, err).Info("process events failed")
+		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return err
 		}
@@ -93,7 +94,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				h.log().Debug("state already locked")
+				logging.WithError(ctx, err).DebugContext(ctx, "state already locked")
 				err = nil
 				additionalIteration = false
 			}
@@ -117,7 +118,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).DebugContext(ctx, "unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -156,7 +157,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return additionalIteration, err
 	}
 	if len(events) == 0 {
-		err = h.setState(tx, currentState)
+		err = h.setState(ctx, tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -165,7 +166,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 
-	err = h.setState(tx, currentState)
+	err = h.setState(ctx, tx, currentState)
 
 	return additionalIteration, err
 }
@@ -173,7 +174,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
-		h.log().OnError(err).Debug("filter eventstore failed")
+		logging.OnError(ctx, err).DebugContext(ctx, "filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)

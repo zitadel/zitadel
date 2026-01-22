@@ -117,23 +117,35 @@ type ZitadelError struct {
 }
 
 func ThrowError(parent error, id, message string) error {
-	return newZitadelError(KindUnknown, parent, id, message)
+	return CreateZitadelError(KindUnknown, parent, id, message, 1)
 }
 
-func CreateZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
-	return newZitadelError(kind, parent, id, message)
-}
-
-func newZitadelError(kind Kind, parent error, id, message string) *ZitadelError {
+// CreateZitadelError creates a ZitadelError of the given kind.
+// If ReportLocation or StackTrace are enabled, they are added to the error.
+// The skip parameter defines how many stack frames to skip when determining
+// the report location.
+// A skip value of 0 means the location where CreateZitadelError is called.
+// When the parent error is also a ZitadelError, the report location and stack trace
+// are inherited from the parent error.
+func CreateZitadelError(kind Kind, parent error, id, message string, skip int) *ZitadelError {
 	err := &ZitadelError{
 		Kind:    kind,
 		Parent:  parent,
 		ID:      id,
 		Message: message,
 	}
+	var target *ZitadelError
+	if errors.As(parent, &target) {
+		// inherit stack trace and report location from parent error
+		err.reportLocation = target.reportLocation
+		err.stackTrace = target.stackTrace
+		err.hasStackTrace = target.hasStackTrace
+		return err
+	}
+
 	if enableReportLocation.Load() {
 		// skip 2: newZitadelError + Create / Throw function.
-		err.reportLocation = sloggcp.NewReportLocation(2)
+		err.reportLocation = sloggcp.NewReportLocation(skip + 1)
 	}
 	if enableStackTrace.Load() {
 		err.stackTrace = debug.Stack()

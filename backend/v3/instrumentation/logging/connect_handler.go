@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
-	slogctx "github.com/veqryn/slog-context"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 )
@@ -19,16 +18,15 @@ func NewConnectInterceptor(next connect.UnaryFunc, ignoredMethodSuffixes ...stri
 			return next(ctx, req)
 		}
 
-		logger := instrumentation.Logger()
+		ctx = NewCtx(ctx, StreamRequest)
 		ctx = instrumentation.SetConnectRequestDetails(ctx, req)
-		ctx = slogctx.NewCtx(ctx, logger)
 
 		resp, err := next(ctx, req)
 		var code connect.Code
 		if err != nil {
 			code = connect.CodeOf(err)
 		}
-		logger.InfoContext(ctx, "connect RPC request", "code", code)
+		Info(ctx, "connect RPC request", "code", code)
 		return resp, err
 	}
 }
