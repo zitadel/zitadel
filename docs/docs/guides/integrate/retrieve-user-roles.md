@@ -6,24 +6,24 @@ sidebar_label: Retrieve User Roles
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
 
 ## What are roles/authorizations/grants in ZITADEL? 
-User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
+User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific administrator roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
 
 Roles are critical to managing permissions in a single-tenant or multi-tenant application. It can, however, be tricky to retrieve them, especially when spanning multiple organizations and projects. 
 
 ## Assign roles and memberships
 
-Human or service users can be assigned roles. You can do this via the ZITADEL Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has manager roles, such as `ORG_OWNER` and `IAM_OWNER`. 
+Human or service users can be assigned roles. You can do this via the ZITADEL Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`. 
 
 Follow the links below to assign roles to your users. 
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
-- [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add administrator roles via the ZITADEL Console](/docs/guides/manage/console/managers)
 - [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
-- [Add manager roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
+- [Add administrator roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
 
 ## Retrieve roles
 
-Roles can be requested via our auth and management APIs, from userinfo endpoint or ID token. Currently, manager roles cannot be directly included in the token. You will need to use the ZITADEL APIs to retrieve them.
+Roles can be requested via our auth and management APIs, from userinfo endpoint or ID token. Currently, administrator roles cannot be directly included in the token. You will need to use the ZITADEL APIs to retrieve them.
 
 ### Generate a token
 
@@ -248,7 +248,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
 
 #### **2.[List my ZITADEL permissions](/docs/apis/resources/auth/auth-service-list-my-zitadel-permissions)​**
 
-Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
+Returns a list of permissions the authenticated user has in ZITADEL based on the administrator roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
 
 This request can be used if you are building a management UI. For instance, if the UI is managing users, you can show the management functionality based on the permissions the user has. Here’s an example: if the user has `user.read` and `user.write` permission you can show the edit buttons, if the user only has `user.read` permission, you can hide the edit buttons.
 
