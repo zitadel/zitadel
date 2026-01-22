@@ -51,6 +51,7 @@ SELECT
 	, identity_provider_intents.request_id
 	, identity_provider_intents.assertion
 	, identity_provider_intents.succeeded_at
+	, identity_provider_intents.failed_at
 	, identity_provider_intents.fail_reason
 	, identity_provider_intents.expires_at
 FROM
@@ -247,6 +248,11 @@ func (i *idpIntentRepository) SetSucceededAt(succeededAt time.Time) database.Cha
 	return database.NewChange(i.SucceededAtColumn(), succeededAt)
 }
 
+// SetFailedAt implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) SetFailedAt(failedAt time.Time) database.Change {
+	return database.NewChange(i.FailedAtColumn(), failedAt)
+}
+
 // SetFailReason implements [domain.IDPIntentRepository].
 func (i *idpIntentRepository) SetFailReason(reason string) database.Change {
 	return database.NewChange(i.FailReasonColumn(), reason)
@@ -416,6 +422,11 @@ func (i idpIntentRepository) SuccessURLColumn() database.Column {
 // FailReasonColumn implements [domain.IDPIntentRepository].
 func (i *idpIntentRepository) FailReasonColumn() database.Column {
 	return database.NewColumn(i.unqualifiedTableName(), "fail_reason")
+}
+
+// FailedAtColumn implements [domain.IDPIntentRepository].
+func (i *idpIntentRepository) FailedAtColumn() database.Column {
+	return database.NewColumn(i.unqualifiedTableName(), "failed_at")
 }
 
 // UpdatedAtColumn implements [domain.idpIntentColumns].

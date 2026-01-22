@@ -27,6 +27,7 @@ CREATE TABLE zitadel.identity_provider_intents
     assertion               JSONB,
     succeeded_at            TIMESTAMPTZ,
     fail_reason             TEXT,
+    failed_at               TIMESTAMPTZ,
     expires_at              TIMESTAMPTZ,
 
     PRIMARY KEY (instance_id, id),

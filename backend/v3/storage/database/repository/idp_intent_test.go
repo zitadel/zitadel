@@ -419,16 +419,18 @@ func TestUpdateIDPIntent(t *testing.T) {
 			expectedUpdatedRows: 1,
 		},
 		{
-			testName:        "when simulating FailedEvent should update reason and state",
+			testName:        "when simulating FailedEvent should update reason, state and failedAt",
 			inputConditions: idpIntentRepo.PrimaryKeyCondition(instanceID, intentID1),
 			inputChanges: database.Changes{
 				idpIntentRepo.SetState(domain.IDPIntentStateFailed),
 				idpIntentRepo.SetFailReason("mock failure"),
+				idpIntentRepo.SetFailedAt(now),
 			},
 			expectedUpdatedRecords: func() []*domain.IDPIntent {
 				toReturn := intent1
 				toReturn.FailReason = "mock failure"
 				toReturn.State = domain.IDPIntentStateFailed
+				toReturn.FailedAt = &now
 				return []*domain.IDPIntent{&toReturn}
 			},
 			expectedUpdatedRows: 1,
@@ -455,13 +457,16 @@ func TestUpdateIDPIntent(t *testing.T) {
 			inputChanges: database.Changes{
 				idpIntentRepo.SetState(domain.IDPIntentStateFailed),
 				idpIntentRepo.SetRequestID("req-123"),
+				idpIntentRepo.SetFailedAt(now),
 			},
 			expectedUpdatedRecords: func() []*domain.IDPIntent {
 				toReturn1, toReturn2 := intent1, intent2
 				toReturn1.State = domain.IDPIntentStateFailed
 				toReturn1.RequestID = "req-123"
+				toReturn1.FailedAt = &now
 				toReturn2.State = domain.IDPIntentStateFailed
 				toReturn2.RequestID = "req-123"
+				toReturn2.FailedAt = &now
 				return []*domain.IDPIntent{&toReturn1, &toReturn2}
 			},
 			expectedUpdatedRows: 2,
@@ -510,6 +515,10 @@ func TestUpdateIDPIntent(t *testing.T) {
 						assert.WithinRange(t, *retrievedIntent.SucceededAt, beforeUpdate, afterUpdate)
 						require.NotNil(t, retrievedIntent.ExpiresAt)
 						assert.WithinRange(t, *retrievedIntent.ExpiresAt, beforeUpdate.AddDate(0, 0, 1), afterUpdate.AddDate(0, 0, 1))
+					}
+					if expectedIntent.State == domain.IDPIntentStateFailed {
+						require.NotNil(t, retrievedIntent.FailedAt)
+						assert.WithinRange(t, *retrievedIntent.FailedAt, beforeUpdate, afterUpdate)
 					}
 					assert.Equal(t, expectedIntent.FailReason, retrievedIntent.FailReason)
 				}

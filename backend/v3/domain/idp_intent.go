@@ -39,6 +39,7 @@ type IDPIntent struct {
 	Assertion       []byte             `json:"assertion,omitempty" db:"assertion"`
 	SucceededAt     *time.Time         `json:"succeeded_at,omitzero" db:"succeeded_at"`
 	FailReason      string             `json:"fail_reason,omitempty" db:"fail_reason"`
+	FailedAt        *time.Time         `json:"failed_at,omitzero" db:"failed_at"`
 	ExpiresAt       *time.Time         `json:"expires_at,omitzero" db:"expires_at"`
 }
 
@@ -95,6 +96,8 @@ type idpIntentColumns interface {
 	SucceededAtColumn() database.Column
 	// FailReasonColumn returns the column for the field fail_reason
 	FailReasonColumn() database.Column
+	// FailedAtColumn returns the column for the field failed_at
+	FailedAtColumn() database.Column
 	// ExpiresAtColumn returns the column for the field expires_at
 	ExpiresAtColumn() database.Column
 }
@@ -159,6 +162,8 @@ type idpIntentChanges interface {
 	SetExpiresAt(expiration time.Time) database.Change
 	// SetSucceededAt sets the succededAt time of the IDP intent
 	SetSucceededAt(succeededAt time.Time) database.Change
+	// SetFailedAt sets the failedAt time of the IDP intent
+	SetFailedAt(failedAt time.Time) database.Change
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/idp_intent.mock.go . IDPIntentRepository

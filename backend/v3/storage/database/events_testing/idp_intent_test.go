@@ -236,6 +236,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 	})
 
 	t.Run("when LDAP intent flow fails should update intent state and reason", func(t *testing.T) {
+		beforeCreate := time.Now()
 		ldapProvider, err := AdminClient.AddLDAPProvider(IAMCTX, defaultInstanceLDAPRequest(gofakeit.Name()))
 		require.NoError(t, err)
 
@@ -250,6 +251,7 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 		}
 		_, err = UserClient.StartIdentityProviderIntent(IAMCTX, req)
 		require.Error(t, err)
+		afterFail := time.Now()
 
 		var idpIntentID string
 		t.Cleanup(func() {
@@ -270,6 +272,8 @@ func TestServer_IDPIntentReduces(t *testing.T) {
 			require.NoError(collect, err)
 			assert.Equal(collect, domain.IDPIntentStateFailed, retrievedRelationalIntent.State)
 			assert.NotEmpty(collect, retrievedRelationalIntent.FailReason)
+			require.NotNil(collect, retrievedRelationalIntent.FailedAt)
+			assert.WithinRange(collect, *retrievedRelationalIntent.SucceededAt, beforeCreate, afterFail)
 			idpIntentID = retrievedRelationalIntent.ID
 		}, retryDuration, tick)
 	})

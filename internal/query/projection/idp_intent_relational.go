@@ -227,6 +227,7 @@ func (i *idpIntentRelationalProjection) reduceFailedEvent(evt eventstore.Event) 
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.SetState(domain.IDPIntentStateFailed),
 			repo.SetFailReason(e.Reason),
+			repo.SetFailedAt(e.CreatedAt()),
 		)
 		return err
 	}), nil
