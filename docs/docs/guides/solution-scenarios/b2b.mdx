@@ -9,7 +9,7 @@ import { B2B } from "../../../src/components/b2b";
 
 B2B describes the situation where an organization interacts with other organizations.
 This **multi-tenancy architecture** usually adds some form of complexity to an Identity and Access Management System.
-In ZITADEL an [organization](/docs/concepts/structure/organizations) can represent a business partner or partner who typically has its own branding and has different access settings like an additional federated login for its users.
+In ZITADEL an [organization](/docs/guides/manage/console/organizations-overview) can represent a business partner or partner who typically has its own branding and has different access settings like an additional federated login for its users.
 
 B2B can be a simple scenario where an organization only shares one of its projects with another organization or have a more complex case where an organization is offering a portal application to all its partners with included (self)administration.
 
@@ -42,7 +42,7 @@ In order to define the need of the **Portal Application** some planning consider
 ### Login
 
 You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. Using OpenID Connect, you can send the user to a specific organization by defining the organization in a [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) (primary domain).
-Settings to the branding or the login options of the organization can be made from the organization section in [Console](/docs/concepts/features/console).
+Settings to the branding or the login options of the organization can be made from the organization section in [Console](/docs/guides/manage/console/console-overview).
 The behavior of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user's organization, or the project's organization.
 
 ### Organizations
@@ -71,10 +71,10 @@ In our scenario, Octagon creates a project grant for Pentagon. Pentagon is limit
 
 In this scenario, Dimitri and Michael share the same organization Pentagon, where as Bill belongs to Octagon. Octagon is owner of the Portal project with its Web App, having Bill configured as user grant with `admin` role. Dimitri owns the `writer` role, whereas Michael only is `reader`.
 
-> Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
+> Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL administrator role.
 
 If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log.
-If you had such a use case, ZITADEL manager roles must be assigned to those users.
+If you had such a use case, ZITADEL administrator roles must be assigned to those users.
 
 ### Noteworthy
 

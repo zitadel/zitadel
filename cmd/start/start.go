@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	_ "embed"
+	"errors"
 	"fmt"
+	"log/slog"
 	"math"
 	"net/http"
 	"os"
@@ -127,12 +129,25 @@ func New(server chan<- *Server) *cobra.Command {
 		Long: `starts ZITADEL.
 Requirements:
 - postgreSQL`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			err := cmd_tls.ModeFromFlag(cmd)
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel start command failed", "err", err)
+				}
+			}()
+
+			err = cmd_tls.ModeFromFlag(cmd)
 			if err != nil {
 				return err
 			}
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
 				return err
@@ -331,6 +346,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Executions,
 		q,
 		keys.Target,
+		queries.GetActiveSigningWebKey,
 	)
 	execution.Start(ctx)
 
@@ -528,7 +544,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, org_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, org_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, feature_v2.CreateServer(commands, queries)); err != nil {

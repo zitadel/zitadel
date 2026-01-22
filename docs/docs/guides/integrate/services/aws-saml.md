@@ -13,8 +13,8 @@ It covers how to:
 Prerequisites:
 
 - existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects)
+- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 
@@ -45,7 +45,7 @@ can connect to ZITADEL as a SAML2 IDP.
 4. Download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
    You can download the certificate from following
-   URL: \{your_instance_domain}/saml/v2/certificate
+   URL: `${CUSTOM_DOMAIN}/saml/v2/certificate`
 
 5. Then upload the ".crt"-file to AWS and click "next".
 

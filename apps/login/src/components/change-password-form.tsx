@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
-import {
-  checkSessionAndSetPassword,
-  sendPassword,
-} from "@/lib/server/password";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { checkSessionAndSetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -40,17 +32,11 @@ type Props = {
   organization?: string;
 };
 
-export function ChangePasswordForm({
-  passwordComplexitySettings,
-  sessionId,
-  loginName,
-  requestId,
-  organization,
-}: Props) {
+export function ChangePasswordForm({ passwordComplexitySettings, sessionId, loginName, requestId, organization }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       password: "",
       comfirmPassword: "",
@@ -65,29 +51,24 @@ export function ChangePasswordForm({
   async function submitChange(values: Inputs) {
     setLoading(true);
 
-    const changeResponse = checkSessionAndSetPassword({
+    const changeResponse = await checkSessionAndSetPassword({
       sessionId,
       password: values.password,
-    })
-      .catch(() => {
-        setError(t("change.errors.couldNotChangePassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
+      return;
+    });
 
     if (changeResponse && "error" in changeResponse && changeResponse.error) {
-      setError(
-        typeof changeResponse.error === "string"
-          ? changeResponse.error
-          : t("change.errors.unknownError")
-      );
+      setError(typeof changeResponse.error === "string" ? changeResponse.error : t("change.errors.unknownError"));
+      setLoading(false);
       return;
     }
 
     if (!changeResponse) {
       setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
       return;
     }
 
@@ -109,20 +90,12 @@ export function ChangePasswordForm({
         setLoading(false);
       });
 
-    if (
-      passwordResponse &&
-      "error" in passwordResponse &&
-      passwordResponse.error
-    ) {
+    if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
       setError(passwordResponse.error);
       return;
     }
 
-    if (
-      passwordResponse &&
-      "redirect" in passwordResponse &&
-      passwordResponse.redirect
-    ) {
+    if (passwordResponse && "redirect" in passwordResponse && passwordResponse.redirect) {
       return router.push(passwordResponse.redirect);
     }
 
@@ -134,9 +107,7 @@ export function ChangePasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -196,17 +167,11 @@ export function ChangePasswordForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
+          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
           onClick={handleSubmit(submitChange)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="change.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="change.submit" namespace="password" />
         </Button>
       </div>
     </form>

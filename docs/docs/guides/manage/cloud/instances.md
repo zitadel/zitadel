@@ -16,7 +16,7 @@ To be able to add more instances please upgrade to "ZITADEL Pro".
 ## Overview
 
 The overview shows all the instances that are registered for your customer.
-You can directly see the custom domain and data region.
+You can directly see the Custom Domain and data region.
 With a click on an instance you get to the detail of the chosen instance.
 
 
@@ -34,7 +34,7 @@ Click on the new button above the instance table to create a new instance.
 3. Instance created! You can now see the details of your first instance.
 
 :::info
-Every new instance gets a generated domain of the form [instancename][randomnumber].zitadel.cloud
+Every new instance gets a generated Custom Domain of the form [instancename][randomnumber].zitadel.cloud
 :::
 
 ![New Instance](/img/manuals/portal/customer_portal_new_instance.gif)
@@ -65,11 +65,11 @@ You can also upgrade manually at any time.
 
 ### Add Custom Domain
 
-We recommend register a custom domain to access your ZITADEL instance.
-The primary custom domain of your ZITADEL instance will be the issuer of the instance. All other custom domains can be used to access the instance itself
+We recommend register a Custom Domain to access your ZITADEL instance.
+The primary Custom Domain of your ZITADEL instance will be the issuer of the instance. All other Custom Domains can be used to access the instance itself
 
 1. Browse to the "Custom Domains" Tab
-2. Click **Add domain**
+2. Click **Add Custom Domain**
 3. Enter the domain you want and select the instance where the domain should belong to
 4. In the next screen you will get all the information you will have to add to your DNS provider to verify your domain
 
@@ -80,14 +80,14 @@ Be aware that it has some impacts if you change the primary domain of your insta
 1. The urls and issuer have to change in your app
 2. Passkey authentication is based on the domain, if you change it, your users will not be able to login with the registered passkey authentication
 
-![Add custom domain](/img/manuals/portal/customer_portal_add_domain.png)
+![Add Custom Domain](/img/manuals/portal/customer_portal_add_domain.png)
 
 #### Verify Custom Domain
 
-As soon as you have added your custom domain you will have to verify it, by adding a CNAME record to your DNS provider.
+As soon as you have added your Custom Domain you will have to verify it, by adding a CNAME record to your DNS provider.
 
 1. Go to your DNS provider
 2. Add a new CNAME record (You can find the target on the detail page of your instance)
 3. After adding the CNAME you need to wait till the domain is verified (this can take some time)
 
-You will now be able to use the added custom domain to access your ZITADEL instance
+You will now be able to use the added Custom Domain to access your ZITADEL instance

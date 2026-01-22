@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Verifikasi 2 Faktor
   DescriptionPhone: 'Buat 2 faktor Anda. '
   DescriptionCode: 'Buat 2 faktor Anda. '
+  CountryCodeLabel: Negara
   PhoneLabel: Telepon
   CodeLabel: Kode
   EditButtonText: Sunting
@@ -409,7 +410,7 @@ Errors:
       NotChanged: Profil tidak berubah
       Empty: Profil kosong
       FirstNameEmpty: Nama depan di profil kosong
-      LastNameEmpty: Nama keluarga di profil kosong
+      LastNameEmpty: Nama belakang di profil kosong
       IDMissing: ID Profil tidak ada
     Email:
       NotFound: Email tidak ditemukan

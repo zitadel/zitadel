@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktör Doğrulama
   DescriptionPhone: 2-faktörünüzü oluşturun. Doğrulamak için telefon numaranızı girin.
   DescriptionCode: 2-faktörünüzü oluşturun. Telefon numaranızı doğrulamak için aldığınız kodu girin.
+  CountryCodeLabel: Ülke
   PhoneLabel: Telefon
   CodeLabel: Kod
   EditButtonText: Düzenle
@@ -448,8 +449,8 @@ Errors:
       NotFound: Profil bulunamadı
       NotChanged: Profil değişmedi
       Empty: Profil boş
-      FirstNameEmpty: Profildeki ad boş
-      LastNameEmpty: Profildeki soyadı boş
+      FirstNameEmpty: Profildeki ad alanı boş
+      LastNameEmpty: Profildeki soyad alanı boş
       IDMissing: Profil ID'si eksik
     Email:
       NotFound: E-posta bulunamadı

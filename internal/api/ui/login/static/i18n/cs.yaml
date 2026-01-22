@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktorové ověření
   DescriptionPhone: Vytvořte svou 2-faktorovou autentizaci. Zadejte své telefonní číslo k jeho ověření.
   DescriptionCode: Vytvořte svou 2-faktorovou autentizaci. Zadejte obdržený kód k ověření vašeho telefonního čísla.
+  CountryCodeLabel: Země
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Upravit

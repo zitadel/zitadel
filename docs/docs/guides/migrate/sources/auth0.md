@@ -24,7 +24,7 @@ The migration tool is written in Go. Download and install the latest version of 
 You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.  
 
 If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.  
-See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations).
+See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations-overview).
 
 > **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
 
@@ -144,7 +144,7 @@ There are two recommended authentication methods:
 #### Example cURL request
 
 ```bash
-curl --location 'https://<instance-domain>/admin/v1/import' \
+curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/import' \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer <access-token>' \

@@ -1,3 +1,5 @@
+const { themes } = require('prism-react-renderer');
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: "ZITADEL Docs",
@@ -182,6 +184,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     prism: {
+      theme: themes.github,
+      darkTheme: themes.dracula,
       additionalLanguages: [
         "csharp",
         "dart",
@@ -339,7 +343,7 @@ module.exports = {
           },
           action_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/action/v2beta/action_service.swagger.json",
+              ".artifacts/openapi/zitadel/action/v2/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -366,7 +370,7 @@ module.exports = {
           },
           org_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
+              ".artifacts/openapi3/zitadel/org/v2/org_service.openapi.yaml",
             outputDir: "docs/apis/resources/org_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -377,15 +381,6 @@ module.exports = {
             specPath:
               ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
             outputDir: "docs/apis/resources/idp_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          org_v2beta: {
-            specPath:
-              ".artifacts/openapi3/zitadel/org/v2beta/org_service.openapi.yaml",
-            outputDir: "docs/apis/resources/org_service_v2beta",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",
@@ -470,6 +465,7 @@ module.exports = {
   ],
   markdown: {
     mermaid: true,
+    emoji: false
   },
   themes: [
     "docusaurus-theme-github-codeblock",

@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Настройка двухфакторной аутентификации
   DescriptionPhone: Введите номер телефона для его подтверждения.
   DescriptionCode: Введите код из СМС для подтверждения номера телефона.
+  CountryCodeLabel: Страна
   PhoneLabel: Номер телефона
   CodeLabel: Код из СМС
   EditButtonText: Изменить
@@ -449,8 +450,8 @@ Errors:
       NotFound: Профиль не найден
       NotChanged: Профиль не изменен
       Empty: Профиль пуст
-      FirstNameEmpty: Поле имени пусто
-      LastNameEmpty: Поле фамилии пусто
+      FirstNameEmpty: Имя в профиле пустое
+      LastNameEmpty: Фамилия в профиле пустая
       IDMissing: Отсутствует идентификатор профиля
       Email:
         NotFound: Электронная почта не найдена
