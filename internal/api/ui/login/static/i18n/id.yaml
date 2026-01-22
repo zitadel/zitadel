@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Verifikasi 2 Faktor
   DescriptionPhone: 'Buat 2 faktor Anda. '
   DescriptionCode: 'Buat 2 faktor Anda. '
+  CountryCodeLabel: Negara
   PhoneLabel: Telepon
   CodeLabel: Kode
   EditButtonText: Sunting
