@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Vérification à deux facteurs
   DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
   DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
+  CountryCodeLabel: Pays
   PhoneLabel: Numéro de téléphone
   CodeLabel: Code
   EditButtonText: Modifier

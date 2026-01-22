@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Kétfaktoros hitelesítés
   DescriptionPhone: Hozd létre a kétfaktoros hitelesítést. Add meg a telefonszámod a hitelesítéshez.
   DescriptionCode: Hozd létre a kétfaktoros hitelesítést. Add meg a kapott kódot a telefonszámod hitelesítéséhez.
+  CountryCodeLabel: Ország
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Szerkesztés
