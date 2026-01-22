@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: siguiente
   CancelButtonText: cancelar
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificación de doble factor
   DescriptionPhone: Crea tu doble factor de autenticación. Introduce tu número de teléfono para verificarlo.
   DescriptionCode: Crea tu doble factor de autenticación. Ingrese el código recibido para verificar su número de teléfono.
+  CountryCodeLabel: País
   PhoneLabel: Número de teléfono
   CodeLabel: Código
   EditButtonText: editar

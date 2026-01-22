@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verification
   DescriptionPhone: Create your 2-factor. Enter your phone number to verify it.
   DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
+  CountryCodeLabel: Country
   PhoneLabel: Phone
   CodeLabel: Code
   EditButtonText: Edit
