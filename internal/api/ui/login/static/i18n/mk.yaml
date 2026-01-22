@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: следно
   CancelButtonText: откажи
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Потврда на 2-факторска автентикација
   DescriptionPhone: Направете двофакторна автентикација. Внесете го вашиот телефонски број за да го потврдите.
   DescriptionCode: Направете двофакторна автентикација. Внесете го примениот код за да го потврдите вашиот телефонски број.
+  CountryCodeLabel: Земја
   PhoneLabel: Телефонски број
   CodeLabel: Код
   EditButtonText: Уредување
