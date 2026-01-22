@@ -1431,8 +1431,13 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 }
 
 func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
-	params := make([]idp.Parameter, 1, 2)
+	params := make([]idp.Parameter, 1, 3)
 	params[0] = idp.UserAgentID(authReq.AgentID)
+
+	// Indicate if the auth request already has a prompt parameter
+	if len(authReq.Prompt) > 0 {
+		params = append(params, idp.HasPromptParam(true))
+	}
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
