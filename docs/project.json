@@ -59,6 +59,13 @@
         "{projectRoot}/openapi"
       ]
     },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm clean",
+        "cwd": "docs"
+      }
+    },
     "generate-openapi": {
       "executor": "nx:run-commands",
       "options": {

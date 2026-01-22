@@ -98,10 +98,10 @@ const v1Meta = {
   pages: v1Services
 };
 
-mkdirSync(join(process.cwd(), 'content/docs/references/api-v1'), { recursive: true });
+mkdirSync(join(process.cwd(), 'content/docs/reference/api-v1'), { recursive: true });
 
 writeFileSync(
-  join(process.cwd(), 'content/docs/references/api-v1/meta.json'),
+  join(process.cwd(), 'content/docs/reference/api-v1/meta.json'),
   JSON.stringify(v1Meta, null, 2)
 );
 

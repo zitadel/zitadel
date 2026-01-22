@@ -69,12 +69,23 @@ function checkImages(files: FileObject[]): boolean {
     let match;
 
     while ((match = imageRegex.exec(content)) !== null) {
-      const imagePath = match[1] || match[2];
+      let imagePath = match[1] || match[2];
+
+      if (match[1]) {
+        // Markdown link: remove title part of the link (e.g. /img.png "title")
+        imagePath = imagePath.trim().split(/\s+/)[0];
+      }
       
       // Ignore external links
       if (imagePath.startsWith('http') || imagePath.startsWith('https') || imagePath.startsWith('data:')) {
         continue;
       }
+
+      // Remove query parameters or anchors
+      imagePath = imagePath.split('?')[0].split('#')[0];
+      
+      // Decode URI components (e.g. %20 -> space)
+      imagePath = decodeURIComponent(imagePath);
 
       let fullPath;
       if (imagePath.startsWith('/')) {
@@ -84,9 +95,6 @@ function checkImages(files: FileObject[]): boolean {
         // Relative path relative to the markdown file
         fullPath = resolve(dirname(file.path), imagePath);
       }
-
-      // Remove query parameters or anchors
-      fullPath = fullPath.split('?')[0].split('#')[0];
 
       if (!existsSync(fullPath)) {
         console.error(`Broken image link in ${file.path}: ${imagePath}`);

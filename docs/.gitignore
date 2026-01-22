@@ -26,6 +26,6 @@ yarn-error.log*
 next-env.d.ts
 
 # generated api docs
-/content/docs/references/api
-/content/docs/references/api-v1
+/content/docs/reference/api
+/content/docs/reference/api-v1
 /openapi/zitadel/
