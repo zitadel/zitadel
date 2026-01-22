@@ -1,7 +1,6 @@
 ---
 title: Organize applications, services, and roles with projects
 sidebar_label: Projects
-sidebar_position: 4
 ---
 
 import ProjectDescription from './\_project_description.mdx';

@@ -5,15 +5,15 @@ sidebar_label: Actions v2
 
 By using ZITADEL Actions v2, you can modify ZITADEL's behavior on specific API calls, events, or functions. This is useful when you have special business requirements that ZITADEL does not support out-of-the-box.
 
-:::info
+<Callout>
 We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you can see how we plan to expand and improve this feature. Please tell us about your needs to help us prioritize further improvements and features.
-:::
+</Callout>
 
-:::warning
+<Callout>
 To use Actions v2, activate the "Actions" [feature flag](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) in order to manage the related resources.
 
 Actions v2 will always be executed if available, even if the feature flag is switched off. To remove any Actions v2, the related Execution must be removed.
-:::
+</Callout>
 
 ## Why Actions?
 ZITADEL can't anticipate or solve every possible business rule and integration requirement for all users. Here are some examples:
@@ -38,9 +38,9 @@ Possible conditions for the Execution:
 - **Function:** Reacts to various functions in ZITADEL, replacing [Actions](/docs/concepts/features/actions).
 - **Event:** Reacts to different events created in ZITADEL, for example, to inform someone if a user gets locked.
 
-:::info
+<Callout>
 Currently, defined Actions v2 will be executed in addition to [Actions](/docs/concepts/features/actions).
-:::
+</Callout>
 
 ## Migration
 

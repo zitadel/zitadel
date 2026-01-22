@@ -12,13 +12,13 @@ import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="OKTA"/>
+<Intro components={props.components}  provider="OKTA"/>
 
 ## ZITADEL Configuration
 
 ### Go to the IdP Providers Overview
 
-<IDPsOverview templates="SAML"/>
+<IDPsOverview components={props.components}  templates="SAML"/>
 
 ### Create a new SAML Provider
 
@@ -93,21 +93,21 @@ If you prefer changing the configuration through the API you can update the SAML
 
 You can also fill the optional fields if needed:
 
-<GeneralConfigDescription provider_account="OKTA account" />
+<GeneralConfigDescription components={props.components}  provider_account="OKTA account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the OKTA Provider](/docs/img/guides/zitadel_activate_okta_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your OKTA login"/>
+<TestSetup components={props.components}  loginscreen="your OKTA login"/>
 
 ![OKTA Button](/docs/img/guides/zitadel_login_okta.png)
 
@@ -115,7 +115,7 @@ You can also fill the optional fields if needed:
 
 ### Add Action to map user attributes
 
-<PrefillAction fields="username, firstname, lastname, email and email verified" provider="OKTA"/>
+<PrefillAction components={props.components}  fields="username, firstname, lastname, email and email verified" provider="OKTA"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_form.js

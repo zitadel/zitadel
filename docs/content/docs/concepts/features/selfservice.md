@@ -13,17 +13,17 @@ It is important to understand that, depending on your use case, there will exist
 
 All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization-i-18-n).
 
-:::info
+<Callout>
 ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
-:::
+</Callout>
 
 ## Registration
 
-:::info
+<Callout>
 You can pre-select a given organization by passing the scope `urn:zitadel:iam:org:domain:primary:{domainname}` in the authorization request.
 This will force users to register only with the specified organization.
 Furthermore the branding and login settings (e.g. Social Login Providers) are directly shown to the user.
-:::
+</Callout>
 
 ### Local account
 

@@ -8,9 +8,9 @@ It explains how to enable user login in your application and how to fetch data f
 
 By the end of this guide, your application will have login functionality with basic role mapping, access the current user's profile and a user list accessible by admins.
 
-:::info
+<Callout>
 This documentation references our [example](https://github.com/zitadel/example-symfony-oidc) on GitHub.
-:::
+</Callout>
 
 ## ZITADEL setup
 
@@ -74,19 +74,19 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Symfony client.
 The example is build on a [generated Symfony web app](https://symfony.com/doc/current/setup.html#creating-symfony-applications), using the following command:
 
-:::info
+<Callout>
 Skip this step if you are connecting ZITADEL to an existing application.
-:::
+</Callout>
 
 ```bash
 symfony new my_project_directory --version="7.0.*" --webapp
 cd my_project_directory
 ```
 
-:::info
+<Callout>
 The remainder of this guide assumes a Symfony project which already includes all web app bundles, such as security, routing and ORM.
 If you are using this guide against an existing project you must make sure the required bundles are installed using the `composer require` command.
-:::
+</Callout>
 
 ### Install Symfony dependencies
 
@@ -106,9 +106,9 @@ See [User Constraints](/docs/guides/manage/console/users-overview#considerations
 We will use the User Info `sub` claim as unique "display" name for the user. `sub` equals the unique User ID from ZITADEL.
 This creates a User Repository and Entity that implements the `UserInterface`:
 
-:::info
+<Callout>
 You can skip this step, if you already have an existing User object in your project.
-:::
+</Callout>
 
 ```bash
 php bin/console make:user
@@ -333,9 +333,9 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/templates/user_list.ht
 
 ## Configure and run the application
 
-:::warning
+<Callout>
 Never store and commit secrets in a `.env` file. Use a `env.local` file instead and make sure the file is in `.gitignore`.
-:::
+</Callout>
 
 ### Database
 

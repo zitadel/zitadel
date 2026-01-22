@@ -10,7 +10,7 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 
-<Intro provider="Entra ID (former Azure Active Directory)"/>
+<Intro components={props.components}  provider="Entra ID (former Azure Active Directory)"/>
 
 ## Entra ID SAML Configuration
 
@@ -51,7 +51,7 @@ Configure the sign-on method of the app.
 
 ### Go to the IdP Providers Overview
 
-<IDPsOverview templates="SAML"/>
+<IDPsOverview components={props.components}  templates="SAML"/>
 
 ### Create a new SAML Service Provider (SP)
 
@@ -64,7 +64,7 @@ Now we configure the identity provider on ZITADEL.
 5. Change the options if needed. Microsoft Entra works out of the box using the pre configured options.
 6. Click Create
 
-<GeneralConfigDescription provider_account="Microsoft account" />
+<GeneralConfigDescription components={props.components}  provider_account="Microsoft account" />
 
 ![Azure SAML App Creation](/docs/img/guides/zitadel_azure_saml_provider.png)
 
@@ -83,10 +83,10 @@ After you created the SAML provider in ZITADEL, you can copy the URLs you need t
 7. Optionally, you can enable the "Federated Logout", which will log out the user from Entra ID once they terminate their session in ZITADEL using the OIDC End Session Endpoint.
 8. Click Save
 
-:::info
+<Callout>
 You can ignore the ZITADEL ACS Intent API URL for now.
 This is relevant if you want to [programmatically sign users in at ZITADEL via a SAML Service Provider](/docs/guides/integrate/login-ui/external-login).
-:::
+</Callout>
 
 ![Azure Entra configuration overview](/docs/img/guides/azure_saml_overview2.png)
 
@@ -96,13 +96,13 @@ Go back to ZITADEL and activate the IdP.
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate Azure SAML Provider](/docs/img/guides/zitadel_activate_azure_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
@@ -122,7 +122,7 @@ Click **Microsoft Entra**
 
 ### Add Action to map user attributes
 
-<PrefillAction fields="username, firstname, lastname, displayname, email and email verified" provider="Entra"/>
+<PrefillAction components={props.components}  fields="username, firstname, lastname, displayname, email and email verified" provider="Entra"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/entra_id_saml_prefil_register_form.js

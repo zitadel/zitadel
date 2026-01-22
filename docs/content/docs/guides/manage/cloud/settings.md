@@ -21,17 +21,17 @@ You can subscribe and unsubscribe to notifications and newsletters:
 - Product News: Receive product updates
 - Security: Receive notifications related to security issues
 
-:::info Technical Advisories
+<Callout title="Technical Advisories">
 If you want to stay up to date on our technical advisories, we recommend [subscribing here to the mailing list](/docs/support/technical_advisory#subscribe-to-our-mailing-list).
 
 Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments.
-:::
+</Callout>
 
 You can also manage your subscriptions by clicking the unsubscribe link in the emails.
 
-:::info Mandatory Information
+<Callout title="Mandatory Information">
 We are required to inform you about changes to the terms of service or based on regulatory requirements. You can't unsubscribe to these notifications.
-:::
+</Callout>
 
 ## Delete team
 

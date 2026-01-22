@@ -39,7 +39,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
     }
     return (
         <div>
-            <CodeBlock language="bash">
+            <CodeBlock  language="bash">
                 {'# Download the configuration files.'}{'\n'}
                 {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy\n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml --quiet \n'}
@@ -72,7 +72,7 @@ export const LoginURL = ({mode}) => {
 
 <details open>
     <summary>{props.configfilename}</summary>
-    <CodeBlock>{props.configfilecontent}</CodeBlock>
+    <CodeBlock >{props.configfilecontent}</CodeBlock>
 </details>
 
 <Commands mode={props.mode} name={props.providername} lower={props.lower} configfilename={props.configfilename}/>
@@ -84,7 +84,7 @@ export const LoginURL = ({mode}) => {
 
 If the console loads normally, you know that the HTTP and gRPC-Web and gRPC APIs are working correctly.
 
-<CodeBlock language="bash">
+<CodeBlock  language="bash">
     {'# You can now stop the database, the Zitadel API, the Zitadel login and '}{props.providername}{'.'}{'\n'}
     {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{props.lower}{'.yaml down'}{'\n'}
 </CodeBlock>

@@ -56,7 +56,7 @@ Create the first user for your customer and ensure the user has enough permissio
 
 import CreateUser from "../../../guides/manage/console/_create-user.mdx";
 
-<CreateUser/>
+<CreateUser components={props.components} />
 
 #### Add Manager Role to User
 
@@ -68,7 +68,7 @@ Go to the detail page of the organization and select the "+" button in the top r
 
 import AddManager from "../../../guides/manage/console/_add_manager.mdx";
 
-<AddManager name="AddManager" />
+<AddManager components={props.components}  name="AddManager" />
 
 ### Invite Team Members
 
@@ -77,10 +77,10 @@ First task will be inviting a team member.
 
 We are now switching to the view of your customer's administrator user.
 
-:::note
+<Callout>
 The following actions can also be configured by an Instance Administrator for their customer.
 To show how you can use the self-management possibilities it is shown from the customer's administrator.
-:::
+</Callout>
 
 The Administrator user received an initialization e-mail after the user was created.
 With the link in the email the admin will be able to setup a password and optionally some multi-factors.
@@ -115,11 +115,11 @@ This does need some specific configuration on your provider.
 3. Enable the "Account creation allowed" if it is not already
 4. If you also want to allow users to link to an existing account, if they already have an account in ZITADEL, enable "Account linking allowed"
 
-:::note
+<Callout>
 It is only possible to automatically create accounts, that send all the required information to register a new user.
 If your provider does not send all the required fields that ZITADEL needs to create a user, make sure to fill them in the background with an Action.
 [Example for prefilling user data automatically](/docs/guides/integrate/identity-providers/additional-information#automatically-pre-fill-user-data)
-:::
+</Callout>
 
 #### Login with your user
 
@@ -127,7 +127,7 @@ Last step is that your user can login to ZITADEL and use the SSO account.
 
 import OrgLoginDescription from "./_org_login_description.mdx";
 
-<OrgLoginDescription name="OrgLodinDescription" />
+<OrgLoginDescription components={props.components}  name="OrgLodinDescription" />
 
 Your user is now ready to login with SSO.
 <img src="/docs/img/guides/solution-scenarios/user-login-with-external-idp.png" alt="User Login with SSO"/>

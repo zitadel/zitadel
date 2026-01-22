@@ -33,9 +33,9 @@ Click on the new button above the instance table to create a new instance.
    - Password
 3. Instance created! You can now see the details of your first instance.
 
-:::info
+<Callout>
 Every new instance gets a generated domain of the form [instancename][randomnumber].zitadel.cloud
-:::
+</Callout>
 
 ![New Instance](/docs/img/manuals/portal/customer_portal_new_instance.gif)
 

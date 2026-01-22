@@ -146,6 +146,6 @@ The storage layer of Zitadel is responsible for multiple tasks. For example:
 Zitadel currently supports PostgreSQL.
 Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgre-sql) before you decide on using one of them.
 
-:::info
+<Callout>
 Zitadel v2 supported CockroachDB and PostgreSQL. Zitadel v3 only supports PostgreSQL. Please refer to [the mirror guide](/docs/self-hosting/manage/cli/mirror) to migrate to PostgreSQL.
-:::
+</Callout>

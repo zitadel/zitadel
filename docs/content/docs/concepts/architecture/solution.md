@@ -67,8 +67,8 @@ The common update involves the following steps and do not need manual interventi
 
 Users who use [Kubernetes/Helm](/docs/self-hosting/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
 
-:::info
+<Callout>
 As a good practice we recommend creating Database Backups prior to an update.
 It is also recommend to read the release notes on GitHub before upgrading.
 Since Zitadel utilizes Semantic Versioning Breaking Changes of any kind will always increase the major version (e.g Version 2 would become Version 3).
-:::
+</Callout>

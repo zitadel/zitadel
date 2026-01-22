@@ -1,7 +1,6 @@
 ---
 title: ZITADEL Organizations
 sidebar_label: Organizations
-sidebar_position: 2
 ---
 
 import OrgDescription from './_org_description.mdx';

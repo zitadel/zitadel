@@ -12,11 +12,11 @@ import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 import PrefillAction from './_prefill_action.mdx';
 
-<Intro provider="MockSAML"/>
+<Intro components={props.components}  provider="MockSAML"/>
 
-:::warning
+<Callout type="warn">
 MockSAML is not intended for any production environment, only for test purposes
-:::
+</Callout>
 
 ## MockSAML
 
@@ -29,7 +29,7 @@ fill in the URL when creating the SAML Provider in ZITADEL.
 
 ### Go to the IdP providers overview
 
-<IDPsOverview templates="SAML"/>
+<IDPsOverview components={props.components}  templates="SAML"/>
 
 ### Create a new SAML ServiceProvider
 
@@ -37,7 +37,7 @@ The SAML provider template has everything you need preconfigured.
 Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
 All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
-<GeneralConfigDescription provider_account="SAML account" />
+<GeneralConfigDescription components={props.components}  provider_account="SAML account" />
 
 ![SAML Provider](/docs/img/guides/zitadel_saml_create_provider.png)
 
@@ -48,13 +48,13 @@ They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in Z
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the SAML Provider](/docs/img/guides/zitadel_activate_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Configure an action to autofill user data
 
@@ -237,7 +237,7 @@ func main() {
 
 ### Optional for Login V1 (using Actions V1)
 
-<PrefillAction fields="firstname, lastname, email, display name and username" provider="mockSaml"/>
+<PrefillAction components={props.components}  fields="firstname, lastname, email, display name and username" provider="mockSaml"/>
 
 NOTE: The name of the action should be the same as the function name. In this example, the action should be named `mapSAMLIDPAttrs`
 
@@ -269,7 +269,7 @@ function mapSAMLIDPAttrs(ctx, api) {
 
 ## Test the setup
 
-<TestSetup loginscreen="your SAML login"/>
+<TestSetup components={props.components}  loginscreen="your SAML login"/>
 
 ![SAML Button](/docs/img/guides/zitadel_login_saml.png)
 

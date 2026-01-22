@@ -30,16 +30,16 @@ export default function CreateApp(props) {
       <p>
         The authentication method defines the communication flow during a login
       </p>
-      <AuthType appType={props.appType} authType={props.authType} />
+      <AuthType components={props.components}  appType={props.appType} authType={props.authType} />
       <h3>Redirect URIs</h3>
-      <RedirectURIs
+      <RedirectURIs components={props.components} 
         appType={props.appType}
         redirectURI={props.redirectURI}
         postLogoutURI={props.postLogoutURI}
       />
       <h3>Review your configuration</h3>
-      <ReviewConfig appType={props.appType} authType={props.authType} />
-      <GenerateKey appType={props.appType} authType={props.authType} />
+      <ReviewConfig components={props.components}  appType={props.appType} authType={props.authType} />
+      <GenerateKey components={props.components}  appType={props.appType} authType={props.authType} />
     </div>
   );
 }

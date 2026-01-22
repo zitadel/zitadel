@@ -1,7 +1,6 @@
 ---
 title: ZITADEL Users
 sidebar_label: Users
-sidebar_position: 3
 ---
 
 ## Types of users

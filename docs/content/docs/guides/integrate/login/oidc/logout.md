@@ -48,18 +48,18 @@ GET $CUSTOM-DOMAIN/oidc/v1/end_session
 The user agent handles the front-channel logout. 
 Each client with an OpenID Session of the user that supports front-channel renders an iframe so the logout request is performed on all clients parallel.
 
-:::note
+<Callout>
 This is not yet implemented in ZITADEL
-:::
+</Callout>
 
 #### Back-Channel Logout
 
 The back-channel logout is a mechanism on the server-side and the user agent does not have to do anything.
 The user will logout from all clients even in the case the user agent was closed.
 
-:::note
+<Callout>
 This is not yet implemented in ZITADEL
-:::
+</Callout>
 
 ## Scenarios
 

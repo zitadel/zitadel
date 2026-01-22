@@ -5,12 +5,12 @@ import ComposeYaml from "./docker-compose.yaml";
 Whereas the guide focuses on the configuration for {props.name}, you can inspect the configurations for the Zitadel API, the Zitadel login and the database in the base Docker Compose file.</>
 <details>
     <summary>base docker-compose.yaml</summary>
-    <CodeBlock language="yaml">{ComposeYaml}</CodeBlock>
+    <CodeBlock  language="yaml">{ComposeYaml}</CodeBlock>
 </details>
 
 <>For running {props.name}, you will extend the base Docker Compose file with the {props.name} specific Docker Compose file.</>
 
 <details>
     <summary>specific docker-compose.yaml</summary>
-    <CodeBlock language="yaml">{props.compose}</CodeBlock>
+    <CodeBlock  language="yaml">{props.compose}</CodeBlock>
 </details>

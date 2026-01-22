@@ -2,8 +2,6 @@
 title: User Metadata
 ---
 
-import Tabs from '@/components/docusaurus/tabs';
-import TabItem from '@/components/docusaurus/tabs';
 
 This guide shows you how to request metadata from a user.
 ZITADEL offers multiple methods to retrieve metadata.
@@ -26,11 +24,11 @@ Most of the methods below require you to login with the correct user while setti
 Make sure you pick the right user when logging into the test application.
 Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
-:::info Getting a token
+<Callout title="Getting a token">
 In case you want to test out different settings configure an application with code flow (PKCE).
 Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/apis/openidoauth/endpoints#token-endpoint).
 You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login/oidc/login-users).
-:::
+</Callout>
 
 ## Use tokens to get user metadata
 
@@ -140,10 +138,10 @@ When you decode the value of `id_token`, then the response will include the meta
 Note that the values are base64 encoded.
 So the value `MTIzNA` decodes to `1234`.
 
-:::info decoding the jwt token
+<Callout title="decoding the jwt token">
 Use a website like [jwt.io](https://jwt.io/) to decode the token.  
 With jq installed you can also use `jq -R 'split(".") | .[1] | @base64d | fromjson' <<< $ID_TOKEN`
-:::
+</Callout>
 
 ### Request metadata from authentication API
 
@@ -154,9 +152,9 @@ Yet when accessing the authentication service, you need to pass the [reserved sc
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
 Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
-:::note Invalid audience
+<Callout title="Invalid audience">
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
-:::
+</Callout>
 
 You can request the user's metadata with the [List My Metadata](/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
 
@@ -186,9 +184,9 @@ Replace `$ACCESS_TOKEN` with your user's access token.
 Replace `$CUSTOM-DOMAIN` with your ZITADEL instance's url.  
 Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
 
-:::info Get all metadata
+<Callout title="Get all metadata">
 You can omit the queries array to retrieve all metadata key-value pairs.
-:::
+</Callout>
 
 An example response for your search looks like this:
 

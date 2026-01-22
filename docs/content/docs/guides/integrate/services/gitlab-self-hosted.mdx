@@ -19,7 +19,7 @@ Prerequisites:
 - existing ZITADEL project, if not present follow the first 3 steps [here](/docs/guides/manage/console/projects-overview)
 - running Gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
 
-<CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
+<CreateApp components={props.components}  appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
 
 ## Gitlab configuration
 

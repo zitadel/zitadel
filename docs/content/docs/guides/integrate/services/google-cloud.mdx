@@ -35,9 +35,9 @@ In your existing project:
 
 First of all we create the application in your project.
 
-:::info
+<Callout>
 Google Cloud requires just an ID Token as JWT including the [described required and optional scopes](https://cloud.google.com/iam/docs/workforce-identity-federation#attribute-mappings).
-:::
+</Callout>
 
 Create a new application and click on "I'm a pro. Skip this wizard."
 
@@ -46,9 +46,9 @@ Create a new application and click on "I'm a pro. Skip this wizard."
 - **Response Type**: ID Token
 - **Authentication Method**: None
 
-:::info
+<Callout>
 You need to add the redirect URL and configure token settings after creating the application.
-:::
+</Callout>
 
 ![Create application screen](/docs/img/guides/integrate/services/google-cloud-create-app.png)
 
@@ -61,9 +61,9 @@ It looks something like `https://auth.cloud.google/signin-callback/locations/glo
 
 Save the settings.
 
-:::caution
+<Callout type="warn">
 Make sure to replace the `WORKFORCE_POOL_ID` and `WORKFORCE_PROVIDER_ID` with your values in the redirect url
-:::
+</Callout>
 
 ## **ZITADEL**: Token settings
 
@@ -88,9 +88,9 @@ Claims can be transformed in ZITADEL with [Actions](/docs/guides/manage/console/
 
 Create an Action with the following code to flatten the roles and include the claim for the users' display name.
 
-:::info
+<Callout>
 If you want to configure a special attribute mapping in the workforce identity pool provider, then adjust the claims accordingly.
-:::
+</Callout>
 
 ```javascript
 function googleGroups(ctx, api) {
@@ -115,9 +115,9 @@ function googleGroups(ctx, api) {
 
 
 
-:::caution
+<Callout type="warn">
 Make sure that the name of the action matches the name of the function.
-:::
+</Callout>
 
 And add the the Action Script to the following Flow and Trigger:
 

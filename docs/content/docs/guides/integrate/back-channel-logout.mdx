@@ -7,11 +7,11 @@ The Back-Channel Logout implements [OpenID Connect Back-Channel Logout 1.0](http
 and can be used to notify clients about session termination at the OpenID Provider. This guide will explain how
 back-channel logout is implemented inside ZITADEL and gives some usage examples.
 
-:::info
+<Callout>
 Back-Channel Logout is currently an experimental [beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
 Be sure to enable it on the [feature API](#feature-api) before using it.
 We highly recommend also enabling the `webkey` feature on your instance. This will prevent issues with automatic key rotation.
-:::
+</Callout>
 
 In this guide we assume your already familiar with getting and validation token. You should already have a good
 understanding on the following topics before starting with this guide:
@@ -77,9 +77,9 @@ implementation *must* be ignored.
 
 The `logout_token` sent in the request is a JWT similar to an ID Token.
 
-:::info
+<Callout>
 Note however, that a Logout Token must never contain a `nonce` claim, to make sure it cannot be used as an ID Token.
-:::
+</Callout>
 
 The following Claims are used within the Logout Token:
 

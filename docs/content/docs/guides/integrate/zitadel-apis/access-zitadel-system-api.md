@@ -2,10 +2,10 @@
 title: Access ZITADEL System API
 sidebar_label: System API
 ---
-:::note
+<Callout>
 This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis). 
 The ZITADEL System API is currently only available for ZITADEL Self-Hosted deployments.
-:::
+</Callout>
 
 ## System API User
 
@@ -107,9 +107,9 @@ So for your instance running on `custom-domain.com` the claims could look like t
 }
 ```
 
-:::note
+<Callout>
 If your system is exposed without TLS or on a dedicated port, be sure to provide this in your audience, e.g. http://localhost:8080 
-:::
+</Callout>
 
 ### ZITADEL Tools
 

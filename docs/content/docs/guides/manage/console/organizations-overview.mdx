@@ -84,27 +84,27 @@ You can verify your own domain names (e.g., `acme.ch`) to simplify the user expe
 1.  ZITADEL generates additional login names for users.
 2.  The user `john.doe` can log in via `john.doe@acme.ch` OR `john.doe@acme.zitadel.cloud`.
 
-:::info
+<Callout>
 Only one user with the username `john.doe` can exist within the organization `ACME`, regardless of which domain suffix they use to log in.
-:::
+</Callout>
 
 ### Primary Domain
 An organization can have multiple domain names, but only one is **Primary**. The primary domain determines:
 * Which login name is displayed to the user in the UI.
 * What information is asserted in `access_tokens` (specifically the `preferred_username` claim).
 
-:::caution
+<Callout type="warn">
 Setting a Primary Domain affects users.
 If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
-:::
+</Callout>
 
 ## Domain Verification Guide
 
 If the **validate org domains** setting in [Domain Settings](./default-settings#domain-settings) is set to `true`, you must prove ownership of your domain via DNS or HTTP challenge.
 
-:::info
+<Callout>
 You can disable domain verification requirements in the [default settings](/docs/guides/manage/console/default-settings#domain-settings) if you are running a self-hosted instance and do not require strict validation.
-:::
+</Callout>
 
 1.  Navigate to your **Organization Settings**.
 2.  Select the menu entry **Verified domains**.
@@ -125,9 +125,9 @@ You can disable domain verification requirements in the [default settings](/docs
 5.  Once verified, click **Verify**.
 6.  (Optional) Click **Set as primary** to make this the default domain for user login names.
 
-:::caution
+<Callout type="warn">
 Do not delete the DNS verification record after success. ZITADEL re-checks domain ownership periodically.
-:::
+</Callout>
 
 ## Organization Settings
 

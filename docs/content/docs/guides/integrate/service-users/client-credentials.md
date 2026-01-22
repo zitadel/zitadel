@@ -1,7 +1,6 @@
 ---
 title: Configure client credential authentication for service users
 sidebar_label: Client credential authentication
-sidebar_position: 3
 ---
 
 This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/docs/guides/manage/console/users-overview#service-users-machine-accounts) and client applications within ZITADEL.
@@ -19,10 +18,10 @@ In ZITADEL, the Client Credentials Flow can be used for this [non-interactive au
 5. Open **Actions** in the top right corner and click on **Generate Client Secret**
 6. Copy the **ClientID** and **ClientSecret** from the dialog
 
-:::note
+<Callout>
 Make sure to copy in particular the ClientSecret. You won't be able to retrieve it again.
 If you lose it, you will have to generate a new one.
-:::
+</Callout>
 
 ![Create new service user](/docs/img/console_serviceusers_secret.gif)
 

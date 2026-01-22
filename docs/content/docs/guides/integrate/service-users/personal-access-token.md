@@ -1,7 +1,6 @@
 ---
 title: Configure personal access token authentication for service users
 sidebar_label: Personal access token authentication
-sidebar_position: 3
 ---
 
 A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.

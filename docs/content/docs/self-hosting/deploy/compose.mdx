@@ -44,7 +44,7 @@ The following commands set up services for a PostgreSQL database, a Zitadel API 
     docker compose ps
     ```
 
-<DefaultUser/>
+<DefaultUser components={props.components} />
 
 ## What's next
 
@@ -53,7 +53,7 @@ The comments give context to the used variables and show examples for commonly u
 
 <details>
     <summary>docker-compose.yaml</summary>
-    <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
+    <CodeBlock  language="yaml">{DockerComposeSource}</CodeBlock>
 </details>
 
 Here are some natural steps forward to go from the current setup to production:

@@ -66,9 +66,9 @@ The Session API is not an industry-standard and can be used instead of OpenID Co
 The session API will return a session token that can be used to authenticate users from your application.
 This token should not be confused with am access or id tokens in opaque or JWT form that is issued during OpenID connect flows.
 
-:::info Token exchange
+<Callout title="Token exchange">
 Token exchange between Session API and OIDC / SAML tokens is not possible at this moment.
-:::
+</Callout>
 
 ### Key features of the Session API
 
@@ -107,9 +107,9 @@ We have dedicated guides on [how to build your custom login UI](/docs/guides/int
 
 When building your own login UI, you will leverage the [Session API](#zitadel-session-api) to authenticate users and manage user sessions.
 
-:::info Session API support for OIDC and SAML
+<Callout title="Session API support for OIDC and SAML">
 At the moment developers can only integrate with ZITADEL's Session API and not with standard compliant OpenID Connect or SAML flows.
-:::
+</Callout>
 
 ### When to build your custom Login UI
 

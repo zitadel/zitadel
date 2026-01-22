@@ -10,11 +10,11 @@ import IDPsOverview from './_idps_overview.mdx';
 import TestSetup from './_test_setup.mdx';
 import Activate from './_activate.mdx';
 
-<Intro provider="Entra ID (former Azure Active Directory)"/>
+<Intro components={props.components}  provider="Entra ID (former Azure Active Directory)"/>
 
 ## Open the Microsoft Identity Provider Template
 
-<IDPsOverview templates="Microsoft"/>
+<IDPsOverview components={props.components}  templates="Microsoft"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Entra ID Client later.
@@ -91,21 +91,21 @@ In this case, configure "Accounts in any organizational directory and personal M
 
 **Tenant ID**: If you have selected *Tenant ID* as *Tenant Type*, you have to enter the *Directory (Tenant) ID* into the *Tenant ID* field, copied previously from the Azure App configuration.
 
-<GeneralConfigDescription provider_account="Microsoft account" />
+<GeneralConfigDescription components={props.components}  provider_account="Microsoft account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate Entra ID](/docs/img/guides/zitadel_activate_azure.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your Microsoft login"/>
+<TestSetup components={props.components}  loginscreen="your Microsoft login"/>
 
 ![Entra ID Button](/docs/img/guides/zitadel_login_azure.png)
 

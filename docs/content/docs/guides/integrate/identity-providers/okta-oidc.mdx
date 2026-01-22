@@ -12,11 +12,11 @@ import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="OKTA"/>
+<Intro components={props.components}  provider="OKTA"/>
 
 ## Open the Generic OIDC Provider Template
 
-<IDPsOverview templates="Generic OIDC"/>
+<IDPsOverview components={props.components}  templates="Generic OIDC"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the OKTA application later.
@@ -52,21 +52,21 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 **Use PKCE**: If enabled, the provider will use Proof Key for Code Exchange (PKCE) to secure the authorization code flow
 in addition to the client secret.
 
-<GeneralConfigDescription provider_account="OKTA account" />
+<GeneralConfigDescription components={props.components}  provider_account="OKTA account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the OKTA Provider](/docs/img/guides/zitadel_activate_okta.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your OKTA login"/>
+<TestSetup components={props.components}  loginscreen="your OKTA login"/>
 
 ![OKTA Button](/docs/img/guides/zitadel_login_okta.png)
 
@@ -74,7 +74,7 @@ in addition to the client secret.
 
 ## Optional: Add ZITADEL action to autofill userdata
 
-<PrefillAction fields="firstname, lastname and email verified" provider="Okta"/>
+<PrefillAction components={props.components}  fields="firstname, lastname and email verified" provider="Okta"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/okta_identity_provider.js

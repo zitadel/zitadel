@@ -8,10 +8,10 @@ It explains how to enable user login in your application and how to fetch data f
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
 
-:::info
+<Callout>
 This documentation references our [example](https://github.com/zitadel/zitadel-java) on GitHub. 
 You can either create your own application or directly run the example by providing the necessary arguments.
-:::
+</Callout>
 
 ## Set up application
 
@@ -30,9 +30,9 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/apis/openid
 The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
-:::info
+<Callout>
 If you are following along with the [example](https://github.com/zitadel/zitadel-java), set the dev mode to `true`, the Redirect URIs to `http://localhost:18080/webapp/login/oauth2/code/zitadel` and Post redirect URI to `http://localhost:18080/webapp`.
-:::
+</Callout>
 
 ![Create app in console - set redirectURI](/docs/img/java-spring/app-create-redirect.png)
 

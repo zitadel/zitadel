@@ -1,7 +1,6 @@
 ---
 title: Configure applications for your frontend and backend services and clients
 sidebar_label: Applications
-sidebar_position: 5
 ---
 import AppType from "../../guides/manage/console/_application-types.mdx";
 

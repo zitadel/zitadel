@@ -46,9 +46,9 @@ If a feature is set to `Inherit`, it becomes available once its enabled per defa
 
 Features can range from UI changes in the console, to new APIs or performance improvements.
 
-:::warning
+<Callout type="warn">
 Be careful on which features you enable as they can be in an experimental state.
-:::
+</Callout>
 
 ## Branding
 
@@ -91,16 +91,16 @@ On each instance we configure our default SMTP provider. To make sure, that you 
 
 You can configure many SMTP providers using templates for popular providers. The templates will add known settings like host, port or default user and will suggest values for user and/or password.
 
-:::important
+<Callout>
 You have to activate your SMTP provider so Zitadel can use it to send your emails. Only one provider can be active.
-:::
+</Callout>
 
-:::warning
+<Callout type="warn">
 The built-in SMTP provider is intended **only for testing and evaluation purposes**.  
 Email delivery through this service may be **delayed or temporarily unstable**.  
 
 For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
-:::
+</Callout>
 
 Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
 

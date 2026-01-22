@@ -116,9 +116,9 @@ These settings block the use of serving it in an iframe to prevents clickjacking
 
 ### Enable iFrame embedding
 
-:::caution
+<Callout type="warn">
 This change can make you vulnerable to clickjacking attacks.
-:::
+</Callout>
 
 If your applications need to load ZITADEL inside an iframe, e.g. for a silent login or silent refresh, you can enable the use on an instance level.
 
@@ -138,11 +138,11 @@ Content-Security-Policy: frame-ancestors https://custom-domain.com
 
 remove the X-Frame-Options header and change the SameSite to `None`.
 
-:::note
+<Callout>
 Please note, that SameSite None requires the cookie to be flagged `secure`, which means it must be sent over TLS (HTTPS) or localhost.
 This also means that domains other than localhost must use TLS for this option to work.
 This is due to browser restrictions: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#none
-:::
+</Callout>
 
 ### Disable Multi-factor (MFA) Prompt
 

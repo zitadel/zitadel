@@ -14,12 +14,12 @@ certain data, such as the first name and the last name, are required for employe
 Or you might want to disable username-password authentication for your admins and only allow phishing-resistant methods (e.g., passkeys),
 but still allow it for your customers.
 
-:::info
+<Callout>
 Please be aware that User Schema is in a [preview stage](https://help.zitadel.com/zitadel-software-release-cycle#preview) not feature complete
 and therefore not generally available.
 
 Do not use it for production yet. To test it out, you need to enable the `UserSchema` [feature flag](/docs/reference/api/feature).
-:::
+</Callout>
 
 ## Create your first schema
 

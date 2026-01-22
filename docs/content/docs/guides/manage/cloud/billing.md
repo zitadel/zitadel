@@ -33,10 +33,10 @@ This includes the following fields:
 If available, enter your tax ID type and VAT number.
 The tax ID will be shown on the invoice.
 
-:::info Reverse Charge
+<Callout title="Reverse Charge">
 When you enter the tax ID we will automatically calculate taxability.
 Depending on your billing address we will mark the invoice as reverse charge.
-:::
+</Callout>
 
 ## Update Billing Information
 

@@ -17,9 +17,9 @@ Here's a breakdown of some key points about ZITADEL APIs:
 * **Admin API:** Used for administrative functions on the ZITADEL instance itself (may require separate user setup).  
 * **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific configuration).
 
-:::note Resource-based APIs
+<Callout title="Resource-based APIs">
 ZITADEL is transitioning from a use-case based API structure to a resource-based one, aiming to simplify API usage.
-:::
+</Callout>
 
 For further details and in-depth exploration, you can refer to the [ZITADEL API documentation](/docs/apis/introduction).
 

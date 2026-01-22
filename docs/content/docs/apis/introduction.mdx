@@ -58,20 +58,20 @@ ZITADEL provides APIs for each [core resource](/docs/apis/v2):
 - [Session](/docs/reference/api/session)
 - [Settings](/docs/reference/api/settings)
 
-:::info
+<Callout>
 We are migrating to a resource-based API approach.
 You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
-:::
+</Callout>
 
 ## ZITADEL APIs (service-based)
 
-:::info Prefer resource-based API
+<Callout title="Prefer resource-based API">
 ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticated users and Management API for organization managers.
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 
 To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based).
-:::
+</Callout>
 
 <ApiCard title="Authentication" type="AUTH">
 <Column>

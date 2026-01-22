@@ -5,7 +5,7 @@ sidebar_label: Managers
 
 import ManagerDescription from "../../../concepts/structure/_manager_description.mdx";
 
-<ManagerDescription name="ManagerDescription" />
+<ManagerDescription components={props.components}  name="ManagerDescription" />
 
 To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
 In the right part of the console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
@@ -14,7 +14,7 @@ In the right part of the console you can find **MANAGERS** in the details part. 
 
 import AddManager from "./_add_manager.mdx";
 
-<AddManager name="AddManager" />
+<AddManager components={props.components}  name="AddManager" />
 
 ## Roles
 

@@ -12,9 +12,9 @@ It explains how to enable user login in your application and how to incorporate 
 
 By the end of this guide, your application will have login functionality with basic role mapping, admin console and polls as described in the Django guide.
 
-:::info
+<Callout>
 This documentation references our [example](https://github.com/zitadel/example-django-python-oidc) on GitHub.
-:::
+</Callout>
 
 ## ZITADEL setup
 
@@ -77,7 +77,7 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 ### Setup Python
 
-<SetupPython/>
+<SetupPython components={props.components} />
 
 ### Install dependencies
 
@@ -100,9 +100,9 @@ python -m pip install -U requirements.txt
 The used base is the "Writing your first Django app" from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/),
 which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate ZITADEL as AuthenticationBackend.
 
-:::info
+<Callout>
 Skip this step if you are connecting ZITADEL to an existing application.
-:::
+</Callout>
 
 ## Define the Django app
 
@@ -192,9 +192,9 @@ https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/urls.py#L
 
 ## Configure and run the application
 
-:::warning
+<Callout type="warn">
 Never store and commit secrets in the ".env" or settings.py file
-:::
+</Callout>
 
 ### Authentication and authorization
 
@@ -208,9 +208,9 @@ https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/views.py
 - `@method_decorator(staff_member_required, name="dispatch")`: means you have to have at least a staff user ("admin" or "staff")
 - `/admin/`: all admin sides are only accessible if you have a superuser with the role "admin"
 
-:::info
+<Callout>
 Additional permission checks could be done with "permission_required" from "django.contrib.auth.decorators" also described in the [Django documentation](https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#custom-permissions).
-:::
+</Callout>
 
 ### DB
 

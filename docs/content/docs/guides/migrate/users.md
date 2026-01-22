@@ -117,10 +117,10 @@ For bulk import use the [import endpoint](/docs/reference/api-v1/admin/zitadel.a
 }
 ```
 
-:::info
+<Callout>
 We will improve the bulk import interface for users in the future.
 You can show your interest or join the discussion on [this issue](https://github.com/zitadel/zitadel/issues/5524).
-:::
+</Callout>
 
 ## Migrate secrets
 
@@ -148,12 +148,12 @@ Import password hashes using the import API (snippet from [bulk-import](#bulk-im
 
 Upon initial login, ZITADEL validates the imported password using the appropriate verifier.
 
-:::info Verifiers
+<Callout title="Verifiers">
 In ZITADEL, a password verifier checks the validity of a password hash created with an algorithm different from the currently configured one.
 It acts as a translator, allowing ZITADEL to understand and validate hashes made with older algorithms like MD5 even when the system has transitioned to newer ones like Argon2.  
 This is crucial during migrations or when importing user data.
 Essentially, a verifier ensures ZITADEL can work with passwords hashed using various algorithms, maintaining security while transitioning to stronger hashing methods.
-:::
+</Callout>
 
 Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
 This ensures consistency and allows for automatic updates even when hasher configurations are changed, such as increasing salt cost for bcrypt.
@@ -203,9 +203,9 @@ _snippet from [bulk-import](#bulk-import) example:_
 
 For passkeys to work on the new system you need to make sure that the new auth server has the same domain as the legacy auth server.
 
-:::info
+<Callout>
 Currently it is not possible to migrate passkeys directly from another system.
-:::
+</Callout>
 
 ## Users linked to an external IDP
 
@@ -236,10 +236,10 @@ You can use an Action with [post-creation flow](/docs/apis/actions/external-auth
 You can store arbitrary key-value information on a user (or Organization) in ZITADEL.
 Use metadata to store additional attributes of the users, such as organizational unit, backend-id, etc.
 
-:::info
+<Callout>
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
 [API reference: User Metadata](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata)
-:::
+</Callout>
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
 With the [complement token flow](/docs/apis/actions/complement-token), you can also transform metadata (or roles) to custom claims.
@@ -248,7 +248,7 @@ With the [complement token flow](/docs/apis/actions/complement-token), you can a
 
 You can assign roles from owned or granted projects to a user.
 
-:::info
+<Callout>
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
 [API reference: User Authorization / Grants](/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
-:::
+</Callout>

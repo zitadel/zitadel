@@ -24,9 +24,9 @@ The following scripts don't include:
 
 Which results in that if you want to import, and you have no defined organization-specific custom policies, the experience for your users will not be exactly like in your old instance.
 
-:::note
+<Callout>
 Note that the resources will be migrated without the event stream. This means that you will not have the audit trail for the imported objects.
-:::
+</Callout>
 
 ## Authorization
 
@@ -52,10 +52,10 @@ Save the PAT to the environment variable `PAT_EXPORT_TOKEN` and the source domai
 
 Save the PAT to the environment variable `PAT_IMPORT_TOKEN` and the source domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
 
-:::warning Clean-up
+<Callout title="Clean-up">
 You should let the PAT expire as soon as possible.
 Make sure to delete the created users after you are done with the migration.
-:::
+</Callout>
 
 ## Use file
 
@@ -89,9 +89,9 @@ curl  --request POST \
 
 ### Import from file
 
-:::note
+<Callout>
 To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
-:::
+</Callout>
 
 Then as an example you can use one request for the import:
 
@@ -115,10 +115,10 @@ curl --request POST \
 
 ### Export to GCS
 
-:::note
+<Callout>
 To use this requests you have to have an access token with enough permissions to export and import.
 The used serviceaccount has to have at least the role "Storage Object Creator" to create objects on GCS
-:::
+</Callout>
 
 To export all necessary data you only have to use one request which results in a file in your GCS, as an example:
 
@@ -160,10 +160,10 @@ data_orgsv1_gcs object:
 
 ### Import to GCS
 
-:::note
+<Callout>
 To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL, with all desired configuration and global resources.
 The used serviceaccount has to have at least the role "Storage Object Viewer" to read objects from GCS
-:::
+</Callout>
 
 Then as an example you can use one request for the import:
 

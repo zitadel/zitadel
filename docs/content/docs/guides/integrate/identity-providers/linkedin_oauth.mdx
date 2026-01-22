@@ -13,7 +13,7 @@ import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="LinkedIn"/>
+<Intro components={props.components}  provider="LinkedIn"/>
 
 ## LinkedIn Configuration
 
@@ -37,15 +37,15 @@ import TestSetup from './_test_setup.mdx';
 
 ### Add custom login policy
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ### Go to the IdP Providers Overview
 
-<IDPsOverview templates="Generic OAuth"/>
+<IDPsOverview components={props.components}  templates="Generic OAuth"/>
 
 ### Create a new Generic OAuth Provider
 
-<GenericOAuth
+<GenericOAuth components={props.components} 
     name=": e.g. LinkedIn"
     authendpoint="https://www.linkedin.com/oauth/v2/authorization"
     tokenendpoint="https://www.linkedin.com/oauth/v2/accessToken"
@@ -56,19 +56,19 @@ import TestSetup from './_test_setup.mdx';
 />
 
 
-<GeneralConfigDescription provider_account="LinkedIn account" />
+<GeneralConfigDescription components={props.components}  provider_account="LinkedIn account" />
 
 ![LinkedIn Provider](/docs/img/guides/zitadel_linkedin_create_provider.png)
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the LinkedIn Provider](/docs/img/guides/zitadel_activate_linkedin.png)
 
 ## Test the setup
 
-<TestSetup loginscreen="your LinkedIn login"/>
+<TestSetup components={props.components}  loginscreen="your LinkedIn login"/>
 
 ![LinkedIn Button](/docs/img/guides/zitadel_login_linkedin.png)
 
@@ -76,7 +76,7 @@ import TestSetup from './_test_setup.mdx';
 
 ## Optional: Add ZITADEL action to autofill userdata
 
-<PrefillAction fields="firstname, lastname, username, email and email verified" provider="LinkedIn"/>
+<PrefillAction components={props.components}  fields="firstname, lastname, username, email and email verified" provider="LinkedIn"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/linkedin_identity_provider.js

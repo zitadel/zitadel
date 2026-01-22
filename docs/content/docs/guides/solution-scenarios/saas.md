@@ -56,9 +56,9 @@ There are some different use cases how the login should behave and look like:
 With the primary domain scope the organization will be restricted to the requested domain, this means only users of the requested organization will be able to login.
 The private labeling (branding) and the login policy of the requested organization will be set automatically.
 
-:::note
+<Callout>
 More about the [Scopes](/docs/apis/openidoauth/scopes)
-:::
+</Callout>
 
 2. Show private labeling (branding) of the project organization
 
@@ -67,6 +67,6 @@ In the default the design of the instance will be shown, but as soon as the user
 If the setting is set to `Ensure Project Resource Owner Setting`, the private labeling of the project organization will always be triggered.
 The last possibility is to show the private labeling of the project organization and as soon as the user is identified the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
-:::note
+<Callout>
 More about [Private Labeling](/docs/guides/manage/customize/branding)
-:::
+</Callout>

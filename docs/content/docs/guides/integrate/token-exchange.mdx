@@ -9,11 +9,11 @@ import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_respon
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
 
-:::info
+<Callout>
 Token Exchange is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
 
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1333448892083208262)!
-:::
+</Callout>
 
 In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
 
@@ -30,7 +30,7 @@ Token Exchange is a complex and broad subject. Before we get our hands dirty wit
 
 Token Exchange offers a range of possibilities for providing and requesting different token types. The existence of the various `*_token_type` fields in the request and response data helps defining which tokens we are sending, which ones we wish to receive and finally which one(s) we did receive in the response.
 
-<TokenExchangeTypes />
+<TokenExchangeTypes components={props.components}  />
 
 #### Access Token type
 
@@ -90,7 +90,7 @@ Sending only the user ID in the `subject_token` is not allowed and will result i
 
 The details supplied in the request changes how Token Exchange operates. While the standard is very permissive, we need to clarify how ZITADEL implements it.
 
-<TokenExchangeRequest />
+<TokenExchangeRequest components={props.components}  />
 
 #### Subject token
 
@@ -140,7 +140,7 @@ ZITADEL does not yet support Resource Indicators. Supplying this parameter will 
 
 The response schema looks very similar to the model of other token endpoint responses. The RFC attempts to reuse the same fields, however they might have different contents then they lead you to believe. This can lead to confusing situations, so be sure to read this section!
 
-<TokenExchangeResponse />
+<TokenExchangeResponse components={props.components}  />
 
 #### Access token
 
@@ -205,9 +205,9 @@ If you are self-hosting, you can also enable the feature for the complete system
 
 Next we need to select an application that is allowed to perform Token Exchange. As with the other grant types, we need to enable the `urn:ietf:params:oauth:grant-type:token-exchange` grant type.
 
-:::important
+<Callout>
 ZITADEL allows any application to use Token Exchange, however we strongly recommend to only configure confidential clients (using either client credentials or JWT assertion) with the Token Exchange grant type. This is because there is some trust placed in the application when it comes to defining scope and that it obtained tokens in a legitimate way. For example, if the app possesses a token of an admin user with impersonation permissions it can obtain tokens for any other user in your instance. It is your responsibility to make sure the application can be trusted with this kind of powers. If you configure a public client with the Token Exchange grant, you risk a leaked token can be used by an attacker who knows the client ID of a granted public client.
-:::
+</Callout>
 
 ![Screenshot showing enabling of Token Exchange grant on a ZITADEL application](/docs/img/guides/token-exchange/app-token-exchange-grant.png)
 
@@ -423,9 +423,9 @@ Doing similar request you can:
 
 In the following example we exchange the initial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
 
-:::info
+<Callout>
 You can also obtain an ID token in the `id_token` response field by requesting an access token and the `openid` scope.
-:::
+</Callout>
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
@@ -455,9 +455,9 @@ This gives us a response with the ID token in the `access_token` field and the `
 
 With impersonation we can let one user assume the role of another user.
 
-:::info
+<Callout>
 Currently impersonated tokens cannot be used for the ZITADEL API. This is to prevent privilege escalation where a impersonator could become an IAM owner, for example. We might enable the use of impersonated tokens in the future.
-:::
+</Callout>
 
 ### Preparation
 
@@ -598,9 +598,9 @@ The previous example required us to have an active token of the user we want to 
 
 ZITADEL allows passing a user ID as the `subject_token`, along with a valid `actor_token`. This is an addition to enable this specific use-case.
 
-:::info
+<Callout>
 User ID as subject token is an experimental addition and is provided pending evaluation of our community. This method might be considered insecure and trust is fully placed into the app making the request. This might be removed in the future.
-:::
+</Callout>
 
 In the following example we are again requesting a JWT access token. Instead of a token, we use the user ID of the end-user in the `subject_token` field and adjust the `subject_token_type` accordingly. As the user ID does not carry any scope and the impersonator / actor does not have a profile, we need to add some scopes to the request in order to receive an ID token with profile and email information.
 

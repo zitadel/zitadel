@@ -1,7 +1,6 @@
 ---
 title: Configure private key JWT authentication for service users
 sidebar_label: Private key JWT authentication
-sidebar_position: 2
 ---
 
 This guide explains how developers can use private key JWT authentication to secure communication between service users and client applications in ZITADEL.
@@ -66,13 +65,13 @@ openssl rsa -in privatekey.pem -pubout -out publickey.pem
 
 To upload your public key, use the [User Service Add Key API](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey)
 
-:::note
+<Callout>
 If you generate a key in ZITADEL, make sure to download and securely store the key file right away. For security reasons, ZITADEL cannot show you the private key again after creation. If the key file is lost, you must generate and register a new one.
-:::
+</Callout>
 
-:::note Expiration
+<Callout title="Expiration">
 If you set an expiration date when generating a key in ZITADEL, that key will expire at midnight on the specified day.
-:::
+</Callout>
 
 ![Create private key](/docs/img/console_serviceusers_new_key.gif)
 

@@ -113,9 +113,9 @@ but in the Projections.Customizations.Telemetry section
 
 ZITADEL supports [PostgreSQL](https://www.postgresql.org/).
 
-:::info
+<Callout>
 ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](/docs/self-hosting/manage/cli/mirror) to migrate to postgres.
-:::
+</Callout>
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
 which runs with PostgreSQL.
@@ -242,9 +242,9 @@ you might want to [limit usage and/or execute tasks on certain usage units and l
 
 ZITADEL itself requires approximately 512MB of RAM and can operate with less than one CPU core. The database component, under typical conditions, utilizes about one CPU core per 100 requests per second (req/s) and 4GB of RAM per core, which includes some caching.
 
-:::info Password hashing
+<Callout title="Password hashing">
 Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
-:::
+</Callout>
 
 ### Production HA cluster
 

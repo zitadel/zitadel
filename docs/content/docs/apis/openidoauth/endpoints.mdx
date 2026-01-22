@@ -3,8 +3,6 @@ title: OpenID Connect Endpoints in ZITADEL
 sidebar_label: OpenID Connect Endpoints
 ---
 
-import Tabs from "@/components/docusaurus/tabs";
-import TabItem from "@/components/docusaurus/tabs";
 import TokenExchangeRequest from "./_token_exchange_request.mdx";
 import TokenExchangeResponse from "./_token_exchange_response.mdx";
 import TokenExchangeTypes from "./_token_exchange_types.mdx";
@@ -20,9 +18,9 @@ This would give us `${CUSTOM_DOMAIN}/.well-known/openid-configuration`.
 
 `${CUSTOM_DOMAIN}/oauth/v2/authorize`
 
-:::note
+<Callout>
 The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
-:::
+</Callout>
 
 The authorization_endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected to this endpoint to
 authenticate the user in exchange for an authorization_code (authorization code flow) or tokens (implicit flow).
@@ -52,13 +50,13 @@ authenticate the user in exchange for an authorization_code (authorization code 
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
 | scope         | `openid` is required, see [Scopes](./scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
 
-:::important
+<Callout>
 Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued,
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`.
 
 Send the access_token to the [userinfo_endpoint](#userinfo-endpoint) or [introspection_endpoint](#introspection-endpoint) the retrieve these claims
 or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
-:::
+</Callout>
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -72,13 +70,13 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 no additional parameters required
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 no additional parameters required
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 | Parameter             | Description                                           |
 | --------------------- | ----------------------------------------------------- |
@@ -87,10 +85,10 @@ no additional parameters required
 
 see PKCE guide for more information
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 no additional parameters required
-</TabItem>
+</Tab>
 </Tabs>
 
 ### Additional parameters
@@ -147,10 +145,10 @@ When your `response_type` was either `id_token` or `id_token token` and no error
 
 Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
-:::note
+<Callout>
 If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
 the error will be display directly to the user on the auth server
-:::
+</Callout>
 
 | Property          | Description                                                          |
 | ----------------- | -------------------------------------------------------------------- |
@@ -201,12 +199,12 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -215,8 +213,8 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` and `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
@@ -225,8 +223,8 @@ Send your `client_id` and `code_verifier` for us to recompute the `code_challeng
 | client_id     | client_id of the application                                 |
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a client assertion as JWT for us to validate the signature against the registered public key.
 
@@ -235,7 +233,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
 #### Successful code response
@@ -300,12 +298,12 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -314,13 +312,13 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
@@ -329,7 +327,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
 #### Successful refresh token response
@@ -392,13 +390,13 @@ curl --request POST \
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. ZITADEL also provides a [token exchange guide](/docs/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
 
-:::info
+<Callout>
 Token Exchange is currently an experimental [beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature. Be sure to enable it on the [feature API](/docs/guides/integrate/token-exchange#feature-api) before using it.
-:::
+</Callout>
 
 #### Request parameters
 
-<TokenExchangeRequest />
+<TokenExchangeRequest components={props.components}  />
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -413,12 +411,12 @@ Depending on your authorization method you will have to provide additional param
     ]}
 >
 
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -427,13 +425,13 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
@@ -442,15 +440,15 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
 #### Successful token exchange response
-<TokenExchangeResponse />
+<TokenExchangeResponse components={props.components}  />
 
 #### Token types
 
-<TokenExchangeTypes />
+<TokenExchangeTypes components={props.components}  />
 
 ### Error response
 
@@ -485,7 +483,7 @@ values={[
 {label: 'private_key_jwt', value: 'private_key_jwt'},
 ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
@@ -497,9 +495,9 @@ curl --request POST \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 
-<TabItem value="private_key_jwt">
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
@@ -517,7 +515,7 @@ curl --request POST \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 </Tabs>
 
 ### Successful introspection response
@@ -572,10 +570,10 @@ If the token is invalid or expired, an HTTP 401 will be returned.
 
 This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
-:::important
+<Callout>
 If you revoke an `access_token` only the specific token will be revoked. When revoking a `refresh_token`,
 the corresponding `access_token` will be revoked as well.
-:::
+</Callout>
 
 | Parameter | Description                      |
 | --------- | -------------------------------- |
@@ -593,12 +591,12 @@ values={[
 {label: 'private_key_jwt', value: 'private_key_jwt'},
 ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to construct a request correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -607,8 +605,8 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameters in the body:
 
@@ -616,8 +614,8 @@ Send your `client_id` as parameters in the body:
 | --------- | ---------------------------- |
 | client_id | client_id of the application |
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
@@ -635,7 +633,7 @@ curl --request POST \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 </Tabs>
 
 ## end_session_endpoint
@@ -672,9 +670,9 @@ The alternative would be to validate tokens with the [introspection endpoint](#i
 Keys are automatically rotated on a regular basis or on demand, meaning keys can change in irregular intervals.
 ZITADEL ensures that a proper `kid` is set with each key.
 
-:::info Keys rotate without prior notice
+<Callout title="Keys rotate without prior notice">
 Be aware that these keys can be rotated without any prior notice.
-:::
+</Callout>
 
 ### Caching
 

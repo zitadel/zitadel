@@ -8,10 +8,10 @@ It explains how to enable user login in your application and how to fetch data f
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
 
-:::tip 
+<Callout title="">
 This documentation references our [example](https://github.com/zitadel/zitadel-vue) on GitHub.
 It also uses the @zitadel/vue package with its default configuration.
-:::
+</Callout>
 
 ## Set up application and obtain keys
 
@@ -29,10 +29,10 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/apis/openid
 The redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The post logout redirect sends your users back to a public route on your application after they have logged out.
 
-:::tip
+<Callout>
 If you are following along with the [example](https://github.com/zitadel/zitadel-vue), set the dev mode switch to `true`.
 Configure a redirect URIs to *http:/<span></span>/localhost:5173/auth/signinwin/zitadel* and a post redirect URI to *http:/<span></span>/localhost:5173/*.
-:::
+</Callout>
 
 Continue and create the application.
 

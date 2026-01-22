@@ -1,5 +1,4 @@
-import TabItem from "@/components/docusaurus/tabs";
-import Tabs from "@/components/docusaurus/tabs";
+
 import PKCE from "./authmethods/_pkce.mdx";
 import Basic from "./authmethods/_basic.mdx";
 import Implicit from "./authmethods/_implicit.mdx";
@@ -7,6 +6,7 @@ import PKCENative from "./authmethods/_pkcenative.mdx";
 import JWTPrivateKey from "./authmethods/_jwtpk.mdx";
 
 export default function AuthMethods(props) {
+  const { Tab, Tabs } = props.components || {};
   return props.selected == "web" ? (
     <div>
       <Tabs
@@ -18,15 +18,15 @@ export default function AuthMethods(props) {
           { label: "JWT with Private Key", value: "jwtpk" },
         ]}
       >
-        <TabItem value="pkce">
-          <PKCE />
-        </TabItem>
-        <TabItem value="basic">
-          <Basic />
-        </TabItem>
-        <TabItem value="jwtpk">
-          <JWTPrivateKey />
-        </TabItem>
+        <Tab value="pkce">
+          <PKCE components={props.components}  />
+        </Tab>
+        <Tab value="basic">
+          <Basic components={props.components}  />
+        </Tab>
+        <Tab value="jwtpk">
+          <JWTPrivateKey components={props.components}  />
+        </Tab>
       </Tabs>
     </div>
   ) : props.selected == "native" ? (
@@ -35,9 +35,9 @@ export default function AuthMethods(props) {
       default="pkce"
       values={[{ label: "PKCE", value: "pkce" }]}
     >
-      <TabItem value="pkce">
-        <PKCENative />
-      </TabItem>
+      <Tab value="pkce">
+        <PKCE components={props.components} Native />
+      </Tab>
     </Tabs>
   ) : props.selected == "spa" ? (
     <Tabs
@@ -48,12 +48,12 @@ export default function AuthMethods(props) {
         { label: "Implicit", value: "implicit" },
       ]}
     >
-      <TabItem value="pkce">
-        <PKCE />
-      </TabItem>
-      <TabItem value="implicit">
-        <Implicit />
-      </TabItem>
+      <Tab value="pkce">
+        <PKCE components={props.components}  />
+      </Tab>
+      <Tab value="implicit">
+        <Implicit components={props.components}  />
+      </Tab>
     </Tabs>
   ) : null;
 }

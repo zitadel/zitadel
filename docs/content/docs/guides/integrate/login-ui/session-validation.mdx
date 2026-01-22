@@ -81,9 +81,9 @@ You may have some cases where you even want to make sure the session does not ex
 where you might use some information of an expired session like the user's `loginName` to automatically create a new
 session in your Login UI and let the user only provide their password.
 
-:::info
+<Callout>
 Note that ZITADEL will reject any expired sessions automatically and that they cannot be updated anymore.
-:::
+</Callout>
 
 ### Set a lifetime
 
@@ -98,9 +98,9 @@ the session.
 }
 ```
 
-:::info
+<Callout>
 Note that if the `lifetime` was not set, the session will never expire.
-:::
+</Callout>
 
 ## Token Introspection
 

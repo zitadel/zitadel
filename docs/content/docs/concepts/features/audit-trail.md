@@ -14,14 +14,14 @@ This form of audit log has several benefits over storing classic audit logs.
 You can view past data in-context of the whole system at a single point in time.
 Reviewing a past state of the application can be important when tracing an incident that happened months back. Moreover the eventstore provides a truly complete and clean audit log.
 
-:::info Future Plans
+<Callout title="Future Plans">
 There will be three major areas for future development on the audit data
 
 - [Metrics](https://github.com/zitadel/zitadel/issues/4458) and [standard reports](https://github.com/zitadel/zitadel/discussions/2162#discussioncomment-1153259)
 - [Feedback loop](https://github.com/zitadel/zitadel/issues/5102) and threat detection
 - Forensics and replay of events
 
-:::
+</Callout>
 
 ## Accessing the Audit Log
 

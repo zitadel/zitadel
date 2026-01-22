@@ -14,9 +14,9 @@ Both profiles need to be configured differently.
 Please make sure to configure your application for the correct type.
 Please refer to Google Help to [Set up SSO for your organization](https://support.google.com/a/answer/12032922) in case you need additional information on the Workspace setup.
 
-:::info OpenID Connect
+<Callout title="OpenID Connect">
 At this time Google supports SSO with OpenID Connect only for few providers.
-:::
+</Callout>
 
 Prerequisites:
 

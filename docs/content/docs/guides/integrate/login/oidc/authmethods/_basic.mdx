@@ -33,10 +33,10 @@ Please check the [authorization_endpoint reference](/docs/apis/openidoauth/endpo
 Regardless of a successful or error response from the authorization_endpoint, the authorization server will call your
 callback endpoint you provided by the `redirect_uri`.
 
-:::note
+<Callout>
 If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
 the error will be display directly to the user on the auth server.
-:::
+</Callout>
 
 Upon successful authentication you'll be given a `code` and if provided the unmodified `state` parameter.
 You will need this `code` in the token request.

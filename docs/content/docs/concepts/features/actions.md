@@ -6,9 +6,9 @@ sidebar_label: Actions
 By using ZITADEL actions, you can manipulate ZITADELs behavior on specific Events.
 This is useful when you have special business requirements that ZITADEL doesn't support out-of-the-box.
 
-:::info
+<Callout>
 We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you see how we are planning to expand and improve it. Please tell us about your needs and help us prioritize further fixes and features. 
-:::
+</Callout>
 
 ## Why actions?
 ZITADEL can't anticipate and solve every possible business rule and integration requirements from all ZITADEL users. Here are some examples:

@@ -11,14 +11,14 @@ import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 import { ResponsivePlayer } from "@/components/player";
 
-<Intro provider="Google"/>
+<Intro components={props.components}  provider="Google"/>
 
-<ResponsivePlayer controls url='https://www.youtube.com/watch?v=wg-ee-EnHdE' />
+<ResponsivePlayer  controls url='https://www.youtube.com/watch?v=wg-ee-EnHdE' />
 
 
 ## Open the Google Identity Provider Template
 
-<IDPsOverview templates="Google"/>
+<IDPsOverview components={props.components}  templates="Google"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Google Cloud Platform later.
@@ -54,21 +54,21 @@ A useful default will be filled if you don't change anything.
 This information will be taken to create/update the user within ZITADEL.
 ZITADEL ensures that at least the `openid`-scope is always sent.
 
-<GeneralConfigDescription provider_account="Google account" />
+<GeneralConfigDescription components={props.components}  provider_account="Google account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the Google Provider](/docs/img/guides/zitadel_activate_google.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your Google login"/>
+<TestSetup components={props.components}  loginscreen="your Google login"/>
 
 {/* TODO: Image highlights GitHub */}
 ![Google Button](/docs/img/guides/zitadel_login_google.png)

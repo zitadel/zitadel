@@ -13,9 +13,9 @@ It explains how to check the token validity in the API and how to check for perm
 
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
 
-:::info
+<Callout>
 This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
-:::
+</Callout>
 
 ## ZITADEL setup
 
@@ -23,15 +23,15 @@ Before we can start building our application, we have to do a few configuration 
 
 ### Create application
 
-<AppJWT/>
+<AppJWT components={props.components} />
 
 ### Create Serviceuser
 
-<ServiceuserJWT/>
+<ServiceuserJWT components={props.components} />
 
 ### Give Serviceuser an authorization
 
-<ServiceuserRole/>
+<ServiceuserRole components={props.components} />
 
 ### Prerequisites
 
@@ -49,7 +49,7 @@ And the following from the Serviceuser:
 
 ### Setup Python
 
-<SetupPython/>
+<SetupPython components={props.components} />
 
 ### Install dependencies
 

@@ -8,10 +8,10 @@ OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
 
-:::info
+<Callout>
 This documentation references our [example](https://github.com/zitadel/zitadel-java) on GitHub.
 You can either create your own application or directly run the example by providing the necessary arguments.
-:::
+</Callout>
 
 ## Set up application
 

@@ -56,9 +56,9 @@ How you organize users depends on your scenario:
 * **B2B / Multi-Tenancy:** We recommend creating separate organizations for each business customer (e.g., based on their domain). Grant your projects to these organizations so they can manage their own users.
 * **B2C / CIAM:** You might want to store all users in a single organization and enable a specific set of social logins for that organization.
 
-:::info
+<Callout>
 You can only verify a domain (e.g., `acme.com`) on **one** organization. If multiple teams share the same email domain but need separate management, they might need to be consolidated into a single organization.
-:::
+</Callout>
 
 ### Hierarchy
 ZITADEL does not enforce a native hierarchy or inheritance for users or organizations. We recommend structuring users along the smallest unit of groups (Organizations). You can use organization metadata or your own business logic to map complex hierarchies if needed.
@@ -67,7 +67,7 @@ ZITADEL does not enforce a native hierarchy or inheritance for users or organiza
 
 ### Create User
 
-<CreateUser/>
+<CreateUser components={props.components} />
 
 ### Metadata
 ZITADEL provides a key-value storage system for users, which is essential for building complex applications.

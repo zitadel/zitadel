@@ -3,8 +3,6 @@ title: Authenticate users with OpenID Connect
 sidebar_label: OIDC Code Flow + PKCE
 ---
 
-import Tabs from "@/components/docusaurus/tabs";
-import TabItem from "@/components/docusaurus/tabs";
 import AuthMethods from "./_authmethods.mdx";
 
 ## Overview
@@ -61,7 +59,7 @@ This will start a wizard asking you for an application name and a type.
         {'label': 'Single Page Application', 'value': 'spa'},
     ]}
 >
-<TabItem value="web">
+<Tab value="web">
 
 #### Authentication method
 
@@ -71,25 +69,25 @@ recommend using POST and will not cover it in this guide.
 
 Please change the authentication method here as well, if you did so in the wizard, so we can better guide you through the process:
 
-<AuthMethods selected="web" />
-</TabItem>
+<AuthMethods components={props.components}  selected="web" />
+</Tab>
 
-<TabItem value="native">
+<Tab value="native">
 
 #### Authentication method
 
 When selecting Native the authentication method always needs to be PKCE.
 
-<AuthMethods selected="native" />
-</TabItem>
+<AuthMethods components={props.components}  selected="native" />
+</Tab>
 
-<TabItem value="spa">
+<Tab value="spa">
 
 #### Authentication method
 
 When selecting SPA the recommended authentication method is again PKCE. All common Frameworks like Angular, React, Vue.js and so on
 are able to successfully authenticate with PKCE. Our management UI Console for instance uses PKCE as well.
 
-<AuthMethods selected="spa" />
-</TabItem>
+<AuthMethods components={props.components}  selected="spa" />
+</Tab>
 </Tabs>

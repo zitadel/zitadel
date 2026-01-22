@@ -13,15 +13,15 @@ Before you start, make sure you have everything set up correctly.
 - You need to be at least a ZITADEL [_IAM_OWNER_](/docs/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
-:::info
+<Callout>
 Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
 In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
-:::
+</Callout>
 
-:::warning
+<Callout>
 To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
 as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
-:::
+</Callout>
 
 ## Start example target
 
@@ -29,9 +29,9 @@ To test the actions feature, you need to create a target that will be called whe
 You will need to implement a listener that can receive HTTP requests, process the request and returns the manipulated request.
 For this example, we will use a simple Go HTTP server that will return the request with added metadata.
 
-:::info
+<Callout>
 The signature of the received request can be checked, [please refer to the example for more information on how to](/docs/guides/integrate/actions/testing-request-signature).
-:::
+</Callout>
 
 ```go
 package main
@@ -130,11 +130,11 @@ func main() {
 }
 ```
 
-:::info  
+<Callout title="">
 The example above runs only on your local machine (`localhost`).  
 To test it with Zitadel, you must make your listener reachable from the internet.  
 You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
-:::
+</Callout>
 
 ## Create target
 

@@ -15,7 +15,7 @@ You can either use the hosted login of ZITADEL to let users register themselves,
 
 import CreateUser from "../../../guides/manage/console/_create-user.mdx";
 
-<CreateUser />
+<CreateUser components={props.components}  />
 
 ## Automated / Self-registration possibilities
 
@@ -56,10 +56,10 @@ As soon as users click the "register" button, they will be presented with a scre
 After that, the user can select either local user registration or an external provider.
 By pressing the button of an external provider, the user will directly be redirected to the provider for consent.
 
-:::info
+<Callout>
 The options are dependent on the settings of the organization.
 If only one option is possible, the option will directly be selected and shown.
-:::
+</Callout>
 
 #### Local User Registration
 
@@ -120,7 +120,7 @@ Please follow the configuration guides for the needed providers: [Let Users Logi
 
 import OrgLoginDescription from "./_org_login_description.mdx";
 
-<OrgLoginDescription name="OrgLoginDescription" />
+<OrgLoginDescription components={props.components}  name="OrgLoginDescription" />
 
 ### Build your own registration form
 

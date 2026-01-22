@@ -2,8 +2,6 @@
 title: Verify Payload Integrity
 ---
 
-import Tabs from "@/components/docusaurus/tabs";
-import TabItem from "@/components/docusaurus/tabs";
 import CodeBlock from '@/components/docusaurus/code-block';
 import JSON from "./go/json.go"
 import JWE from "./go/jwe.go"
@@ -19,10 +17,10 @@ Before you start, make sure you have everything set up correctly.
 
 - You need to be at least a ZITADEL [_IAM_OWNER_](/docs/guides/manage/console/managers)
 
-:::info
+<Callout>
 Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
 In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
-:::
+</Callout>
 
 ## Payload and Validation Types
 
@@ -134,22 +132,22 @@ For this example, we will use a simple Go HTTP server that will print the receiv
 As mentioned before, this validation can and should be applied to any target implementation.
 
 <Tabs>
-    <TabItem value="JSON">
-        <CodeBlock language="go">{JSON}</CodeBlock>
-    </TabItem>
-    <TabItem value="JWT">
-        <CodeBlock language="go">{JWT}</CodeBlock>
-    </TabItem>
-    <TabItem value="JWE">
-        <CodeBlock language="go">{JWE}</CodeBlock>
-    </TabItem>
+    <Tab value="JSON">
+        <CodeBlock  language="go">{JSON}</CodeBlock>
+    </Tab>
+    <Tab value="JWT">
+        <CodeBlock  language="go">{JWT}</CodeBlock>
+    </Tab>
+    <Tab value="JWE">
+        <CodeBlock  language="go">{JWE}</CodeBlock>
+    </Tab>
 </Tabs>
 
-:::info
+<Callout>
 The example above runs only on your local machine (`localhost`).
 To test it with Zitadel, you must make your listener reachable from the internet.
 You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).
-:::
+</Callout>
 
 ## Example call
 

@@ -19,15 +19,15 @@ So if you simply change your `IP` address and run the same request again and aga
 
 If you are blocked you will receive a `http status 429`.
 
-:::tip Implement exponential backoff
+<Callout title="Implement exponential backoff">
 You should consider to implement [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) into your application to prevent a blocking loop.
-:::
+</Callout>
 
-:::info Raising limits
+<Callout title="Raising limits">
 We understand that there are certain scenarios where your users access ZITADEL from shared IP Addresses.
 For example if you use a corporate proxy or Network Address Translation NAT.
 Please [get in touch](https://zitadel.com/contact) with us to discuss your requirements, and we'll find a solution.
-:::
+</Callout>
 
 ## What rate limits do apply
 

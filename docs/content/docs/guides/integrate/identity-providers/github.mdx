@@ -12,11 +12,11 @@ import TestSetup from './_test_setup.mdx';
 import UnlinkedOAuth from './_unlinked_oauth.mdx';
 import PrefillAction from './_prefill_action.mdx';
 
-<Intro provider="GitHub"/>
+<Intro components={props.components}  provider="GitHub"/>
 
 ## Open the GitHub Identity Provider Template
 
-<IDPsOverview templates="GitHub or GitHub Enterprise Server"/>
+<IDPsOverview components={props.components}  templates="GitHub or GitHub Enterprise Server"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it to the GitHub OAuth application later.
@@ -57,33 +57,33 @@ A useful default will be filled if you don't change anything.
 This information is used to create and/or update the user within ZITADEL.
 ZITADEL ensures that at least the `openid`-scope is always sent.
 
-<GeneralConfigDescription provider_account="GitHub account" />
+<GeneralConfigDescription components={props.components}  provider_account="GitHub account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the GitHub](/docs/img/guides/zitadel_activate_github.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your GitHub login"/>
+<TestSetup components={props.components}  loginscreen="your GitHub login"/>
 
 ![GitHub Button](/docs/img/guides/zitadel_login_github.png)
 
 ![GitHub Login](/docs/img/guides/github_login.png)
 
-<UnlinkedOAuth provider="GitHub"/>
+<UnlinkedOAuth components={props.components}  provider="GitHub"/>
 
 ![GitHub Login](/docs/img/guides/zitadel_login_external_not_found_registration.png)
 
 ## Optional: Add ZITADEL action to autofill userdata
 
-<PrefillAction fields="firstname and lastname" provider="GitHub"/>
+<PrefillAction components={props.components}  fields="firstname and lastname" provider="GitHub"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/github_identity_provider.js

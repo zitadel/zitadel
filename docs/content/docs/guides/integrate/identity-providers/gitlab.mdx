@@ -12,11 +12,11 @@ import TestSetup from './_test_setup.mdx';
 import UnlinkedOAuth from './_unlinked_oauth.mdx';
 import PrefillAction from './_prefill_action.mdx';
 
-<Intro provider="GitLab"/>
+<Intro components={props.components}  provider="GitLab"/>
 
 ## Open the GitLab Identity Provider Template
 
-<IDPsOverview templates="GitLab or GitLab Self Hosted"/>
+<IDPsOverview components={props.components}  templates="GitLab or GitLab Self Hosted"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it to the GitLab Application later.
@@ -55,33 +55,33 @@ A useful default will be filled if you don't change anything.
 This information will be taken to create/update the user within ZITADEL.
 ZITADEL ensures that at least the `openid`-scope is always sent.
 
-<GeneralConfigDescription provider_account="GitLab account" />
+<GeneralConfigDescription components={props.components}  provider_account="GitLab account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the GitLab](/docs/img/guides/zitadel_activate_gitlab.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your GitLab login"/>
+<TestSetup components={props.components}  loginscreen="your GitLab login"/>
 
 ![GitLab Button](/docs/img/guides/zitadel_login_gitlab.png)
 
 ![GitLab Login](/docs/img/guides/gitlab_login.png)
 
-<UnlinkedOAuth provider="GitLab"/>
+<UnlinkedOAuth components={props.components}  provider="GitLab"/>
 
 ![GitLab Login](/docs/img/guides/zitadel_login_external_not_found_registration.png)
 
 ## Optional: Add ZITADEL action to autofill userdata
 
-<PrefillAction fields="firstname and lastname" provider="GitLab"/>
+<PrefillAction components={props.components}  fields="firstname and lastname" provider="GitLab"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider.js

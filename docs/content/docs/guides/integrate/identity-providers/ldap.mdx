@@ -11,26 +11,26 @@ import GeneralConfigDescription from './_general_config_description.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="an LDAP server"/>
+<Intro components={props.components}  provider="an LDAP server"/>
 
 ## How it works
 
-<HowLDAPIDPWorks/>
+<HowLDAPIDPWorks components={props.components} />
 
 ## ZITADEL Configuration
 
 ### Go to the IdP Providers Overview
 
-<IDPsOverview templates="Active Directory / LDAP"/>
+<IDPsOverview components={props.components}  templates="Active Directory / LDAP"/>
 
 ### Create a new LDAP Provider
 
 Fill in the following fields in the LDAP template.
 
-:::caution
+<Callout type="warn">
 We highly recommend to use LDAPS or StartTLS enable servers.
 Otherwise, your users passwords are sent in clear text through the wire.
-:::
+</Callout>
 
 **Name**: Name of the identity provider
 
@@ -52,23 +52,23 @@ Otherwise, your users passwords are sent in clear text through the wire.
 
 **Timeout**: If this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
-<GeneralConfigDescription provider_account="LDAP user" />
+<GeneralConfigDescription components={props.components}  provider_account="LDAP user" />
 
 ![LDAP Provider](/docs/img/guides/zitadel_ldap_create_provider.png)
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the LDAP Provider](/docs/img/guides/zitadel_activate_ldap.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="ZITADELs LDAP login"/>
+<TestSetup components={props.components}  loginscreen="ZITADELs LDAP login"/>
 
 ![LDAP Button](/docs/img/guides/zitadel_login_ldap.png)
 

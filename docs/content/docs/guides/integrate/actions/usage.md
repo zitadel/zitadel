@@ -36,10 +36,10 @@ The information sent to the Endpoint is structured as JSON:
 }
 ```
 
-:::warning
+<Callout>
 To marshal and unmarshal the request please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson), 
 as the request is a protocol buffer message, to avoid potential problems with the attribute names.
-:::
+</Callout>
 
 ### Sent information Response
 
@@ -61,10 +61,10 @@ The information sent to the Endpoint is structured as JSON:
 }
 ```
 
-:::warning
+<Callout>
 To marshal and unmarshal the request and response please use a package like [protojson](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson),
 as the request and response are protocol buffer messages, to avoid potential problems with the attribute names.
-:::
+</Callout>
 
 ### Sent information Function
 
@@ -486,6 +486,6 @@ Only values from 400 to 499 will be forwarded through ZITADEL, other StatusCodes
 
 If the Target returns any other status code than >= 200 and < 299, the execution is looked at as failed, and a PreconditionFailed error is logged.
 
-:::important
+<Callout>
 To interrupt the execution while forwarding this error, "interruptOnError" must be **true** for the Target
-:::
+</Callout>

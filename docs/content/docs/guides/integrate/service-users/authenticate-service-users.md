@@ -1,7 +1,6 @@
 ---
 title: Authenticate service users and client applications
 sidebar_label: Authenticate service users
-sidebar_position: 1
 ---
 
 This guide explains ZITADEL service users and their role in facilitating secure machine-to-machine communication within your applications.

@@ -8,7 +8,7 @@ import ProjectDescription from "../../../concepts/structure/_project_description
 
 ## What is a project?
 
-<ProjectDescription name="ProjectDescription" />
+<ProjectDescription components={props.components}  name="ProjectDescription" />
 
 A Project is the vessel that holds your Applications and Roles. It defines the security context for a specific software solution.
 
@@ -39,9 +39,9 @@ Read more about managing roles [here](./roles).
 When creating a new ZITADEL instance, you will find an automatically created project in the first organization.
 This **Default Project** (named "ZITADEL") protects the ZITADEL Management Console and APIs.
 
-:::caution
+<Callout type="warn">
 We do not recommend changing any settings in the Default Project or using it for your own applications, as this could influence the behavior of ZITADEL itself.
-:::
+</Callout>
 
 ![Default Project](/docs/img/guides/solution-scenarios/console-default-project.png)
 

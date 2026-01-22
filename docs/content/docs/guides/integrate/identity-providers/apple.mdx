@@ -10,11 +10,11 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="Apple"/>
+<Intro components={props.components}  provider="Apple"/>
 
 ## Open the Apple Identity Provider Template
 
-<IDPsOverview templates="Apple"/>
+<IDPsOverview components={props.components}  templates="Apple"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Apple service later.
@@ -67,21 +67,21 @@ A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `name` and `email` are prefilled. This information will be taken to create/update the user within ZITADEL.
 
-<GeneralConfigDescription provider_account="Apple account" />
+<GeneralConfigDescription components={props.components}  provider_account="Apple account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the Apple Provider](/docs/img/guides/zitadel_activate_apple.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your Apple login"/>
+<TestSetup components={props.components}  loginscreen="your Apple login"/>
 
 ![Apple Button](/docs/img/guides/zitadel_login_apple.png)
 

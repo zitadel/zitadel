@@ -25,13 +25,13 @@ As our application will also support web, we have to make sure to set redirects 
 
 For our local web development, add a redirectURI for `http://localhost:4444/auth.html` with your custom port. For Android and IOS, add your **custom scheme**. In our case it is `com.example.zitadelflutter`.
 
-:::caution Use Custom Redirect URI!
+<Callout type="warn" title="Use Custom Redirect URI!">
 
 Your custom scheme has to be compliant with the OAuth 2.0
 authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
 Otherwise your app might get rejected.
 
-:::
+</Callout>
 
 For development, you need to set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 

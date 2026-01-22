@@ -1,7 +1,6 @@
 ---
 title: Let Users Login with Preferred Identity Provider
 sidebar_label: Login users with SSO
-sidebar_position: 1
 ---
 
 ## External Identity Providers and SSO authentication

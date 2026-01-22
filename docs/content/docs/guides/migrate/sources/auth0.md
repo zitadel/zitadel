@@ -37,10 +37,10 @@ Auth0 does not export hashed passwords as part of the bulk user export.
 You must create a support ticket to download password hashes and password-related information.
 Please also refer to the Auth0 guide on how to [Export Data](https://auth0.com/docs/troubleshoot/customer-support/manage-subscriptions/export-data#user-passwords).
 
-:::info
+<Callout>
 You can also import users into ZITADEL with an verified email but without the passwords.
 Users will be prompted to create a new password after they login for the first time after migration.
-:::
+</Callout>
 
 1. Go to https://support.auth0.com/tickets and click on **Open Ticket**
 2. Issue Type: **I have a question regarding my Auth0 account**
