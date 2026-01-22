@@ -57,9 +57,10 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
-        .catch((error) => {
-          setError(error);
-          return;
+        .then((response) => {
+          if (response?.error) {
+            setError(response.error);
+          }
         })
         .finally(() => {
           setLoading(false);
@@ -67,7 +68,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     }
   }, []);
 
-  async function updateSessionForOTPChallenge() {
+  async function updateSessionForOTPChallenge(): Promise<{ error?: string; [key: string]: any }> {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -95,25 +96,21 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       });
     }
 
-    setLoading(true);
-    const response = await updateOrCreateSession({
-      loginName,
-      sessionId,
-      organization,
-      challenges,
-      requestId,
-    })
-      .catch(() => {
-        setError("Could not request OTP challenge");
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    let response;
+    try {
+      response = await updateOrCreateSession({
+        loginName,
+        sessionId,
+        organization,
+        challenges,
+        requestId,
       });
+    } catch (error) {
+      return { error: "Could not request OTP challenge" };
+    }
 
     if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
+      return { error: response.error };
     }
 
     return response;
@@ -223,16 +220,13 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 disabled={loading}
                 type="button"
                 className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
-                onClick={() => {
+                onClick={async () => {
                   setLoading(true);
-                  updateSessionForOTPChallenge()
-                    .catch((error) => {
-                      setError(error);
-                      return;
-                    })
-                    .finally(() => {
-                      setLoading(false);
-                    });
+                  const response = await updateSessionForOTPChallenge();
+                  if (response?.error) {
+                    setError(response.error);
+                  }
+                  setLoading(false);
                 }}
                 data-testid="resend-button"
               >
