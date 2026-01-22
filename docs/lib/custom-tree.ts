@@ -186,12 +186,22 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
     const indexNode = findPage('index');
     if (indexNode) newChildren.push(indexNode);
     
-    (guidesSidebar as any[]).forEach(item => {
+    (guidesSidebar as unknown as any[]).forEach(item => {
         const node = buildNode(item);
-        if (node) newChildren.push(node);
+        if (node) {
+            if (node.type === 'folder') {
+                (node as any).collapsible = false;
+            }
+            newChildren.push(node);
+        }
     });
 
-    if (apisFolder) newChildren.push(apisFolder);
+    if (apisFolder) {
+        if (apisFolder.type === 'folder') {
+            (apisFolder as any).collapsible = false;
+        }
+        newChildren.push(apisFolder);
+    }
     
     // Self-hosting is in Guides usually? In new nav "Deploy & Operate" is under GuidesSidebar.
     // Concepts is in GuidesSidebar.
