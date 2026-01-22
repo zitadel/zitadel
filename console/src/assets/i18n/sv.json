@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Hemlighet borttagen framgångsrikt!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roller",
+      "TITLE": "ZITADEL-administratörsroller",
       "DESCRIPTION": "Detta är alla medlemsbeviljanden för användaren. Du kan också ändra dem på organisations-, projekt- eller IAM-detaljsidor.",
       "ORGCONTEXT": "Du ser alla organisationer och projekt som är relaterade till den för närvarande valda organisationen.",
       "USERCONTEXT": "Du ser alla organisationer och projekt som du är auktoriserad till. Inklusive andra organisationer.",
