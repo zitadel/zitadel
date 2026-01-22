@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	InstanceFeatureTable = "projections.instance_features2"
+	InstanceFeatureTable = "projections.instance_features3"
 
 	InstanceFeatureInstanceIDCol   = "instance_id"
 	InstanceFeatureKeyCol          = "key"
