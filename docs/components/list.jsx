@@ -142,24 +142,24 @@ export function ListElement({
   description,
 }) {
   return (
-    <a 
-      className={styles.listelement} 
-      href={link} 
+    <a
+      className={styles.listelement}
+      href={link}
     >
       {type
         ? type
         : iconClasses && (
-            <div className={roundClasses}>
-              {label ? (
-                <span className={styles.listlabel}>{label}</span>
-              ) : (
-                <i className={`${iconClasses}`}></i>
-              )}
-            </div>
-          )}
+          <div className={roundClasses}>
+            {label ? (
+              <span className={styles.listlabel}>{label}</span>
+            ) : (
+              <i className={`${iconClasses}`}></i>
+            )}
+          </div>
+        )}
       <div>
         <h3>{title}</h3>
-        <p className={styles.listelement.description}>{description}</p>
+        <p className={styles.description}>{description}</p>
       </div>
     </a>
   );

@@ -2,3 +2,48 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 @import 'fumadocs-openapi/css/preset.css';
+@import '../css/custom.css';
+
+@theme {
+    --color-fd-primary: var(--primary);
+    --color-fd-primary-foreground: var(--primary-foreground);
+    --color-fd-background: var(--background);
+    --color-fd-foreground: var(--foreground);
+    --color-fd-card: var(--card);
+    --color-fd-card-foreground: var(--foreground);
+    --color-fd-popover: var(--card);
+    --color-fd-popover-foreground: var(--foreground);
+    --color-fd-muted: var(--muted);
+    --color-fd-muted-foreground: var(--muted-foreground);
+    --color-fd-accent: var(--accent);
+    --color-fd-accent-foreground: var(--foreground);
+    --color-fd-border: var(--border);
+    --color-fd-ring: var(--primary);
+
+    --color-zitadelpink: #ff2069;
+    --font-sans: "Lato", "ui-sans-serif", "system-ui";
+}
+
+:root {
+    --primary: hsl(340, 100%, 56%);
+    --primary-foreground: hsl(0, 0%, 100%);
+    --background: hsl(0, 0%, 98%);
+    --foreground: hsl(0, 0%, 10%);
+    --card: hsl(0, 0%, 100%);
+    --muted: hsl(0, 0%, 96%);
+    --muted-foreground: hsl(0, 0%, 45%);
+    --accent: hsl(0, 0%, 92%);
+    --border: hsl(0, 0%, 90%);
+}
+
+.dark {
+    --primary: hsl(0, 0%, 98%);
+    --primary-foreground: hsl(0, 0%, 9%);
+    --background: hsl(230, 45%, 7%);
+    --foreground: hsl(0, 0%, 98%);
+    --card: hsl(230, 43%, 20%);
+    --muted: hsl(230, 43%, 12%);
+    --muted-foreground: hsl(230, 20%, 70%);
+    --accent: hsl(230, 43%, 25%);
+    --border: hsl(230, 43%, 30%);
+}

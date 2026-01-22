@@ -1,68 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import "../../static/icons/line-awesome/css/line-awesome.min.css";
-
 @font-face {
   font-family: Lato;
   font-style: normal;
   font-weight: 400;
-  src: url(../../static/fonts/lato/Lato-Regular.ttf) format("truetype");
+  src: url(/fonts/lato/Lato-Regular.ttf) format("truetype");
 }
-@font-face {
-  font-family: Lato;
-  font-style: normal;
-  font-weight: 900;
-  src: url(../../static/fonts/lato/Lato-Black.ttf) format("truetype");
-}
-@font-face {
-  font-family: Lato;
-  font-style: italic;
-  font-weight: 900;
-  src: url(../../static/fonts/lato/Lato-BlackItalic.ttf) format("truetype");
-}
+
 @font-face {
   font-family: Lato;
   font-style: normal;
   font-weight: 700;
-  src: url(../../static/fonts/lato/Lato-Bold.ttf) format("truetype");
+  src: url(/fonts/lato/Lato-Bold.ttf) format("truetype");
 }
-@font-face {
-  font-family: Lato;
-  font-style: italic;
-  font-weight: 700;
-  src: url(../../static/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
-}
+
 @font-face {
   font-family: Lato;
   font-style: italic;
   font-weight: 400;
-  src: url(../../static/fonts/lato/Lato-Italic.ttf) format("truetype");
+  src: url(/fonts/lato/Lato-Italic.ttf) format("truetype");
 }
-@font-face {
-  font-family: Lato;
-  font-style: normal;
-  font-weight: 300;
-  src: url(../../static/fonts/lato/Lato-Light.ttf) format("truetype");
-}
+
 @font-face {
   font-family: Lato;
   font-style: italic;
-  font-weight: 300;
-  src: url(../../static/fonts/lato/Lato-LightItalic.ttf) format("truetype");
-}
-@font-face {
-  font-family: Lato;
-  font-style: normal;
-  font-weight: 100;
-  src: url(../../static/fonts/lato/Lato-Thin.ttf) format("truetype");
-}
-@font-face {
-  font-family: Lato;
-  font-style: italic;
-  font-weight: 100;
-  src: url(../../static/fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+  font-weight: 700;
+  src: url(/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
 }
 
 /* You can override the default Infima variables here. */
@@ -75,16 +36,14 @@
   --ifm-menu-color-active: #000000;
   --ifm-menu-color-background-hover: #f7fafc;
   --ifm-font-color-base: #6b7280;
-  --ifm-link-color: #5469d4;
-  --ifm-menu-color: #697386;
-  --ifm-footer-link-color: #000000;
-  --ifm-color-primary: #5469d4;
-  --ifm-color-primary-dark: #4d61cf;
-  --ifm-color-primary-darker: #4356c9;
-  --ifm-color-primary-darkest: #3a4cc3; /* 293bb9 */
-  --ifm-color-primary-light: #6e80da;
-  --ifm-color-primary-lighter: #8796e1;
-  --ifm-color-primary-lightest: #aab4ea;
+  --ifm-link-color: #ff2069;
+  --ifm-color-primary: #ff2069;
+  --ifm-color-primary-dark: #e61d5f;
+  --ifm-color-primary-darker: #cc1a54;
+  --ifm-color-primary-darkest: #b3164a;
+  --ifm-color-primary-light: #ff4d87;
+  --ifm-color-primary-lighter: #ff7aa5;
+  --ifm-color-primary-lightest: #ffa6c3;
   --ifm-code-font-size: 95%;
   --ifm-font-family-base: "Lato", sans-serif;
   --ifm-hero-background-color: #7e21ce;
@@ -98,7 +57,8 @@
   --ifm-footer-padding-vertical: 50px;
   --ifm-heading-font-weight: 500;
   --ifm-heading-color: #000000;
-  --ifm-font-color-base: #000000dd; /*#6b7280;*/
+  --ifm-font-color-base: #000000dd;
+  /*#6b7280;*/
   --font-color-strong: #000000;
   --ifm-navbar-link-hover-color: #000000;
   --ifm-heading-color: #000000;
@@ -127,7 +87,7 @@
   --gigibannerforeground: black;
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
-  --card-border-hover: #6c8eef;
+  --card-border-hover: #ff2069;
   --ifm-pagination-nav-color-hover: #000000;
   --input-border: #1a191954;
   --input-hover-border: #000000;
@@ -262,9 +222,11 @@ h4 {
   height: 40px;
 }
 
-:root[data-theme="dark"] {
-  --ifm-navbar-background-color: #1b2036; /*#141c2d;*/
-  --ifm-footer-background-color: #00000020; /* #121430; */
+.dark {
+  --ifm-navbar-background-color: #0a0c1a;
+  /*#141c2d;*/
+  --ifm-footer-background-color: #00000020;
+  /* #121430; */
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
@@ -275,7 +237,7 @@ h4 {
   --docsearch-searchbox-focus-background: #454a66;
   --docsearch-searchbox-shadow: inset 0 0 0 1px var(--docsearch-primary-color);
   --docsearch-hit-background: #454a66;
-  --docsearch-highlight-color: #5469d4;
+  --docsearch-highlight-color: #ff2069;
   --ifm-navbar-shadow: inset 0 -1px rgba(255, 255, 255, 0.12);
   --ifm-footer-link-color: #ffffff;
   --ifm-color-emphasis-300: #ffffff20;
@@ -286,14 +248,16 @@ h4 {
   --ifm-color-primary-light: #ff4180;
   --ifm-color-primary-lighter: #ff6396;
   --ifm-color-primary-lightest: #ff90b4;
-  --ifm-background-color: #141735; /* #141c2d; */
+  --ifm-background-color: #0a0c1a;
+  /* #141c2d; */
   --ifm-hero-background-color: #0f1022;
   --ifm-hero-text-color: #ffffff;
   --get-started-bg: var(--ifm-font-color-base);
   --get-started: #ff1f69;
   --ifm-footer-color: #ffffff50;
   --ifm-heading-color: #ffffff;
-  --ifm-font-color-base: #ffffffdd; /* #c1c9d2; */
+  --ifm-font-color-base: #ffffffdd;
+  /* #c1c9d2; */
   --font-color-strong: #ffffff;
   --ifm-navbar-link-hover-color: #ffffff;
   --ifm-color-success-contrast-foreground: #cbf4c9;
@@ -301,7 +265,8 @@ h4 {
   --ifm-color-success-dark: #cbf4c9;
   --ifm-color-info-dark: #6c8eef;
   --ifm-color-info-contrast-background: #3c4257;
-  --ifm-table-stripe-background: #1a253c; /* #1a1d46; */
+  --ifm-table-stripe-background: #1a253c;
+  /* #1a1d46; */
   --ifm-color-secondary-contrast-background: #3c4257;
   --ifm-code-background: #3c4257;
   --ifm-alert-background-color: #92400e50;
@@ -312,8 +277,10 @@ h4 {
   --ifm-toc-border-color: rgba(135, 149, 161, 0.2);
   --ifm-table-border-color: rgba(135, 149, 161, 0.2);
   --ifm-card-background-color: #1a253c;
-  --card-background: #1a253c; /* #1a1d46; */
-  --list-background: #1a253c; /* #1a1d46; */
+  --card-background: #1a253c;
+  /* #1a1d46; */
+  --list-background: #1a253c;
+  /* #1a1d46; */
   --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
@@ -390,11 +357,11 @@ main .container img {
 .custom-rounded-email,
 .custom-rounded-storage,
 .custom-rounded-service {
-  background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+  background: linear-gradient(40deg, #ff2069 30%, #cc1a54);
 }
 
 .custom-rounded-split {
-  background: linear-gradient(40deg, #3b82f6, #4f46e5);
+  background: linear-gradient(40deg, #ff2069, #cc1a54);
 }
 
 .custom-rounded-texts,
@@ -523,12 +490,12 @@ p strong {
 }
 
 /* Sidebar Method labels */
-.api-method > .menu__link {
+.api-method>.menu__link {
   align-items: center;
   justify-content: start;
 }
 
-.api-method > .menu__link::before {
+.api-method>.menu__link::before {
   width: 50px;
   height: 20px;
   font-size: 12px;
@@ -543,42 +510,42 @@ p strong {
   flex-shrink: 0;
 }
 
-.get > .menu__link::before {
+.get>.menu__link::before {
   content: "get";
   background-color: var(--ifm-color-info-contrast-background);
   color: var(--ifm-color-info-contrast-foreground);
   border-color: var(--ifm-color-info-dark);
 }
 
-.post > .menu__link::before {
+.post>.menu__link::before {
   content: "post";
   background-color: var(--ifm-color-success-contrast-background);
   color: var(--ifm-color-success-contrast-foreground);
   border-color: var(--ifm-color-success-dark);
 }
 
-.delete > .menu__link::before {
+.delete>.menu__link::before {
   content: "del";
   background-color: var(--ifm-color-danger-contrast-background);
   color: var(--ifm-color-danger-contrast-foreground);
   border-color: var(--ifm-color-danger-dark);
 }
 
-.put > .menu__link::before {
+.put>.menu__link::before {
   content: "put";
   background-color: var(--ifm-color-warning-contrast-background);
   color: var(--ifm-color-warning-contrast-foreground);
   border-color: var(--ifm-color-warning-dark);
 }
 
-.patch > .menu__link::before {
+.patch>.menu__link::before {
   content: "patch";
   background-color: var(--ifm-color-success-contrast-background);
   color: var(--ifm-color-success-contrast-foreground);
   border-color: var(--ifm-color-success-dark);
 }
 
-.head > .menu__link::before {
+.head>.menu__link::before {
   content: "head";
   background-color: var(--ifm-color-secondary-contrast-background);
   color: var(--ifm-color-secondary-contrast-foreground);
@@ -604,7 +571,8 @@ p strong {
 
 .player-wrapper {
   position: relative;
-  padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  padding-top: 56.25%;
+  /* Player ratio: 100 / (1280 / 720) */
   margin-bottom: 2rem;
 }
 

@@ -3,6 +3,7 @@ import type { MDXComponents } from 'mdx/types';
 import { APIPage } from '@/components/api-page';
 import { Callout as FumaCallout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 const Callout = (props: any) => <FumaCallout {...props} />;
 
@@ -12,6 +13,8 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
     Callout,
     Tab,
     Tabs,
+    Step,
+    Steps,
     APIPage,
     ...components,
   };
