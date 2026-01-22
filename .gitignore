@@ -67,7 +67,7 @@ docs/docs/apis/proto
 **/.sass-cache
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
-zitadel-*-*
+/zitadel-*-*
 !apps/**/zitadel-*-*
 
 # local
