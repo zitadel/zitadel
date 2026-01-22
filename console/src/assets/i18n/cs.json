@@ -219,7 +219,7 @@
           "DC": "Když si pro svou organizaci nárokuješ doménu, uživatelé, kteří v názvu přihlášení nepoužívají tuto doménu, budou vyzváni ke změně svého přihlašovacího jména tak, aby odpovídalo nárokované doméně.",
           "INIT": "Když je uživatel vytvořen, obdrží e-mail s odkazem na nastavení svého hesla.",
           "PC": "Když uživatel změní své heslo, obdrží o tomto změně notifikaci, pokud máš tuto možnost povolenou v nastavení notifikací.",
-          "PL": "Když uživatel přidá metodu bezheslového přihlášení, musí ji aktivovat kliknutím na odkaz v e-mailu.",
+          "PL": "Když uživatel přidá metodu autentizace pomocí passkey, musí ji aktivovat kliknutím na odkaz v e-mailu.",
           "PR": "Když uživatel resetuje své heslo, obdrží e-mail s odkazem na nastavení nového hesla.",
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Přizpůsob si přihlašovací formulář.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Povoleno přihlášení pomocí uživatelského jména a hesla",
-            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí bezheslového přihlášení nebo pomocí externího poskytovatele identity."
+            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí autentizace pomocí passkey nebo pomocí externího poskytovatele identity."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Povolena registrace uživatelů",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchronní"
         },
         "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
+        "PAYLOAD_TYPE": "Typ obsahu",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Neurčeno",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifrovaný JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardní JSON payload s hlavičkou pro podpis a ověření.\nJWT: Payload je odeslán jako podepsané JWT. Ověření probíhá pomocí podpisu JWT.\nJWE: JWT je navíc zašifrován, aby se předešlo neoprávněnému přístupu k informacím v payloadu.",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Stav",
       "NAME": "Jméno",
       "EMPTY": "Není nastaveno žádné zařízení",
-      "TITLE": "Bezheslová autentizace",
-      "DESCRIPTION": "Přidat metody autentizace založené na WebAuthn pro přihlášení do ZITADEL bez hesla.",
+      "TITLE": "Autentizace pomocí Passkey",
+      "DESCRIPTION": "Přidat metody autentizace založené na WebAuthn pro přihlášení do ZITADEL pomocí Passkey.",
       "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
       "U2F": "Přidat metodu",
       "U2F_DIALOG_TITLE": "Ověřit autentizátor",
-      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše zařízení používané pro bezheslové přihlášení",
-      "U2F_SUCCESS": "Bezheslová autentizace úspěšně vytvořena!",
+      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro váš Passkey Login",
+      "U2F_SUCCESS": "Autentizace pomocí Passkey úspěšně vytvořena!",
       "U2F_ERROR": "Během nastavení došlo k chybě!",
       "U2F_NAME": "Název autentizátoru",
       "TYPE": {
         "0": "Nejsou definovány žádné MFA",
         "1": "Jednorázové heslo (OTP)",
-        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Žádný stav",
@@ -853,17 +861,17 @@
         "3": "Smazáno"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Odstranit metodu bezheslové autentizace",
-        "DELETE_DESCRIPTION": "Chystáte se odstranit metodu bezheslové autentizace. Jste si jisti?",
-        "ADD_TITLE": "Bezheslová autentizace",
-        "ADD_DESCRIPTION": "Vyberte jednu z dostupných možností pro vytvoření metody bezheslové autentizace.",
+        "DELETE_TITLE": "Odstranit Passkey",
+        "DELETE_DESCRIPTION": "Chystáte se odstranit Passkey. Jste si jisti?",
+        "ADD_TITLE": "Autentizace pomocí Passkey",
+        "ADD_DESCRIPTION": "Vyberte jednu z dostupných možností pro vytvoření Passkey.",
         "SEND_DESCRIPTION": "Pošlete si registrační odkaz na vaši e-mailovou adresu.",
         "SEND": "Odeslat registrační odkaz",
         "SENT": "E-mail byl úspěšně odeslán. Zkontrolujte vaši poštovní schránku pro pokračování v nastavení.",
         "QRCODE_DESCRIPTION": "Generovat QR kód pro skenování s jiným zařízením.",
         "QRCODE": "Generovat QR kód",
         "QRCODE_SCAN": "Skenovat tento QR kód pro pokračování v nastavení na vašem zařízení.",
-        "NEW_DESCRIPTION": "Použijte toto zařízení pro nastavení bezheslového přihlášení.",
+        "NEW_DESCRIPTION": "Použijte toto zařízení pro nastavení Passkey.",
         "NEW": "Přidat nové"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "Autentizační aplikace pro TOTP (časově omezené jednorázové heslo)",
       "OTP_DIALOG_TITLE": "Přidat OTP",
       "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí autentizační aplikace a zadejte kód níže pro ověření a aktivaci metody OTP.",
-      "U2F": "Otisk prstu, bezpečnostní klíče, Face ID a další",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Ověřit faktor",
       "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše univerzální vícefaktorové zařízení.",
       "U2F_SUCCESS": "Faktor úspěšně přidán!",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "Není definována žádná MFA",
         "1": "Jednorázové heslo (OTP)",
-        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Žádný stav",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Kód pro ověření e-mailu odeslán.",
       "OTPREMOVED": "OTP odstraněn.",
       "U2FREMOVED": "Faktor odstraněn.",
-      "PASSWORDLESSREMOVED": "Bezheslové přihlášení odstraněno.",
+      "PASSWORDLESSREMOVED": "Passkey odstraněn.",
       "INITIALPASSWORDSET": "Počáteční heslo nastaveno.",
       "PASSWORDNOTIFICATIONSENT": "Oznámení o změně hesla odesláno.",
       "PASSWORDCHANGED": "Heslo úspěšně změněno.",
@@ -1147,12 +1155,12 @@
       "MACHINEADDED": "Systémový uživatel vytvořen!",
       "DELETED": "Uživatel úspěšně smazán!",
       "UNLOCKED": "Uživatel úspěšně odemčen!",
-      "PASSWORDLESSREGISTRATIONSENT": "Odkaz pro registraci odeslán úspěšně.",
+      "PASSWORDLESSREGISTRATIONSENT": "Odkaz pro registraci Passkey odeslán úspěšně.",
       "SECRETGENERATED": "Tajemství úspěšně vygenerováno!",
       "SECRETREMOVED": "Tajemství úspěšně odstraněno!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Manažerské role v ZITADEL",
+      "TITLE": "Role správce ZITADEL",
       "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
       "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1600,7 +1609,7 @@
         "2": "Ověření e-mailem",
         "3": "Ověření telefonem",
         "4": "Resetování hesla",
-        "5": "Inicializace bez hesla",
+        "5": "Inicializace Passkey",
         "6": "Tajemství pomocí aplikace",
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
@@ -1679,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Oznámení",
       "DESCRIPTION": "Určuje, při jakých změnách budou odesílána oznámení.",
-      "PASSWORDCHANGE": "Změna hesla"
+      "PASSWORDCHANGE": "Heslo změněno"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Upravte si přihlašovací stránku podle svého stylu a změňte její chování.",
@@ -1796,7 +1805,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1828,10 +1838,10 @@
         "usernameChangeText": "Změna uživatelského jména",
         "verifyMfaOtpText": "Ověřit OTP",
         "verifyMfaU2fText": "Ověřit Univerzální druhý faktor",
-        "passwordlessPromptText": "Výzva k bezheslovému přístupu",
-        "passwordlessRegistrationDoneText": "Bezheslová registrace dokončena",
-        "passwordlessRegistrationText": "Bezheslová registrace",
-        "passwordlessText": "Bezheslový",
+        "passwordlessPromptText": "Výzva k Passkey",
+        "passwordlessRegistrationDoneText": "Registrace Passkey dokončena",
+        "passwordlessRegistrationText": "Registrace Passkey",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Přehled o externí registraci uživatelů"
       }
     },
@@ -1845,7 +1855,7 @@
         "VEO": "Ověření e-mailu OTP",
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
-        "PL": "Bezheslový",
+        "PL": "Passkey",
         "PC": "Změna hesla",
         "IU": "Pozvat uživatele"
       },
@@ -2382,8 +2392,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Bezheslové přihlášení",
-      "MULTIFACTORDESCRIPTION": "Definujte zde vaše vícefaktorové možnosti pro bezheslové ověřování.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definujte zde vaše vícefaktorové možnosti pro autentizaci pomocí Passkey.",
       "SECONDFACTORTITLE": "Vícefaktorové ověřování",
       "SECONDFACTORDESCRIPTION": "Definujte další možné faktory, kterými lze zabezpečit ověřování heslem."
     },
@@ -2403,12 +2413,12 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Neznámý",
-      "1": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Neznámý",
       "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
-      "2": "Otisk prstu, bezpečnostní klíče, Face ID a další",
+      "2": "Passkey",
       "3": "Jednorázové heslo e-mailem (Email OTP)",
       "4": "Jednorázové heslo SMS (SMS OTP)",
       "5": "Obnovovací kódy"
@@ -2425,7 +2435,7 @@
       "DESCRIPTION": "Pro ověření můžete vybrat předdefinované nebo vlastní vytvořené poskytovatele.",
       "SELECTIDPS": "Poskytovatelé identity"
     },
-    "PASSWORDLESS": "Přihlášení bez hesla",
+    "PASSWORDLESS": "Přihlášení pomocí Passkey",
     "PASSWORDLESSTYPE": {
       "0": "Nepovoleno",
       "1": "Povoleno"
@@ -2761,7 +2771,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

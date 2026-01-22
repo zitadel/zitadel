@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Kétfaktoros hitelesítés
   DescriptionPhone: Hozd létre a kétfaktoros hitelesítést. Add meg a telefonszámod a hitelesítéshez.
   DescriptionCode: Hozd létre a kétfaktoros hitelesítést. Add meg a kapott kódot a telefonszámod hitelesítéséhez.
+  CountryCodeLabel: Ország
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Szerkesztés
@@ -237,6 +238,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Nem
   Female: Nő
   Male: Férfi
@@ -281,6 +283,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Felhasználási feltételek
   TosConfirm: Elfogadom a
   TosLinkText: TOS
@@ -354,6 +357,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Eszköz engedélyezése
   UserCode:
@@ -402,8 +406,8 @@ Errors:
       NotFound: Profil nem található
       NotChanged: Profil nem változott
       Empty: Profil üres
-      FirstNameEmpty: A profilban a keresztnév üres
-      LastNameEmpty: A profilban a vezetéknév üres
+      FirstNameEmpty: A profilban az első név mező üres
+      LastNameEmpty: A profilban a vezetéknév mező üres
       IDMissing: Hiányzik a profil azonosító
     Email:
       NotFound: Email nem található

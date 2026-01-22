@@ -3,7 +3,6 @@ package actions
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -92,13 +91,13 @@ func Test_isHostBlocked(t *testing.T) {
 			name: "looked up failure",
 			fields: fields{
 				lookup: func(host string) ([]net.IP, error) {
-					return nil, errors.New("some error")
+					return nil, io.EOF
 				},
 			},
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
-			want: zerrors.ThrowInternal(nil, "ACTIO-4m9s2", "lookup failed"),
+			want: zerrors.ThrowInternal(io.EOF, "ACTIO-4m9s2", "lookup failed"),
 		},
 	}
 	for _, tt := range tests {

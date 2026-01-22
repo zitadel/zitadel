@@ -14,7 +14,7 @@ title: Objects
   - `nickName` *string*
   - `displayName` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) format
   - `email` *string*
   - `isEmailVerified` *boolean*
   - `phone` *string*
@@ -71,7 +71,7 @@ title: Objects
   - `displayName` *string*
   - `avatarKey` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) format
   - `gender` *number*  
     <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
   - `email` *string*
@@ -101,7 +101,7 @@ title: Objects
   - `nickName` *string*
   - `displayName` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) format
 - `email`
   - `email` *string*
   - `isEmailVerified` *boolean*
@@ -182,7 +182,7 @@ This object represents [the claims](../openidoauth/claims) which will be written
 - `email_verified` *bool*
 - `updated_at` *Number*
 
-Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects#role-settings) and your [application](../../guides/manage/console/applications#token-settings)
+Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects-overview#role-settings) and your [application](../../guides/manage/console/applications-overview#token-settings)
 
 ## user grant list
 

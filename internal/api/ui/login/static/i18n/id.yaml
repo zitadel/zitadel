@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Verifikasi 2 Faktor
   DescriptionPhone: 'Buat 2 faktor Anda. '
   DescriptionCode: 'Buat 2 faktor Anda. '
+  CountryCodeLabel: Negara
   PhoneLabel: Telepon
   CodeLabel: Kode
   EditButtonText: Sunting
@@ -237,6 +238,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -281,6 +283,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Syarat dan Ketentuan
   TosConfirm: Saya menerima itu
   TosLinkText: KL
@@ -354,6 +357,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:
@@ -403,7 +407,7 @@ Errors:
       NotChanged: Profil tidak berubah
       Empty: Profil kosong
       FirstNameEmpty: Nama depan di profil kosong
-      LastNameEmpty: Nama keluarga di profil kosong
+      LastNameEmpty: Nama belakang di profil kosong
       IDMissing: ID Profil tidak ada
     Email:
       NotFound: Email tidak ditemukan

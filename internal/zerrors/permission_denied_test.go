@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestPermissionDeniedError(t *testing.T) {
-	var err interface{} = new(zerrors.PermissionDeniedError)
-	_, ok := err.(zerrors.PermissionDenied)
-	assert.True(t, ok)
-}
+func TestPermissionDenied(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "PERMISSION_DENIED"
+	message := "you do not have permission"
 
-func TestThrowPermissionDeniedf(t *testing.T) {
-	err := zerrors.ThrowPermissionDeniedf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.PermissionDeniedError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowPermissionDenied", func(t *testing.T) {
+		err := zerrors.ThrowPermissionDenied(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsPermissionDenied(t *testing.T) {
-	err := zerrors.ThrowPermissionDenied(nil, "id", "msg")
-	ok := zerrors.IsPermissionDenied(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindPermissionDenied, zitadelErr.Kind)
 
-	err = errors.New("I am found!")
-	ok = zerrors.IsPermissionDenied(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowPermissionDeniedf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowPermissionDeniedf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindPermissionDenied, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsPermissionDenied", func(t *testing.T) {
+		err := zerrors.ThrowPermissionDenied(parentErr, id, message)
+		isPermissionDenied := zerrors.IsPermissionDenied(err)
+		assert.True(t, isPermissionDenied)
+	})
 }

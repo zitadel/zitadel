@@ -14,7 +14,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Message } from '@bufbuild/protobuf';
-import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition } from '@zitadel/proto/zitadel/action/v2/execution_pb';
 import { distinctUntilChanged, startWith, takeUntil } from 'rxjs/operators';
 import { CreateQueryResult } from '@tanstack/angular-query-experimental';
 import { toSignal } from '@angular/core/rxjs-interop';

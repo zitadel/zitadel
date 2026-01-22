@@ -2,8 +2,8 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/service-url";
+import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -17,13 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
+async function loadSessions({ serviceConfig }: { serviceConfig: ServiceConfig }) {
   const cookieIds = await getAllSessionCookieIds();
 
   if (cookieIds && cookieIds.length) {
-    const response = await listSessions({
-      serviceUrl,
-      ids: cookieIds.filter((id) => !!id) as string[],
+    const response = await listSessions({ serviceConfig, ids: cookieIds.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
   } else {
@@ -39,23 +37,19 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  let sessions = await loadSessions({ serviceUrl });
+  let sessions = await loadSessions({ serviceConfig });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
   });
 
   const params = new URLSearchParams();

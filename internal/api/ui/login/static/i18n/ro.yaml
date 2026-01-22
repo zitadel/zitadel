@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Verificare în 2 pași
   DescriptionPhone: Creează-ți autentificarea cu 2 factori. Introdu numărul tău de telefon pentru a-l verifica.
   DescriptionCode: Creează-ți autentificarea cu 2 factori. Introdu codul primit pentru a-ți verifica numărul de telefon.
+  CountryCodeLabel: Țară
   PhoneLabel: Telefon
   CodeLabel: Cod
   EditButtonText: Editează
@@ -267,6 +268,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Gen
   Female: Femeie
   Male: Bărbat
@@ -312,6 +314,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Termeni și condiții
   TosConfirm: Accept
   TosLinkText: TOS
@@ -391,6 +394,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Autorizare dispozitiv
   UserCode:

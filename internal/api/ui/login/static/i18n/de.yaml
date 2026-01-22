@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Zweitfaktor hinzufügen
   DescriptionPhone: Erstelle deinen Zweitfaktor. Gib deine Telefonnummer ein, um sie zu verifizieren.
   DescriptionCode: Erstelle deinen Zweitfaktor. Gib den erhaltenen Code ein, um deine Telefonnummer zu verifizieren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefonnummer
   CodeLabel: Code
   EditButtonText: Bearbeiten
@@ -266,6 +267,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -311,6 +313,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -390,6 +393,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:

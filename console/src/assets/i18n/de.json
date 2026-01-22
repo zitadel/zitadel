@@ -219,7 +219,7 @@
           "DC": "Wenn du eine Domain für deine Organisation beanspruchst, werden Benutzer, die diese Domain nicht in ihrem Anmeldenamen verwenden, aufgefordert, ihren Anmeldenamen zu ändern, um ihn an die beanspruchte Domain anzupassen.",
           "INIT": "Wenn ein Benutzer erstellt wird, erhält er eine E-Mail mit einem Link, um sein Passwort festzulegen.",
           "PC": "Wenn ein Benutzer sein Passwort ändert, erhält er eine Benachrichtigung über die Änderung, wenn du dies in den Benachrichtigungseinstellungen aktiviert hast.",
-          "PL": "Wenn ein Benutzer eine passwortlose Authentifizierungsmethode hinzufügt, muss er sie aktivieren, indem er auf einen Link in einer E-Mail klickt.",
+          "PL": "Wenn ein Benutzer eine Passkey Authentifizierungsmethode hinzufügt, muss er sie aktivieren, indem er auf einen Link in einer E-Mail klickt.",
           "PR": "Wenn ein Benutzer sein Passwort zurücksetzt, erhält er eine E-Mail mit einem Link, um ein neues Passwort festzulegen.",
           "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
           "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Passe das Login-Formular an.",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Benutzername und Passwort erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit passwortloser Authentifizierung oder einem externen Identitätsanbieter einloggen."
+            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit Passkey Authentifizierung oder einem externen Identitätsanbieter einloggen."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Benutzerregistrierung erlaubt",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchron"
         },
         "TYPES_DESCRIPTION": "Webhook, der Aufruf verarbeitet den Statuscode, aber die Antwort ist irrelevant\nCall, der Aufruf verarbeitet den Statuscode und die Antwort\nAsync, der Aufruf verarbeitet weder Statuscode noch Antwort, kann aber parallel zu anderen Zielen aufgerufen werden",
+        "PAYLOAD_TYPE": "Payload-Typ",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nicht angegeben",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Verschlüsseltes JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard-JSON-Payload mit einem Signatur-Header zur Verifikation.\nJWT: Der Payload wird als signiertes JWT gesendet. Die Verifikation erfolgt über die JWT-Signatur.\nJWE: Das JWT wird zusätzlich verschlüsselt, um unautorisierten Zugriff auf die Payloadinformationen zu verhindern.",
         "ENDPOINT": "Endpunkt",
         "ENDPOINT_DESCRIPTION": "Geben Sie den Endpunkt ein, an dem Ihr Code gehostet wird. Stellen Sie sicher, dass er für uns zugänglich ist!",
         "TIMEOUT": "Timeout",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Status",
       "NAME": "Name",
       "EMPTY": "Kein Gerät definiert",
-      "TITLE": "Passwortlose Authentifizierungsmethoden",
-      "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
+      "TITLE": "Passkey Authentifizierungsmethoden",
+      "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich mit einem Passkey anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "U2F": "Methode hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
-      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
-      "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
+      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Passkey Login an.",
+      "U2F_SUCCESS": "Passkey Authentifizierung erfolgreich erstellt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "One Time Password (OTP)",
-        "2": "Fingerabdruck, Security Keys, Face ID und andere"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Kein Status",
@@ -853,17 +861,17 @@
         "3": "Gelöscht"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Passwortlose Authentifizierung entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
-        "ADD_TITLE": "Passwortlose Authentifizierung",
-        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
+        "DELETE_TITLE": "Passkey Authentifizierung entfernen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passkey Authentifizierungsmethode zu entfernen. Sind sie sicher?",
+        "ADD_TITLE": "Passkey Authentifizierung",
+        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer Passkey Authentifizierungsmethode.",
         "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre E-Mail Adresse.",
         "SEND": "Registrierungslink senden",
         "SENT": "Die E-Mail wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach, um mit dem Setup fortzufahren.",
         "QRCODE_DESCRIPTION": "QR-Code zum Scannen mit einem anderen Gerät generieren.",
         "QRCODE": "QR-Code generieren",
         "QRCODE_SCAN": "Scannen Sie diesen QR-Code, um mit dem Setup auf Ihrem Gerät fortzufahren.",
-        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwortlos aufzusetzen.",
+        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um einen Passkey aufzusetzen.",
         "NEW": "Hinzufügen"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "Authentikator App für TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-      "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
       "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
-        "2": "Fingerabdruck, Security Key, Face ID oder andere"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Kein Status",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Bestätigungscode per E-Mail gesendet.",
       "OTPREMOVED": "OTP entfernt.",
       "U2FREMOVED": "Faktor entfernt.",
-      "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
+      "PASSWORDLESSREMOVED": "Passkey entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
       "PASSWORDNOTIFICATIONSENT": "Passwortänderung mitgeteilt.",
       "PASSWORDCHANGED": "Passwort geändert.",
@@ -1147,12 +1155,12 @@
       "MACHINEADDED": "Service-Benutzer erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link via E-Mail versendet.",
+      "PASSWORDLESSREGISTRATIONSENT": "Passkey Registrierungslink via E-Mail versendet.",
       "SECRETGENERATED": "Secret erfolgreich generiert!",
       "SECRETREMOVED": "Secret erfolgreich gelöscht!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager-Rollen",
+      "TITLE": "ZITADEL-Administratorrollen",
       "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
       "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
       "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1600,7 +1609,7 @@
         "2": "Email Verifikationscode",
         "3": "Telefonnummer Verifikationscode",
         "4": "Passwort Zurücksetzen Code",
-        "5": "Passwordless Initialisierungscode",
+        "5": "Passkey Initialisierungscode",
         "6": "Applicationssecret",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
@@ -1679,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "Benachrichtigung",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
-      "PASSWORDCHANGE": "Passwortänderung"
+      "PASSWORDCHANGE": "Passwort geändert"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
@@ -1796,7 +1805,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1828,10 +1838,10 @@
         "usernameChangeText": "Benutzernamenwechsel",
         "verifyMfaOtpText": "OTP Verifikation",
         "verifyMfaU2fText": "Universeller Zweitfaktor Verifikation",
-        "passwordlessPromptText": "Passwortlos Aufforderung",
-        "passwordlessRegistrationDoneText": "Passwortlos setzen erfolgreich",
-        "passwordlessRegistrationText": "Passwortlos Registrierung",
-        "passwordlessText": "Passwortlos",
+        "passwordlessPromptText": "Passkey Aufforderung",
+        "passwordlessRegistrationDoneText": "Passkey setzen erfolgreich",
+        "passwordlessRegistrationText": "Passkey Registrierung",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Externe Registrierung Benutzer Übersicht"
       }
     },
@@ -1845,7 +1855,7 @@
         "VEO": "E-Mail-OTP überprüfen",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwortlos",
+        "PL": "Passkey",
         "PC": "Passwordwechsel",
         "IU": "Benutzer einladen"
       },
@@ -2315,8 +2325,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Vorname-Attribut",
+    "LASTNAMEATTRIBUTE": "Nachname-Attribut",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2373,8 +2383,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Passwordless",
-      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Passwortlose Authentifizierung verwenden können.",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Passkey Authentifizierung verwenden können.",
       "SECONDFACTORTITLE": "Multifaktor Authentifizierung",
       "SECONDFACTORDESCRIPTION": "Definieren Sie hier weitere mögliche Faktoren, mit dem die sie Ihre Passwordauthentifizierung absichern können."
     },
@@ -2394,12 +2404,12 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "Fingerabdruck, Security Keys, Face ID und andere"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
       "1": "One Time Password per Authenticator App (TOTP)",
-      "2": "Fingerabdruck, Security Keys, Face ID und andere",
+      "2": "Passkey",
       "3": "One Time Password per Email (Email OTP)",
       "4": "One Time Password per SMS (SMS OTP)",
       "5": "Wiederherstellungscodes"
@@ -2416,7 +2426,7 @@
       "DESCRIPTION": "Sie können vordefinierte oder selbsterstellten Provider auswählen",
       "SELECTIDPS": "Identitätsanbieter"
     },
-    "PASSWORDLESS": "Passwortloser Login",
+    "PASSWORDLESS": "Passkey Login",
     "PASSWORDLESSTYPE": {
       "0": "Nicht erlaubt",
       "1": "Erlaubt"
@@ -2752,7 +2762,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

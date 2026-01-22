@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalUserDescription: Login with an external user.
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
   RegisterButtonText: Register
   NextButtonText: Next
 
@@ -26,7 +26,7 @@ SelectAccount:
   OtherUser: Other User
   SessionState0: active
   SessionState1: Signed out
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
 
 Password:
   Title: Password
@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verification
   DescriptionPhone: Create your 2-factor. Enter your phone number to verify it.
   DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
+  CountryCodeLabel: Country
   PhoneLabel: Phone
   CodeLabel: Code
   EditButtonText: Edit
@@ -244,8 +245,8 @@ RegistrationUser:
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   LanguageLabel: Language
   German: Deutsch
   English: English
@@ -267,6 +268,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -287,8 +289,8 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You may now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   NicknameLabel: Nickname
   PhoneLabel: Phone number
   LanguageLabel: Language
@@ -312,6 +314,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -327,8 +330,8 @@ RegistrationOrg:
   OrgNameLabel: Organization name
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
+  FirstnameLabel: First name
+  LastnameLabel: Last name
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
   TosAndPrivacyLabel: Terms and conditions
@@ -391,6 +394,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 DeviceAuth:
   Title: Device Authorization
   UserCode:
@@ -442,8 +446,8 @@ Errors:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: Given name in profile is empty
-      LastNameEmpty: Family name in profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found

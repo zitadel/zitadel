@@ -21,7 +21,7 @@ At this time Google supports SSO with OpenID Connect only for few providers.
 Prerequisites:
 
 - You need to have a domain registered with your Google Workspace account to configure SSO profiles
-- Make sure that you [verify the same domain also in your ZITADEL organization and set it as primary domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain)
+- Make sure that you [verify the same domain also in your ZITADEL organization and set it as primary domain](/docs/guides/manage/console/organizations-overview#primary-domain)
 - A user in Google Workspace (eg, road.runner@acme.com)
 - A user in ZITADEL with the same username (eg, road.runner@acme.com); make sure you verify the domain to set the username. This is different than the user's email address
 
@@ -39,7 +39,7 @@ Download the public certificate from your ZITADEL instance by requesting `${CUST
  wget ${CUSTOM_DOMAIN}/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `${CUSTOM_DOMAIN}` with your custom domain.
+Always replace `${CUSTOM_DOMAIN}` with your Custom Domain.
 
 Use the following configuration
 
@@ -119,24 +119,24 @@ Open the Google settings for [SSO with third-party IdP](https://admin.google.com
 
 ![SSO with third-party IdP](/img/guides/integrate/services/google-workspace-sso-overview.png)
 
-Download the public certificate from your ZITADEL instance by requesting `$YOUR_DOMAIN/saml/v2/certificate`
+Download the public certificate from your ZITADEL instance by requesting `${CUSTOM_DOMAIN}/saml/v2/certificate`
 
 ```bash
- wget $YOUR_DOMAIN/saml/v2/certificate -O idp.crt
+ wget ${CUSTOM_DOMAIN}/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$YOUR_DOMAIN` with your custom domain.
+Always replace `${CUSTOM_DOMAIN}` with your Custom Domain.
 
 Use the following configuration
 
-| Setting | Value |
-| --- | --- |
-| SSO profile name | ZITADEL SSO |
-| IDP entity ID | $YOUR_DOMAIN/saml/v2/metadata |
-| Sign-in page URL | $YOUR_DOMAIN/saml/v2/SSO |
-| Sign-out page URL | $YOUR_DOMAIN/saml/v2/SLO |
-| Change password URL | $YOUR_DOMAIN/ui/console/users/me?id=security |
-| Verification Certificate | Upload the certificate (idp.crt) |
+| Setting                  | Value                                              |
+|--------------------------|----------------------------------------------------|
+| SSO profile name         | ZITADEL SSO                                        |
+| IDP entity ID            | `${CUSTOM_DOMAIN}`/saml/v2/metadata                |
+| Sign-in page URL         | `${CUSTOM_DOMAIN}`/saml/v2/SSO                     |
+| Sign-out page URL        | `${CUSTOM_DOMAIN}`/saml/v2/SLO                     |
+| Change password URL      | `${CUSTOM_DOMAIN}`/ui/console/users/me?id=security |
+| Verification Certificate | Upload the certificate (idp.crt)                   |
 
 Now go ahead and click *SAVE*
 

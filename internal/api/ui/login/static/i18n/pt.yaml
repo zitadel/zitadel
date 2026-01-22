@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: próximo
   CancelButtonText: cancelar
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificação de 2 fatores
   DescriptionPhone: Crie sua verificação de 2 fatores. Digite seu número de telefone para verificá-lo.
   DescriptionCode: Crie sua verificação de 2 fatores. Digite o código recebido para verificar seu número de telefone.
+  CountryCodeLabel: País
   PhoneLabel: Número de telefone
   CodeLabel: Código
   EditButtonText: editar
@@ -263,6 +264,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -308,6 +310,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -387,6 +390,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 
 DeviceAuth:
   Title: Autorização de dispositivo

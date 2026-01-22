@@ -20,6 +20,7 @@ import localeHu from '@angular/common/locales/hu';
 import localeKo from '@angular/common/locales/ko';
 import localeRo from '@angular/common/locales/ro';
 import localeTr from '@angular/common/locales/tr';
+import localeUk from '@angular/common/locales/uk';
 import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -74,8 +75,8 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
 import { PosthogService } from './services/posthog.service';
-import { NewHeaderComponent } from './modules/new-header/new-header.component';
-import { provideTanStackQuery, QueryClient, withDevtools } from '@tanstack/angular-query-experimental';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { provideNgIconsConfig } from '@ng-icons/core';
 
@@ -119,6 +120,8 @@ registerLocaleData(localeRo);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ro.json'));
 registerLocaleData(localeTr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/tr.json'));
+registerLocaleData(localeUk);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/uk.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -177,7 +180,6 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
-    NewHeaderComponent,
     CdkOverlayOrigin,
   ],
   providers: [
@@ -249,10 +251,7 @@ const authConfig: AuthConfig = {
     LanguagesService,
     PosthogService,
     { provide: 'windowObject', useValue: window },
-    provideTanStackQuery(
-      new QueryClient(),
-      withDevtools(() => ({ loadDevtools: 'auto' })),
-    ),
+    provideTanStackQuery(new QueryClient(), withDevtools()),
     provideNgIconsConfig({
       size: '1rem',
     }),

@@ -4,8 +4,8 @@ import { LoginOTP } from "@/components/login-otp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getOriginalHost } from "@/lib/server/host";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getPublicHost } from "@/lib/server/host";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getSession } from "@/lib/zitadel";
 import { Metadata } from "next";
@@ -25,8 +25,8 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const host = getPublicHost(_headers);
 
   const {
     loginName, // send from password page
@@ -40,18 +40,16 @@ export default async function Page(props: {
 
   const session = sessionId
     ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
-      });
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -60,12 +58,12 @@ export default async function Page(props: {
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
-    serviceUrl,
+    serviceConfig,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
-    serviceUrl,
+    serviceConfig,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 

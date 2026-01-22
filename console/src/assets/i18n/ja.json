@@ -219,7 +219,7 @@
           "DC": "組織のドメインを主張すると、そのドメインをログイン名に使用していないユーザーは、主張されたドメインに合わせてログイン名を変更するよう促されます。",
           "INIT": "ユーザーが作成されると、パスワードを設定するリンクが記載されたメールを受け取ります。",
           "PC": "ユーザーがパスワードを変更すると、通知設定でこれを有効にした場合、変更に関する通知を受け取ります。",
-          "PL": "ユーザーがパスワードレス認証方法を追加すると、メールのリンクをクリックしてそれをアクティブにする必要があります。",
+          "PL": "ユーザーがパスキー認証方法を追加すると、メールのリンクをクリックしてそれをアクティブにする必要があります。",
           "PR": "ユーザーがパスワードをリセットすると、新しいパスワードを設定するリンクが記載されたメールを受け取ります。",
           "VE": "ユーザーがメールアドレスを変更すると、新しいアドレスを検証するリンクが記載されたメールを受け取ります。",
           "VP": "ユーザーが電話番号を変更すると、新しい番号を検証するコードが記載されたSMSを受け取ります。",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "ログインフォームをカスタマイズします。",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "ユーザー名とパスワードが許可",
-            "DESCRIPTION": "ユーザーがユーザー名とパスワードでログインできるようにします。これが無効になっている場合、ユーザーはパスワードレス認証または外部IDプロバイダーを使用してのみログインできます。"
+            "DESCRIPTION": "ユーザーがユーザー名とパスワードでログインできるようにします。これが無効になっている場合、ユーザーはパスキー認証または外部IDプロバイダーを使用してのみログインできます。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "ユーザー登録が許可",
@@ -623,6 +623,14 @@
           "restAsync": "REST 非同期"
         },
         "TYPES_DESCRIPTION": "Webhook、呼び出しはステータスコードを処理しますが、応答は無関係です\nCall、呼び出しはステータスコードと応答を処理します\nAsync、呼び出しはステータスコードも応答も処理しませんが、他のターゲットと並行して呼び出すことができます",
+        "PAYLOAD_TYPE": "ペイロードの種類",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "暗号化された JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 検証用の署名ヘッダーを持つ標準の JSON ペイロード。\nJWT: ペイロードは署名付き JWT として送信されます。検証は JWT の署名で行われます。\nJWE: JWT はさらに暗号化され、ペイロード情報への不正アクセスを防ぎます。",
         "ENDPOINT": "エンドポイント",
         "ENDPOINT_DESCRIPTION": "コードがホストされているエンドポイントを入力します。アクセス可能であることを確認してください。",
         "TIMEOUT": "タイムアウト",
@@ -832,19 +840,19 @@
       "TABLESTATE": "ステータス",
       "NAME": "名前",
       "EMPTY": "デバイスセットはありません",
-      "TITLE": "パスワードレス認証",
-      "DESCRIPTION": "WebAuthnベースの認証方法を追加して、ZITADELにパスワードレスでログオンします。",
+      "TITLE": "パスキー認証",
+      "DESCRIPTION": "WebAuthnベースの認証方法を追加して、ZITADELにパスキーでログオンします。",
       "MANAGE_DESCRIPTION": "二段階認証を管理する。",
       "U2F": "認証方法を追加する",
       "U2F_DIALOG_TITLE": "Authenticatorの認証",
-      "U2F_DIALOG_DESCRIPTION": "使用済みのパスワードレスログインの名前を入力する",
-      "U2F_SUCCESS": "パスワードレス認証が正常に作成されました！",
+      "U2F_DIALOG_DESCRIPTION": "使用済みのパスキーログインの名前を入力する",
+      "U2F_SUCCESS": "パスキー認証が正常に作成されました！",
       "U2F_ERROR": "セットアップ中のエラーが発生しました！",
       "U2F_NAME": "認証者名",
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",
-        "2": "指紋、セキュリティキー、フェイスIDなど"
+        "2": "パスキー"
       },
       "STATE": {
         "0": "状態なし",
@@ -853,17 +861,17 @@
         "3": "削除"
       },
       "DIALOG": {
-        "DELETE_TITLE": "パスワードレス認証の削除",
-        "DELETE_DESCRIPTION": "パスワードレス認証を削除しようとしています。本当によろしいですか？",
-        "ADD_TITLE": "パスワードレス認証",
-        "ADD_DESCRIPTION": "パスワードレス認証方法を作成するための、利用可能なオプションのいずれかを選択する。",
+        "DELETE_TITLE": "パスキー認証の削除",
+        "DELETE_DESCRIPTION": "パスキー認証を削除しようとしています。本当によろしいですか？",
+        "ADD_TITLE": "パスキー認証",
+        "ADD_DESCRIPTION": "パスキー認証方法を作成するための、利用可能なオプションのいずれかを選択する。",
         "SEND_DESCRIPTION": "メールアドレスに登録リンクを送信する。",
         "SEND": "登録リンクを送信する",
         "SENT": "メールは正常に配信されました。セットアップを続行するには、メールボックスを確認してください。",
         "QRCODE_DESCRIPTION": "別のデバイスでスキャンするためのQRコードを生成する。",
         "QRCODE": "QRコードを生成する",
         "QRCODE_SCAN": "このQRコードをスキャンして、デバイスのセットアップを続行する。",
-        "NEW_DESCRIPTION": "このデバイスを使用して、パスワードレス認証をセットアップする。",
+        "NEW_DESCRIPTION": "このデバイスを使用して、パスキー認証をセットアップする。",
         "NEW": "新規追加"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "TOTP用認証アプリ（ワンタイム・パスワード）",
       "OTP_DIALOG_TITLE": "OTPの追加",
       "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
-      "U2F": "指紋、セキュリティキー、フェイスIDなど",
+      "U2F": "パスキー",
       "U2F_DIALOG_TITLE": "二要素認証の検証",
       "U2F_DIALOG_DESCRIPTION": "使用済みの二要素認証の名前を入力する。",
       "U2F_SUCCESS": "二要素認証が正常に追加されました！",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",
-        "2": "指紋、セキュリティキー、フェイスIDなど"
+        "2": "パスキー"
       },
       "STATE": {
         "0": "状態なし",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "メールアドレス認証コードが送信されました。",
       "OTPREMOVED": "OTPが削除されました",
       "U2FREMOVED": "要素認証が削除されました。",
-      "PASSWORDLESSREMOVED": "パスワードレス認証が削除削除。",
+      "PASSWORDLESSREMOVED": "パスキー認証が削除削除。",
       "INITIALPASSWORDSET": "初期パスワードがセットされました。",
       "PASSWORDNOTIFICATIONSENT": "パスワード変更通知が送信されました。",
       "PASSWORDCHANGED": "パスワードは正常に変更されました。",
@@ -1546,7 +1554,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       }
     },
     "SMTP": {
@@ -1600,7 +1609,7 @@
         "2": "メール認証",
         "3": "電話番号認証",
         "4": "パスワードのリセット",
-        "5": "パスワードレスの初期設定",
+        "5": "パスキーの初期設定",
         "6": "アプリのシークレット",
         "7": "ワンタイムパスワード (OTP) - SMS",
         "8": "ワンタイムパスワード (OTP) - 電子メール"
@@ -1679,7 +1688,7 @@
     "NOTIFICATION": {
       "TITLE": "通知",
       "DESCRIPTION": "どのような変更に対して、どのような通知を行うかを決定します。",
-      "PASSWORDCHANGE": "パスワードの変更"
+      "PASSWORDCHANGE": "パスワードが変更されました"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "ログインをパーソナライズされた動作に変更します。",
@@ -1796,7 +1805,8 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1828,10 +1838,10 @@
         "usernameChangeText": "ユーザー名の変更",
         "verifyMfaOtpText": "OTPを認証する",
         "verifyMfaU2fText": "ユニバーサルの二要素認証を承認する",
-        "passwordlessPromptText": "パスワードレスプロンプト",
-        "passwordlessRegistrationDoneText": "パスワードレス登録が完了しました",
-        "passwordlessRegistrationText": "パスワードレス登録",
-        "passwordlessText": "パスワードレス",
+        "passwordlessPromptText": "パスキープロンプト",
+        "passwordlessRegistrationDoneText": "パスキー登録が完了しました",
+        "passwordlessRegistrationText": "パスキー登録",
+        "passwordlessText": "パスキー",
         "externalRegistrationUserOverviewText": "外部登録ユーザーの概要"
       }
     },
@@ -1845,7 +1855,7 @@
         "VEO": "メールOTPを確認する",
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
-        "PL": "パスワードレス",
+        "PL": "パスキー",
         "PC": "パスワードの変更",
         "IU": "ユーザーの招待"
       },
@@ -2322,8 +2332,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "名の属性",
+    "LASTNAMEATTRIBUTE": "姓の属性",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2395,8 +2405,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "パスワードレス",
-      "MULTIFACTORDESCRIPTION": "ここでパスワードレス認証のための多要素認証を定義します。",
+      "MULTIFACTORTITLE": "パスキー",
+      "MULTIFACTORDESCRIPTION": "ここでパスキー認証のための多要素認証を定義します。",
       "SECONDFACTORTITLE": "多要素認証",
       "SECONDFACTORDESCRIPTION": "パスワード認証を保護できるさらに多要素認証を定義します。"
     },
@@ -2416,12 +2426,12 @@
     "TYPE": "タイプ",
     "MULTIFACTORTYPES": {
       "0": "不明",
-      "1": "指紋、セキュリティキー、フェイスIDなど"
+      "1": "パスキー"
     },
     "SECONDFACTORTYPES": {
       "0": "不明",
       "1": "認証アプリ用ワンタイムパスワード(TOTP)",
-      "2": "指紋、セキュリティキー、フェイスIDなど",
+      "2": "パスキー",
       "3": "Eメール用ワンタイムパスワード（email OTP）",
       "4": "SMS用ワンタイムパスワード（SMS OTP）",
       "5": "リカバリーコード"
@@ -2438,7 +2448,7 @@
       "DESCRIPTION": "認証に使用するプロバイダーは、あらかじめ定義されたものと自分で作成したものを選択できます。",
       "SELECTIDPS": "IDプロバイダー"
     },
-    "PASSWORDLESS": "パスワードレスログイン",
+    "PASSWORDLESS": "パスキーログイン",
     "PASSWORDLESSTYPE": {
       "0": "無効",
       "1": "有効"
@@ -2778,7 +2788,8 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

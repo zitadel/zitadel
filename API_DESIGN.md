@@ -206,7 +206,7 @@ In this case, the settings could share the same `SettingsContext` message to det
 But do not create a global `Context` message that is used across the whole API if there are different scenarios and different fields required for the context.  
 The same applies to messages that are returned by multiple resources.  
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
-as part of an authorization or a manager role, where only limited information is needed.
+as part of an authorization or an administrator role, where only limited information is needed.
 
 On the other hand, types that always follow the same pattern and are used in multiple resources, such as `IDFilter`, `TimestampFilter` or `InIDsFilter` SHOULD be globalized and reused.
 
@@ -269,6 +269,30 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Verify` for verifying a resource.
 - `Send` for sending a resource.
 - etc.
+
+#### REST Path
+
+Paths of operations MUST be structured as follows:
+
+| Operation     | Method | Path                                     |
+|---------------|--------|------------------------------------------|
+| Create/Add    | POST   | /\<version\>/\<resource\>                |
+| Update        | POST   | /\<version\>/\<resource\>/\<identifier\> |
+| Delete/Remove | DELETE | /\<version\>/\<resource\>/\<identifier\> |
+| Set           | PUT    | /\<version\>/\<resource\>                |
+| Get           | GET    | /\<version\>/\<resource\>/\<identifier\> |
+| List          | POST   | /\<version\>/\<resource\>/search         |
+
+Which results in an example path for operations like `/v2beta/users/search`.
+
+Paths of status changes on resources MUST be structured as follows:
+
+| Operation  | Method | Path                                                |
+|------------|--------|-----------------------------------------------------|
+| Activate   | POST   | /\<version\>/\<resource\>/\<identifier\>/activate   |
+| Deactivate | POST   | /\<version\>/\<resource\>/\<identifier\>/deactivate |
+
+Which results in an example path for status changes like `/v2beta/users/1234567890/activate`.
 
 ## Authentication and Authorization
 

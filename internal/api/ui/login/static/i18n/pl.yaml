@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: dalej
   CancelButtonText: anuluj
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Weryfikacja 2-etapowa
   DescriptionPhone: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź swój numer telefonu, aby go zweryfikować.
   DescriptionCode: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź otrzymany kod, aby zweryfikować swój numer telefonu.
+  CountryCodeLabel: Kraj
   PhoneLabel: Numer telefonu
   CodeLabel: Kod
   EditButtonText: edytować
@@ -267,6 +268,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -312,6 +314,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -391,6 +394,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
 
 DeviceAuth:
   Title: Autoryzacja urządzenia
