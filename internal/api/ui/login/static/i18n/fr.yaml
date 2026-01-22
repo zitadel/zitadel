@@ -269,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -315,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -395,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
 
 DeviceAuth:
   Title: Autorisation de l'appareil

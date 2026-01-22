@@ -39,7 +39,7 @@ export const LANGS: Lang[] = [
   {
     name: "Русский",
     code: "ru",
-  },  
+  },
   {
     name: "Türkçe",
     code: "tr",
@@ -51,6 +51,10 @@ export const LANGS: Lang[] = [
   {
     name: "Українська",
     code: "uk",
+  },
+  {
+    name: "Hrvatski",
+    code: "hr",
   },
 ];
 

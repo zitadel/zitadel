@@ -269,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   GenderLabel: Cinsiyet
   Female: Kadın
   Male: Erkek
@@ -315,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
   TosAndPrivacyLabel: Şartlar ve koşullar
   TosConfirm: Kabul ediyorum
   TosLinkText: Kullanım Şartları
@@ -395,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Croatian: Hrvatski
 DeviceAuth:
   Title: Cihaz Yetkilendirme
   UserCode:
