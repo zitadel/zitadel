@@ -42,6 +42,15 @@ const generateServiceDocs = (service: string, filename?: string, version: string
     output: `./content/docs/reference/api/${service}`,
     includeDescription: true,
   });
+
+  const indexPath = join(process.cwd(), `./content/docs/reference/api/${service}/index.mdx`);
+  const content = `---
+title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
+---
+
+API Reference for ${service}
+`;
+  writeFileSync(indexPath, content);
 };
 
 services.forEach(service => generateServiceDocs(service));
@@ -57,6 +66,15 @@ const generateUserSchemaDocs = () => {
     output: './content/docs/reference/api/user_schema',
     includeDescription: true,
   });
+
+  const indexPath = join(process.cwd(), './content/docs/reference/api/user_schema/index.mdx');
+  const content = `---
+title: User Schema API
+---
+
+API Reference for User Schema
+`;
+  writeFileSync(indexPath, content);
 };
 generateUserSchemaDocs();
 
@@ -89,6 +107,15 @@ const generateV1ServiceDocs = (service: string) => {
     output: `./content/docs/reference/api-v1/${service}`,
     includeDescription: true,
   });
+
+  const indexPath = join(process.cwd(), `./content/docs/reference/api-v1/${service}/index.mdx`);
+  const content = `---
+title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
+---
+
+API Reference for ${service}
+`;
+  writeFileSync(indexPath, content);
 };
 
 v1Services.forEach(service => generateV1ServiceDocs(service));
