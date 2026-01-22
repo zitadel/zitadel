@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const TEXT_EXTENSIONS = ['.yaml', '.conf', '.txt', '.json'];
+const TEXT_EXTENSIONS = ['.yaml', '.yml', '.conf', '.txt', '.json', '.caddyfile', '.go'];
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico', '.bmp'];
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less'];
 
@@ -13,6 +13,8 @@ export async function load(url, context, nextLoad) {
   }
 
   const u = new URL(url);
+  const ext = path.extname(u.pathname).toLowerCase();
+  // console.log(`[Loader] Loading: ${url}, ext: ${ext}`);
   
   // Handle ?raw imports
   if (u.searchParams.has('raw')) {
@@ -25,8 +27,6 @@ export async function load(url, context, nextLoad) {
       source: `export default ${JSON.stringify(content)};`,
     };
   }
-  
-  const ext = path.extname(u.pathname).toLowerCase();
   
   if (TEXT_EXTENSIONS.includes(ext)) {
     u.search = '';
@@ -61,5 +61,19 @@ export async function load(url, context, nextLoad) {
     };
   }
   
-  return nextLoad(url, context);
+  // Try to use nextLoad, but if it fails for YAML, it's likely because it's from root
+  try {
+    return await nextLoad(url, context);
+  } catch (err) {
+    if (ext === '.yaml' || ext === '.yml') {
+        const filePath = fileURLToPath(u);
+        const content = await readFile(filePath, 'utf8');
+        return {
+          format: 'module',
+          shortCircuit: true,
+          source: `export default ${JSON.stringify(content)};`,
+        };
+    }
+    throw err;
+  }
 }
