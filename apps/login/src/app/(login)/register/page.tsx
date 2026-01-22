@@ -93,7 +93,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {legal &&
           passwordComplexitySettings &&
           organization &&
-          (loginSettings.allowUsernamePassword || loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+          loginSettings.allowLocalAuthentication && (
             <RegisterForm
               idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               legal={legal}
