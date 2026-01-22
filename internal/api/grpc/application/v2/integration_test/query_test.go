@@ -484,7 +484,7 @@ func TestListApplications(t *testing.T) {
 			},
 		},
 		{
-			testName: "when filtering by clientID should return matching API app only",
+			testName: "when filtering by clientID should return matching OIDC app only",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
 				Pagination: &filter.PaginationRequest{Asc: true},
@@ -515,7 +515,7 @@ func TestListApplications(t *testing.T) {
 			},
 		},
 		{
-			testName: "when filtering by clientID should return matching OIDC app only",
+			testName: "when filtering by clientID should return matching API app only",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &application.ListApplicationsRequest{
 				Pagination: &filter.PaginationRequest{Asc: true},
@@ -527,7 +527,7 @@ func TestListApplications(t *testing.T) {
 					},
 				},
 			},
-			expectedOrderedList: []appWithName{{name: oidcAppName, app: createdApiApp}},
+			expectedOrderedList: []appWithName{{name: apiAppName, app: createdApiApp}},
 			expectedOrderedKeys: func(apps []appWithName) any {
 				creationDates := make([]time.Time, len(apps))
 				for i, a := range apps {
@@ -558,7 +558,7 @@ func TestListApplications(t *testing.T) {
 					},
 				},
 			},
-			expectedOrderedList: []appWithName{{name: oidcAppName, app: createdSAMLApp}},
+			expectedOrderedList: []appWithName{{name: samlAppName, app: createdSAMLApp}},
 			expectedOrderedKeys: func(apps []appWithName) any {
 				creationDates := make([]time.Time, len(apps))
 				for i, a := range apps {
