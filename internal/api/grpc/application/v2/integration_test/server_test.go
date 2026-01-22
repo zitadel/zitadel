@@ -80,8 +80,9 @@ func samlMetadataGen(entityID string) []byte {
 	return []byte(str)
 }
 
-func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *application.CreateApplicationResponse, string) {
-	samlMetas := samlMetadataGen(integration.URL())
+func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *application.CreateApplicationResponse, string, string) {
+	entityID := integration.URL()
+	samlMetas := samlMetadataGen(entityID)
 	appName := integration.ApplicationName()
 
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.ApplicationV2.CreateApplication(IAMOwnerCtx, &application.CreateApplicationRequest{
@@ -104,11 +105,11 @@ func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *ap
 	})
 	require.Nil(t, appSAMLConfigChangeErr)
 
-	return samlMetas, appForSAMLConfigChange, appName
+	return samlMetas, appForSAMLConfigChange, appName, entityID
 }
 
 func createSAMLApp(t *testing.T, baseURI, projectID string) ([]byte, *application.CreateApplicationResponse) {
-	metas, app, _ := createSAMLAppWithName(t, baseURI, projectID)
+	metas, app, _, _ := createSAMLAppWithName(t, baseURI, projectID)
 	return metas, app
 }
 

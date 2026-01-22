@@ -577,6 +577,7 @@ message AddOrganizationRequest{
   // which is the recommended way. The generated ID will be returned in the response.
   //
   // Deprecated: use 'organization_id' field instead.
+  // If both org_id and organization_id are set, organization_id will take precedence.
   optional string org_id = 3 [
     deprecated = true,
     (validate.rules).string = {min_len: 1, max_len: 200},

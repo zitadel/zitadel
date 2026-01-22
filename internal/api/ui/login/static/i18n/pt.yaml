@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: próximo
   CancelButtonText: cancelar
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificação de 2 fatores
   DescriptionPhone: Crie sua verificação de 2 fatores. Digite seu número de telefone para verificá-lo.
   DescriptionCode: Crie sua verificação de 2 fatores. Digite o código recebido para verificar seu número de telefone.
+  CountryCodeLabel: País
   PhoneLabel: Número de telefone
   CodeLabel: Código
   EditButtonText: editar

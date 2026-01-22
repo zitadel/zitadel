@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: dalej
   CancelButtonText: anuluj
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Weryfikacja 2-etapowa
   DescriptionPhone: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź swój numer telefonu, aby go zweryfikować.
   DescriptionCode: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź otrzymany kod, aby zweryfikować swój numer telefonu.
+  CountryCodeLabel: Kraj
   PhoneLabel: Numer telefonu
   CodeLabel: Kod
   EditButtonText: edytować
