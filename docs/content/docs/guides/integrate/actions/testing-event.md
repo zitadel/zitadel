@@ -71,7 +71,7 @@ You can do this by using **Webhook.site** (see [Creating a Listener with Webhook
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the
 target can be created as follows:
 
-See [Create a target](/docs/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
+See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
@@ -95,7 +95,7 @@ Save the returned ID to set in the execution.
 To configure ZITADEL to call the target when an event occurs, you need to set an execution and define the event
 condition.
 
-See [Set an execution](/docs/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
+See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \

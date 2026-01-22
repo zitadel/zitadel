@@ -9,7 +9,7 @@ This documentation section guides you through the process of integrating ZITADEL
 
 ## Overview
 
-The NestJS API includes a single secured route that prints "Hello World!" when authenticated. The API expects an authorization header with a valid JWT, serving as a bearer token to authenticate the user when calling the API. The API will validate the access token on the [introspect endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint) and receive the user from ZITADEL.
+The NestJS API includes a single secured route that prints "Hello World!" when authenticated. The API expects an authorization header with a valid JWT, serving as a bearer token to authenticate the user when calling the API. The API will validate the access token on the [introspect endpoint](/docs/apis/openidoauth/endpoints#introspection-endpoint) and receive the user from ZITADEL.
 
 The API application utilizes [JWT with Private Key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) for authentication against ZITADEL and accessing the introspection endpoint. Make sure to create an API Application within Zitadel and download the JSON. In this instance, we use this service account, so make sure to provide the secrets in the example application via environmental variables.
 

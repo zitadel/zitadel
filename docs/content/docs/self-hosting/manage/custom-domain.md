@@ -50,7 +50,7 @@ Check out the [reverse proxy configuration examples](/docs/self-hosting/manage/r
 Note that by default, you cannot access ZITADEL at an organizations domain.
 Organization level domains [are intended for routing users by their login methods to their correct organization](/docs/guides/solution-scenarios/domain-discovery).
 
-However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/docs/apis/resources/system/system-service-add-domain#adds-a-domain-to-an-instance).
+However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/docs/reference/api-v1/system/zitadel.system.v1.SystemService.AddDomain).
 Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
 
 ## Generated Subdomains
@@ -60,6 +60,6 @@ You can immediately access the ZITADEL Console and APIs using these subdomains w
 
 ## More Information
 
-- [Check out the production-near loadbalancing example with Traefik](/docs/self-hosting/deploy/loadbalancing-example)
+- [Check out the production-near loadbalancing example with Traefik](/docs/self-hosting/manage/reverseproxy/traefik)
 - [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
 

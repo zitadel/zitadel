@@ -27,7 +27,7 @@ When you want to send a link to your user, that enables them to register a new p
 
 If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
-More detailed information about the API: [Send Registration Link Documentation](/docs/apis/resources/user_service_v2/user-service-create-passkey-registration-link)
+More detailed information about the API: [Send Registration Link Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.CreatePasskeyRegistrationLink)
 
 Request Example:
 Send either the sendLink or the returnCode (empty message) in the request body, depending on the use case you have.
@@ -74,7 +74,7 @@ By specifying the authenticator type you can choose if the passkey should be cro
 
 The API response will provide you the public key credential options, this will be used by the browser to obtain a signed challenge.
 
-More detailed information about the API: [Start Passkey Registration Documentation](/docs/apis/resources/user_service_v2/user-service-register-passkey)
+More detailed information about the API: [Start Passkey Registration Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey)
 
 Request Example:
 The code only has to be filled if the user did get a registration code.
@@ -179,7 +179,7 @@ Include the public key credential you got from the browser in your request.
 You can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-More detailed information about the API: [Verify Passkey Registration Documentation](/docs/apis/resources/user_service_v2/user-service-verify-passkey-registration)
+More detailed information about the API: [Verify Passkey Registration Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.VerifyPasskeyRegistration)
 
 Example Request:
 
@@ -218,7 +218,7 @@ First step is to ask the user for his username and create a new session with the
 When creating the new session make sure to include the challenge for passkey, resp. webAuthN with a required user verification and the domain of your login UI.
 The response will include the public key credential request options for the passkey in the challenges.
 
-More detailed information about the API: [Create Session Documentation](/docs/apis/resources/session_service_v2/session-service-create-session)
+More detailed information about the API: [Create Session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
 Example Request:
 ```bash

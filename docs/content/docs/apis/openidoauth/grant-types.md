@@ -105,13 +105,13 @@ JWT
 
 ---
 
-See [JWT Profile Grant on Token Endpoint](endpoints#token_endpoint) for usage.
+See [JWT Profile Grant on Token Endpoint](./endpoints#token-endpoint) for usage.
 
 ### Using JWTs for Client Authentication
 
-See how to build a [JWT for client authentication](authn-methods#jwt-with-private-key) from the downloaded key.
+See how to build a [JWT for client authentication](./authn-methods#jwt-with-private-key) from the downloaded key.
 
-Find out how to use it on the [token endpoint](endpoints#token_endpoint) or the [introspection endpoint](endpoints#introspection_endpoint).
+Find out how to use it on the [token endpoint](./endpoints#token-endpoint) or the [introspection endpoint](./endpoints#introspection-endpoint).
 
 ## Token Exchange
 

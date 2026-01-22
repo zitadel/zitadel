@@ -11,7 +11,7 @@ It is important to understand that, depending on your use case, there will exist
 - `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
 - `Managers` are users with a [special manager role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
 
-All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization--i18n).
+All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization-i-18-n).
 
 :::info
 ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
@@ -73,7 +73,7 @@ Read more about [Service Users](/docs/guides/integrate/service-users/authenticat
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client can also implement this, by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end_session_endpoint).
+A client can also implement this, by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end-session-endpoint).
 
 ## Profile
 

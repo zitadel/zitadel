@@ -121,7 +121,7 @@ In the guides below, some of which utilize the Generic OIDC or SAML templates fo
 - [LDAP](./ldap) 
 - [Local OpenLDAP](./openldap.mdx)
 - [OKTA generic OIDC](./okta-oidc)
-- [OKTA SAML](./okta-saml)
+- [OKTA SAML](./okta_saml)
 - [Keycloak generic OIDC](./keycloak)
 - [MockSAML](./mocksaml)
 - [JWT IdP](./jwt_idp)
@@ -179,5 +179,5 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 ## References
 
 - [Identity brokering in ZITADEL](/docs/concepts/features/identity-brokering)
-- [The ZITADEL API reference for managing external IdPs](/docs/apis/resources/admin/identity-providers)
+- [The ZITADEL API reference for managing external IdPs](/docs/reference/api-v1/admin)
 - [Handle external logins in a custom login UI](/docs/guides/integrate/login-ui/external-login)

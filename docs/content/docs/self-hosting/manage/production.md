@@ -114,7 +114,7 @@ but in the Projections.Customizations.Telemetry section
 ZITADEL supports [PostgreSQL](https://www.postgresql.org/).
 
 :::info
-ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](cli/mirror) to migrate to postgres.
+ZITADEL v2 supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/). Please refer to [the mirror guide](/docs/self-hosting/manage/cli/mirror) to migrate to postgres.
 :::
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
@@ -226,7 +226,7 @@ DefaultInstance:
     ReplyToAddress:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/self-hosting/manage/configure/configure#database-initialization-file), you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the [Console user interface](/docs/guides/manage/console/console-overview).
 - Probably, you also want to [apply your custom branding](/docs/guides/manage/customize/branding), [hook into certain events](/docs/guides/manage/customize/behavior), [customize texts](/docs/guides/manage/customize/texts) or [add metadata to your users](/docs/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/guides/manage/terraform-provider).

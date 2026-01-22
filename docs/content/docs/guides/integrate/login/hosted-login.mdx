@@ -20,7 +20,7 @@ After successful authentication, the user will be redirected back to the origina
 ## Security and compliance
 
 ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
-It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/).
+It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/saml).
 
 We make sure to harden the login UI and minimize the attack surface.
 One of the measures we apply is setting the necessary security heads thus minimizing the risk of common vulnerabilities in login pages, such as XSS vulnerabilities.
@@ -110,7 +110,7 @@ Unauthenticated users can request a password reset after providing the loginname
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy) is set
+- Instance or organization [login policy](/docs/guides/manage/console/default-settings#login-behavior-and-access) is set
 - Requested by the client
 - A multi-factor is set up for the user
 
@@ -124,14 +124,14 @@ You can disable the prompt, in case multifactor authentication is not enforced b
 
 Users can select a button to initiate passkey login or use a fall-back method (ie. login with username/password), if available.
 
-The [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
+The [passkeys](/docs/concepts/features/passkeys) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the operating system and browser.
 
 ## Hosted Login Version 2
 
-We have worked on a new, self-hostable implementation of our hosted MIT licensed login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitadels-session-api).
+We have worked on a new, self-hostable implementation of our hosted MIT licensed login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitade-ls-session-api).
 This solution empowers you to easily customize the login experience to perfectly match your brand and needs.
 
 ### Limitations
@@ -172,30 +172,29 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
         1. Enable the new login on your application configuration. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
         ![Login V2 Application Configuration](/docs/img/guides/integrate/login/login-v2-app-config.png)
-        2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
+        2. Enable the [loginV2 feature](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </TabItem>
     <TabItem value="vercel_custom" label="Vercel Custom Login Deployment">
 
         The simplest way to deploy the new login for yourself is by using the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to deploy the login directly to your Vercel.
 
-        1. [Create a service user](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
+        1. [Create a service user](/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) with a PAT in your instance
         2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (CUSTOM_DOMAIN/ui/console/instance?id=organizations)
-        Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
+        Note: [Zitadel Manager Guide](/docs/guides/manage/console/managers)
         3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) in our [repository](https://github.com/zitadel/zitadel)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
            - PAT
            - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
-        5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
+        5. Add the domain where your login UI is hosted to the [trusted domains](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
         6. Use the new login in your application.
             <PreventLockout/>
             You have three different options on how to achieve this:
             1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
             ![Login V2 Application Configuration](/docs/img/guides/integrate/login/login-v2-app-config.png)
-            2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
+            2. Enable the [loginV2 feature](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
             3. Change the issuer in the code of your application to the new domain of your login
         7. Enforce users to have their email verified. By setting `EMAIL_VERIFICATION` to `true` in your environment variables, your users will be enforced to verify their email address before they can log in.
 
     </TabItem>
 </Tabs>
-

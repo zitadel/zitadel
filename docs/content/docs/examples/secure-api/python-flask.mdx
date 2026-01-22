@@ -12,7 +12,7 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
-The API will validate the access token on the [introspect endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint) and will receive the user's roles from ZITADEL.
+The API will validate the access token on the [introspect endpoint](/docs/apis/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from ZITADEL.
 
 The API application uses [Client Secret Basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
@@ -180,7 +180,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         return res
 ```
 
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/guides/start/quickstart#referred1).
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/guides/start/quickstart).
 
 ```python
 ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"

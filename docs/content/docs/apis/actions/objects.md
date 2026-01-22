@@ -111,7 +111,7 @@ title: Objects
 
 ## Auth Request
 
-This object contains context information about the request to the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization_endpoint).
+This object contains context information about the request to the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization-endpoint).
 
 - `id` *string*
 - `agentId` *string*

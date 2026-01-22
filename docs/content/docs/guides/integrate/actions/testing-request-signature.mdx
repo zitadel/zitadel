@@ -42,7 +42,7 @@ This type is recommended if the payload contains sensitive information that shou
 
 We'll start the endpoint on port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-See [Create a target](/docs/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
+See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 Specify the `payloadType` according to the implementation you want to test: `PAYLOAD_TYPE_JSON`, `PAYLOAD_TYPE_JWT`, or `PAYLOAD_TYPE_JWE`.
 
@@ -107,7 +107,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/targets/<TargetID>/publickeys/
 To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the request
 condition.
 
-See [Set an execution](/docs/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
+See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \

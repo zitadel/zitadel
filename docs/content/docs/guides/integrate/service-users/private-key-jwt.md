@@ -8,7 +8,7 @@ This guide explains how developers can use private key JWT authentication to sec
 
 In ZITADEL, the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**"JWT bearer token with private key"**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant type is used for non-interactive authentication.
 
-Read more about the [different authentication methods for service users](authenticate-service-users), including their benefits, drawbacks, and security considerations.
+Read more about the [different authentication methods for service users](./authenticate-service-users), including their benefits, drawbacks, and security considerations.
 
 #### How private key JWT authentication works
 
@@ -64,7 +64,7 @@ openssl genrsa -out privatekey.pem 2048
 openssl rsa -in privatekey.pem -pubout -out publickey.pem
 ```
 
-To upload your public key, use the [User Service Add Key API](/docs/apis/resources/user_service_v2/user-service-add-key)
+To upload your public key, use the [User Service Add Key API](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey)
 
 :::note
 If you generate a key in ZITADEL, make sure to download and securely store the key file right away. For security reasons, ZITADEL cannot show you the private key again after creation. If the key file is lost, you must generate and register a new one.

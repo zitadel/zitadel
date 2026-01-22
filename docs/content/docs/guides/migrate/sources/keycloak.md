@@ -116,7 +116,7 @@ There are two recommended authentication methods:
 
 ### 5.2. Import Data with the ZITADEL API
 
-Use your **access token** or **PAT** to authenticate, then call the [Management API – Human User Import](https://zitadel.com/docs/apis/resources/admin/admin-service-import-data) endpoint.
+Use your **access token** or **PAT** to authenticate, then call the [Management API – Human User Import](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser) endpoint.
 
 **Import Endpoint:**
 

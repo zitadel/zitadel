@@ -58,9 +58,7 @@ Via Console:
 3. Enter a username and a display name
 4. Click on **Create**
 
-Via APIs:
-
-* [Create User (Machine)](/docs/apis/resources/mgmt/management-service-add-machine-user)
+Via APIs23: * [Create User (Machine)](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
 
 ## 2. Grant a Manager role to the service user
 
@@ -97,7 +95,7 @@ The following sections will explain the more specific authentication to access t
 
 ### Authenticate with private key JWT
 
-Follow the steps in this guide to [generate an key file](../service-users/private-key-jwt#2-generate-a-private-key-file) and [create a JWT and sign with private key](../service-users/private-key-jwt#3-create-a-jwt-and-sign-with-private-key).
+Follow the steps in this guide to [generate an key file](../service-users/private-key-jwt#2-register-a-private-key-for-your-service-user) and [create a JWT and sign with private key](../service-users/private-key-jwt#3-create-a-jwt-and-sign-it-with-your-private-key).
 
 With the encoded JWT (assertion) from the prior step, you will need to craft a POST request to ZITADEL's token endpoint.
 

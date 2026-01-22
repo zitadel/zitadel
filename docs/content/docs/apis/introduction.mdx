@@ -21,7 +21,7 @@ Please refer to our guides how to [authenticate users](/docs/guides/integrate/lo
 
 For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](../apis/resources/session_service_v2/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
+Additionally, you can use the [session API](/docs/reference/api/session) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui).
 
 ### Authenticate service users and machines
 
@@ -45,7 +45,7 @@ The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenI
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2), get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2) or get SAML request details with the [SAML service API](/docs/apis/resources/saml_service_v2).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/reference/api/session), get OIDC authentication request details with the [OIDC service API](/docs/reference/api/oidc) or get SAML request details with the [SAML service API](/docs/reference/api/saml).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -54,9 +54,9 @@ Refer to our guide to learn how to [build your own login UI](/docs/guides/integr
 
 ZITADEL provides APIs for each [core resource](/docs/apis/v2):
 
-- [User](/docs/apis/resources/user_service_v2)
-- [Session](/docs/apis/resources/session_service_v2)
-- [Settings](/docs/apis/resources/settings_service_v2)
+- [User](/docs/reference/api/user)
+- [Session](/docs/reference/api/session)
+- [Settings](/docs/reference/api/settings)
 
 :::info
 We are migrating to a resource-based API approach.
@@ -98,7 +98,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/auth/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/apis/resources/auth)
+[OpenAPI Docs](/docs/reference/api-v1/auth)
 
 </div>
 </Column>
@@ -131,7 +131,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/management/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/apis/resources/mgmt)
+[OpenAPI Docs](/docs/reference/api-v1/management)
 
 </div>
 </Column>
@@ -162,7 +162,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/admin/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/apis/resources/admin)
+[OpenAPI Docs](/docs/reference/api-v1/admin)
 
 </div>
 </Column>
@@ -195,7 +195,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/system/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/apis/resources/system)
+[OpenAPI Docs](/docs/reference/api-v1/system)
 
 </div>
 </Column>

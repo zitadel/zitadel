@@ -109,9 +109,9 @@ However, PATs also come with limitations:
 
 We have guides for the different authentication methods:
 
-- [Private key JWT authentication](private-key-jwt)
-- [Client credential authentication](client-credentials)
-- [Personal access token authentication](personal-access-token)
+- [Private key JWT authentication](./private-key-jwt)
+- [Client credential authentication](./client-credentials)
+- [Personal access token authentication](./personal-access-token)
 
 ## Important considerations
 
@@ -127,7 +127,7 @@ However, [client credentials authentication](./client-credentials.md) might be c
 ## Further resources
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/apis/resources/mgmt/user-machine)
+* [Service User API reference](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
 * [OIDC JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)

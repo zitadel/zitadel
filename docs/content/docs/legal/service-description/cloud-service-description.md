@@ -29,8 +29,8 @@ You will benefit from the transparency of the open source and the hyper-scalabil
 
 - [Enterprise supported features](https://help.zitadel.com/zitadel-support-states#enterprise) are only supported under an Enterprise license
 - Individual [onboarding support](./support-services#onboarding-support) tailored to your needs and team
-- Get access to our support with a [Service Level Agreement](support-services#service-level-agreement) that is tailored to your needs
-- Benefit from personal [technical account management](support-services#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
+- Get access to our support with a [Service Level Agreement](./support-services#service-level-agreement) that is tailored to your needs
+- Benefit from personal [technical account management](./support-services#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
 
 #### Benefits over ZITADEL Cloud
 
@@ -82,4 +82,4 @@ In a disaster recovery scenario, our goal is to guarantee a recovery point objec
 Under normal operations, RPO and RTO goals are below 1 minute.
 
 If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
-Please consult the [migration guides](/docs/guides/migrate/introduction.md) for more information.
+Please consult the [migration guides](/docs/guides/migrate/introduction) for more information.

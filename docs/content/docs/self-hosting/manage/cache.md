@@ -32,7 +32,7 @@ Caches:
       Level: error
 ```
 
-For a full configuration reference, please see the [runtime configuration file](/docs/self-hosting/manage/configure#runtime-configuration-file) section's `defaults.yaml`.
+For a full configuration reference, please see the [runtime configuration file](/docs/self-hosting/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
 
 ## Connectors
 
@@ -158,12 +158,12 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/apis/resources/system/system-service), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/reference/api-v1/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
 
 - Instance [features](/docs/guides/manage/console/default-settings#features)
 - Custom domains: generated and [custom](/docs/guides/manage/cloud/instances#add-custom-domain)
-- [Trusted domains](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain)
-- Security settings ([IFrame policy](/docs/guides/solution-scenarios/configurations#embedding-zitadel-in-an-iframe))
+- [Trusted domains](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain)
+- Security settings ([IFrame policy](/docs/guides/solution-scenarios/configurations#embedding-zitadel-in-an-i-frame))
 - Limits[^2]
 - [Allowed languages](/docs/guides/manage/console/default-settings#languages)
 

@@ -6,7 +6,7 @@ sidebar_position: 3
 
 This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/docs/guides/manage/console/users-overview#service-users-machine-accounts) and client applications within ZITADEL.
 
-In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](../service-users/authenticate-service-users).
+In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](./authenticate-service-users) as alternative to the [JWT profile authentication](./authenticate-service-users).
 
 ## Steps to authenticate a Service User with client credentials
 
@@ -102,8 +102,8 @@ By following these steps and adhering to security best practices, you can effect
 
 ## Notes
 
-* Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/apis/resources/mgmt/user-machine)
+* Read about the [different authentication methods for service users](./authenticate-service-users)
+* [Service User API reference](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
 * [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)
