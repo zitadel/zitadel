@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Memiliki kendali atas seluruh instansi, termasuk semua organisasi",
     "IAM_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh instansi, termasuk semua organisasi",
-    "IAM_ORG_MANAGER": "Memiliki izin untuk membuat dan mengelola organisasi",
-    "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
+    "IAM_ORG_ADMINISTRATOR": "Memiliki izin untuk membuat dan mengelola organisasi",
+    "IAM_USER_ADMINISTRATOR": "Memiliki izin untuk membuat dan mengelola pengguna",
     "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
     "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
     "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola klien masuk",
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
-    "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
+    "ORG_USER_ADMINISTRATOR": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
-    "ORG_SETTINGS_MANAGER": "Memiliki izin untuk mengelola pengaturan organisasi",
+    "ORG_SETTINGS_ADMINISTRATOR": "Memiliki izin untuk mengelola pengaturan organisasi",
     "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
     "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
     "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
     "ORG_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari organisasi",
     "ORG_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari organisasi",
-    "ORG_USER_SELF_MANAGER": "Memiliki izin untuk mengelola pengguna sendiri",
+    "ORG_USER_SELF_ADMINISTRATOR": "Memiliki izin untuk mengelola pengguna sendiri",
     "PROJECT_OWNER": "Memiliki izin atas keseluruhan proyek",
     "PROJECT_OWNER_VIEWER": "Memiliki izin untuk meninjau keseluruhan proyek",
     "PROJECT_OWNER_GLOBAL": "Memiliki izin atas keseluruhan proyek",
@@ -766,7 +766,7 @@
       "KEYS": "Kunci",
       "PAT": "Token Akses Pribadi",
       "USERGRANTS": "Otorisasi",
-      "MEMBERSHIPS": "Keanggotaan",
+      "MEMBERSHIPS": "Peran Administrator",
       "METADATA": "Metadata"
     },
     "TITLE": "Informasi Pribadi",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Menghapus",
       "TYPE": "Jenis",
       "ORGID": "ID Organisasi",
-      "UPDATED": "Keanggotaan telah diperbarui.",
+      "UPDATED": "Peran Administrator telah diperbarui.",
       "NOPERMISSIONTOEDIT": "Anda kehilangan izin yang diperlukan untuk mengedit peran!",
       "TYPES": {
         "UNKNOWN": "Tidak dikenal",
@@ -1271,8 +1271,8 @@
       "DESCRIPTION": "Kelola tampilan ZITADEL Anda dan acara yang gagal."
     },
     "MEMBER": {
-      "TITLE": "Manajer",
-      "DESCRIPTION": "Manajer ini diizinkan untuk membuat perubahan pada instance Anda."
+      "TITLE": "Administrator",
+      "DESCRIPTION": "Administrator ini dapat memodifikasi instance Anda."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERSADDED": "Manajer menambahkan.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERSADDED": "Administrator menambahkan.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "ROLEREMOVED": "Peran dihapus.",
       "ROLECHANGED": "Peran berubah.",
       "REACTIVATED": "Diaktifkan kembali",
@@ -1449,7 +1449,7 @@
       "2": "Dinonaktifkan"
     },
     "MEMBER": {
-      "TITLE": "Manajer Organisasi",
+      "TITLE": "Administrator Organisasi",
       "DESCRIPTION": "Tentukan pengguna yang dapat mengubah preferensi organisasi Anda."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organisasi diaktifkan kembali.",
       "DOMAINADDED": "Menambahkan domain.",
       "DOMAINREMOVED": "Domain dihapus.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "SETPRIMARY": "Kumpulan domain primer.",
       "DELETED": "Organisasi berhasil dihapus",
       "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Anggota",
+      "TITLE": "Administrator",
       "USERNAME": "Nama belakang",
       "DISPLAYNAME": "Nama Tampilan",
       "LOGINNAME": "Nama Masuk",
       "EMAIL": "E-mail",
       "ROLES": "Peran",
-      "ADD": "Tambahkan Anggota",
+      "ADD": "TTambahkan administrator",
       "ADDDESCRIPTION": "Masukkan nama pengguna yang akan ditambahkan."
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "Nama Baru"
     },
     "MEMBER": {
-      "TITLE": "Manajer",
-      "TITLEDESC": "Manajer dapat membuat perubahan pada proyek ini berdasarkan peran mereka.",
-      "DESCRIPTION": "Manajer ini mungkin dapat mengedit proyek Anda.",
+      "TITLE": "Administrator",
+      "TITLEDESC": "Administrator dapat membuat perubahan pada proyek ini berdasarkan peran mereka.",
+      "DESCRIPTION": "Administrator ini mungkin dapat mengedit proyek Anda.",
       "USERNAME": "Nama belakang",
       "DISPLAYNAME": "Nama Tampilan",
       "LOGINNAME": "Nama login",
@@ -2069,9 +2069,9 @@
       },
       "DETAIL": {
         "TITLE": "Hibah Proyek",
-        "DESC": "Anda dapat memilih peran mana yang dapat digunakan oleh organisasi tertentu, dan memilih manajer",
-        "MEMBERTITLE": "Manajer",
-        "MEMBERDESC": "Ini adalah manajer dari organisasi yang diberikan. Tambahkan pengguna di sini yang harus mendapatkan akses untuk mengedit data proyek.",
+        "DESC": "Anda dapat memilih peran apa yang dapat digunakan oleh organisasi Anda dan memilih administrator.",
+        "MEMBERTITLE": "Administrator",
+        "MEMBERDESC": "Ini adalah administrator yang ditugaskan ke organisasi Anda. Tambahkan pengguna di sini yang memerlukan akses untuk mengedit data proyek.",
         "PROJECTNAME": "Nama Proyek",
         "GRANTEDORG": "Organisasi yang Diberikan",
         "RESOURCEOWNER": "Pemilik Sumber Daya"
@@ -2084,7 +2084,7 @@
       "ALL": "Semua",
       "SHOWDETAIL": "Tampilkan Detail",
       "USER": "Pengguna",
-      "MEMBERS": "Manajer",
+      "MEMBERS": "Administrator",
       "ORG": "Organisasi",
       "PROJECTNAME": "Nama Proyek",
       "GRANTEDORG": "Organisasi yang Diberikan",
@@ -2102,9 +2102,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Hibah proyek dibuat.",
         "PROJECTGRANTADDED": "Hibah proyek dibuat.",
         "PROJECTGRANTCHANGED": "Hibah proyek berubah.",
-        "PROJECTGRANTMEMBERADDED": "Manajer hibah menambahkan.",
-        "PROJECTGRANTMEMBERCHANGED": "Manajer hibah berubah.",
-        "PROJECTGRANTMEMBERREMOVED": "Manajer hibah dihapus.",
+        "PROJECTGRANTMEMBERADDED": "Administrator hibah ditambahkan.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrator hibah diubah.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrator hibah dihapus.",
         "PROJECTGRANTUPDATED": "Hibah Proyek diperbarui"
       },
       "DIALOG": {
@@ -2167,10 +2167,10 @@
       "EMPTY": "Tidak ada proyek yang ditemukan"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manajer dihapus.",
-      "MEMBERSADDED": "Manajer menambahkan.",
-      "MEMBERADDED": "Manajer menambahkan.",
-      "MEMBERCHANGED": "Manajer berubah.",
+      "MEMBERREMOVED": "Administrator dihapus.",
+      "MEMBERSADDED": "Administrator menambahkan.",
+      "MEMBERADDED": "Administrator menambahkan.",
+      "MEMBERCHANGED": "Administrator berubah.",
       "ROLESCREATED": "Peran dibuat.",
       "ROLEREMOVED": "Peran dihapus.",
       "ROLECHANGED": "Peran berubah.",
@@ -2790,7 +2790,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Tambahkan Manajer",
+    "ADD": "Tambahkan Administrator",
     "CREATIONTYPE": "Jenis Penciptaan",
     "CREATIONTYPES": {
       "0": "Proyek Milik",
@@ -2802,8 +2802,8 @@
     "EDITROLE": "Edit peran",
     "EDITFOR": "Edit peran pengguna: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Hapus Manajer",
-      "DELETE_DESCRIPTION": "Anda akan menghapus pengelola. Apa kamu yakin?"
+      "DELETE_TITLE": "Hapus Administrator",
+      "DELETE_DESCRIPTION": "Anda akan menghapus administrator. Apakah Anda yakin ingin melakukannya?"
     },
     "SHOWDETAILS": "Klik untuk menampilkan detail."
   },
@@ -2838,7 +2838,7 @@
       "UPDATED": "Otorisasi diperbarui.",
       "REMOVED": "Otorisasi dihapus",
       "BULKREMOVED": "Otorisasi dihapus.",
-      "CANTSHOWINFO": "Anda tidak dapat mengunjungi profil pengguna ini karena Anda bukan anggota organisasi tempat pengguna ini berada"
+      "CANTSHOWINFO": "Anda tidak dapat melihat profil pengguna ini karena Anda bukan anggota organisasi tempat pengguna ini berada."
     },
     "DIALOG": {
       "DELETE_TITLE": "Hapus otorisasi",

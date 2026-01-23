@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
     "IAM_OWNER_VIEWER": "Tem permissão para revisar toda a instância, incluindo todas as organizações",
-    "IAM_ORG_MANAGER": "Tem permissão para criar e gerenciar organizações",
-    "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
+    "IAM_ORG_ADMINISTRATOR": "Tem permissão para criar e gerenciar organizações",
+    "IAM_USER_ADMINISTRATOR": "Tem permissão para criar e gerenciar usuários",
     "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
     "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
     "IAM_LOGIN_CLIENT": "Tem permissão para gerenciar clientes de login",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
-    "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
+    "ORG_USER_ADMINISTRATOR": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
-    "ORG_SETTINGS_MANAGER": "Tem permissão para gerenciar as configurações da organização",
+    "ORG_SETTINGS_ADMINISTRATOR": "Tem permissão para gerenciar as configurações da organização",
     "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de usuários",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
     "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
-    "ORG_USER_SELF_MANAGER": "Tem permissão para gerenciar seu próprio usuário",
+    "ORG_USER_SELF_ADMINISTRATOR": "Tem permissão para gerenciar seu próprio usuário",
     "PROJECT_OWNER": "Tem permissão sobre todo o projeto",
     "PROJECT_OWNER_VIEWER": "Tem permissão para revisar todo o projeto",
     "PROJECT_OWNER_GLOBAL": "Tem permissão sobre todo o projeto",
@@ -766,7 +766,7 @@
       "KEYS": "Chaves",
       "PAT": "Tokens de Acesso Pessoal",
       "USERGRANTS": "Autorizações",
-      "MEMBERSHIPS": "Associações",
+      "MEMBERSHIPS": "Funções de administrador",
       "METADATA": "Metadados"
     },
     "TITLE": "Informações Pessoais",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Funções de administrador do ZITADEL",
-      "DESCRIPTION": "Essas são todas as permissões de membros do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
+      "DESCRIPTION": "Essas são todas as permissões de administradores do usuário. Você também pode modificá-las nas páginas de detalhes da organização, projeto ou IAM.",
       "ORGCONTEXT": "Você vê todas as organizações e projetos relacionados à organização atualmente selecionada.",
       "USERCONTEXT": "Você vê todas as organizações e projetos para os quais está autorizado. Incluindo outras organizações.",
       "CREATIONDATE": "Data de Criação",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Remover",
       "TYPE": "Tipo",
       "ORGID": "ID da Organização",
-      "UPDATED": "A permissão de membro foi atualizada.",
+      "UPDATED": "A permissão de administrador foi atualizada.",
       "NOPERMISSIONTOEDIT": "Você não possui as permissões necessárias para editar funções!",
       "TYPES": {
         "UNKNOWN": "Desconhecido",
@@ -1271,8 +1271,8 @@
       "DESCRIPTION": "Gerencie as visualizações do ZITADEL e eventos falhados."
     },
     "MEMBER": {
-      "TITLE": "Gerentes",
-      "DESCRIPTION": "Esses gerentes têm permissão para fazer alterações na sua instância."
+      "TITLE": "Administradores",
+      "DESCRIPTION": "Esses administradores têm permissão para fazer alterações na sua instância."
     },
     "PAGES": {
       "STATE": "Status",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERSADDED": "Gerentes adicionados.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERSADDED": "Administradores adicionados.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "ROLEREMOVED": "Função removida.",
       "ROLECHANGED": "Função alterada.",
       "REACTIVATED": "Reativado",
@@ -1450,7 +1450,7 @@
       "3": "Removida"
     },
     "MEMBER": {
-      "TITLE": "Gerentes da Organização",
+      "TITLE": "Administradores da Organização",
       "DESCRIPTION": "Defina os usuários que podem alterar as preferências da sua organização."
     },
     "TOAST": {
@@ -1459,9 +1459,9 @@
       "REACTIVATED": "Organização reativada.",
       "DOMAINADDED": "Domínio adicionado.",
       "DOMAINREMOVED": "Domínio removido.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
       "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
@@ -1932,7 +1932,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organização",
-    "DESCRIPTION": "Aqui você pode editar a configuração da sua organização e gerenciar os membros.",
+    "DESCRIPTION": "Aqui você pode editar a configuração da sua organização e gerenciar os administradores.",
     "DETAIL": {
       "TITLE": "Detalhes",
       "NAME": "Nome",
@@ -1944,13 +1944,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Membros",
+      "TITLE": "Administradores",
       "USERNAME": "Nome de Usuário",
       "DISPLAYNAME": "Nome de Exibição",
       "LOGINNAME": "Nome de Login",
       "EMAIL": "E-mail",
       "ROLES": "Funções",
-      "ADD": "Adicionar Membro",
+      "ADD": "Adicionar Administrador",
       "ADDDESCRIPTION": "Insira os nomes dos usuários a serem adicionados."
     },
     "TABLE": {
@@ -2041,9 +2041,9 @@
       "NAME": "Novo Nome"
     },
     "MEMBER": {
-      "TITLE": "Gerentes",
-      "TITLEDESC": "Os gerentes podem fazer alterações neste projeto com base em sua função.",
-      "DESCRIPTION": "Esses gerentes podem ter permissão para editar o seu projeto.",
+      "TITLE": "Administradores",
+      "TITLEDESC": "Os administradores podem fazer alterações neste projeto com base em sua função.",
+      "DESCRIPTION": "Esses administradores podem ter permissão para editar o seu projeto.",
       "USERNAME": "Nome de Usuário",
       "DISPLAYNAME": "Nome de Exibição",
       "LOGINNAME": "Nome de Login",
@@ -2073,9 +2073,9 @@
       },
       "DETAIL": {
         "TITLE": "Concessão de Projeto",
-        "DESC": "Você pode selecionar quais funções podem ser usadas pela organização especificada e eleger gerentes",
-        "MEMBERTITLE": "Gerentes",
-        "MEMBERDESC": "Estes são os gerentes da organização concedida. Adicione usuários aqui que devem ter acesso para editar os dados do projeto.",
+        "DESC": "Você pode selecionar quais funções podem ser usadas pela organização especificada e eleger administradores",
+        "MEMBERTITLE": "Administradores",
+        "MEMBERDESC": "Estes são os administradores da organização concedida. Adicione usuários aqui que devem ter acesso para editar os dados do projeto.",
         "PROJECTNAME": "Nome do Projeto",
         "GRANTEDORG": "Organização Concedida",
         "RESOURCEOWNER": "Proprietário do Recurso"
@@ -2088,7 +2088,7 @@
       "ALL": "Todos",
       "SHOWDETAIL": "Mostrar Detalhes",
       "USER": "Usuário",
-      "MEMBERS": "Gerentes",
+      "MEMBERS": "Administradores",
       "ORG": "Organização",
       "PROJECTNAME": "Nome do Projeto",
       "GRANTEDORG": "Organização Concedida",
@@ -2106,9 +2106,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Concessão de projeto criada.",
         "PROJECTGRANTADDED": "Concessão de projeto criada.",
         "PROJECTGRANTCHANGED": "Concessão de projeto alterada.",
-        "PROJECTGRANTMEMBERADDED": "Gerente da concessão adicionado.",
-        "PROJECTGRANTMEMBERCHANGED": "Gerente da concessão alterado.",
-        "PROJECTGRANTMEMBERREMOVED": "Gerente da concessão removido.",
+        "PROJECTGRANTMEMBERADDED": "Administrador da concessão adicionado.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrador da concessão alterado.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrador da concessão removido.",
         "PROJECTGRANTUPDATED": "Concessão de Projeto atualizada"
       },
       "DIALOG": {
@@ -2171,10 +2171,10 @@
       "EMPTY": "Nenhum projeto encontrado"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Gerente removido.",
-      "MEMBERSADDED": "Gerentes adicionados.",
-      "MEMBERADDED": "Gerente adicionado.",
-      "MEMBERCHANGED": "Gerente alterado.",
+      "MEMBERREMOVED": "Administrador removido.",
+      "MEMBERSADDED": "Administradores adicionados.",
+      "MEMBERADDED": "Administrador adicionado.",
+      "MEMBERCHANGED": "Administrador alterado.",
       "ROLESCREATED": "Funções criadas.",
       "ROLEREMOVED": "Função removida.",
       "ROLECHANGED": "Função alterada.",
@@ -2762,7 +2762,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Adicionar um Gerente",
+    "ADD": "Adicionar um Administrador",
     "CREATIONTYPE": "Tipo de Criação",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2774,8 +2774,8 @@
     "EDITROLE": "Editar funções",
     "EDITFOR": "Editar as funções para o usuário: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remover Gerente",
-      "DELETE_DESCRIPTION": "Você está prestes a remover um gerente. Tem certeza?"
+      "DELETE_TITLE": "Remover Administrador",
+      "DELETE_DESCRIPTION": "Você está prestes a remover um administrador. Tem certeza?"
     },
     "SHOWDETAILS": "Clique para mostrar detalhes."
   },
@@ -2810,7 +2810,7 @@
       "UPDATED": "Autorização atualizada.",
       "REMOVED": "Autorização removida",
       "BULKREMOVED": "Autorizações removidas.",
-      "CANTSHOWINFO": "Você não pode visitar o perfil deste usuário porque não é membro da organização à qual esse usuário pertence"
+      "CANTSHOWINFO": "Você não pode visitar o perfil deste usuário porque não é administrador da organização à qual esse usuário pertence"
     },
     "DIALOG": {
       "DELETE_TITLE": "Excluir autorização",

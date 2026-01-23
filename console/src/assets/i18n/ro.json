@@ -652,13 +652,13 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Are control asupra întregii instanțe, inclusiv asupra tuturor organizațiilor",
     "IAM_OWNER_VIEWER": "Are permisiunea de a revizui întreaga instanță, inclusiv toate organizațiile",
-    "IAM_ORG_MANAGER": "Are permisiunea de a crea și gestiona organizații",
-    "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
+    "IAM_ORG_ADMINISTRATOR": "Are permisiunea de a crea și gestiona organizații",
+    "IAM_USER_ADMINISTRATOR": "Are permisiunea de a crea și gestiona utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
     "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona clientii de login",
     "ORG_OWNER": "Are permisiunea asupra întregii organizații",
-    "ORG_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatorii organizației",
+    "ORG_USER_ADMINISTRATOR": "Are permisiunea de a crea și gestiona utilizatorii organizației",
     "ORG_OWNER_VIEWER": "Are permisiunea de a revizui întreaga organizație",
     "ORG_USER_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile utilizatorilor",
     "ORG_PROJECT_PERMISSION_EDITOR": "Are permisiunea de a gestiona granturile proiectelor",
@@ -764,7 +764,7 @@
       "KEYS": "Chei",
       "PAT": "Tokenuri de acces personal",
       "USERGRANTS": "Autorizații",
-      "MEMBERSHIPS": "Afilieri",
+      "MEMBERSHIPS": "Roluri de administrator",
       "METADATA": "Metadata"
     },
     "TITLE": "Informații personale",
@@ -1159,7 +1159,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Rolurile administratorilor ZITADEL",
-      "DESCRIPTION": "Acestea sunt toate granturile de membru ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
+      "DESCRIPTION": "Acestea sunt toate granturile de administrator ale utilizatorului. Puteți să le modificați și în paginile de detalii ale organizației, proiectului sau IAM.",
       "ORGCONTEXT": "Vedeți toate organizațiile și proiectele care sunt legate de organizația selectată în prezent.",
       "USERCONTEXT": "Vedeți toate organizațiile și proiectele la care sunteți autorizat. Inclusiv alte organizații.",
       "CREATIONDATE": "Data creării",
@@ -1168,7 +1168,7 @@
       "REMOVE": "Eliminați",
       "TYPE": "Tip",
       "ORGID": "ID-ul organizației",
-      "UPDATED": "Afilierea a fost actualizată.",
+      "UPDATED": "Rolul de administrator a fost actualizat.",
       "NOPERMISSIONTOEDIT": "Vă lipsesc permisiunile necesare pentru a edita rolurile!",
       "TYPES": {
         "UNKNOWN": "Necunoscut",
@@ -1269,8 +1269,8 @@
       "DESCRIPTION": "Gestionați-vă vizualizările ZITADEL și evenimentele eșuate."
     },
     "MEMBER": {
-      "TITLE": "Manageri",
-      "DESCRIPTION": "Acești manageri au permisiunea de a face modificări în instanța dvs."
+      "TITLE": "Administratori",
+      "DESCRIPTION": "Acești administratori au permisiunea de a face modificări în instanța dvs."
     },
     "PAGES": {
       "STATE": "Stare",
@@ -1359,10 +1359,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager eliminat.",
-      "MEMBERSADDED": "Manageri adăugați.",
-      "MEMBERADDED": "Manager adăugat.",
-      "MEMBERCHANGED": "Manager modificat.",
+      "MEMBERREMOVED": "Administrator eliminat.",
+      "MEMBERSADDED": "Administratori adăugați.",
+      "MEMBERADDED": "Administrator adăugat.",
+      "MEMBERCHANGED": "Administrator modificat.",
       "ROLEREMOVED": "Rol eliminat.",
       "ROLECHANGED": "Rol modificat.",
       "REACTIVATED": "Reactivat",
@@ -1447,7 +1447,7 @@
       "2": "Dezactivat"
     },
     "MEMBER": {
-      "TITLE": "Manageri de organizație",
+      "TITLE": "Administratori de organizație",
       "DESCRIPTION": "Definiți utilizatorii care vă pot modifica preferințele organizațiilor."
     },
     "TOAST": {
@@ -1456,9 +1456,9 @@
       "REACTIVATED": "Organizația a fost reactivată.",
       "DOMAINADDED": "Domeniu adăugat.",
       "DOMAINREMOVED": "Domeniu eliminat.",
-      "MEMBERADDED": "Manager adăugat.",
-      "MEMBERREMOVED": "Manager eliminat.",
-      "MEMBERCHANGED": "Manager modificat.",
+      "MEMBERADDED": "Administrator adăugat.",
+      "MEMBERREMOVED": "Administrator eliminat.",
+      "MEMBERCHANGED": "Administrator modificat.",
       "SETPRIMARY": "Domeniu principal setat.",
       "DELETED": "Organizația a fost ștearsă cu succes",
       "DEFAULTORGNOTFOUND": "Organizația implicită nu a fost găsită",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Membri",
+      "TITLE": "Administrator",
       "USERNAME": "Nume de utilizator",
       "DISPLAYNAME": "Nume afișat",
       "LOGINNAME": "Nume de conectare",
       "EMAIL": "E-mail",
       "ROLES": "Roluri",
-      "ADD": "Adăugați membru",
+      "ADD": "Adăugați administrator",
       "ADDDESCRIPTION": "Introduceți numele utilizatorilor care urmează să fie adăugați."
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "Nume nou"
     },
     "MEMBER": {
-      "TITLE": "Manageri",
-      "TITLEDESC": "Managerii pot face modificări acestui proiect pe baza rolului lor.",
-      "DESCRIPTION": "Acești manageri ar putea să vă poată edita proiectul.",
+      "TITLE": "Administratori",
+      "TITLEDESC": "Administratorii pot face modificări acestui proiect pe baza rolului lor.",
+      "DESCRIPTION": "Acești administratori ar putea să vă poată edita proiectul.",
       "USERNAME": "Nume de utilizator",
       "DISPLAYNAME": "Nume afișat",
       "LOGINNAME": "Nume de conectare",
@@ -2069,9 +2069,9 @@
       },
       "DETAIL": {
         "TITLE": "Grant de proiect",
-        "DESC": "Puteți selecta ce roluri pot fi utilizate de organizația specificată și puteți alege manageri",
-        "MEMBERTITLE": "Manageri",
-        "MEMBERDESC": "Aceștia sunt managerii organizației acordate. Adăugați aici utilizatori care ar trebui să obțină acces pentru a edita datele proiectului.",
+        "DESC": "Puteți selecta ce roluri pot fi utilizate de organizația specificată și puteți alege administratori",
+        "MEMBERTITLE": "Administratori",
+        "MEMBERDESC": "Aceștia sunt administratorii organizației acordate. Adăugați aici utilizatori care ar trebui să obțină acces pentru a edita datele proiectului.",
         "PROJECTNAME": "Numele proiectului",
         "GRANTEDORG": "Organizație acordată",
         "RESOURCEOWNER": "Proprietarul resursei"
@@ -2084,7 +2084,7 @@
       "ALL": "Toate",
       "SHOWDETAIL": "Afișați detalii",
       "USER": "Utilizator",
-      "MEMBERS": "Manageri",
+      "MEMBERS": "Administratori",
       "ORG": "Organizație",
       "PROJECTNAME": "Numele proiectului",
       "GRANTEDORG": "Organizație acordată",
@@ -2167,10 +2167,10 @@
       "EMPTY": "Niciun proiect găsit"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager eliminat.",
-      "MEMBERSADDED": "Manageri adăugați.",
-      "MEMBERADDED": "Manager adăugat.",
-      "MEMBERCHANGED": "Manager modificat.",
+      "MEMBERREMOVED": "Administrator eliminat.",
+      "MEMBERSADDED": "Administratori adăugați.",
+      "MEMBERADDED": "Administrator adăugat.",
+      "MEMBERCHANGED": "Administrator modificat.",
       "ROLESCREATED": "Roluri create.",
       "ROLEREMOVED": "Rol eliminat.",
       "ROLECHANGED": "Rol modificat.",
@@ -2788,7 +2788,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Adăugați un manager",
+    "ADD": "Adăugați un administrator",
     "CREATIONTYPE": "Tip creare",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2801,7 +2801,7 @@
     "EDITFOR": "Editați rolurile pentru utilizator: {{value}}",
     "DIALOG": {
       "DELETE_TITLE": "Eliminați managerul",
-      "DELETE_DESCRIPTION": "Sunteți pe cale să eliminați un manager. Sigur doriți să continuați?"
+      "DELETE_DESCRIPTION": "Sunteți pe cale să eliminați un administrator. Sigur doriți să continuați?"
     },
     "SHOWDETAILS": "Faceți clic pentru a afișa detalii."
   },
@@ -2836,7 +2836,7 @@
       "UPDATED": "Autorizarea a fost actualizată.",
       "REMOVED": "Autorizarea a fost eliminată",
       "BULKREMOVED": "Autorizațiile au fost eliminate.",
-      "CANTSHOWINFO": "Nu puteți vizita profilul acestui utilizator, deoarece nu sunteți membru al organizației căreia îi aparține acest utilizator"
+      "CANTSHOWINFO": "Nu puteți vizita profilul acestui utilizator, deoarece nu sunteți administrator al organizației căreia îi aparține acest utilizator"
     },
     "DIALOG": {
       "DELETE_TITLE": "Ștergeți autorizarea",

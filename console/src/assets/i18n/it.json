@@ -651,21 +651,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
     "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
-    "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
-    "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "IAM_ORG_ADMINISTRATOR": "Ha il permesso di creare e gestire organizzazioni",
+    "IAM_USER_ADMINISTRATOR": "Ha l'autorizzazione per creare e gestire utenti",
     "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
     "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
     "IAM_LOGIN_CLIENT": "Ha il permesso di gestire i client di accesso",
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
-    "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
+    "ORG_USER_ADMINISTRATOR": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
-    "ORG_SETTINGS_MANAGER": "Ha il permesso di gestire le impostazioni dell'organizzazione",
+    "ORG_SETTINGS_ADMINISTRATOR": "Ha il permesso di gestire le impostazioni dell'organizzazione",
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
     "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
     "ORG_END_USER_IMPERSONATOR": "Ha il permesso per rappresentare gli utenti finali dell'organizzazione",
-    "ORG_USER_SELF_MANAGER": "Ha il permesso per gestire il proprio account utente",
+    "ORG_USER_SELF_ADMINISTRATOR": "Ha il permesso per gestire il proprio account utente",
     "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
     "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
     "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
@@ -765,7 +765,7 @@
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
       "USERGRANTS": "Autorizzazioni",
-      "MEMBERSHIPS": "Memberships",
+      "MEMBERSHIPS": "Ruoli dell'amministratore",
       "METADATA": "Metadati"
     },
     "TITLE": "Informazioni personali",
@@ -1160,7 +1160,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Ruoli dell'amministratore ZITADEL",
-      "DESCRIPTION": "Questi sono tutti i member grant dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di sistema.",
+      "DESCRIPTION": "Questi sono tutti ruoli di amministratore utente. Puoi modificarli anche nelle pagine dei dettagli dell'organizzazione, del progetto o dell'IAM.",
       "ORGCONTEXT": "Vedi tutti i progetti che sono collegati all'organizzazione attualmente selezionata.",
       "USERCONTEXT": "Vedi tutte le organizzazioni e i progetti a cui sei autorizzato. Comprese le altre organizzazioni.",
       "CREATIONDATE": "Data di creazione",
@@ -1169,7 +1169,7 @@
       "REMOVE": "Rimuovi",
       "TYPE": "Tipo",
       "ORGID": "ID dell' organizzazione",
-      "UPDATED": "membership cambiato con successo.",
+      "UPDATED": "Il ruolo dell'amministratore è stato aggiornato.",
       "NOPERMISSIONTOEDIT": "Non hai l'autorizzazione richiesta per cambiare i ruoli!",
       "TYPES": {
         "UNKNOWN": "Sconosciuto",
@@ -1225,7 +1225,7 @@
     "ALLOWEDTOFAIL": "Può fallire",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Attenzione",
-      "DESCRIPTION": "Se disabiliti questa impostazione, potrebbe impedire agli utenti della tua organizzazione di accedere. Inoltre, non sarai più in grado di accedere alla console per disabilitare l'azione. Ti consigliamo di creare un utente amministratore in un'organizzazione separata o di testare gli script prima in un ambiente di sviluppo o in un'organizzazione di sviluppo."
+      "DESCRIPTION": "Se si disabilita questa impostazione, gli utenti dell'organizzazione potrebbero non essere in grado di accedere. Inoltre, non sarà più possibile accedere alla console per disabilitare l'azione. Si consiglia di creare un utente amministratore in un'organizzazione separata o di testare prima gli script in un ambiente di sviluppo o in un'organizzazione di sviluppo."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo processo",
@@ -1270,8 +1270,8 @@
       "DESCRIPTION": "Gestisci i view di ZITADEL e gli eventi falliti."
     },
     "MEMBER": {
-      "TITLE": "Manager",
-      "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
+      "TITLE": "Amministratori",
+      "DESCRIPTION": "Questi amministratori possono modificare la tua istanza."
     },
     "PAGES": {
       "STATE": "Stato",
@@ -1360,10 +1360,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager rimosso.",
-      "MEMBERSADDED": "I manager sono stati aggiunti con successo.",
-      "MEMBERADDED": "Il manager è stato aggiunto con successo.",
-      "MEMBERCHANGED": "Manager cambiato.",
+      "MEMBERREMOVED": "Amministratore rimosso.",
+      "MEMBERSADDED": "Amministratori aggiunti.",
+      "MEMBERADDED": "Amministratore aggiunto.",
+      "MEMBERCHANGED": "Amministratore modificato.",
       "ROLEREMOVED": "Ruolo rimosso.",
       "ROLECHANGED": "Ruolo cambiato.",
       "REACTIVATED": "Riattivato",
@@ -1449,7 +1449,7 @@
       "2": "Disattivato"
     },
     "MEMBER": {
-      "TITLE": "Manager dell'organizzazione",
+      "TITLE": "Amministratori dell'organizzazione",
       "DESCRIPTION": "Definisci gli utenti che possono cambiare le preferenze delle tue organizzazioni."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "Organizzazione riattivata.",
       "DOMAINADDED": "Aggiunto dominio.",
       "DOMAINREMOVED": "Dominio rimosso.",
-      "MEMBERADDED": "Manager aggiunto con successo",
-      "MEMBERREMOVED": "Manager rimosso con successo",
-      "MEMBERCHANGED": "Manager cambiato con successo",
+      "MEMBERADDED": "Amministratore aggiunto",
+      "MEMBERREMOVED": "Amministratore rimosso",
+      "MEMBERCHANGED": "Amministratore modificato",
       "SETPRIMARY": "Dominio primario cambiato con successo",
       "DELETED": "Organizzazione eliminata con successo",
       "DEFAULTORGNOTFOUND": "Impossibile trovare l'organizzazione predefinita",
@@ -1944,13 +1944,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Member",
+      "TITLE": "Amministratori",
       "USERNAME": "Nome utente",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Nome di accesso",
       "EMAIL": "E-mail",
       "ROLES": "Ruoli",
-      "ADD": "Aggiungi member",
+      "ADD": "Aggiungi amministratore",
       "ADDDESCRIPTION": "Inserisci gli indirizzi e-mail degli utenti da aggiungere."
     },
     "TABLE": {
@@ -2041,9 +2041,9 @@
       "NAME": "Nuovo nome"
     },
     "MEMBER": {
-      "TITLE": "Manager",
-      "TITLEDESC": "I manager possono apportare modifiche a questo progetto in base al loro ruolo.",
-      "DESCRIPTION": "Questi manager potrebbero apportare modifiche al tuo progetto.",
+      "TITLE": "Amministratori",
+      "TITLEDESC": "Gli amministratori possono modificare questo progetto in base al loro ruolo.",
+      "DESCRIPTION": "Questi amministratori possono modificare il tuo progetto.",
       "USERNAME": "Nome utente",
       "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Nome di accesso",
@@ -2071,9 +2071,9 @@
       },
       "DETAIL": {
         "TITLE": "Organizzazione ammissibile",
-        "DESC": "Puoi definire quali ruoli possono essere usati e gestire i manager",
-        "MEMBERTITLE": "Manager",
-        "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
+        "DESC": "Puoi scegliere quali ruoli può utilizzare la tua organizzazione e selezionare gli amministratori.",
+        "MEMBERTITLE": "Amministratori",
+        "MEMBERDESC": "Questi sono gli amministratori assegnati alla tua organizzazione. Aggiungi qui gli utenti che necessitano dell'accesso per modificare i dati del progetto.",
         "PROJECTNAME": "Nome del progetto",
         "GRANTEDORG": "Organizzazione ammissibile",
         "RESOURCEOWNER": "Resource owner"
@@ -2086,7 +2086,7 @@
       "ALL": "Tutti",
       "SHOWDETAIL": "Mostra dettagli",
       "USER": "Utente",
-      "MEMBERS": "Manager",
+      "MEMBERS": "Amministratori",
       "ORG": "Organizzazione",
       "PROJECTNAME": "Nome del progetto",
       "GRANTEDORG": "Organizzazione ammissible",
@@ -2104,9 +2104,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Project grant creato.",
         "PROJECTGRANTADDED": "Project grant creato.",
         "PROJECTGRANTCHANGED": "Project grant è stato cambiato.",
-        "PROJECTGRANTMEMBERADDED": "Grant manager aggiunto.",
-        "PROJECTGRANTMEMBERCHANGED": "Grant manager cambiato.",
-        "PROJECTGRANTMEMBERREMOVED": "Grant manager rimosso.",
+        "PROJECTGRANTMEMBERADDED": "Amministratore Grant aggiunto..",
+        "PROJECTGRANTMEMBERCHANGED": "Amministratore concesso modificato",
+        "PROJECTGRANTMEMBERREMOVED": "Amministratore concesso rimosso.",
         "PROJECTGRANTUPDATED": "Project Grant cambiato."
       },
       "DIALOG": {
@@ -2169,10 +2169,10 @@
       "EMPTY": "Nessun progetto trovato"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager rimosso con successo.",
-      "MEMBERSADDED": "Manager aggiunto con successo.",
-      "MEMBERADDED": "Manager aggiunto con successo.",
-      "MEMBERCHANGED": "Manager cambiato con successo.",
+      "MEMBERREMOVED": "Amministratore rimosso.",
+      "MEMBERSADDED": "Amministratore aggiunto.",
+      "MEMBERADDED": "Amministratore aggiunto.",
+      "MEMBERCHANGED": "Amministratore modificato.",
       "ROLESCREATED": "Ruoli creati con successo.",
       "ROLEREMOVED": "Ruolo rimosso con successo.",
       "ROLECHANGED": "Ruolo cambiato con successo.",
@@ -2767,7 +2767,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Aggiungi un manager",
+    "ADD": "Aggiungi un amministratori",
     "CREATIONTYPE": "Tipo di creazione",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2779,8 +2779,8 @@
     "EDITROLE": "Modifica ruoli",
     "EDITFOR": "Modifica i ruoli per l'utente: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Rimuovi manager",
-      "DELETE_DESCRIPTION": "Stai per rimuovere un manager. Vuoi davvero continuare?"
+      "DELETE_TITLE": "Rimuovi amministratori",
+      "DELETE_DESCRIPTION": "Stai per rimuovere un amministratore. Sei sicuro di volerlo fare?"
     },
     "SHOWDETAILS": "Clicca per mostrare i dettagli."
   },
@@ -2815,7 +2815,7 @@
       "UPDATED": "Autorizzazione aggiornata.",
       "REMOVED": "Autorizzazione rimossa con successo.",
       "BULKREMOVED": "Autorizzazioni rimossi con successo.",
-      "CANTSHOWINFO": "Non puoi visitare il profilo di questo utente poiché non sei un membro dell'organizzazione a cui appartiene questo utente"
+      "CANTSHOWINFO": "Non puoi visualizzare il profilo di questo utente perché non sei membro dell'organizzazione a cui appartiene."
     },
     "DIALOG": {
       "DELETE_TITLE": "Elima autorizzazione",

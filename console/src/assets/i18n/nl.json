@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
-    "IAM_ORG_MANAGER": "Heeft toestemming om organisaties aan te maken en te beheren",
-    "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
+    "IAM_ORG_ADMINISTRATOR": "Heeft toestemming om organisaties aan te maken en te beheren",
+    "IAM_USER_ADMINISTRATOR": "Heeft toestemming om gebruikers aan te maken en te beheren",
     "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
     "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
     "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldklanten te beheren",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
-    "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
+    "ORG_USER_ADMINISTRATOR": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
-    "ORG_SETTINGS_MANAGER": "Heeft toestemming om de instellingen van de organisatie te beheren",
+    "ORG_SETTINGS_ADMINISTRATOR": "Heeft toestemming om de instellingen van de organisatie te beheren",
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
     "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
-    "ORG_USER_SELF_MANAGER": "Heeft toestemming om zijn eigen gebruiker te beheren",
+    "ORG_USER_SELF_ADMINISTRATOR": "Heeft toestemming om zijn eigen gebruiker te beheren",
     "PROJECT_OWNER": "Heeft toestemming over het hele project",
     "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
     "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
@@ -766,7 +766,7 @@
       "KEYS": "Sleutels",
       "PAT": "Persoonlijke toegangstokens",
       "USERGRANTS": "Machtigingen",
-      "MEMBERSHIPS": "Lidmaatschappen",
+      "MEMBERSHIPS": "Beheerdersrollen",
       "METADATA": "Metadata"
     },
     "TITLE": "Persoonlijke informatie",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Beheerdersrollen",
-      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
+      "DESCRIPTION": "Dit zijn alle beheerdersrollenstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
       "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
       "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
       "CREATIONDATE": "Aanmaakdatum",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Verwijderen",
       "TYPE": "Type",
       "ORGID": "Organisatie ID",
-      "UPDATED": "Het lidmaatschap is bijgewerkt.",
+      "UPDATED": "Het beheerdersrollen is bijgewerkt.",
       "NOPERMISSIONTOEDIT": "U mist de benodigde rechten om rollen te bewerken!",
       "TYPES": {
         "UNKNOWN": "Onbekend",
@@ -1932,7 +1932,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organisatie",
-    "DESCRIPTION": "Hier kunt u de configuratie van uw organisatie bewerken en de leden beheren.",
+    "DESCRIPTION": "Hier kunt u de configuratie van uw organisatie bewerken en de beheerders beheren.",
     "DETAIL": {
       "TITLE": "Detail",
       "NAME": "Naam",
@@ -1944,13 +1944,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Leden",
+      "TITLE": "Beheerders",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Login Naam",
       "EMAIL": "E-mail",
       "ROLES": "Rollen",
-      "ADD": "Lid toevoegen",
+      "ADD": "Beheerder toevoegen",
       "ADDDESCRIPTION": "Voer de namen van de gebruikers in die moeten worden toegevoegd."
     },
     "TABLE": {
@@ -2041,9 +2041,9 @@
       "NAME": "Nieuwe naam"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
-      "DESCRIPTION": "Deze managers kunnen mogelijk uw project bewerken.",
+      "TITLE": "Beheerders",
+      "TITLEDESC": "Beheerders kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
+      "DESCRIPTION": "Deze beheerders kunnen mogelijk uw project bewerken.",
       "USERNAME": "Gebruikersnaam",
       "DISPLAYNAME": "Weergavenaam",
       "LOGINNAME": "Loginnaam",
@@ -2071,9 +2071,9 @@
       },
       "DETAIL": {
         "TITLE": "Projectverlening",
-        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en managers kiezen",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "Dit zijn de managers van de verleende organisatie. Voeg hier gebruikers toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
+        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en beheerders kiezen",
+        "MEMBERTITLE": "Beheerders",
+        "MEMBERDESC": "Dit zijn de beheerders van de verleende organisatie. Voeg hier gebruikers toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
         "PROJECTNAME": "Projectnaam",
         "GRANTEDORG": "Verleende Organisatie",
         "RESOURCEOWNER": "Resource Eigenaar"
@@ -2086,7 +2086,7 @@
       "ALL": "Alles",
       "SHOWDETAIL": "Toon details",
       "USER": "Gebruiker",
-      "MEMBERS": "Managers",
+      "MEMBERS": "Beheerders",
       "ORG": "Organisatie",
       "PROJECTNAME": "Projectnaam",
       "GRANTEDORG": "Verleende Organisatie",
@@ -2104,9 +2104,9 @@
         "PROJECTGRANTUSERGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTADDED": "Projectverlening gecreëerd.",
         "PROJECTGRANTCHANGED": "Projectverlening gewijzigd.",
-        "PROJECTGRANTMEMBERADDED": "Verlening Manager toegevoegd.",
-        "PROJECTGRANTMEMBERCHANGED": "Verlening Manager gewijzigd.",
-        "PROJECTGRANTMEMBERREMOVED": "Verlening Manager verwijderd.",
+        "PROJECTGRANTMEMBERADDED": "Verlening Beheerder toegevoegd.",
+        "PROJECTGRANTMEMBERCHANGED": "Verlening Beheerder gewijzigd.",
+        "PROJECTGRANTMEMBERREMOVED": "Verlening Beheerder verwijderd.",
         "PROJECTGRANTUPDATED": "Projectverlening bijgewerkt"
       },
       "DIALOG": {
@@ -2169,10 +2169,10 @@
       "EMPTY": "Geen project gevonden"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager verwijderd.",
-      "MEMBERSADDED": "Managers toegevoegd.",
-      "MEMBERADDED": "Manager toegevoegd.",
-      "MEMBERCHANGED": "Manager gewijzigd.",
+      "MEMBERREMOVED": "Beheerder verwijderd.",
+      "MEMBERSADDED": "Beheerders toegevoegd.",
+      "MEMBERADDED": "Beheerder toegevoegd.",
+      "MEMBERCHANGED": "Beheerder gewijzigd.",
       "ROLESCREATED": "Rollen gecreëerd.",
       "ROLEREMOVED": "Rol verwijderd.",
       "ROLECHANGED": "Rol gewijzigd.",
@@ -2785,7 +2785,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Voeg een Manager toe",
+    "ADD": "Voeg een Beheerder toe",
     "CREATIONTYPE": "Creatietype",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2797,8 +2797,8 @@
     "EDITROLE": "Bewerk rollen",
     "EDITFOR": "Bewerk de rollen voor de gebruiker: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Verwijder Manager",
-      "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
+      "DELETE_TITLE": "Verwijder Beheerder",
+      "DELETE_DESCRIPTION": "U staat op het punt om een beheerder te verwijderen. Weet u het zeker?"
     },
     "SHOWDETAILS": "Klik om details te tonen."
   },
@@ -2833,7 +2833,7 @@
       "UPDATED": "Autorisatie bijgewerkt.",
       "REMOVED": "Autorisatie verwijderd",
       "BULKREMOVED": "Autorisaties verwijderd.",
-      "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen lid bent van de organisatie waartoe deze gebruiker behoort"
+      "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen beheerder bent van de organisatie waartoe deze gebruiker behoort"
     },
     "DIALOG": {
       "DELETE_TITLE": "Verwijder autorisatie",

@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "인스턴스와 모든 조직에 대한 제어 권한이 있습니다",
     "IAM_OWNER_VIEWER": "인스턴스와 모든 조직을 검토할 수 있는 권한이 있습니다",
-    "IAM_ORG_MANAGER": "조직을 생성하고 관리할 수 있는 권한이 있습니다",
-    "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
+    "IAM_ORG_ADMINISTRATOR": "조직을 생성하고 관리할 수 있는 권한이 있습니다",
+    "IAM_USER_ADMINISTRATOR": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_LOGIN_CLIENT": "로그인 클라이언트를 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
-    "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
+    "ORG_USER_ADMINISTRATOR": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
-    "ORG_SETTINGS_MANAGER": "조직 설정을 관리할 수 있는 권한이 있습니다",
+    "ORG_SETTINGS_ADMINISTRATOR": "조직 설정을 관리할 수 있는 권한이 있습니다",
     "ORG_USER_PERMISSION_EDITOR": "사용자 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_PERMISSION_EDITOR": "프로젝트 권한을 관리할 수 있는 권한이 있습니다",
     "ORG_PROJECT_CREATOR": "자신의 프로젝트와 하위 설정을 생성할 수 있는 권한이 있습니다",
     "ORG_ADMIN_IMPERSONATOR": "조직의 관리자 및 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "ORG_END_USER_IMPERSONATOR": "조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
-    "ORG_USER_SELF_MANAGER": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
+    "ORG_USER_SELF_ADMINISTRATOR": "자신의 사용자 계정을 관리할 수 있는 권한이 있습니다",
     "PROJECT_OWNER": "프로젝트에 대한 전체 권한이 있습니다",
     "PROJECT_OWNER_VIEWER": "프로젝트 전체를 검토할 수 있는 권한이 있습니다",
     "PROJECT_OWNER_GLOBAL": "프로젝트에 대한 전체 권한이 있습니다",
@@ -766,7 +766,7 @@
       "KEYS": "키",
       "PAT": "개인 접근 토큰",
       "USERGRANTS": "권한 부여",
-      "MEMBERSHIPS": "멤버십",
+      "MEMBERSHIPS": "관리자 역할",
       "METADATA": "메타데이터"
     },
     "TITLE": "개인 정보",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL 관리자 역할",
-      "DESCRIPTION": "이 사용자의 모든 멤버 권한입니다. 조직, 프로젝트 또는 IAM 세부 페이지에서 수정할 수도 있습니다.",
+      "DESCRIPTION": "이들은 모두 사용자 관리자 역할입니다. 조직, 프로젝트 또는 IAM 세부 정보 페이지에서도 편집할 수 있습니다.",
       "ORGCONTEXT": "현재 선택된 조직과 관련된 모든 조직과 프로젝트를 볼 수 있습니다.",
       "USERCONTEXT": "사용 권한이 있는 모든 조직과 프로젝트를 볼 수 있습니다. 다른 조직도 포함됩니다.",
       "CREATIONDATE": "생성 날짜",
@@ -1170,7 +1170,7 @@
       "REMOVE": "제거",
       "TYPE": "유형",
       "ORGID": "조직 ID",
-      "UPDATED": "멤버십이 업데이트되었습니다.",
+      "UPDATED": "관리자 역할이 업데이트되었습니다.",
       "NOPERMISSIONTOEDIT": "역할을 편집할 권한이 없습니다!",
       "TYPES": {
         "UNKNOWN": "알 수 없음",
@@ -1272,7 +1272,7 @@
     },
     "MEMBER": {
       "TITLE": "관리자",
-      "DESCRIPTION": "이 관리자들은 인스턴스 내에서 변경할 권한이 있습니다."
+      "DESCRIPTION": "이 관리자들은 귀하의 인스턴스를 수정할 수 있습니다."
     },
     "PAGES": {
       "STATE": "상태",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "관리자가 제거되었습니다.",
-      "MEMBERSADDED": "관리자가 추가되었습니다.",
-      "MEMBERADDED": "관리자가 추가되었습니다.",
-      "MEMBERCHANGED": "관리자가 변경되었습니다.",
+      "MEMBERREMOVED": "관리자 제거됨.",
+      "MEMBERSADDED": "관리자 추가됨.",
+      "MEMBERADDED": "관리자 추가됨.",
+      "MEMBERCHANGED": "관리자 수정됨.",
       "ROLEREMOVED": "역할이 제거되었습니다.",
       "ROLECHANGED": "역할이 변경되었습니다.",
       "REACTIVATED": "재활성화됨",
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "조직이 재활성화되었습니다.",
       "DOMAINADDED": "도메인이 추가되었습니다.",
       "DOMAINREMOVED": "도메인이 삭제되었습니다.",
-      "MEMBERADDED": "관리자가 추가되었습니다.",
-      "MEMBERREMOVED": "관리자가 제거되었습니다.",
-      "MEMBERCHANGED": "관리자가 변경되었습니다.",
+      "MEMBERADDED": "관리자 추가됨",
+      "MEMBERREMOVED": "관리자 제거됨",
+      "MEMBERCHANGED": "관리자 수정됨",
       "SETPRIMARY": "기본 도메인이 설정되었습니다.",
       "DELETED": "조직이 성공적으로 삭제되었습니다",
       "DEFAULTORGNOTFOUND": "기본 조직을 찾을 수 없습니다",
@@ -1944,13 +1944,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "멤버",
+      "TITLE": "관리자",
       "USERNAME": "사용자 이름",
       "DISPLAYNAME": "표시 이름",
       "LOGINNAME": "로그인 이름",
       "EMAIL": "이메일",
       "ROLES": "역할",
-      "ADD": "멤버 추가",
+      "ADD": "관리자 추가",
       "ADDDESCRIPTION": "추가할 사용자 이름을 입력하세요."
     },
     "TABLE": {
@@ -2042,8 +2042,8 @@
     },
     "MEMBER": {
       "TITLE": "관리자",
-      "TITLEDESC": "관리자는 역할에 따라 이 프로젝트를 변경할 수 있습니다.",
-      "DESCRIPTION": "이 관리자는 프로젝트를 편집할 수 있습니다.",
+      "TITLEDESC": "관리자는 자신의 역할에 따라 이 프로젝트를 수정할 수 있습니다.",
+      "DESCRIPTION": "이 관리자들은 귀하의 프로젝트를 편집할 수 있습니다.",
       "USERNAME": "사용자 이름",
       "DISPLAYNAME": "표시 이름",
       "LOGINNAME": "로그인 이름",
@@ -2071,9 +2071,9 @@
       },
       "DETAIL": {
         "TITLE": "프로젝트 권한",
-        "DESC": "특정 조직이 사용할 수 있는 역할을 선택하고 관리자를 지정할 수 있습니다.",
+        "DESC": "조직에서 사용할 수 있는 역할을 선택하고 관리자를 지정할 수 있습니다.",
         "MEMBERTITLE": "관리자",
-        "MEMBERDESC": "권한이 부여된 조직의 관리자입니다. 프로젝트 데이터 편집 권한을 부여할 사용자를 추가하세요.",
+        "MEMBERDESC": "이들은 권한 부여된 조직의 관리자입니다. 프로젝트 데이터 편집 권한이 필요한 사용자를 여기에 추가하세요.",
         "PROJECTNAME": "프로젝트 이름",
         "GRANTEDORG": "권한 부여된 조직",
         "RESOURCEOWNER": "리소스 소유자"
@@ -2104,9 +2104,9 @@
         "PROJECTGRANTUSERGRANTADDED": "프로젝트 권한이 생성되었습니다.",
         "PROJECTGRANTADDED": "프로젝트 권한이 생성되었습니다.",
         "PROJECTGRANTCHANGED": "프로젝트 권한이 변경되었습니다.",
-        "PROJECTGRANTMEMBERADDED": "권한 관리자가 추가되었습니다.",
-        "PROJECTGRANTMEMBERCHANGED": "권한 관리자가 변경되었습니다.",
-        "PROJECTGRANTMEMBERREMOVED": "권한 관리자가 제거되었습니다.",
+        "PROJECTGRANTMEMBERADDED": "권한 부여 관리자 추가됨.",
+        "PROJECTGRANTMEMBERCHANGED": "권한 부여 관리자 수정됨.",
+        "PROJECTGRANTMEMBERREMOVED": "권한 부여 관리자 제거됨.",
         "PROJECTGRANTUPDATED": "프로젝트 권한이 업데이트되었습니다."
       },
       "DIALOG": {
@@ -2169,10 +2169,10 @@
       "EMPTY": "찾은 프로젝트가 없습니다"
     },
     "TOAST": {
-      "MEMBERREMOVED": "관리자가 제거되었습니다.",
-      "MEMBERSADDED": "관리자가 추가되었습니다.",
-      "MEMBERADDED": "관리자가 추가되었습니다.",
-      "MEMBERCHANGED": "관리자가 변경되었습니다.",
+      "MEMBERREMOVED": "관리자 제거됨.",
+      "MEMBERSADDED": "관리자 추가됨.",
+      "MEMBERADDED": "관리자 추가됨.",
+      "MEMBERCHANGED": "관리자 수정됨.",
       "ROLESCREATED": "역할이 생성되었습니다.",
       "ROLEREMOVED": "역할이 제거되었습니다.",
       "ROLECHANGED": "역할이 변경되었습니다.",
@@ -2788,7 +2788,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "매니저 추가",
+    "ADD": "관리자 추가",
     "CREATIONTYPE": "생성 유형",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2800,8 +2800,8 @@
     "EDITROLE": "역할 편집",
     "EDITFOR": "사용자의 역할 편집: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "매니저 제거",
-      "DELETE_DESCRIPTION": "매니저를 제거하려고 합니다. 계속하시겠습니까?"
+      "DELETE_TITLE": "관리자 제거",
+      "DELETE_DESCRIPTION": "관리자를 제거하려 합니다. 정말로 제거하시겠습니까?"
     },
     "SHOWDETAILS": "세부 정보 보려면 클릭하세요."
   },
@@ -2836,7 +2836,7 @@
       "UPDATED": "권한이 업데이트되었습니다.",
       "REMOVED": "권한이 제거되었습니다.",
       "BULKREMOVED": "권한이 삭제되었습니다.",
-      "CANTSHOWINFO": "이 사용자가 속한 조직의 구성원이 아니기 때문에 사용자의 프로필을 볼 수 없습니다."
+      "CANTSHOWINFO": "해당 사용자가 속한 조직의 구성원이 아니므로 이 사용자의 프로필을 볼 수 없습니다."
     },
     "DIALOG": {
       "DELETE_TITLE": "권한 삭제",

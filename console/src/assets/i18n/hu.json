@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Teljes irányítása van az egész példány felett, beleértve minden szervezetet",
     "IAM_OWNER_VIEWER": "Jogosultsága van az egész példány átnézésére, beleértve minden szervezetet",
-    "IAM_ORG_MANAGER": "Jogosultsága van szervezetek létrehozására és kezelésére",
-    "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
+    "IAM_ORG_ADMINISTRATOR": "Jogosultsága van szervezetek létrehozására és kezelésére",
+    "IAM_USER_ADMINISTRATOR": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
     "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési kliensek kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
-    "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
+    "ORG_USER_ADMINISTRATOR": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
-    "ORG_SETTINGS_MANAGER": "Engedélye van a szervezet beállításainak kezelésére",
+    "ORG_SETTINGS_ADMINISTRATOR": "Engedélye van a szervezet beállításainak kezelésére",
     "ORG_USER_PERMISSION_EDITOR": "Engedélye van a felhasználói jogok kezelésére",
     "ORG_PROJECT_PERMISSION_EDITOR": "Engedélye van a projektjogosultságok kezelésére",
     "ORG_PROJECT_CREATOR": "Engedélye van saját projektek és alapbeállítások létrehozására",
     "ORG_ADMIN_IMPERSONATOR": "Engedélye van a szervezet adminisztrátorainak és véghasználóinak megszemélyesítésére",
     "ORG_END_USER_IMPERSONATOR": "Engedélye van a szervezet véghasználóinak megszemélyesítésére",
-    "ORG_USER_SELF_MANAGER": "Engedélye van a saját felhasználói fiókjaidat kezelésére",
+    "ORG_USER_SELF_ADMINISTRATOR": "Engedélye van a saját felhasználói fiókjaidat kezelésére",
     "PROJECT_OWNER": "Engedélye van az egész projekt fölött",
     "PROJECT_OWNER_VIEWER": "Jogosultságod van a teljes projekt átnézésére.",
     "PROJECT_OWNER_GLOBAL": "Jogosultságod van a teljes projektre.",
@@ -766,7 +766,7 @@
       "KEYS": "Kulcsok",
       "PAT": "Személyes Hozzáférési Tokenek",
       "USERGRANTS": "Engedélyek",
-      "MEMBERSHIPS": "Tagságok",
+      "MEMBERSHIPS": "Rendszergazdai szerepkörök",
       "METADATA": "Metaadatok"
     },
     "TITLE": "Személyes Információk",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL rendszergazdai szerepkörök",
-      "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
+      "DESCRIPTION": "Ezek a felhasználó összes adminisztrátori szerepköri jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
       "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
       "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
       "CREATIONDATE": "Létrehozás dátuma",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Eltávolítás",
       "TYPE": "Típus",
       "ORGID": "Szervezet azonosító",
-      "UPDATED": "A tagság frissítve lett.",
+      "UPDATED": "A rendszergazdai szerepkör frissült.",
       "NOPERMISSIONTOEDIT": "Nincs meg a szükséges engedélyed, hogy szerepköröket szerkessz!",
       "TYPES": {
         "UNKNOWN": "Ismeretlen",
@@ -1271,8 +1271,8 @@
       "DESCRIPTION": "Kezeld a ZITADEL nézeteidet és a sikertelen eseményeket."
     },
     "MEMBER": {
-      "TITLE": "Menedzserek",
-      "DESCRIPTION": "Ezek a menedzserek végezhetnek módosításokat az instanciádban."
+      "TITLE": "Rendszergazdák",
+      "DESCRIPTION": "Ezek a rendszergazdák módosíthatják a példányát."
     },
     "PAGES": {
       "STATE": "Állapot",
@@ -1361,10 +1361,10 @@
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "A menedzser eltávolítva.",
-      "MEMBERSADDED": "Menedzserek hozzáadva.",
-      "MEMBERADDED": "A menedzser hozzáadva.",
-      "MEMBERCHANGED": "A menedzser megváltoztatva.",
+      "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
+      "MEMBERSADDED": "Adminisztrátorok hozzáadva.",
+      "MEMBERADDED": "Adminisztrátor hozzáadva.",
+      "MEMBERCHANGED": "Adminisztrátor megváltoztatva.",
       "ROLEREMOVED": "Szerep eltávolítva.",
       "ROLECHANGED": "Szerep megváltoztatva.",
       "REACTIVATED": "Újraaktiválva",
@@ -1449,7 +1449,7 @@
       "2": "Deaktiválva"
     },
     "MEMBER": {
-      "TITLE": "Szervezet vezetői",
+      "TITLE": "Szervezeti adminisztrátorok",
       "DESCRIPTION": "Határozd meg azokat a felhasználókat, akik megváltoztathatják a szervezet beállításait."
     },
     "TOAST": {
@@ -1458,9 +1458,9 @@
       "REACTIVATED": "A szervezet újraaktiválva.",
       "DOMAINADDED": "Domain hozzáadva.",
       "DOMAINREMOVED": "Domain eltávolítva.",
-      "MEMBERADDED": "Vezető hozzáadva.",
-      "MEMBERREMOVED": "Vezető eltávolítva.",
-      "MEMBERCHANGED": "A vezető megváltozott.",
+      "MEMBERADDED": "Adminisztrátor hozzáadva.",
+      "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
+      "MEMBERCHANGED": "Adminisztrátor megváltozott.",
       "SETPRIMARY": "Az elsődleges domain beállítva.",
       "DELETED": "A szervezet sikeresen törölve.",
       "DEFAULTORGNOTFOUND": "Az alapértelmezett szervezet nem található.",
@@ -1942,13 +1942,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Tagok",
+      "TITLE": "Rendszergazdák",
       "USERNAME": "Felhasználónév",
       "DISPLAYNAME": "Megjelenített név",
       "LOGINNAME": "Bejelentkezési név",
       "EMAIL": "E-mail",
       "ROLES": "Szerepkörök",
-      "ADD": "Tag hozzáadása",
+      "ADD": "Adminisztrátor hozzáadása",
       "ADDDESCRIPTION": "Add meg a hozzáadandó felhasználók neveit."
     },
     "TABLE": {
@@ -2039,9 +2039,9 @@
       "NAME": "Új név"
     },
     "MEMBER": {
-      "TITLE": "Menedzserek",
-      "TITLEDESC": "A menedzserek módosításokat végezhetnek ezen a projekten a szerepkörük alapján.",
-      "DESCRIPTION": "Ezek a menedzserek esetleg szerkeszthetik a projektedet.",
+      "TITLE": "Adminisztrátorok",
+      "TITLEDESC": "Az adminisztrátorok szerepkörüknek megfelelően módosíthatják ezt a projektet.",
+      "DESCRIPTION": "Ezek az adminisztrátorok szerkeszthetik a projektjét.",
       "USERNAME": "Felhasználónév",
       "DISPLAYNAME": "Megjelenített név",
       "LOGINNAME": "Bejelentkezési név",
@@ -2069,9 +2069,9 @@
       },
       "DETAIL": {
         "TITLE": "Projekt Támogatás",
-        "DESC": "Kiválaszthatod, hogy mely szerepeket használhatja a megadott szervezet, és kinevezhetsz menedzsereket",
-        "MEMBERTITLE": "Menedzserek",
-        "MEMBERDESC": "Ezek a támogatott szervezet menedzserei. Adj hozzá felhasználókat, akik hozzáférést kapnak a projekt adatok szerkesztéséhez.",
+        "DESC": "Kiválaszthatja, hogy a szervezete mely szerepköröket használhatja, és kiválaszthatja az adminisztrátorokat.",
+        "MEMBERTITLE": "Adminisztrátorok",
+        "MEMBERDESC": "Ezek a szervezetéhez rendelt adminisztrátorok. Ide adja hozzá azokat a felhasználókat, akiknek hozzáférésre van szükségük a projektadatok szerkesztéséhez.",
         "PROJECTNAME": "Projekt Neve",
         "GRANTEDORG": "Támogatott Szervezet",
         "RESOURCEOWNER": "Erőforrás Tulajdonos"
@@ -2084,7 +2084,7 @@
       "ALL": "Összes",
       "SHOWDETAIL": "Részletek megjelenítése",
       "USER": "Felhasználó",
-      "MEMBERS": "Menedzserek",
+      "MEMBERS": "Adminisztrátorok",
       "ORG": "Szervezet",
       "PROJECTNAME": "Projekt neve",
       "GRANTEDORG": "Támogatott szervezet",
@@ -2167,10 +2167,10 @@
       "EMPTY": "Nem található projekt"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Menedzser eltávolítva.",
-      "MEMBERSADDED": "Menedzserek hozzáadva.",
-      "MEMBERADDED": "Menedzser hozzáadva.",
-      "MEMBERCHANGED": "Menedzser megváltoztatva.",
+      "MEMBERREMOVED": "Adminisztrátor eltávolítva.",
+      "MEMBERSADDED": "Adminisztrátorok hozzáadva.",
+      "MEMBERADDED": "Adminisztrátor hozzáadva.",
+      "MEMBERCHANGED": "Adminisztrátor megváltoztatva.",
       "ROLESCREATED": "Szerepkörök létrehozva.",
       "ROLEREMOVED": "Szerepkör eltávolítva.",
       "ROLECHANGED": "Szerepkör megváltoztatva.",
@@ -2790,7 +2790,7 @@
     "uk": "Українська"
   },
   "MEMBER": {
-    "ADD": "Hozzáadás egy menedzsert",
+    "ADD": "Adminisztrátor hozzáadása",
     "CREATIONTYPE": "Létrehozás típusa",
     "CREATIONTYPES": {
       "3": "IAM",
@@ -2802,8 +2802,8 @@
     "EDITROLE": "Szerepkörök szerkesztése",
     "EDITFOR": "Felhasználó szerepköreinek szerkesztése: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Menedszer eltávolítása",
-      "DELETE_DESCRIPTION": "Egy menedzser eltávolítására készülsz. Biztos vagy benne?"
+      "DELETE_TITLE": "Adminisztrátor eltávolítása",
+      "DELETE_DESCRIPTION": "Adminisztrátort készül eltávolítani. Biztosan ezt szeretné tenni?"
     },
     "SHOWDETAILS": "Kattints a részletek megjelenítéséhez."
   },
@@ -2838,7 +2838,7 @@
       "UPDATED": "Engedély frissítve.",
       "REMOVED": "Engedély eltávolítva",
       "BULKREMOVED": "Engedélyek eltávolítva.",
-      "CANTSHOWINFO": "Nem látogathatod meg ennek a felhasználónak a profilját, mivel nem vagy tagja annak a szervezetnek, amelyhez a felhasználó tartozik."
+      "CANTSHOWINFO": "Nem tudja megtekinteni ennek a felhasználónak a profilját, mert nem tagja annak a szervezetnek, amelyhez ez a felhasználó tartozik."
     },
     "DIALOG": {
       "DELETE_TITLE": "Engedély törlése",

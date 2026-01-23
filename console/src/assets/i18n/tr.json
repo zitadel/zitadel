@@ -652,21 +652,21 @@
   "MEMBERROLES": {
     "IAM_OWNER": "Tüm organizasyonlar dahil olmak üzere tüm örnek üzerinde kontrole sahiptir",
     "IAM_OWNER_VIEWER": "Tüm organizasyonlar dahil olmak üzere tüm örneği gözden geçirme iznine sahiptir",
-    "IAM_ORG_MANAGER": "Organizasyonları oluşturma ve yönetme iznine sahiptir",
-    "IAM_USER_MANAGER": "Kullanıcıları oluşturma ve yönetme iznine sahiptir",
+    "IAM_ORG_ADMINISTRATOR": "Organizasyonları oluşturma ve yönetme iznine sahiptir",
+    "IAM_USER_ADMINISTRATOR": "Kullanıcıları oluşturma ve yönetme iznine sahiptir",
     "IAM_ADMIN_IMPERSONATOR": "Tüm organizasyonlardan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_END_USER_IMPERSONATOR": "Tüm organizasyonlardan son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_LOGIN_CLIENT": "Giriş istemcilerini yönetme iznine sahiptir",
     "ORG_OWNER": "Tüm organizasyon üzerinde izne sahiptir",
-    "ORG_USER_MANAGER": "Organizasyonun kullanıcılarını oluşturma ve yönetme iznine sahiptir",
+    "ORG_USER_ADMINISTRATOR": "Organizasyonun kullanıcılarını oluşturma ve yönetme iznine sahiptir",
     "ORG_OWNER_VIEWER": "Tüm organizasyonu gözden geçirme iznine sahiptir",
-    "ORG_SETTINGS_MANAGER": "Organizasyon ayarlarını yönetme iznine sahiptir",
+    "ORG_SETTINGS_ADMINISTRATOR": "Organizasyon ayarlarını yönetme iznine sahiptir",
     "ORG_USER_PERMISSION_EDITOR": "Kullanıcı yetkilerini yönetme iznine sahiptir",
     "ORG_PROJECT_PERMISSION_EDITOR": "Proje yetkilerini yönetme iznine sahiptir",
     "ORG_PROJECT_CREATOR": "Kendi projelerini ve altyapı ayarlarını oluşturma iznine sahiptir",
     "ORG_ADMIN_IMPERSONATOR": "Organizasyondan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "ORG_END_USER_IMPERSONATOR": "Organizasyondan son kullanıcıların kimliğine bürünme iznine sahiptir",
-    "ORG_USER_SELF_MANAGER": "Kendi kullanıcısını yönetme iznine sahiptir",
+    "ORG_USER_SELF_ADMINISTRATOR": "Kendi kullanıcısını yönetme iznine sahiptir",
     "PROJECT_OWNER": "Tüm proje üzerinde izne sahiptir",
     "PROJECT_OWNER_VIEWER": "Tüm projeyi gözden geçirme iznine sahiptir",
     "PROJECT_OWNER_GLOBAL": "Tüm proje üzerinde izne sahiptir",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Örneğiniz engellendi.",
-      "DESCRIPTION": "ZITADEL örnek yöneticinizden aboneliği güncellemesini isteyin."
+      "DESCRIPTION": "Yöneticinizden ZITADEL örneğinin aboneliğini güncellemesini isteyin."
     },
     "INVALID_FORMAT": "Biçimlendirme geçersiz.",
     "NOTANEMAIL": "Verilen değer bir e-posta adresi değil.",
@@ -766,7 +766,7 @@
       "KEYS": "Anahtarlar",
       "PAT": "Kişisel Erişim Token'ları",
       "USERGRANTS": "Yetkilendirmeler",
-      "MEMBERSHIPS": "Üyelikler",
+      "MEMBERSHIPS": "Yönetici rolleri",
       "METADATA": "Meta Veri"
     },
     "TITLE": "Kişisel Bilgiler",
@@ -1161,7 +1161,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Yönetici Rolleri",
-      "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
+      "DESCRIPTION": "Bunlar kullanıcının tüm yönetici rolleri yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
       "CREATIONDATE": "Oluşturma Tarihi",
@@ -1170,7 +1170,7 @@
       "REMOVE": "Kaldır",
       "TYPE": "Tür",
       "ORGID": "Organizasyon ID",
-      "UPDATED": "Üyelik güncellendi.",
+      "UPDATED": "Yönetici rolü güncellendi.",
       "NOPERMISSIONTOEDIT": "Rolleri düzenlemek için gerekli izinlere sahip değilsiniz!",
       "TYPES": {
         "UNKNOWN": "Bilinmeyen",
@@ -1935,7 +1935,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organizasyon",
-    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve üyeleri yönetebilirsiniz.",
+    "DESCRIPTION": "Burada organizasyonunuzun yapılandırmasını düzenleyebilir ve yöneticileri yönetebilirsiniz.",
     "DETAIL": {
       "TITLE": "Detay",
       "NAME": "Ad",
@@ -1947,13 +1947,13 @@
       }
     },
     "MEMBER": {
-      "TITLE": "Üyeler",
+      "TITLE": "Yöneticiler",
       "USERNAME": "Kullanıcı Adı",
       "DISPLAYNAME": "Görünen Ad",
       "LOGINNAME": "Giriş Adı",
       "EMAIL": "E-posta",
       "ROLES": "Roller",
-      "ADD": "Üye Ekle",
+      "ADD": "Yönetici Ekle",
       "ADDDESCRIPTION": "Eklenecek kullanıcıların adlarını girin."
     },
     "TABLE": {
@@ -2843,7 +2843,7 @@
       "UPDATED": "Yetkilendirme güncellendi.",
       "REMOVED": "Yetkilendirme kaldırıldı",
       "BULKREMOVED": "Yetkilendirmeler kaldırıldı.",
-      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun üyesi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
+      "CANTSHOWINFO": "Bu kullanıcının ait olduğu organizasyonun yöneticisi olmadığınız için bu kullanıcının profilini ziyaret edemezsiniz"
     },
     "DIALOG": {
       "DELETE_TITLE": "Yetkilendirmeyi sil",

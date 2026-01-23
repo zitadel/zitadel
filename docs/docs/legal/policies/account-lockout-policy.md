@@ -64,7 +64,7 @@ If you need to recover an Administrator account of an instance, please make sure
 Please visit the [support page in the customer portal](https://zitadel.com/admin/support):
 
 - State clearly in the subject line that this is related to an account lockout **for** the affected instance
-- The sender's email address must match the verified email address of the affected instance manager
+- The sender's email address must match the verified email address of the affected instance administrator
 - State the reason why you're not able to recover the account yourself
 
 Please allow us time to validate your request.  
