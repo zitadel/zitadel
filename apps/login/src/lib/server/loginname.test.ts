@@ -265,7 +265,7 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({
-          error: "errors.usernamePasswordNotAllowed",
+          error: "errors.localAuthenticationNotAllowed",
         });
       });
 
@@ -395,7 +395,7 @@ describe("sendLoginname", () => {
         expect((result as any).redirect).toContain("altPassword=true"); // password is allowed
       });
 
-      test("should not show password alternative when password is not allowed", async () => {
+      test("should return error when allowLocalAuthentication is false (disabling both password and passkey)", async () => {
         mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY],
@@ -405,9 +405,9 @@ describe("sendLoginname", () => {
           loginName: "user@example.com",
         });
 
-        expect(result).toBeDefined();
-        expect(result?.redirect).toMatch(/^\/passkey\?/);
-        expect(result?.redirect).toContain("altPassword=false"); // password is not allowed
+        expect(result).toEqual({
+          error: "errors.localAuthenticationNotAllowed",
+        });
       });
 
       test("should redirect to IDP when no passkey but IDP available", async () => {
@@ -452,7 +452,7 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toEqual({
-          error: "errors.usernamePasswordNotAllowed",
+          error: "errors.localAuthenticationNotAllowed",
         });
       });
     });
@@ -844,7 +844,7 @@ describe("sendLoginname", () => {
         ignoreUnknownUsernames: true,
       });
 
-      expect(result).not.toEqual({ error: "errors.usernamePasswordNotAllowed" });
+      expect(result).not.toEqual({ error: "errors.localAuthenticationNotAllowed" });
       expect(result).toHaveProperty("redirect");
       expect((result as any).redirect).toMatch(/^\/password\?/);
     });

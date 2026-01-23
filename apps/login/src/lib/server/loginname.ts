@@ -348,7 +348,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             }
 
             return {
-              error: t("errors.usernamePasswordNotAllowed"),
+              error: t("errors.localAuthenticationNotAllowed"),
             };
           }
 
@@ -439,7 +439,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             return preventUserEnumeration(command.organization);
           }
           return {
-            error: "Username Password not allowed! Contact your administrator for more information.",
+            error: t("errors.localAuthenticationNotAllowed"),
           };
         }
 

@@ -47,7 +47,7 @@
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotCreateSession": "Impossible de créer une session pour l'utilisateur",
       "initialUserNotSupported": "Utilisateur initial non pris en charge",
-      "usernamePasswordNotAllowed": "L'identifiant et le mot de passe ne sont pas autorisés ! Contactez votre administrateur pour plus d'informations.",
+      "localAuthenticationNotAllowed": "L'identifiant et le mot de passe ne sont pas autorisés ! Contactez votre administrateur pour plus d'informations.",
       "passkeysNotAllowed": "Les clés d'accès ne sont pas autorisées ! Contactez votre administrateur pour plus d'informations.",
       "couldNotFindIdentityProvider": "Impossible de trouver le fournisseur d'identité.",
       "userNotActive": "L'utilisateur n'est pas actif. Contactez votre administrateur pour plus d'informations."
