@@ -20,19 +20,19 @@ title: Objects
   - `phone` *string*
   - `isPhoneVerified` *boolean*
 
-## Metadata with value as bytes
+## metadata with value as bytes
 
 - `key` *string*
 - `value` Array of *byte*
 
-## Metadata result
+## metadata result
 
 - `count` *number*
 - `sequence` *number*
 - `timestamp` *Date*
 - `metadata` Array of [*metadata*](#metadata)
 
-## Metadata
+## metadata
 
 - `creationDate` *Date*
 - `changeDate` *Date*
@@ -41,7 +41,9 @@ title: Objects
 - `key` *string*
 - `value` `Any`
 
-## Role Assignment
+## user grant
+
+User grant is a role assignment for a user.
 
 - `projectID` *string*  
   Required. ID of the project for the role assignment. 
@@ -50,7 +52,7 @@ title: Objects
 - `roles` Array of *string*  
   Roles to assign to the user.
 
-## User
+## user
 
 - `id` *string*
 - `creationDate` *Date*
@@ -83,7 +85,7 @@ title: Objects
   - `name` *string*
   - `description` *string*
 
-## Human User
+## human user
 
 - `id` *string*
 - `creationDate` *Date*
@@ -184,7 +186,7 @@ This object represents [the claims](../openidoauth/claims) which will be written
 
 There could be additional fields depending on the configuration of your [project](../../guides/manage/console/projects-overview#role-settings) and your [application](../../guides/manage/console/applications-overview#token-settings)
 
-## Role Assignments
+## user grant list
 
 This object represents a list of roles assigned to a user stored in ZITADEL.
 
