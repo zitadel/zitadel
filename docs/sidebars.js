@@ -1136,7 +1136,9 @@ module.exports = {
                 title: "Authorization Service API",
                 slug: "/apis/resources/authorization_service_v2",
                 description:
-                  "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
+                  "AuthorizationService provides methods to manage role assignments for users within your projects and applications.\n" +
+                  "\n" +
+                  "Note: Authorization in this context refers to role assignments, not to OAuth authorization. \n" +
                   "\n" +
                   "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
                   "users, etc., please use the InternalPermissionService."

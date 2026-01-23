@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: El color de advertencia (modo oscuro) no es un valor de código hex válido
         FontColorDark: El color de fuente (modo oscuro) no es un valor de código hex válido
   UserGrant:
-    AlreadyExists: La concesión de usuario ya existe
-    NotFound: Concesión de usuario no encontrada
-    Invalid: La concesión de usuario no es válida
-    NotChanged: La concesión de usuario no ha cambiado
+    AlreadyExists: La asignación de rol ya existe
+    NotFound: Asignación de rol no encontrada
+    Invalid: La asignación de rol no es válida
+    NotChanged: La asignación de rol no ha cambiado
     IDMissing: Falta Id
     NoPermissionForProject: El usuario no tiene permisos en este proyecto
     RoleKeyNotFound: Rol no encontrado
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organización
   project: Proyecto
   user: Usuario
-  usergrant: Concesión de usuario
+  usergrant: Asignación de rol
   quota: Cuota
   feature: Característica
   target: Objectivo
@@ -872,16 +872,16 @@ EventTypes:
     signed:
       out: El usuario cerró sesión
     grant:
-      added: Autorización añadida
-      changed: Autorización modificada
-      removed: Autorización eliminada
-      deactivated: Autorización desactivada
-      reactivated: Autorización reactivada
-      reserved: Autorización reservada
-      released: Autorización liberada
+      added: Rol asignado
+      changed: Asignación de rol cambiada
+      removed: Asignación de rol eliminada
+      deactivated: Asignación de rol desactivada
+      reactivated: Asignación de rol reactivada
+      reserved: Asignación de rol reservada
+      released: Asignación de rol liberada
       cascade:
-        removed: Autorización eliminada
-        changed: Autorización modificada
+        removed: Asignación de rol eliminada
+        changed: Asignación de rol cambiada
     metadata:
       set: Metadatos de usuario establecidos
       removed: Metadatos de usuario eliminados

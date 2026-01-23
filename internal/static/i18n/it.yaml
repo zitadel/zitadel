@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Warn color (dark mode) non è un valore di colore HEX valido
         FontColorDark: Il colore del carattere (modalità scura) non è un valore di colore HEX valido
   UserGrant:
-    AlreadyExists: User Grant già esistente
-    NotFound: User Grant non trovato
-    Invalid: User Grant non è valido
-    NotChanged: User Grant non è stata cambiato
+    AlreadyExists: L'assegnazione del ruolo esiste già
+    NotFound: Assegnazione di ruolo non trovata
+    Invalid: L'assegnazione del ruolo non è valida
+    NotChanged: L'assegnazione del ruolo non è stata modificata
     IDMissing: ID mancante
     NoPermissionForProject: L'utente non ha permessi su questo progetto
     RoleKeyNotFound: Ruolo non trovato
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organizzazione
   project: Progetto
   user: Utente
-  usergrant: Sovvenzione utente
+  usergrant: Assegnazione di ruolo
   quota: Quota
   feature: Funzionalità
   target: Bersaglio
@@ -871,16 +871,16 @@ EventTypes:
     signed:
       out: L'utente è uscito
     grant:
-      added: Autorizzazione aggiunta
-      changed: Autorizzazione cambiata
-      removed: Autorizzazione rimossa
-      deactivated: Autorizzazione disattivata
-      reactivated: Autorizzazione riattivata
-      reserved: Autorizzazione riservata
-      released: Autorizzazione rilasciata
+      added: Ruolo assegnato
+      changed: Assegnazione di ruolo modificata
+      removed: Assegnazione di ruolo rimossa
+      deactivated: Assegnazione di ruolo disattivata
+      reactivated: Assegnazione di ruolo riattivata
+      reserved: Assegnazione di ruolo riservata
+      released: Assegnazione di ruolo rilasciata
       cascade:
-        removed: Autorizzazione rimossa
-        changed: Autorizzazione cambiata
+        removed: Assegnazione di ruolo rimossa
+        changed: Assegnazione di ruolo modificata
     metadata:
       set: Set di metadati utente
       removed: Metadati utente rimossi

@@ -438,10 +438,10 @@ Errors:
         WarnColorDark: ワーンカラー（ダークモード）は有効なHexカラー値ではありません
         FontColorDark: フォントカラー（ダークモード）は有効なHexカラー値ではありません
   UserGrant:
-    AlreadyExists: ユーザーグラントはすでに存在しています
-    NotFound: ユーザーグラントが見つかりません
-    Invalid: 無効なユーザーグラントです
-    NotChanged: ユーザーグラントは変更されていません
+    AlreadyExists: ロール割り当てはすでに存在しています
+    NotFound: ロール割り当てが見つかりません
+    Invalid: 無効なロール割り当てです
+    NotChanged: ロール割り当ては変更されていません
     IDMissing: IDがありません
     NoPermissionForProject: ユーザーにはこのプロジェクトに許可がありません
     RoleKeyNotFound: ロールが見つかりません
@@ -630,7 +630,7 @@ AggregateTypes:
   org: 組織
   project: プロジェクト
   user: ユーザー
-  usergrant: ユーザーグラント
+  usergrant: ロール割り当て
   quota: クォータ
   feature: 特徴
   target: 目標
@@ -873,16 +873,16 @@ EventTypes:
     signed:
       out: ユーザーのサインアウト
     grant:
-      added: 認可の追加
-      changed: 認可の変更
-      removed: 認可の削除
-      deactivated: 認可の非アクティブ化
-      reactivated: 認可のアクティブ化
-      reserved: 認可の予約
-      released: 認可の解放
+      added: ロールの割り当て
+      changed: ロール割り当ての変更
+      removed: ロール割り当ての削除
+      deactivated: ロール割り当ての非アクティブ化
+      reactivated: ロール割り当ての再アクティブ化
+      reserved: ロール割り当ての予約
+      released: ロール割り当ての解放
       cascade:
-        removed: 認可の削除
-        changed: 認可の変更
+        removed: ロール割り当ての削除
+        changed: ロール割り当ての変更
     metadata:
       set: ユーザーメタデータのセット
       removed: ユーザーメタデータの削除

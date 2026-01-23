@@ -438,10 +438,10 @@ Errors:
         WarnColorDark: 警告颜色 (深色模式) 不是有效的十六进制颜色值
         FontColorDark: 字体颜色 (深色模式) 不是有效的十六进制颜色值
   UserGrant:
-    AlreadyExists: 用户授权已存在
-    NotFound: 用户授权不存在
-    Invalid: 用户授权无效
-    NotChanged: 用户授权未更改
+    AlreadyExists: 角色分配已存在
+    NotFound: 找不到角色分配
+    Invalid: 角色分配无效
+    NotChanged: 角色分配未更改
     IDMissing: 没有 ID
     NoPermissionForProject: 用户对此项目没有权限
     RoleKeyNotFound: 角色不存在
@@ -630,7 +630,7 @@ AggregateTypes:
   org: 组织
   project: 项目
   user: 用户
-  usergrant: 用户授权
+  usergrant: 角色分配
   quota: 配额
   feature: 特征
   target: 靶
@@ -873,16 +873,16 @@ EventTypes:
     signed:
       out: 用户退出登录
     grant:
-      added: 添加授权
-      changed: 更改授权
-      removed: 删除授权
-      deactivated: 停用授权
-      reactivated: 启用授权
-      reserved: 保留授权
-      released: 释放授权
+      added: 已分配角色
+      changed: 角色分配已更改
+      removed: 角色分配已删除
+      deactivated: 角色分配已停用
+      reactivated: 角色分配已重新激活
+      reserved: 角色分配已保留
+      released: 角色分配已释放
       cascade:
-        removed: 删除授权
-        changed: 更改授权
+        removed: 角色分配已删除
+        changed: 角色分配已更改
     metadata:
       set: 用户元数据集
       removed: 删除用户元数据

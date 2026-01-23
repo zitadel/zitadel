@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Warn Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
         FontColorDark: Schrift Farbe (dunkler Modus) ist kein gültiger Hex Farbwert
   UserGrant:
-    AlreadyExists: Benutzer Berechtigung existiert bereits
-    NotFound: Benutzer Berechtigung konnte nicht gefunden werden
-    Invalid: Benutzer Berechtigung ist ungültig
-    NotChanged: Benutzer Berechtigung wurde nicht verändert
+    AlreadyExists: Rollenzuweisung existiert bereits
+    NotFound: Rollenzuweisung konnte nicht gefunden werden
+    Invalid: Rollenzuweisung ist ungültig
+    NotChanged: Rollenzuweisung wurde nicht verändert
     IDMissing: ID fehlt
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
     RoleKeyNotFound: Rolle konnte nicht gefunden werden
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organisation
   project: Projekt
   user: Benutzer
-  usergrant: Benutzerberechtigung
+  usergrant: Rollenzuweisung
   quota: Kontingent
   feature: Feature
   target: Ziel
@@ -872,16 +872,16 @@ EventTypes:
     signed:
       out: Benutzer erfolgreich abgemeldet
     grant:
-      added: Berechtigung hinzugefügt
-      changed: Berechtigung geändert
-      removed: Berechtigung entfernt
-      deactivated: Berechtigung deaktiviert
-      reactivated: Berechtigung reaktiviert
-      reserved: Berechtigung reserviert
-      released: Berechtigung freigegeben
+      added: Rolle zugewiesen
+      changed: Rollenzuweisung geändert
+      removed: Rollenzuweisung entfernt
+      deactivated: Rollenzuweisung deaktiviert
+      reactivated: Rollenzuweisung reaktiviert
+      reserved: Rollenzuweisung reserviert
+      released: Rollenzuweisung freigegeben
       cascade:
-        removed: Berechtigung entfernt
-        changed: Berechtigung geändert
+        removed: Rollenzuweisung entfernt
+        changed: Rollenzuweisung geändert
     metadata:
       set: Benutzer Metadaten gesetzt
       removed: Benutzer Metadaten gelöscht

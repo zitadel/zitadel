@@ -49,13 +49,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
+            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and role assignments of their project."
         },
         {
             name: "Authentication Methods"
         },
         {
-            name: "Authorization"
+            name: "Role Assignments"
         },
         {
             name: "Branding"
@@ -105,7 +105,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Project Grants",
-            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called a project grant."
+            description: "A project that is granted to another organization, so the other organization has access to it and can manage role assignments to users, is called a project grant."
         },
         {
             name: "Project Roles"
@@ -4627,7 +4627,8 @@ service ManagementService {
     //
     // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-deactivate-authorization.api.mdx) to disable a user's access to an owned or granted project.
     //
-    // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
+    // Deactivate the user grant. User grants are the roles users have for a specific project and organization.
+    // The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_deactivate"
@@ -4656,7 +4657,8 @@ service ManagementService {
     //
     // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-activate-authorization.api.mdx) to enable a user's access to an owned or granted project.
     //
-    // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
+    // Reactivate a deactivated user grant. User grants are the roles users have for a specific project and organization.
+    // The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_reactivate"
@@ -4685,7 +4687,8 @@ service ManagementService {
     //
     // Deprecated: [Delete an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove a users access to an owned or granted project.
     //
-    // Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
+    // Removes the user grant from the user. User grants are the roles users have for a specific project and organization.
+    // The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{grant_id}"
@@ -4713,7 +4716,8 @@ service ManagementService {
     //
     // Deprecated: [Delete authorizations one after the other](apis/resources/authorization_service_v2/zitadel-authorization-v-2-authorization-service-delete-authorization.api.mdx) to remove access for multiple users on multiple owned or granted projects.
     //
-    // Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
+    // Remove a list of user grants. User grants are the roles users have for a specific project and organization.
+    // The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/user_grants/_bulk"

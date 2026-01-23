@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Kolor ostrzegawczy (tryb ciemny) nie jest prawidłową wartością Hex koloru
         FontColorDark: Kolor czcionki (tryb ciemny) nie jest prawidłową wartością Hex koloru
   UserGrant:
-    AlreadyExists: Uprawnienie użytkownika już istnieje
-    NotFound: Uprawnienie użytkownika nie znalezione
-    Invalid: Uprawnienie użytkownika jest nieprawidłowe
-    NotChanged: Uprawnienie użytkownika nie zostało zmienione
+    AlreadyExists: Przypisanie roli już istnieje
+    NotFound: Nie znaleziono przypisania roli
+    Invalid: Przypisanie roli jest nieprawidłowe
+    NotChanged: Przypisanie roli nie zostało zmienione
     IDMissing: Brak ID
     NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
     RoleKeyNotFound: Rola nie znaleziona
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organizacja
   project: Projekt
   user: Użytkownik
-  usergrant: Uprawnienie użytkownika
+  usergrant: Przypisanie roli
   quota: Limit
   feature: Funkcja
   target: Cel
@@ -872,16 +872,16 @@ EventTypes:
     signed:
       out: Użytkownik wylogowany
     grant:
-      added: Dodano autoryzację
-      changed: Zmieniono autoryzację
-      removed: Usunięto autoryzację
-      deactivated: Dezaktywowano autoryzację
-      reactivated: Aktywowano ponownie autoryzację
-      reserved: Zarezerwowano autoryzację
-      released: Zwolniono autoryzację
+      added: Rola przypisana
+      changed: Zmieniono przypisanie roli
+      removed: Usunięto przypisanie roli
+      deactivated: Dezaktywowano przypisanie roli
+      reactivated: Reaktywowano przypisanie roli
+      reserved: Zarezerwowano przypisanie roli
+      released: Zwolniono przypisanie roli
       cascade:
-        removed: Usunięto autoryzację
-        changed: Zmieniono autoryzację
+        removed: Usunięto przypisanie roli
+        changed: Zmieniono przypisanie roli
     metadata:
       set: Ustawiono metadane użytkownika
       removed: Usunięto metadane użytkownika

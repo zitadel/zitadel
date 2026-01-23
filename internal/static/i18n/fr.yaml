@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: La couleur d'avertissement (mode sombre) n'a pas de valeur de couleur hexadécimale valide.
         FontColorDark: La couleur de la police (mode foncé) n'a pas de valeur de couleur hexadécimale valide.
   UserGrant:
-    AlreadyExists: L'autorisation de l'utilisateur existe déjà
-    NotFound: Subvention d'utilisateur non trouvée
-    Invalid: La subvention d'utilisateur n'est pas valide
-    NotChanged: L'autorisation de l'utilisateur n'a pas été modifiée.
+    AlreadyExists: L'affectation de rôle existe déjà
+    NotFound: Affectation de rôle non trouvée
+    Invalid: L'affectation de rôle n'est pas valide
+    NotChanged: L'affectation de rôle n'a pas été modifiée
     IDMissing: Id manquant
     NoPermissionForProject: L'utilisateur n'a aucune autorisation pour ce projet
     RoleKeyNotFound: Rôle non trouvé
@@ -629,7 +629,7 @@ AggregateTypes:
   org: Organisation
   project: Projet
   user: Utilisateur
-  usergrant: Subvention de l'utilisateur
+  usergrant: Affectation de rôle
   quota: Contingent
   feature: Fonctionnalité
   target: Cible
@@ -867,16 +867,16 @@ EventTypes:
     signed:
       out: L'utilisateur s'est déconnecté
     grant:
-      added: Autorisation ajoutée
-      changed: Autorisation modifiée
-      removed: Autorisation supprimée
-      deactivated: Autorisation désactivée
-      reactivated: Autorisation réactivée
-      reserved: Autorisation réservée
-      released: Autorisation validée
+      added: Rôle assigné
+      changed: Affectation de rôle modifiée
+      removed: Affectation de rôle supprimée
+      deactivated: Affectation de rôle désactivée
+      reactivated: Affectation de rôle réactivée
+      reserved: Affectation de rôle réservée
+      released: Affectation de rôle libérée
       cascade:
-        removed: Autorisation supprimée
-        changed: Autorisation modifiée
+        removed: Affectation de rôle supprimée
+        changed: Affectation de rôle modifiée
     metadata:
       set: Ensemble de métadonnées de l'utilisateur
       removed: Métadonnées de l'utilisateur supprimées

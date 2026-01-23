@@ -437,10 +437,10 @@ Errors:
         WarnColorDark: Warna peringatan (mode gelap) bukanlah nilai warna Hex yang valid
         FontColorDark: Warna font (mode gelap) bukanlah nilai warna Hex yang valid
   UserGrant:
-    AlreadyExists: Hibah pengguna sudah ada
-    NotFound: Hibah pengguna tidak ditemukan
-    Invalid: Hibah pengguna tidak valid
-    NotChanged: Hibah pengguna belum diubah
+    AlreadyExists: Penetapan peran sudah ada
+    NotFound: Penetapan peran tidak ditemukan
+    Invalid: Penetapan peran tidak valid
+    NotChanged: Penetapan peran belum diubah
     IDMissing: Aku hilang
     NoPermissionForProject: Pengguna tidak memiliki izin pada proyek ini
     RoleKeyNotFound: Peran tidak ditemukan
@@ -624,7 +624,7 @@ AggregateTypes:
   org: Organisasi
   project: Proyek
   user: Pengguna
-  usergrant: Hibah pengguna
+  usergrant: Penetapan Peran
   quota: Kuota
   feature: Fitur
   target: Target
@@ -866,16 +866,16 @@ EventTypes:
     signed:
       out: Pengguna keluar
     grant:
-      added: Otorisasi ditambahkan
-      changed: Otorisasi berubah
-      removed: Otorisasi dihapus
-      deactivated: Otorisasi dinonaktifkan
-      reactivated: Otorisasi diaktifkan kembali
-      reserved: Otorisasi dicadangkan
-      released: Otorisasi dirilis
+      added: Peran ditugaskan
+      changed: Penetapan peran diubah
+      removed: Penetapan peran dihapus
+      deactivated: Penetapan peran dinonaktifkan
+      reactivated: Penetapan peran diaktifkan kembali
+      reserved: Penetapan peran dicadangkan
+      released: Penetapan peran dirilis
       cascade:
-        removed: Otorisasi dihapus
-        changed: Otorisasi berubah
+        removed: Penetapan peran dihapus
+        changed: Penetapan peran diubah
     metadata:
       set: Kumpulan metadata pengguna
       removed: Metadata pengguna dihapus

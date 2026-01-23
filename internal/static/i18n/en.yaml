@@ -438,10 +438,10 @@ Errors:
         WarnColorDark: Warn color (dark mode) is no valid Hex color value
         FontColorDark: Font color (dark mode) is no valid Hex color value
   UserGrant:
-    AlreadyExists: User grant already exists
-    NotFound: User grant not found
-    Invalid: User grant is invalid
-    NotChanged: User grant has not been changed
+    AlreadyExists: Role assignment already exists
+    NotFound: Role assignment not found
+    Invalid: Role assignment is invalid
+    NotChanged: Role assignment has not been changed
     IDMissing: Id missing
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
@@ -630,7 +630,7 @@ AggregateTypes:
   org: Organization
   project: Project
   user: User
-  usergrant: User grant
+  usergrant: Role Assignment
   quota: Quota
   feature: Feature
   target: Target
@@ -873,16 +873,16 @@ EventTypes:
     signed:
       out: User signed out
     grant:
-      added: Authorization added
-      changed: Authorization changed
-      removed: Authorization removed
-      deactivated: Authorization deactivated
-      reactivated: Authorization reactivated
-      reserved: Authorization reserved
-      released: Authorization released
+      added: Role assigned
+      changed: Role assignment changed
+      removed: Role assignment removed
+      deactivated: Role assignment deactivated
+      reactivated: Role assignment reactivated
+      reserved: Role assignment reserved
+      released: Role assignment released
       cascade:
-        removed: Authorization removed
-        changed: Authorization changed
+        removed: Role assignment removed
+        changed: Role assignment changed
     metadata:
       set: User metadata set
       removed: User metadata removed

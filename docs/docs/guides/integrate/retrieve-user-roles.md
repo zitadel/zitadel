@@ -5,25 +5,25 @@ sidebar_label: Retrieve User Roles
 
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
 
-## What are roles/authorizations/grants in ZITADEL? 
-User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific administrator roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
+## What are roles and role assignments in ZITADEL? 
+User roles or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as role assignments, whereas the APIs refer to them as authorizations. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific manager roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
 
 Roles are critical to managing permissions in a single-tenant or multi-tenant application. It can, however, be tricky to retrieve them, especially when spanning multiple organizations and projects. 
 
 ## Assign roles and memberships
 
-Human or service users can be assigned roles. You can do this via the ZITADEL Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`. 
+Human or service users can be assigned roles. You can do this via the ZITADEL Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has manager roles, such as `ORG_OWNER` and `IAM_OWNER`. 
 
 Follow the links below to assign roles to your users. 
 
 - [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
-- [Add administrator roles via the ZITADEL Console](/docs/guides/manage/console/managers)
-- [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
-- [Add administrator roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
+- [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add application roles via the Project Service API](/docs/apis/resources/project_service_v2/zitadel-project-v-2-project-service-add-project-role)
+- [Add manager roles to users via the Internal Permission Service API](/docs/apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-create-administrator)
 
 ## Retrieve roles
 
-Roles can be requested via our auth and management APIs, from userinfo endpoint or ID token. Currently, administrator roles cannot be directly included in the token. You will need to use the ZITADEL APIs to retrieve them.
+Roles can be requested via our auth and management APIs, from userinfo endpoint or ID token. Currently, manager roles cannot be directly included in the token. You will need to use the ZITADEL APIs to retrieve them.
 
 ### Generate a token
 
@@ -34,7 +34,7 @@ How to generate a token:
 - [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service users](/docs/guides/integrate/service-users/authenticate-service-users)
 
-In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
+To access role information via the token, you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
 
 ### Determine the audience
 
@@ -218,7 +218,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/category/apis/resources/auth/user-authorizations-grants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted setup. You can use the logged-in user’s token or the machine user’s token to retrieve the roles assigned to this user using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
@@ -248,7 +248,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
 
 #### **2.[List my ZITADEL permissions](/docs/apis/resources/auth/auth-service-list-my-zitadel-permissions)​**
 
-Returns a list of permissions the authenticated user has in ZITADEL based on the administrator roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
+Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
 
 This request can be used if you are building a management UI. For instance, if the UI is managing users, you can show the management functionality based on the permissions the user has. Here’s an example: if the user has `user.read` and `user.write` permission you can show the edit buttons, if the user only has `user.read` permission, you can hide the edit buttons.
 
