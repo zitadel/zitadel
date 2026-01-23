@@ -29,7 +29,7 @@
 /* Custom Zitadel Variables */
 :root {
   --font-family-base: "Lato", sans-serif;
-  
+
   /* Custom Gradients/Colors used in utility classes */
   --get-started: #ff2069;
   --get-started-bg-hover: #7e21ce;
@@ -45,14 +45,16 @@
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --card-border-hover: #ff2069;
-  
+
   --font-color-strong: #000000;
 }
 
-.dark {
+:root[class~="dark"],
+[data-theme="dark"] {
   --get-started: #ff1f69;
-  --get-started-bg: #dddddd; /* approximated from previous var(--ifm-font-color-base) */
-  
+  --get-started-bg: #dddddd;
+  /* approximated from previous var(--ifm-font-color-base) */
+
   --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
@@ -64,7 +66,7 @@
   --footer-border: rgba(255, 255, 255, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --card-border-hover: #ffffff;
-  
+
   --font-color-strong: #ffffff;
 }
 
@@ -81,7 +83,8 @@
   border-radius: 50vw;
   border: 2px solid var(--get-started);
   background-color: var(--get-started);
-  color: white; /* Fixed white for better contrast on pink */
+  color: white;
+  /* Fixed white for better contrast on pink */
 }
 
 .get-started:hover {
@@ -220,8 +223,8 @@ p strong {
 
 /* API Method Colors - Adapted for Fumadocs if needed, or keeping as utility classes */
 .api-method {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Helper classes for light/dark mode visibility */
@@ -264,7 +267,8 @@ p strong {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #ef444420; /* fallback danger color */
+  background-color: #ef444420;
+  /* fallback danger color */
   color: #ef4444;
   font-size: 12px;
   font-weight: 600;
