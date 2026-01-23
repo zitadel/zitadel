@@ -526,6 +526,9 @@ importers:
       shiki:
         specifier: ^3.19.0
         version: 3.19.0
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
       vanilla-cookieconsent:
         specifier: 3.0.0
         version: 3.0.0
