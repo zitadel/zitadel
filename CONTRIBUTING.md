@@ -461,7 +461,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 - Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
 - Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
-### Contribute to Management Console
+### Contribute to the Management Console
 
 To learn more about the Management Console, go to the Management Consoles [README.md](./console/README.md).
 
@@ -519,9 +519,9 @@ Allow the API [to redirect to your dev server](#configure-console-dev-server-red
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
-#### Configure Management Console Dev Server Redirects
+#### Configure the Management Console Dev Server Redirects
 
-To allow Management Console access via http://localhost:4200, you have to configure the Zitadel API.
+To allow the Management Console access via http://localhost:4200, you have to configure the Zitadel API.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
 2. Select the _ZITADEL_ project.
@@ -531,12 +531,12 @@ To allow Management Console access via http://localhost:4200, you have to config
 6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
 7. Select the _Save_ button
 
-#### Pass Management Console Quality Checks
+#### Pass the Management Console Quality Checks
 
 Run the quality checks for the code you changed.
 
 ```bash
-# Run management console-related linting builds and unit tests
+# Run the management console-related linting builds and unit tests
 pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 ```
 

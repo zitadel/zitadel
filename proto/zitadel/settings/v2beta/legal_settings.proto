@@ -51,7 +51,7 @@ string custom_link = 7 [
 ];
 string custom_link_text = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "The button text that would be shown in management console pointing to custom link.";
+        description: "The button text that would be shown in the management console pointing to custom link.";
         example: "\"External\"";
     }
 ];

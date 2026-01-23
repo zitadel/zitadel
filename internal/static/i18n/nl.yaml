@@ -1238,7 +1238,7 @@ EventTypes:
       removed: Domein verwijderd
     iam:
       console:
-        set: ZITADEL Management Console-toepassing ingesteld
+        set: ZITADEL Management Console-applicatie ingesteld
       project:
         set: ZITADEL project ingesteld
     mail:

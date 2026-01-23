@@ -676,7 +676,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "Alle organisatie-instellingen en tabellen in beheerconsole zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
+      "TEXT": "Alle organisatie-instellingen en tabellen in de beheerconsole zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
     },
     "INSTANCE": {
       "TEXT": "Klik hier om naar de instantie-instellingen te gaan. Merk op dat u alleen toegang heeft tot deze knop als u uitgebreide machtigingen heeft."

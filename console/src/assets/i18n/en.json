@@ -677,7 +677,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "All organization settings and tables in management console are based on a selected organization. Click this button to switch organization or create a new one."
+      "TEXT": "All organization settings and tables in the Management Console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
       "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
@@ -1664,8 +1664,8 @@
         "DISABLED": "\"Disabled\" is inherited"
       },
       "RESET": "Set all to inherit",
-      "CONSOLEUSEV2USERAPI": "Use V2 Api in Management Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the management console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in the Management Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the Management Console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
       "LOGINV2_BASEURI": "Base URI",
