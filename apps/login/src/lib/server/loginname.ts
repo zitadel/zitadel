@@ -371,7 +371,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
+          if (
+            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
+            !userLoginSettings?.allowLocalAuthentication
+          ) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -406,7 +409,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     } else {
       // prefer passkey in favor of other methods
-      if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
+      if (
+        methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY) &&
+        userLoginSettings?.passkeysType !== PasskeysType.NOT_ALLOWED &&
+        userLoginSettings?.allowLocalAuthentication
+      ) {
         const passkeyParams = new URLSearchParams({
           loginName: command.ignoreUnknownUsernames
             ? command.loginName

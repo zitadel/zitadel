@@ -537,7 +537,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings
         .mockResolvedValueOnce({
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           ignoreUnknownUsernames: false,
         })
         // Mock login settings for discovered org - must include all necessary flags
@@ -621,7 +621,7 @@ describe("sendLoginname", () => {
       mockGetLoginSettings
         .mockResolvedValueOnce({
           allowRegister: true,
-          allowUsernamePassword: true,
+          allowLocalAuthentication: true,
           ignoreUnknownUsernames: false,
         })
         // Mock login settings for org with domain discovery disabled
@@ -645,7 +645,7 @@ describe("sendLoginname", () => {
     test("should not discover org if multiple orgs match the domain", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
 
@@ -669,7 +669,7 @@ describe("sendLoginname", () => {
     test("should use provided organization instead of discovering when org context exists", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
 
@@ -687,7 +687,7 @@ describe("sendLoginname", () => {
       expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
 
-    test("should redirect to password when ignoreUnknownUsernames is true, allowRegister is true, but allowUsernamePassword is false (User not found)", async () => {
+    test("should redirect to password when ignoreUnknownUsernames is true, allowRegister is true, but allowLocalAuthentication is false (User not found)", async () => {
       mockSearchUsers.mockResolvedValue({ result: [] });
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: true,
@@ -765,7 +765,7 @@ describe("sendLoginname", () => {
       });
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
       });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
@@ -795,7 +795,7 @@ describe("sendLoginname", () => {
       });
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
       });
       mockListAuthenticationMethodTypes.mockResolvedValue({
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
@@ -827,7 +827,7 @@ describe("sendLoginname", () => {
       };
 
       mockGetLoginSettings.mockResolvedValue({
-        allowUsernamePassword: false,
+        allowLocalAuthentication: false,
         ignoreUnknownUsernames: true,
       });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
@@ -910,7 +910,7 @@ describe("sendLoginname", () => {
         },
       };
 
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
@@ -941,7 +941,7 @@ describe("sendLoginname", () => {
         },
       };
 
-      mockGetLoginSettings.mockResolvedValue({ allowUsernamePassword: true });
+      mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
       mockCreate.mockReturnValue({});
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
@@ -980,7 +980,7 @@ describe("sendLoginname", () => {
       };
 
       mockGetLoginSettings.mockResolvedValue({
-        allowUsernamePassword: true,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: true,
       });
       // Mock search result returns a user with resolved/different loginName
@@ -1024,6 +1024,7 @@ describe("sendLoginname", () => {
 
       mockGetLoginSettings.mockResolvedValue({
         passkeysType: PasskeysType.ALLOWED,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: true,
       });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
@@ -1065,6 +1066,7 @@ describe("sendLoginname", () => {
 
       mockGetLoginSettings.mockResolvedValue({
         passkeysType: PasskeysType.ALLOWED,
+        allowLocalAuthentication: true,
         ignoreUnknownUsernames: true,
       });
       mockSearchUsers.mockResolvedValue({ result: [mockUser] });
@@ -1106,10 +1108,10 @@ describe("sendLoginname", () => {
       // Mock implementation to return different settings based on organization
       mockGetLoginSettings.mockImplementation(async (args: any) => {
         if (args.organization === "context-org") {
-          return { allowUsernamePassword: true, ignoreUnknownUsernames: true };
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: true };
         }
         if (args.organization === "user-org") {
-          return { allowUsernamePassword: true, ignoreUnknownUsernames: false };
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: false };
         }
         return {};
       });
@@ -1154,10 +1156,10 @@ describe("sendLoginname", () => {
 
       mockGetLoginSettings.mockImplementation(async (args: any) => {
         if (args.organization === "context-org") {
-          return { allowUsernamePassword: true, ignoreUnknownUsernames: false };
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: false };
         }
         if (args.organization === "user-org") {
-          return { allowUsernamePassword: true, ignoreUnknownUsernames: true };
+          return { allowLocalAuthentication: true, ignoreUnknownUsernames: true };
         }
         return {};
       });
