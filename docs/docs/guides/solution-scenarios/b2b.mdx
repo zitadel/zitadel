@@ -74,7 +74,7 @@ Bill, a user from the Octagon organization, is assigned the admin role for the P
 Dimitri and Michael are both part of the Pentagon organization and have been assigned the `writer` and `reader` roles, respectively.
 
 > Note: Roles are intended for your application's internal business logic and require separate validation.
-The users in this example cannot manage role assignments for other users unless they have an appropriate ZITADEL manager role.
+The users in this example cannot manage role assignments for other users unless they have an appropriate ZITADEL administrator role.
 
 If you build a dashboard for users to assign roles, you must use the Management API with the user's personal access token and not with a machine user's token. This ensures that all actions are properly recorded in the audit log. To enable this, the users performing these actions must be granted a ZITADEL manager role.
 

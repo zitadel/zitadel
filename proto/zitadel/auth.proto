@@ -910,7 +910,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
             summary: "List My ZITADEL Permissions";
-            description: "Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
+            description: "Returns a list of permissions the authenticated user has in ZITADEL based on the administrator roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
         };
     }
 
@@ -946,7 +946,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
-            summary: "List My ZITADEL Manager Roles";
+            summary: "List My ZITADEL Administrator Roles";
             description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
         };
     }

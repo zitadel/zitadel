@@ -142,11 +142,15 @@ func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*comm
 	if err != nil {
 		return nil, err
 	}
+	id := request.GetOrganizationId()
+	if id == "" {
+		id = request.GetOrgId() //nolint:staticcheck
+	}
 	return &command.OrgSetup{
 		Name:         request.GetName(),
 		CustomDomain: "",
 		Admins:       admins,
-		OrgID:        request.GetOrgId(),
+		OrgID:        id,
 	}, nil
 }
 

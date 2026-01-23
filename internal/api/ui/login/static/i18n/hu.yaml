@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Kétfaktoros hitelesítés
   DescriptionPhone: Hozd létre a kétfaktoros hitelesítést. Add meg a telefonszámod a hitelesítéshez.
   DescriptionCode: Hozd létre a kétfaktoros hitelesítést. Add meg a kapott kódot a telefonszámod hitelesítéséhez.
+  CountryCodeLabel: Ország
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Szerkesztés
@@ -238,6 +239,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Nem
   Female: Nő
   Male: Férfi
@@ -283,6 +285,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Felhasználási feltételek
   TosConfirm: Elfogadom a
   TosLinkText: TOS
@@ -357,6 +360,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Eszköz engedélyezése
   UserCode:

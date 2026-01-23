@@ -1159,7 +1159,7 @@
       "SECRETREMOVED": "Secret rimosso con successo!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Memberships di ZITADEL",
+      "TITLE": "Ruoli dell'amministratore ZITADEL",
       "DESCRIPTION": "Questi sono tutti i member grant dell'utente. Puoi modificarli anche nelle pagine di dettaglio dell'organizzazione, del progetto o di sistema.",
       "ORGCONTEXT": "Vedi tutti i progetti che sono collegati all'organizzazione attualmente selezionata.",
       "USERCONTEXT": "Vedi tutte le organizzazioni e i progetti a cui sei autorizzato. Comprese le altre organizzazioni.",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1806,7 +1807,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2764,7 +2766,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

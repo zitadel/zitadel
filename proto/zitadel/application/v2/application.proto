@@ -37,6 +37,9 @@ message Application {
     APIConfiguration api_configuration = 7;
     SAMLConfiguration saml_configuration = 8;
   }
+
+  // The ProjectID represents the ID of the project the application belongs to.
+  string project_id = 9;
 }
 
 enum ApplicationState {
@@ -69,6 +72,14 @@ message ApplicationSearchFilter {
 
     // Filter for specific application types.
     ApplicationType type_filter = 4 [(validate.rules).enum = {defined_only: true, not_in:[0]}];
+
+    // Filter the applications by the clientID
+    // This is only applicable for OIDC and API applications.
+    ClientIDFilter client_id_filter = 5;
+
+    // Filter the applications by their entityID
+    // This is only applicable for SAML applications.
+    EntityIDFilter entity_id_filter = 6;
   }
 }
 
@@ -93,6 +104,30 @@ message ApplicationNameFilter {
 
   // The method to use for text comparison. If not set, defaults to EQUALS.
   zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ClientIDFilter {
+  // The clientID to search for. The search is performed as an exact match.
+  string client_id = 1 [
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"client-12345\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message EntityIDFilter {
+  // The entityID to search for. The search is performed as an exact match.
+  string entity_id = 1 [
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"https://example.com/saml/v2/metadata\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 enum ApplicationType {

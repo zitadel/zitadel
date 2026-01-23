@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Rahasia berhasil dihapus!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Peran Manajer ZITADEL",
+      "TITLE": "Peran Administrator ZITADEL",
       "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1803,7 +1804,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2787,7 +2789,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",
