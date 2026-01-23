@@ -82,7 +82,7 @@ func (c change[V]) IsOnColumn(col Column) bool {
 
 type Changes []Change
 
-func NewChanges(cols ...Change) Change {
+func NewChanges(cols ...Change) Changes {
 	return Changes(cols)
 }
 

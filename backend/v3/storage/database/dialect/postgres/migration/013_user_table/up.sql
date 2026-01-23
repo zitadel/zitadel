@@ -178,41 +178,6 @@ FOR EACH ROW
 WHEN (NEW.updated_at IS NULL)
 EXECUTE FUNCTION zitadel.set_updated_at();
 
-CREATE OR REPLACE FUNCTION zitadel.cleanup_orphaned_user_verifications()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- This function cleans up verifications if the corresponding ID in the users table
-    -- is changed, removed or if the user is deleted.
-
-    IF OLD.unverified_password_id IS NOT NULL AND OLD.unverified_password_id IS DISTINCT FROM NEW.unverified_password_id THEN
-        DELETE FROM zitadel.verifications WHERE instance_id = OLD.instance_id AND id = OLD.unverified_password_id;
-    END IF;
-
-    IF OLD.unverified_email_id IS NOT NULL AND OLD.unverified_email_id IS DISTINCT FROM NEW.unverified_email_id THEN
-        DELETE FROM zitadel.verifications WHERE instance_id = OLD.instance_id AND id = OLD.unverified_email_id;
-    END IF;
-
-    IF OLD.unverified_phone_id IS NOT NULL AND OLD.unverified_phone_id IS DISTINCT FROM NEW.unverified_phone_id THEN
-        DELETE FROM zitadel.verifications WHERE instance_id = OLD.instance_id AND id = OLD.unverified_phone_id;
-    END IF;
-
-    IF OLD.email_otp_verification_id IS NOT NULL AND OLD.email_otp_verification_id IS DISTINCT FROM NEW.email_otp_verification_id THEN
-        DELETE FROM zitadel.verifications WHERE instance_id = OLD.instance_id AND id = OLD.email_otp_verification_id;
-    END IF;
-
-    IF OLD.phone_otp_verification_id IS NOT NULL AND OLD.phone_otp_verification_id IS DISTINCT FROM NEW.phone_otp_verification_id THEN
-        DELETE FROM zitadel.verifications WHERE instance_id = OLD.instance_id AND id = OLD.phone_otp_verification_id;
-    END IF;
-
-    RETURN NEW; -- Return value is ignored for AFTER triggers.
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_cleanup_verifications
-AFTER UPDATE OR DELETE ON zitadel.users
-FOR EACH ROW
-EXECUTE FUNCTION zitadel.cleanup_orphaned_user_verifications();
-
 -- ----------------------------------------------------------------
 -- user metadata
 -- ----------------------------------------------------------------
@@ -250,8 +215,8 @@ CREATE TABLE zitadel.user_personal_access_tokens(
     , id TEXT NOT NULL
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , expires_at TIMESTAMPTZ
-    , type SMALLINT NOT NULL CHECK (type >= 0)
-    , public_key BYTEA NOT NULL
+    , type SMALLINT NOT NULL CHECK (type >= 0) --TODO(adlerhurst): remove column
+    , public_key BYTEA NOT NULL --TODO(adlerhurst): remove column
     , scopes TEXT[]
     
     , PRIMARY KEY (instance_id, id)

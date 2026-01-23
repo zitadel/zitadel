@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/embedded"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/integration"
 )
 
@@ -198,4 +199,34 @@ func createMachineUser(t *testing.T, tx database.QueryExecutor, instanceID, orgI
 	err := userRepo.Create(t.Context(), tx, &user)
 	require.NoError(t, err)
 	return user.ID
+}
+
+func createHumanUser(t *testing.T, tx database.QueryExecutor, instanceID, orgID string) *domain.User {
+	t.Helper()
+	user := &domain.User{
+		InstanceID:     instanceID,
+		OrganizationID: orgID,
+		ID:             gofakeit.UUID(),
+		Username:       gofakeit.Username(),
+		State:          domain.UserStateActive,
+		Human: &domain.HumanUser{
+			FirstName: gofakeit.FirstName(),
+			LastName:  gofakeit.LastName(),
+			Email: domain.HumanEmail{
+				Address: gofakeit.Email(),
+			},
+			Password: domain.HumanPassword{
+				Password: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "aes256",
+					KeyID:      "key-id",
+					Crypted:    []byte("crypted"),
+				},
+			},
+		},
+	}
+	userRepo := repository.UserRepository()
+	err := userRepo.Create(t.Context(), tx, user)
+	require.NoError(t, err)
+	return user
 }

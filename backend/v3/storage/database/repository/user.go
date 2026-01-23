@@ -89,7 +89,7 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'avatarKey', users.avatar_key` +
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
 	`, 'password', jsonb_build_object('password', encode(users.password, 'escape')::JSONB, 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts, 'pendingVerification', ` + verificationQuery(userHuman{}.unverifiedPasswordIDColumn()) + `)` +
-	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check, 'pendingVerification', ` + verificationQuery(userHuman{}.emailOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` + //TODO: handle nullable
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check, 'check', ` + checkQuery(userHuman{}.emailOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` + //TODO: handle nullable
 	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check, 'check', ` + checkQuery(userHuman{}.smsOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
 	`, 'totp', jsonb_build_object('verifiedAt', users.totp_verified_at,'lastSuccessfullyCheckedAt', users.last_successful_totp_check, 'check', ` + checkQuery(userHuman{}.totpSecretIDColumn()) + `, 'pendingVerification', ` + verificationQuery(userHuman{}.unverifiedTOTPIDColumn()) + `)` +
 	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'publicKey', encode(human_passkeys.public_key::BYTEA, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'type', human_passkeys.type, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at, 'challenge', encode(human_passkeys.challenge, 'base64'), 'rpId', human_passkeys.relying_party_id)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
@@ -121,7 +121,7 @@ func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...da
 		u.joinMachineKeys(),
 		u.joinPATs(),
 		u.joinMetadata(),
-		// u.joinVerifications(),
+		u.joinVerifications(),
 		u.joinPasskeys(),
 		database.WithGroupBy(u.PrimaryKeyColumns()...),
 	)

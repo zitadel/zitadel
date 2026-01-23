@@ -15,55 +15,12 @@ import (
 // CheckEmailOTP implements [domain.HumanUserRepository.CheckEmailOTP].
 func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
 	switch typ := check.(type) {
-	case *domain.CheckTypeFailed:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
-			))
-		}, nil)
-	case *domain.CheckTypeSucceeded:
-		lastSucceededChange := database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), database.NowInstruction)
-		if !typ.SucceededAt.IsZero() {
-			lastSucceededChange = database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), typ.SucceededAt)
-		}
-		return database.NewChanges(
-			lastSucceededChange,
-			database.NewChangeToNull(u.emailOTPVerificationIDColumn()),
-		)
 	case *domain.CheckTypeInit:
-		return database.NewCTEChange(
-			func(builder *database.StatementBuilder) {
-				var (
-					createdAt any = database.NowInstruction
-					expiry    any = database.NullInstruction
-				)
-				if !typ.CreatedAt.IsZero() {
-					createdAt = typ.CreatedAt
-				}
-				if typ.Expiry != nil {
-					expiry = *typ.Expiry
-				}
-				builder.WriteString("INSERT INTO zitadel.verifications (instance_id, code, created_at, expiry) SELECT ")
-				existingHumanUser.InstanceIDColumn().WriteQualified(builder)
-				builder.WriteString(", ")
-				builder.WriteArgs(typ.Code, createdAt, expiry)
-				builder.WriteString(" FROM ")
-				builder.WriteString(existingHumanUser.unqualifiedTableName())
-				builder.WriteString(" RETURNING id")
-			}, func(name string) database.Change {
-				return database.NewChangeToStatement(u.emailOTPVerificationIDColumn(), func(builder *database.StatementBuilder) {
-					builder.WriteString("SELECT id FROM ")
-					builder.WriteString(name)
-				})
-			},
-		)
+		return u.verification.initCheck(typ, existingHumanUser.unqualifiedTableName(), u.emailOTPVerificationIDColumn())
+	case *domain.CheckTypeSucceeded:
+		return u.verification.succeeded(typ, u.lastSuccessfulEmailOTPCheckColumn(), u.emailOTPVerificationIDColumn())
+	case *domain.CheckTypeFailed:
+		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailOTPVerificationIDColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for email OTP check change %T", check))
 }
@@ -86,64 +43,19 @@ func (u userHuman) EnableEmailOTPAt(enabledAt time.Time) database.Change {
 // SetEmail implements [domain.HumanUserRepository.SetEmail].
 func (u userHuman) SetEmail(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
-	case *domain.VerificationTypeSkipped:
-		skippedAt := database.NewChange(u.emailVerifiedAtColumn(), database.NowInstruction)
-		if !typ.SkippedAt.IsZero() {
-			skippedAt = database.NewChange(u.emailVerifiedAtColumn(), typ.SkippedAt)
-		}
-		return database.NewChanges(
-			database.NewChange(u.EmailColumn(), *typ.Value),
-			skippedAt,
-		)
-	case *domain.VerificationTypeFailed:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
-			))
-		}, nil)
 	case *domain.VerificationTypeInit:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
-			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			builder.WriteString(" RETURNING id")
-		}, func(name string) database.Change {
-			return database.NewChangeToStatement(u.emailVerificationIDColumn(), func(builder *database.StatementBuilder) {
-				builder.WriteString("SELECT id FROM ")
-				builder.WriteString(name)
-			})
-		})
+		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.emailVerificationIDColumn())
+	case *domain.VerificationTypeSkipped:
+		return u.verification.skipped(typ, u.emailVerifiedAtColumn(), u.EmailColumn())
 	case *domain.VerificationTypeUpdate:
-		changes := make(database.Changes, 0, 3)
-		if typ.Value != nil {
-			changes = append(changes, database.NewChange(u.EmailColumn(), *typ.Value))
-		}
-		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
-		}
-		if typ.Expiry != nil {
-			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
-		}
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			changes.Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailVerificationIDColumn()),
-			))
-		}, nil)
+		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
+			existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn(),
+		)
+	case *domain.VerificationTypeVerified:
+		return u.verification.verified(typ, existingUser.unqualifiedTableName(), u.InstanceIDColumn(),
+			u.emailVerificationIDColumn(), u.emailVerifiedAtColumn(), u.EmailColumn())
+	case *domain.VerificationTypeFailed:
+		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for email verification change %T", verification))
 }

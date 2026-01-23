@@ -15,12 +15,7 @@ import (
 func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
 	switch typ := check.(type) {
 	case *domain.CheckTypeFailed:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
-		}, nil)
+		return u.verification.failed(existingHumanUser.unqualifiedTableName(), u.InstanceIDColumn(), u.totpSecretIDColumn())
 	case *domain.CheckTypeSucceeded:
 		lastSucceededChange := database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction)
 		if !typ.SucceededAt.IsZero() {

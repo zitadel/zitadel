@@ -26,71 +26,34 @@ func (u userHuman) RemovePhone() database.Change {
 // SetPhone implements [domain.HumanUserRepository.SetPhone].
 func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
-	case *domain.VerificationTypeSkipped:
-		skippedAt := database.NewChange(u.phoneVerifiedAtColumn(), database.NowInstruction)
-		if !typ.SkippedAt.IsZero() {
-			skippedAt = database.NewChange(u.phoneVerifiedAtColumn(), typ.SkippedAt)
-		}
-		return database.NewChanges(
-			database.NewChange(u.phoneColumn(), *typ.Value),
-			skippedAt,
-		)
-	case *domain.VerificationTypeFailed:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.smsOTPVerificationIDColumn()),
-			))
-		}, nil)
 	case *domain.VerificationTypeInit:
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
-			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			builder.WriteString(" RETURNING id")
-		}, func(name string) database.Change {
-			return database.NewChangeToStatement(u.phoneVerificationIDColumn(), func(builder *database.StatementBuilder) {
-				builder.WriteString("SELECT id FROM ")
-				builder.WriteString(name)
-			})
-		})
+		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.phoneVerificationIDColumn())
+	case *domain.VerificationTypeSkipped:
+		return u.verification.skipped(typ, u.phoneVerifiedAtColumn(), u.phoneColumn())
 	case *domain.VerificationTypeUpdate:
-		changes := make(database.Changes, 0, 3)
-		if typ.Value != nil {
-			changes = append(changes, database.NewChange(u.phoneColumn(), *typ.Value))
-		}
-		if typ.Code != nil {
-			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
-		}
-		if typ.Expiry != nil {
-			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
-		}
-		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE ")
-			builder.WriteString(u.verification.qualifiedTableName())
-			builder.WriteString(" SET ")
-			changes.Write(builder)
-			builder.WriteString(" FROM ")
-			builder.WriteString(existingHumanUser.unqualifiedTableName())
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.phoneVerificationIDColumn()),
-			))
-		}, nil)
+		return u.verification.update(typ, existingHumanUser.unqualifiedTableName(),
+			existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn(),
+		)
+	case *domain.VerificationTypeVerified:
+		return u.verification.verified(typ, existingUser.unqualifiedTableName(), u.InstanceIDColumn(),
+			u.phoneVerificationIDColumn(), u.phoneVerifiedAtColumn(), u.phoneColumn())
+	case *domain.VerificationTypeFailed:
+		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for phone verification change %T", verification))
 }
 
 // CheckSMSOTP implements [domain.HumanUserRepository.CheckSMSOTP].
 func (u userHuman) CheckSMSOTP(check domain.CheckType) database.Change {
-	panic("unimplemented")
+	switch typ := check.(type) {
+	case *domain.CheckTypeInit:
+		return u.verification.initCheck(typ, existingHumanUser.unqualifiedTableName(), u.smsOTPVerificationIDColumn())
+	case *domain.CheckTypeSucceeded:
+		return u.verification.succeeded(typ, u.lastSuccessfulSMSOTPCheckColumn(), u.smsOTPVerificationIDColumn())
+	case *domain.CheckTypeFailed:
+		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.smsOTPVerificationIDColumn())
+	}
+	panic(fmt.Sprintf("type not allowed for email OTP check change %T", check))
 }
 
 // DisableSMSOTP implements [domain.HumanUserRepository.DisableSMSOTP].

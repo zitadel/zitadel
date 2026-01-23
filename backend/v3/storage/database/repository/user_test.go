@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 func Test_user_Get(t *testing.T) {
@@ -219,14 +220,7 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 	assert.Equal(t, expected.Gender, actual.Gender, "human gender")
 	assert.True(t, expected.MultifactorInitializationSkippedAt.Equal(actual.MultifactorInitializationSkippedAt), "human multifactor initialization skipped at")
 
-	assert.Equal(t, expected.Email.Address, actual.Email.Address, "human email address")
-	assert.True(t, expected.Email.VerifiedAt.Equal(actual.Email.VerifiedAt), "human email verified at")
-	assert.True(t, expected.Email.OTP.EnabledAt.Equal(actual.Email.OTP.EnabledAt), "human email otp enabled at")
-	assert.True(t, expected.Email.OTP.LastSuccessfullyCheckedAt.Equal(actual.Email.OTP.LastSuccessfullyCheckedAt), "human email otp last successfully checked at")
-	if expected.Email.OTP.Check != nil {
-		t.Error("human.email.otp.check not asserted")
-	}
-	assertVerification(t, expected.Email.Unverified, actual.Email.Unverified, "human email unverified")
+	assertHumanEmail(t, expected.Email, actual.Email)
 
 	if expected.Phone == nil {
 		assert.Nil(t, actual.Phone, "human phone nil")
@@ -345,4 +339,50 @@ func assertVerification(t *testing.T, expected, actual *domain.Verification, fie
 	}
 	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human phone unverified failed attempts")
 	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human phone unverified verified at")
+}
+
+func assertHumanEmail(t *testing.T, expected, actual domain.HumanEmail) {
+	t.Helper()
+
+	assert.Equal(t, expected.Address, actual.Address, "human email address")
+	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human email verified at")
+	assert.True(t, expected.OTP.EnabledAt.Equal(actual.OTP.EnabledAt), "human email otp enabled at")
+	assert.True(t, expected.OTP.LastSuccessfullyCheckedAt.Equal(actual.OTP.LastSuccessfullyCheckedAt), "human email otp last successfully checked at")
+
+	assertCheck(t, expected.OTP.Check, actual.OTP.Check)
+	assertVerification(t, expected.Unverified, actual.Unverified, "human email unverified")
+}
+
+func assertCheck(t *testing.T, expected, actual *domain.Check) {
+	t.Helper()
+
+	if expected == nil {
+		assert.Nil(t, actual, "check nil")
+		return
+	}
+
+	require.NotNil(t, actual, "check not nil")
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "check failed attempts")
+	if expected.ExpiresAt != nil {
+		require.NotNil(t, actual.ExpiresAt, "check expires at not nil")
+		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "check expires at")
+	} else {
+		assert.Nil(t, actual.ExpiresAt, "check expires at nil")
+	}
+	assertCryptoValue(t, expected.Code, actual.Code)
+}
+
+func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue) {
+	t.Helper()
+
+	if expected == nil {
+		assert.Nil(t, actual, "crypto value nil")
+		return
+	}
+
+	require.NotNil(t, actual, "crypto value not nil")
+	assert.Equal(t, expected.Crypted, actual.Crypted, "crypto value crypted")
+	assert.Equal(t, expected.CryptoType, actual.CryptoType, "crypto value crypto type")
+	assert.Equal(t, expected.Algorithm, actual.Algorithm, "crypto value algorithm")
+	assert.Equal(t, expected.KeyID, actual.KeyID, "crypto value key id")
 }
