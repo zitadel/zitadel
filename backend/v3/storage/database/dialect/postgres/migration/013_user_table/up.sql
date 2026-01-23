@@ -296,6 +296,4 @@ CREATE TABLE zitadel.human_identity_provider_links(
 
     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, identity_provider_id) REFERENCES zitadel.identity_providers(instance_id, id) ON DELETE CASCADE
-
-    , UNIQUE (instance_id, user_id, provided_user_id)
 );
