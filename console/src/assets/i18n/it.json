@@ -29,12 +29,12 @@
     },
     "ORG": {
       "TITLE": "Organizzazione",
-      "DESCRIPTION": "Un'organizzazione ospita utenti, progetti con app, provider di identità e impostazioni come il branding aziendale. Vuoi condividere le impostazioni tra più organizzazioni? Configura le impostazioni predefinite.",
+      "DESCRIPTION": "Un'organizzazione ospita utenti, progetti con application, provider di identità e impostazioni come il branding aziendale. Vuoi condividere le impostazioni tra più organizzazioni? Configura le impostazioni predefinite.",
       "METADATA": "Aggiungi attributi personalizzati all'organizzazione come la sua posizione o un identificatore in un altro sistema. Puoi utilizzare queste informazioni nelle tue azioni."
     },
     "PROJECTS": {
       "TITLE": "Progetti",
-      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua app mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua application mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "OWNED": {
         "TITLE": "Progetti di Proprietà",
         "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
@@ -386,12 +386,12 @@
         "action": "Crea progetto"
       },
       "APPLICATION_CREATED": {
-        "title": "Registra la tua app",
+        "title": "Registra la tua application",
         "description": "Registra la tua applicazione web, nativa, api o saml e configura un flusso di autenticazione.",
-        "action": "Registra app"
+        "action": "Registra application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Accedi alla tua app",
+        "title": "Accedi alla tua application",
         "description": "Integra la tua applicazione con ZITADEL per l'autenticazione e testala accedendo con il tuo utente amministratore.",
         "action": "Accedi"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
     "GUIDE": "Guida",
     "BROWSEEXAMPLES": "Esplora esempi e SDK",
-    "DUPLICATEAPPRENAME": "Un'app con lo stesso nome esiste già. Scegli un nome diverso.",
+    "DUPLICATEAPPRENAME": "Un'application con lo stesso nome esiste già. Scegli un nome diverso.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifica framework",
@@ -883,9 +883,9 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "App di autenticazione per TOTP (Time-based One-Time Password)",
+      "OTP": "Application di autenticazione per TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'application di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione è selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
       "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
+      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'application (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana",
       "DISABLEWATERMARK_DESC": "Nascondi filigrana Powered by ZITADEL nell'interfaccia di accesso"
@@ -2411,7 +2411,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password per Authenticator App (TOTP)",
+      "1": "One Time Password per Authenticator Application (TOTP)",
       "2": "Passkey",
       "3": "One Time Password per Email (Email OTP)",
       "4": "One Time Password per SMS (SMS OTP)",
@@ -2511,7 +2511,7 @@
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato",
       "URLS": "URLs",
-      "DELETE": "Rimuovi App",
+      "DELETE": "Rimuovi Application",
       "JUMPTOPROJECT": "Per configurare ruoli, autorizzazioni e altro, vai al progetto.",
       "DETAIL": {
         "TITLE": "Dettagli",
@@ -2526,7 +2526,7 @@
           "TITLE": "Configurazione OIDC"
         },
         "DELETE": {
-          "TITLE": "Rimuovere App",
+          "TITLE": "Rimuovere Application",
           "DESCRIPTION": "Vuoi davvero rimuovere questa applicazione?"
         }
       },
@@ -2547,8 +2547,8 @@
       }
     },
     "NAMEDIALOG": {
-      "TITLE": "Rinomina App",
-      "DESCRIPTION": "Inserisci il nuovo nome della tua app",
+      "TITLE": "Rinomina Application",
+      "DESCRIPTION": "Inserisci il nuovo nome della tua application",
       "NAME": "Nuovo nome"
     },
     "NAME": "Nome",
@@ -2557,7 +2557,7 @@
     "AUTHMETHODSECTION": "Metodo di autenticazione",
     "GRANT": "Tipi di Grant",
     "ADDITIONALORIGINS": "Origini aggiuntive",
-    "ADDITIONALORIGINSDESC": "Se vuoi aggiungere ulteriori Origini alla tua app che non è usata come reindirizzamento puoi farlo qui.",
+    "ADDITIONALORIGINSDESC": "Se vuoi aggiungere ulteriori Origini alla tua application che non è usata come reindirizzamento puoi farlo qui.",
     "ORIGINS": "Origini",
     "NOTANORIGIN": "Il valore inserito non è un'origine",
     "PROSWITCH": "Sono un professionista. Salta questo passo.",
@@ -2647,7 +2647,7 @@
           },
           "NATIVE": {
             "TITLE": "Native",
-            "DESCRIPTION": "App mobili, desktop, dispositivi intelligenti, ecc."
+            "DESCRIPTION": "Application mobili, desktop, dispositivi intelligenti, ecc."
           },
           "USERAGENT": {
             "TITLE": "User Agent",
@@ -2728,10 +2728,10 @@
       "DEACTIVATED": "Applicazione disattivata.",
       "OIDCUPDATED": "Applicazione aggiornata",
       "APIUPDATED": "Applicazione aggiornata",
-      "UPDATED": "App aggiornata.",
-      "CREATED": "App creata.",
+      "UPDATED": "Application aggiornata.",
+      "CREATED": "Application creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
-      "DELETED": "App rimossa con successo.",
+      "DELETED": "Application rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"
     },
     "LOGINV2": {

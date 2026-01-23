@@ -386,12 +386,12 @@
         "action": "Skapa projekt"
       },
       "APPLICATION_CREATED": {
-        "title": "Registrera din app",
+        "title": "Registrera din application",
         "description": "Registrera din webb-, native-, API- eller SAML-applikation och ställ in ett autentiseringsflöde.",
-        "action": "Registrera app"
+        "action": "Registrera application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logga in på din app",
+        "title": "Logga in på din application",
         "description": "Integrera din applikation med ZITADEL för autentisering och testa det genom att logga in med din administratörsanvändare.",
         "action": "Logga in"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Utvecklingsläge är aktiverat som standard. Du kan uppdatera värden för produktion senare.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bläddra bland Exempel och SDKs",
-    "DUPLICATEAPPRENAME": "En app med samma namn finns redan. Vänligen välj ett annat namn.",
+    "DUPLICATEAPPRENAME": "En application med samma namn finns redan. Vänligen välj ett annat namn.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Byt Ramverk",
@@ -1615,7 +1615,7 @@
         "3": "Telefonverifiering",
         "4": "Återställning av lösenord",
         "5": "Passkey-initiering",
-        "6": "App-hemlighet",
+        "6": "Application-hemlighet",
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
       },
@@ -2539,7 +2539,7 @@
       "DATECREATED": "Skapad",
       "DATECHANGED": "Ändrad",
       "URLS": "URL:er",
-      "DELETE": "Ta bort app",
+      "DELETE": "Ta bort application",
       "JUMPTOPROJECT": "För att konfigurera roller, behörigheter och mer, navigera till projektet.",
       "DETAIL": {
         "TITLE": "Detalj",
@@ -2554,7 +2554,7 @@
           "TITLE": "Ändra OIDC-konfiguration"
         },
         "DELETE": {
-          "TITLE": "Ta bort app",
+          "TITLE": "Ta bort application",
           "DESCRIPTION": "Vill du verkligen ta bort denna applikation?"
         }
       },
@@ -2575,8 +2575,8 @@
       }
     },
     "NAMEDIALOG": {
-      "TITLE": "Byt namn på app",
-      "DESCRIPTION": "Ange det nya namnet för din app",
+      "TITLE": "Byt namn på application",
+      "DESCRIPTION": "Ange det nya namnet för din application",
       "NAME": "Nytt namn"
     },
     "NAME": "Namn",
@@ -2585,7 +2585,7 @@
     "AUTHMETHODSECTION": "Autentiseringsmetod",
     "GRANT": "Beviljningstyper",
     "ADDITIONALORIGINS": "Ytterligare ursprung",
-    "ADDITIONALORIGINSDESC": "Om du vill lägga till ytterligare ursprung till din app som inte används som omdirigering kan du göra det här.",
+    "ADDITIONALORIGINSDESC": "Om du vill lägga till ytterligare ursprung till din application som inte används som omdirigering kan du göra det här.",
     "ORIGINS": "Ursprung",
     "NOTANORIGIN": "Det angivna värdet är inte ett ursprung",
     "PROSWITCH": "Jag är ett proffs. Hoppa över denna guide.",
@@ -2619,7 +2619,7 @@
       "DEVMODE_DISABLED": "Inaktiverad",
       "DEVMODEDESC": "Observera: Med utvecklingsläge aktiverat kommer omdirigerings-URI:er inte att valideras.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Hoppa över inloggningsframgångssida",
-      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska app.",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska application.",
       "REDIRECT": "Omdirigerings-URI:er",
       "REDIRECTSECTION": "Omdirigerings-URI:er",
       "POSTLOGOUTREDIRECT": "Post Logout-URI:er",
@@ -2754,12 +2754,12 @@
     "TOAST": {
       "REACTIVATED": "Applikation återaktiverad.",
       "DEACTIVATED": "Applikation avaktiverad.",
-      "OIDCUPDATED": "App uppdaterad.",
-      "APIUPDATED": "App uppdaterad",
-      "UPDATED": "App uppdaterad.",
-      "CREATED": "App skapad.",
+      "OIDCUPDATED": "Application uppdaterad.",
+      "APIUPDATED": "Application uppdaterad",
+      "UPDATED": "Application uppdaterad.",
+      "CREATED": "Application skapad.",
       "CLIENTSECRETREGENERATED": "Klienthemlighet genererad.",
-      "DELETED": "App raderad.",
+      "DELETED": "Application raderad.",
       "CONFIGCHANGED": "Ändringar upptäckta!"
     },
     "LOGINV2": {

@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekte",
-      "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile App und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
+      "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile Application und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
       "OWNED": {
         "TITLE": "Eigene Projekte",
         "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
@@ -386,12 +386,12 @@
         "action": "Projekt erstellen"
       },
       "APPLICATION_CREATED": {
-        "title": "Registriere deine App",
+        "title": "Registriere deine Application",
         "description": "Registriere deine erste Web-, Nativ-, API- oder SAML-Applikation und konfiguriere den Authentification-Flow.",
-        "action": "App registrieren"
+        "action": "Application registrieren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logge dich in deine App ein",
+        "title": "Logge dich in deine Application ein",
         "description": "Integriere deine Applikation mit ZITADEL für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
         "action": "Einloggen"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Beispiele durchsuchen",
-    "DUPLICATEAPPRENAME": "Es gibt bereits eine App mit gleichem Namen. Bitte wähle einen anderen Namen.",
+    "DUPLICATEAPPRENAME": "Es gibt bereits eine Application mit gleichem Namen. Bitte wähle einen anderen Namen.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework ändern",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "Authentikator App für TOTP (Time-based One-Time Password)",
+      "OTP": "Authentikator Application für TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
-      "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+      "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator Application und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
       "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne Application-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
       "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"

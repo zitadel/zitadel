@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projects",
-      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile app, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
+      "DESCRIPTION": "A project hosts one or more applications that you can use to authenticate your users. For example, you might have a single project with 3 applications: one each for your web frontend, your mobile application, and your backend services. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the project's owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
         "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
@@ -386,12 +386,12 @@
         "action": "Create project"
       },
       "APPLICATION_CREATED": {
-        "title": "Register your app",
+        "title": "Register your application",
         "description": "Register your web, native, api or saml application and setup an authentication flow.",
-        "action": "Register app"
+        "action": "Register application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Log in to your app",
+        "title": "Log in to your application",
         "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
         "action": "Log in"
       },
@@ -454,7 +454,7 @@
     "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Browse Examples and SDKs",
-    "DUPLICATEAPPRENAME": "An app with the same name exists already. Please choose a different name.",
+    "DUPLICATEAPPRENAME": "An application with the same name exists already. Please choose a different name.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",
@@ -885,9 +885,9 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator Application for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator application and enter the code below to verify and activate the OTP method.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
@@ -1615,7 +1615,7 @@
         "3": "Phone verification",
         "4": "Password Reset",
         "5": "Passkey Initialization",
-        "6": "App Secret",
+        "6": "Application Secret",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
@@ -1921,7 +1921,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
       "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
+      "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an application context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
       "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface"
@@ -2436,7 +2436,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password by Authenticator App (TOTP)",
+      "1": "One Time Password by Authenticator Application (TOTP)",
       "2": "Passkey",
       "3": "One Time Password by Email (Email OTP)",
       "4": "One Time Password by SMS (SMS OTP)",

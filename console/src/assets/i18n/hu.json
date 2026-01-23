@@ -2430,7 +2430,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Ismeretlen",
-      "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
+      "1": "Egyszeri Jelszó az Authenticator Application-al (TOTP)",
       "2": "Passkey",
       "3": "Egyszeri Jelszó Emailben (Email OTP)",
       "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
@@ -2751,10 +2751,10 @@
       "DEACTIVATED": "Alkalmazás deaktiválva.",
       "OIDCUPDATED": "Az alkalmazás frissítve.",
       "APIUPDATED": "Az alkalmazás frissítve",
-      "UPDATED": "Az app frissítve.",
-      "CREATED": "Az app létrehozva.",
+      "UPDATED": "Az application frissítve.",
+      "CREATED": "Az application létrehozva.",
       "CLIENTSECRETREGENERATED": "Az ügyfél titok generálva.",
-      "DELETED": "Az app törölve.",
+      "DELETED": "Az application törölve.",
       "CONFIGCHANGED": "Változások észlelve!"
     },
     "LOGINV2": {

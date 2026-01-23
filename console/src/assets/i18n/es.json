@@ -388,7 +388,7 @@
       "APPLICATION_CREATED": {
         "title": "Registra tu aplicación",
         "description": "Registra tu aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
-        "action": "Registrar app"
+        "action": "Registrar application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Inicia sesión en tu aplicación",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Añade un doble factor para configurar una seguridad óptima de tu cuenta.",
       "MANAGE_DESCRIPTION": "Gestiona el método de doble factor para tus usuarios.",
       "ADD": "Añadir factor",
-      "OTP": "App autenticadora para TOTP (Time-based One-Time Password)",
+      "OTP": "Application autenticadora para TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Añadir TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una app autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una application autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
       "U2F": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)",
       "U2F_DIALOG_TITLE": "Verificar factor",
       "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para tu Multifactor universal.",
@@ -1612,7 +1612,7 @@
         "3": "Verificación de teléfono",
         "4": "Restablecimiento de contraseña",
         "5": "Inicialización de llave de acceso",
-        "6": "Secreto de App",
+        "6": "Secreto de Application",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
@@ -2407,7 +2407,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconocido",
-      "1": "One Time Password por Authenticator App (TOTP)",
+      "1": "One Time Password por Authenticator Application (TOTP)",
       "2": "Llave de acceso",
       "3": "One Time Password por email (Email OTP)",
       "4": "One Time Password por SMS (SMS OTP)",
@@ -2507,7 +2507,7 @@
       "DATECREATED": "Creada",
       "DATECHANGED": "Cambiada",
       "URLS": "URLs",
-      "DELETE": "Borrar App",
+      "DELETE": "Borrar Application",
       "JUMPTOPROJECT": "Para configurar roles, autorizaciones y más, navegue hasta el proyecto.",
       "DETAIL": {
         "TITLE": "Detalle",
@@ -2522,7 +2522,7 @@
           "TITLE": "Cambiar configuración OIDC"
         },
         "DELETE": {
-          "TITLE": "Borrar App",
+          "TITLE": "Borrar Application",
           "DESCRIPTION": "¿Realmente quieres borrar esta aplicación?"
         }
       },
@@ -2543,8 +2543,8 @@
       }
     },
     "NAMEDIALOG": {
-      "TITLE": "Renombrar App",
-      "DESCRIPTION": "Introducir el nuevo nombre de tu app",
+      "TITLE": "Renombrar Application",
+      "DESCRIPTION": "Introducir el nuevo nombre de tu application",
       "NAME": "Nuevo nombre"
     },
     "NAME": "Nombre",
@@ -2587,7 +2587,7 @@
       "DEVMODE_DISABLED": "Desactivado",
       "DEVMODEDESC": "Cuidado: Si el modo de desarrollo está activado las URIs de redirección no serán validadas.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Saltar página de inicio de sesión con éxito",
-      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sáltate la página de éxito después de iniciar sesión en esta app nativa.",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sáltate la página de éxito después de iniciar sesión en esta application nativa.",
       "REDIRECT": "URIs de redirección",
       "REDIRECTSECTION": "URIs de redirección",
       "POSTLOGOUTREDIRECT": "URIs a usar tras cerrar sesión",
@@ -2722,7 +2722,7 @@
     "TOAST": {
       "REACTIVATED": "Aplicación reactivada.",
       "DEACTIVATED": "Aplicación desactivada.",
-      "OIDCUPDATED": "App actualizada.",
+      "OIDCUPDATED": "Application actualizada.",
       "APIUPDATED": "App actualizada",
       "UPDATED": "App actualizada.",
       "CREATED": "App creada.",

@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projecten",
-      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele app, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele application, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
       "OWNED": {
         "TITLE": "Eigen Projecten",
         "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
@@ -386,12 +386,12 @@
         "action": "Project aanmaken"
       },
       "APPLICATION_CREATED": {
-        "title": "Registreer uw app",
+        "title": "Registreer uw application",
         "description": "Registreer uw web-, native-, api- of saml-applicatie en stel een authenticatiestroom in.",
-        "action": "App registreren"
+        "action": "Application registreren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Log in op uw app",
+        "title": "Log in op uw application",
         "description": "Integreer uw applicatie met ZITADEL voor authenticatie en test het door in te loggen met uw beheerdersgebruiker.",
         "action": "Log in"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bekijk voorbeelden",
-    "DUPLICATEAPPRENAME": "Er bestaat al een app met dezelfde aartsvijand. Kies een andere naam.",
+    "DUPLICATEAPPRENAME": "Er bestaat al een application met dezelfde aartsvijand. Kies een andere naam.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Verander Framework",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Voeg een tweede factor toe om optimale beveiliging voor uw account te garanderen.",
       "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
       "ADD": "Factor toevoegen",
-      "OTP": "Authenticator App voor TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator Application voor TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Voeg OTP toe",
-      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-app en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
+      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-application en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
       "U2F": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere",
       "U2F_DIALOG_TITLE": "Verifieer factor",
       "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte universele multifactor.",
@@ -1611,7 +1611,7 @@
         "3": "Telefoon verificatie",
         "4": "Wachtwoord Reset",
         "5": "Passkey Initialisatie",
-        "6": "App Secret",
+        "6": "Application Secret",
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
       "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
-      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een application context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
       "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"
@@ -2429,7 +2429,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Onbekend",
-      "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
+      "1": "Eenmalig wachtwoord door Authenticator Application (TOTP)",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
       "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
       "4": "Eenmalig wachtwoord per SMS (SMS OTP)",
@@ -2529,7 +2529,7 @@
       "DATECREATED": "Gecreëerd",
       "DATECHANGED": "Gewijzigd",
       "URLS": "URL's",
-      "DELETE": "Verwijder App",
+      "DELETE": "Verwijder Application",
       "JUMPTOPROJECT": "Om rollen, autorisaties en meer te configureren, navigeert u naar het project.",
       "DETAIL": {
         "TITLE": "Detail",
@@ -2544,7 +2544,7 @@
           "TITLE": "Wijzig OIDC-configuratie"
         },
         "DELETE": {
-          "TITLE": "Verwijder App",
+          "TITLE": "Verwijder Application",
           "DESCRIPTION": "Weet u zeker dat u deze toepassing wilt verwijderen?"
         }
       },
@@ -2565,8 +2565,8 @@
       }
     },
     "NAMEDIALOG": {
-      "TITLE": "Hernoem App",
-      "DESCRIPTION": "Voer de nieuwe naam in voor uw app",
+      "TITLE": "Hernoem Application",
+      "DESCRIPTION": "Voer de nieuwe naam in voor uw application",
       "NAME": "Nieuwe naam"
     },
     "NAME": "Naam",
@@ -2575,7 +2575,7 @@
     "AUTHMETHODSECTION": "Authenticatiemethode",
     "GRANT": "Grant Types",
     "ADDITIONALORIGINS": "Extra Origins",
-    "ADDITIONALORIGINSDESC": "Als u extra Origins aan uw app wilt toevoegen die niet als redirect worden gebruikt, kunt u dat hier doen.",
+    "ADDITIONALORIGINSDESC": "Als u extra Origins aan uw application wilt toevoegen die niet als redirect worden gebruikt, kunt u dat hier doen.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "De ingevoerde waarde is geen origin",
     "PROSWITCH": "Ik ben een professional. Sla deze wizard over.",
@@ -2609,7 +2609,7 @@
       "DEVMODE_DISABLED": "Uitgeschakeld",
       "DEVMODEDESC": "Let op: Met ingeschakelde ontwikkelingsmodus worden redirect URI's niet gevalideerd.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Sla Login Succes Pagina over",
-      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sla de succespagina na een login voor deze native app over.",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sla de succespagina na een login voor deze native application over.",
       "REDIRECT": "Redirect URI's",
       "REDIRECTSECTION": "Redirect URI's",
       "POSTLOGOUTREDIRECT": "Post Logout URI's",
