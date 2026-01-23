@@ -4,6 +4,17 @@ import { rehypeCode } from 'fumadocs-core/mdx-plugins';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  basePath: '/docs',
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/docs',
+        basePath: false,
+        permanent: false,
+      },
+    ];
+  },
   turbopack: {
     rules: {
       '*.{go,yaml,Caddyfile,conf}': {

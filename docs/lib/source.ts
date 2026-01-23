@@ -4,13 +4,13 @@ import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
-  baseUrl: '/docs',
+  baseUrl: '/',
   source: docs.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
 });
 
 export const versionSource = loader({
-  baseUrl: '/docs',
+  baseUrl: '/',
   source: versions.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
 });
@@ -23,7 +23,7 @@ export function getPage(slugs: string[] | undefined) {
     const page = versionSource.getPage(safeSlugs);
     if (page) return { page, source: versionSource };
   }
-  
+
   return { page: source.getPage(safeSlugs), source: source };
 }
 

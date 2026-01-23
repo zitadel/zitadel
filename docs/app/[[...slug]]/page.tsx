@@ -13,7 +13,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import { Feedback } from '@/components/feedback';
 
-export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
+export default async function Page(props: PageProps<'/[[...slug]]'>) {
   const params = await props.params;
   const { page, source: pageSource } = getPage(params.slug);
   if (!page) notFound();
@@ -45,7 +45,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps<'/docs/[[...slug]]'>,
+  props: PageProps<'/[[...slug]]'>,
 ): Promise<Metadata> {
   const params = await props.params;
   const { page } = getPage(params.slug);

@@ -8,19 +8,19 @@ export const baseOptions: BaseLayoutProps = {
   links: [
     {
       text: 'Guides',
-      url: '/docs/guides/overview',
+      url: '/guides/overview',
       active: 'nested-url',
       icon: <BookOpen />,
     },
     {
       text: 'APIs',
-      url: '/docs/apis/introduction',
+      url: '/apis/introduction',
       active: 'nested-url',
       icon: <Code2 />,
     },
     {
       text: 'Legal',
-      url: '/docs/legal/terms-of-service',
+      url: '/legal/terms-of-service',
       active: 'nested-url',
       icon: <Server />, // Using Server icon as placeholder or pick another one
     },

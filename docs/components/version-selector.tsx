@@ -14,22 +14,23 @@ interface Version {
 export function VersionSelector() {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // Determine current version from URL
-  // /docs/v2/setup -> v2
-  // /docs/setup -> current
-  const currentVersion = versions.find((v) => 
-    pathname.startsWith(`/docs/${v.version}`)
+  // /v2/setup -> v2
+  // /setup -> current
+  const currentVersion = versions.find((v) =>
+    pathname.startsWith(`/${v.version}`)
   )?.version || 'current';
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedVersion = e.target.value;
-    
+
     if (selectedVersion === 'current') {
       // Try to keep the slug if possible, stripping the version prefix
-      // /docs/v2/setup -> /docs/setup
-      const newPath = pathname.replace(/^\/docs\/v[^\/]+/, '/docs');
-      router.push(newPath);
+      // /v2/setup -> /setup
+      const newPath = pathname.replace(/^\/v[^\/]+/, '');
+      // Ensure we don't end up with empty string, default to /
+      router.push(newPath || '/');
       return;
     }
 
@@ -42,18 +43,21 @@ export function VersionSelector() {
     }
 
     // Switch to hydrated version
-    // /docs/setup -> /docs/v2/setup
-    // /docs/v1/setup -> /docs/v2/setup
-    let slug = pathname.replace(/^\/docs/, '');
+    // /setup -> /v2/setup
+    // /v1/setup -> /v2/setup
+    let slug = pathname;
     if (currentVersion !== 'current') {
-        slug = slug.replace(new RegExp(`^/${currentVersion}`), '');
+      slug = slug.replace(new RegExp(`^/${currentVersion}`), '');
     }
-    router.push(`/docs/${selectedVersion}${slug}`);
+    // ensure slug starts with /
+    if (!slug.startsWith('/')) slug = '/' + slug;
+
+    router.push(`/${selectedVersion}${slug}`);
   };
 
   return (
-    <select 
-      value={currentVersion} 
+    <select
+      value={currentVersion}
       onChange={handleChange}
       className="p-2 bg-transparent text-sm font-medium rounded-md border border-fd-border hover:bg-fd-accent/50 focus:outline-none focus:ring-2 focus:ring-fd-ring text-fd-foreground"
     >
