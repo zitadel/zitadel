@@ -109,20 +109,21 @@ InitMFAOTP:
   Title: 双因素验证
   Description: 创建你的双因素。如果你还没有，请下载一个认证器应用程序。
   OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
+  SecretLabel: 秘钥
+  CodeLabel: 验证码
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+InitMFAOTPSMS:
+  Title: 双因素验证
+  DescriptionPhone: 创建双因素身份验证。输入您的电话号码进行验证。
+  DescriptionCode: 创建双因素身份验证。输入收到的代码以验证您的电话号码。
+  CountryCodeLabel: 国家
   PhoneLabel: 电话号码
   CodeLabel: 验证码
   EditButtonText: 编辑
   ResendButtonText: 重发代码
   NextButtonText: 继续
-
-InitMFASMS:
-  Title: 双因素验证
-  DescriptionPhone: 创建双因素身份验证。输入您的电话号码进行验证。
-  DescriptionCode: 创建双因素身份验证。输入收到的代码以验证您的电话号码。
-  SecretLabel: 秘钥
-  CodeLabel: 验证码
-  NextButtonText: 继续
-  CancelButtonText: 取消
 
 InitMFAU2F:
   Title: 添加安全密钥
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: 设备授权
   UserCode:

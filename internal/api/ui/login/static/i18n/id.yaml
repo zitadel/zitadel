@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Verifikasi 2 Faktor
   DescriptionPhone: 'Buat 2 faktor Anda. '
   DescriptionCode: 'Buat 2 faktor Anda. '
+  CountryCodeLabel: Negara
   PhoneLabel: Telepon
   CodeLabel: Kode
   EditButtonText: Sunting
@@ -238,6 +239,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -283,6 +285,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Syarat dan Ketentuan
   TosConfirm: Saya menerima itu
   TosLinkText: KL
@@ -357,6 +360,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:
