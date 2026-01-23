@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Inlogformulier",
           "DESCRIPTION": "Pas het inlogformulier aan.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Gebruikersnaam en wachtwoord toegestaan",
-            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met hun gebruikersnaam en wachtwoord. Als dit is gedeactiveerd, kunnen je gebruikers alleen inloggen met wachtwoordloze authenticatie of met een externe identiteitsprovider."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokale authenticatie toegestaan",
+            "DESCRIPTION": "Sta uw gebruikers toe in te loggen met hun gebruikersnaam en wachtwoord of via passkey-authenticatie. Als dit is uitgeschakeld, kunnen uw gebruikers alleen inloggen via een externe identiteitsprovider."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Gebruikersregistratie toegestaan",

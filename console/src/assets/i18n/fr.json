@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulaire de connexion",
           "DESCRIPTION": "Personnalisez le formulaire de connexion",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nom d'utilisateur et mot de passe autorisés",
-            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et mot de passe. Si désactivé, vos utilisateurs pourront uniquement se connecter avec une clé d'accès ou avec un fournisseur d'identité externe"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Authentification locale autorisée",
+            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et leur mot de passe ou via l'authentification par passkey. Si cette option est désactivée, vos utilisateurs ne pourront se connecter qu'en utilisant un fournisseur d'identité externe."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Enregistrement de nouveaux utilisateurs autorisé",
