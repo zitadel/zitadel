@@ -81,7 +81,7 @@
     "SETTINGS": {
       "INSTANCE": {
         "TITLE": "Výchozí nastavení",
-        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými přiřazení rolími lze některá z nich přepsat v nastavení organizace."
+        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými oprávněními lze některá z nich přepsat v nastavení organizace."
       },
       "ORG": {
         "TITLE": "Nastavení organizace",
@@ -427,7 +427,7 @@
     "MACHINEUSERS": "Systémoví uživatelé",
     "LOGOUT": "Odhlásit všechny uživatele",
     "NEWORG": "Nová organizace",
-    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená přiřazení rolí.",
+    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
     "SHOWORGS": "Zobrazit všechny organizace",
     "GRANTS": "Přiřazení rolí",
     "ACTIONS": "Akce",
@@ -651,35 +651,35 @@
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
-    "IAM_OWNER_VIEWER": "Má přiřazení rolí prohlížet celou instanci, včetně všech organizací",
-    "IAM_ORG_MANAGER": "Má přiřazení rolí vytvářet a spravovat organizace",
-    "IAM_USER_MANAGER": "Má přiřazení rolí vytvářet a spravovat uživatele",
-    "IAM_ADMIN_IMPERSONATOR": "Má přiřazení rolí vydávat se za správce a koncové uživatele ze všech organizací",
-    "IAM_END_USER_IMPERSONATOR": "Má přiřazení rolí vydávat se za koncové uživatele ze všech organizací",
-    "IAM_LOGIN_CLIENT": "Má přiřazení rolí spravovat přihlašovací klienty",
-    "ORG_OWNER": "Má přiřazení rolí nad celou organizací",
-    "ORG_USER_MANAGER": "Má přiřazení rolí vytvářet a spravovat uživatele organizace",
-    "ORG_OWNER_VIEWER": "Má přiřazení rolí prohlížet celou organizaci",
-    "ORG_SETTINGS_MANAGER": "Má přiřazení rolí spravovat nastavení organizace",
-    "ORG_USER_PERMISSION_EDITOR": "Má přiřazení rolí spravovat uživatelská pověření",
-    "ORG_PROJECT_PERMISSION_EDITOR": "Má přiřazení rolí spravovat pověření projektu",
-    "ORG_PROJECT_CREATOR": "Má přiřazení rolí vytvářet své vlastní projekty a podřízená nastavení",
-    "ORG_ADMIN_IMPERSONATOR": "Má přiřazení rolí vydávat se za správce a koncové uživatele z organizace",
-    "ORG_END_USER_IMPERSONATOR": "Má přiřazení rolí vydávat se za koncové uživatele z organizace",
-    "ORG_USER_SELF_MANAGER": "Má přiřazení rolí spravovat svůj vlastní uživatelský účet",
-    "PROJECT_OWNER": "Má přiřazení rolí nad celým projektem",
-    "PROJECT_OWNER_VIEWER": "Má přiřazení rolí prohlížet celý projekt",
-    "PROJECT_OWNER_GLOBAL": "Má přiřazení rolí nad celým projektem",
-    "PROJECT_OWNER_VIEWER_GLOBAL": "Má přiřazení rolí prohlížet celý projekt",
-    "PROJECT_GRANT_OWNER": "Má přiřazení rolí spravovat pověření projektu",
-    "PROJECT_GRANT_OWNER_VIEWER": "Má přiřazení rolí prohlížet pověření projektu"
+    "IAM_OWNER_VIEWER": "Má oprávnění prohlížet celou instanci, včetně všech organizací",
+    "IAM_ORG_MANAGER": "Má oprávnění vytvářet a spravovat organizace",
+    "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
+    "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
+    "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
+    "IAM_LOGIN_CLIENT": "Má oprávnění spravovat přihlašovací klienty",
+    "ORG_OWNER": "Má oprávnění nad celou organizací",
+    "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
+    "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
+    "ORG_SETTINGS_MANAGER": "Má oprávnění spravovat nastavení organizace",
+    "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat přiřazení rolí",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
+    "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
+    "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
+    "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
+    "ORG_USER_SELF_MANAGER": "Má oprávnění spravovat svůj vlastní uživatelský účet",
+    "PROJECT_OWNER": "Má oprávnění nad celým projektem",
+    "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
+    "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Má oprávnění prohlížet celý projekt",
+    "PROJECT_GRANT_OWNER": "Má oprávnění spravovat pověření projektu",
+    "PROJECT_GRANT_OWNER_VIEWER": "Má oprávnění prohlížet pověření projektu"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
       "TEXT": "Všechna nastavení organizace a tabulky v konzole jsou založeny na vybrané organizaci. Klikněte na toto tlačítko, chcete-li přepnout organizaci nebo vytvořit novou."
     },
     "INSTANCE": {
-      "TEXT": "Klikněte sem pro přístup k nastavením instance. Vezměte prosím na vědomí, že máte přístup k tomuto tlačítku pouze pokud máte rozšířená přiřazení rolí."
+      "TEXT": "Klikněte sem pro přístup k nastavením instance. Vezměte prosím na vědomí, že máte přístup k tomuto tlačítku pouze pokud máte rozšířená oprávnění."
     },
     "PROFILE": {
       "TEXT": "Zde můžete přepínat mezi vašimi uživatelskými účty a spravovat vaše relace a profil."
@@ -724,7 +724,7 @@
       "ME": "Přejít na vlastní profil",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects - Projekty",
       "USERS": "<strong>G</strong>o to <strong>U</strong>sers - Uživatelé",
-      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations - přiřazení rolí",
+      "USERGRANTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments - Přiřazení rolí",
       "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows - Akce a postupy",
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains - Domény"
     }
@@ -765,7 +765,7 @@
       "SECURITY": "Heslo a zabezpečení",
       "KEYS": "Klíče",
       "PAT": "Osobní přístupové tokeny",
-      "USERGRANTS": "přiřazení rolí",
+      "USERGRANTS": "Přiřazení rolí",
       "MEMBERSHIPS": "Členství",
       "METADATA": "Metadata"
     },
@@ -1163,7 +1163,7 @@
       "TITLE": "Role správce ZITADEL",
       "DESCRIPTION": "Zde jsou všechna členská přiřazení rolí uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
       "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
-      "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte přiřazení rolí. Včetně jiných organizací.",
+      "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
       "CREATIONDATE": "Datum vytvoření",
       "CHANGEDATE": "Poslední změna",
       "DISPLAYNAME": "Zobrazované jméno",
@@ -1171,7 +1171,7 @@
       "TYPE": "Typ",
       "ORGID": "ID organizace",
       "UPDATED": "Členství bylo aktualizováno.",
-      "NOPERMISSIONTOEDIT": "Nemáte potřebná přiřazení rolí pro úpravu rolí!",
+      "NOPERMISSIONTOEDIT": "Nemáte potřebná oprávnění pro úpravu rolí!",
       "TYPES": {
         "UNKNOWN": "Neznámý",
         "ORG": "Organizace",
@@ -1272,7 +1272,7 @@
     },
     "MEMBER": {
       "TITLE": "Manažeři",
-      "DESCRIPTION": "Tito manažeři mají přiřazení rolí provádět změny ve vaší instanci."
+      "DESCRIPTION": "Tito manažeři mají oprávnění provádět změny ve vaší instanci."
     },
     "PAGES": {
       "STATE": "Stav",
@@ -1385,7 +1385,7 @@
       "CREATE": "Vytvořit organizaci",
       "DEACTIVATE": "Deaktivovat organizaci",
       "REACTIVATE": "Reaktivovat organizaci",
-      "NOPERMISSION": "Nemáte přiřazení rolí přistupovat k nastavení organizace.",
+      "NOPERMISSION": "Nemáte oprávnění přistupovat k nastavení organizace.",
       "USERSELFACCOUNT": "Použijte svůj osobní účet jako vlastníka organizace",
       "ORGDETAIL_TITLE": "Zadejte název a doménu vaší nové organizace.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Zadejte název vaší nové organizace.",
@@ -1647,7 +1647,7 @@
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
       "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
-      "PERMISSIONCHECKV2": "Kontrola přiřazení rolí V2",
+      "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
@@ -2058,7 +2058,7 @@
       "EMPTY": "Žádná povolení k organizacím.",
       "TITLE": "Povolení k projektu",
       "DESCRIPTION": "Umožněte jiné organizaci využívat váš projekt.",
-      "EDITTITLE": "Upravit přiřazení rolí",
+      "EDITTITLE": "Upravit oprávnění",
       "CREATE": {
         "TITLE": "Vytvořit povolení pro organizaci",
         "SEL_USERS": "Vyberte uživatele, kterým chcete povolit přístup",
@@ -2144,7 +2144,7 @@
       "OPTIONS": "Možnosti",
       "ASSERTION": "Během autentizace odesílat i role",
       "ASSERTION_DESCRIPTION": "Informace o rolích budou odesílány z uživatelského koncového bodu a případně také v tokenech a dalších typech (v závislosti na nastavení vaší aplikace).",
-      "CHECK": "Kontrola přiřazení rolí při autentizaci",
+      "CHECK": "Kontrola oprávnění při autentizaci",
       "CHECK_DESCRIPTION": "Je-li nastaveno, uživatelé smějí být autentizováni pouze v případě, že je jim přiřazena jakákoliv role.",
       "DIALOG": {
         "DELETE_TITLE": "Smazat roli",
