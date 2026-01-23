@@ -1,218 +1,212 @@
 import type * as PageTree from 'fumadocs-core/page-tree';
-import { guidesSidebar, apisSidebar } from './sidebar-data';
+import { 
+    guidesSidebar, 
+    apisSidebar, 
+    legalSidebar,
+    type SidebarItem, // Import the shared type
+} from './sidebar-data';
 
-type SidebarItem = {
-    type?: 'category' | 'link' | 'doc';
-    label?: string;
-    items?: readonly any[]; 
-    href?: string;
-    id?: string;
-    collapsed?: boolean;
-} | string;
+// --- Logic ---
 
 export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
-    const allPages = new Map<string, PageTree.Item>();
-    const allFolders = new Map<string, PageTree.Folder>();
+    const pageLookup = new Map<string, PageTree.Item>();
+    const folderLookup = new Map<string, PageTree.Folder>();
 
+    /**
+     * 1. Normalizer
+     */
+    function normalize(path: string): string {
+        return path
+            .toLowerCase()
+            .replace(/^\/|docs\/|\/$/g, '') 
+            .replace(/\/index$/, '')        
+            .replace(/_/g, '-');            
+    }
+
+    /**
+     * 2. Collector
+     */
     function collect(node: PageTree.Node) {
         if (node.type === 'page') {
-            allPages.set(node.url, node);
+            pageLookup.set(node.url, node);
+            pageLookup.set(normalize(node.url), node);
         }
+        
         if (node.type === 'folder') {
-            // Index the folder by its "path" (approximated from children or name?)
-            // Fumadocs folder doesn't always have a URL.
-            // But we can approximate path if it has an index page?
             if (node.index) {
-                // If index page is /docs/foo/index, folder is /docs/foo
-                 const url = node.index.url;
-                 if(url) {
-                    const folderPath = url.replace(/\/$/, '').replace(/\/index$/, '');
-                    allFolders.set(folderPath, node);
-                 }
-            } else {
-                 // Try to guess from first child? Or maybe name?
-                 // This is tricky. 
-                 // But for "reference/api/user", we know the path structure.
-                 // Let's rely on finding children matching the path.
+                pageLookup.set(node.index.url, node.index);
+                pageLookup.set(normalize(node.index.url), node.index);
             }
-            
-            // Also we can traverse children to find match
+
+            const childUrl = node.index?.url || node.children.find(c => c.type === 'page')?.url;
+            if (childUrl) {
+                const rawPath = childUrl.split('/').slice(0, -1).join('/'); 
+                folderLookup.set(normalize(rawPath), node);
+                
+                const cleanDir = rawPath.replace(/^\/|docs\//, '');
+                folderLookup.set(cleanDir, node); 
+            }
             node.children.forEach(collect);
         }
     }
     originalTree.children.forEach(collect);
-    
-    // Helper to find folder by path scanning
-    function findFolder(pathHint: string): PageTree.Folder | undefined {
-        if (!pathHint) return undefined;
-        let clean = pathHint;
-        if (clean.startsWith('/')) clean = clean.substring(1);
-        if (clean.startsWith('docs/')) clean = clean.substring(5);
-        clean = clean.replace(/\/index$/, '').replace(/\/$/, '');
-        
-        const targetUrl = `/docs/${clean}`;
-        // Normalize for fuzzy comparison
-        const targetUrlNorm = targetUrl.replace(/_/g, '-').toLowerCase();
 
-        let found: PageTree.Folder | undefined;
-        
-        function scan(node: PageTree.Node) {
-            if (found) return;
-            if (node.type === 'folder') {
-                // Check index page
-                if (node.index) {
-                    const idxUrl = node.index.url.replace(/\/index$/, '');
-                     if (idxUrl === targetUrl) { found = node; return; }
-                     // Fuzzy match index
-                     if (idxUrl.replace(/_/g, '-').toLowerCase() === targetUrlNorm) { found = node;  return; }
-                }
-                
-                // If checking children pages for common prefix might be too aggressive/expensive here?
-                // But let's check exact children match if no index
-                const firstPage = node.children.find((c: PageTree.Node) => c.type === 'page') as PageTree.Item;
-                if (firstPage) {
-                    const pageDir = firstPage.url.substring(0, firstPage.url.lastIndexOf('/'));
-                     if (pageDir === targetUrl) { found = node; return; }
-                     if (pageDir.replace(/_/g, '-').toLowerCase() === targetUrlNorm) { found = node; return; }
-                }
-                
-                node.children.forEach(scan);
-            }
-        }
-        originalTree.children.forEach(scan);
-        return found;
-    }
-
+    /**
+     * 3. Optimized Page Finder
+     */
     function findPage(path: string): PageTree.Item | undefined {
         if (!path) return undefined;
-        let clean = path;
-        if (clean.startsWith('/')) clean = clean.substring(1);
-        if (clean.startsWith('docs/')) clean = clean.substring(5);
-        clean = clean.replace(/\/index$/, '').replace(/\/$/, '');
-
-        // 1. Try exact lookup first (fastest)
-        const exactUrl = `/docs/${clean}`;
-        if (allPages.has(exactUrl)) return allPages.get(exactUrl);
-
-        // 2. Fuzzy match: normalize separators
-        // We match if the *end* of the URL segments matches the path segments
-        const cleanSegments = clean.split('/').filter(Boolean);
         
-        for (const [url, node] of allPages.entries()) {
-             const urlPath = url.startsWith('/docs/') ? url.substring(6) : url;
-             const urlSegments = urlPath.split('/').filter(Boolean);
-             
-             // Check if cleanSegments match end of urlSegments
-             if (urlSegments.length < cleanSegments.length) continue;
-             
-             const offset = urlSegments.length - cleanSegments.length;
-             let match = true;
-             for (let i = 0; i < cleanSegments.length; i++) {
-                 const s1 = cleanSegments[i].replace(/_/g, '-').toLowerCase();
-                 const s2 = urlSegments[i + offset].replace(/_/g, '-').toLowerCase();
-                 if (s1 !== s2) {
-                     match = false;
-                     break;
-                 }
-             }
-             
-             if (match) return node;
+        const key = normalize(path);
+        if (pageLookup.has(key)) return pageLookup.get(key);
+
+        // Deduped Match
+        const segments = key.split('/');
+        if (segments.length >= 2 && segments[segments.length - 1] === segments[segments.length - 2]) {
+            const dedupedKey = segments.slice(0, -1).join('/');
+            if (pageLookup.has(dedupedKey)) return pageLookup.get(dedupedKey);
+        }
+
+        // Suffix Scan Fallback
+        for (const [lookupKey, node] of pageLookup.entries()) {
+            if (lookupKey.endsWith('/' + key)) return node;
         }
         
         return undefined;
     }
 
-    function buildNode(item: SidebarItem): PageTree.Node | null {
+    /**
+     * 4. Folder Finder
+     */
+    function findFolder(dirName: string): PageTree.Folder | undefined {
+        if (!dirName) return undefined;
+        
+        if (folderLookup.has(dirName)) return folderLookup.get(dirName);
+        const normKey = normalize(dirName);
+        if (folderLookup.has(normKey)) return folderLookup.get(normKey);
+
+        for (const [key, folder] of folderLookup.entries()) {
+            if (key.includes(normKey)) return folder;
+        }
+        return undefined;
+    }
+
+    /**
+     * 5. Recursive Builder
+     */
+    function buildNode(item: SidebarItem): PageTree.Node | PageTree.Node[] | null {
+        // String Shorthand
         if (typeof item === 'string') {
-            // Could be page or folder
             const page = findPage(item);
             if (page) return page;
             
             const folder = findFolder(item);
-            if (folder) return folder;
+            if (folder) {
+                // Safe sort for strict TS
+                return [...folder.children].sort((a, b) => 
+                    String(a.name ?? '').localeCompare(String(b.name ?? ''))
+                );
+            }
             
-            console.warn(`[Sidebar] Missing item for path: ${item}`);
+            console.warn(`[Sidebar] Missing item: ${item}`);
             return null;
         }
         
+        // Links
         if (item.type === 'link') {
-            return {
-                type: 'page',
-                name: item.label || 'Link',
-                url: item.href || '#',
-                external: true
-            } as PageTree.Item;
+            const isExternal = item.href && (item.href.startsWith('http') || item.href.startsWith('//'));
+            if (isExternal) {
+                return {
+                    type: 'page',
+                    name: item.label || 'Link',
+                    url: item.href || '#',
+                    external: true,
+                    icon: item.icon
+                } as PageTree.Item;
+            } 
+            if (item.href) {
+                 const page = findPage(item.href);
+                 if (page) return { ...page, name: item.label || page.name, icon: item.icon };
+            }
+            return null;
         }
 
+        // Docs
         if (item.type === 'doc') {
              const node = findPage(item.id || '');
              if (!node) return null;
-             return {
-                 ...node,
-                 name: item.label || node.name
-             };
+             return { ...node, name: item.label || node.name, icon: item.icon };
         }
 
+        // Autogenerated
+        if (item.type === 'autogenerated') {
+            if (item.dirName) {
+                const folder = findFolder(item.dirName);
+                if (folder) {
+                    // Safe sort for strict TS
+                    return [...folder.children].sort((a, b) => 
+                        String(a.name ?? '').localeCompare(String(b.name ?? ''))
+                    );
+                }
+            }
+            return null;
+        }
+
+        // Categories
         if (item.type === 'category' || !item.type) {
             const children: PageTree.Node[] = [];
             if (item.items) {
                 for (const child of item.items) {
                     const built = buildNode(child);
-                    if (built) children.push(built);
+                    if (built) {
+                        if (Array.isArray(built)) children.push(...built);
+                        else children.push(built);
+                    }
                 }
+            }
+            
+            let indexPage: PageTree.Item | undefined;
+            if (item.link?.type === 'generated-index' && item.link.slug) {
+                indexPage = findPage(item.link.slug);
+            } else if (item.link?.type === 'doc' && item.link.id) {
+                indexPage = findPage(item.link.id);
             }
             
             return {
                 type: 'folder',
                 name: item.label || 'Category',
                 children: children,
-                defaultOpen: item.collapsed === false 
+                defaultOpen: item.collapsed === false, 
+                index: indexPage,
+                icon: item.icon
             } as PageTree.Folder;
         }
         
         return null; 
     }
 
-    const apisFolder = buildNode({
-         type: 'category',
-         label: 'APIs',
-         items: apisSidebar as any
-    });
-    
-    // We can also have legal, etc. if needed.
-    const legalFolder = findFolder('legal');
-    
+    // 6. Construction
     const newChildren: PageTree.Node[] = [];
+    
     const indexNode = findPage('index');
     if (indexNode) newChildren.push(indexNode);
     
-    (guidesSidebar as unknown as any[]).forEach(item => {
-        const node = buildNode(item);
-        if (node) {
-            if (node.type === 'folder') {
-                (node as any).collapsible = false;
-            }
-            newChildren.push(node);
-        }
+    guidesSidebar.forEach(item => {
+        const node = buildNode(item); 
+        if (node && !Array.isArray(node)) newChildren.push(node);
     });
 
-    if (apisFolder) {
-        if (apisFolder.type === 'folder') {
-            (apisFolder as any).collapsible = false;
-        }
-        newChildren.push(apisFolder);
-    }
-    
-    // Self-hosting is in Guides usually? In new nav "Deploy & Operate" is under GuidesSidebar.
-    // Concepts is in GuidesSidebar.
-    
-    // If legal exists, add it
-    // if (legalFolder) newChildren.push(legalFolder);
-    // Actually Legal was a link in sidebar?
-    // "type": "link", "label": "Rate Limits (Cloud)", "href": "/legal/policies/rate-limit-policy"
-    
-    // If there are top-level pages not covered, we might lose them.
-    // But user requested "make sure ONLY this navigation structure is used".
+    const apisFolder = buildNode({
+         type: 'category',
+         label: 'APIs',
+         items: apisSidebar
+    });
+    if (apisFolder && !Array.isArray(apisFolder)) newChildren.push(apisFolder);
+
+    legalSidebar.forEach(item => {
+        const node = buildNode(item);
+        if (node && !Array.isArray(node)) newChildren.push(node);
+    });
     
     return {
         name: originalTree.name,
