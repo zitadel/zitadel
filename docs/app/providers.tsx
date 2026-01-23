@@ -2,11 +2,14 @@
 
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import AuthRequestProvider from '@/utils/authrequest';
+import MixpanelProvider from '@/components/mixpanel-provider';
 
 export function Providers({ children }: any) {
   return (
     <RootProvider>
-      <AuthRequestProvider>{children}</AuthRequestProvider>
+      <MixpanelProvider>
+        <AuthRequestProvider>{children}</AuthRequestProvider>
+      </MixpanelProvider>
     </RootProvider>
   );
 }

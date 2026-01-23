@@ -1,5 +1,12 @@
 [
   {
+    "version": "v4.10",
+    "label": "v4.10",
+    "type": "external",
+    "url": "/docs/v4.10",
+    "target": "https://docs-git-v410x-zitadel.vercel.app/docs"
+  },
+  {
     "version": "v4.9",
     "label": "v4.9",
     "type": "external",
