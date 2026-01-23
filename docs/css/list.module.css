@@ -20,7 +20,7 @@
 .listelement p {
   font-size: 14px;
   margin: 0;
-  color: var(--ifm-font-color-base);
+  color: var(--foreground);
 }
 
 .fillspace {
@@ -45,7 +45,7 @@
 }
 
 .listWrapperTitle {
-  color: var(--ifm-heading-color);
+  color: var(--foreground);
   font-size: 16px;
   margin-bottom: 0.5rem;
   display: block;

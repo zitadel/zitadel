@@ -33,7 +33,7 @@
 .tile p {
   font-size: 14px;
   margin: 0;
-  color: var(--ifm-font-color-base);
+  color: var(--foreground);
 }
 
 .tile img {

@@ -5,45 +5,81 @@
 @import '../css/custom.css';
 
 @theme {
-    --color-fd-primary: var(--primary);
-    --color-fd-primary-foreground: var(--primary-foreground);
-    --color-fd-background: var(--background);
-    --color-fd-foreground: var(--foreground);
-    --color-fd-card: var(--card);
-    --color-fd-card-foreground: var(--foreground);
-    --color-fd-popover: var(--card);
-    --color-fd-popover-foreground: var(--foreground);
-    --color-fd-muted: var(--muted);
-    --color-fd-muted-foreground: var(--muted-foreground);
-    --color-fd-accent: var(--accent);
-    --color-fd-accent-foreground: var(--foreground);
-    --color-fd-border: var(--border);
-    --color-fd-ring: var(--primary);
+    --color-fd-primary: hsl(var(--primary));
+    --color-fd-primary-foreground: hsl(var(--primary-foreground));
+    --color-fd-background: hsl(var(--background));
+    --color-fd-foreground: hsl(var(--foreground));
+    --color-fd-card: hsl(var(--card));
+    --color-fd-card-foreground: hsl(var(--card-foreground));
+    --color-fd-popover: hsl(var(--card));
+    --color-fd-popover-foreground: hsl(var(--foreground));
+    --color-fd-muted: hsl(var(--muted));
+    --color-fd-muted-foreground: hsl(var(--muted-foreground));
+    --color-fd-accent: hsl(var(--accent));
+    --color-fd-accent-foreground: hsl(var(--accent-foreground));
+    --color-fd-border: hsl(var(--border));
+    --color-fd-ring: hsl(var(--primary));
 
     --color-zitadelpink: #ff2069;
     --font-sans: "Lato", "ui-sans-serif", "system-ui";
 }
 
 :root {
-    --primary: hsl(340, 100%, 56%);
-    --primary-foreground: hsl(0, 0%, 100%);
-    --background: hsl(0, 0%, 98%);
-    --foreground: hsl(0, 0%, 10%);
-    --card: hsl(0, 0%, 100%);
-    --muted: hsl(0, 0%, 96%);
-    --muted-foreground: hsl(0, 0%, 45%);
-    --accent: hsl(0, 0%, 92%);
-    --border: hsl(0, 0%, 90%);
+    --primary: 340 100% 56%;
+    /* #ff2069 */
+    --primary-foreground: 0 0% 100%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 92%;
+    --accent-foreground: 340 100% 56%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+
+    --radius: 0.5rem;
 }
 
-.dark {
-    --primary: hsl(0, 0%, 98%);
-    --primary-foreground: hsl(0, 0%, 9%);
-    --background: hsl(230, 45%, 7%);
-    --foreground: hsl(0, 0%, 98%);
-    --card: hsl(230, 43%, 20%);
-    --muted: hsl(230, 43%, 12%);
-    --muted-foreground: hsl(230, 20%, 70%);
-    --accent: hsl(230, 43%, 25%);
-    --border: hsl(230, 43%, 30%);
+:root[class~="dark"],
+[data-theme="dark"] {
+    --primary: 340 100% 56%;
+    /* #ff2069 */
+    --primary-foreground: 0 0% 100%;
+
+    --background: 230 45% 7%;
+    --foreground: 0 0% 98%;
+
+    --card: 230 43% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --muted: 230 43% 15%;
+    --muted-foreground: 230 20% 70%;
+
+    --accent: 230 43% 20%;
+    --accent-foreground: 340 100% 65%;
+
+    --border: 230 43% 25%;
+    --input: 230 43% 25%;
+
+    --color-fd-primary: hsl(var(--primary));
+    --color-fd-primary-foreground: hsl(var(--primary-foreground));
+    --color-fd-background: hsl(var(--background));
+    --color-fd-foreground: hsl(var(--foreground));
+    --color-fd-card: hsl(var(--card));
+    --color-fd-card-foreground: hsl(var(--card-foreground));
+    --color-fd-popover: hsl(var(--card));
+    --color-fd-popover-foreground: hsl(var(--foreground));
+    --color-fd-muted: hsl(var(--muted));
+    --color-fd-muted-foreground: hsl(var(--muted-foreground));
+    --color-fd-accent: hsl(var(--accent));
+    --color-fd-accent-foreground: hsl(var(--accent-foreground));
+    --color-fd-border: hsl(var(--border));
+    --color-fd-ring: hsl(var(--primary));
 }
