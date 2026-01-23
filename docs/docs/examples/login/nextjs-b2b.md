@@ -69,10 +69,10 @@ On the detail page of that user, navigate to "Personal Access Tokens" and add a 
 
 Copy the generated Token as you will need this in your environment configuration file later.
 
-Go back to the `Portal` project and add the Service User as Manager (top right).
+Go back to the `Portal` project and add the Service User as an Administrator (top right).
 Make sure to select `Project Owner Viewer` as the management role.
 
-To show granted projects, go to the `Demo-Vendor` organization and add the Service User as `Org Project Permission Editor` Manager.
+To show granted projects, go to the `Demo-Vendor` organization and add the Service User as `Org Project Permission Editor` Administrator.
 
 ## Configuration
 
@@ -141,7 +141,7 @@ Let's call the first user `Alice Admin`. Create a second user called `Eric Emplo
 ### Administrator Role
 
 We want to enable Alice to assign roles to users in her organization in a self-service manner.
-To make this happen, we need to assign Alice an [Administrator Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
+To make this happen, we need to assign Alice an [Administrator Role](/concepts/structure/administrators) within the Organization `Demo-Customer`.
 
 Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Administrator Role `Org Owner`.
 

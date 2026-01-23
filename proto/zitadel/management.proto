@@ -2187,7 +2187,7 @@ service ManagementService {
     //
     // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-internal-permission-service-list-administrators.api.mdx) instead.
     //
-    // Show all the permissions the user has in ZITADEL (ZITADEL Manager).
+    // Show all the permissions the user has in ZITADEL (ZITADEL Administrator).
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"

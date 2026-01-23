@@ -69,7 +69,7 @@ You can overwrite all the defaults with the arguments you pass to `createZitadel
 
 Export the object returned from `createZitadelAuth()`
 
-### Initialize user manager
+### Initialize User Administrator
 
 ```ts reference
 https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
@@ -77,7 +77,7 @@ https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
 
 ### Add two new components to your application
 
-First, add the component which prompts the user to login.
+First, add the component which prompts the user to log in.
 
 ```ts reference
 https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx

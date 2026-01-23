@@ -117,7 +117,7 @@ The tool will merge both objects into a single one in the importBody.json output
 
 ### 5.1. Obtain Access Token (or PAT) for API Access
 
-To call the ZITADEL Admin API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+To call the ZITADEL Admin API, you need to authenticate using a **Service User** with the `IAM_OWNER` administrator permissions.
 
 There are two recommended authentication methods:
 

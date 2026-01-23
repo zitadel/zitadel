@@ -100,7 +100,7 @@ The tool will generate `importBody.json`, which is ready for importing into ZITA
 
 ### 5.1. Obtain Access Token (or PAT) for API Access
 
-To call the ZITADEL Management API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+To call the ZITADEL Management API, you need to authenticate using a **Service User** with the `IAM_OWNER` Administrator permissions.
 
 There are two recommended authentication methods:
 

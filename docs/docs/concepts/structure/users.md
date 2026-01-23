@@ -26,9 +26,9 @@ The main difference between human and machine users is the type of credentials t
 
 Learn how to [use service users](/docs/guides/integrate/service-users/authenticate-service-users) with ZITADEL.
 
-### Managers
+### Administrators
 
-Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
+Any user, human or service user, can be given an [Administrator](/concepts/structure/administrators) role.
 A user with an administrator role is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
@@ -60,7 +60,7 @@ Consider this general recommendation as a starting point:
 - Create one organization ("default organization") for your own company
 - Configure projects and applications in the default organization
 - Structure users in organizations based on common domains that are self-managed (eg, company)
-- Grant your projects to the organizations, allow Managers to give granted roles to their users
+- Grant your projects to the organizations, allow Administrators to give granted roles to their users
 
 You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios/introduction). 
 

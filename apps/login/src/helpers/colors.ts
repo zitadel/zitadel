@@ -391,17 +391,17 @@ export function getMembershipColor(role: string): ColorShade {
     case "IAM_OWNER_VIEWER":
       color = COLORS[14];
       break;
-    case "IAM_ORG_MANAGER":
+    case "IAM_ORG_ADMINISTRATOR":
       color = COLORS[11];
       break;
-    case "IAM_USER_MANAGER":
+    case "IAM_USER_ADMINISTRATOR":
       color = COLORS[8];
       break;
 
     case "ORG_OWNER":
       color = COLORS[16];
       break;
-    case "ORG_USER_MANAGER":
+    case "ORG_USER_ADMINISTRATOR":
       color = COLORS[8];
       break;
     case "ORG_OWNER_VIEWER":

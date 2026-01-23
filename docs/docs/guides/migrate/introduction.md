@@ -15,7 +15,7 @@ You can read more about the basic structure and important concepts of ZITADEL in
 Multi-tenancy in ZITADEL can be achieved through either [Instances](/docs/concepts/structure/instance) or [Organizations](/docs/guides/manage/console/organizations-overview).
 Where instances represent isolated ZITADEL instances, Organizations provide a more permeable approach to multi-tenancy.
 
-In most cases, when you want to achieve multi-tenancy, you use Organizations. Each organization can have their own set of Settings (eg, Security Policies, IDPs, Branding), Managers, and Users.
+In most cases, when you want to achieve multi-tenancy, you use Organizations. Each organization can have their own set of Settings (eg, Security Policies, IDPs, Branding), Administrators, and Users.
 Please also consult our guide on [Solution Scenarios](/docs/guides/solution-scenarios/introduction) for B2C and B2B for more details.
 
 ## Delegated access management
@@ -26,7 +26,7 @@ ZITADEL works differently by using [Granted Projects](/docs/concepts/structure/g
 Projects can be granted to [Organization](/docs/guides/manage/console/organizations-overview#organization-grants) or even to individual users.
 You can think of it as a logical link to a Project, which can be used by the receiving Organization or User as if it was their own project, except privileges to modify the Project itself.
 
-Delegated access management is a great way of keeping the management overhead low and enabling [self-service](/docs/concepts/features/selfservice#managers-in-delegation) for Organizations to manage their own Settings and Authorizations.
+Delegated access management is a great way of keeping the management overhead low and enabling [self-service](/docs/concepts/features/selfservice#administrators-in-delegation) for Organizations to manage their own Settings and Authorizations.
 
 ## Actions
 

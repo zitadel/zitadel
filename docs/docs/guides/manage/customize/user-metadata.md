@@ -223,7 +223,7 @@ Learn everything about how to build your own registration UI [here](/docs/guides
 
 The previous methods allowed you to retrieve metadata only for the `sub` in the access token.
 In case you want to get the metadata for another user, you need to use the management service.
-The user that calls the management service must have [manager permissions](/docs/guides/manage/console/managers).
+The user that calls the management service must have [administrator permissions](/docs/guides/manage/console/administrators).
 A user can be either a human user or a service user.
 
 You can get [metadata of a user filtered by your query](/docs/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/docs/apis/resources/mgmt/management-service-get-user-metadata).
