@@ -40,8 +40,8 @@ func TestSession_Create(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleClient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -225,8 +225,8 @@ func TestSession_Update(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleClient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -934,8 +934,8 @@ func TestSession_Delete(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleClient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -1018,8 +1018,8 @@ func TestSession_Get(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleClient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -1094,8 +1094,8 @@ func TestSession_List(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleClient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)

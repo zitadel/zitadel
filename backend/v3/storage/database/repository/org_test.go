@@ -34,8 +34,8 @@ func TestCreateOrganization(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -142,8 +142,8 @@ func TestCreateOrganization(t *testing.T) {
 						Name:                      gofakeit.Name(),
 						DefaultOrgID:              "defaultOrgId",
 						IAMProjectID:              "iamProject",
-						ManagementConsoleClientID: "managementConsoleCLient",
-						ManagementConsoleAppID:    "managementConsoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage:           "defaultLanguage",
 					}
 					err := instanceRepo.Create(t.Context(), tx, &instance)
@@ -282,8 +282,8 @@ func TestUpdateOrganization(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -438,8 +438,8 @@ func TestGetOrganization(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 
@@ -621,8 +621,8 @@ func TestListOrganization(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -778,8 +778,8 @@ func TestListOrganization(t *testing.T) {
 						Name:                      gofakeit.Name(),
 						DefaultOrgID:              "defaultOrgId",
 						IAMProjectID:              "iamProject",
-						ManagementConsoleClientID: "managementConsoleCLient",
-						ManagementConsoleAppID:    "managementConsoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage:           "defaultLanguage",
 					}
 					err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -803,8 +803,8 @@ func TestListOrganization(t *testing.T) {
 						Name:                      gofakeit.Name(),
 						DefaultOrgID:              "defaultOrgId",
 						IAMProjectID:              "iamProject",
-						ManagementConsoleClientID: "managementConsoleCLient",
-						ManagementConsoleAppID:    "managementConsoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage:           "defaultLanguage",
 					}
 					err = instanceRepo.Create(t.Context(), tx, &instance_2)
@@ -890,8 +890,8 @@ func TestDeleteOrganization(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -1039,8 +1039,8 @@ func TestGetOrganizationWithSubResources(t *testing.T) {
 		Name:                      gofakeit.Name(),
 		DefaultOrgID:              "defaultOrgId",
 		IAMProjectID:              "iamProject",
-		ManagementConsoleClientID: "managementConsoleCLient",
-		ManagementConsoleAppID:    "managementConsoleApp",
+		ConsoleClientID: "managementConsoleCLient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage:           "defaultLanguage",
 	})
 	require.NoError(t, err)
