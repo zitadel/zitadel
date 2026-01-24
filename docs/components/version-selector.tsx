@@ -4,100 +4,85 @@ import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import versions from '../content/versions.json';
 
-interface Version {
-  param?: string;
-  label: string;
-  url: string;
-  ref?: string;
-  refType?: string;
-  type?: string;
-}
-
 export function VersionSelector() {
-  const pathname = usePathname();
-  const router = useRouter();
+    const pathname = usePathname();
+    const router = useRouter();
 
-  // Determine current version from URL
-  // /docs -> latest
-  // /docs/v4.10 -> v4.10
-  // Default to latest if no match found
+    // Handle basePath issues: usePathname() typically returns path relative to basePath if configured?
+    // But purely relying on that is tricky. Let's normalize.
+    // If pathname starts with /docs, assume it's the full path and we strip it for logic, 
+    // then let router handle re-adding it if needed (or we check behaviors).
+    // Actually, Next.js router.push() expects path relative to basePath usually?
+    // Let's implement robust segment swapping.
 
-  // Create a map for easy lookup
-  // We want to match longest prefix first, so "v4.10" matches before "latest" (which is root /docs)
-  // Actually, simplified:
-  // If path starts with /docs/vX.Y, then it is vX.Y
-  // If path is /docs or /docs/..., and not /docs/vX.Y, it is likely latest (assuming /docs prefix)
+    const normalizePath = (p: string) => {
+        if (p.startsWith('/docs')) return p.slice(5) || '/';
+        return p;
+    };
 
-  // Check versions with 'param' defined.
-  const currentVersionObj = versions.find((v) => {
-    if (!v.param) return false;
-    if (v.param === 'latest') {
-      // 'latest' usually maps to root /docs (without version prefix)
-      // So if it DOES NOT start with any OTHER version prefix, it is likely latest.
-      // However, let's look for explicit matches first.
-      return false;
-    }
-    return pathname.startsWith(`/docs/${v.param}`);
-  });
+    const normalizedPath = normalizePath(pathname);
 
-  const currentVersion = currentVersionObj ? currentVersionObj.param : 'latest';
+    const currentVersionObj = versions.find((v) => {
+        if (!v.param || v.param === 'latest') return false;
+        return normalizedPath.startsWith(`/${v.param}`);
+    });
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedParam = e.target.value;
-    const selectedVersion = versions.find(v => v.param === selectedParam || (v.type === 'external' && v.label === selectedParam)); // Fallback for external
+    const currentVersion = currentVersionObj ? currentVersionObj.param : 'latest';
 
-    if (!selectedVersion) {
-      // Handle external link selected via label if param is missing?
-      // Our versions.json has explicit external entries without param sometimes?
-      // Actually the Archive entry has no param.
-      // Let's iterate versions to find match by URL or Label if param missing
-      const external = versions.find(v => v.label === selectedParam); // value in option might be label if param missing
-      if (external && external.type === 'external') {
-        window.location.href = external.url;
-      }
-      return;
-    }
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        const version = versions.find((v) => (v.param || v.label) === value);
 
-    if (selectedVersion.type === 'external') {
-      window.location.href = selectedVersion.url;
-      return;
-    }
+        if (!version) return;
 
-    // Switching logic
-    if (selectedParam === 'latest') {
-      // Switch to /docs/...
-      // If current is /docs/v4.10/foo -> /docs/foo
-      const newPath = pathname.replace(new RegExp(`^/docs/${currentVersion}`), '/docs');
-      router.push(newPath);
-    } else {
-      // Switch to /docs/v4.x/...
-      if (currentVersion === 'latest') {
-        // /docs/foo -> /docs/v4.x/foo
-        const newPath = pathname.replace(/^\/docs/, `/docs/${selectedParam}`);
+        if (version.type === 'external') {
+            window.open(version.url, '_blank');
+            return;
+        }
+
+        if (!version.param) return;
+
+        // Calculate the 'tail' of the path (content path)
+        let tail = normalizedPath;
+        if (currentVersion !== 'latest') {
+            // Strip current version prefix
+            // e.g. /v4.10/foo -> /foo
+            tail = normalizedPath.replace(new RegExp(`^/${currentVersion}`), '') || '/';
+        }
+
+        // Construct new path
+        let newPath = tail;
+        if (version.param !== 'latest') {
+            // Add new version prefix
+            // e.g. /foo -> /v4.9/foo
+            // Handle root slash
+            if (tail === '/') {
+                newPath = `/${version.param}`;
+            } else {
+                newPath = `/${version.param}${tail}`;
+            }
+        }
+
+        // Next.js router handles basePath automatically if configured correctly.
+        // If we push '/v4.10', it becomes '/docs/v4.10'.
         router.push(newPath);
-      } else {
-        // /docs/vOld/foo -> /docs/vNew/foo
-        const newPath = pathname.replace(new RegExp(`^/docs/${currentVersion}`), `/docs/${selectedParam}`);
-        router.push(newPath);
-      }
-    }
-  };
+    };
 
-  return (
-    <select
-      value={currentVersion}
-      onChange={handleChange}
-      className="p-2 bg-transparent text-sm font-medium rounded-md border border-fd-border hover:bg-fd-accent/50 focus:outline-none focus:ring-2 focus:ring-fd-ring text-fd-foreground"
-    >
-      {versions.map((v) => (
-        <option
-          key={v.param || v.label}
-          value={v.param || v.label}
-          className="bg-fd-background text-fd-foreground"
+    return (
+        <select
+            value={currentVersion}
+            onChange={handleChange}
+            className="p-2 bg-transparent text-sm font-medium rounded-md border border-fd-border hover:bg-fd-accent/50 focus:outline-none focus:ring-2 focus:ring-fd-ring text-fd-foreground w-full mb-4"
         >
-          {v.label}
-        </option>
-      ))}
-    </select>
-  );
+            {versions.map((v) => (
+                <option
+                    key={v.param || v.label}
+                    value={v.param || v.label}
+                    className="bg-fd-background text-fd-foreground"
+                >
+                    {v.label}
+                </option>
+            ))}
+        </select>
+    );
 }
