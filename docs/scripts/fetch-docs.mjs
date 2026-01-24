@@ -165,81 +165,188 @@ async function downloadFileContent(tagOrBranch, repoPath) {
 async function fixRelativeImports(versionDir, tagOrBranch) {
     if (!fs.existsSync(versionDir)) return;
     const files = fs.readdirSync(versionDir, { recursive: true });
-    const downloadedFiles = new Set();
-
+    
+    // We'll traverse all files to fix links/imports
     for (const file of files) {
         const filePath = join(versionDir, file);
         if (!fs.statSync(filePath).isFile()) continue;
-        if (filePath.endsWith('.mdx') || filePath.endsWith('.md')) {
-            let content = fs.readFileSync(filePath, 'utf8');
-            let changed = false;
+        if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) continue;
 
-            // Regex to find imports with relative paths going outside docs/content
-            // Example: import DefaultsYamlSource from "../../../../../cmd/defaults.yaml";
-            const importRegex = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
-            let match;
-            
-            // We need to collect all matches first because we'll be changing content
-            const matches = [];
-            while ((match = importRegex.exec(content)) !== null) {
-                matches.push({ full: match[0], path: match[1] });
-            }
+        let content = fs.readFileSync(filePath, 'utf8');
+        let changed = false;
 
-            for (const m of matches) {
-                // To find the repo-relative path, we resolve the import as it would be in the original repo
-                // Original content was in docs/content/<rest-of-path>
-                // Versioned content is in docs/content/<version>/<rest-of-path>
-                const versionFolder = path.basename(versionDir);
-                const relativePathInContent = filePath.split(join('content', versionFolder))[1];
-                if (!relativePathInContent) continue;
-                
-                // Use absolute paths to avoid confusion
-                const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
-                const originalDir = dirname(originalFilePath);
-                
-                // Resolve the import against the original location
-                // e.g. /abs/path/to/docs/content/guides/... + ../../../../../cmd/defaults.yaml
-                const absoluteImportTarget = resolve(originalDir, m.path);
-                const projectRoot = resolve(ROOT_DIR, '..'); // /abs/path/to/repo
+        // Helper to rewrite a single path
+        // Returns null if no change needed, or the new string if changed
+        const rewritePath = (originalRelPath) => {
+             // 1. Resolve where it was originally pointing
+             const versionFolder = path.basename(versionDir);
+             const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+             if (!relativePathInContent) return null; // Should not happen given logic
 
-                // Check if it's inside the project but outside docs/content (or strictly outside docs if we want to be safe)
-                // The main use case is importing from cmd/ or other repo folders
-                if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR)) {
-                     const relativeToProjectRoot = absoluteImportTarget.replace(projectRoot + '/', '');
-                     
-                     // We want to download this file and put it in a local versioned folder
-                     const localPathInVersion = join(versionDir, '_external', relativeToProjectRoot);
-                     const localDirInVersion = dirname(localPathInVersion);
-                     
-                     if (!fs.existsSync(localPathInVersion)) {
-                         console.log(`[fix-imports] Discovered external import: ${relativeToProjectRoot} in ${file}`);
-                         const fileContent = await downloadFileContent(tagOrBranch, relativeToProjectRoot);
-                         if (fileContent !== null) {
-                             fs.mkdirSync(localDirInVersion, { recursive: true });
-                             fs.writeFileSync(localPathInVersion, fileContent);
-                             downloadedFiles.add(relativeToProjectRoot);
-                         } else {
-                             console.warn(`[fix-imports] Failed to download versioned file: ${relativeToProjectRoot}`);
-                             continue;
-                         }
-                     }
- 
-                     // Update the import path in the MDX file to point to our local copy
-                     const newRelativePath = path.relative(dirname(filePath), localPathInVersion);
-                     // MDX imports should use forward slashes
-                     const normalizedPath = newRelativePath.split(path.sep).join('/');
-                     const finalPath = normalizedPath.startsWith('.') ? normalizedPath : './' + normalizedPath;
-                     
-                     console.log(`[fix-imports] Rewriting import in ${file}: ${m.path} -> ${finalPath}`);
-                     const newImport = m.full.replace(m.path, finalPath);
-                     content = content.replace(m.full, newImport);
-                     changed = true;
-                }
-            }
+             // The original file was at CONTENT_LATEST_DIR + relativePathInContent
+             const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+             const originalDir = dirname(originalFilePath);
+             
+             // Resolve target
+             // Note: resolve() handles '..' correctly
+             const absoluteTarget = resolve(originalDir, originalRelPath);
+             
+             const projectRoot = resolve(ROOT_DIR, '..'); // Repo root
+             
+             // 2. Determine where this target lives now
+             // Case A: It's in 'public' -> We moved public assets to 'public/<version>'
+             // Check if target starts with ROOT_DIR/public
+             if (absoluteTarget.startsWith(PUBLIC_DIR)) {
+                 // It refers to a public asset.
+                 // The NEW location of this asset is PUBLIC_DIR/<version>/<rest of path>
+                 // But wait, PUBLIC_DIR is 'docs/public'.
+                 // In downloadVersion, we move 'zitadel-xxx/docs/public' to 'docs/public/<version>'.
+                 // So if original path was 'docs/public/img/foo.png', new path is 'docs/public/<version>/img/foo.png'.
+                 
+                 const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1); // 'img/foo.png'
+                 const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
+                 
+                 // Now calculate relative path from the NEW file location to this NEW target
+                 // New file is at 'filePath'
+                 const newRelPath = path.relative(dirname(filePath), newTargetAbs);
+                 return newRelPath.split(path.sep).join('/'); // Normalize to forward slashes
+             }
+             
+             // Case B: It's in 'docs/content' (linking to another doc)
+             // If it's a relative link to another doc, we usually want to keep it relative
+             // content/<ver>/a.md -> content/<ver>/b.md is same relative relationship as content/a.md -> content/b.md
+             // UNLESS it crosses out of content?
+             
+             // Case C: It's external (e.g. cmd/defaults.yaml)
+             // This is what the original code was handling.
+             // If it is NOT in docs/content, and NOT in docs/public, we treat it as external file to download.
+             if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PublicOrRootPublic(absoluteTarget))) {
+                  // External file logic...
+                  // For now, let's keep the original logic for downloading defaults.yaml
+                  return null; // We handle this in the regex pass below specially or reuse this logic?
+             }
 
-            if (changed) {
-                fs.writeFileSync(filePath, content);
-            }
+              // Case D: It's a relative link to, say, components/ or other things in docs/
+              // Original: docs/content/foo.md -> ../components/Bar
+              // New: docs/content/<ver>/foo.md -> ../../components/Bar
+              // We just need to recalculate relative path from NEW file to ORIGINAL target
+              
+              // If it's pointing to something in docs/ (but not content/ or public/), like components/
+              if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
+                   const newRelPath = path.relative(dirname(filePath), absoluteTarget);
+                   return newRelPath.split(path.sep).join('/');
+              }
+              
+              return null;
+        };
+
+        // Helper for detecting public dir properly
+        // The PUBLIC_DIR variable is 'docs/public'. But absoluteTarget might be resolved via 'src'
+        function PublicOrRootPublic(p) {
+            return PUBLIC_DIR; 
+        }
+
+        // --- Replacements ---
+        
+        // 1. Imports: import ... from '...'
+        // We capture the path: group 2
+        const importRegex = /(import\s+.*?\s+from\s+['"])([^'"]+)(['"])/g;
+        content = content.replace(importRegex, (match, p1, p2, p3) => {
+             if (!p2.startsWith('.')) return match; // Only relative
+             const rewritten = rewritePath(p2);
+             if (rewritten && rewritten !== p2) {
+                 changed = true;
+                 return `${p1}${rewritten}${p3}`;
+             }
+             
+             // External file handling (legacy logic preserved/adapted)
+             // If rewritePath returned null, maybe it is the "external download" case?
+             // Let's implement the external download check here if rewritePath didn't handle it.
+             // ... (The original logic specifically looked for `../../../../../cmd` etc)
+             // We can incorporate it into rewritePath or do it here.
+             
+             // Let's check for the cmd/defaults.yaml case explicitly if rewritePath failed
+             if (p2.includes('/cmd/')) {
+                  // Re-use logic for downloading external files? 
+                  // It's cleaner to put it in rewritePath, but I need async. replace does not support async.
+                  // This function 'fixRelativeImports' is async. I can collect matches first.
+             }
+             
+             return match;
+        });
+        
+        // 2. Markdown Images: ![alt](src)
+        const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
+        content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
+             if (!p2.startsWith('.')) return match;
+             const rewritten = rewritePath(p2);
+             if (rewritten && rewritten !== p2) {
+                 changed = true;
+                 return `${p1}${rewritten}${p3}`;
+             }
+             return match;
+        });
+
+        // 3. HTML Attributes: src="..." or href="..."
+        // Naive regex, but likely sufficient for MDX
+        const htmlAttrRegex = /(src|href)=['"]([^'"]+)['"]/g;
+        content = content.replace(htmlAttrRegex, (match, attr, val) => {
+             if (!val.startsWith('.')) return match;
+             const rewritten = rewritePath(val);
+             if (rewritten && rewritten !== val) {
+                 changed = true;
+                 // reconstruct match
+                 const quote = match.includes("'") ? "'" : '"';
+                 return `${attr}=${quote}${rewritten}${quote}`;
+             }
+             return match;
+        });
+        
+        // --- Special handling for the "download external file" case ---
+        // The previous regex replacement structure prevents async operations.
+        // We have to scan for external files separately or before replacing, OR use a synchronous download (not ideal)
+        // OR rely on the existing synchronous logic for rewriting if we pre-download them.
+        
+        // Let's perform a SCAN for strictly external files (like ../cmd/defaults.yaml) first
+        // Reuse original logic for downloading
+        const importRegexForDownload = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
+        let match;
+        while ((match = importRegexForDownload.exec(content)) !== null) {
+              const relPath = match[1];
+              const versionFolder = path.basename(versionDir);
+              const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+              const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+              const absoluteImportTarget = resolve(dirname(originalFilePath), relPath);
+              const projectRoot = resolve(ROOT_DIR, '..');
+              
+              // If it points to cmd/ or similar external
+              if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
+                   const relativeToProjectRoot = absoluteImportTarget.replace(projectRoot + '/', '');
+                   const localPathInVersion = join(versionDir, '_external', relativeToProjectRoot);
+                   
+                   // Download if missing
+                   if (!fs.existsSync(localPathInVersion)) {
+                      console.log(`[fix-imports] Downloading external: ${relativeToProjectRoot}`);
+                      const fileContent = await downloadFileContent(tagOrBranch, relativeToProjectRoot); // existing function
+                      if (fileContent) {
+                          fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
+                          fs.writeFileSync(localPathInVersion, fileContent);
+                      }
+                   }
+                   
+                   // Rewrite to local path
+                   const newRelPath = path.relative(dirname(filePath), localPathInVersion).split(path.sep).join('/');
+                   const finalPath = newRelPath.startsWith('.') ? newRelPath : './' + newRelPath;
+                   // Perform replacement
+                   const newImport = match[0].replace(relPath, finalPath);
+                   content = content.replace(match[0], newImport);
+                   changed = true;
+              }
+        }
+        
+        if (changed) {
+            console.log(`[fix-relative] Updated ${file}`);
+            fs.writeFileSync(filePath, content);
         }
     }
 }
