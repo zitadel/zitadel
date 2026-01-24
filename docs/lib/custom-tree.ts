@@ -1,14 +1,14 @@
 import type * as PageTree from 'fumadocs-core/page-tree';
-import { 
-    guidesSidebar, 
-    apisSidebar, 
+import {
+    guidesSidebar,
+    apisSidebar,
     legalSidebar,
     type SidebarItem, // Import the shared type
 } from './sidebar-data';
 
 // --- Logic ---
 
-export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
+export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPrefix?: string, suppressWarnings?: boolean }): PageTree.Root {
     const pageLookup = new Map<string, PageTree.Item>();
     const folderLookup = new Map<string, PageTree.Folder>();
 
@@ -16,11 +16,20 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
      * 1. Normalizer
      */
     function normalize(path: string): string {
-        return path
-            .toLowerCase()
-            .replace(/^\/|docs\/|\/$/g, '') 
-            .replace(/\/index$/, '')        
-            .replace(/_/g, '-');            
+        let p = path.toLowerCase();
+
+        if (options?.stripPrefix) {
+            if (p.startsWith(options.stripPrefix)) {
+                p = p.substring(options.stripPrefix.length);
+            }
+        } else {
+            p = p.replace(/^\/|docs\/|\/$/g, '');
+        }
+
+        return p
+            .replace(/^\//, '')
+            .replace(/\/index$/, '')
+            .replace(/_/g, '-');
     }
 
     /**
@@ -31,7 +40,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
             pageLookup.set(node.url, node);
             pageLookup.set(normalize(node.url), node);
         }
-        
+
         if (node.type === 'folder') {
             if (node.index) {
                 pageLookup.set(node.index.url, node.index);
@@ -40,11 +49,11 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
 
             const childUrl = node.index?.url || node.children.find(c => c.type === 'page')?.url;
             if (childUrl) {
-                const rawPath = childUrl.split('/').slice(0, -1).join('/'); 
+                const rawPath = childUrl.split('/').slice(0, -1).join('/');
                 folderLookup.set(normalize(rawPath), node);
-                
+
                 const cleanDir = rawPath.replace(/^\/|docs\//, '');
-                folderLookup.set(cleanDir, node); 
+                folderLookup.set(cleanDir, node);
             }
             node.children.forEach(collect);
         }
@@ -56,7 +65,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
      */
     function findPage(path: string): PageTree.Item | undefined {
         if (!path) return undefined;
-        
+
         const key = normalize(path);
         if (pageLookup.has(key)) return pageLookup.get(key);
 
@@ -65,13 +74,16 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
         if (segments.length >= 2 && segments[segments.length - 1] === segments[segments.length - 2]) {
             const dedupedKey = segments.slice(0, -1).join('/');
             if (pageLookup.has(dedupedKey)) return pageLookup.get(dedupedKey);
+            if (path.includes('traefik')) console.log('[CustomTree] Dedup failed for:', dedupedKey, 'Orig:', key);
         }
 
         // Suffix Scan Fallback
         for (const [lookupKey, node] of pageLookup.entries()) {
             if (lookupKey.endsWith('/' + key)) return node;
         }
-        
+
+        if (path.includes('traefik')) console.log('[CustomTree] Failed to find completely:', key, 'Prefix:', options?.stripPrefix);
+
         return undefined;
     }
 
@@ -80,7 +92,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
      */
     function findFolder(dirName: string): PageTree.Folder | undefined {
         if (!dirName) return undefined;
-        
+
         if (folderLookup.has(dirName)) return folderLookup.get(dirName);
         const normKey = normalize(dirName);
         if (folderLookup.has(normKey)) return folderLookup.get(normKey);
@@ -99,19 +111,21 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
         if (typeof item === 'string') {
             const page = findPage(item);
             if (page) return page;
-            
+
             const folder = findFolder(item);
             if (folder) {
                 // Safe sort for strict TS
-                return [...folder.children].sort((a, b) => 
+                return [...folder.children].sort((a, b) =>
                     String(a.name ?? '').localeCompare(String(b.name ?? ''))
                 );
             }
-            
-            console.warn(`[Sidebar] Missing item: ${item}`);
+
+            if (!options?.suppressWarnings) {
+                console.warn(`[Sidebar] Missing item: ${item}`);
+            }
             return null;
         }
-        
+
         // Links
         if (item.type === 'link') {
             const isExternal = item.href && (item.href.startsWith('http') || item.href.startsWith('//'));
@@ -123,19 +137,19 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
                     external: true,
                     icon: item.icon
                 } as PageTree.Item;
-            } 
+            }
             if (item.href) {
-                 const page = findPage(item.href);
-                 if (page) return { ...page, name: item.label || page.name, icon: item.icon };
+                const page = findPage(item.href);
+                if (page) return { ...page, name: item.label || page.name, icon: item.icon };
             }
             return null;
         }
 
         // Docs
         if (item.type === 'doc') {
-             const node = findPage(item.id || '');
-             if (!node) return null;
-             return { ...node, name: item.label || node.name, icon: item.icon };
+            const node = findPage(item.id || '');
+            if (!node) return null;
+            return { ...node, name: item.label || node.name, icon: item.icon };
         }
 
         // Autogenerated
@@ -144,7 +158,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
                 const folder = findFolder(item.dirName);
                 if (folder) {
                     // Safe sort for strict TS
-                    return [...folder.children].sort((a, b) => 
+                    return [...folder.children].sort((a, b) =>
                         String(a.name ?? '').localeCompare(String(b.name ?? ''))
                     );
                 }
@@ -164,42 +178,42 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
                     }
                 }
             }
-            
+
             let indexPage: PageTree.Item | undefined;
             if (item.link?.type === 'generated-index' && item.link.slug) {
                 indexPage = findPage(item.link.slug);
             } else if (item.link?.type === 'doc' && item.link.id) {
                 indexPage = findPage(item.link.id);
             }
-            
+
             return {
                 type: 'folder',
                 name: item.label || 'Category',
                 children: children,
-                defaultOpen: item.collapsed === false, 
+                defaultOpen: item.collapsed === false,
                 index: indexPage,
                 icon: item.icon
             } as PageTree.Folder;
         }
-        
-        return null; 
+
+        return null;
     }
 
     // 6. Construction
     const newChildren: PageTree.Node[] = [];
-    
+
     const indexNode = findPage('index');
     if (indexNode) newChildren.push(indexNode);
-    
+
     guidesSidebar.forEach(item => {
-        const node = buildNode(item); 
+        const node = buildNode(item);
         if (node && !Array.isArray(node)) newChildren.push(node);
     });
 
     const apisFolder = buildNode({
-         type: 'category',
-         label: 'APIs',
-         items: apisSidebar
+        type: 'category',
+        label: 'APIs',
+        items: apisSidebar
     });
     if (apisFolder && !Array.isArray(apisFolder)) newChildren.push(apisFolder);
 
@@ -207,7 +221,7 @@ export function buildCustomTree(originalTree: PageTree.Root): PageTree.Root {
         const node = buildNode(item);
         if (node && !Array.isArray(node)) newChildren.push(node);
     });
-    
+
     return {
         name: originalTree.name,
         children: newChildren

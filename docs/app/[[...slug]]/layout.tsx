@@ -17,7 +17,34 @@ export default async function Layout(props: { children: React.ReactNode; params:
 
   let tree = source.pageTree;
   if (currentVersion !== 'latest') {
-    tree = versionSource.pageTree;
+    // Hoist the version folder to root to flatten sidebar
+    // versionSource.pageTree -> [ v4.10 folder, v4.9 folder ... ]
+    // We want the children of the specific version folder.
+    const children = (versionSource.pageTree as any).children || [];
+
+    const versionFolder = children.find((node: any) => {
+      if (node.type !== 'folder') return false;
+      // Check if the folder's index page belongs to this version
+      if (node.index?.url && node.index.url.includes(`/${currentVersion}`)) return true;
+      // Fallback: check first child if index missing
+      if (node.children?.[0]?.url?.includes(`/${currentVersion}`)) return true;
+      return false;
+    });
+
+    if (versionFolder) {
+      // Hoist children
+      const hoistedTree = {
+        name: versionFolder.name,
+        children: versionFolder.children,
+      } as any;
+
+      // Apply custom sidebar structure (from local sidebar-data.ts)
+      // We strip the prefix '/docs/v4.10' so the lookup matches generic keys 'guides/...'
+      const prefix = currentVersion === 'latest' ? '/docs' : `/docs/${currentVersion}`;
+      tree = buildCustomTree(hoistedTree, { stripPrefix: prefix });
+    } else {
+      tree = versionSource.pageTree;
+    }
   } else {
     tree = buildCustomTree(source.pageTree);
   }
