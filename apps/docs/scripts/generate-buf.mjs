@@ -6,7 +6,7 @@ import os from 'os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
-const PROTO_DIR = join(ROOT_DIR, '../proto');
+const PROTO_DIR = join(ROOT_DIR, '../../proto');
 const OPENAPI_DIR = join(ROOT_DIR, 'openapi');
 const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
 const REPO_URL = 'https://github.com/zitadel/zitadel.git';

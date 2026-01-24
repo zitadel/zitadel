@@ -129,7 +129,7 @@ The code consists of the following parts:
 | API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
 | Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
-| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)   |
+| Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./apps/docs](./apps/docs)                          | [Contribute to Frontend](#contribute-to-frontend)   |
 | translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
@@ -582,7 +582,7 @@ pnpm nx run @zitadel/client:build  # Build after changes
 
 ### Contribute to Docs
 
-Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
+Project documentation is made with Docusaurus and is located under [./apps/docs](./apps/docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
 To start developing, make sure you followed the [quick start](#quick-start) steps.
 
@@ -656,7 +656,7 @@ You also have to add some changes to the following files:
 
 - [Register Local File](./console/src/app/app.module.ts)
 - [Add Supported Language](./console/src/app/utils/language.ts)
-- [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
+- [Customized Text Docs](./apps/docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
 ## **Did you find a security flaw?**
@@ -726,7 +726,7 @@ The category shows which part of Zitadel is affected.
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
 - **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
-- **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
+- **category: docs**: Adjustments or new documentations, this can be found in the apps/docs folder.
 - **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
-const PROTO_DIR = join(ROOT_DIR, '../proto');
+const PROTO_DIR = join(ROOT_DIR, '../../proto');
 const CONTENT_DIR = join(ROOT_DIR, 'content');
 const CONTENT_API_DIR = join(ROOT_DIR, 'content/reference/api');
 const PUBLIC_DIR = join(ROOT_DIR, 'public/docs');

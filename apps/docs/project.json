@@ -1,12 +1,12 @@
 {
   "name": "@zitadel/docs",
-  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm build",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/.next"
@@ -24,7 +24,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "next dev",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "dependsOn": [
         "generate"
@@ -34,7 +34,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "next start",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "dependsOn": [
         "build"
@@ -44,7 +44,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm fetch-docs",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/content/v*",
@@ -63,7 +63,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm generate:buf",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "dependsOn": [
         "fetch-docs"
@@ -75,7 +75,7 @@
       "inputs": [
         "default",
         {
-          "dependentTasksOutputFiles": "docs/content/versions.json"
+          "dependentTasksOutputFiles": "apps/docs/content/versions.json"
         }
       ]
     },
@@ -83,14 +83,14 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm clean",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       }
     },
     "generate-openapi": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm generate:openapi",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/content/reference/api",
@@ -103,7 +103,7 @@
       "inputs": [
         "default",
         {
-          "dependentTasksOutputFiles": "docs/openapi/**"
+          "dependentTasksOutputFiles": "apps/docs/openapi/**"
         }
       ]
     },
@@ -111,7 +111,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm generate:virtual",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/content/**/index.mdx"
@@ -125,7 +125,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm exec fumadocs-mdx",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/.source"
@@ -138,7 +138,7 @@
       "inputs": [
         "default",
         {
-          "dependentTasksOutputFiles": "docs/content/**"
+          "dependentTasksOutputFiles": "apps/docs/content/**"
         }
       ]
     },
@@ -146,7 +146,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'Generation complete'",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "dependsOn": [
         "generate-source"
