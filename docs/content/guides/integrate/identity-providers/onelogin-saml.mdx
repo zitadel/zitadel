@@ -33,7 +33,7 @@ After the ZITADEL SAML provider exists, we’ll return to OneLogin and finish th
    - Any optional icon or description you like.
 6. Click **Save** to create the application.
 
-![Image: OneLogin Add Apps screen showing SAML connector selection](/docs/img/guides/onelogin-add-apps.png)
+![Image: OneLogin Add Apps screen showing SAML connector selection](/img/guides/onelogin-add-apps.png)
 
 ### Export OneLogin IdP metadata
 
@@ -67,7 +67,7 @@ All the necessary configuration is contained in the metadata which has to be exc
 
 <GeneralConfigDescription components={props.components}  provider_account="OneLogin" />
 
-![SAML Provider](/docs/img/guides/zitadel_saml_create_provider.png)
+![SAML Provider](/img/guides/zitadel_saml_create_provider.png)
 
 After saving, open the newly created **OneLogin SAML provider** in ZITADEL.  
 In the details view you will find the **ZITADEL Service Provider** URLs, such as:
@@ -107,7 +107,7 @@ Now that ZITADEL is configured, return to OneLogin and finish the SAML configura
    - **ACS (Consumer) URL Validator** (if present)  
      For testing, you can use a permissive value like `.*`, then tighten it later to match the exact ACS URL.
 
-![Image: OneLogin SAML configuration with ZITADEL URLs](/docs/img/guides/onelogin-configuration.png)
+![Image: OneLogin SAML configuration with ZITADEL URLs](/img/guides/onelogin-configuration.png)
 
 4. Save your changes.
 
@@ -141,7 +141,7 @@ These attributes are later available in ZITADEL’s **IdP information** and can 
 
 <Activate components={props.components} />
 
-![Activate OneLogin SAML provider in ZITADEL](/docs/img/guides/zitadel_activate_onelogin_saml.png)
+![Activate OneLogin SAML provider in ZITADEL](/img/guides/zitadel_activate_onelogin_saml.png)
 
 ### Ensure your Login Policy allows External IdPs
 
@@ -327,4 +327,4 @@ func main() {
 
 <TestSetup components={props.components}  loginscreen="your OneLogin login"/>
 
-![Image: OneLogin button on ZITADEL login](/docs/img/guides/zitadel_login_onelogin_button.png)
+![Image: OneLogin button on ZITADEL login](/img/guides/zitadel_login_onelogin_button.png)

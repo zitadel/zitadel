@@ -42,4 +42,4 @@ We do not recommend changing any settings or using this project for anything els
 
 The default name of the project is "ZITADEL", this might differ on self-hosted instances, when you change the default name.
 
-![Default Project](/docs/img/guides/solution-scenarios/console-default-project.png)
+![Default Project](/img/guides/solution-scenarios/console-default-project.png)

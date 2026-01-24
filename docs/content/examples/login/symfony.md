@@ -27,7 +27,7 @@ Inside ZITADEL, you can use regular lower-case role names without prefixes, if y
 
 In your project settings make sure the "Assert Roles On Authentication" is enabled.
 
-![Project settings in console](/docs/img/symfony/project-settings.png)
+![Project settings in console](/img/symfony/project-settings.png)
 
 In the project Role tab, add 2 special roles:
 
@@ -36,11 +36,11 @@ In the project Role tab, add 2 special roles:
 
 A `user` role is not required. This role is assumed by default for any authenticated user in Symfony.
 
-![Project roles in console](/docs/img/symfony/project-roles.png)
+![Project roles in console](/img/symfony/project-roles.png)
 
 Finally, we can assign the roles to users in the project's authorizations tab.
 
-![Project authorizations in console](/docs/img/symfony/project-authorizations.png)
+![Project authorizations in console](/img/symfony/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -50,11 +50,11 @@ In your Project, add a new application at the top of the page.
 Select Web application type and continue.
 We use [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code)for our Symfony application.
 
-![Create app in console](/docs/img/symfony/app-create.png)
+![Create app in console](/img/symfony/app-create.png)
 
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated 
 
-![Configure app authentication method in console](/docs/img/symfony/app-auth-method.png)
+![Configure app authentication method in console](/img/symfony/app-auth-method.png)
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
@@ -63,7 +63,7 @@ For the example application we are writing use:
 - `http://localhost:8000/login_check` as Redirect URI
 - `http://localhost:8000/logout` as post-logout URI.
 
-![Configure app redirects console](/docs/img/symfony/app-redirects.png)
+![Configure app redirects console](/img/symfony/app-redirects.png)
 
 After the final step you are presented with a client ID and secret.
 Copy and paste them to a safe location for later use by the application.

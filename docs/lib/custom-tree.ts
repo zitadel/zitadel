@@ -9,6 +9,7 @@ import {
 // --- Logic ---
 
 export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPrefix?: string, suppressWarnings?: boolean }): PageTree.Root {
+    const start = performance.now();
     const pageLookup = new Map<string, PageTree.Item>();
     const folderLookup = new Map<string, PageTree.Folder>();
 
@@ -17,10 +18,16 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      */
     function normalize(path: string): string {
         let p = path.toLowerCase();
+        // Ensure leading slash for consistent prefix checking
+        if (!p.startsWith('/')) p = '/' + p;
 
-        if (options?.stripPrefix) {
-            if (p.startsWith(options.stripPrefix)) {
-                p = p.substring(options.stripPrefix.length);
+        const prefix = options?.stripPrefix ?
+            (options.stripPrefix.startsWith('/') ? options.stripPrefix : '/' + options.stripPrefix).toLowerCase()
+            : undefined;
+
+        if (prefix) {
+            if (p.startsWith(prefix)) {
+                p = p.substring(prefix.length);
             }
         } else {
             p = p.replace(/^\/|docs\/|\/$/g, '');
@@ -35,30 +42,33 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
     /**
      * 2. Collector
      */
-    function collect(node: PageTree.Node) {
+    function collect(node: PageTree.Node, path: string = '') {
         if (node.type === 'page') {
             pageLookup.set(node.url, node);
             pageLookup.set(normalize(node.url), node);
         }
 
         if (node.type === 'folder') {
+            const nodeName = typeof node.name === 'string' ? node.name : '';
+            const currentPath = path ? `${path}/${nodeName}` : nodeName;
+
+            // Use URL of index or children to infer the real disk-like path
+            const sampleUrl = node.index?.url || node.children.find(c => c.type === 'page')?.url;
+            if (sampleUrl) {
+                const folderUrl = node.index ? sampleUrl : sampleUrl.split('/').slice(0, -1).join('/');
+                folderLookup.set(normalize(folderUrl), node);
+                folderLookup.set(folderUrl.replace(/^\/|docs\//, ''), node);
+            }
+
             if (node.index) {
                 pageLookup.set(node.index.url, node.index);
                 pageLookup.set(normalize(node.index.url), node.index);
             }
 
-            const childUrl = node.index?.url || node.children.find(c => c.type === 'page')?.url;
-            if (childUrl) {
-                const rawPath = childUrl.split('/').slice(0, -1).join('/');
-                folderLookup.set(normalize(rawPath), node);
-
-                const cleanDir = rawPath.replace(/^\/|docs\//, '');
-                folderLookup.set(cleanDir, node);
-            }
-            node.children.forEach(collect);
+            node.children.forEach(c => collect(c, currentPath));
         }
     }
-    originalTree.children.forEach(collect);
+    originalTree.children.forEach(c => collect(c));
 
     /**
      * 3. Optimized Page Finder
@@ -74,15 +84,12 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
         if (segments.length >= 2 && segments[segments.length - 1] === segments[segments.length - 2]) {
             const dedupedKey = segments.slice(0, -1).join('/');
             if (pageLookup.has(dedupedKey)) return pageLookup.get(dedupedKey);
-            if (path.includes('traefik')) console.log('[CustomTree] Dedup failed for:', dedupedKey, 'Orig:', key);
         }
 
         // Suffix Scan Fallback
         for (const [lookupKey, node] of pageLookup.entries()) {
             if (lookupKey.endsWith('/' + key)) return node;
         }
-
-        if (path.includes('traefik')) console.log('[CustomTree] Failed to find completely:', key, 'Prefix:', options?.stripPrefix);
 
         return undefined;
     }
@@ -109,16 +116,41 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
     function buildNode(item: SidebarItem): PageTree.Node | PageTree.Node[] | null {
         // String Shorthand
         if (typeof item === 'string') {
-            const page = findPage(item);
-            if (page) return page;
-
             const folder = findFolder(item);
             if (folder) {
-                // Safe sort for strict TS
-                return [...folder.children].sort((a, b) =>
-                    String(a.name ?? '').localeCompare(String(b.name ?? ''))
-                );
+                const nodes: PageTree.Node[] = [];
+                const seenUrls = new Set<string>();
+
+                // Add index first
+                if (folder.index && folder.index.url) {
+                    nodes.push(folder.index);
+                    seenUrls.add(folder.index.url);
+                }
+
+                // Add children that are not already present
+                folder.children.forEach(child => {
+                    if (child.type === 'page' && child.url) {
+                        if (!seenUrls.has(child.url)) {
+                            nodes.push(child);
+                            seenUrls.add(child.url);
+                        }
+                    } else {
+                        // For folders, we rely on their distinct identity or recursive structure.
+                        // Assuming folder children don't duplicate the parent index URL.
+                        nodes.push(child);
+                    }
+                });
+
+                // Sort unique nodes by name
+                return nodes.sort((a, b) => {
+                    const nameA = typeof a.name === 'string' ? a.name : '';
+                    const nameB = typeof b.name === 'string' ? b.name : '';
+                    return nameA.localeCompare(nameB);
+                });
             }
+
+            const page = findPage(item);
+            if (page) return page;
 
             if (!options?.suppressWarnings) {
                 console.warn(`[Sidebar] Missing item: ${item}`);
@@ -158,9 +190,11 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
                 const folder = findFolder(item.dirName);
                 if (folder) {
                     // Safe sort for strict TS
-                    return [...folder.children].sort((a, b) =>
-                        String(a.name ?? '').localeCompare(String(b.name ?? ''))
-                    );
+                    return [...folder.children].sort((a, b) => {
+                        const nameA = typeof a.name === 'string' ? a.name : '';
+                        const nameB = typeof b.name === 'string' ? b.name : '';
+                        return nameA.localeCompare(nameB);
+                    });
                 }
             }
             return null;
@@ -221,6 +255,12 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
         const node = buildNode(item);
         if (node && !Array.isArray(node)) newChildren.push(node);
     });
+
+    const end = performance.now();
+    const duration = end - start;
+    if (duration > 100) {
+        console.log(`[CustomTree] Build time: ${duration.toFixed(2)}ms`);
+    }
 
     return {
         name: originalTree.name,

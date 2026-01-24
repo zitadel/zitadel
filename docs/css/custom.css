@@ -2,28 +2,28 @@
   font-family: Lato;
   font-style: normal;
   font-weight: 400;
-  src: url(/fonts/lato/Lato-Regular.ttf) format("truetype");
+  src: url(/docs/fonts/lato/Lato-Regular.ttf) format("truetype");
 }
 
 @font-face {
   font-family: Lato;
   font-style: normal;
   font-weight: 700;
-  src: url(/fonts/lato/Lato-Bold.ttf) format("truetype");
+  src: url(/docs/fonts/lato/Lato-Bold.ttf) format("truetype");
 }
 
 @font-face {
   font-family: Lato;
   font-style: italic;
   font-weight: 400;
-  src: url(/fonts/lato/Lato-Italic.ttf) format("truetype");
+  src: url(/docs/fonts/lato/Lato-Italic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: Lato;
   font-style: italic;
   font-weight: 700;
-  src: url(/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+  src: url(/docs/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
 }
 
 /* Custom Zitadel Variables */

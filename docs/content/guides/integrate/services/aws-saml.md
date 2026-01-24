@@ -30,13 +30,13 @@ Described [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/manag
 can connect to ZITADEL as a SAML2 IDP.
 
 1. Chose the External identity provider:
-   ![Choose identity source](/docs/img/saml/aws/change_idp.png)
+   ![Choose identity source](/img/saml/aws/change_idp.png)
 
 2. Download the metadata file, to provide ZITADEL with all the information it needs, and save the AWS SSO Sign-in URL,
    which you use to login afterwards.
 
 3. Fill out the fields as follows, to provide AWS with all the information it needs:
-   ![Configure external identity provider](/docs/img/saml/aws/configure_idp.png)
+   ![Configure external identity provider](/img/saml/aws/configure_idp.png)
 
    To connect to another environment, change the domains, for example if you would use ZITADEL under the url "
    https://example.com" you would have the URLs "https://example.com/saml/v2/SSO"
@@ -62,14 +62,14 @@ The metadata used in this part is from "Change to external identity provider ZIT
 In your existing project:
 
 1. Press the "+"-button to add an application
-   ![Project](/docs/img/saml/zitadel/project.png)
+   ![Project](/img/saml/zitadel/project.png)
 2. Fill in a name for the application and chose the SAML type, then click "Continue".
-   ![New Application](/docs/img/saml/zitadel/application_saml.png)
+   ![New Application](/img/saml/zitadel/application_saml.png)
 3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
    Continue".
-   ![Add Metadata to Application](/docs/img/saml/zitadel/application_saml_metadata.png)
+   ![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
 4. Check your application, if everything is correct, press "Create".
-   ![Create Application](/docs/img/saml/zitadel/application_saml_create.png)
+   ![Create Application](/img/saml/zitadel/application_saml_create.png)
 
 Everything on the side of ZITADEL is done if the application is correctly created.
 

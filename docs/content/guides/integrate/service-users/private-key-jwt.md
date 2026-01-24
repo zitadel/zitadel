@@ -22,7 +22,7 @@ Read more about the [different authentication methods for service users](./authe
 9. The client sends an API request, including the `access_token` in the Authorization header.
 10. The resource server validates the JWT with [token introspection](../token-introspection/).
 
-![private key jwt authentication sequence diagram](/docs/img/guides/integrate/service-users/sequence-private-key-jwt.svg)
+![private key jwt authentication sequence diagram](/img/guides/integrate/service-users/sequence-private-key-jwt.svg)
 
 ## Prerequisites
 
@@ -73,7 +73,7 @@ If you generate a key in ZITADEL, make sure to download and securely store the k
 If you set an expiration date when generating a key in ZITADEL, that key will expire at midnight on the specified day.
 </Callout>
 
-![Create private key](/docs/img/console_serviceusers_new_key.gif)
+![Create private key](/img/console_serviceusers_new_key.gif)
 
 If you let ZITADEL generate a key for you and download the JSON file, it will look similar to the example below. In this ZITADEL-generated key file, the `key` property contains the _private_ key for your service account. Store this JSON securely and never share your private key. ZITADEL automatically stores the public key component, so you do not need to upload it.
 

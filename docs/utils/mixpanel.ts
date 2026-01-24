@@ -5,11 +5,11 @@ let mixpanel: OverridedMixpanel | undefined;
 export async function initMixpanel() {
   if (typeof window === 'undefined') return;
 
-  const module = await import('mixpanel-browser');
-  mixpanel = module.default;
-
   const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
   if (!token) return;
+
+  const module = await import('mixpanel-browser');
+  mixpanel = module.default;
 
   mixpanel.init(token, {
     property_blacklist: ['$referrer', 'referrer', '$current_url_query_params', '$initial_referrer'],
@@ -22,11 +22,15 @@ export async function initMixpanel() {
 }
 
 export function optInTracking() {
-  mixpanel?.opt_in_tracking();
+  if (isMixpanelInitialized()) {
+    mixpanel?.opt_in_tracking();
+  }
 }
 
 export function optOutTracking() {
-  mixpanel?.opt_out_tracking();
+  if (isMixpanelInitialized()) {
+    mixpanel?.opt_out_tracking();
+  }
 }
 
 function isMixpanelInitialized(): boolean {

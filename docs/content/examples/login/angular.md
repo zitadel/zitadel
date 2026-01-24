@@ -17,7 +17,7 @@ You'll need to provide some information about your app. We recommend creating a 
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
-![Create app in console](/docs/img/angular/app-create.png)
+![Create app in console](/img/angular/app-create.png)
 
 
 ### Redirect URIs
@@ -163,7 +163,7 @@ Congratulations! You have successfully integrated your Angular application with 
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
-![App in console](/docs/img/angular/app-screen.png)
+![App in console](/img/angular/app-screen.png)
 
 ### What's next?
 

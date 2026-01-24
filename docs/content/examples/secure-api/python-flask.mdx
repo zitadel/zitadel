@@ -7,7 +7,7 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 ## Overview
 
-![Overview](/docs/img/python-flask/1.png)
+![Overview](/img/python-flask/1.png)
 
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
@@ -27,7 +27,7 @@ In order to run the example you need to have `python3` and `pip3` installed.
 
 ### ZITADEL configuration for the API
 
-![Create API application](/docs/img/python-flask/2.png)
+![Create API application](/img/python-flask/2.png)
 
 You need to setup a couple of things in ZITADEL. 
 
@@ -64,7 +64,7 @@ def handle_auth_error(ex: ValidatorError) -> Response:
     response.status_code = ex.status_code
     return response
 
-@APP.route("/docs/img/api/public")
+@APP.route("/img/api/public")
 def public():
     """No access token required."""
     response = (
@@ -73,7 +73,7 @@ def public():
     return jsonify(message=response)
 
 
-@APP.route("/docs/img/api/private")
+@APP.route("/img/api/private")
 @require_auth(None)
 def private():
     """A valid access token is required."""
@@ -83,7 +83,7 @@ def private():
     return jsonify(message=response)
 
 
-@APP.route("/docs/img/api/private-scoped")
+@APP.route("/img/api/private-scoped")
 @require_auth(["read:messages"])
 def private_scoped():
     """A valid access token and scope are required."""
@@ -99,9 +99,9 @@ if __name__ == "__main__":
 The API has three routes:
 
 <ul>
-<li> "/docs/img/api/public" - No access token is required.</li>
-<li>"/docs/img/api/private" - A valid access token is required.</li>
-<li>"/docs/img/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
+<li> "/img/api/public" - No access token is required.</li>
+<li>"/img/api/private" - A valid access token is required.</li>
+<li>"/img/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
 </ul>
 
 The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from ZITADEL using ZITADEL's introspection endpoint.
@@ -190,7 +190,7 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ### ZITADEL configuration to create a service user
 
-![Create a service user](/docs/img/python-flask/3.png)
+![Create a service user](/img/python-flask/3.png)
 
 1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
 2. To enable authorization, follow [this guide](/docs/guides/manage/console/roles) to create a role `read:messages` on your project. 

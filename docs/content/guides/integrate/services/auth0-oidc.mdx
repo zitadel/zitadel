@@ -26,14 +26,14 @@ Prerequisites:
 In Authentication > Enterprise
 
 1. Press the "+" button right to "OpenID Connect"  
-  ![Create new connection](/docs/img/oidc/auth0/auth0-create-app.png)
+  ![Create new connection](/img/oidc/auth0/auth0-create-app.png)
 2. Set a connection name for example "ZITADEL"
 3. The issuer url is `https://${CUSTOM_DOMAIN}/.well-known/openid-configuration`
 4. Copy the callback URL (ending with `/login/callback`)
 
 The configuration should look like this:
 
-![initial connection configuration](/docs/img/oidc/auth0/auth0-init-app.png)
+![initial connection configuration](/img/oidc/auth0/auth0-init-app.png)
 
 Next we have to switch to the ZITADEL console.
 
@@ -47,13 +47,13 @@ First of all we create the application in your project.
 
 1. Copy the client id from ZITADEL and past it into the **Client ID** field
 2. Copy the client secret from ZITADEL and past it into the **Client Secret** field
-   ![full configuration](/docs/img/oidc/auth0/auth0-full.png)
+   ![full configuration](/img/oidc/auth0/auth0-full.png)
 3. click Create
 4. To verify the connection go to the "Applications" tab and enable the Default App
-   ![enable app](/docs/img/oidc/auth0/auth0-enable-app.png)
+   ![enable app](/img/oidc/auth0/auth0-enable-app.png)
 5. Click "Back to OpenID Connect"
 6. Click on the "..." button right to the newly created connection and click "Try"
-   ![click try](/docs/img/oidc/auth0/auth0-try.png)
+   ![click try](/img/oidc/auth0/auth0-try.png)
 7. ZITADEL should open on a new tab and you can enter your login information
 8. After you logged in you should see the following:
-   ![full configuration](/docs/img/oidc/auth0/auth0-works.png)
+   ![full configuration](/img/oidc/auth0/auth0-works.png)

@@ -24,7 +24,7 @@ We start setting up the enterprise application.
 2. Search for "SAML Toolkit" and click on the "Microsoft Entra SAML Toolkit" card.
 3. Change the name if wanted and click "Create"
 
-![Azure SAML App Creation](/docs/img/guides/azure_saml_app_create.png)
+![Azure SAML App Creation](/img/guides/azure_saml_app_create.png)
 
 ### Disable required assignment
 
@@ -34,7 +34,7 @@ To allow all users to sign in using ZITADEL we need to manually disable required
 2. Set "Assignment required?" to No
 3. Hit Save
 
-![Disable assignment required check](/docs/img/guides/azure_disable_assignment_required.png)
+![Disable assignment required check](/img/guides/azure_disable_assignment_required.png)
 
 ### Setup SAML
 
@@ -45,7 +45,7 @@ Configure the sign-on method of the app.
 3. You will be redirected to the Single Sign-On details page
 4. Copy the URL of SAML Certificates > App Federation Metadata Url to your clipboard
 
-![Azure Entra overview](/docs/img/guides/azure_saml_overview.png)
+![Azure Entra overview](/img/guides/azure_saml_overview.png)
 
 ## ZITADEL Configuration
 
@@ -66,13 +66,13 @@ Now we configure the identity provider on ZITADEL.
 
 <GeneralConfigDescription components={props.components}  provider_account="Microsoft account" />
 
-![Azure SAML App Creation](/docs/img/guides/zitadel_azure_saml_provider.png)
+![Azure SAML App Creation](/img/guides/zitadel_azure_saml_provider.png)
 
 ## Configure Basic SAML Configuration
 
 After you created the SAML provider in ZITADEL, you can copy the URLs you need to configure in your Entra ID application.
 
-![Azure SAML App URLs](/docs/img/guides/zitadel_azure_saml_provider_urls.png)
+![Azure SAML App URLs](/img/guides/zitadel_azure_saml_provider_urls.png)
 
 1. Go to Microsoft Entra > Manage > Single sign-on
 2. Edit the "Basic SAML Configuration"
@@ -88,7 +88,7 @@ You can ignore the ZITADEL ACS Intent API URL for now.
 This is relevant if you want to [programmatically sign users in at ZITADEL via a SAML Service Provider](/docs/guides/integrate/login-ui/external-login).
 </Callout>
 
-![Azure Entra configuration overview](/docs/img/guides/azure_saml_overview2.png)
+![Azure Entra configuration overview](/img/guides/azure_saml_overview2.png)
 
 ## Enable the Microsoft Entra Button in ZITADELs Login Page
 
@@ -98,7 +98,7 @@ Go back to ZITADEL and activate the IdP.
 
 <Activate components={props.components} />
 
-![Activate Azure SAML Provider](/docs/img/guides/zitadel_activate_azure_saml.png)
+![Activate Azure SAML Provider](/img/guides/zitadel_activate_azure_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -114,11 +114,11 @@ You see a new button which redirects you to Microsoft Entra screen.
 By default, ZITADEL shows what you define in the default settings.
 If you overwrite the default settings for an organization, you need to send the organization scope in your auth request.
 
-![Azure Entra Button](/docs/img/guides/zitadel_login_azure_saml.png)
+![Azure Entra Button](/img/guides/zitadel_login_azure_saml.png)
 
 Click **Microsoft Entra**
 
-![Entra ID Login](/docs/img/guides/microsoft_login.png)
+![Entra ID Login](/img/guides/microsoft_login.png)
 
 ### Add Action to map user attributes
 

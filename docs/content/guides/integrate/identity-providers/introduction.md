@@ -92,7 +92,7 @@ Once in the settings:
 - Access the **Login Behavior and Security** section to modify your login policy. Here, ensure you enable the option for **External IDP Allowed**.
 
 
-![Allow External IDP](/docs/img/guides/zitadel_allow_external_idp.png)
+![Allow External IDP](/img/guides/zitadel_allow_external_idp.png)
 
 
 
@@ -104,7 +104,7 @@ Access the settings page of your instance or the specific organization and selec
 
 The ZITADEL Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
 
-![Identity Provider Overview](/docs/img/guides/zitadel_identity_provider_overview.png)
+![Identity Provider Overview](/img/guides/zitadel_identity_provider_overview.png)
 
 
 ## Available guides

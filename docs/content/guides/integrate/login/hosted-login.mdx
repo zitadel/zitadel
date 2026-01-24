@@ -48,7 +48,7 @@ Developers can configure the authentication methods offered on the login page ba
 
 ### Enterprise single-sign-on
 
-![Screenshot of ZITADEL console showing different identity provider templates](/docs/img/guides/integrate/login/login-external-idp-templates.png)
+![Screenshot of ZITADEL console showing different identity provider templates](/img/guides/integrate/login/login-external-idp-templates.png)
 
 With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third-party identity providers.
 ZITADEL acts as an [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
@@ -169,7 +169,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         To activate it to authenticate on your Zitadel Cloud apps, you can follow one of these steps:
 
         1. Enable the new login on your application configuration. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
-        ![Login V2 Application Configuration](/docs/img/guides/integrate/login/login-v2-app-config.png)
+        ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
         2. Enable the [loginV2 feature](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </Tab>
@@ -189,7 +189,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
             <PreventLockout components={props.components} />
             You have three different options on how to achieve this:
             1. Enable the new login on your application configuration and add the URL of your login UI. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
-            ![Login V2 Application Configuration](/docs/img/guides/integrate/login/login-v2-app-config.png)
+            ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
             2. Enable the [loginV2 feature](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
             3. Change the issuer in the code of your application to the new domain of your login
         7. Enforce users to have their email verified. By setting `EMAIL_VERIFICATION` to `true` in your environment variables, your users will be enforced to verify their email address before they can log in.

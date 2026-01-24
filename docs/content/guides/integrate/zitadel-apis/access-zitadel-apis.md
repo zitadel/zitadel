@@ -79,7 +79,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 3. Search for your service user
 4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/docs/guides/manage/console/managers))
 
-![Add Org Manager](/docs/img/console_org_manager_add.gif)
+![Add Org Manager](/img/console_org_manager_add.gif)
 
 ## 3. Authenticate service user and request token
 
@@ -150,7 +150,7 @@ Get the client id and client secret by
 2. Open **Actions** in the top right corner and click on **Generate Client Secret**
 3. Copy the **ClientID** and **ClientSecret** from the dialog
 
-![Create new service user](/docs/img/console_serviceusers_secret.gif)
+![Create new service user](/img/console_serviceusers_secret.gif)
 
 With the ClientId and ClientSecret from the prior step, you will need to craft a POST request to ZITADEL's token endpoint.
 

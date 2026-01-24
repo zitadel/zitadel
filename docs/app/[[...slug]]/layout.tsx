@@ -39,9 +39,12 @@ export default async function Layout(props: { children: React.ReactNode; params:
       } as any;
 
       // Apply custom sidebar structure (from local sidebar-data.ts)
-      // We strip the prefix '/docs/v4.10' so the lookup matches generic keys 'guides/...'
-      const prefix = currentVersion === 'latest' ? '/docs' : `/docs/${currentVersion}`;
-      tree = buildCustomTree(hoistedTree, { stripPrefix: prefix });
+      // We strip the prefix '/v4.10' so the lookup matches generic keys 'guides/...'
+      // The logs showed the URLs start with /[version] not /docs/[version]
+      const prefix = currentVersion === 'latest' ? '/docs' : `/${currentVersion}`;
+      tree = buildCustomTree(hoistedTree, {
+        stripPrefix: prefix
+      });
     } else {
       tree = versionSource.pageTree;
     }
