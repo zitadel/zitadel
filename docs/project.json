@@ -14,6 +14,10 @@
       "dependsOn": [
         "^build",
         "check-links"
+      ],
+      "inputs": [
+        "default",
+        "^production"
       ]
     },
     "dev": {
@@ -45,8 +49,14 @@
       "outputs": [
         "{projectRoot}/content/v*",
         "{projectRoot}/content/versions.json",
-        "{workspaceRoot}/proto/latest",
-        "{workspaceRoot}/proto/v*"
+        "{projectRoot}/public/v*"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "runtime": "git ls-remote --tags https://github.com/zitadel/zitadel.git | grep -v '\\^{}' | head -n 20"
+        }
       ]
     },
     "generate-buf": {
@@ -60,6 +70,13 @@
       ],
       "outputs": [
         "{projectRoot}/openapi"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "docs/content/versions.json"
+        }
       ]
     },
     "clean": {
@@ -81,6 +98,13 @@
       ],
       "dependsOn": [
         "generate-buf"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "docs/openapi/**"
+        }
       ]
     },
     "generate-virtual": {
@@ -88,7 +112,14 @@
       "options": {
         "command": "pnpm generate:virtual",
         "cwd": "docs"
-      }
+      },
+      "outputs": [
+        "{projectRoot}/content/**/index.mdx"
+      ],
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
     },
     "generate-source": {
       "executor": "nx:run-commands",
@@ -102,6 +133,13 @@
       "dependsOn": [
         "generate-openapi",
         "generate-virtual"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "docs/content/**"
+        }
       ]
     },
     "generate": {
@@ -122,6 +160,14 @@
       },
       "dependsOn": [
         "generate"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/proto/**/*",
+        "{projectRoot}/content/**/*",
+        "{projectRoot}/public/**/*"
       ]
     },
     "lint": {
