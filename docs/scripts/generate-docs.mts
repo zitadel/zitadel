@@ -32,17 +32,17 @@ async function generateVersionApiDocs(version: string) {
   console.log(`Generating API docs for version: ${version} -> ${outputRoot}`);
   mkdirSync(outputRoot, { recursive: true });
 
-  const specs = await glob('**/*.openapi.yaml', { cwd: sourceRoot });
+  const specs = await glob('**/*.openapi.json', { cwd: sourceRoot });
   const services: string[] = [];
 
   for (const specPath of specs) {
     const fullPath = join(sourceRoot, specPath);
     const content = readFileSync(fullPath, 'utf8');
-    const doc = yaml.load(content) as any;
+    const doc = JSON.parse(content) as any;
 
     if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
 
-    let service = basename(specPath, '.openapi.yaml');
+    let service = basename(specPath, '.openapi.json');
     if (service.endsWith('_service')) {
       service = service.slice(0, -8);
     }
@@ -50,7 +50,7 @@ async function generateVersionApiDocs(version: string) {
     // For services in subdirectories (like resource/userschema), 
     // we want a unique but readable name.
     const relDir = dirname(specPath);
-    const folderPrefix = relDir !== '.' && !relDir.startsWith('openapi/zitadel')
+    const folderPrefix = relDir !== '.' && !relDir.startsWith('zitadel')
       ? relDir.split('/').pop() + '-'
       : '';
     const uniqueService = folderPrefix + service;
@@ -97,7 +97,7 @@ async function run() {
     process.exit(1);
   }
 
-  const versions = readdirSync(OPENAPI_ROOT).filter(f => lstatSync(join(OPENAPI_ROOT, f)).isDirectory());
+  const versions = readdirSync(OPENAPI_ROOT).filter(f => lstatSync(join(OPENAPI_ROOT, f)).isDirectory() && f !== 'zitadel');
 
   for (const version of versions) {
     await generateVersionApiDocs(version);

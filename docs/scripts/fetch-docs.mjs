@@ -19,7 +19,7 @@ console.log(`[fetch-docs] PROTO_DIR: ${PROTO_DIR}`);
 console.log(`[fetch-docs] CONTENT_DIR: ${CONTENT_DIR}`);
 
 const REPO = 'zitadel/zitadel';
-const CUTOFF = '4.10.0';
+const CUTOFF = '2.0.0';
 const ARCHIVE_URL = 'https://archive.zitadel.com';
 
 async function fetchTags() {
@@ -65,15 +65,23 @@ function filterVersions(tags) {
     }
   }
 
-  const result = Array.from(groups.values()).slice(0, 4);
+  // User requested Highest + 2 minor versions below it = 3 versions total
+  const result = Array.from(groups.values()).slice(0, 3);
   console.log(`Selected versions: ${result.join(', ')}`);
   return result;
 }
 
+// Downloads content from the 'fuma-docs' branch but puts it in a version-specific folder
+// This is done because older tags do not have valid fumadocs content yet.
 async function downloadVersion(tag) {
-  const url = `https://github.com/${REPO}/archive/refs/tags/${tag}.tar.gz`;
-  const tempDir = join(ROOT_DIR, `.temp/${tag}`);
+  // MOCK: Use fuma-docs branch content for validity testing
+  const MOCK_REF = 'fuma-docs'; 
+  const url = `https://github.com/${REPO}/archive/refs/heads/${MOCK_REF}.tar.gz`;
+  
+  const tempDir = join(ROOT_DIR, `.temp/${tag}`); // Extract to tag-specific temp to avoid collisions
   fs.mkdirSync(tempDir, { recursive: true });
+
+  console.log(`Downloading content for ${tag} (using source: ${MOCK_REF})...`);
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
@@ -82,12 +90,10 @@ async function downloadVersion(tag) {
     '-xz',
     '-C', tempDir,
     `--strip-components=1`,
-    `zitadel-${tag.replace(/^v/, '')}/docs/content`,
-    `zitadel-${tag.replace(/^v/, '')}/docs/public`,
-    `zitadel-${tag.replace(/^v/, '')}/docs/content`,
-    `zitadel-${tag.replace(/^v/, '')}/docs/public`,
-    `zitadel-${tag.replace(/^v/, '')}/cmd/defaults.yaml`,
-    `zitadel-${tag.replace(/^v/, '')}/cmd/setup/steps.yaml`
+    `zitadel-${MOCK_REF}/docs/content`,
+    `zitadel-${MOCK_REF}/docs/public`, // Assuming public assets might be needed
+    `zitadel-${MOCK_REF}/cmd/defaults.yaml`,
+    `zitadel-${MOCK_REF}/cmd/setup/steps.yaml`
   ];
 
   await new Promise((resolve, reject) => {
@@ -96,21 +102,47 @@ async function downloadVersion(tag) {
     tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
     tar.stderr.on('data', d => {
         const msg = d.toString();
-        // Ignore "not found in archive" warnings if they are expected for some versions
+        // Ignore "not found in archive" warnings if they are expected
         if (!msg.includes('Not found in archive')) console.error(msg);
     });
   });
 
-  // Move to final destinations
+  // Move to final destinations matches the version tag
   const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
   
   const contentDest = join(CONTENT_DIR, versionSlug);
+  const publicDest = join(PUBLIC_DIR, versionSlug);
+
   fs.mkdirSync(dirname(contentDest), { recursive: true });
   fs.mkdirSync(dirname(publicDest), { recursive: true });
+  
+  // Clean existing destination to avoid staleness
+  fs.rmSync(contentDest, { recursive: true, force: true });
+  fs.rmSync(publicDest, { recursive: true, force: true });
 
   if (fs.existsSync(join(tempDir, 'docs/content'))) {
      fs.renameSync(join(tempDir, 'docs/content'), contentDest);
+  } else {
+     console.warn(`[warn] docs/content not found in ${MOCK_REF} archive for ${tag}`);
   }
+
+  // Handle external files (defaults.yaml etc)
+  // We put them in _external folder inside the version content
+  const externalDir = join(contentDest, '_external/cmd');
+  fs.mkdirSync(externalDir, { recursive: true });
+  
+  if (fs.existsSync(join(tempDir, 'cmd/defaults.yaml'))) {
+      fs.cpSync(join(tempDir, 'cmd/defaults.yaml'), join(externalDir, 'defaults.yaml'));
+  }
+   if (fs.existsSync(join(tempDir, 'cmd/setup/steps.yaml'))) {
+      // Create setup dir if needed
+      fs.mkdirSync(join(externalDir, 'setup'), { recursive: true });
+      fs.cpSync(join(tempDir, 'cmd/setup/steps.yaml'), join(externalDir, 'setup/steps.yaml'));
+  }
+
+  // Also handling public assets? 
+  // If fuma-docs branch has docs/public, we might want to version them or just copy them.
+  // For now simple rename if exists
   if (fs.existsSync(join(tempDir, 'docs/public'))) {
     fs.renameSync(join(tempDir, 'docs/public'), publicDest);
   }
@@ -118,46 +150,7 @@ async function downloadVersion(tag) {
   fs.rmSync(tempDir, { recursive: true, force: true });
 }
 
-async function downloadTestVersion() {
-    const url = `https://github.com/${REPO}/archive/refs/heads/fuma-docs.tar.gz`;
-    const tag = 'fuma-docs';
-    const tempDir = join(ROOT_DIR, `.temp/${tag}`);
-    fs.mkdirSync(tempDir, { recursive: true });
 
-    console.log(`Downloading test version from ${url}...`);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
-
-    const tarArgs = [
-      '-xz',
-      '-C', tempDir,
-      `--strip-components=1`,
-      `zitadel-${tag}/docs/content`,
-      `zitadel-${tag}/cmd/defaults.yaml`,
-      `zitadel-${tag}/cmd/setup/steps.yaml`
-    ];
-
-    await new Promise((resolve, reject) => {
-      const tar = spawn('tar', tarArgs);
-      Readable.fromWeb(res.body).pipe(tar.stdin);
-      tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
-      tar.stderr.on('data', d => console.error(d.toString()));
-    });
-
-    const versionSlug = 'vTest';
-    const contentDest = join(CONTENT_DIR, versionSlug);
-
-    fs.rmSync(contentDest, { recursive: true, force: true });
-
-    if (fs.existsSync(join(tempDir, 'docs/content'))) {
-       fs.mkdirSync(dirname(contentDest), { recursive: true });
-       fs.renameSync(join(tempDir, 'docs/content'), contentDest);
-    } else {
-       console.warn(`Warning: docs/content not found in ${tag} archive`);
-    }
-
-    fs.rmSync(tempDir, { recursive: true, force: true });
-}
 
 async function downloadFileContent(tagOrBranch, repoPath) {
     const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
@@ -275,21 +268,16 @@ async function run() {
   console.log(`Latest version (Local): ${latestLabel}`);
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
-  // Download older versions
+  // Download chosen versions
   for (const tag of others) {
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
     await downloadVersion(tag);
     await fixRelativeImports(join(CONTENT_DIR, versionSlug), tag);
   }
 
-  // Download Test version
-  await downloadTestVersion();
-  await fixRelativeImports(join(CONTENT_DIR, 'vTest'), 'fuma-docs');
-
   // Generate versions.json
   const versionsJson = [
-    { param: 'latest', label: `${latestLabel} (Latest)`, url: '/docs', ref: 'local', refType: 'local' },
-    { param: 'vTest', label: 'vTest (Branch)', url: '/docs/vTest', ref: 'fuma-docs', refType: 'branch' }
+    { param: 'latest', label: `${latestLabel} (Latest)`, url: '/docs', ref: 'local', refType: 'local' }
   ];
 
   for (const tag of others) {

@@ -32,9 +32,7 @@ next-env.d.ts
 
 # multi-version artifacts
 /content/versions.json
-/content/versions/
-/content/vTest/
+/content/v*/
 /public/docs/v*
-/public/docs/vTest/
 /.temp/
 /.source

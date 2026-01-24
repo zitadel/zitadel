@@ -36,7 +36,7 @@ async function run() {
     if (!fs.existsSync(dir)) return;
     const files = fs.readdirSync(dir);
     for (const file of files) {
-      if (file === 'latest' || (file.startsWith('v') && (file === 'vTest' || !isNaN(parseInt(file[1]))))) {
+      if (file === 'latest' || (file.startsWith('v') && !isNaN(parseInt(file[1])))) {
         const p = join(dir, file);
         console.log(`Removing ${p}...`);
         fs.rmSync(p, { recursive: true, force: true });

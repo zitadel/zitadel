@@ -3,10 +3,10 @@ import path from 'node:path';
 import yaml from 'js-yaml';
 
 const V1_BASE_PATHS: Record<string, string> = {
-  'admin.openapi.yaml': '/admin/v1',
-  'auth.openapi.yaml': '/auth/v1',
-  'management.openapi.yaml': '/management/v1',
-  'system.openapi.yaml': '/system/v1',
+  'admin.openapi.json': '/admin/v1',
+  'auth.openapi.json': '/auth/v1',
+  'management.openapi.json': '/management/v1',
+  'system.openapi.json': '/system/v1',
 };
 
 
@@ -19,12 +19,31 @@ async function walk(dir: string): Promise<string[]> {
     if (stat.isDirectory()) {
       files = files.concat(await walk(filepath));
     } else {
-      if (file.endsWith('.openapi.yaml')) {
+      if (file.endsWith('.openapi.json')) {
         files.push(filepath);
       }
     }
   }
   return files;
+}
+
+function removeAdditionalPropertiesFalse(obj: any) {
+  if (typeof obj !== 'object' || obj === null) return;
+
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      removeAdditionalPropertiesFalse(item);
+    }
+    return;
+  }
+
+  if (obj.additionalProperties === false) {
+    delete obj.additionalProperties;
+  }
+
+  for (const key in obj) {
+    removeAdditionalPropertiesFalse(obj[key]);
+  }
 }
 
 async function cleanOpenApi() {
@@ -37,41 +56,33 @@ async function cleanOpenApi() {
   }
 
   const files = await walk(openApiDir);
-  
+
   for (const file of files) {
     const content = await fs.readFile(file, 'utf-8');
     const filename = path.basename(file);
-    
-    // 1. Inject servers block for v1 APIs
-    if (filename in V1_BASE_PATHS) {
-      try {
-        const doc = yaml.load(content) as any;
-        if (doc) {
-          doc.servers = [
-            {
-              url: V1_BASE_PATHS[filename],
-              description: "ZITADEL " + filename.split('.')[0] + " API v1"
-            }
-          ];
-          await fs.writeFile(file, yaml.dump(doc, { noRefs: true }));
-          // Re-read content for the next step
-        }
-      } catch (e) {
-        console.error(`Error processing YAML for ${file}:`, e);
-      }
+
+    let doc: any;
+    try {
+      doc = JSON.parse(content);
+    } catch (e) {
+      console.error(`Error parsing JSON for ${file}:`, e);
+      continue;
     }
 
-    // Re-read content in case it was modified above, or use the original content
-    const currentContent = await fs.readFile(file, 'utf-8');
-    const lines = currentContent.split('\n');
-    
-    // Filter out "additionalProperties: false" lines
-    // We assume it's on its own line with indentation
-    const newLines = lines.filter(line => !line.trim().match(/^additionalProperties:\s*false/));
-    
-    if (lines.length !== newLines.length) {
-        await fs.writeFile(file, newLines.join('\n'));
+    // 1. Inject servers block for v1 APIs
+    if (filename in V1_BASE_PATHS) {
+      doc.servers = [
+        {
+          url: V1_BASE_PATHS[filename],
+          description: "ZITADEL " + filename.split('.')[0] + " API v1"
+        }
+      ];
     }
+
+    // 2. Remove additionalProperties: false
+    removeAdditionalPropertiesFalse(doc);
+
+    await fs.writeFile(file, JSON.stringify(doc, null, 2));
   }
 }
 

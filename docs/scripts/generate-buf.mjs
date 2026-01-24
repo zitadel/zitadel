@@ -61,11 +61,16 @@ async function run() {
         '--output', outputPath
       ], {
         cwd: localGenDir, // Run in temp dir
-        stdio: 'inherit'
+        stdio: 'inherit',
+        env: {
+            ...process.env,
+            BUF_TOKEN: '851d3e2519b882d9e6da46eadec5e3ccc6a966dae0ce5e78dd285d9f912e35fd'
+        }
       });
 
       if (result.status !== 0) {
         console.error(`Failed to generate OpenAPI for ${label}`);
+        process.exit(1);
       } else {
         console.log(`Successfully generated OpenAPI for ${label}`);
       }
