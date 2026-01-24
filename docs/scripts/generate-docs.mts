@@ -39,11 +39,11 @@ const generateServiceDocs = (service: string, filename?: string, version: string
 
   void generateFiles({
     input: api,
-    output: `./content/docs/reference/api/${service}`,
+    output: `./content/reference/api/${service}`,
     includeDescription: true,
   });
 
-  const indexPath = join(process.cwd(), `./content/docs/reference/api/${service}/index.mdx`);
+  const indexPath = join(process.cwd(), `./content/reference/api/${service}/index.mdx`);
   const content = `---
 title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
 ---
@@ -63,11 +63,11 @@ const generateUserSchemaDocs = () => {
 
   void generateFiles({
     input: api,
-    output: './content/docs/reference/api/user_schema',
+    output: './content/reference/api/user_schema',
     includeDescription: true,
   });
 
-  const indexPath = join(process.cwd(), './content/docs/reference/api/user_schema/index.mdx');
+  const indexPath = join(process.cwd(), './content/reference/api/user_schema/index.mdx');
   const content = `---
 title: User Schema API
 ---
@@ -83,10 +83,10 @@ const meta = {
   pages: [...services, 'user_schema']
 };
 
-mkdirSync(join(process.cwd(), 'content/docs/reference/api'), { recursive: true });
+mkdirSync(join(process.cwd(), 'content/reference/api'), { recursive: true });
 
 writeFileSync(
-  join(process.cwd(), 'content/docs/reference/api/meta.json'),
+  join(process.cwd(), 'content/reference/api/meta.json'),
   JSON.stringify(meta, null, 2)
 );
 
@@ -104,11 +104,11 @@ const generateV1ServiceDocs = (service: string) => {
 
   void generateFiles({
     input: api,
-    output: `./content/docs/reference/api-v1/${service}`,
+    output: `./content/reference/api-v1/${service}`,
     includeDescription: true,
   });
 
-  const indexPath = join(process.cwd(), `./content/docs/reference/api-v1/${service}/index.mdx`);
+  const indexPath = join(process.cwd(), `./content/reference/api-v1/${service}/index.mdx`);
   const content = `---
 title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
 ---
@@ -125,10 +125,10 @@ const v1Meta = {
   pages: v1Services
 };
 
-mkdirSync(join(process.cwd(), 'content/docs/reference/api-v1'), { recursive: true });
+mkdirSync(join(process.cwd(), 'content/reference/api-v1'), { recursive: true });
 
 writeFileSync(
-  join(process.cwd(), 'content/docs/reference/api-v1/meta.json'),
+  join(process.cwd(), 'content/reference/api-v1/meta.json'),
   JSON.stringify(v1Meta, null, 2)
 );
 

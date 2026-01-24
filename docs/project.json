@@ -73,7 +73,7 @@
         "cwd": "docs"
       },
       "outputs": [
-        "{projectRoot}/content/docs/reference/api"
+        "{projectRoot}/content/reference/api"
       ],
       "dependsOn": [
         "clean-openapi"

@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // Adjust path if needed
-import { guidesSidebar, apisSidebar, legalSidebar } from '../lib/sidebar-data'; 
+import { guidesSidebar, apisSidebar, legalSidebar } from '../lib/sidebar-data';
 
-const CONTENT_DIR = path.join(process.cwd(), 'content/docs');
+const CONTENT_DIR = path.join(process.cwd(), 'content');
 
 function ensureDirectoryExistence(filePath: string) {
   const dirname = path.dirname(filePath);
@@ -42,7 +42,7 @@ function traverse(items: readonly any[]) {
       item.link.slug
     ) {
       const slug = item.link.slug;
-      
+
       // Remove leading slash or 'docs/' prefix
       const cleanSlug = slug.replace(/^\/|docs\/|\/$/g, '');
       const filePath = path.join(CONTENT_DIR, cleanSlug, 'index.mdx');
@@ -50,12 +50,12 @@ function traverse(items: readonly any[]) {
       // --- CHANGE: Always overwrite the file ---
       console.log(`[+] Generating Virtual Page: ${cleanSlug}`);
       ensureDirectoryExistence(filePath);
-      
+
       const content = generateContent(
-          item.link.title || item.label || 'Overview',
-          item.link.description || ''
+        item.link.title || item.label || 'Overview',
+        item.link.description || ''
       );
-      
+
       fs.writeFileSync(filePath, content);
     }
 
