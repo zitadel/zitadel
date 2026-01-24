@@ -1,9 +1,0 @@
-{
-  "title": "API v1",
-  "pages": [
-    "admin",
-    "auth",
-    "management",
-    "system"
-  ]
-}
