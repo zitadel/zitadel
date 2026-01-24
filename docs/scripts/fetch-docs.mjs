@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const PROTO_DIR = join(ROOT_DIR, '../proto');
 const CONTENT_DIR = join(ROOT_DIR, 'content');
-const PUBLIC_DIR = join(ROOT_DIR, 'public/docs');
+const PUBLIC_DIR = join(ROOT_DIR, 'public');
 const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
 const CONTENT_LATEST_DIR = join(ROOT_DIR, 'content');
 

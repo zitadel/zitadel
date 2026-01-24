@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     other: [
       {
         rel: 'stylesheet',
-        url: '/docs/img/icons/line-awesome/css/line-awesome.min.css',
+        url: '/img/icons/line-awesome/css/line-awesome.min.css',
       },
     ],
   },

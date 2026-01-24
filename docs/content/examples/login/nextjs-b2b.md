@@ -9,7 +9,7 @@ If you need more info on B2B use cases consider reading our guide for the [B2B s
 
 > You can follow along with the template code in our [zitadel-nextjs-b2b](https://github.com/zitadel/zitadel-nextjs-b2b) repo.
 
-![B2B Application](/docs/img/nextjs-b2b/home.png)
+![B2B Application](../../../public/img/nextjs-b2b/home.png)
 
 ## What does it do?
 

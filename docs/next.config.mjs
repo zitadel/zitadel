@@ -1,10 +1,14 @@
 import { createMDX } from 'fumadocs-mdx/next';
 import { rehypeCode } from 'fumadocs-core/mdx-plugins';
+import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   basePath: '/docs',
+  outputFileTracingIncludes: {
+    '/**': ['./openapi/**/*'],
+  },
   async redirects() {
     return [
       {

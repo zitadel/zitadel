@@ -23,12 +23,12 @@ Prerequisites:
 ## **Auth0**: Create a new connection
 
 In Authentication -> Enterprise
-![Navigation Authentication Enterprise](/docs/img/saml/auth0/auth_enterprise.png)
+![Navigation Authentication Enterprise](../../../../public/img/saml/auth0/auth_enterprise.png)
 
 1. Press the "+" button right to "SAML"  
-   ![Enterprise Connections](/docs/img/saml/auth0/enterprise_connections.png)
+   ![Enterprise Connections](../../../../public/img/saml/auth0/enterprise_connections.png)
 2. Fill out the fields as follows in the SAML Connection:
-   ![New SAML Connection](/docs/img/saml/auth0/connection.png)
+   ![New SAML Connection](../../../../public/img/saml/auth0/connection.png)
 
 This includes:
 
@@ -57,14 +57,14 @@ be https://example.auth0.com/samlp/metadata?connection=SAML-ZITADEL.
 In your existing project:
 
 1. Press the "+"-button to add an application
-   ![Project](/docs/img/saml/zitadel/project.png)
+   ![Project](../../../../public/img/saml/zitadel/project.png)
 2. Fill in a name for the application and chose the SAML type, then click "Continue".
-   ![New Application](/docs/img/saml/zitadel/application_saml.png)
+   ![New Application](../../../../public/img/saml/zitadel/application_saml.png)
 3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
    Continue".
-   ![Add Metadata to Application](/docs/img/saml/zitadel/application_saml_metadata.png)
+   ![Add Metadata to Application](../../../../public/img/saml/zitadel/application_saml_metadata.png)
 4. Check your application, if everything is correct, press "Create".
-   ![Create Application](/docs/img/saml/zitadel/application_saml_create.png)
+   ![Create Application](../../../../public/img/saml/zitadel/application_saml_create.png)
 
 Everything on the side of ZITADEL is done if the application is correctly created.
 
@@ -73,7 +73,7 @@ Everything on the side of ZITADEL is done if the application is correctly create
 To then test the connection you only have to press "Try" on the created connection in the Authentication -> Enterprise
 screen.
 
-![Authentication Enterprise Try](/docs/img/saml/auth0/auth_enterprise_try.png)
+![Authentication Enterprise Try](../../../../public/img/saml/auth0/auth_enterprise_try.png)
 
 To further customize the requests you can also customize the SAML communication as
 described [here](https://auth0.com/docs/authenticate/protocols/saml/saml-configuration/customize-saml-assertions)

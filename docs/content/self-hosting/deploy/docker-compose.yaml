@@ -44,7 +44,7 @@ services:
 
       # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
       # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
-      # The PAT can be used to provision resources with [Terraform](/docs/guides/manage/terraform-provider), for example.
+      # The PAT can be used to provision resources with [Terraform](/guides/manage/terraform-provider), for example.
       # ZITADEL_FIRSTINSTANCE_PATPATH: /current-dir/admin.pat
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER

@@ -15,7 +15,7 @@ You can now change all the texts from a message.
 As soon as you click into a input field you will see some attribute chips below the field. 
 These are the parameters you can include on this specific message.
 
-![Message Texts](/docs/img/console_message_texts.png)
+![Message Texts](../../../../public/img/console_message_texts.png)
 
 ## Login Texts
 
@@ -23,7 +23,7 @@ Like the message texts you are also able to change the texts on the login interf
 First choose the screen and the language you like to edit. 
 You will see the default texts in the input field and you can overwrite them by typing into the box.
 
-![Message Texts](/docs/img/console_login_texts.png)
+![Message Texts](../../../../public/img/console_login_texts.png)
 
 ## Reset to default
 
@@ -69,4 +69,4 @@ Also, the instances OIDC discovery endpoint will only list the allowed languages
 
 All language settings are also configurable in the consoles *Languages* default settings.
 
-![Languages](/docs/img/guides/console/languages.png)
+![Languages](../../../../public/img/guides/console/languages.png)

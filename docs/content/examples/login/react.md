@@ -22,7 +22,7 @@ Navigate to your project, then add a new application at the top of the page.
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all single page applications.
 
-![Create app in console](/docs/img/react/app-create.png)
+![Create app in console](../../../public/img/react/app-create.png)
 
 ### Redirect URIs
 
@@ -44,9 +44,9 @@ After successful creation of the app, make sure copy the client ID, as you will 
 
 Also note the projects resource ID, as you will need it to configure your React client.
 
-![Create project role "admin"](/docs/img/react/project-role.png)
+![Create project role "admin"](../../../public/img/react/project-role.png)
 
-![Assign the "admin" role to your user](/docs/img/react/project-authz.png)
+![Assign the "admin" role to your user](../../../public/img/react/project-authz.png)
 
 If you want to read your users roles from user info endpoint, make sure to enable the checkbox in your project.
 
@@ -109,7 +109,7 @@ This application includes all the functionalities mentioned in this quickstart.
 You can start by cloning the repository and changing the arguments to `createZitadelAuth` to fit your requirements.
 If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-react/issues).
 
-![App in console](/docs/img/react/app-screen.png)
+![App in console](../../../public/img/react/app-screen.png)
 
 ### What's next?
 

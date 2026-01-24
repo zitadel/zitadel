@@ -46,13 +46,13 @@ Follow these precise steps to configure SCIM provisioning in Okta:
 
 4. In the **Provisioning** section, select **SCIM** and then **Save**.
 
-<img src="/docs/img/manage/users/enable-scim-provisioning.png" alt="Enable SCIM provisioning in Okta"/> 
+<img src="../../../public/img/manage/users/enable-scim-provisioning.png" alt="Enable SCIM provisioning in Okta"/> 
 
 5. Under the **General** tab, also confirm that [Federation Broker Mode](https://help.okta.com/en-us/content/topics/apps/apps-fbm-main.htm) is disabled.
 
 6. Click on the **Provisioning** tab, then go to the **Integration** tab and select **Edit**.
 
-<img src="/docs/img/manage/users/select-provisioning-actions.png" alt="Select provisioning actions in Okta"/>
+<img src="../../../public/img/manage/users/select-provisioning-actions.png" alt="Select provisioning actions in Okta"/>
 
 7. Enter the **SCIM connector base URL** using this format:
 
@@ -90,7 +90,7 @@ Like the example in the above image:
 
 14. Click **Save** to apply these settings.
 
-<img src="/docs/img/manage/users/provisioning-to-app.png" alt="Enable provisioning to App in Okta"/>
+<img src="../../../public/img/manage/users/provisioning-to-app.png" alt="Enable provisioning to App in Okta"/>
 
 ## Step 3: Attribute Mapping (Recommended)
 

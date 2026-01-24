@@ -1,7 +1,7 @@
 import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsSync } from 'fs';
-import { join, dirname, basename } from 'path';
+import path, { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
 import yaml from 'js-yaml';
@@ -59,7 +59,7 @@ async function generateVersionApiDocs(version: string) {
     services.push(uniqueService);
 
     const api = createOpenAPI({
-      input: [fullPath],
+      input: [path.relative(ROOT_DIR, fullPath)],
     });
 
     await generateFiles({

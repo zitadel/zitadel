@@ -6,7 +6,7 @@ ZITADEL's external user grant is a feature that allows you to grant access to pr
 This is useful in scenarios where you want to collaborate with external users without needing them to be part of your organization.
 By using external user grants, you can streamline collaboration with external users while maintaining control over access to your projects within ZITADEL.
 
-![](/docs/img/concepts/features/external-user-grant.png)
+![](../../../public/img/concepts/features/external-user-grant.png)
 
 ## Where to store users
 
