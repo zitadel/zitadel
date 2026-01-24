@@ -245,13 +245,28 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
 }
 
 function getLocalVersion() {
+    const isVercel = process.env.VERCEL === '1';
+    const vercelBranch = process.env.VERCEL_GIT_COMMIT_REF;
+    
+    let branch = vercelBranch;
+    if (!branch) {
+        try {
+            branch = execSync('git branch --show-current').toString().trim();
+        } catch (e) {}
+    }
+
+    if (branch && branch !== 'main') {
+        return { label: branch, isUnreleased: true };
+    }
+
     try {
-        const branch = execSync('git branch --show-current').toString().trim();
-        if (branch === 'fuma-docs') return 'v4.11.0-beta';
         const tag = execSync('git describe --tags --abbrev=0').toString().trim();
-        if (semver.valid(tag) && semver.gt(tag, CUTOFF)) return tag;
+        if (semver.valid(tag) && semver.gt(tag, CUTOFF)) {
+            return { label: tag, isUnreleased: false };
+        }
     } catch (e) {}
-    return 'v4.11.0'; 
+
+    return { label: 'v4.11.0', isUnreleased: true }; 
 }
 
 async function run() {
@@ -259,13 +274,10 @@ async function run() {
   const tags = await fetchTags();
   const selectedTags = filterVersions(tags);
   
-  let latestLabel = getLocalVersion();
+  let localVer = getLocalVersion();
   let others = selectedTags; // In our case, if local is latest, all filtered tags are others
 
-  console.log(`Latest version (Local): ${latestLabel}`);
-  console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
-
-  console.log(`Latest version (Local): ${latestLabel}`);
+  console.log(`Latest version (Local): ${localVer.label} (Unreleased: ${localVer.isUnreleased})`);
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
   // Download chosen versions
@@ -277,12 +289,27 @@ async function run() {
 
   // Generate versions.json
   const versionsJson = [
-    { param: 'latest', label: `${latestLabel} (Latest)`, url: '/docs', ref: 'local', refType: 'local' }
+    { 
+      param: 'latest', 
+      label: localVer.isUnreleased ? `${localVer.label} (Unreleased)` : `${localVer.label} (Latest)`, 
+      url: '/docs', 
+      ref: 'local', 
+      refType: 'local' 
+    }
   ];
 
   for (const tag of others) {
     const v = `v${semver.major(tag)}.${semver.minor(tag)}`;
-    versionsJson.push({ param: v, label: v, url: `/docs/${v}`, ref: tag, refType: 'tag' });
+    const versionSlug = `v${semver.major(tag)}${semver.minor(tag)}x`;
+    const targetUrl = `https://docs-git-${versionSlug}-zitadel.vercel.app/docs`;
+    versionsJson.push({ 
+        param: v, 
+        label: v, 
+        url: `/docs/${v}`, 
+        ref: tag, 
+        refType: 'tag',
+        target: targetUrl
+    });
   }
 
   versionsJson.push({
