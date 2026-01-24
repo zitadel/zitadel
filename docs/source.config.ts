@@ -13,7 +13,7 @@ export const docs = defineDocs({
   dir: 'content',
   docs: {
     schema: frontmatterSchema,
-    files: ['**/!(_)*.md', '**/!(_)*.mdx'],
+    files: ['**/!(_|v)*.md', '**/!(_|v)*.mdx'], // Exclude versioned folders
     postprocess: {
       includeProcessedMarkdown: true,
     },
@@ -25,17 +25,17 @@ export const docs = defineDocs({
 });
 
 export const versions = defineDocs({
-  dir: 'content/versions',
+  dir: 'content',
   docs: {
     schema: frontmatterSchema,
-    files: ['**/*.md', '**/*.mdx'],
+    files: ['v*/!(_|v)*.md', 'v*/!(_|v)*.mdx', 'v*/**/!(_|v)*.md', 'v*/**/!(_|v)*.mdx'], // Include only versioned folders from content
     postprocess: {
       includeProcessedMarkdown: true,
     },
   },
   meta: {
     schema: metaSchema,
-    files: ['**/meta.json'],
+    files: ['v*/meta.json', 'v*/**/meta.json'],
   },
 });
 

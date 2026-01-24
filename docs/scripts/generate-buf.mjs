@@ -3,61 +3,71 @@ import { join, dirname, resolve } from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import os from 'os';
-import semver from 'semver';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const PROTO_DIR = join(ROOT_DIR, '../proto');
 const OPENAPI_DIR = join(ROOT_DIR, 'openapi');
+const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
+const REPO_URL = 'https://github.com/zitadel/zitadel.git';
 
 async function run() {
-  if (!fs.existsSync(PROTO_DIR)) {
-    console.error(`Proto directory not found at ${PROTO_DIR}`);
-    process.exit(1);
+  if (!fs.existsSync(VERSIONS_FILE)) {
+      console.error('versions.json not found. Run fetch-docs.mjs first.');
+      process.exit(1);
   }
 
-  const versions = fs.readdirSync(PROTO_DIR).filter(file => {
-      const stats = fs.lstatSync(join(PROTO_DIR, file));
-      if (!stats.isDirectory()) return false;
-      return file === 'latest' || file === 'vTest' || (file.startsWith('v') && semver.valid(file.includes('.') ? file : file + '.0.0'));
-  });
-
-  console.log(`Found versioned protos: ${versions.join(', ')}`);
+  const versions = JSON.parse(fs.readFileSync(VERSIONS_FILE, 'utf8'));
+  console.log(`Processing ${versions.length} versions from versions.json`);
 
   const baseTempDir = fs.mkdtempSync(join(os.tmpdir(), 'zitadel-buf-'));
-  console.log(`Using base temp dir: ${baseTempDir}`);
+  // Use a subdirectory for local generation to avoid pollution
+  const localGenDir = join(baseTempDir, 'local'); 
+  fs.mkdirSync(localGenDir, { recursive: true });
+
+  const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
 
   try {
-    for (const version of versions) {
-      const protoPath = resolve(join(PROTO_DIR, version));
-      const outputPath = resolve(join(OPENAPI_DIR, version));
+    for (const v of versions) {
+      if (v.type === 'external') continue; // Skip archive links
 
-      console.log(`\n--- Generating OpenAPI specs for ${version} ---`);
+      const label = v.param;
+      const outputPath = resolve(join(OPENAPI_DIR, label));
+      
+      console.log(`\n--- Generating OpenAPI specs for ${label} ---`);
       
       fs.rmSync(outputPath, { recursive: true, force: true });
       fs.mkdirSync(outputPath, { recursive: true });
 
-      const versionTempDir = join(baseTempDir, version);
-      fs.mkdirSync(versionTempDir, { recursive: true });
-
-      console.log(`Copying protos to temp dir...`);
-      fs.cpSync(protoPath, versionTempDir, { recursive: true });
-
-      const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
+      // Determine buf input based on refType
+      let bufInput;
+      if (v.refType === 'local') {
+          // Point to local proto directory (repo root/proto)
+          bufInput = PROTO_DIR; // e.g. /home/ffo/git/zitadel/zitadel/proto
+      } else {
+          // Construct git input
+          // Format: <url>#<refType>=<ref>,subdir=<subdir>
+          // Example: https://github.com/zitadel/zitadel.git#tag=v4.11.0,subdir=proto
+          const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
+          bufInput = `${REPO_URL}#${refPart},subdir=proto`;
+      }
+      
+      console.log(`Using input: ${bufInput}`);
 
       const result = spawnSync('npx', [
         '@bufbuild/buf', 'generate',
+        bufInput,
         '--template', templatePath,
         '--output', outputPath
       ], {
-        cwd: versionTempDir,
+        cwd: localGenDir, // Run in temp dir
         stdio: 'inherit'
       });
 
       if (result.status !== 0) {
-        console.error(`Failed to generate OpenAPI for ${version}`);
+        console.error(`Failed to generate OpenAPI for ${label}`);
       } else {
-        console.log(`Successfully generated OpenAPI for ${version}`);
+        console.log(`Successfully generated OpenAPI for ${label}`);
       }
     }
   } finally {

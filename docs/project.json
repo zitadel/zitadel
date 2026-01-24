@@ -36,24 +36,27 @@
         "build"
       ]
     },
+    "fetch-docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm fetch-docs",
+        "cwd": "docs"
+      },
+      "outputs": [
+        "{projectRoot}/content/v*",
+        "{projectRoot}/content/versions.json",
+        "{workspaceRoot}/proto/latest",
+        "{workspaceRoot}/proto/v*"
+      ]
+    },
     "generate-buf": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm generate:buf",
         "cwd": "docs"
       },
-      "outputs": [
-        "{projectRoot}/openapi"
-      ]
-    },
-    "clean-openapi": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm clean:openapi",
-        "cwd": "docs"
-      },
       "dependsOn": [
-        "generate-buf"
+        "fetch-docs"
       ],
       "outputs": [
         "{projectRoot}/openapi"
@@ -73,11 +76,19 @@
         "cwd": "docs"
       },
       "outputs": [
-        "{projectRoot}/content/reference/api"
+        "{projectRoot}/content/reference/api",
+        "{projectRoot}/content/v*/reference/api"
       ],
       "dependsOn": [
-        "clean-openapi"
+        "generate-buf"
       ]
+    },
+    "generate-virtual": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:virtual",
+        "cwd": "docs"
+      }
     },
     "generate-source": {
       "executor": "nx:run-commands",
@@ -89,7 +100,8 @@
         "{projectRoot}/.source"
       ],
       "dependsOn": [
-        "generate-openapi"
+        "generate-openapi",
+        "generate-virtual"
       ]
     },
     "generate": {

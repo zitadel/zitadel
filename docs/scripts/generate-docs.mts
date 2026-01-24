@@ -19,7 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
-const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content/versions');
+const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);

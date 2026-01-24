@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { join, dirname } from 'path';
+import path, { join, dirname, resolve } from 'path';
 import { spawn, execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import semver from 'semver';
@@ -8,9 +8,15 @@ import { Readable } from 'stream';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const PROTO_DIR = join(ROOT_DIR, '../proto');
-const CONTENT_DIR = join(ROOT_DIR, 'content/versions');
+const CONTENT_DIR = join(ROOT_DIR, 'content');
 const PUBLIC_DIR = join(ROOT_DIR, 'public/docs');
 const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
+const CONTENT_LATEST_DIR = join(ROOT_DIR, 'content');
+
+console.log(`[fetch-docs] __dirname: ${__dirname}`);
+console.log(`[fetch-docs] ROOT_DIR: ${ROOT_DIR}`);
+console.log(`[fetch-docs] PROTO_DIR: ${PROTO_DIR}`);
+console.log(`[fetch-docs] CONTENT_DIR: ${CONTENT_DIR}`);
 
 const REPO = 'zitadel/zitadel';
 const CUTOFF = '4.10.0';
@@ -78,36 +84,32 @@ async function downloadVersion(tag) {
     `--strip-components=1`,
     `zitadel-${tag.replace(/^v/, '')}/docs/content`,
     `zitadel-${tag.replace(/^v/, '')}/docs/public`,
-    `zitadel-${tag.replace(/^v/, '')}/proto`
+    `zitadel-${tag.replace(/^v/, '')}/docs/content`,
+    `zitadel-${tag.replace(/^v/, '')}/docs/public`,
+    `zitadel-${tag.replace(/^v/, '')}/cmd/defaults.yaml`,
+    `zitadel-${tag.replace(/^v/, '')}/cmd/setup/steps.yaml`
   ];
 
   await new Promise((resolve, reject) => {
     const tar = spawn('tar', tarArgs);
     Readable.fromWeb(res.body).pipe(tar.stdin);
     tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
-    tar.stderr.on('data', d => console.error(d.toString()));
+    tar.stderr.on('data', d => {
+        const msg = d.toString();
+        // Ignore "not found in archive" warnings if they are expected for some versions
+        if (!msg.includes('Not found in archive')) console.error(msg);
+    });
   });
 
   // Move to final destinations
   const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
   
   const contentDest = join(CONTENT_DIR, versionSlug);
-  const protoDest = join(PROTO_DIR, versionSlug);
-  const publicDest = join(PUBLIC_DIR, versionSlug);
-
-  fs.rmSync(contentDest, { recursive: true, force: true });
-  fs.rmSync(protoDest, { recursive: true, force: true });
-  fs.rmSync(publicDest, { recursive: true, force: true });
-
   fs.mkdirSync(dirname(contentDest), { recursive: true });
-  fs.mkdirSync(dirname(protoDest), { recursive: true });
   fs.mkdirSync(dirname(publicDest), { recursive: true });
 
   if (fs.existsSync(join(tempDir, 'docs/content'))) {
      fs.renameSync(join(tempDir, 'docs/content'), contentDest);
-  }
-  if (fs.existsSync(join(tempDir, 'proto'))) {
-     fs.renameSync(join(tempDir, 'proto'), protoDest);
   }
   if (fs.existsSync(join(tempDir, 'docs/public'))) {
     fs.renameSync(join(tempDir, 'docs/public'), publicDest);
@@ -131,7 +133,8 @@ async function downloadTestVersion() {
       '-C', tempDir,
       `--strip-components=1`,
       `zitadel-${tag}/docs/content`,
-      `zitadel-${tag}/proto`
+      `zitadel-${tag}/cmd/defaults.yaml`,
+      `zitadel-${tag}/cmd/setup/steps.yaml`
     ];
 
     await new Promise((resolve, reject) => {
@@ -143,10 +146,8 @@ async function downloadTestVersion() {
 
     const versionSlug = 'vTest';
     const contentDest = join(CONTENT_DIR, versionSlug);
-    const protoDest = join(PROTO_DIR, versionSlug);
 
     fs.rmSync(contentDest, { recursive: true, force: true });
-    fs.rmSync(protoDest, { recursive: true, force: true });
 
     if (fs.existsSync(join(tempDir, 'docs/content'))) {
        fs.mkdirSync(dirname(contentDest), { recursive: true });
@@ -154,14 +155,100 @@ async function downloadTestVersion() {
     } else {
        console.warn(`Warning: docs/content not found in ${tag} archive`);
     }
-    if (fs.existsSync(join(tempDir, 'proto'))) {
-       fs.mkdirSync(dirname(protoDest), { recursive: true });
-       fs.renameSync(join(tempDir, 'proto'), protoDest);
-    } else {
-       console.warn(`Warning: proto folder not found in ${tag} archive`);
-    }
 
     fs.rmSync(tempDir, { recursive: true, force: true });
+}
+
+async function downloadFileContent(tagOrBranch, repoPath) {
+    const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        // Fallback for some repo structures if needed, or if file doesn't exist in that version
+        return null;
+    }
+    return await res.text();
+}
+
+async function fixRelativeImports(versionDir, tagOrBranch) {
+    if (!fs.existsSync(versionDir)) return;
+    const files = fs.readdirSync(versionDir, { recursive: true });
+    const downloadedFiles = new Set();
+
+    for (const file of files) {
+        const filePath = join(versionDir, file);
+        if (!fs.statSync(filePath).isFile()) continue;
+        if (filePath.endsWith('.mdx') || filePath.endsWith('.md')) {
+            let content = fs.readFileSync(filePath, 'utf8');
+            let changed = false;
+
+            // Regex to find imports with relative paths going outside docs/content
+            // Example: import DefaultsYamlSource from "../../../../../cmd/defaults.yaml";
+            const importRegex = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
+            let match;
+            
+            // We need to collect all matches first because we'll be changing content
+            const matches = [];
+            while ((match = importRegex.exec(content)) !== null) {
+                matches.push({ full: match[0], path: match[1] });
+            }
+
+            for (const m of matches) {
+                // To find the repo-relative path, we resolve the import as it would be in the original repo
+                // Original content was in docs/content/<rest-of-path>
+                // Versioned content is in docs/content/<version>/<rest-of-path>
+                const versionFolder = path.basename(versionDir);
+                const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+                if (!relativePathInContent) continue;
+                
+                // Use absolute paths to avoid confusion
+                const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+                const originalDir = dirname(originalFilePath);
+                
+                // Resolve the import against the original location
+                // e.g. /abs/path/to/docs/content/guides/... + ../../../../../cmd/defaults.yaml
+                const absoluteImportTarget = resolve(originalDir, m.path);
+                const projectRoot = resolve(ROOT_DIR, '..'); // /abs/path/to/repo
+
+                // Check if it's inside the project but outside docs/content (or strictly outside docs if we want to be safe)
+                // The main use case is importing from cmd/ or other repo folders
+                if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR)) {
+                     const relativeToProjectRoot = absoluteImportTarget.replace(projectRoot + '/', '');
+                     
+                     // We want to download this file and put it in a local versioned folder
+                     const localPathInVersion = join(versionDir, '_external', relativeToProjectRoot);
+                     const localDirInVersion = dirname(localPathInVersion);
+                     
+                     if (!fs.existsSync(localPathInVersion)) {
+                         console.log(`[fix-imports] Discovered external import: ${relativeToProjectRoot} in ${file}`);
+                         const fileContent = await downloadFileContent(tagOrBranch, relativeToProjectRoot);
+                         if (fileContent !== null) {
+                             fs.mkdirSync(localDirInVersion, { recursive: true });
+                             fs.writeFileSync(localPathInVersion, fileContent);
+                             downloadedFiles.add(relativeToProjectRoot);
+                         } else {
+                             console.warn(`[fix-imports] Failed to download versioned file: ${relativeToProjectRoot}`);
+                             continue;
+                         }
+                     }
+ 
+                     // Update the import path in the MDX file to point to our local copy
+                     const newRelativePath = path.relative(dirname(filePath), localPathInVersion);
+                     // MDX imports should use forward slashes
+                     const normalizedPath = newRelativePath.split(path.sep).join('/');
+                     const finalPath = normalizedPath.startsWith('.') ? normalizedPath : './' + normalizedPath;
+                     
+                     console.log(`[fix-imports] Rewriting import in ${file}: ${m.path} -> ${finalPath}`);
+                     const newImport = m.full.replace(m.path, finalPath);
+                     content = content.replace(m.full, newImport);
+                     changed = true;
+                }
+            }
+
+            if (changed) {
+                fs.writeFileSync(filePath, content);
+            }
+        }
+    }
 }
 
 function getLocalVersion() {
@@ -185,47 +272,29 @@ async function run() {
   console.log(`Latest version (Local): ${latestLabel}`);
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
-  // Source Strategy: Latest (Local)
-  const targetLatestProto = join(ROOT_DIR, '../proto/latest');
-  fs.rmSync(targetLatestProto, { recursive: true, force: true });
-  fs.mkdirSync(targetLatestProto, { recursive: true });
-  
-  const localProtoDir = join(ROOT_DIR, '../proto');
-  const files = fs.readdirSync(localProtoDir);
-  for (const file of files) {
-      if (file === 'latest' || (file.startsWith('v') && semver.valid(file))) continue;
-      
-      const src = join(localProtoDir, file);
-      const dest = join(targetLatestProto, file);
-      
-      if (fs.lstatSync(src).isDirectory()) {
-          try {
-              fs.symlinkSync(src, dest);
-          } catch (e) {
-              fs.cpSync(src, dest, { recursive: true });
-          }
-      } else {
-          fs.copyFileSync(src, dest);
-      }
-  }
+  console.log(`Latest version (Local): ${latestLabel}`);
+  console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
   // Download older versions
   for (const tag of others) {
+    const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
     await downloadVersion(tag);
+    await fixRelativeImports(join(CONTENT_DIR, versionSlug), tag);
   }
 
   // Download Test version
   await downloadTestVersion();
+  await fixRelativeImports(join(CONTENT_DIR, 'vTest'), 'fuma-docs');
 
   // Generate versions.json
   const versionsJson = [
-    { param: 'latest', label: `${latestLabel} (Latest)`, url: '/docs' },
-    { param: 'vTest', label: 'vTest (Branch)', url: '/docs/vTest' }
+    { param: 'latest', label: `${latestLabel} (Latest)`, url: '/docs', ref: 'local', refType: 'local' },
+    { param: 'vTest', label: 'vTest (Branch)', url: '/docs/vTest', ref: 'fuma-docs', refType: 'branch' }
   ];
 
   for (const tag of others) {
     const v = `v${semver.major(tag)}.${semver.minor(tag)}`;
-    versionsJson.push({ param: v, label: v, url: `/docs/${v}` });
+    versionsJson.push({ param: v, label: v, url: `/docs/${v}`, ref: tag, refType: 'tag' });
   }
 
   versionsJson.push({

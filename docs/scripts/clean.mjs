@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const PROTO_DIR = join(ROOT_DIR, '../proto');
-const CONTENT_VERSIONS_DIR = join(ROOT_DIR, 'content/versions');
+const CONTENT_DIR = join(ROOT_DIR, 'content');
 const CONTENT_API_DIR = join(ROOT_DIR, 'content/reference/api');
 const PUBLIC_DIR = join(ROOT_DIR, 'public/docs');
 const OPENAPI_DIR = join(ROOT_DIR, 'openapi');
@@ -19,7 +19,6 @@ const targets = [
   join(ROOT_DIR, '.temp'),
   VERSIONS_FILE,
   CONTENT_API_DIR,
-  CONTENT_VERSIONS_DIR,
 ];
 
 async function run() {
@@ -45,8 +44,10 @@ async function run() {
     }
   };
 
+  cleanVersioned(ROOT_DIR);
   cleanVersioned(PROTO_DIR);
   cleanVersioned(PUBLIC_DIR);
+  cleanVersioned(CONTENT_DIR);
 
   console.log('Cleanup complete.');
 }
