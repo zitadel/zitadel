@@ -55,6 +55,9 @@ console/src/app/proto/generated/
 pkg/**/**.connect.go
 **.gen.go
 openapi/**/*.json
+# multi-version proto artifacts
+/proto/latest/
+/proto/v*/
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
 /internal/api/ui/console/static/*

@@ -26,6 +26,14 @@ yarn-error.log*
 next-env.d.ts
 
 # generated api docs
-/content/docs/reference/api
-/content/docs/reference/api-v1
-/openapi/zitadel/
+/content/reference/api
+/content/reference/api-v1
+/openapi/
+
+# multi-version artifacts
+/content/versions.json
+/content/versions/
+/public/docs/v*
+/public/docs/vTest/
+/.temp/
+/.source

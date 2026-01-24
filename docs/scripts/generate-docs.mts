@@ -1,7 +1,10 @@
 import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsSync } from 'fs';
+import { join, dirname, basename } from 'path';
+import { fileURLToPath } from 'url';
+import { glob } from 'glob';
+import yaml from 'js-yaml';
 
 // Suppress "Generated: ..." logs to avoid Vercel log limits
 const originalLog = console.log;
@@ -12,123 +15,96 @@ console.log = (...args) => {
   originalLog(...args);
 };
 
-const services = [
-  'action',
-  'application',
-  'authorization',
-  'feature',
-  'group',
-  'idp',
-  'instance',
-  'internal_permission',
-  'oidc',
-  'org',
-  'project',
-  'saml',
-  'session',
-  'settings',
-  'user',
-  'webkey'
-];
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = join(__dirname, '..');
+const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
+const CONTENT_ROOT = join(ROOT_DIR, 'content');
+const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content/versions');
 
-const generateServiceDocs = (service: string, filename?: string, version: string = 'v2') => {
-  const name = filename || `${service}_service`;
-  const api = createOpenAPI({
-    input: [`./openapi/zitadel/${service}/${version}/${name}.openapi.yaml`],
-  });
+async function generateVersionApiDocs(version: string) {
+  const sourceRoot = join(OPENAPI_ROOT, version);
+  if (!existsSync(sourceRoot)) return;
 
-  void generateFiles({
-    input: api,
-    output: `./content/reference/api/${service}`,
-    includeDescription: true,
-  });
+  const outputRoot = version === 'latest'
+    ? join(CONTENT_ROOT, 'reference/api')
+    : join(CONTENT_VERSIONS_ROOT, `${version}/reference/api`);
 
-  const indexPath = join(process.cwd(), `./content/reference/api/${service}/index.mdx`);
-  const content = `---
-title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
+  console.log(`Generating API docs for version: ${version} -> ${outputRoot}`);
+  mkdirSync(outputRoot, { recursive: true });
+
+  const specs = await glob('**/*.openapi.yaml', { cwd: sourceRoot });
+  const services: string[] = [];
+
+  for (const specPath of specs) {
+    const fullPath = join(sourceRoot, specPath);
+    const content = readFileSync(fullPath, 'utf8');
+    const doc = yaml.load(content) as any;
+
+    if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
+
+    let service = basename(specPath, '.openapi.yaml');
+    if (service.endsWith('_service')) {
+      service = service.slice(0, -8);
+    }
+
+    // For services in subdirectories (like resource/userschema), 
+    // we want a unique but readable name.
+    const relDir = dirname(specPath);
+    const folderPrefix = relDir !== '.' && !relDir.startsWith('openapi/zitadel')
+      ? relDir.split('/').pop() + '-'
+      : '';
+    const uniqueService = folderPrefix + service;
+
+    const outputDir = join(outputRoot, uniqueService);
+    services.push(uniqueService);
+
+    const api = createOpenAPI({
+      input: [fullPath],
+    });
+
+    await generateFiles({
+      input: api,
+      output: outputDir,
+      includeDescription: true,
+    });
+
+    const indexPath = join(outputDir, 'index.mdx');
+    const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    const indexContent = `---
+title: ${title} API
 ---
 
-API Reference for ${service}
+API Reference for ${title}
 `;
-  writeFileSync(indexPath, content);
-};
+    writeFileSync(indexPath, indexContent);
+  }
 
-services.forEach(service => generateServiceDocs(service));
-generateServiceDocs('org', undefined, 'v2beta');
+  // Generate meta.json
+  const meta = {
+    title: "APIs",
+    pages: services.sort()
+  };
 
-const generateUserSchemaDocs = () => {
-  const api = createOpenAPI({
-    input: ['./openapi/zitadel/resources/userschema/v3alpha/user_schema_service.openapi.yaml'],
-  });
+  writeFileSync(
+    join(outputRoot, 'meta.json'),
+    JSON.stringify(meta, null, 2)
+  );
+}
 
-  void generateFiles({
-    input: api,
-    output: './content/reference/api/user_schema',
-    includeDescription: true,
-  });
+async function run() {
+  if (!existsSync(OPENAPI_ROOT)) {
+    console.error('OpenAPI root not found. Run generate-buf.mjs first.');
+    process.exit(1);
+  }
 
-  const indexPath = join(process.cwd(), './content/reference/api/user_schema/index.mdx');
-  const content = `---
-title: User Schema API
----
+  const versions = readdirSync(OPENAPI_ROOT).filter(f => lstatSync(join(OPENAPI_ROOT, f)).isDirectory());
 
-API Reference for User Schema
-`;
-  writeFileSync(indexPath, content);
-};
-generateUserSchemaDocs();
+  for (const version of versions) {
+    await generateVersionApiDocs(version);
+  }
+}
 
-const meta = {
-  title: "APIs",
-  pages: [...services, 'user_schema']
-};
-
-mkdirSync(join(process.cwd(), 'content/reference/api'), { recursive: true });
-
-writeFileSync(
-  join(process.cwd(), 'content/reference/api/meta.json'),
-  JSON.stringify(meta, null, 2)
-);
-
-const v1Services = [
-  'admin',
-  'auth',
-  'management',
-  'system'
-];
-
-const generateV1ServiceDocs = (service: string) => {
-  const api = createOpenAPI({
-    input: [`./openapi/zitadel/${service}.openapi.yaml`],
-  });
-
-  void generateFiles({
-    input: api,
-    output: `./content/reference/api-v1/${service}`,
-    includeDescription: true,
-  });
-
-  const indexPath = join(process.cwd(), `./content/reference/api-v1/${service}/index.mdx`);
-  const content = `---
-title: ${service.charAt(0).toUpperCase() + service.slice(1)} API
----
-
-API Reference for ${service}
-`;
-  writeFileSync(indexPath, content);
-};
-
-v1Services.forEach(service => generateV1ServiceDocs(service));
-
-const v1Meta = {
-  title: "API v1",
-  pages: v1Services
-};
-
-mkdirSync(join(process.cwd(), 'content/reference/api-v1'), { recursive: true });
-
-writeFileSync(
-  join(process.cwd(), 'content/reference/api-v1/meta.json'),
-  JSON.stringify(v1Meta, null, 2)
-);
-
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
