@@ -20,7 +20,7 @@ You can directly see the custom domain and data region.
 With a click on an instance you get to the detail of the chosen instance.
 
 
-![Instance Overview](/img/manuals/portal/customer_portal_instance_overview.png)
+![Instance Overview](/docs/img/manuals/portal/customer_portal_instance_overview.png)
 
 
 ## New instance
@@ -37,13 +37,13 @@ Click on the new button above the instance table to create a new instance.
 Every new instance gets a generated domain of the form [instancename][randomnumber].zitadel.cloud
 </Callout>
 
-![New Instance](/img/manuals/portal/customer_portal_new_instance.gif)
+![New Instance](/docs/img/manuals/portal/customer_portal_new_instance.gif)
 
 ## Detail
 
 The detail shows you general information about your instance, the region and your usage.
 
-![New Instance](/img/manuals/portal/customer_portal_instance_detail.png)
+![New Instance](/docs/img/manuals/portal/customer_portal_instance_detail.png)
 
 ### Upgrade to Pro
 
@@ -61,7 +61,7 @@ You can also upgrade manually at any time.
    - Customer: At least you have to fill the country
 5. Save the information
 
-![Upgrade to Pro](/img/manuals/portal/customer_portal_upgrade_tier.png)
+![Upgrade to Pro](/docs/img/manuals/portal/customer_portal_upgrade_tier.png)
 
 ### Add Custom Domain
 
@@ -80,7 +80,7 @@ Be aware that it has some impacts if you change the primary domain of your insta
 1. The urls and issuer have to change in your app
 2. Passkey authentication is based on the domain, if you change it, your users will not be able to login with the registered passkey authentication
 
-![Add custom domain](/img/manuals/portal/customer_portal_add_domain.png)
+![Add custom domain](/docs/img/manuals/portal/customer_portal_add_domain.png)
 
 #### Verify Custom Domain
 

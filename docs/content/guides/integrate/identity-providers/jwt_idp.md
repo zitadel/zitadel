@@ -35,7 +35,7 @@ To configure JWT IdP in ZITADEL, you need to provide:
 
 The authentication flow with JWT IdP looks like this:
 
-![JWT IdP Architecture](/img/guides/jwt_idp.png)
+![JWT IdP Architecture](/docs/img/guides/jwt_idp.png)
 
 **Step-by-Step Process**
 

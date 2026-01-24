@@ -19,11 +19,11 @@ Before we begin developing our application, we need to perform a few configurati
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
-![Create app in console](/img/java-spring/app-create.png)
+![Create app in console](/docs/img/java-spring/app-create.png)
 
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all applications.
 
-![Create app in console - set auth method](/img/java-spring/app-create-auth.png)
+![Create app in console - set auth method](/docs/img/java-spring/app-create-auth.png)
 
 ### Redirect URIs
 
@@ -34,7 +34,7 @@ The Post-logout redirect send the users back to a route on your application afte
 If you are following along with the [example](https://github.com/zitadel/zitadel-java), set the dev mode to `true`, the Redirect URIs to `http://localhost:18080/webapp/login/oauth2/code/zitadel` and Post redirect URI to `http://localhost:18080/webapp`.
 </Callout>
 
-![Create app in console - set redirectURI](/img/java-spring/app-create-redirect.png)
+![Create app in console - set redirectURI](/docs/img/java-spring/app-create-redirect.png)
 
 Continue and create the application.
 
@@ -42,7 +42,7 @@ Continue and create the application.
 
 After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Java client.
 
-![Create app in console - copy client_id](/img/java-spring/app-create-clientid.png)
+![Create app in console - copy client_id](/docs/img/java-spring/app-create-clientid.png)
 
 ## Spring setup
 
@@ -165,7 +165,7 @@ java \
 If you then visit on [http://localhost:18080/webapp](http://localhost:18080/webapp) you should directly be redirected to your ZITADEL instance.
 After login with your existing user you will be presented the profile page:
 
-![Profile Page](/img/java-spring/app-profile.png)
+![Profile Page](/docs/img/java-spring/app-profile.png)
 
 ## Completion
 

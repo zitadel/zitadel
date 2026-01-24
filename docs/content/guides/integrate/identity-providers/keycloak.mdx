@@ -20,7 +20,7 @@ import TestSetup from './_test_setup.mdx';
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Keycloak Client later.
 
-![Generic OIDC Provider](/img/guides/zitadel_generic_oidc_create_provider.png)
+![Generic OIDC Provider](/docs/img/guides/zitadel_generic_oidc_create_provider.png)
 
 ## Keycloak Configuration
 
@@ -33,8 +33,8 @@ You will have to paste it in the Keycloak Client later.
 5. [Paste the ZITADEL Callback URL you copied before](#open-the-generic-oidc-provider-template) to the redirect URIs
 6. Go to the credentials tab and copy the secret
 
-![Add new OIDC Client in Keycloak](/img/guides/keycloak_add_client.png)
-![Get Client Secret](/img/guides/keycloak_client_secret.png)
+![Add new OIDC Client in Keycloak](/docs/img/guides/keycloak_add_client.png)
+![Get Client Secret](/docs/img/guides/keycloak_client_secret.png)
 
 ## ZITADEL configuration
 
@@ -55,13 +55,13 @@ in addition to the client secret.
 
 <GeneralConfigDescription components={props.components}  provider_account="Keycloak account" />
 
-![Keycloak Provider](/img/guides/zitadel_keycloak_create_provider.png)
+![Keycloak Provider](/docs/img/guides/zitadel_keycloak_create_provider.png)
 
 ### Activate IdP
 
 <Activate components={props.components} />
 
-![Activate the Keycloak Provider](/img/guides/zitadel_activate_keycloak.png)
+![Activate the Keycloak Provider](/docs/img/guides/zitadel_activate_keycloak.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -71,6 +71,6 @@ in addition to the client secret.
 
 <TestSetup components={props.components}  loginscreen="your Keycloak login"/>
 
-![Keycloak Button](/img/guides/zitadel_login_keycloak.png)
+![Keycloak Button](/docs/img/guides/zitadel_login_keycloak.png)
 
-![Keycloak Login](/img/guides/keycloak_login.png)
+![Keycloak Login](/docs/img/guides/keycloak_login.png)

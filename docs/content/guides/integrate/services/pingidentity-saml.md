@@ -28,10 +28,10 @@ additional [external identity provider](https://docs.pingidentity.com/bundle/pin
 can follow the instructions [here](https://docs.pingidentity.com/bundle/pingone/page/ovy1567784211297.html)
 
 1. As described you have to create a new provider, with a unique identifier:
-   ![Create IDP Profile](/img/saml/pingidentity/create_idp_profile.png)
+   ![Create IDP Profile](/docs/img/saml/pingidentity/create_idp_profile.png)
 
 We recommend activating signing the auth request whenever possible:
-![Configure PingOne Connection](/img/saml/pingidentity/conf_connection.png)
+![Configure PingOne Connection](/docs/img/saml/pingidentity/conf_connection.png)
 
 2. Manually enter the necessary information:
 
@@ -39,7 +39,7 @@ We recommend activating signing the auth request whenever possible:
 - IDP EntityID, for example https://accounts.example.com/saml/metadata
 - Binding, which is a decision which you can take yourself, we recommend HTTP POST as it has fewer restrictions
 - Import certificate, provided from the certificate endpoint
-  ![Configure IDP Connection](/img/saml/pingidentity/conf_idp_connection.png)
+  ![Configure IDP Connection](/docs/img/saml/pingidentity/conf_idp_connection.png)
 
 Everything you need to know about the attribute mapping you can find
 in [Ping Identity's documentation](https://docs.pingidentity.com/bundle/pingone/page/pwv1567784207915.html)
@@ -67,19 +67,19 @@ ENTITYID="PINGONE (SP) ENTITY ID"
 </md:EntityDescriptor>
 ```
 
-![Identity Providers P1 Connection](/img/saml/pingidentity/idp_p1_connection.png)
-![Identity Providers IDP Configuration](/img/saml/pingidentity/idp_idp_configuration.png)
+![Identity Providers P1 Connection](/docs/img/saml/pingidentity/idp_p1_connection.png)
+![Identity Providers IDP Configuration](/docs/img/saml/pingidentity/idp_idp_configuration.png)
 
 In your existing project:
 
 1. Press the "+"-button to add an application
-   ![Project](/img/saml/zitadel/project.png)
+   ![Project](/docs/img/saml/zitadel/project.png)
 2. Fill in a name for the application and chose the SAML type, then click "Continue".
-   ![New Application](/img/saml/zitadel/application_saml.png)
+   ![New Application](/docs/img/saml/zitadel/application_saml.png)
 3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
    Continue".
-   ![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
+   ![Add Metadata to Application](/docs/img/saml/zitadel/application_saml_metadata.png)
 4. Check your application, if everything is correct, press "Create".
-   ![Create Application](/img/saml/zitadel/application_saml_create.png)
+   ![Create Application](/docs/img/saml/zitadel/application_saml_create.png)
 
 Everything on the side of ZITADEL is done if the application is correctly created.

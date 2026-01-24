@@ -29,23 +29,23 @@ The following instructions give you a quick overview of the most important steps
 [Open the group](https://gitlab.com/dashboard/groups) to which you want to add the SSO configuration.
 Select on the menu Settings and then SAML SSO.  
 Copy `GitLab metadata URL` for the next step.
-![Add identity provider](/img/saml/gitlab/gitlab-01.png)
+![Add identity provider](/docs/img/saml/gitlab/gitlab-01.png)
 
 ## **ZITADEL**: Create the application
 
 In your existing project:
 
 Press the "+"-button to add an application
-![Project](/img/saml/zitadel/project.png)
+![Project](/docs/img/saml/zitadel/project.png)
 
 Fill in a name for the application and chose the SAML type, then click "Continue".
-![New Application](/img/saml/zitadel/application_saml.png)
+![New Application](/docs/img/saml/zitadel/application_saml.png)
 
 Enter the URL from before, then click "Continue".
-![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
+![Add Metadata to Application](/docs/img/saml/zitadel/application_saml_metadata.png)
 
 Check your application, if everything is correct, press "Create".
-![Create Application](/img/saml/zitadel/application_saml_create.png)
+![Create Application](/docs/img/saml/zitadel/application_saml_create.png)
 
 ## **Gitlab**: Configuration
 
@@ -56,7 +56,7 @@ Complete the configuration as follows:
 
 Save the changes.
 
-![Filled in values](/img/saml/gitlab/gitlab-02.png)
+![Filled in values](/docs/img/saml/gitlab/gitlab-02.png)
 
 ## **Gitlab**: Verify SAML configuration
 
@@ -65,4 +65,4 @@ Once you saved the changes, click on the button "Verify SAML configuration".
 You should be redirected to ZITADEL.
 Login with your user. 
 After that you should be redirected back to GitLab and you can inspect the Response Output.
-![Validate Setup](/img/saml/gitlab/gitlab-03.png)
+![Validate Setup](/docs/img/saml/gitlab/gitlab-03.png)

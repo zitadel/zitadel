@@ -19,15 +19,15 @@ Before we begin developing our API, we need to perform a few configuration steps
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **API** application type and continue.
 
-![Create app in console](/img/java-spring/api-create.png)
+![Create app in console](/docs/img/java-spring/api-create.png)
 
 Select Basic Auth for authenticating at the Introspection Endpoint.
 
-![Create app in console](/img/java-spring/api-create-auth.png)
+![Create app in console](/docs/img/java-spring/api-create-auth.png)
 
 After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID and secret, as you will need it to configure your Java client.
 
-![Create api key in console](/img/java-spring/api-create-clientid-secret.png)
+![Create api key in console](/docs/img/java-spring/api-create-clientid-secret.png)
 
 ## Spring Setup
 
@@ -224,13 +224,13 @@ So let's create the role and grant it to the user. To do so, go to your project 
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
 Finally, create the role as shown below:
 
-![Create project role in console](/img/java-spring/api-project-role.png)
+![Create project role in console](/docs/img/java-spring/api-project-role.png)
 
 After you have created the role, let's grant it the user, who requested the tasks.
 Click on `Authorization` in the navigation and create a new one by selecting the user and the `admin` role.
 After successful creation, it should look like:
 
-![Created authorization in console](/img/java-spring/api-project-auth.png)
+![Created authorization in console](/docs/img/java-spring/api-project-auth.png)
 
 So you should now be able to add a new task:
 

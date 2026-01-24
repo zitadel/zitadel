@@ -6,7 +6,7 @@ sidebar_label: Customer Portal Administrators
 Manage all your administrators who are allowed to access the Customer Portal.
 For the moment all users with access to the Customer Portal will have the role "Admin".
 
-![Create user](/img/manuals/portal/customer_portal_administrator_list.png)
+![Create user](/docs/img/manuals/portal/customer_portal_administrator_list.png)
 
 
 ## Add new administrator
@@ -18,7 +18,7 @@ For the moment all users with access to the Customer Portal will have the role "
 
 The user will receive a verification email. Clicking the button in the email will lead to the user activation screen where password creation is required.
 
-![Create user](/img/manuals/portal/customer_portal_add_admin.png)
+![Create user](/docs/img/manuals/portal/customer_portal_add_admin.png)
 
 ## Delete administrator
 
@@ -29,4 +29,4 @@ The user will receive a verification email. Clicking the button in the email wil
 
 The user will be deleted and has no access to the Customer Portal anymore
 
-![Delete user](/img/manuals/portal/customer_portal_delete_admin.png)
+![Delete user](/docs/img/manuals/portal/customer_portal_delete_admin.png)

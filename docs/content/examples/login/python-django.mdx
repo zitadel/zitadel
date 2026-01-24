@@ -30,7 +30,7 @@ This example expects 3 different roles:
 
 In your project settings make sure the "Assert Roles On Authentication" is enabled.
 
-![Project settings in console](/img/django/project-settings.png)
+![Project settings in console](/docs/img/django/project-settings.png)
 
 In the project Role tab, add 3 special roles:
 
@@ -40,11 +40,11 @@ In the project Role tab, add 3 special roles:
 
 If none of the roles is provided as a user, the user in Django will not be created.
 
-![Project roles in console](/img/django/project-roles.png)
+![Project roles in console](/docs/img/django/project-roles.png)
 
 Finally, we can assign the roles to users in the project's authorizations tab.
 
-![Project authorizations in console](/img/django/project-authorizations.png)
+![Project authorizations in console](/docs/img/django/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -54,11 +54,11 @@ In your Project, add a new application at the top of the page.
 Select Web application type and continue.
 We use [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code) for our Django application.
 
-![Create app in console](/img/django/app-create.png)
+![Create app in console](/docs/img/django/app-create.png)
 
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated secret for later use.
 
-![Configure app authentication method in console](/img/django/app-auth-method.png)
+![Configure app authentication method in console](/docs/img/django/app-auth-method.png)
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
@@ -67,7 +67,7 @@ For the example application we are writing use:
 - `http://localhost:8000/oidc/callback/` as Redirect URI
 - `http://localhost:8000/oidc/logout/` as post-logout URI.
 
-![Configure app redirects console](/img/django/app-redirects.png)
+![Configure app redirects console](/docs/img/django/app-redirects.png)
 
 After the final step you are presented with a client ID and secret.
 Copy and paste them to a safe location for later use by the application.

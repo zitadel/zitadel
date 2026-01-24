@@ -38,14 +38,14 @@ async function checkLinks() {
   const files = await getFiles();
 
   const linkErrors = await validateFiles(files, {
-      scanned,
-      markdown: {
-        components: {
-          Card: { attributes: ['href'] },
-        },
+    scanned,
+    markdown: {
+      components: {
+        Card: { attributes: ['href'] },
       },
-      checkRelativePaths: 'as-url',
-    });
+    },
+    checkRelativePaths: 'as-url',
+  });
 
   printErrors(linkErrors, false);
 
@@ -65,7 +65,7 @@ function checkImages(files: FileObject[]): boolean {
 
   for (const file of files) {
     const content = file.content;
-    const imageRegex = /!\[.*?\]\((.*?)\)|<img.*?src=["'](.*?)["']/g;
+    const imageRegex = /!\[.*?\]\((.*?)\)|<img.*?src=[{"'](.*?)["'}]/g;
     let match;
 
     while ((match = imageRegex.exec(content)) !== null) {
@@ -75,7 +75,7 @@ function checkImages(files: FileObject[]): boolean {
         // Markdown link: remove title part of the link (e.g. /img.png "title")
         imagePath = imagePath.trim().split(/\s+/)[0];
       }
-      
+
       // Ignore external links
       if (imagePath.startsWith('http') || imagePath.startsWith('https') || imagePath.startsWith('data:')) {
         continue;
@@ -83,14 +83,22 @@ function checkImages(files: FileObject[]): boolean {
 
       // Remove query parameters or anchors
       imagePath = imagePath.split('?')[0].split('#')[0];
-      
+
       // Decode URI components (e.g. %20 -> space)
       imagePath = decodeURIComponent(imagePath);
 
       let fullPath;
       if (imagePath.startsWith('/')) {
-        // Absolute path relative to public folder
-        fullPath = join(PUBLIC_ROOT, imagePath);
+        // Enforce /docs prefix for absolute paths
+        if (!imagePath.startsWith('/docs/')) {
+          console.error(`Broken image link in ${file.path}: ${imagePath} (must start with /docs/)`);
+          hasErrors = true;
+          continue;
+        }
+
+        // Absolute path relative to public folder (strip /docs prefix)
+        const relativeToPublic = imagePath.slice(5); // Remove '/docs'
+        fullPath = join(PUBLIC_ROOT, relativeToPublic);
       } else {
         // Relative path relative to the markdown file
         fullPath = resolve(dirname(file.path), imagePath);
@@ -100,6 +108,7 @@ function checkImages(files: FileObject[]): boolean {
         console.error(`Broken image link in ${file.path}: ${imagePath}`);
         hasErrors = true;
       }
+
     }
   }
 
@@ -116,8 +125,8 @@ async function getFiles() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
   const promises = pages.map(
     async (page: any): Promise<FileObject> => ({
-      path: page.file?.path || page.absolutePath, 
-      content: await readFile(page.file?.path || page.absolutePath, 'utf8'), 
+      path: page.file?.path || page.absolutePath,
+      content: await readFile(page.file?.path || page.absolutePath, 'utf8'),
       url: page.url,
       data: page.data,
     }),

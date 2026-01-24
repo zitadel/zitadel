@@ -5,7 +5,7 @@ sidebar_label: Granted Projects
 
 # Granted Project
 
-![Organization Grant](/img/concepts/objects/organization_grants.png)
+![Organization Grant](/docs/img/concepts/objects/organization_grants.png)
 
 With ZITADEL you can grant selected roles within your project to an organization. The receiving organization can then create authorizations for their users on their own (self-service).
 
