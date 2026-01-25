@@ -91,6 +91,100 @@ API Reference for ${title}
   );
 }
 
+async function fixAllGeneratedLinks() {
+  console.log('Post-processing: Fixing API links...');
+  const files = await glob('**/*.{md,mdx}', { cwd: CONTENT_ROOT });
+  const fileIndex = new Map<string, Map<string, string>>(); // version -> (Name -> absoluteURL)
+
+  const getVersion = (filePath: string) => {
+    const parts = filePath.split(path.sep);
+    if (parts[0].startsWith('v4.')) return parts[0];
+    return 'latest';
+  };
+
+  const getUrl = (filePath: string) => {
+    return '/docs/' + filePath.replace(/\.(md|mdx)$/, '').split(path.sep).join('/');
+  };
+
+  // Build index
+  for (const file of files) {
+    const version = getVersion(file);
+    if (!fileIndex.has(version)) fileIndex.set(version, new Map());
+    const versionMap = fileIndex.get(version)!;
+
+    const name = basename(file.replace(/\.md$/, ''), '.mdx');
+    const parts = name.split('.');
+
+    const operation = parts[parts.length - 1];
+    const service = parts.length > 1 ? parts[parts.length - 2] : null;
+    const url = getUrl(file);
+
+    // Prioritize non-beta/non-alpha in the index
+    const isBeta = name.includes('beta') || name.includes('alpha');
+    const existing = versionMap.get(operation.toLowerCase());
+    if (!existing || (!isBeta && existing.includes('beta'))) {
+      versionMap.set(operation.toLowerCase(), url);
+    }
+
+    if (service) {
+      const serviceOp = `${service}.${operation}`.toLowerCase();
+      const existingServiceOp = versionMap.get(serviceOp);
+      if (!existingServiceOp || (!isBeta && existingServiceOp.includes('beta'))) {
+        versionMap.set(serviceOp, url);
+      }
+    }
+    versionMap.set(name.toLowerCase(), url);
+  }
+
+  let fixedCount = 0;
+  for (const file of files) {
+    const fullPath = join(CONTENT_ROOT, file);
+    const content = readFileSync(fullPath, 'utf-8');
+    const version = getVersion(file);
+    const versionMap = fileIndex.get(version);
+
+    // [Text](apis/resources/service_name/file_name.api.mdx)
+    const linkRegex = /\[([^\]]+)\]\(([\/]?apis\/resources\/([^\/]+)\/([^\/)]+)\.api\.mdx)\)/g;
+
+    let modified = false;
+    let newContent = content.replace(linkRegex, (match, text, fullLink, serviceSlug, fileSlug) => {
+      const toPascalCase = (s: string) => s.split(/[-_]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+
+      // Extraction strategy: fileSlug is "user-service-get-user-by-id"
+      const serviceIndex = fileSlug.lastIndexOf('service-');
+      const operationKebab = serviceIndex !== -1 ? fileSlug.slice(serviceIndex + 8) : fileSlug;
+      const operation = toPascalCase(operationKebab);
+
+      let targetUrl = versionMap?.get(operation.toLowerCase());
+
+      if (!targetUrl && serviceSlug) {
+        const serviceMatch = serviceSlug.match(/^([a-z_]+)_service/);
+        if (serviceMatch) {
+          const service = toPascalCase(serviceMatch[1]) + 'Service';
+          targetUrl = versionMap?.get(`${service}.${operation}`.toLowerCase());
+        }
+      }
+
+      if (targetUrl) {
+        modified = true;
+        fixedCount++;
+        return `[${text}](${targetUrl})`;
+      }
+      return match;
+    });
+
+    if (newContent.includes('/docs/docs')) {
+      newContent = newContent.replace(/\/docs\/docs/g, '/docs');
+      modified = true;
+    }
+
+    if (modified) {
+      writeFileSync(fullPath, newContent);
+    }
+  }
+  console.log(`Post-processing: Fixed ${fixedCount} links.`);
+}
+
 async function run() {
   if (!existsSync(OPENAPI_ROOT)) {
     console.error('OpenAPI root not found. Run generate-buf.mjs first.');
@@ -102,6 +196,8 @@ async function run() {
   for (const version of versions) {
     await generateVersionApiDocs(version);
   }
+
+  await fixAllGeneratedLinks();
 }
 
 run().catch(err => {

@@ -9,7 +9,7 @@ We describe our [support services](/docs/legal/service-description/support-servi
 
 ## General
 
-We always recommend first having a look at our [documentation](/docs/docs), [discord chat](https://zitadel.com/chat) and [GitHub repository](https://github.com/zitadel/zitadel). You can also ask our AI assistant for help before contacting Support. 
+We always recommend first having a look at our [documentation](/docs), [discord chat](https://zitadel.com/chat) and [GitHub repository](https://github.com/zitadel/zitadel). You can also ask our AI assistant for help before contacting Support. 
 
 ![Customer Portal General Support](../../../../public/img/manuals/portal/customer_portal_general_support.png)
 

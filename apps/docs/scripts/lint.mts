@@ -1,7 +1,8 @@
 import { register } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { existsSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
+import { writeFileSync, existsSync } from 'node:fs';
+import { readFile, stat } from 'node:fs/promises';
 
 register('./scripts/loader.mjs', pathToFileURL('./'));
 register('fumadocs-mdx/node/loader', import.meta.url);
@@ -20,25 +21,37 @@ const PUBLIC_ROOT = resolve('public');
 
 async function checkLinks() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
-
-  const scanned = await scanURLs({
-    preset: 'next',
-    populate: {
-      'docs/[[...slug]]': pages.map((page: any) => {
-        return {
-          value: {
-            slug: page.slugs,
-          },
-          hashes: getHeadings(page),
-        };
-      }),
-    },
-  });
+  console.log(`Total pages found: ${pages.length}`);
+  if (pages.length > 0) {
+    console.log(`First page slug: ${pages[0].slugs}`);
+  }
 
   const files = await getFiles();
 
+  // Load redirects and add them to the scanned URLs
+  let redirects: any[] = [];
+  if (existsSync('redirects.json')) {
+    redirects = JSON.parse(await readFile('redirects.json', 'utf-8'));
+  }
+
+  const scanned = {
+    urls: new Map<string, { hashes: string[] }>([
+      // Load redirects first
+      ...redirects.map((r: any): [string, { hashes: string[] }] => [r.source, { hashes: [] }]),
+      // Load files second, so they overwrite redirects with actual headings
+      ...files.map((f): [string, { hashes: string[] }] => [f.url!, { hashes: getHeadings(f) }]),
+    ]),
+    fallbackUrls: [],
+  };
+
+  writeFileSync('scanned-urls.json', JSON.stringify(Array.from(scanned.urls.keys()), null, 2));
+
+  console.log(`Manually populated URLs count: ${scanned.urls.size}`);
+
+
   const linkErrors = await validateFiles(files, {
     scanned,
+    baseUrl: '/docs',
     markdown: {
       components: {
         Card: { attributes: ['href'] },
@@ -49,7 +62,7 @@ async function checkLinks() {
 
   printErrors(linkErrors, false);
 
-  const imageErrors = checkImages(files);
+  const imageErrors = await checkImages(files);
 
   if (linkErrors.length === 0 && !imageErrors) {
     console.log('\n✅ All checks passed: No broken links or images found.');
@@ -60,15 +73,15 @@ async function checkLinks() {
   }
 }
 
-function checkImages(files: FileObject[]): boolean {
+async function checkImages(files: FileObject[]): Promise<boolean> {
   let hasErrors = false;
 
-  for (const file of files) {
+  await Promise.all(files.map(async (file) => {
     const content = file.content;
     const imageRegex = /!\[.*?\]\((.*?)\)|<img.*?src=[{"'](.*?)["'}]/g;
-    let match;
+    const matches = Array.from(content.matchAll(imageRegex));
 
-    while ((match = imageRegex.exec(content)) !== null) {
+    await Promise.all(matches.map(async (match) => {
       let imagePath = match[1] || match[2];
 
       if (match[1]) {
@@ -78,7 +91,7 @@ function checkImages(files: FileObject[]): boolean {
 
       // Ignore external links
       if (imagePath.startsWith('http') || imagePath.startsWith('https') || imagePath.startsWith('data:')) {
-        continue;
+        return;
       }
 
       // Remove query parameters or anchors
@@ -93,7 +106,7 @@ function checkImages(files: FileObject[]): boolean {
         if (!imagePath.startsWith('/docs/')) {
           console.error(`Broken image link in ${file.path}: ${imagePath} (must start with /docs/)`);
           hasErrors = true;
-          continue;
+          return;
         }
 
         // Absolute path relative to public folder (strip /docs prefix)
@@ -104,22 +117,55 @@ function checkImages(files: FileObject[]): boolean {
         fullPath = resolve(dirname(file.path), imagePath);
       }
 
-      if (!existsSync(fullPath)) {
+      try {
+        await stat(fullPath);
+      } catch {
         console.error(`Broken image link in ${file.path}: ${imagePath}`);
         hasErrors = true;
       }
-
-    }
-  }
+    }));
+  }));
 
   return hasErrors;
 }
 
-function getHeadings({ data }: any): string[] {
-  return data.toc.map((item: any) => item.url.slice(1));
-}
+function getHeadings({ data, content }: any): string[] {
+  const headings = new Set<string>();
 
-import { readFile } from 'node:fs/promises';
+  if (data.toc && data.toc.length > 0) {
+    data.toc.forEach((item: any) => headings.add(item.url.slice(1)));
+  }
+  if (data.structuredData?.headings) {
+    data.structuredData.headings.forEach((h: any) => headings.add(h.id));
+  }
+
+  // Fallback: parse content directly
+  if (content) {
+    const lines = content.split('\n');
+    let inCodeBlock = false;
+    for (const line of lines) {
+      if (line.trim().startsWith('```')) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (inCodeBlock) continue;
+
+      const match = line.match(/^(#{1,6})\s+(.+)$/);
+      if (match) {
+        const title = match[2].trim();
+        const slug = title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/_/g, '-')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-');
+        headings.add(slug);
+      }
+    }
+  }
+
+  return Array.from(headings);
+}
 
 async function getFiles() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
@@ -127,7 +173,7 @@ async function getFiles() {
     async (page: any): Promise<FileObject> => ({
       path: page.file?.path || page.absolutePath,
       content: await readFile(page.file?.path || page.absolutePath, 'utf8'),
-      url: page.url,
+      url: page.url === '/' ? '/docs' : `/docs${page.url.startsWith('/') ? page.url : '/' + page.url}`,
       data: page.data,
     }),
   );

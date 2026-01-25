@@ -191,7 +191,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
              // Note: resolve() handles '..' correctly
              const absoluteTarget = resolve(originalDir, originalRelPath);
              
-             const projectRoot = resolve(ROOT_DIR, '..'); // Repo root
+             const projectRoot = resolve(ROOT_DIR, '../..'); // Repo root (apps/docs/../..)
              
              // 2. Determine where this target lives now
              // Case A: It's in 'public' -> We moved public assets to 'public/<version>'
@@ -224,6 +224,11 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
                   // External file logic...
                   // For now, let's keep the original logic for downloading defaults.yaml
                   return null; // We handle this in the regex pass below specially or reuse this logic?
+             }
+
+             // Handle references to defaults.yaml or setup/steps.yaml specially
+             if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
+                 return null; // Let the external file handlers deal with it
              }
 
               // Case D: It's a relative link to, say, components/ or other things in docs/
@@ -317,17 +322,28 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
               const relativePathInContent = filePath.split(join('content', versionFolder))[1];
               const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
               const absoluteImportTarget = resolve(dirname(originalFilePath), relPath);
-              const projectRoot = resolve(ROOT_DIR, '..');
+              const projectRoot = resolve(ROOT_DIR, '../..');
               
               // If it points to cmd/ or similar external
               if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
-                   const relativeToProjectRoot = absoluteImportTarget.replace(projectRoot + '/', '');
-                   const localPathInVersion = join(versionDir, '_external', relativeToProjectRoot);
+                    const repoRoot = resolve(ROOT_DIR, '../..');
+                    
+                    // The original imports were relative to docs/content, not apps/docs/content.
+                    // We need to account for the extra 'apps/' level.
+                    let relativeToRepoRoot;
+                    if (absoluteImportTarget.startsWith(join(repoRoot, 'apps'))) {
+                        // If it resolved to apps/cmd/defaults.yaml, it should be cmd/defaults.yaml
+                        relativeToRepoRoot = absoluteImportTarget.replace(join(repoRoot, 'apps') + '/', '');
+                    } else {
+                        relativeToRepoRoot = absoluteImportTarget.replace(repoRoot + '/', '');
+                    }
+                    
+                    const localPathInVersion = join(versionDir, '_external', relativeToRepoRoot);
                    
                    // Download if missing
                    if (!fs.existsSync(localPathInVersion)) {
-                      console.log(`[fix-imports] Downloading external: ${relativeToProjectRoot}`);
-                      const fileContent = await downloadFileContent(tagOrBranch, relativeToProjectRoot); // existing function
+                      console.log(`[fix-imports] Downloading external: ${relativeToRepoRoot}`);
+                      const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot); // existing function
                       if (fileContent) {
                           fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
                           fs.writeFileSync(localPathInVersion, fileContent);

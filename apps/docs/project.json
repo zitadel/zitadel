@@ -156,7 +156,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm check-links",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       },
       "dependsOn": [
         "generate"
@@ -174,7 +174,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "eslint .",
-        "cwd": "docs"
+        "cwd": "apps/docs"
       }
     }
   }

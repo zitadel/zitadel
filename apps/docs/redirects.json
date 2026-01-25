@@ -1728,5 +1728,1590 @@
     "source": "/docs/references/v2",
     "destination": "/docs/reference/v2",
     "permanent": true
+  },
+  {
+    "source": "/docs/guides/start/quickstart",
+    "destination": "/guides/start/quickstart",
+    "permanent": true
+  },
+  {
+    "source": "/docs/examples",
+    "destination": "/examples",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts",
+    "destination": "/concepts",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal",
+    "destination": "/legal",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/actions-overview",
+    "destination": "/guides/manage/console/actions-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login/oidc/device-authorization",
+    "destination": "/guides/integrate/login/oidc/device-authorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session",
+    "destination": "/reference/api/session",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login-ui",
+    "destination": "/guides/integrate/login-ui",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/service-users/authenticate-service-users",
+    "destination": "/guides/integrate/service-users/authenticate-service-users",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/openidoauth/scopes",
+    "destination": "/apis/openidoauth/scopes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/openidoauth/claims",
+    "destination": "/apis/openidoauth/claims",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/retrieve-user-roles",
+    "destination": "/guides/integrate/retrieve-user-roles",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/v2",
+    "destination": "/apis/v2",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user",
+    "destination": "/reference/api/user",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth",
+    "destination": "/reference/api/auth",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management",
+    "destination": "/reference/api/management",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin",
+    "destination": "/reference/api/admin",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api",
+    "destination": "/guides/integrate/zitadel-apis/access-zitadel-system-api",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/system",
+    "destination": "/reference/api/system",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal/service-description/support-services",
+    "destination": "/legal/service-description/support-services",
+    "permanent": true
+  },
+  {
+    "source": "/docs/product/roadmap",
+    "destination": "/product/roadmap",
+    "permanent": true
+  },
+  {
+    "source": "/docs/product/release-cycle",
+    "destination": "/product/release-cycle",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action",
+    "destination": "/reference/api/action",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/token-exchange",
+    "destination": "/guides/integrate/token-exchange",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/architecture/solution",
+    "destination": "/concepts/architecture/solution",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/internal-authentication",
+    "destination": "/apis/actions/internal-authentication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/external-authentication",
+    "destination": "/apis/actions/external-authentication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/okta-oidc",
+    "destination": "/guides/integrate/identity-providers/okta-oidc",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/gitlab",
+    "destination": "/guides/integrate/identity-providers/gitlab",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/github",
+    "destination": "/guides/integrate/identity-providers/github",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/migrate",
+    "destination": "/guides/integrate/identity-providers/migrate",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/okta_saml",
+    "destination": "/guides/integrate/identity-providers/okta_saml",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/azure-ad-saml",
+    "destination": "/guides/integrate/identity-providers/azure-ad-saml",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/mocksaml",
+    "destination": "/guides/integrate/identity-providers/mocksaml",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/modules",
+    "destination": "/apis/actions/modules",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/objects",
+    "destination": "/apis/actions/objects",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios/saas",
+    "destination": "/guides/solution-scenarios/saas",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/deploy/kubernetes",
+    "destination": "/self-hosting/deploy/kubernetes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login/oidc/oauth-recommended-flows",
+    "destination": "/guides/integrate/login/oidc/oauth-recommended-flows",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/openidoauth/authn-methods",
+    "destination": "/apis/openidoauth/authn-methods",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/customize/branding",
+    "destination": "/guides/manage/customize/branding",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/customize/user-metadata",
+    "destination": "/guides/manage/customize/user-metadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/complement-token",
+    "destination": "/apis/actions/complement-token",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/applications-overview",
+    "destination": "/guides/manage/console/applications-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/roles",
+    "destination": "/guides/manage/console/roles",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/customize-samlresponse",
+    "destination": "/apis/actions/customize-samlresponse",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/tls_modes",
+    "destination": "/self-hosting/manage/tls_modes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/production",
+    "destination": "/self-hosting/manage/production",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/customize/behavior",
+    "destination": "/guides/manage/customize/behavior",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/actions/code-examples",
+    "destination": "/apis/actions/code-examples",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/migrate-from-v1",
+    "destination": "/guides/integrate/actions/migrate-from-v1",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/usage",
+    "destination": "/guides/integrate/actions/usage",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-request",
+    "destination": "/guides/integrate/actions/testing-request",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-request-manipulation",
+    "destination": "/guides/integrate/actions/testing-request-manipulation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-request-signature",
+    "destination": "/guides/integrate/actions/testing-request-signature",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-response",
+    "destination": "/guides/integrate/actions/testing-response",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-response-manipulation",
+    "destination": "/guides/integrate/actions/testing-response-manipulation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-function",
+    "destination": "/guides/integrate/actions/testing-function",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-function-manipulation",
+    "destination": "/guides/integrate/actions/testing-function-manipulation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/actions/testing-event",
+    "destination": "/guides/integrate/actions/testing-event",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/console-overview",
+    "destination": "/guides/manage/console/console-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/users-overview",
+    "destination": "/guides/manage/console/users-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/zitadel-apis/event-api",
+    "destination": "/guides/integrate/zitadel-apis/event-api",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/external-audit-log",
+    "destination": "/guides/integrate/external-audit-log",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios/restrict-console",
+    "destination": "/guides/solution-scenarios/restrict-console",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/audit-trail",
+    "destination": "/concepts/features/audit-trail",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/cloud/instances",
+    "destination": "/guides/manage/cloud/instances",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios/domain-discovery",
+    "destination": "/guides/solution-scenarios/domain-discovery",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/default-settings",
+    "destination": "/guides/manage/console/default-settings",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/identity-brokering",
+    "destination": "/concepts/features/identity-brokering",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/account-linking",
+    "destination": "/concepts/features/account-linking",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/selfservice",
+    "destination": "/concepts/features/selfservice",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/passkeys",
+    "destination": "/concepts/features/passkeys",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/console",
+    "destination": "/concepts/features/console",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login-ui/passkey",
+    "destination": "/guides/integrate/login-ui/passkey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/user/reg-create-user",
+    "destination": "/guides/manage/user/reg-create-user",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/customize/texts",
+    "destination": "/guides/manage/customize/texts",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/knowledge/opaque-tokens",
+    "destination": "/concepts/knowledge/opaque-tokens",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/token-introspection",
+    "destination": "/guides/integrate/token-introspection",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/organizations-overview",
+    "destination": "/guides/manage/console/organizations-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListOrgMemberRoles",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgMemberRoles",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios",
+    "destination": "/guides/solution-scenarios",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/onboarding",
+    "destination": "/guides/integrate/onboarding",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/openidoauth/grant-types",
+    "destination": "/apis/openidoauth/grant-types",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/console/projects-overview",
+    "destination": "/guides/manage/console/projects-overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/service-users/personal-access-token",
+    "destination": "/guides/integrate/service-users/personal-access-token",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddOIDCApp",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOIDCApp",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddProjectRole",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddOrgMember",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddOrgMember",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserGrants",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserGrants",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserGrantByID",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserGrantByID",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/structure/granted_projects",
+    "destination": "/concepts/structure/granted_projects",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ImportHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ImportData",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/architecture/secrets",
+    "destination": "/concepts/architecture/secrets",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal/policies/rate-limit-policy",
+    "destination": "/legal/policies/rate-limit-policy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/azure-ad-oidc",
+    "destination": "/guides/integrate/identity-providers/azure-ad-oidc",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios/configurations",
+    "destination": "/guides/solution-scenarios/configurations",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/solution-scenarios/b2c",
+    "destination": "/guides/solution-scenarios/b2c",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.UpdateProject",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal/terms-of-service",
+    "destination": "/legal/terms-of-service",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal/policies/acceptable-use-policy",
+    "destination": "/legal/policies/acceptable-use-policy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/legal/data-processing-agreement",
+    "destination": "/legal/data-processing-agreement",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/reverse_proxy",
+    "destination": "/self-hosting/manage/reverseproxy/reverse_proxy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/manage/terraform-provider",
+    "destination": "/guides/manage/terraform-provider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/updating_scaling",
+    "destination": "/self-hosting/manage/updating_scaling",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/system/zitadel.system.v1.SystemService.AddDomain",
+    "destination": "/reference/api/system/zitadel.system.v1.SystemService.AddDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/traefik",
+    "destination": "/self-hosting/manage/reverseproxy/traefik",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/http2",
+    "destination": "/self-hosting/manage/http2",
+    "permanent": true
+  },
+  {
+    "source": "/docs/apis/observability/metrics",
+    "destination": "/apis/observability/metrics",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/database",
+    "destination": "/self-hosting/manage/database",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/eventstore/implementation",
+    "destination": "/concepts/eventstore/implementation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/usage_control",
+    "destination": "/self-hosting/manage/usage_control",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListEvents",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEvents",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserChanges",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserChanges",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListAppChanges",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListAppChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListOrgChanges",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListOrgChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectChanges",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ActivateFeatureLoginDefaultOrg",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateFeatureLoginDefaultOrg",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListAllProjectGrants",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListAllProjectGrants",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/cli/mirror",
+    "destination": "/self-hosting/manage/cli/mirror",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.CreateTarget",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.SetExecution",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/actions_v2",
+    "destination": "/concepts/features/actions_v2",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionServices",
+    "destination": "/reference/api/action/zitadel.action.v2.ActionService.ListExecutionServices",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/architecture/software",
+    "destination": "/concepts/architecture/software",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login-ui/external-login",
+    "destination": "/guides/integrate/login-ui/external-login",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.MigrateGenericOIDCProvider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.MigrateGenericOIDCProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.MigrateGenericOIDCProvider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.MigrateGenericOIDCProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddSAMLProvider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddSAMLProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddSAMLProvider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddSAMLProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.UpdateSAMLProvider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.UpdateSAMLProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.UpdateSAMLProvider",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.UpdateSAMLProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/deploy/compose",
+    "destination": "/self-hosting/deploy/compose",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/ldap",
+    "destination": "/guides/integrate/identity-providers/ldap",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures",
+    "destination": "/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/login/hosted-login",
+    "destination": "/guides/integrate/login/hosted-login",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.CreateSession",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session/zitadel.session.v2.SessionService.SetSession",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.SetSession",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.StartIdentityProviderIntent",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.StartIdentityProviderIntent",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddHumanUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddIDPLink",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddIDPLink",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback",
+    "destination": "/reference/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.VerifyTOTPRegistration",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyTOTPRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.SetPhone",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetPhone",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.VerifyPhone",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyPhone",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddOTPSMS",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddOTPEmail",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddOTPEmail",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RegisterU2F",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RegisterU2F",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.VerifyU2FRegistration",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyU2FRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session/zitadel.session.v2.SessionService.DeleteSession",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.DeleteSession",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.CreatePasskeyRegistrationLink",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.CreatePasskeyRegistrationLink",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RegisterPasskey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.VerifyPasskeyRegistration",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.VerifyPasskeyRegistration",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.PasswordReset",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.PasswordReset",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.SetPassword",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetPassword",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest",
+    "destination": "/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/saml/zitadel.saml.v2.SAMLService.CreateResponse",
+    "destination": "/reference/api/saml/zitadel.saml.v2.SAMLService.CreateResponse",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session/zitadel.session.v2.SessionService.GetSession",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.GetSession",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/session/zitadel.session.v2.SessionService.ListSessions",
+    "destination": "/reference/api/session/zitadel.session.v2.SessionService.ListSessions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/settings/zitadel.settings.v2.SettingsService.GetLoginSettings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetLoginSettings",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/settings/zitadel.settings.v2.SettingsService.GetPasswordComplexitySettings",
+    "destination": "/reference/api/settings/zitadel.settings.v2.SettingsService.GetPasswordComplexitySettings",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/identity-providers/additional-information",
+    "destination": "/guides/integrate/identity-providers/additional-information",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.SetRestrictions",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetRestrictions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.SetUpOrg",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.SetUpOrg",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.SetOrgMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.BulkSetOrgMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkSetOrgMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.SetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.BulkSetUserMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.BulkSetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddMachineUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddKey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/token-introspection/basic-auth",
+    "destination": "/guides/integrate/token-introspection/basic-auth",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListEventTypes",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEventTypes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListAggregateTypes",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListAggregateTypes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis",
+    "destination": "/guides/integrate/zitadel-apis/access-zitadel-apis",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/services",
+    "destination": "/guides/integrate/services",
+    "permanent": true
+  },
+  {
+    "source": "/docs/concepts/features/external-user-grant",
+    "destination": "/concepts/features/external-user-grant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddSMSProviderHTTP",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddSMSProviderHTTP",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ActivateSMSProvider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateSMSProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListSMSProviders",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListSMSProviders",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddEmailProviderHTTP",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.AddEmailProviderHTTP",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ActivateEmailProvider",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ActivateEmailProvider",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListEmailProviders",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.ListEmailProviders",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.GetRestrictions",
+    "destination": "/reference/api/admin/zitadel.admin.v1.AdminService.GetRestrictions",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyMetadata",
+    "destination": "/reference/api/auth/zitadel.auth.v1.AuthService.ListMyMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/integrate/onboarding/end-users",
+    "destination": "/guides/integrate/onboarding/end-users",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserMetadata",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.GetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/feature",
+    "destination": "/reference/api/feature",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.CreateUserSchema",
+    "destination": "/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.CreateUserSchema",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.PatchUserSchema",
+    "destination": "/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.PatchUserSchema",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.SearchUserSchemas",
+    "destination": "/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.SearchUserSchemas",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.GetUserSchema",
+    "destination": "/reference/api/user_schema/zitadel.resources.userschema.v3alpha.ZITADELUserSchemas.GetUserSchema",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineKey",
+    "destination": "/reference/api/management/zitadel.management.v1.ManagementService.AddMachineKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.CreateApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeactivateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.DeleteApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GetApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GetApplicationKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ListApplicationKeys",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ListApplications",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.ReactivateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.GenerateClientSecret",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication",
+    "destination": "/reference/api/application/zitadel.application.v2.ApplicationService.UpdateApplication",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.CreateAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.AddTrustedDomain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.AddTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations",
+    "destination": "/reference/api/org/zitadel.org.v2.OrganizationService.ListOrganizations",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListTrustedDomains",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListTrustedDomains",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.DeleteAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveTrustedDomain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveTrustedDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization",
+    "destination": "/reference/api/org/zitadel.org.v2.OrganizationService.AddOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator",
+    "destination": "/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.UpdateAdministrator",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ListAuthorizations",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.AddCustomDomain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.AddCustomDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListCustomDomains",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListCustomDomains",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListInstances",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.ListInstances",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveCustomDomain",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveCustomDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.DeleteInstance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.DeleteInstance",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/instance/zitadel.instance.v2.InstanceService.UpdateInstance",
+    "destination": "/reference/api/instance/zitadel.instance.v2.InstanceService.UpdateInstance",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/deploy/linux",
+    "destination": "/self-hosting/deploy/linux",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/deploy/macos",
+    "destination": "/self-hosting/deploy/macos",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.CreateUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.CreateUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UpdateUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.CreateInviteCode",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.CreateInviteCode",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeleteUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.AddOrganizationDomain",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.AddOrganizationDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddPersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.CreateProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.CreateProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.CreateProjectGrant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.CreateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.AddProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.CreateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeleteAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.SetOrganizationMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.SetUserMetadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeactivateOrganization",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.DeactivateOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProjectGrant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeactivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.DeactivateUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.DeactivateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.AddSecret",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.AddSecret",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.GenerateOrganizationDomainValidation",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.GenerateOrganizationDomainValidation",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjectGrants",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.GetUserByID",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.GetUserByID",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListUsers",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListUsers",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListPersonalAccessTokens",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.GetProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.GetProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListUserMetadata",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListUserMetadata",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UpdateHumanUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjects",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjects",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListAuthenticationMethodTypes",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListAuthenticationMethodTypes",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListIDPLinks",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListIDPLinks",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListPasskeys",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListPasskeys",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ListKeys",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ListKeys",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationDomains",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.ListOrganizationDomains",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.ListProjectRoles",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ListProjectRoles",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.LockUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.LockUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.ActivateOrganization",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.ActivateOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.ActivateProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ActivateProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.ActivateProjectGrant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.ActivateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ReactivateUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ReactivateUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.ActivateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveTOTP",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveTOTP",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveOTPEmail",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveOTPEmail",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveOTPSMS",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveOTPSMS",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveU2F",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveU2F",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveIDPLink",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveIDPLink",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemovePasskey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemovePasskey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveKey",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemoveSecret",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemoveSecret",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationDomain",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.DeleteOrganizationDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.RemovePersonalAccessToken",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.RemovePersonalAccessToken",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.DeleteProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeleteProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.DeleteProjectGrant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.DeleteProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.RemoveProjectRole",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.RemoveProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.DeleteUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.DeleteUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ResendEmailCode",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ResendEmailCode",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.ResendPhoneCode",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.ResendPhoneCode",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.UnlockUser",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.UnlockUser",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/user/zitadel.user.v2.UserService.SetEmail",
+    "destination": "/reference/api/user/zitadel.user.v2.UserService.SetEmail",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.UpdateOrganization",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.UpdateOrganization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProject",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProject",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectGrant",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectGrant",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectRole",
+    "destination": "/reference/api/project/zitadel.project.v2.ProjectService.UpdateProjectRole",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization",
+    "destination": "/reference/api/authorization/zitadel.authorization.v2.AuthorizationService.UpdateAuthorization",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/org/zitadel.org.v2beta.OrganizationService.VerifyOrganizationDomain",
+    "destination": "/reference/api/org/zitadel.org.v2beta.OrganizationService.VerifyOrganizationDomain",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/nginx",
+    "destination": "/self-hosting/manage/reverseproxy/nginx",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/caddy",
+    "destination": "/self-hosting/manage/reverseproxy/caddy",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/httpd",
+    "destination": "/self-hosting/manage/reverseproxy/httpd",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/cloudflare",
+    "destination": "/self-hosting/manage/reverseproxy/cloudflare",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/cloudflare_tunnel",
+    "destination": "/self-hosting/manage/reverseproxy/cloudflare_tunnel",
+    "permanent": true
+  },
+  {
+    "source": "/docs/self-hosting/manage/reverseproxy/zitadel_cloud",
+    "destination": "/self-hosting/manage/reverseproxy/zitadel_cloud",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/webkey",
+    "destination": "/reference/api/webkey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey",
+    "destination": "/reference/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey",
+    "permanent": true
   }
 ]
