@@ -118,6 +118,345 @@ func Test_user_Get(t *testing.T) {
 	}
 }
 
+func Test_user_Update(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
+
+	userRepo := repository.UserRepository()
+	// humanRepo := repository.HumanUserRepository()
+	// machineRepo := repository.MachineUserRepository()
+
+	instanceID := createInstance(t, tx)
+
+	orgID1 := createOrganization(t, tx, instanceID)
+	orgID2 := createOrganization(t, tx, instanceID)
+
+	human := &domain.User{
+		ID:             gofakeit.UUID(),
+		InstanceID:     instanceID,
+		OrganizationID: orgID1,
+		Username:       "human-user",
+		State:          domain.UserStateActive,
+		Human: &domain.HumanUser{
+			FirstName:         "John",
+			LastName:          "Doe",
+			DisplayName:       "JohnD",
+			Nickname:          "johnny",
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderMale,
+			AvatarKey:         "https://my.avatar/key",
+			Email: domain.HumanEmail{
+				Address: "john@doe.com",
+			},
+		},
+	}
+	humanCondition := userRepo.PrimaryKeyCondition(instanceID, human.ID)
+
+	machine := &domain.User{
+		ID:             gofakeit.UUID(),
+		InstanceID:     instanceID,
+		OrganizationID: orgID2,
+		Username:       "machine-user",
+		State:          domain.UserStateActive,
+		Machine: &domain.MachineUser{
+			Name:        "My Machine",
+			Description: "This is my machine user",
+		},
+	}
+	machineCondition := userRepo.PrimaryKeyCondition(instanceID, machine.ID)
+
+	err := userRepo.Create(t.Context(), tx, human)
+	require.NoError(t, err)
+	err = userRepo.Create(t.Context(), tx, machine)
+	require.NoError(t, err)
+
+	type args struct {
+		condition database.Condition
+		changes   []database.Change
+	}
+	type want struct {
+		err  error
+		user *domain.User
+	}
+	tests := []struct {
+		name  string
+		setup func(t *testing.T, tx database.Transaction) error
+		args  args
+		want  want
+	}{
+		{
+			name: "set username",
+			args: args{
+				condition: humanCondition,
+				changes: []database.Change{
+					userRepo.SetUsername("new-human-username"),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u := *human
+					u.Username = "new-human-username"
+					return &u
+				}(),
+			},
+		},
+		{
+			name: "set state",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					userRepo.SetState(domain.UserStateInactive),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u := *machine
+					u.State = domain.UserStateInactive
+					return &u
+				}(),
+			},
+		},
+		{
+			name: "add metadata",
+			args: args{
+				condition: machineCondition,
+				changes: []database.Change{
+					userRepo.AddMetadata(
+						&domain.Metadata{
+							InstanceID: instanceID,
+							Key:        "key1",
+							Value:      []byte("value"),
+						},
+						&domain.Metadata{
+							InstanceID: instanceID,
+							Key:        "key2",
+							Value:      []byte("42"),
+						},
+					),
+				},
+			},
+			want: want{
+				user: func() *domain.User {
+					u := *machine
+					u.Metadata = append(u.Metadata, &domain.Metadata{
+						InstanceID: instanceID,
+						Key:        "key1",
+						Value:      []byte("value"),
+					}, &domain.Metadata{
+						InstanceID: instanceID,
+						Key:        "key2",
+						Value:      []byte("42"),
+					})
+					return &u
+				}(),
+			},
+		},
+		// {
+		// 	name: "remove metadata",
+		// },
+		// {
+		// 	name: "set human first name",
+		// },
+		// {
+		// 	name: "set human last name",
+		// },
+		// {
+		// 	name: "set human nickname",
+		// },
+		// {
+		// 	name: "set human display name",
+		// },
+		// {
+		// 	name: "set human preferred language",
+		// },
+		// {
+		// 	name: "set human gender",
+		// },
+		// {
+		// 	name: "set human avatar key",
+		// },
+		// {
+		// 	name: "set human skip mfa initialization",
+		// },
+		// {
+		// 	name: "set human skip mfa initialization at",
+		// },
+		// {
+		// 	name: "set human verification init",
+		// },
+		// {
+		// 	name: "set human verification update",
+		// },
+		// {
+		// 	name: "set human verification verified",
+		// },
+		// {
+		// 	name: "set human verification failed",
+		// },
+		// {
+		// 	name: "set human password verification init",
+		// },
+		// {
+		// 	name: "set human password verification update",
+		// },
+		// {
+		// 	name: "set human password verified",
+		// },
+		// {
+		// 	name: "set human verification skipped",
+		// },
+		// {
+		// 	name: "set human password change required",
+		// },
+		// {
+		// 	name: "set human last successful password check",
+		// },
+		// {
+		// 	name: "set human increment password failed attempts",
+		// },
+		// {
+		// 	name: "set human reset password failed attempts",
+		// },
+		// {
+		// 	name: "set human set email verification init",
+		// },
+		// {
+		// 	name: "set human set email verified",
+		// },
+		// {
+		// 	name: "set human set email verification update",
+		// },
+		// {
+		// 	name: "set human set email verification skipped",
+		// },
+		// {
+		// 	name: "set human enable email otp",
+		// },
+		// {
+		// 	name: "set human enable email otp at",
+		// },
+		// {
+		// 	name: "set human disable email otp",
+		// },
+		// {
+		// 	name: "set human last successful email otp check",
+		// },
+		// {
+		// 	name: "set human increment email otp failed attempts",
+		// },
+		// {
+		// 	name: "set human reset email otp failed attempts",
+		// },
+		// {
+		// 	name: "set human set phone verification init",
+		// },
+		// {
+		// 	name: "set human set phone verified",
+		// },
+		// {
+		// 	name: "set human set phone verification update",
+		// },
+		// {
+		// 	name: "set human set phone verification skipped",
+		// },
+		// {
+		// 	name: "set human enable sms otp",
+		// },
+		// {
+		// 	name: "set human enable sms otp at",
+		// },
+		// {
+		// 	name: "set human disable sms otp",
+		// },
+		// {
+		// 	name: "set human last successful sms otp check",
+		// },
+		// {
+		// 	name: "set human increment sms otp failed attempts",
+		// },
+		// {
+		// 	name: "set human reset sms otp failed attempts",
+		// },
+		// {
+		// 	name: "set human totp secret",
+		// },
+		// {
+		// 	name: "set human totp verified at",
+		// },
+		// {
+		// 	name: "set human remove totp",
+		// },
+		// {
+		// 	name: "set human last successful totp check",
+		// },
+		// {
+		// 	name: "set human add identity provider link",
+		// },
+		// {
+		// 	name: "set human update identity provider link",
+		// },
+		// {
+		// 	name: "set human remove identity provider link",
+		// },
+		// {
+		// 	name: "set human add passkey",
+		// },
+		// {
+		// 	name: "set human update passkey",
+		// },
+		// {
+		// 	name: "set human remove passkey",
+		// },
+		// {
+		// 	name: "set machine name",
+		// },
+		// {
+		// 	name: "set machine description",
+		// },
+		// {
+		// 	name: "set machine set secret",
+		// },
+		// {
+		// 	name: "set machine access token type",
+		// },
+		// {
+		// 	name: "set machine add key",
+		// },
+		// {
+		// 	name: "set machine remove key",
+		// },
+		// {
+		// 	name: "set machine add personal access token",
+		// },
+		// {
+		// 	name: "set machine remove personal access token",
+		// },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			savepoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			t.Cleanup(func() {
+				err := savepoint.Rollback(context.Background())
+				if err != nil {
+					t.Log("rollback savepoint failed", err)
+				}
+			})
+			if tt.setup != nil {
+				err := tt.setup(t, savepoint)
+				require.NoError(t, err)
+			}
+
+			_, err = userRepo.Update(t.Context(), savepoint, tt.args.condition, tt.args.changes...)
+			require.ErrorIs(t, err, tt.want.err)
+
+			user, err := userRepo.Get(t.Context(), savepoint, database.WithCondition(tt.args.condition))
+			require.NoError(t, err)
+			assertUser(t, tt.want.user, user)
+		})
+	}
+}
+
 func assertUser(t *testing.T, expected, actual *domain.User) {
 	t.Helper()
 	assert.Equal(t, expected.InstanceID, actual.InstanceID)

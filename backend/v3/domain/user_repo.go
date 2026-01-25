@@ -155,10 +155,10 @@ type humanPasswordChanges interface {
 	// SetLastSuccessfulPasswordCheck sets the last successful password check time
 	// If checkedAt is zero, it will be set to NOW()
 	SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.Change
-	// IncrementPhoneOTPFailedAttempts increments the phone OTP failed attempts
-	IncrementPhoneOTPFailedAttempts() database.Change
-	// ResetPhoneOTPFailedAttempts resets the phone OTP failed attempts
-	ResetPhoneOTPFailedAttempts() database.Change
+	// IncrementPasswordFailedAttempts increments the password failed attempts
+	IncrementPasswordFailedAttempts() database.Change
+	// ResetPasswordFailedAttempts resets the password failed attempts
+	ResetPasswordFailedAttempts() database.Change
 }
 
 type humanEmailChanges interface {

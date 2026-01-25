@@ -383,6 +383,14 @@ func (u userHuman) SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.
 	return database.NewChange(u.lastSuccessfulPasswordCheckColumn(), checkedAt)
 }
 
+func (u userHuman) IncrementPasswordFailedAttempts() database.Change {
+	return database.NewIncrementColumnChange(u.failedPasswordAttemptsColumn())
+}
+
+func (u userHuman) ResetPasswordFailedAttempts() database.Change {
+	return database.NewChange(u.failedPasswordAttemptsColumn(), 0)
+}
+
 // SetPreferredLanguage implements [domain.HumanUserRepository.SetPreferredLanguage].
 func (u userHuman) SetPreferredLanguage(preferredLanguage language.Tag) database.Change {
 	if preferredLanguage == language.Und {

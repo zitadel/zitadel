@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -15,9 +16,8 @@ import (
 )
 
 func Test_humanUser_create(t *testing.T) {
-	// tx, rollback := transactionForRollback(t)
-	// t.Cleanup(rollback)
-	tx := pool
+	tx, rollback := transactionForRollback(t)
+	t.Cleanup(rollback)
 
 	userRepo := repository.UserRepository()
 	userRepo = userRepo.LoadKeys().LoadPATs()
@@ -26,7 +26,7 @@ func Test_humanUser_create(t *testing.T) {
 	orgID := createOrganization(t, tx, instanceID)
 	createdAt := time.Now().Round(time.Second)
 
-	// existingUserID := createMachineUser(t, tx, instanceID, orgID)
+	existingUserID := createMachineUser(t, tx, instanceID, orgID)
 	password := &crypto.CryptoValue{
 		CryptoType: crypto.TypeEncryption,
 		Algorithm:  "aes256",
@@ -527,41 +527,39 @@ func Test_humanUser_create(t *testing.T) {
 				},
 			}
 		}(),
-		// func() test {
-		// 	username := gofakeit.Username()
-		// 	return test{
-		// 		name: "already exists",
-		// 		args: args{
-		// 			user: &domain.User{
-		// 				InstanceID:     instanceID,
-		// 				OrganizationID: orgID,
-		// 				ID:             existingUserID,
-		// 				Username:       username,
-		// 				State:          domain.UserStateActive,
-		// 				CreatedAt:      createdAt,
-		// 				Machine: &domain.MachineUser{
-		// 					Name: "machine",
-		// 				},
-		// 			},
-		// 		},
-		// 		want: want{
-		// 			err: new(database.UniqueError),
-		// 		},
-		// 	}
-		// }(),
+		func() test {
+			username := gofakeit.Username()
+			return test{
+				name: "already exists",
+				args: args{
+					user: &domain.User{
+						InstanceID:     instanceID,
+						OrganizationID: orgID,
+						ID:             existingUserID,
+						Username:       username,
+						State:          domain.UserStateActive,
+						CreatedAt:      createdAt,
+						Machine: &domain.MachineUser{
+							Name: "machine",
+						},
+					},
+				},
+				want: want{
+					err: new(database.UniqueError),
+				},
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// savepoint, err := tx.Begin(t.Context())
-			// require.NoError(t, err)
-			// t.Cleanup(func() {
-			// 	err := savepoint.Rollback(context.Background())
-			// 	if err != nil {
-			// 		t.Log("rollback savepoint failed", err)
-			// 	}
-			// })
-			savepoint := tx
-			var err error
+			savepoint, err := tx.Begin(t.Context())
+			require.NoError(t, err)
+			t.Cleanup(func() {
+				err := savepoint.Rollback(context.Background())
+				if err != nil {
+					t.Log("rollback savepoint failed", err)
+				}
+			})
 
 			err = userRepo.Create(t.Context(), savepoint, tt.args.user)
 			require.ErrorIs(t, err, tt.want.err)
