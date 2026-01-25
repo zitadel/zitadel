@@ -33,7 +33,7 @@ import { Cards } from 'fumadocs-ui/components/card';
 `;
 }
 
-function traverse(items: readonly any[]) {
+function traverse(items: readonly any[], baseDir: string) {
   items.forEach((item) => {
     if (
       item.type === 'category' &&
@@ -45,10 +45,10 @@ function traverse(items: readonly any[]) {
 
       // Remove leading slash or 'docs/' prefix
       const cleanSlug = slug.replace(/^\/|docs\/|\/$/g, '');
-      const filePath = path.join(CONTENT_DIR, cleanSlug, 'index.mdx');
+      const filePath = path.join(baseDir, cleanSlug, 'index.mdx');
 
       // --- CHANGE: Always overwrite the file ---
-      console.log(`[+] Generating Virtual Page: ${cleanSlug}`);
+      console.log(`[+] Generating Virtual Page: ${path.relative(CONTENT_DIR, filePath)}`);
       ensureDirectoryExistence(filePath);
 
       const content = generateContent(
@@ -60,13 +60,38 @@ function traverse(items: readonly any[]) {
     }
 
     if (item.items) {
-      traverse(item.items);
+      traverse(item.items, baseDir);
     }
   });
 }
 
+const VERSIONS_FILE = path.join(CONTENT_DIR, 'versions.json');
+
 console.log('--- Scanning Sidebar for Virtual Pages ---');
-traverse(guidesSidebar);
-traverse(apisSidebar);
-traverse(legalSidebar);
+
+// 1. Generate for Latest (Root Content)
+console.log(`\nProcessing: Latest`);
+traverse(guidesSidebar, CONTENT_DIR);
+traverse(apisSidebar, CONTENT_DIR);
+traverse(legalSidebar, CONTENT_DIR);
+
+// 2. Generate for Versions
+if (fs.existsSync(VERSIONS_FILE)) {
+  const versions = JSON.parse(fs.readFileSync(VERSIONS_FILE, 'utf8'));
+
+  versions.forEach((v: any) => {
+    if (!v.param || v.param === 'latest' || !v.param.startsWith('v')) return;
+
+    const versionDir = path.join(CONTENT_DIR, v.param);
+    if (!fs.existsSync(versionDir)) return;
+
+    console.log(`\nProcessing: ${v.param}`);
+    // Assuming versions share the same structure/sidebar as they are mocked from this branch
+    // independent of the "source" (git tag), if we want virtual pages we must generate them.
+    traverse(guidesSidebar, versionDir);
+    traverse(apisSidebar, versionDir);
+    traverse(legalSidebar, versionDir);
+  });
+}
+
 console.log('--- Done ---');
