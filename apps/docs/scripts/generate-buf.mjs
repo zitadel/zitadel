@@ -28,65 +28,69 @@ async function run() {
   const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
 
   try {
-    await Promise.all(versions.map(async (v) => {
-      if (v.type === 'external') return; // Skip archive links
+  // Limit concurrency to avoid OOM
+  const pLimit = (await import('p-limit')).default;
+  const limit = pLimit(2);
 
-      const label = v.param;
-      const outputPath = resolve(join(OPENAPI_DIR, label));
+  await Promise.all(versions.map(v => limit(async () => {
+    if (v.type === 'external') return; // Skip archive links
+
+    const label = v.param;
+    const outputPath = resolve(join(OPENAPI_DIR, label));
       
-      console.log(`\n--- Generating OpenAPI specs for ${label} ---`);
+    console.log(`\n--- Generating OpenAPI specs for ${label} ---`);
       
-      fs.rmSync(outputPath, { recursive: true, force: true });
-      fs.mkdirSync(outputPath, { recursive: true });
+    fs.rmSync(outputPath, { recursive: true, force: true });
+    fs.mkdirSync(outputPath, { recursive: true });
 
-      // Create a unique temp dir for this specific generation task to avoid conflicts
-      const taskTempDir = join(baseTempDir, label);
-      fs.mkdirSync(taskTempDir, { recursive: true });
+    // Create a unique temp dir for this specific generation task to avoid conflicts
+    const taskTempDir = join(baseTempDir, label);
+    fs.mkdirSync(taskTempDir, { recursive: true });
 
-      // Determine buf input based on refType
-      let bufInput;
-      if (v.refType === 'local') {
-          // Point to local proto directory (repo root/proto)
-          bufInput = PROTO_DIR; 
-      } else {
-          const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
-          bufInput = `${REPO_URL}#${refPart},subdir=proto`;
-      }
+    // Determine buf input based on refType
+    let bufInput;
+    if (v.refType === 'local') {
+        // Point to local proto directory (repo root/proto)
+        bufInput = PROTO_DIR; 
+    } else {
+        const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
+        bufInput = `${REPO_URL}#${refPart},subdir=proto`;
+    }
       
-      console.log(`Using input for ${label}: ${bufInput}`);
+    console.log(`Using input for ${label}: ${bufInput}`);
 
-      // Use spawn (async) instead of spawnSync to avoid blocking the event loop
-      await new Promise((resolvePromise, rejectPromise) => {
-          import('child_process').then(({ spawn }) => {
-              const child = spawn('npx', [
-                '@bufbuild/buf', 'generate',
-                bufInput,
-                '--template', templatePath,
-                '--output', outputPath
-              ], {
-                cwd: taskTempDir, 
-                stdio: 'inherit',
-                env: {
-                    ...process.env,
-                    BUF_TOKEN: '851d3e2519b882d9e6da46eadec5e3ccc6a966dae0ce5e78dd285d9f912e35fd'
+    // Use spawn (async) instead of spawnSync to avoid blocking the event loop
+    await new Promise((resolvePromise, rejectPromise) => {
+        import('child_process').then(({ spawn }) => {
+            const child = spawn('npx', [
+              '@bufbuild/buf', 'generate',
+              bufInput,
+              '--template', templatePath,
+              '--output', outputPath
+            ], {
+              cwd: taskTempDir, 
+              stdio: 'inherit',
+              env: {
+                  ...process.env,
+                  BUF_TOKEN: '851d3e2519b882d9e6da46eadec5e3ccc6a966dae0ce5e78dd285d9f912e35fd'
+              }
+            });
+
+            child.on('close', (code) => {
+                if (code !== 0) {
+                    rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
+                } else {
+                    console.log(`Successfully generated OpenAPI for ${label}`);
+                    resolvePromise();
                 }
-              });
-
-              child.on('close', (code) => {
-                  if (code !== 0) {
-                      rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
-                  } else {
-                      console.log(`Successfully generated OpenAPI for ${label}`);
-                      resolvePromise();
-                  }
-              });
+            });
               
-              child.on('error', (err) => {
-                  rejectPromise(err);
-              });
-          });
-      });
-    }));
+            child.on('error', (err) => {
+                rejectPromise(err);
+            });
+        });
+    });
+  })));
   } finally {
     fs.rmSync(baseTempDir, { recursive: true, force: true });
   }

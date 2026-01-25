@@ -193,7 +193,9 @@ async function run() {
 
   const versions = readdirSync(OPENAPI_ROOT).filter(f => lstatSync(join(OPENAPI_ROOT, f)).isDirectory() && f !== 'zitadel');
 
-  await Promise.all(versions.map(version => generateVersionApiDocs(version)));
+  for (const version of versions) {
+    await generateVersionApiDocs(version);
+  }
 
   await fixAllGeneratedLinks();
 }
