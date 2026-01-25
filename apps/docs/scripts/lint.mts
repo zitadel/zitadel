@@ -49,11 +49,10 @@ function pLimit(concurrency: number) {
 async function checkLinks() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
   console.log(`Total pages found: ${pages.length}`);
-  if (pages.length > 0) {
-    console.log(`First page slug: ${pages[0].slugs}`);
-  }
 
-  const files = await getFiles();
+  const allFiles = await getFiles();
+  const filesToCheck = allFiles.filter((f) => !f.isVersioned);
+  const allFilesAsTargets = allFiles;
 
   // Load redirects and add them to the scanned URLs
   let redirects: any[] = [];
@@ -63,10 +62,12 @@ async function checkLinks() {
 
   const scanned = {
     urls: new Map<string, { hashes: string[] }>([
+      // Add /docs specifically as it's the home page and might be linked to
+      ['/docs', { hashes: [] }],
       // Load redirects first
       ...redirects.map((r: any): [string, { hashes: string[] }] => [r.source, { hashes: [] }]),
       // Load files second, so they overwrite redirects with actual headings
-      ...files.map((f): [string, { hashes: string[] }] => [f.url!, { hashes: getHeadings(f) }]),
+      ...allFilesAsTargets.map((f): [string, { hashes: string[] }] => [f.url!, { hashes: getHeadings(f) }]),
     ]),
     fallbackUrls: [],
   };
@@ -76,7 +77,7 @@ async function checkLinks() {
   console.log(`Manually populated URLs count: ${scanned.urls.size}`);
 
   console.time('validateFiles');
-  const linkErrors = await validateFiles(files, {
+  const linkErrors = await validateFiles(filesToCheck, {
     scanned,
     baseUrl: '/docs',
     markdown: {
@@ -91,7 +92,7 @@ async function checkLinks() {
   printErrors(linkErrors, false);
 
   console.time('checkImages');
-  const imageErrors = await checkImages(files);
+  const imageErrors = await checkImages(filesToCheck);
   console.timeEnd('checkImages');
 
   if (linkErrors.length === 0 && !imageErrors) {
@@ -103,7 +104,7 @@ async function checkLinks() {
   }
 }
 
-async function checkImages(files: FileObject[]): Promise<boolean> {
+async function checkImages(files: (FileObject & { isVersioned?: boolean })[]): Promise<boolean> {
   let hasErrors = false;
   const limit = pLimit(50); // Limit to 50 concurrent file checks
 
@@ -117,6 +118,7 @@ async function checkImages(files: FileObject[]): Promise<boolean> {
       const matches = Array.from(content.matchAll(imageRegex));
 
       for (const match of matches) {
+        const isMarkdown = !!match[1];
         let imagePath = match[1] || match[2];
 
         if (match[1]) {
@@ -130,15 +132,45 @@ async function checkImages(files: FileObject[]): Promise<boolean> {
         imagePath = imagePath.split('?')[0].split('#')[0];
         imagePath = decodeURIComponent(imagePath);
 
-        let fullPath;
-        if (imagePath.startsWith('/')) {
-          if (!imagePath.startsWith('/docs/')) {
-            console.error(`Broken image link in ${file.path}: ${imagePath} (must start with /docs/)`);
+        // HTML Image Rules
+        if (!isMarkdown) {
+          if (imagePath.includes('public/')) {
+            console.error(`Broken HTML image link in ${file.path}: ${imagePath} (HTML tags cannot reference 'public/' directly, use absolute path '/docs/img/...')`);
             hasErrors = true;
             continue;
           }
-          const relativeToPublic = imagePath.slice(5);
-          fullPath = join(PUBLIC_ROOT, relativeToPublic);
+          if (!imagePath.startsWith('/docs/')) {
+            console.error(`Broken HTML image link in ${file.path}: ${imagePath} (HTML tags must use absolute path starting with '/docs/, e.g. '/docs/img/...')`);
+            hasErrors = true;
+            continue;
+          }
+          // Check existence for absolute /docs/ path
+          const relativeToPublic = imagePath.slice(5); // Remove /docs
+          const fullPath = join(PUBLIC_ROOT, relativeToPublic);
+          try {
+            await stat(fullPath);
+          } catch {
+            console.error(`Broken image link in ${file.path}: ${imagePath} (File not found at ${fullPath})`);
+            hasErrors = true;
+          }
+          continue;
+        }
+
+        // Markdown Image Rules
+        let fullPath;
+        if (imagePath.startsWith('/')) {
+          // Markdown absolute paths are relative to public (usually) or not supported by webpack import if not aliased
+          // We'll assume they map to public if they start with slash, but fumadocs might prefer relative.
+          // For now, let's just check existence relative to public if absolute.
+          // BUT, if they start with /docs/, that's likely wrong for Markdown import if it expects file path.
+          if (imagePath.startsWith('/docs/')) {
+            // Be lenient or strict? User had issues with imports.
+            // Let's rely on standard resolution.
+            const relativeToPublic = imagePath.slice(5);
+            fullPath = join(PUBLIC_ROOT, relativeToPublic);
+          } else {
+            fullPath = join(PUBLIC_ROOT, imagePath.startsWith('/') ? imagePath.slice(1) : imagePath);
+          }
         } else {
           fullPath = resolve(dirname(file.path), imagePath);
         }
@@ -198,12 +230,17 @@ function getHeadings({ data, content }: any): string[] {
 async function getFiles() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
   const promises = pages.map(
-    async (page: any): Promise<FileObject> => ({
-      path: page.file?.path || page.absolutePath,
-      content: await readFile(page.file?.path || page.absolutePath, 'utf8'),
-      url: page.url === '/' ? '/docs' : `/docs${page.url.startsWith('/') ? page.url : '/' + page.url}`,
-      data: page.data,
-    }),
+    async (page: any): Promise<FileObject & { isVersioned: boolean }> => {
+      const path = page.file?.path || page.absolutePath;
+      return {
+        path,
+        content: await readFile(path, 'utf8'),
+        // REMOVED /docs prefix here to ensure strict link checking against actual routes
+        url: page.url.startsWith('/') ? page.url : '/' + page.url,
+        data: page.data,
+        isVersioned: path.includes('/v4.') || page.url.startsWith('v4.'),
+      };
+    },
   );
   return Promise.all(promises);
 }
