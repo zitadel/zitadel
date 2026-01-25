@@ -1,45 +1,58 @@
-# docs
+# @zitadel/docs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Documentation for Zitadel, built with [Fumadocs](https://fumadocs.dev) and [Next.js](https://nextjs.org).
 
-Run development server:
+## Getting Started
+
+Ensure you have followed the [root quick start](../../CONTRIBUTING.md#quick-start) to set up dependencies.
+
+### Local Development
+
+Start the development server:
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+pnpm nx run @zitadel/docs:dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+The site will be available at http://localhost:3000.
 
-## Explore
+### Scripts
 
-In the project, you can see:
+Key scripts for documentation workflows:
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+| Script | Description |
+| :--- | :--- |
+| `dev` | Starts the development server. |
+| `build` | Builds the production application. |
+| `fetch:remote` | Fetches remote tags and referenced content. |
+| `generate:all` | Runs all generation steps (`fetch:remote`, `generate:grpc`, `generate:api`, `generate:indices`). |
+| `check:links` | Checks for broken links. |
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+## Contributing
 
-### Fumadocs MDX
+### Build Process
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+The docs build process automatically handling the following steps via `generate:all`:
+1.  Downloads required protoc plugins.
+2.  Generates gRPC documentation from proto files.
+3.  Generates API documentation from OpenAPI specs.
+4.  Generates index files for directory structures.
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+### Style Guide
 
-## Learn More
+- **Variables**: Use environment variables in code snippets where possible.
+- **Embedded Content**: Use `_filename.mdx` for content embedded in other pages (not indexed individually).
+- **Code Embedding**: Use the `file` property in code blocks to embed code from the repo.
+- **Voice**: Use active voice and sentence case for titles.
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+Refer to the [Google Developer Style Guide](https://developers.google.com/style) for general guidelines.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+### Pull Requests
+
+Use `docs(<scope>): <short summary>` for PR titles.
+Pass quality checks before submitting:
+
+```bash
+pnpm nx run @zitadel/docs:build
+pnpm nx run @zitadel/docs:check:links
+```

@@ -27,7 +27,7 @@
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate"
+        "generate-all"
       ]
     },
     "start": {
@@ -40,10 +40,10 @@
         "build"
       ]
     },
-    "fetch-docs": {
+    "fetch-remote": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm fetch-docs",
+        "command": "pnpm fetch:remote",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -59,14 +59,14 @@
         }
       ]
     },
-    "generate-buf": {
+    "generate-grpc": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:buf",
+        "command": "pnpm generate:grpc",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "fetch-docs"
+        "fetch-remote"
       ],
       "outputs": [
         "{projectRoot}/openapi"
@@ -80,17 +80,10 @@
         }
       ]
     },
-    "clean": {
+    "generate-api": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm clean",
-        "cwd": "apps/docs"
-      }
-    },
-    "generate-openapi": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm generate:openapi",
+        "command": "pnpm generate:api",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -98,7 +91,7 @@
         "{projectRoot}/content/v*/reference/api"
       ],
       "dependsOn": [
-        "generate-buf"
+        "generate-grpc"
       ],
       "cache": true,
       "inputs": [
@@ -108,10 +101,10 @@
         }
       ]
     },
-    "generate-virtual": {
+    "generate-indices": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:virtual",
+        "command": "pnpm generate:indices",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -132,8 +125,8 @@
         "{projectRoot}/.source"
       ],
       "dependsOn": [
-        "generate-openapi",
-        "generate-virtual"
+        "generate-api",
+        "generate-indices"
       ],
       "cache": true,
       "inputs": [
@@ -143,7 +136,7 @@
         }
       ]
     },
-    "generate": {
+    "generate-all": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'Generation complete'",
@@ -156,11 +149,11 @@
     "check-links": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm check-links",
+        "command": "pnpm check:links",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate"
+        "generate-all"
       ],
       "cache": true,
       "inputs": [
