@@ -10,7 +10,7 @@ An Identity and Access Management system is a highly interactive environment. ZI
 Actions allow you to define custom scripts (JavaScript) that are executed based on specific triggers (Flows). This enables advanced customization, such as modifying tokens, calling external APIs during login, or customizing authentication flows.
 
 <img
-  src="../../../../public/img/guides/console/actionsmenu.png"
+  src="/docs/img/guides/console/actionsmenu.png"
   width="700px"
   alt="Actions menu"
 />
@@ -69,7 +69,7 @@ To add an action, navigate to your Organization's top navigation and select **Ac
 * **Timeout:** How long the script is allowed to run before being terminated.
 * **Allowed to Fail:** If checked, the flow will continue even if the script throws an error.
 
-<img src="../../../../public/img/guides/console/action.png" alt="Create Action" width="450px" />
+<img src="/docs/img/guides/console/action.png" alt="Create Action" width="450px" />
 
 ### 2. Create a Flow (Link Action to Trigger)
 
@@ -79,7 +79,7 @@ Merely creating an Action does not run it. You must create a **Flow** to define 
 2.  Select the **Trigger** (e.g., Post Authentication).
 3.  Add your Action to the list of executed scripts.
 
-<img src="../../../../public/img/guides/console/flow.png" alt="Flow" width="400px" />
+<img src="/docs/img/guides/console/flow.png" alt="Flow" width="400px" />
 
 **Example Scenario:**
 You create an **External Authentication** Flow with a **Post Authentication** trigger. Now, whenever a user authenticates via an external IDP (like Google or Azure AD), your Action is triggered immediately after the authentication step but before the session is finalized.

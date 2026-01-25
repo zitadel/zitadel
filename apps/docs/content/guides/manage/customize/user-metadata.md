@@ -18,7 +18,7 @@ Typical use cases for user metadata include:
 ## Before you start
 
 Before you start you need to add some metadata to an existing user.
-You can do so by using [Console](../console/users) or [setting user metadata](/reference/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata) through the management API.
+You can do so by using [Console](../console/users) or [setting user metadata](/reference/api/management/zitadel.management.v1.ManagementService.SetUserMetadata) through the management API.
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
@@ -156,7 +156,7 @@ Use the [OIDC authentication request playground](https://zitadel.com/playgrounds
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
 </Callout>
 
-You can request the user's metadata with the [List My Metadata](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
+You can request the user's metadata with the [List My Metadata](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
 
 ```bash
 curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
@@ -224,5 +224,5 @@ In case you want to get the metadata for another user, you need to use the manag
 The user that calls the management service must have [manager permissions](/guides/manage/console/managers).
 A user can be either a human user or a service user.
 
-You can get [metadata of a user filtered by your query](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserMetadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api-v1/management).
+You can get [metadata of a user filtered by your query](/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/reference/api/management/zitadel.management.v1.ManagementService.GetUserMetadata).
+The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api/management).

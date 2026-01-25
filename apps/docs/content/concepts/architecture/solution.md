@@ -37,7 +37,7 @@ Hence our reference design for Kubernetes is to have three application nodes and
 
 > If you are using a serverless offering like Google Cloud Run you can scale Zitadel from 0 to 1000 Pods without the need of deploying the node across multiple availability zones.
 
-![Cluster Architecture](../../../public/img/zitadel_cluster_architecture.png)
+![](../../../public/img/zitadel_cluster_architecture.png)
 
 ### Multi Cluster / Region
 
@@ -48,7 +48,7 @@ Make sure to read our [Production Guide](/self-hosting/manage/production#prefer-
 Consult the [Postgres documentation](https://www.postgresql.org/docs/current/high-availability.html) for more details.
 
 
-![Multi-Cluster Architecture](../../../public/img/zitadel_multicluster_architecture.png)
+![](../../../public/img/zitadel_multicluster_architecture.png)
 
 ## Zero Downtime Updates
 

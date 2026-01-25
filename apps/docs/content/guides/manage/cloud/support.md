@@ -11,9 +11,9 @@ We describe our [support services](/legal/service-description/support-services) 
 
 We always recommend first having a look at our [documentation](/docs), [discord chat](https://zitadel.com/chat) and [GitHub repository](https://github.com/zitadel/zitadel). You can also ask our AI assistant for help before contacting Support. 
 
-![Customer Portal General Support](../../../../public/img/manuals/portal/customer_portal_general_support.png)
+![](../../../../public/img/manuals/portal/customer_portal_general_support.png)
 
-![Customer Portal Inkeep Support](../../../../public/img/manuals/portal/customer_portal_general_support_inkeep.png)
+![](../../../../public/img/manuals/portal/customer_portal_general_support_inkeep.png)
 
 ## Support Request
 
@@ -27,8 +27,8 @@ Create a new support request with the following information:
 - Affected Instance (Only for cloud instances)
 - Database Version (Only for self-hosted instances)
 
-![Customer Portal Support](../../../../public/img/manuals/portal/customer_portal_support.png)
+![](../../../../public/img/manuals/portal/customer_portal_support.png)
 
-![Customer Portal Support](../../../../public/img/manuals/portal/customer_portal_support_2.png)
+![](../../../../public/img/manuals/portal/customer_portal_support_2.png)
 
 After submitting the form, you will receive a confirmation email, and our team will be in touch with you shortly.

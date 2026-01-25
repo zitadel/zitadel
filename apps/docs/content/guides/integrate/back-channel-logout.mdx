@@ -27,7 +27,7 @@ ZITADEL provides the possibility for OpenID Connect clients to be notified about
 if a user signs out from another client using the same SSO session.
 This allows the client to also invalidate the user's session without the need for an active browser session.
 
-![Authentication and Back-Channel Logout Flow](../../../public/img/guides/back-channel-logout/back-channel-logout-flow.png)
+![](../../../public/img/guides/back-channel-logout/back-channel-logout-flow.png)
 
 1. When an unauthenticated user visits your application,
 2. it will create an authorization request to the authorization endpoint.
@@ -58,7 +58,7 @@ provides the possibility to match the exact SSO session, which was terminated.
 ### Client
 
 To enable the back-channel logout on a client, they simply need to register a `backchannel_logout_uri` as part of their
-configuration, e.g. [creating an OIDC application](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddOIDCApp).
+configuration, e.g. [creating an OIDC application](/reference/api/management/zitadel.management.v1.ManagementService.AddOIDCApp).
 
 As soon as the URI is set, every new authorization request will register a back-channel notification to be sent once
 the session is terminated by a user sign out.

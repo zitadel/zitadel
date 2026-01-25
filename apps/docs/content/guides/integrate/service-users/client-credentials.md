@@ -23,7 +23,7 @@ Make sure to copy in particular the ClientSecret. You won't be able to retrieve 
 If you lose it, you will have to generate a new one.
 </Callout>
 
-![Create new service user](../../../../public/img/console_serviceusers_secret.gif)
+![](../../../../public/img/console_serviceusers_secret.gif)
 
 ### 2. Authenticating a service user and request a token
 
@@ -68,7 +68,7 @@ Per default a service user will get an opaque access token.
 If you want to get a Jason Web Token (JWT) as an access token for your user, you can change the token type in the general settings of your service account.
 To learn more about opaque and JWT tokens read our [Opaque Tokens in ZITADEL: Enhancing Application Security](/concepts/knowledge/opaque-tokens) Guide
 
-![Service User Token Type](../../../../public/img/console_service_user_tokentype.png)
+![](../../../../public/img/console_service_user_tokentype.png)
 
 ### 3. Include the access token in the authorization header
 
@@ -102,7 +102,7 @@ By following these steps and adhering to security best practices, you can effect
 ## Notes
 
 * Read about the [different authentication methods for service users](./authenticate-service-users)
-* [Service User API reference](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
+* [Service User API reference](/reference/api/management/zitadel.management.v1.ManagementService.AddMachineUser)
 * [OIDC client secret basic](/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

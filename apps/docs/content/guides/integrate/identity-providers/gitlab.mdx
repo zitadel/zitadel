@@ -21,7 +21,7 @@ import PrefillAction from './_prefill_action.mdx';
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it to the GitLab Application later.
 
-![GitLab Provider](../../../../public/img/guides/zitadel_gitlab_create_provider.png)
+![](../../../../public/img/guides/zitadel_gitlab_create_provider.png)
 
 ## GitLab Configuration
 
@@ -33,7 +33,7 @@ You will have to paste it to the GitLab Application later.
 4. Fill in the application name
 5. [Paste the ZITADEL Callback URL you copied before](#open-the-gitlab-identity-provider-template) to the Redirect URI field.
 
-![Register an OAuth application](../../../../public/img/guides/gitlab_app_registration.png)
+![](../../../../public/img/guides/gitlab_app_registration.png)
 
 ### Client ID and secret
 
@@ -41,7 +41,7 @@ After clicking "Save application", you will see the detail page of the applicati
 To be able to connect GitLab to ZITADEL you will need a client ID and a client secret.
 Save the ID and the Secret, you will not be able to copy the secret again, if you lose it you have to generate a new one.
 
-![Client ID and Secret](../../../../public/img/guides/gitlab_app_id_secret.png)
+![](../../../../public/img/guides/gitlab_app_id_secret.png)
 
 ## ZITADEL Configuration
 
@@ -61,7 +61,7 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <Activate components={props.components} />
 
-![Activate the GitLab](../../../../public/img/guides/zitadel_activate_gitlab.png)
+![](../../../../public/img/guides/zitadel_activate_gitlab.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -71,13 +71,13 @@ ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <TestSetup components={props.components}  loginscreen="your GitLab login"/>
 
-![GitLab Button](../../../../public/img/guides/zitadel_login_gitlab.png)
+![](../../../../public/img/guides/zitadel_login_gitlab.png)
 
-![GitLab Login](../../../../public/img/guides/gitlab_login.png)
+![](../../../../public/img/guides/gitlab_login.png)
 
 <UnlinkedOAuth components={props.components}  provider="GitLab"/>
 
-![GitLab Login](../../../../public/img/guides/zitadel_login_external_not_found_registration.png)
+![](../../../../public/img/guides/zitadel_login_external_not_found_registration.png)
 
 ## Optional: Add ZITADEL action to autofill userdata
 

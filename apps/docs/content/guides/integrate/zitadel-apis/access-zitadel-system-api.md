@@ -77,7 +77,7 @@ SystemAPIUsers:
      KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 ```
 
-If you don't specify any memberships, you are allowed to access the whole [ZITADEL System API](/reference/api-v1/system).
+If you don't specify any memberships, you are allowed to access the whole [ZITADEL System API](/reference/api/system).
 
 ## Generate JWT
 

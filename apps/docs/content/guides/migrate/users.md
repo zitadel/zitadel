@@ -7,7 +7,7 @@ Migrating users from an existing system, while minimizing impact on said users, 
 
 ## Individual Users
 
-Creating individual users can be done with this endpoint: [ImportHumanUser](/reference/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser).
+Creating individual users can be done with this endpoint: [ImportHumanUser](/reference/api/management/zitadel.management.v1.ManagementService.ImportHumanUser).
 Please also consult our [guide](/guides/manage/user/reg-create-user) on how to create users.
 
 ```json
@@ -42,7 +42,7 @@ Please also consult our [guide](/guides/manage/user/reg-create-user) on how to c
 
 ## Bulk import
 
-For bulk import use the [import endpoint](/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) on the admin API:
+For bulk import use the [import endpoint](/reference/api/admin/zitadel.admin.v1.AdminService.ImportData) on the admin API:
 
 ```json
 {
@@ -238,7 +238,7 @@ Use metadata to store additional attributes of the users, such as organizational
 
 <Callout>
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata)
+[API reference: User Metadata](/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata)
 </Callout>
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/apis/openidoauth/scopes#reserved-scopes) in your auth request.
@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 <Callout>
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
+[API reference: User Authorization / Grants](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
 </Callout>

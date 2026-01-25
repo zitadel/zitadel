@@ -8,7 +8,7 @@ Default settings work as default or fallback settings for your organizational se
 To access default settings, use the settings page at `{instanceDomain}/ui/console/settings` or click at the default settings button on the **top-right** of the page and then navigate to settings in the navigation.
 
 <img
-  src="../../../../public/img/guides/console/instancebutton.png"
+  src="/docs/img/guides/console/instancebutton.png"
   alt="Instance Button"
   width="450px"
 />
@@ -39,7 +39,7 @@ The Page lets you choose between the settings `Enabled`, `Disabled` or `Inherit`
 If a feature is set to `Inherit`, it becomes available once its enabled per default.
 
 <img
-  src="../../../../public/img/console_feature_settings.png"
+  src="/docs/img/console_feature_settings.png"
   alt="Feature page"
   width="700px"
 />
@@ -54,7 +54,7 @@ Be careful on which features you enable as they can be in an experimental state.
 
 We recommend setting your Branding and SMTP settings initially as it will comfort your customers having a familiar UI for login and receiving notifications from your domain and mail addresses.
 
-![Private Labeling](../../../../public/img/console_private_labeling.png)
+![](../../../../public/img/console_private_labeling.png)
 
 In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, and choose between multiple behaviors. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
 
@@ -80,7 +80,7 @@ At the moment Twilio is available as SMS provider.
 You can configure on which changes the users will be notified. The text of the message can be changed in the [Message texts](#message-texts)
 
 <img
-  src="../../../../public/img/guides/console/notification.png"
+  src="/docs/img/guides/console/notification.png"
   alt="Notification"
   width="400px"
 />
@@ -113,22 +113,22 @@ To configure your custom SMTP please fill the following fields:
 - User
 - SMTP Password
 
-<img src="../../../../public/img/guides/console/smtp.png" alt="SMTP" width="800px" />
+<img src="/docs/img/guides/console/smtp.png" alt="SMTP" width="800px" />
 
 While you create/update a SMTP provider you have the chance to test your SMTP configuration
 
-<img src="../../../../public/img/guides/console/smtp_test.png" alt="SMTP" width="800px" />
+<img src="/docs/img/guides/console/smtp_test.png" alt="SMTP" width="800px" />
 
 In the SMTP providers table you can hover on a provider row to show buttons that allow you to activate/deactivate a provider, test your smtp settings and delete a provider
 
-<img src="../../../../public/img/guides/console/smtp_table.png" alt="SMTP" width="800px" />
+<img src="/docs/img/guides/console/smtp_table.png" alt="SMTP" width="800px" />
 
 ### SMS
 
 No default provider is configured to send some SMS to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration by adding your Sid, Token and either a Sender Number or a Verification Service Sid.
 Setting a Verification Service Sid allows using the Twilio Verify Service instead of the Messages Service for verification.
 
-<img src="../../../../public/img/guides/console/twilio.png" alt="Twilio" />
+<img src="/docs/img/guides/console/twilio.png" alt="Twilio" />
 
 ## Login Behavior and Access
 
@@ -146,7 +146,7 @@ The Login Policy defines how the login process should look like and which authen
 | Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
 
 <img
-  src="../../../../public/img/guides/console/loginpolicy.png"
+  src="/docs/img/guides/console/loginpolicy.png"
   alt="Login Behavior and Access"
   width="800px"
 />
@@ -168,7 +168,7 @@ We recommend setting your own default redirect URI, if you do not want end users
 Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
 <img
-  src="../../..//img/guides/solution-scenarios/console-default-redirect.png"
+  src="/docs/img/guides/solution-scenarios/console-default-redirect.png"
   alt="Login Policy Advanced Setting: Default Redirect URL"
   width="600px"
 />
@@ -226,7 +226,7 @@ The following properties can be set:
 - Has Symbol (Everything that is not a number or letter)
 
 <img
-  src="../../../../public/img/guides/console/complexity.png"
+  src="/docs/img/guides/console/complexity.png"
   alt="Password Complexity"
   width="600px"
 />
@@ -244,7 +244,7 @@ The following properties can be set:
 - Expiration warning after days
 
 <img
-  src="../../../../public/img/guides/console/expiry.png"
+  src="/docs/img/guides/console/expiry.png"
   alt="Password Expiry Policy"
   width="600px"
 />
@@ -260,7 +260,7 @@ The following settings are available:
 
 If an account is locked, the administrator has to unlock it in the ZITADEL console
 
-<img src="../../../../public/img/guides/console/lockout.png" alt="Lockout" width="600px" />
+<img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
 ## Domain settings
 
@@ -304,7 +304,7 @@ Example:
 `https://demo.com/tos-{{.Lang}}`
 
 <img
-  src="../../../../public/img/guides/console/external_links_1.png"
+  src="/docs/img/guides/console/external_links_1.png"
   alt="External Links"
   width="600px"
 />
@@ -312,7 +312,7 @@ Example:
 Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
 
 <img
-  src="../../../../public/img/guides/console/external_links_2.png"
+  src="/docs/img/guides/console/external_links_2.png"
   alt="Custom button"
   width="600px"
 />
@@ -333,7 +333,7 @@ These are the texts for your notification mails. Available for change are:
 You can set the locale of the translations on the right.
 
 <img
-  src="../../../../public/img/guides/console/messagetexts.png"
+  src="/docs/img/guides/console/messagetexts.png"
   alt="Message texts"
   width="600px"
 />
@@ -343,7 +343,7 @@ You can set the locale of the translations on the right.
 These are the texts for the login. Just like for message texts, you can select the locale on the right.
 
 <img
-  src="../../../../public/img/guides/console/logintexts.png"
+  src="/docs/img/guides/console/logintexts.png"
   alt="Login texts"
   width="600px"
 />
@@ -354,7 +354,7 @@ Drag allowed languages to the left column. Languages in the right column are not
 
 Choose a default language which acts as a fallback, if no language header is set.
 
-<img src="../../../../public/img/console_languages.png" alt="Languages" width="800px" />
+<img src="/docs/img/console_languages.png" alt="Languages" width="800px" />
 
 ## OIDC token lifetimes and expiration
 
@@ -367,7 +367,7 @@ You can set the following times:
 - Refresh Token Idle Expiration
 
 <img
-  src="../../../../public/img/guides/console/oidcsettings.png"
+  src="/docs/img/guides/console/oidcsettings.png"
   alt="OIDC Token Lifetimes"
   width="400px"
 />
@@ -388,7 +388,7 @@ The following secrets can be configured:
 - One Time Password (OTP) - Email
 
 <img
-  src="../../../../public/img/guides/console/secretappearance.png"
+  src="/docs/img/guides/console/secretappearance.png"
   alt="Secret generator"
   width="400px"
 />

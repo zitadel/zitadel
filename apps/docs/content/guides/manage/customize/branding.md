@@ -16,7 +16,7 @@ After this your settings will trigger in your system. The login and the emails w
 
 ## Settings
 
-![Private Labeling](../../../../public/img/console_private_labeling.png)
+![](../../../../public/img/console_private_labeling.png)
 
 ### Logo
 

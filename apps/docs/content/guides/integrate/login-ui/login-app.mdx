@@ -31,7 +31,7 @@ The cookie consists of an id and a token and is bound to a session which is upda
 
 The following illustration shows the architecture of the Login app and a potential authentication code flow starting from an application which implements the OIDC specification respectively.
 
-![Next.js Login Architecture](../../../../public/img/typescript-login-architecture.png)
+![](../../../../public/img/typescript-login-architecture.png)
 
 _Note that the illustration is just a representation of the architecture and may not specify actual endpoints._
 
@@ -119,7 +119,7 @@ In order to run the new Login app, make sure to follow the instructions in the [
 #### How to setup domains for OIDC
 
 When setting up the new Login app for OIDC, the domain must be registered on your instance and use https.
-To register your login domain on your instance, [add](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain) your domain on your instances trusted domains.
+To register your login domain on your instance, [add](/reference/api/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain) your domain on your instances trusted domains.
 
 #### OIDC Proxy
 
@@ -140,8 +140,8 @@ You can review an example implementation of a middleware [here](https://github.c
 To deploy your own version on Vercel, navigate to your instance and create a service user.
 Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
-Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain).
+Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/reference/api/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain).
 
 If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
 
-![Deploy to Vercel](../../../../public/img/deploy-to-vercel.png)
+![](../../../../public/img/deploy-to-vercel.png)

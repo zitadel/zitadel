@@ -8,7 +8,7 @@ Most other solutions replace a historic record and track changes in a separate l
 ZITADEL only ever appends data in an [Eventstore](/concepts/eventstore/overview), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
-![Example of events that happen for a profile change and a login](../../../public/img/concepts/audit-trail/audit-log-events.png)
+![](../../../public/img/concepts/audit-trail/audit-log-events.png)
 
 This form of audit log has several benefits over storing classic audit logs.
 You can view past data in-context of the whole system at a single point in time.
@@ -31,21 +31,21 @@ You can check the last changes of most objects in the [Console](/guides/manage/c
 In the following screenshot you can see an example of last changes on an [user](/guides/manage/console/users-overview).
 The same view is available on several other objects such as organization or project.
 
-![Profile Self Manage](../../../public/img/guides/console/myprofile.png)
+![](../../../public/img/guides/console/myprofile.png)
 
 ### Event View
 
 Administrators can see all events across an instance and filter them directly in [Console](/guides/manage/console/console-overview).
 Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events
 
-![Event viewer](../../../public/img/concepts/audit-trail/event-viewer.png)
+![](../../../public/img/concepts/audit-trail/event-viewer.png)
 
 ### Event API
 
 Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
 - [Event API Guide](/guides/integrate/zitadel-apis/event-api)
-- [API Documentation](/reference/api-v1/admin)
+- [API Documentation](/reference/api/admin)
 
 Access to the API is possible with a [Service User](/guides/integrate/service-users/authenticate-service-users) account, allowing you to integrate the events with your own business logic.
 

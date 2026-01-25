@@ -26,51 +26,51 @@ You'll need to provide some information about your app. We recommend creating a 
 
 Starting from the homepage of your console, click on Create Application
 
-![Create app in homepage](../../../public/img/go/api-create_application.png)
+![](../../../public/img/go/api-create_application.png)
 
 Select a project from the dropdown and select *Other* as framework, then continue.
 
-![Framework Selection](../../../public/img/go/api-select_framework.png)
+![](../../../public/img/go/api-select_framework.png)
 
 Add your app name and select *API* as application type, then continue.
 
-![Application Type](../../../public/img/go/api-app_details.png)
+![](../../../public/img/go/api-app_details.png)
 
 We recommend that you use JWT Profile for authenticating at the Introspection Endpoint. So select *JWT* as authentication method
 
-![JWT authentication method](../../../public/img/go/api-select_jwt.png)
+![](../../../public/img/go/api-select_jwt.png)
 
 You then need to create a new JSON key.
 
-![New JSON key](../../../public/img/go/api-new_key.png)
+![](../../../public/img/go/api-new_key.png)
 
 Select an expiration date that suits you.
 
-![Key expiration date](../../../public/img/go/api-expiration_date.png)
+![](../../../public/img/go/api-expiration_date.png)
 
 And make sure to download it, as you won't be able to retrieve it again.
 
-![Key download](../../../public/img/go/api-download_key.png)
+![](../../../public/img/go/api-download_key.png)
 
 Now we need to create a *Personal Access Token* to authenticate the client requests.
 
 On the user view, switch to *Service Users* and create a new one.
 
-![Service User Panel](../../../public/img/go/api-service_user_panel.png)
+![](../../../public/img/go/api-service_user_panel.png)
 
 Give the service user a name and a user name. Select `Bearer` as *Access Token Type*.
 
-![Service User Creation](../../../public/img/go/api-create_service_user.png)
+![](../../../public/img/go/api-create_service_user.png)
 
 ### Create service user and personal access token (PAT)
 
 Once done, from the left panel of the user management, click on Personal Access Token and create a new one.
 
-![Personal Access Token View](../../../public/img/go/api-PAT_view.png)
+![](../../../public/img/go/api-PAT_view.png)
 
 Set an expiration date and then copy the PAT generated to somewhere safe. We will need it later.
 
-![PAT creation](../../../public/img/go/api-PAT_creation.png)
+![](../../../public/img/go/api-PAT_creation.png)
 
 ## Go Setup
 
@@ -203,13 +203,13 @@ So let's create the role and grant it to the user. To do so, go to your project 
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
 Finally, create the role as shown below:
 
-![Create project role in console](../../../public/img/go/api-project-role.png)
+![](../../../public/img/go/api-project-role.png)
 
 After you have created the role, let's grant it the user, who requested the tasks.
 Click on `Authorization` in the navigation and create a new one by selecting the user and the `admin` role.
 After successful creation, it should look like:
 
-![Created authorization in console](../../../public/img/go/api-project-auth.png)
+![](../../../public/img/go/api-project-auth.png)
 
 So you should now be able to add a new task:
 

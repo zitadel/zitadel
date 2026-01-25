@@ -6,7 +6,7 @@ title: Billing
 
 In the billing page shows your configured payment methods and the invoice 
 
-![Customer Portal Billing](../../../../public/img/manuals/portal/customer_portal_billing.png)
+![](../../../../public/img/manuals/portal/customer_portal_billing.png)
 
 ### Payment Method
 
@@ -50,4 +50,4 @@ You will only need to add billing information if your want to get the pro tier. 
 We show all you invoices, and you are able to download them directly in the Customer Portal.
 
 
-![Customer Portal INvoices](../../../../public/img/manuals/portal/customer_portal_invoices.png)
+![](../../../../public/img/manuals/portal/customer_portal_invoices.png)

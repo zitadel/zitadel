@@ -28,14 +28,14 @@ We will fill that as soon as we have done the configuration in OKTA.
 2. Save Configuration
 
 As an alternative you can add the SAML identity provider through the API, either on the default settings or on a specific organization:
-- [Add Default SAML Identity Provider](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddSAMLProvider)
-- [Add SAML Identity Provider on Organization](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddSAMLProvider)
+- [Add Default SAML Identity Provider](/reference/api/admin/zitadel.admin.v1.AdminService.AddSAMLProvider)
+- [Add SAML Identity Provider on Organization](/reference/api/management/zitadel.management.v1.ManagementService.AddSAMLProvider)
 
-![OKTA Provider Empty](../../../../public/img/guides/zitadel_okta_saml_provider_empty.png)
+![](../../../../public/img/guides/zitadel_okta_saml_provider_empty.png)
 
 After you created the SAML Provider in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
 
-![OKTA SAML App URLs](../../../../public/img/guides/zitadel_okta_saml_provider_urls.png)
+![](../../../../public/img/guides/zitadel_okta_saml_provider_urls.png)
 
 ## OKTA Configuration
 
@@ -50,7 +50,7 @@ After you created the SAML Provider in ZITADEL, you can copy the URLs you need t
 5. Save the configuration
 6. Copy the metadata URL from the details
 
-![Add new SAML Application in OKTA](../../../../public/img/guides/okta_add_saml_app.png)
+![](../../../../public/img/guides/okta_add_saml_app.png)
 
 ### Add Attribute Statements
 
@@ -65,7 +65,7 @@ Add the following three mappings:
 | surname      | Basic       | user.lastName  |
 | emailaddress | Basic       | user.email     |
 
-![Add Attribute Mapping ](../../../../public/img/guides/okta_saml_attribute_mapping.png)
+![](../../../../public/img/guides/okta_saml_attribute_mapping.png)
 
 ### Assign Users to Application
 
@@ -74,7 +74,7 @@ To allow users to authenticate with that app go to the "Assign" Tab.
 2. Choose Assign To People
 3. Select the users you like to be able to authenticate
 
-![Add new SAML Application in OKTA](../../../../public/img/guides/okta_assign_user_to_app.png)
+![](../../../../public/img/guides/okta_assign_user_to_app.png)
 
 ## Finish ZITADEL Configuration
 
@@ -86,10 +86,10 @@ Add [the metadata URL you have saved before from OKTA](#register-a-new-client) t
 As soon as you have saved the provider, and you have a look at the detail you should now see the Metadata Xml field filled.
 
 If you prefer changing the configuration through the API you can update the SAML provider on the default settings or a specific organization:
-- [Update Default SAML Identity Provider](/reference/api-v1/admin/zitadel.admin.v1.AdminService.UpdateSAMLProvider)
-- [Update SAML Identity Provider on Organization](/reference/api-v1/management/zitadel.management.v1.ManagementService.UpdateSAMLProvider)
+- [Update Default SAML Identity Provider](/reference/api/admin/zitadel.admin.v1.AdminService.UpdateSAMLProvider)
+- [Update SAML Identity Provider on Organization](/reference/api/management/zitadel.management.v1.ManagementService.UpdateSAMLProvider)
 
-![OKTA Provider Empty](../../../../public/img/guides/zitadel_okta_saml_provider_filled.png)
+![](../../../../public/img/guides/zitadel_okta_saml_provider_filled.png)
 
 You can also fill the optional fields if needed:
 
@@ -99,7 +99,7 @@ You can also fill the optional fields if needed:
 
 <Activate components={props.components} />
 
-![Activate the OKTA Provider](../../../../public/img/guides/zitadel_activate_okta_saml.png)
+![](../../../../public/img/guides/zitadel_activate_okta_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -109,9 +109,9 @@ You can also fill the optional fields if needed:
 
 <TestSetup components={props.components}  loginscreen="your OKTA login"/>
 
-![OKTA Button](../../../../public/img/guides/zitadel_login_okta.png)
+![](../../../../public/img/guides/zitadel_login_okta.png)
 
-![OKTA Login](../../../../public/img/guides/okta_login.png)
+![](../../../../public/img/guides/okta_login.png)
 
 ### Add Action to map user attributes
 

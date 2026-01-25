@@ -18,8 +18,8 @@ Follow the links below to assign roles to your users.
 
 - [Add application roles via the ZITADEL Console](/guides/manage/console/roles)
 - [Add manager roles via the ZITADEL Console](/guides/manage/console/managers)
-- [Add application roles via the ZITADEL Management API](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddProjectRole)
-- [Add manager roles to users via the ZITADEL Management API](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddOrgMember)
+- [Add application roles via the ZITADEL Management API](/reference/api/management/zitadel.management.v1.ManagementService.AddProjectRole)
+- [Add manager roles to users via the ZITADEL Management API](/reference/api/management/zitadel.management.v1.ManagementService.AddOrgMember)
 
 ## Retrieve roles
 
@@ -65,7 +65,7 @@ And you can also use the same to access the ZITADEL APIs.
 If you need user roles returned from the userinfo endpoint, you must select the **’Assert Roles on Authentication’** checkbox in your project under general settings. 
 
 <img
-    src="../../../public/img/guides/integrate/retrieve-user-roles-1.png"
+    src="/docs/img/guides/integrate/retrieve-user-roles-1.png"
     width="75%"
     alt="Assert Roles on Authentication"
 />
@@ -73,7 +73,7 @@ If you need user roles returned from the userinfo endpoint, you must select the 
 If you need them included in your ID Token, select **’User Roles Inside ID Token’** in application settings. This has to be set in your applications as this is dependent on your application type. Navigate to your application and select this setting.
 
 <img
-    src="../../../public/img/guides/integrate/retrieve-user-roles-2.png"
+    src="/docs/img/guides/integrate/retrieve-user-roles-2.png"
     width="75%"
     alt="Assert Roles on Authentication"
 />
@@ -218,12 +218,12 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://`${CUSTOM_DOMAIN}`/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
 
-#### **1. [List my project roles](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions)**
+#### **1. [List my project roles](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyProjectPermissions)**
 
 Returns a list of roles for the authenticated user and for the requesting project (based on the token).
 
@@ -246,7 +246,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/me/_search' \
 }
 ```
 
-#### **2.[List my ZITADEL permissions](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions)​**
+#### **2.[List my ZITADEL permissions](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyZitadelPermissions)​**
 
 Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
 
@@ -294,7 +294,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/auth/v1/permissions/zitadel/me/_search
 }
 ```
 
-#### **[3. List my authorizations/grants​](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)**
+#### **[3. List my authorizations/grants​](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)**
 
 Returns a list of user grants the authenticated user has. User grants consist of an organization, a project and roles.
 
@@ -402,11 +402,11 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://`${CUSTOM_DOMAIN}`/management/v1**
 
-In [APIs listed under user grants in the management API](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserGrants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/reference/api/management/zitadel.management.v1.ManagementService.ListUserGrants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
-#### **1. [Search user grants](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserGrants)​**
+#### **1. [Search user grants](/reference/api/management/zitadel.management.v1.ManagementService.ListUserGrants)​**
 
 Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
 
@@ -475,7 +475,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/management/v1/users/grants/_search' \
 }
 ```
 
-#### **2. [User grant by ID](/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserGrantByID)​** 
+#### **2. [User grant by ID](/reference/api/management/zitadel.management.v1.ManagementService.GetUserGrantByID)​** 
 
 Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
 
