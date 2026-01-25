@@ -90,8 +90,8 @@ async function downloadVersion(tag) {
     '-xz',
     '-C', tempDir,
     `--strip-components=1`,
-    `zitadel-${MOCK_REF}/docs/content`,
-    `zitadel-${MOCK_REF}/docs/public`, // Assuming public assets might be needed
+    `zitadel-${MOCK_REF}/apps/docs/content`,
+    `zitadel-${MOCK_REF}/apps/docs/public`, 
     `zitadel-${MOCK_REF}/cmd/defaults.yaml`,
     `zitadel-${MOCK_REF}/cmd/setup/steps.yaml`
   ];
@@ -103,7 +103,7 @@ async function downloadVersion(tag) {
     tar.stderr.on('data', d => {
         const msg = d.toString();
         // Ignore "not found in archive" warnings if they are expected
-        if (!msg.includes('Not found in archive')) console.error(msg);
+        if (!msg.includes('Not found in archive') && !msg.includes('Not found in the archive')) console.error(msg);
     });
   });
 
@@ -120,10 +120,10 @@ async function downloadVersion(tag) {
   fs.rmSync(contentDest, { recursive: true, force: true });
   fs.rmSync(publicDest, { recursive: true, force: true });
 
-  if (fs.existsSync(join(tempDir, 'docs/content'))) {
-     fs.renameSync(join(tempDir, 'docs/content'), contentDest);
+  if (fs.existsSync(join(tempDir, 'apps/docs/content'))) {
+     fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
   } else {
-     console.warn(`[warn] docs/content not found in ${MOCK_REF} archive for ${tag}`);
+     console.warn(`[warn] apps/docs/content not found in ${MOCK_REF} archive for ${tag}`);
   }
 
   // Handle external files (defaults.yaml etc)
@@ -141,10 +141,10 @@ async function downloadVersion(tag) {
   }
 
   // Also handling public assets? 
-  // If fuma-docs branch has docs/public, we might want to version them or just copy them.
+  // If fuma-docs branch has apps/docs/public, we might want to version them or just copy them.
   // For now simple rename if exists
-  if (fs.existsSync(join(tempDir, 'docs/public'))) {
-    fs.renameSync(join(tempDir, 'docs/public'), publicDest);
+  if (fs.existsSync(join(tempDir, 'apps/docs/public'))) {
+    fs.renameSync(join(tempDir, 'apps/docs/public'), publicDest);
   }
 
   fs.rmSync(tempDir, { recursive: true, force: true });
