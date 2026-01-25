@@ -3,6 +3,7 @@
 
 # generated content
 .source
+scanned-urls.json
 
 # test & build
 /coverage

@@ -19,6 +19,33 @@ const { source, versionSource } = await import('../lib/source');
 
 const PUBLIC_ROOT = resolve('public');
 
+// Simple p-limit implementation to avoid adding dependency
+function pLimit(concurrency: number) {
+  const queue: (() => void)[] = [];
+  let active = 0;
+
+  const next = () => {
+    active--;
+    if (queue.length > 0) {
+      queue.shift()!();
+    }
+  };
+
+  const run = async <T,>(fn: () => Promise<T>): Promise<T> => {
+    if (active >= concurrency) {
+      await new Promise<void>((resolve) => queue.push(resolve));
+    }
+    active++;
+    try {
+      return await fn();
+    } finally {
+      next();
+    }
+  };
+
+  return run;
+}
+
 async function checkLinks() {
   const pages = [...source.getPages(), ...versionSource.getPages()];
   console.log(`Total pages found: ${pages.length}`);
@@ -48,7 +75,7 @@ async function checkLinks() {
 
   console.log(`Manually populated URLs count: ${scanned.urls.size}`);
 
-
+  console.time('validateFiles');
   const linkErrors = await validateFiles(files, {
     scanned,
     baseUrl: '/docs',
@@ -59,10 +86,13 @@ async function checkLinks() {
     },
     checkRelativePaths: 'as-url',
   });
+  console.timeEnd('validateFiles');
 
   printErrors(linkErrors, false);
 
+  console.time('checkImages');
   const imageErrors = await checkImages(files);
+  console.timeEnd('checkImages');
 
   if (linkErrors.length === 0 && !imageErrors) {
     console.log('\n✅ All checks passed: No broken links or images found.');
@@ -75,57 +105,55 @@ async function checkLinks() {
 
 async function checkImages(files: FileObject[]): Promise<boolean> {
   let hasErrors = false;
+  const limit = pLimit(50); // Limit to 50 concurrent file checks
 
-  await Promise.all(files.map(async (file) => {
-    const content = file.content;
-    const imageRegex = /!\[.*?\]\((.*?)\)|<img.*?src=[{"'](.*?)["'}]/g;
-    const matches = Array.from(content.matchAll(imageRegex));
+  // Flat list of all image checks
+  const allChecks: Promise<void>[] = [];
 
-    await Promise.all(matches.map(async (match) => {
-      let imagePath = match[1] || match[2];
+  for (const file of files) {
+    allChecks.push(limit(async () => {
+      const content = file.content;
+      const imageRegex = /!\[.*?\]\((.*?)\)|<img.*?src=[{"'](.*?)["'}]/g;
+      const matches = Array.from(content.matchAll(imageRegex));
 
-      if (match[1]) {
-        // Markdown link: remove title part of the link (e.g. /img.png "title")
-        imagePath = imagePath.trim().split(/\s+/)[0];
-      }
+      for (const match of matches) {
+        let imagePath = match[1] || match[2];
 
-      // Ignore external links
-      if (imagePath.startsWith('http') || imagePath.startsWith('https') || imagePath.startsWith('data:')) {
-        return;
-      }
-
-      // Remove query parameters or anchors
-      imagePath = imagePath.split('?')[0].split('#')[0];
-
-      // Decode URI components (e.g. %20 -> space)
-      imagePath = decodeURIComponent(imagePath);
-
-      let fullPath;
-      if (imagePath.startsWith('/')) {
-        // Enforce /docs prefix for absolute paths
-        if (!imagePath.startsWith('/docs/')) {
-          console.error(`Broken image link in ${file.path}: ${imagePath} (must start with /docs/)`);
-          hasErrors = true;
-          return;
+        if (match[1]) {
+          imagePath = imagePath.trim().split(/\s+/)[0];
         }
 
-        // Absolute path relative to public folder (strip /docs prefix)
-        const relativeToPublic = imagePath.slice(5); // Remove '/docs'
-        fullPath = join(PUBLIC_ROOT, relativeToPublic);
-      } else {
-        // Relative path relative to the markdown file
-        fullPath = resolve(dirname(file.path), imagePath);
-      }
+        if (imagePath.startsWith('http') || imagePath.startsWith('https') || imagePath.startsWith('data:')) {
+          continue;
+        }
 
-      try {
-        await stat(fullPath);
-      } catch {
-        console.error(`Broken image link in ${file.path}: ${imagePath}`);
-        hasErrors = true;
+        imagePath = imagePath.split('?')[0].split('#')[0];
+        imagePath = decodeURIComponent(imagePath);
+
+        let fullPath;
+        if (imagePath.startsWith('/')) {
+          if (!imagePath.startsWith('/docs/')) {
+            console.error(`Broken image link in ${file.path}: ${imagePath} (must start with /docs/)`);
+            hasErrors = true;
+            continue;
+          }
+          const relativeToPublic = imagePath.slice(5);
+          fullPath = join(PUBLIC_ROOT, relativeToPublic);
+        } else {
+          fullPath = resolve(dirname(file.path), imagePath);
+        }
+
+        try {
+          await stat(fullPath);
+        } catch {
+          console.error(`Broken image link in ${file.path}: ${imagePath}`);
+          hasErrors = true;
+        }
       }
     }));
-  }));
+  }
 
+  await Promise.all(allChecks);
   return hasErrors;
 }
 
