@@ -1,3 +1,8 @@
+// Suppress MaxListenersExceededWarning from fumadocs-mdx internal concurrency
+if (typeof process !== 'undefined') {
+  process.setMaxListeners(30);
+}
+
 import {
   defineConfig,
   defineDocs,
