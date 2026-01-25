@@ -28,8 +28,8 @@ async function run() {
   const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
 
   try {
-    for (const v of versions) {
-      if (v.type === 'external') continue; // Skip archive links
+    await Promise.all(versions.map(async (v) => {
+      if (v.type === 'external') return; // Skip archive links
 
       const label = v.param;
       const outputPath = resolve(join(OPENAPI_DIR, label));
@@ -39,42 +39,54 @@ async function run() {
       fs.rmSync(outputPath, { recursive: true, force: true });
       fs.mkdirSync(outputPath, { recursive: true });
 
+      // Create a unique temp dir for this specific generation task to avoid conflicts
+      const taskTempDir = join(baseTempDir, label);
+      fs.mkdirSync(taskTempDir, { recursive: true });
+
       // Determine buf input based on refType
       let bufInput;
       if (v.refType === 'local') {
           // Point to local proto directory (repo root/proto)
-          bufInput = PROTO_DIR; // e.g. /home/ffo/git/zitadel/zitadel/proto
+          bufInput = PROTO_DIR; 
       } else {
-          // Construct git input
-          // Format: <url>#<refType>=<ref>,subdir=<subdir>
-          // Example: https://github.com/zitadel/zitadel.git#tag=v4.11.0,subdir=proto
           const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
           bufInput = `${REPO_URL}#${refPart},subdir=proto`;
       }
       
-      console.log(`Using input: ${bufInput}`);
+      console.log(`Using input for ${label}: ${bufInput}`);
 
-      const result = spawnSync('npx', [
-        '@bufbuild/buf', 'generate',
-        bufInput,
-        '--template', templatePath,
-        '--output', outputPath
-      ], {
-        cwd: localGenDir, // Run in temp dir
-        stdio: 'inherit',
-        env: {
-            ...process.env,
-            BUF_TOKEN: '851d3e2519b882d9e6da46eadec5e3ccc6a966dae0ce5e78dd285d9f912e35fd'
-        }
+      // Use spawn (async) instead of spawnSync to avoid blocking the event loop
+      await new Promise((resolvePromise, rejectPromise) => {
+          import('child_process').then(({ spawn }) => {
+              const child = spawn('npx', [
+                '@bufbuild/buf', 'generate',
+                bufInput,
+                '--template', templatePath,
+                '--output', outputPath
+              ], {
+                cwd: taskTempDir, 
+                stdio: 'inherit',
+                env: {
+                    ...process.env,
+                    BUF_TOKEN: '851d3e2519b882d9e6da46eadec5e3ccc6a966dae0ce5e78dd285d9f912e35fd'
+                }
+              });
+
+              child.on('close', (code) => {
+                  if (code !== 0) {
+                      rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
+                  } else {
+                      console.log(`Successfully generated OpenAPI for ${label}`);
+                      resolvePromise();
+                  }
+              });
+              
+              child.on('error', (err) => {
+                  rejectPromise(err);
+              });
+          });
       });
-
-      if (result.status !== 0) {
-        console.error(`Failed to generate OpenAPI for ${label}`);
-        process.exit(1);
-      } else {
-        console.log(`Successfully generated OpenAPI for ${label}`);
-      }
-    }
+    }));
   } finally {
     fs.rmSync(baseTempDir, { recursive: true, force: true });
   }

@@ -404,11 +404,25 @@ async function run() {
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
   // Download chosen versions
-  for (const tag of others) {
+  // Parallelize download and processing
+  await Promise.all(others.map(async (tag) => {
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
-    await downloadVersion(tag);
-    await fixRelativeImports(join(CONTENT_DIR, versionSlug), tag);
-  }
+    const contentDest = join(CONTENT_DIR, versionSlug);
+    
+    // Simple cache check: if directory exists and looks populated, skip
+    // We could check for a specific file like meta.json or similar if we wanted to be more robust
+    if (fs.existsSync(contentDest)) {
+        console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
+    } else {
+        await downloadVersion(tag);
+        // Only fix imports if we just downloaded it (or maybe always run it? Safe to rerun)
+        // Rerunning fixRelativeImports is relatively cheap compared to download + tar extraction
+        // but let's stick to doing it only if we downloaded or if we force it.
+        // For now: Always fix imports to be safe, or just on new download. 
+        // Let's doing it on new download for speed.
+        await fixRelativeImports(contentDest, tag);
+    }
+  }));
 
   // Generate versions.json
   const versionsJson = [
