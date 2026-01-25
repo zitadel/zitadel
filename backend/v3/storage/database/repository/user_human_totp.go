@@ -11,38 +11,6 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// CheckTOTP implements [domain.HumanUserRepository.CheckTOTP].
-func (u userHuman) CheckTOTP(check domain.CheckType) database.Change {
-	switch typ := check.(type) {
-	case *domain.CheckTypeFailed:
-		return u.verification.failed(existingHumanUser.unqualifiedTableName(), u.InstanceIDColumn(), u.totpSecretIDColumn())
-	case *domain.CheckTypeSucceeded:
-		lastSucceededChange := database.NewChange(u.lastSuccessfulTOTPCheckColumn(), database.NowInstruction)
-		if !typ.SucceededAt.IsZero() {
-			lastSucceededChange = database.NewChange(u.lastSuccessfulTOTPCheckColumn(), typ.SucceededAt)
-		}
-		return database.NewChanges(
-			database.NewCTEChange(
-				func(builder *database.StatementBuilder) {
-					builder.WriteString("UPDATE ")
-					builder.WriteString(u.verification.qualifiedTableName())
-					builder.WriteString(" SET ")
-					database.NewChange(u.verification.failedAttemptsColumn(), 0)
-					builder.WriteString(" FROM ")
-					builder.WriteString(existingHumanUser.unqualifiedTableName())
-					writeCondition(builder, database.And(
-						database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-						database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.totpSecretIDColumn()),
-					))
-				},
-				nil,
-			),
-			lastSucceededChange,
-		)
-	}
-	panic(fmt.Sprintf("unhandled check type %T", check))
-}
-
 // RemoveTOTP implements [domain.HumanUserRepository.RemoveTOTP].
 func (u userHuman) RemoveTOTP() database.Change {
 	return database.NewChanges(
@@ -74,7 +42,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 		},
 			func(name string) database.Change {
 				return database.NewChangeToStatement(
-					u.unverifiedPasswordIDColumn(),
+					u.passwordVerificationIDColumn(),
 					func(builder *database.StatementBuilder) {
 						builder.WriteString(" SELECT ")
 						existingHumanUser.verification.idColumn().WriteQualified(builder)
@@ -93,11 +61,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 		if !typ.VerifiedAt.IsZero() {
 			verifiedAtChange = database.NewChange(u.totpVerifiedAtColumn(), typ.VerifiedAt)
 		}
-		return database.NewChanges(
-			database.NewChangeToColumn(u.totpSecretIDColumn(), u.unverifiedTOTPIDColumn()),
-			database.NewChangeToNull(u.unverifiedTOTPIDColumn()),
-			verifiedAtChange,
-		)
+		return verifiedAtChange
 	case *domain.VerificationTypeUpdate:
 		changes := make(database.Changes, 0, 3)
 		if typ.Code != nil {
@@ -118,7 +82,7 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 			builder.WriteString(existingHumanUser.unqualifiedTableName())
 			writeCondition(builder, database.And(
 				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedTOTPIDColumn()),
+				// database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedTOTPIDColumn()),
 			))
 		}, nil)
 	case *domain.VerificationTypeSkipped:
@@ -152,7 +116,6 @@ func (u userHuman) SetTOTP(verification domain.VerificationType) database.Change
 						builder.WriteString(" SELECT id FROM ")
 						builder.WriteString(name)
 					}),
-					database.NewChangeToNull(u.unverifiedTOTPIDColumn()),
 					skippedAtChange,
 				)
 			},
@@ -179,8 +142,4 @@ func (u userHuman) totpVerifiedAtColumn() database.Column {
 
 func (u userHuman) lastSuccessfulTOTPCheckColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "last_successful_totp_check")
-}
-
-func (u userHuman) unverifiedTOTPIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "unverified_totp_id")
 }

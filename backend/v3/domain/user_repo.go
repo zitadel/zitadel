@@ -161,11 +161,6 @@ type humanEmailChanges interface {
 	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
-	// CheckEmailOTP sets the email OTP based on the check
-	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckEmailOTP(check CheckType) database.Change
 	// EnableEmailOTPAt enables the email OTP
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
@@ -184,11 +179,6 @@ type humanPhoneChanges interface {
 	SetPhone(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
-	// CheckSMSOTP sets the SMS OTP based on the check
-	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckSMSOTP(check CheckType) database.Change
 	// EnableSMSOTPAt enables the SMS OTP
 	// If enabledAt is zero, it will be set to NOW()
 	EnableSMSOTPAt(enabledAt time.Time) database.Change
@@ -205,11 +195,6 @@ type humanTOTPChanges interface {
 	// 	* [VerificationTypeUpdate] to update totp verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip totp verification, existing verification is removed (e.g. admin set totp)
 	SetTOTP(verification VerificationType) database.Change
-	// SetTOTPCheck sets the TOTP check based on the check type
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	//  * [CheckTypeInit] is not allowed for TOTP
-	CheckTOTP(check CheckType) database.Change
 	// RemoveTOTP removes the TOTP
 	RemoveTOTP() database.Change
 }

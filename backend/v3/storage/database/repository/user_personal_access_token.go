@@ -12,14 +12,14 @@ func (personalAccessTokenRepo) AddPersonalAccessToken(pat *domain.PersonalAccess
 	return database.NewCTEChange(
 		func(builder *database.StatementBuilder) {
 			builder.WriteString("INSERT INTO zitadel.user_personal_access_tokens (" +
-				"instance_id, user_id, id, created_at, expires_at, type, public_key, scopes" +
+				"instance_id, user_id, id, created_at, expires_at, scopes" +
 				") SELECT instance_id, id, ",
 			)
 			var createdAt any = database.NowInstruction
 			if !pat.CreatedAt.IsZero() {
 				createdAt = pat.CreatedAt
 			}
-			builder.WriteArgs(pat.ID, createdAt, pat.ExpiresAt, pat.Type, pat.PublicKey, pat.Scopes)
+			builder.WriteArgs(pat.ID, createdAt, pat.ExpiresAt, pat.Scopes)
 			builder.WriteString(" FROM existing_user")
 		},
 		nil,

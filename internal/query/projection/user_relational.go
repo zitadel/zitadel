@@ -2008,9 +2008,9 @@ func (p *userRelationalProjection) reduceTOTPCheckSucceeded(event eventstore.Eve
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckTOTP(&domain.CheckTypeSucceeded{
-				SucceededAt: e.CreatedAt(),
-			}),
+			// repo.CheckTOTP(&domain.CheckTypeSucceeded{
+			// 	SucceededAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2030,9 +2030,9 @@ func (p *userRelationalProjection) reduceTOTPCheckFailed(event eventstore.Event)
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckTOTP(&domain.CheckTypeFailed{
-				FailedAt: e.CreatedAt(),
-			}),
+			// repo.CheckTOTP(&domain.CheckTypeFailed{
+			// 	FailedAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2094,11 +2094,11 @@ func (p *userRelationalProjection) reduceOTPSMSCodeAdded(event eventstore.Event)
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckSMSOTP(&domain.CheckTypeInit{
-				Code:      e.Code,
-				CreatedAt: e.CreatedAt(),
-				Expiry:    &e.Expiry,
-			}),
+			// repo.CheckSMSOTP(&domain.CheckTypeInit{
+			// 	Code:      e.Code,
+			// 	CreatedAt: e.CreatedAt(),
+			// 	Expiry:    &e.Expiry,
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2118,9 +2118,9 @@ func (p *userRelationalProjection) reduceOTPSMSCheckSucceeded(event eventstore.E
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckSMSOTP(&domain.CheckTypeSucceeded{
-				SucceededAt: e.CreatedAt(),
-			}),
+			// repo.CheckSMSOTP(&domain.CheckTypeSucceeded{
+			// 	SucceededAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2140,9 +2140,9 @@ func (p *userRelationalProjection) reduceOTPSMSCheckFailed(event eventstore.Even
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckSMSOTP(&domain.CheckTypeFailed{
-				FailedAt: e.CreatedAt(),
-			}),
+			// repo.CheckSMSOTP(&domain.CheckTypeFailed{
+			// 	FailedAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2202,11 +2202,11 @@ func (p *userRelationalProjection) reduceOTPEmailCodeAdded(event eventstore.Even
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckEmailOTP(&domain.CheckTypeInit{
-				Code:      e.Code,
-				CreatedAt: e.CreatedAt(),
-				Expiry:    &e.Expiry,
-			}),
+			// repo.CheckEmailOTP(&domain.CheckTypeInit{
+			// 	Code:      e.Code,
+			// 	CreatedAt: e.CreatedAt(),
+			// 	Expiry:    &e.Expiry,
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2226,9 +2226,9 @@ func (p *userRelationalProjection) reduceOTPEmailCheckSucceeded(event eventstore
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckEmailOTP(&domain.CheckTypeSucceeded{
-				SucceededAt: e.CreatedAt(),
-			}),
+			// repo.CheckEmailOTP(&domain.CheckTypeSucceeded{
+			// 	SucceededAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2248,9 +2248,9 @@ func (p *userRelationalProjection) reduceOTPEmailCheckFailed(event eventstore.Ev
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.CheckEmailOTP(&domain.CheckTypeFailed{
-				FailedAt: e.CreatedAt(),
-			}),
+			// repo.CheckEmailOTP(&domain.CheckTypeFailed{
+			// 	FailedAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -2286,8 +2286,8 @@ func mapMachineKeyType(keyType old_domain.AuthNKeyType) domain.MachineKeyType {
 	case old_domain.AuthNKeyTypeJSON:
 		return domain.MachineKeyTypeJSON
 	case old_domain.AuthNKeyTypeNONE:
-		return domain.MachineKeyTypeNone
+		fallthrough
 	default:
-		return domain.MachineKeyTypeUnspecified
+		return domain.MachineKeyTypeNone
 	}
 }

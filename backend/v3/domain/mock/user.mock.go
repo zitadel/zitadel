@@ -320,6 +320,44 @@ func (c *MockUserRepositoryHumanCall) DoAndReturn(f func() domain.HumanUserRepos
 	return c
 }
 
+// IDColumn mocks base method.
+func (m *MockUserRepository) IDColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IDColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// IDColumn indicates an expected call of IDColumn.
+func (mr *MockUserRepositoryMockRecorder) IDColumn() *MockUserRepositoryIDColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDColumn", reflect.TypeOf((*MockUserRepository)(nil).IDColumn))
+	return &MockUserRepositoryIDColumnCall{Call: call}
+}
+
+// MockUserRepositoryIDColumnCall wrap *gomock.Call
+type MockUserRepositoryIDColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockUserRepositoryIDColumnCall) Return(arg0 database.Column) *MockUserRepositoryIDColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockUserRepositoryIDColumnCall) Do(f func() database.Column) *MockUserRepositoryIDColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockUserRepositoryIDColumnCall) DoAndReturn(f func() database.Column) *MockUserRepositoryIDColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IDCondition mocks base method.
 func (m *MockUserRepository) IDCondition(userID string) database.Condition {
 	m.ctrl.T.Helper()

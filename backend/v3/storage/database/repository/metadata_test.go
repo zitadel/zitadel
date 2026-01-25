@@ -1,0 +1,33 @@
+package repository_test
+
+import (
+	"slices"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
+)
+
+func assertMetadata(t *testing.T, expected, gotten []*domain.Metadata) {
+	t.Helper()
+
+	assert.Len(t, gotten, len(expected))
+	for _, exp := range expected {
+		var actual *domain.Metadata
+		gotten = slices.DeleteFunc(gotten, func(m *domain.Metadata) bool {
+			if exp.Key != m.Key {
+				return false
+			}
+			actual = m
+			return true
+		})
+		require.NotNil(t, actual, "metadata with key %s not found", exp.Key)
+		assert.Equal(t, exp.Value, actual.Value, "metadata value mismatch for key %s", exp.Key)
+		assert.True(t, exp.CreatedAt.Equal(actual.CreatedAt), "metadata created at mismatch for key %s", exp.Key)
+		assert.True(t, exp.UpdatedAt.Equal(actual.UpdatedAt), "metadata updated at mismatch for key %s", exp.Key)
+
+	}
+	assert.Empty(t, gotten, "unmatched metadata found")
+}

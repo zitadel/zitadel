@@ -10,9 +10,10 @@ type Verification struct {
 	ID             string              `json:"id" db:"id"`
 	Value          *string             `json:"value" db:"value"`
 	Code           *crypto.CryptoValue `json:"code" db:"code"`
+	CreatedAt      time.Time           `json:"createdAt" db:"created_at"`
+	UpdatedAt      time.Time           `json:"updatedAt" db:"updated_at"`
 	ExpiresAt      *time.Time          `json:"expiresAt" db:"expires_at"`
 	FailedAttempts uint8               `json:"failedAttempts" db:"failed_attempts"`
-	VerifiedAt     time.Time           `json:"verifiedAt" db:"verified_at"`
 }
 
 type VerificationType interface {

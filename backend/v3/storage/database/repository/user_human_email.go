@@ -12,19 +12,6 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// CheckEmailOTP implements [domain.HumanUserRepository.CheckEmailOTP].
-func (u userHuman) CheckEmailOTP(check domain.CheckType) database.Change {
-	switch typ := check.(type) {
-	case *domain.CheckTypeInit:
-		return u.verification.initCheck(typ, existingHumanUser.unqualifiedTableName(), u.emailOTPVerificationIDColumn())
-	case *domain.CheckTypeSucceeded:
-		return u.verification.succeeded(typ, u.lastSuccessfulEmailOTPCheckColumn(), u.emailOTPVerificationIDColumn())
-	case *domain.CheckTypeFailed:
-		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailOTPVerificationIDColumn())
-	}
-	panic(fmt.Sprintf("type not allowed for email OTP check change %T", check))
-}
-
 // DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
 func (u userHuman) DisableEmailOTP() database.Change {
 	return database.NewChange(u.emailOTPEnabledAtColumn(), false)
@@ -82,18 +69,10 @@ func (u userHuman) emailOTPEnabledAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email_otp_enabled_at")
 }
 
-func (u userHuman) emailOTPVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email_otp_verification_id")
-}
-
-func (u userHuman) lastSuccessfulEmailOTPCheckColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "email_otp_last_successfully_checked_at")
-}
-
 func (u userHuman) emailVerifiedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email_verified_at")
 }
 
 func (u userHuman) emailVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "unverified_email_id")
+	return database.NewColumn(u.unqualifiedTableName(), "email_verification_id")
 }

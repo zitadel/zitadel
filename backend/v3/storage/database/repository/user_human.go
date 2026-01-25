@@ -57,14 +57,15 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 	if !user.Human.MultifactorInitializationSkippedAt.IsZero() {
 		columnValues["multifactor_initialization_skipped_at"] = user.Human.MultifactorInitializationSkippedAt
 	}
-	if !user.Human.Password.VerifiedAt.IsZero() {
-		columnValues["password_verified_at"] = user.Human.Password.VerifiedAt
-	}
 	if !user.Human.PreferredLanguage.IsRoot() {
 		columnValues["preferred_language"] = user.Human.PreferredLanguage
 	}
 	if user.Human.Password.IsChangeRequired {
 		columnValues["password_change_required"] = true
+	}
+	if user.Human.Password.Unverified == nil {
+		// TODO: do we need to create a verification if [user.Human.Password.Unverified] is not nil?
+		columnValues["password_verified_at"] = createdAt
 	}
 	if user.Human.DisplayName != "" {
 		columnValues["display_name"] = user.Human.DisplayName
@@ -81,6 +82,8 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 
 	ctes := make(map[string]database.CTEChange)
 
+	// TODO: can we handle email the same as phone?
+	// meaning that we either set it verified or unverified
 	if user.Human.Email.Unverified != nil {
 		verification := &domain.VerificationTypeInit{
 			Value:     &user.Human.Email.Address,
@@ -96,7 +99,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 
 		change := u.SetEmail(verification).(database.CTEChange)
 		ctes["email_verification"] = change
-		columnValues["unverified_email_id"] = func(builder *database.StatementBuilder) {
+		columnValues["email_verification_id"] = func(builder *database.StatementBuilder) {
 			builder.WriteString(`(SELECT id FROM email_verification)`)
 		}
 	}
@@ -116,7 +119,7 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 
 			change := u.SetPhone(verification).(database.CTEChange)
 			ctes["phone_verification"] = change
-			columnValues["unverified_phone_id"] = func(builder *database.StatementBuilder) {
+			columnValues["phone_verification_id"] = func(builder *database.StatementBuilder) {
 				builder.WriteString(`(SELECT id FROM phone_verification)`)
 			}
 		} else {
@@ -129,16 +132,17 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		ctes[fmt.Sprintf("passkey_%d", i)] = u.AddPasskey(passkey).(database.CTEChange)
 	}
 
-	if user.Human.TOTP.Unverified != nil {
-		ctes["totp"] = u.SetTOTP(&domain.VerificationTypeInit{
-			CreatedAt: user.CreatedAt,
-			Code:      user.Human.TOTP.Unverified.Code,
-			Value:     user.Human.TOTP.Unverified.Value,
-		}).(database.CTEChange)
-		columnValues["unverified_totp_id"] = func(builder *database.StatementBuilder) {
-			builder.WriteString(`(SELECT id FROM totp)`)
-		}
-	}
+	// TODO: fix
+	// if user.Human.TOTP.Unverified != nil {
+	// 	ctes["totp"] = u.SetTOTP(&domain.VerificationTypeInit{
+	// 		CreatedAt: user.CreatedAt,
+	// 		Code:      user.Human.TOTP.Unverified.Code,
+	// 		Value:     user.Human.TOTP.Unverified.Value,
+	// 	}).(database.CTEChange)
+	// 	columnValues["unverified_totp_id"] = func(builder *database.StatementBuilder) {
+	// 		builder.WriteString(`(SELECT id FROM totp)`)
+	// 	}
+	// }
 
 	for i, link := range user.Human.IdentityProviderLinks {
 		name := fmt.Sprintf("idp_link_%d", i)
@@ -266,7 +270,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 			},
 			func(name string) database.Change {
 				return database.NewChangeToStatement(
-					u.unverifiedPasswordIDColumn(),
+					u.passwordVerificationIDColumn(),
 					func(builder *database.StatementBuilder) {
 						builder.WriteString(" SELECT ")
 						existingHumanUser.verification.idColumn().WriteQualified(builder)
@@ -288,13 +292,13 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 
 		return database.NewChanges(
 			verifiedAtChange,
-			database.NewChangeToNull(u.unverifiedPasswordIDColumn()),
+			database.NewChangeToNull(u.passwordVerificationIDColumn()),
 			database.NewChange(u.failedPasswordAttemptsColumn(), 0),
 			database.NewChangeToStatement(u.passwordColumn(), func(builder *database.StatementBuilder) {
 				builder.WriteString("DELETE FROM zitadel.verifications USING existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
+					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.passwordVerificationIDColumn()),
 				))
 				builder.WriteString(" RETURNING value")
 			}),
@@ -317,7 +321,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 				builder.WriteString(" FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
+					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.passwordVerificationIDColumn()),
 				))
 			},
 			nil,
@@ -328,7 +332,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 			verifiedAtChange = database.NewChange(u.passwordVerifiedAtColumn(), typ.SkippedAt)
 		}
 		return database.NewChanges(
-			database.NewChangeToNull(u.unverifiedPasswordIDColumn()),
+			database.NewChangeToNull(u.passwordVerificationIDColumn()),
 			verifiedAtChange,
 			database.NewChange(u.passwordColumn(), *typ.Value),
 		)
@@ -339,7 +343,7 @@ func (u userHuman) SetPassword(verification domain.VerificationType) database.Ch
 				builder.WriteString("FROM existing_user")
 				writeCondition(builder, database.And(
 					database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.unverifiedPasswordIDColumn()),
+					database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.passwordVerificationIDColumn()),
 				))
 			},
 			nil,
@@ -404,7 +408,7 @@ func (u userHuman) SetVerification(verification domain.VerificationType) databas
 
 		return database.NewChanges(
 			verifiedAtChange,
-			database.NewChangeToNull(u.unverifiedPasswordIDColumn()),
+			database.NewChangeToNull(u.passwordVerificationIDColumn()),
 			database.NewChange(u.failedPasswordAttemptsColumn(), 0),
 			database.NewChangeToStatement(u.passwordColumn(), func(builder *database.StatementBuilder) {
 				builder.WriteString("DELETE FROM zitadel.verifications USING existing_user")
@@ -529,8 +533,8 @@ func (u userHuman) passwordChangeRequiredColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password_change_required")
 }
 
-func (u userHuman) unverifiedPasswordIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "unverified_password_id")
+func (u userHuman) passwordVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_verification_id")
 }
 
 func (u userHuman) passwordColumn() database.Column {

@@ -22,7 +22,7 @@ func (u userMachine) create(ctx context.Context, builder *database.StatementBuil
 		changes = append(changes, u.AddPersonalAccessToken(pat))
 	}
 	for _, metadata := range user.Metadata {
-		changes = append(changes, u.AddMetadata(&metadata.Metadata))
+		changes = append(changes, u.AddMetadata(metadata))
 	}
 	for i, change := range changes {
 		sessionCTE(change, i, 0, builder)

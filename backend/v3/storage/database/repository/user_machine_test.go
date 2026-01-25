@@ -212,17 +212,13 @@ func Test_machineUser_create(t *testing.T) {
 			pats := []*domain.PersonalAccessToken{
 				{
 					ID:        gofakeit.UUID(),
-					PublicKey: []byte("public key"),
 					CreatedAt: createdAt,
 					ExpiresAt: createdAt.Add(24 * time.Hour),
-					Type:      domain.PersonalAccessTokenTypeBearer,
 				},
 				{
 					ID:        gofakeit.UUID(),
-					PublicKey: []byte("public key"),
 					CreatedAt: createdAt,
 					ExpiresAt: createdAt.Add(24 * time.Hour),
-					Type:      domain.PersonalAccessTokenTypeJWT,
 					Scopes:    []string{"some", "scopes"},
 				},
 			}
@@ -267,10 +263,8 @@ func Test_machineUser_create(t *testing.T) {
 			pats := []*domain.PersonalAccessToken{
 				{
 					ID:        gofakeit.UUID(),
-					PublicKey: []byte("public key"),
 					CreatedAt: createdAt,
 					ExpiresAt: createdAt.Add(24 * time.Hour),
-					Type:      domain.PersonalAccessTokenTypeBearer,
 				},
 			}
 			keys := []*domain.MachineKey{
@@ -292,22 +286,18 @@ func Test_machineUser_create(t *testing.T) {
 						Username:       username,
 						State:          domain.UserStateActive,
 						CreatedAt:      createdAt,
-						Metadata: []*domain.UserMetadata{
+						Metadata: []*domain.Metadata{
 							{
-								Metadata: domain.Metadata{
-									Key:       "meta1",
-									Value:     []byte("value1"),
-									CreatedAt: createdAt,
-									UpdatedAt: createdAt,
-								},
+								Key:       "meta1",
+								Value:     []byte("value1"),
+								CreatedAt: createdAt,
+								UpdatedAt: createdAt,
 							},
 							{
-								Metadata: domain.Metadata{
-									Key:       "meta2",
-									Value:     []byte("123"),
-									CreatedAt: createdAt,
-									UpdatedAt: createdAt,
-								},
+								Key:       "meta2",
+								Value:     []byte("123"),
+								CreatedAt: createdAt,
+								UpdatedAt: createdAt,
 							},
 						},
 						Machine: &domain.MachineUser{
@@ -329,24 +319,20 @@ func Test_machineUser_create(t *testing.T) {
 						State:          domain.UserStateActive,
 						CreatedAt:      createdAt,
 						UpdatedAt:      createdAt,
-						Metadata: []*domain.UserMetadata{
+						Metadata: []*domain.Metadata{
 							{
-								Metadata: domain.Metadata{
-									InstanceID: instanceID,
-									Key:        "meta1",
-									Value:      []byte("value1"),
-									CreatedAt:  createdAt,
-									UpdatedAt:  createdAt,
-								},
+								InstanceID: instanceID,
+								Key:        "meta1",
+								Value:      []byte("value1"),
+								CreatedAt:  createdAt,
+								UpdatedAt:  createdAt,
 							},
 							{
-								Metadata: domain.Metadata{
-									InstanceID: instanceID,
-									Key:        "meta2",
-									Value:      []byte("123"),
-									CreatedAt:  createdAt,
-									UpdatedAt:  createdAt,
-								},
+								InstanceID: instanceID,
+								Key:        "meta2",
+								Value:      []byte("123"),
+								CreatedAt:  createdAt,
+								UpdatedAt:  createdAt,
 							},
 						},
 						Machine: &domain.MachineUser{

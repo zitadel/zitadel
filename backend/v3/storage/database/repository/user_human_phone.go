@@ -19,7 +19,7 @@ func (u userHuman) RemovePhone() database.Change {
 		database.NewChangeToNull(u.phoneVerifiedAtColumn()),
 		database.NewChangeToNull(u.smsOTPEnabledAtColumn()),
 		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
-		database.NewChangeToNull(u.smsOTPVerificationIDColumn()),
+		database.NewChangeToNull(u.failedSMSOTPAttemptsColumn()),
 	)
 }
 
@@ -41,19 +41,6 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.phoneVerificationIDColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for phone verification change %T", verification))
-}
-
-// CheckSMSOTP implements [domain.HumanUserRepository.CheckSMSOTP].
-func (u userHuman) CheckSMSOTP(check domain.CheckType) database.Change {
-	switch typ := check.(type) {
-	case *domain.CheckTypeInit:
-		return u.verification.initCheck(typ, existingHumanUser.unqualifiedTableName(), u.smsOTPVerificationIDColumn())
-	case *domain.CheckTypeSucceeded:
-		return u.verification.succeeded(typ, u.lastSuccessfulSMSOTPCheckColumn(), u.smsOTPVerificationIDColumn())
-	case *domain.CheckTypeFailed:
-		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.smsOTPVerificationIDColumn())
-	}
-	panic(fmt.Sprintf("type not allowed for email OTP check change %T", check))
 }
 
 // DisableSMSOTP implements [domain.HumanUserRepository.DisableSMSOTP].
@@ -93,7 +80,7 @@ func (u userHuman) phoneVerifiedAtColumn() database.Column {
 }
 
 func (u userHuman) phoneVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "unverified_phone_id")
+	return database.NewColumn(u.unqualifiedTableName(), "phone_verification_id")
 }
 
 func (u userHuman) smsOTPEnabledAtColumn() database.Column {
@@ -101,9 +88,9 @@ func (u userHuman) smsOTPEnabledAtColumn() database.Column {
 }
 
 func (u userHuman) lastSuccessfulSMSOTPCheckColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "last_successful_sms_otp_check")
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_last_successful_check")
 }
 
-func (u userHuman) smsOTPVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_verification_id")
+func (u userHuman) failedSMSOTPAttemptsColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "sms_otp_failed_attempts")
 }

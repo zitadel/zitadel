@@ -17,9 +17,9 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt      time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 
-	Machine  *MachineUser    `json:"machine,omitempty" db:"-"`
-	Human    *HumanUser      `json:"human,omitempty" db:"-"`
-	Metadata []*UserMetadata `json:"metadata,omitempty" db:"metadata"`
+	Machine  *MachineUser `json:"machine,omitempty" db:"-"`
+	Human    *HumanUser   `json:"human,omitempty" db:"-"`
+	Metadata []*Metadata  `json:"metadata,omitempty" db:"metadata"`
 }
 
 type MachineUser struct {
@@ -89,11 +89,13 @@ type HumanPassword struct {
 	Password *crypto.CryptoValue `json:"password" db:"password"` //TODO: make sure password is not marshalled
 	// IsChangeRequired indicates if the user must change their password
 	IsChangeRequired bool `json:"isChangeRequired,omitempty" db:"is_change_required"`
-	// VerifiedAt is the time when the current password was verified
-	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
+	// ChangedAt is the time when the current password was last updated
+	ChangedAt time.Time `json:"changedAt,omitzero" db:"changed_at"`
 	// Unverified is the verification data for setting a new password
 	// If nil, no password change is in progress
 	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
+	// LastSuccessfullyCheckedAt is the time when the password was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
 	// FailedAttempts is the number of consecutive failed password attempts
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
@@ -119,29 +121,30 @@ type HumanPhone struct {
 
 type HumanTOTP struct {
 	VerifiedAt time.Time `json:"verifiedAt,omitzero" db:"verified_at"`
-
-	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
-	// Check is the verified secret
-	Check *Check `json:"check,omitempty" db:"-"`
+	Secret     []byte    `json:"secret,omitempty" db:"secret"`
+	// LastSuccessfullyCheckedAt is the time when the TOTP was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
+	// FailedAttempts is the number of consecutive failed password attempts
+	// It is reset to 0 on successful verification
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
 	// Unverified is the unverified secret
 	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type OTP struct {
-	EnabledAt                 time.Time `json:"enabledAt,omitzero" db:"enabled_at"`
-	LastSuccessfullyCheckedAt time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
-	// Check is the currently active OTP check
-	// If nil, no OTP check is active
-	Check *Check `json:"check,omitempty" db:"-"`
+	EnabledAt time.Time `json:"enabledAt,omitzero" db:"enabled_at"`
+	// LastSuccessfullyCheckedAt is the time when the OTP was last successfully checked
+	LastSuccessfullyCheckedAt *time.Time `json:"lastSuccessfullyCheckedAt,omitzero" db:"last_successfully_checked_at"`
+	// FailedAttempts is the number of consecutive failed password attempts
+	// It is reset to 0 on successful verification
+	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
 }
 
 type PersonalAccessToken struct {
-	ID        string                  `json:"id" db:"id"`
-	CreatedAt time.Time               `json:"createdAt,omitzero" db:"created_at"`
-	ExpiresAt time.Time               `json:"expiresAt,omitzero" db:"expires_at"`
-	Type      PersonalAccessTokenType `json:"type" db:"type"`
-	PublicKey []byte                  `json:"publicKey" db:"public_key"`
-	Scopes    []string                `json:"scopes" db:"scopes"`
+	ID        string    `json:"id" db:"id"`
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
+	ExpiresAt time.Time `json:"expiresAt,omitzero" db:"expires_at"`
+	Scopes    []string  `json:"scopes" db:"scopes"`
 }
 
 //go:generate enumer -type PersonalAccessTokenType -transform lower -trimprefix PersonalAccessTokenType
@@ -167,9 +170,8 @@ type MachineKey struct {
 type MachineKeyType uint8
 
 const (
-	MachineKeyTypeUnspecified MachineKeyType = iota
+	MachineKeyTypeNone MachineKeyType = iota
 	MachineKeyTypeJSON
-	MachineKeyTypeNone
 )
 
 type Passkey struct {
@@ -206,6 +208,7 @@ const (
 )
 
 type IdentityProviderLink struct {
+	// TODO(adlerhurst): double check with marcos pr
 	ProviderID       string `json:"providerId" db:"provider_id"`
 	ProvidedUserID   string `json:"providedUserId" db:"provided_user_id"`
 	ProvidedUsername string `json:"providedUsername" db:"provided_username"`

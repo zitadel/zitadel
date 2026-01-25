@@ -131,23 +131,7 @@ func assertUser(t *testing.T, expected, actual *domain.User) {
 	require.Equal(t, expected.Machine == nil, actual.Machine == nil, "machine check")
 	require.Equal(t, expected.Human == nil, actual.Human == nil, "human check")
 
-	require.Len(t, actual.Metadata, len(expected.Metadata), "metadata")
-	for i, expectedMetadata := range expected.Metadata {
-		var actualMetadata *domain.UserMetadata
-		actual.Metadata = slices.DeleteFunc(actual.Metadata, func(m *domain.UserMetadata) bool {
-			if m.Key == expectedMetadata.Key {
-				actualMetadata = m
-				return true
-			}
-			return false
-		})
-		require.NotNil(t, actualMetadata, "metadata[%d] not found", i)
-		assert.Equal(t, expectedMetadata.Key, actualMetadata.Key, "metadata[%d] key", i)
-		assert.Equal(t, expectedMetadata.Value, actualMetadata.Value, "metadata[%d] value", i)
-		assert.True(t, expectedMetadata.CreatedAt.Equal(actualMetadata.CreatedAt), "metadata[%d] created at", i)
-		assert.True(t, expectedMetadata.UpdatedAt.Equal(actualMetadata.UpdatedAt), "metadata[%d] updated at", i)
-	}
-	assert.Empty(t, actual.Metadata, "unmatched metadata")
+	assertMetadata(t, expected.Metadata, actual.Metadata)
 
 	if expected.Machine != nil {
 		require.Nil(t, expected.Human)
@@ -172,40 +156,9 @@ func assertMachineUser(t *testing.T, expected, actual *domain.MachineUser) {
 	assert.Equal(t, expected.AccessTokenType, actual.AccessTokenType, "machine access token type")
 	assert.Equal(t, expected.Secret, actual.Secret, "machine secret")
 	require.Len(t, actual.PATs, len(expected.PATs), "machine pats")
-	for i, expectedPAT := range expected.PATs {
-		var actualPAT *domain.PersonalAccessToken
-		actual.PATs = slices.DeleteFunc(actual.PATs, func(p *domain.PersonalAccessToken) bool {
-			if p.ID == expectedPAT.ID {
-				actualPAT = p
-				return true
-			}
-			return false
-		})
-		require.NotNil(t, actualPAT, "machine pat[%d] not found", i)
-		assert.Equal(t, expectedPAT.ID, actualPAT.ID, "machine pat[%d] id", i)
-		assert.True(t, expectedPAT.CreatedAt.Equal(actualPAT.CreatedAt), "machine pat[%d] created at", i)
-		assert.True(t, expectedPAT.ExpiresAt.Equal(actualPAT.ExpiresAt), "machine pat[%d] expires at", i)
-		assert.Equal(t, expectedPAT.Scopes, actualPAT.Scopes, "machine pat[%d] scopes", i)
-	}
-	assert.Empty(t, actual.PATs, "unmatched machine pats")
-	require.Len(t, actual.Keys, len(expected.Keys), "machine keys")
-	for i, expectedKey := range expected.Keys {
-		var actualKey *domain.MachineKey
-		actual.Keys = slices.DeleteFunc(actual.Keys, func(k *domain.MachineKey) bool {
-			if k.ID == expectedKey.ID {
-				actualKey = k
-				return true
-			}
-			return false
-		})
-		require.NotNil(t, actualKey, "machine key[%d] not found", i)
-		assert.Equal(t, expectedKey.ID, actualKey.ID, "machine key[%d] id", i)
-		assert.Equal(t, expectedKey.PublicKey, actualKey.PublicKey, "machine key[%d] public key", i)
-		assert.True(t, expectedKey.CreatedAt.Equal(actualKey.CreatedAt), "machine key[%d] created at", i)
-		assert.True(t, expectedKey.ExpiresAt.Equal(actualKey.ExpiresAt), "machine key[%d] expires at", i)
-		assert.Equal(t, expectedKey.Type, actualKey.Type, "machine key[%d] type", i)
-	}
-	assert.Empty(t, actual.Keys, "unmatched machine keys")
+
+	assertPersonalAccessTokens(t, expected.PATs, actual.PATs)
+	assertMachineKeys(t, expected.Keys, actual.Keys)
 }
 
 func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
@@ -230,16 +183,114 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 		assert.Equal(t, expected.Phone.Number, actual.Phone.Number, "human phone number")
 		assert.True(t, expected.Phone.VerifiedAt.Equal(actual.Phone.VerifiedAt), "human phone verified at")
 		assert.True(t, expected.Phone.OTP.EnabledAt.Equal(actual.Phone.OTP.EnabledAt), "human phone otp enabled at")
-		assert.True(t, expected.Phone.OTP.LastSuccessfullyCheckedAt.Equal(actual.Phone.OTP.LastSuccessfullyCheckedAt), "human phone otp last successfully checked at")
-		if expected.Phone.OTP.Check != nil {
-			t.Error("human.phone.otp.check not asserted")
+		if expected.Phone.OTP.LastSuccessfullyCheckedAt != nil {
+			require.NotNil(t, actual.Phone.OTP.LastSuccessfullyCheckedAt, "human phone otp last successfully checked at not nil")
+			assert.True(t, expected.Phone.OTP.LastSuccessfullyCheckedAt.Equal(*actual.Phone.OTP.LastSuccessfullyCheckedAt), "human phone otp last successfully checked at")
+		} else {
+			assert.Nil(t, actual.Phone.OTP.LastSuccessfullyCheckedAt, "human phone otp last successfully checked at nil")
 		}
 		assertVerification(t, expected.Phone.Unverified, actual.Phone.Unverified, "human phone unverified")
 	}
+	assertPasskeys(t, expected.Passkeys, actual.Passkeys)
 
-	for i, expectedPasskey := range expected.Passkeys {
+	assert.Equal(t, expected.Password.Password, actual.Password.Password, "human password password")
+	assert.Equal(t, expected.Password.IsChangeRequired, actual.Password.IsChangeRequired, "human password is change required")
+	assertVerification(t, expected.Password.Unverified, actual.Password.Unverified, "human password unverified")
+	assert.Equal(t, expected.Password.FailedAttempts, actual.Password.FailedAttempts, "human password failed attempts")
+
+	assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
+	if expected.TOTP.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at not nil")
+		assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(*actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
+	} else {
+		assert.Nil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at nil")
+	}
+	assertVerification(t, expected.TOTP.Unverified, actual.TOTP.Unverified, "human totp unverified")
+
+	assertIdentityProviderLinks(t, expected.IdentityProviderLinks, actual.IdentityProviderLinks)
+	assertVerifications(t, expected.Verifications, actual.Verifications)
+}
+
+func assertHumanEmail(t *testing.T, expected, actual domain.HumanEmail) {
+	t.Helper()
+
+	assert.Equal(t, expected.Address, actual.Address, "human email address")
+	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human email verified at")
+	assert.True(t, expected.OTP.EnabledAt.Equal(actual.OTP.EnabledAt), "human email otp enabled at")
+	if expected.OTP.LastSuccessfullyCheckedAt != nil {
+		require.NotNil(t, actual.OTP.LastSuccessfullyCheckedAt, "human email otp last successfully checked at not nil")
+		assert.True(t, expected.OTP.LastSuccessfullyCheckedAt.Equal(*actual.OTP.LastSuccessfullyCheckedAt), "human email otp last successfully checked at")
+	} else {
+		assert.Nil(t, actual.OTP.LastSuccessfullyCheckedAt, "human email otp last successfully checked at nil")
+	}
+
+	assertVerification(t, expected.Unverified, actual.Unverified, "human email unverified")
+}
+
+func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue) {
+	t.Helper()
+
+	if expected == nil {
+		assert.Nil(t, actual, "crypto value nil")
+		return
+	}
+
+	require.NotNil(t, actual, "crypto value not nil")
+	assert.Equal(t, expected.Crypted, actual.Crypted, "crypto value crypted")
+	assert.Equal(t, expected.CryptoType, actual.CryptoType, "crypto value crypto type")
+	assert.Equal(t, expected.Algorithm, actual.Algorithm, "crypto value algorithm")
+	assert.Equal(t, expected.KeyID, actual.KeyID, "crypto value key id")
+}
+
+func assertPersonalAccessTokens(t *testing.T, expected, actual []*domain.PersonalAccessToken) {
+	assert.Len(t, actual, len(expected), "machine pats")
+	for _, expectedPAT := range expected {
+		var actualPAT *domain.PersonalAccessToken
+		actual = slices.DeleteFunc(actual, func(p *domain.PersonalAccessToken) bool {
+			if p.ID == expectedPAT.ID {
+				actualPAT = p
+				return true
+			}
+			return false
+		})
+		require.NotNil(t, actualPAT, "pat[%s] not found", expectedPAT.ID)
+		assert.Equal(t, expectedPAT.ID, actualPAT.ID, "pat[%s] id", expectedPAT.ID)
+		assert.True(t, expectedPAT.CreatedAt.Equal(actualPAT.CreatedAt), "pat[%s] created at", expectedPAT.ID)
+		assert.True(t, expectedPAT.ExpiresAt.Equal(actualPAT.ExpiresAt), "pat[%s] expires at", expectedPAT.ID)
+		assert.Equal(t, expectedPAT.Scopes, actualPAT.Scopes, "pat[%s] scopes", expectedPAT.ID)
+	}
+	assert.Empty(t, actual, "unmatched machine pats")
+}
+
+func assertMachineKeys(t *testing.T, expected, actual []*domain.MachineKey) {
+	t.Helper()
+
+	require.Len(t, actual, len(expected), "machine keys")
+	for _, expectedKey := range expected {
+		var actualKey *domain.MachineKey
+		actual = slices.DeleteFunc(actual, func(k *domain.MachineKey) bool {
+			if k.ID == expectedKey.ID {
+				actualKey = k
+				return true
+			}
+			return false
+		})
+		require.NotNil(t, actualKey, "machine key[%s] not found", expectedKey.ID)
+		assert.Equal(t, expectedKey.ID, actualKey.ID, "machine key[%s] id", expectedKey.ID)
+		assert.Equal(t, expectedKey.PublicKey, actualKey.PublicKey, "machine key[%s] public key", expectedKey.ID)
+		assert.True(t, expectedKey.CreatedAt.Equal(actualKey.CreatedAt), "machine key[%s] created at", expectedKey.ID)
+		assert.True(t, expectedKey.ExpiresAt.Equal(actualKey.ExpiresAt), "machine key[%s] expires at", expectedKey.ID)
+		assert.Equal(t, expectedKey.Type, actualKey.Type, "machine key[%s] type", expectedKey.ID)
+	}
+	assert.Empty(t, actual, "unmatched machine keys")
+}
+
+func assertPasskeys(t *testing.T, expected, actual []*domain.Passkey) {
+	t.Helper()
+
+	for i, expectedPasskey := range expected {
 		var actualPasskey *domain.Passkey
-		actual.Passkeys = slices.DeleteFunc(actual.Passkeys, func(p *domain.Passkey) bool {
+		actual = slices.DeleteFunc(actual, func(p *domain.Passkey) bool {
 			if p.ID == expectedPasskey.ID {
 				actualPasskey = p
 				return true
@@ -261,38 +312,15 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 		assert.Equal(t, expectedPasskey.SignCount, actualPasskey.SignCount, "human passkey[%d] sign count", i)
 		assert.Equal(t, expectedPasskey.Challenge, actualPasskey.Challenge, "human passkey[%d] challenge", i)
 	}
-	assert.Empty(t, actual.Passkeys, "unmatched human passkeys")
+	assert.Empty(t, actual, "unmatched human passkeys")
+}
 
-	assert.Equal(t, expected.Password.Password, actual.Password.Password, "human password password")
-	assert.Equal(t, expected.Password.IsChangeRequired, actual.Password.IsChangeRequired, "human password is change required")
-	assert.True(t, expected.Password.VerifiedAt.Equal(actual.Password.VerifiedAt), "human password verified at")
-	assertVerification(t, expected.Password.Unverified, actual.Password.Unverified, "human password unverified")
-	assert.Equal(t, expected.Password.FailedAttempts, actual.Password.FailedAttempts, "human password failed attempts")
+func assertVerifications(t *testing.T, expected, actual []*domain.Verification) {
+	t.Helper()
 
-	assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
-	assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
-	if expected.TOTP.Check != nil {
-		require.NotNil(t, actual.TOTP.Check, "human totp check not found")
-		assert.Equal(t, expected.TOTP.Check.Code, actual.TOTP.Check.Code, "human totp check code")
-		if expected.TOTP.Check.ExpiresAt != nil {
-			require.NotNil(t, actual.TOTP.Check.ExpiresAt, "human totp check expires at not nil")
-			assert.True(t, expected.TOTP.Check.ExpiresAt.Equal(*actual.TOTP.Check.ExpiresAt), "human totp check expires at")
-		} else {
-			assert.Nil(t, actual.TOTP.Check.ExpiresAt, "human totp check expires at nil")
-		}
-		assert.Equal(t, expected.TOTP.Check.FailedAttempts, actual.TOTP.Check.FailedAttempts, "human totp check failed attempts")
-	} else {
-		assert.Nil(t, actual.TOTP.Check, "human totp check nil")
-	}
-	assertVerification(t, expected.TOTP.Unverified, actual.TOTP.Unverified, "human totp unverified")
-
-	if len(expected.IdentityProviderLinks) > 0 {
-		t.Error("human.identityProviders not asserted")
-	}
-
-	for i, expectedVerification := range expected.Verifications {
+	for i, expectedVerification := range expected {
 		var actualVerification *domain.Verification
-		actual.Verifications = slices.DeleteFunc(actual.Verifications, func(v *domain.Verification) bool {
+		actual = slices.DeleteFunc(actual, func(v *domain.Verification) bool {
 			if v.ID == expectedVerification.ID {
 				actualVerification = v
 				return true
@@ -315,74 +343,40 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 			assert.Nil(t, actualVerification.ExpiresAt, "human verification[%d] expires at nil", i)
 		}
 		assert.Equal(t, expectedVerification.FailedAttempts, actualVerification.FailedAttempts, "human verification[%d] failed attempts", i)
-		assert.True(t, expectedVerification.VerifiedAt.Equal(actualVerification.VerifiedAt), "human verification[%d] verified at", i)
 	}
-	assert.Empty(t, actual.Verifications, "unmatched human verifications")
+	assert.Empty(t, actual, "unmatched human verifications")
 }
 
 func assertVerification(t *testing.T, expected, actual *domain.Verification, field string) {
 	t.Helper()
 
 	if expected == nil {
-		assert.Nil(t, actual, "verification nil")
+		assert.Nil(t, actual, "%s verification nil", field)
 		return
 	}
 
-	require.NotNil(t, actual, "human phone unverified not nil")
-	assert.Equal(t, expected.Value, actual.Value, "human phone unverified value")
-	assert.Equal(t, expected.Code, actual.Code, "human phone unverified code")
+	require.NotNil(t, actual, "%s not nil", field)
+	assert.Equal(t, expected.Value, actual.Value, "%s value", field)
+	assert.Equal(t, expected.Code, actual.Code, "%s code", field)
 	if expected.ExpiresAt != nil {
-		require.NotNil(t, actual.ExpiresAt, "human phone unverified expires at not nil")
-		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "human phone unverified expires at")
+		require.NotNil(t, actual.ExpiresAt, "%s expires at not nil", field)
+		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "%s expires at", field)
 	} else {
-		assert.Nil(t, actual.ExpiresAt, "human phone unverified expires at nil")
+		assert.Nil(t, actual.ExpiresAt, "%s expires at nil", field)
 	}
-	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "human phone unverified failed attempts")
-	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human phone unverified verified at")
+	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "%s failed attempts", field)
 }
 
-func assertHumanEmail(t *testing.T, expected, actual domain.HumanEmail) {
+func assertIdentityProviderLinks(t *testing.T, expected, actual []*domain.IdentityProviderLink) {
 	t.Helper()
 
-	assert.Equal(t, expected.Address, actual.Address, "human email address")
-	assert.True(t, expected.VerifiedAt.Equal(actual.VerifiedAt), "human email verified at")
-	assert.True(t, expected.OTP.EnabledAt.Equal(actual.OTP.EnabledAt), "human email otp enabled at")
-	assert.True(t, expected.OTP.LastSuccessfullyCheckedAt.Equal(actual.OTP.LastSuccessfullyCheckedAt), "human email otp last successfully checked at")
-
-	assertCheck(t, expected.OTP.Check, actual.OTP.Check)
-	assertVerification(t, expected.Unverified, actual.Unverified, "human email unverified")
-}
-
-func assertCheck(t *testing.T, expected, actual *domain.Check) {
-	t.Helper()
-
-	if expected == nil {
-		assert.Nil(t, actual, "check nil")
-		return
+	require.Len(t, actual, len(expected), "identity provider links")
+	for i, expectedLink := range expected {
+		assert.Equal(t, expectedLink.ProviderID, actual[i].ProviderID)
+		assert.Equal(t, expectedLink.ProvidedUserID, actual[i].ProvidedUserID)
+		assert.Equal(t, expectedLink.ProvidedUsername, actual[i].ProvidedUsername)
+		assert.True(t, expectedLink.CreatedAt.Equal(actual[i].CreatedAt), "identity provider link[%d] created at", i)
+		assert.True(t, expectedLink.UpdatedAt.Equal(actual[i].UpdatedAt), "identity provider link[%d] updated at", i)
 	}
-
-	require.NotNil(t, actual, "check not nil")
-	assert.Equal(t, expected.FailedAttempts, actual.FailedAttempts, "check failed attempts")
-	if expected.ExpiresAt != nil {
-		require.NotNil(t, actual.ExpiresAt, "check expires at not nil")
-		assert.True(t, expected.ExpiresAt.Equal(*actual.ExpiresAt), "check expires at")
-	} else {
-		assert.Nil(t, actual.ExpiresAt, "check expires at nil")
-	}
-	assertCryptoValue(t, expected.Code, actual.Code)
-}
-
-func assertCryptoValue(t *testing.T, expected, actual *crypto.CryptoValue) {
-	t.Helper()
-
-	if expected == nil {
-		assert.Nil(t, actual, "crypto value nil")
-		return
-	}
-
-	require.NotNil(t, actual, "crypto value not nil")
-	assert.Equal(t, expected.Crypted, actual.Crypted, "crypto value crypted")
-	assert.Equal(t, expected.CryptoType, actual.CryptoType, "crypto value crypto type")
-	assert.Equal(t, expected.Algorithm, actual.Algorithm, "crypto value algorithm")
-	assert.Equal(t, expected.KeyID, actual.KeyID, "crypto value key id")
+	assert.Empty(t, actual, "unmatched identity provider links")
 }

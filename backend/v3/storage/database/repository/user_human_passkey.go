@@ -50,7 +50,6 @@ func (u userPasskeyRepo) AddPasskey(passkey *domain.Passkey) database.Change {
 				u.createdAtColumn(),
 				u.updatedAtColumn(),
 				u.verifiedAtColumn(),
-				// TODO init_verification_id
 				u.typeColumn(),
 				u.nameColumn(),
 				u.signCountColumn(),
@@ -72,7 +71,6 @@ func (u userPasskeyRepo) AddPasskey(passkey *domain.Passkey) database.Change {
 				createdAt,
 				updatedAt,
 				verifiedAt,
-				// TODO: verification_id
 				passkey.Type,
 				passkey.Name,
 				passkey.SignCount,
@@ -147,10 +145,7 @@ func (u userPasskeyRepo) SetPasskeyVerifiedAt(verifiedAt time.Time) database.Cha
 	if !verifiedAt.IsZero() {
 		verifiedAtChange = database.NewChange(u.verifiedAtColumn(), verifiedAt)
 	}
-	return database.Changes{
-		verifiedAtChange,
-		database.NewChange(u.initVerificationIDColumn(), database.NullInstruction),
-	}
+	return verifiedAtChange
 }
 
 // UpdatePasskey implements [domain.HumanUserRepository.UpdatePasskey].
@@ -263,8 +258,4 @@ func (u userPasskeyRepo) updatedAtColumn() database.Column {
 
 func (u userPasskeyRepo) createdAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "created_at")
-}
-
-func (u userPasskeyRepo) initVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "init_verification_id")
 }

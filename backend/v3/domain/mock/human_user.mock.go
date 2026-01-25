@@ -884,6 +884,44 @@ func (c *MockHumanUserRepositoryFirstNameConditionCall) DoAndReturn(f func(datab
 	return c
 }
 
+// IDColumn mocks base method.
+func (m *MockHumanUserRepository) IDColumn() database.Column {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IDColumn")
+	ret0, _ := ret[0].(database.Column)
+	return ret0
+}
+
+// IDColumn indicates an expected call of IDColumn.
+func (mr *MockHumanUserRepositoryMockRecorder) IDColumn() *MockHumanUserRepositoryIDColumnCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDColumn", reflect.TypeOf((*MockHumanUserRepository)(nil).IDColumn))
+	return &MockHumanUserRepositoryIDColumnCall{Call: call}
+}
+
+// MockHumanUserRepositoryIDColumnCall wrap *gomock.Call
+type MockHumanUserRepositoryIDColumnCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockHumanUserRepositoryIDColumnCall) Return(arg0 database.Column) *MockHumanUserRepositoryIDColumnCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockHumanUserRepositoryIDColumnCall) Do(f func() database.Column) *MockHumanUserRepositoryIDColumnCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockHumanUserRepositoryIDColumnCall) DoAndReturn(f func() database.Column) *MockHumanUserRepositoryIDColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // IDCondition mocks base method.
 func (m *MockHumanUserRepository) IDCondition(userID string) database.Condition {
 	m.ctrl.T.Helper()
@@ -2747,17 +2785,17 @@ func (c *MockHumanUserRepositorySetUsernameCall) DoAndReturn(f func(string) data
 }
 
 // SetVerification mocks base method.
-func (m *MockHumanUserRepository) SetVerification(id string, verification domain.VerificationType) database.Change {
+func (m *MockHumanUserRepository) SetVerification(verification domain.VerificationType) database.Change {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetVerification", id, verification)
+	ret := m.ctrl.Call(m, "SetVerification", verification)
 	ret0, _ := ret[0].(database.Change)
 	return ret0
 }
 
 // SetVerification indicates an expected call of SetVerification.
-func (mr *MockHumanUserRepositoryMockRecorder) SetVerification(id, verification any) *MockHumanUserRepositorySetVerificationCall {
+func (mr *MockHumanUserRepositoryMockRecorder) SetVerification(verification any) *MockHumanUserRepositorySetVerificationCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetVerification", reflect.TypeOf((*MockHumanUserRepository)(nil).SetVerification), id, verification)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetVerification", reflect.TypeOf((*MockHumanUserRepository)(nil).SetVerification), verification)
 	return &MockHumanUserRepositorySetVerificationCall{Call: call}
 }
 
@@ -2773,13 +2811,13 @@ func (c *MockHumanUserRepositorySetVerificationCall) Return(arg0 database.Change
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockHumanUserRepositorySetVerificationCall) Do(f func(string, domain.VerificationType) database.Change) *MockHumanUserRepositorySetVerificationCall {
+func (c *MockHumanUserRepositorySetVerificationCall) Do(f func(domain.VerificationType) database.Change) *MockHumanUserRepositorySetVerificationCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockHumanUserRepositorySetVerificationCall) DoAndReturn(f func(string, domain.VerificationType) database.Change) *MockHumanUserRepositorySetVerificationCall {
+func (c *MockHumanUserRepositorySetVerificationCall) DoAndReturn(f func(domain.VerificationType) database.Change) *MockHumanUserRepositorySetVerificationCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

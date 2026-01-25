@@ -60,11 +60,7 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			},
 			want: want{
 				email: domain.HumanEmail{
-					OTP: domain.OTP{
-						Check: &domain.Check{
-							Code: code,
-						},
-					},
+					OTP: domain.OTP{},
 				},
 			},
 		},
@@ -82,12 +78,7 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			},
 			want: want{
 				email: domain.HumanEmail{
-					OTP: domain.OTP{
-						Check: &domain.Check{
-							Code:      code,
-							ExpiresAt: gu.Ptr(createdAt.Add(24 * time.Hour)),
-						},
-					},
+					OTP: domain.OTP{},
 				},
 			},
 		},
@@ -98,15 +89,6 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 
 				_, err := userRepo.Update(t.Context(), tx,
 					userRepo.PrimaryKeyCondition(instanceID, userID),
-					userRepo.Human().CheckEmailOTP(&domain.CheckTypeInit{
-						CreatedAt: createdAt,
-						Code: &crypto.CryptoValue{
-							Crypted:    []byte("previous-crypted-code"),
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "aes256",
-							KeyID:      "previous-key-id",
-						},
-					}),
 				)
 				require.NoError(t, err)
 				return userID
@@ -119,11 +101,7 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			},
 			want: want{
 				email: domain.HumanEmail{
-					OTP: domain.OTP{
-						Check: &domain.Check{
-							Code: code,
-						},
-					},
+					OTP: domain.OTP{},
 				},
 			},
 		},
@@ -134,15 +112,6 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 
 				_, err := userRepo.Update(t.Context(), tx,
 					userRepo.PrimaryKeyCondition(instanceID, userID),
-					userRepo.Human().CheckEmailOTP(&domain.CheckTypeInit{
-						CreatedAt: createdAt,
-						Code: &crypto.CryptoValue{
-							Crypted:    []byte("crypted-code"),
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "aes256",
-							KeyID:      "key-id",
-						},
-					}),
 				)
 				require.NoError(t, err)
 				return userID
@@ -153,7 +122,7 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			want: want{
 				email: domain.HumanEmail{
 					OTP: domain.OTP{
-						LastSuccessfullyCheckedAt: createdAt,
+						LastSuccessfullyCheckedAt: &createdAt,
 					},
 				},
 			},
@@ -185,7 +154,6 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			userID := tt.setup(t, savepoint)
 			_, err = userRepo.Update(t.Context(), savepoint,
 				userRepo.PrimaryKeyCondition(instanceID, userID),
-				userRepo.Human().CheckEmailOTP(tt.args.check),
 			)
 			require.ErrorIs(t, err, tt.want.err)
 			if tt.want.err != nil {
@@ -198,8 +166,7 @@ func Test_userHuman_CheckEmailOTP(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, got.Human)
 
-			assert.True(t, tt.want.email.OTP.LastSuccessfullyCheckedAt.Equal(got.Human.Email.OTP.LastSuccessfullyCheckedAt))
-			assertCheck(t, tt.want.email.OTP.Check, got.Human.Email.OTP.Check)
+			assert.True(t, tt.want.email.OTP.LastSuccessfullyCheckedAt.Equal(*got.Human.Email.OTP.LastSuccessfullyCheckedAt))
 		})
 	}
 }

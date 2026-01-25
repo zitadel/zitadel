@@ -80,7 +80,7 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
 	`, 'accessTokenType', users.access_token_type` +
 	`, 'keys', jsonb_agg(DISTINCT jsonb_build_object('id', machine_keys.id, 'publicKey', encode(machine_keys.public_key, 'base64'), 'createdAt', machine_keys.created_at, 'expiresAt', machine_keys.expires_at, 'type', machine_keys.type)) FILTER (WHERE machine_keys.user_id IS NOT NULL)` +
-	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'publicKey', encode(user_personal_access_tokens.public_key, 'base64'), 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'type', user_personal_access_tokens.type, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +
+	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +
 	`) END AS machine` +
 	// human
 	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
@@ -88,12 +88,12 @@ var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, 
 	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
 	`, 'avatarKey', users.avatar_key` +
 	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
-	`, 'password', jsonb_build_object('password', encode(users.password, 'escape')::JSONB, 'isChangeRequired', users.password_change_required, 'verifiedAt', users.password_verified_at, 'failedAttempts', users.failed_password_attempts, 'pendingVerification', ` + verificationQuery(userHuman{}.unverifiedPasswordIDColumn()) + `)` +
-	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_email_otp_check, 'check', ` + checkQuery(userHuman{}.emailOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` + //TODO: handle nullable
-	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.unverified_phone_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.last_successful_sms_otp_check, 'check', ` + checkQuery(userHuman{}.smsOTPVerificationIDColumn()) + `), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
-	`, 'totp', jsonb_build_object('verifiedAt', users.totp_verified_at,'lastSuccessfullyCheckedAt', users.last_successful_totp_check, 'check', ` + checkQuery(userHuman{}.totpSecretIDColumn()) + `, 'pendingVerification', ` + verificationQuery(userHuman{}.unverifiedTOTPIDColumn()) + `)` +
-	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'publicKey', encode(human_passkeys.public_key::BYTEA, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'type', human_passkeys.type, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at, 'challenge', encode(human_passkeys.challenge, 'base64'), 'rpId', human_passkeys.relying_party_id)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
-	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'value', verifications.value, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.unverified_password_id, ''), COALESCE(users.unverified_email_id, ''), COALESCE(users.email_otp_verification_id, ''), COALESCE(users.unverified_phone_id, ''), COALESCE(users.sms_otp_verification_id, ''), COALESCE(users.totp_secret_id, ''), COALESCE(users.unverified_totp_id, '')))` +
+	`, 'password', jsonb_build_object('password', encode(users.password, 'escape')::JSONB, 'isChangeRequired', users.password_change_required, 'changedAt', users.password_verified_at, 'failedAttempts', users.password_failed_attempts, 'lastSuccessfullyCheckedAt', users.password_last_successful_check, 'pendingVerification', ` + verificationQuery(userHuman{}.passwordVerificationIDColumn()) + `)` +
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.email_otp_last_successful_check, 'failedAttempts', users.email_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` +
+	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.phone_verification_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.sms_otp_last_successful_check, 'failedAttempts', users.sms_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
+	`, 'totp', jsonb_build_object('secret', users.totp_secret, 'verifiedAt', users.totp_verified_at, 'lastSuccessfullyCheckedAt', users.totp_last_successful_check)` +
+	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'type', human_passkeys.type, 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'challenge', encode(human_passkeys.challenge, 'base64'), 'publicKey', encode(human_passkeys.public_key, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', human_passkeys.relying_party_id, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
+	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'value', verifications.value, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'updatedAt', verifications.updated_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.password_verification_id, ''), COALESCE(users.email_verification_id, ''), COALESCE(users.phone_verification_id, '')))` +
 	`) END AS human FROM zitadel.users`
 
 func verificationQuery(column database.Column) string {
@@ -101,15 +101,6 @@ func verificationQuery(column database.Column) string {
 	builder.WriteString("CASE WHEN ")
 	column.WriteQualified(&builder)
 	builder.WriteString(` IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT value, encode(code, 'escape')::JSONB AS code, created_at+expiry AS "expiresAt", failed_attempts as "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = `)
-	column.WriteQualified(&builder)
-	builder.WriteString(`) AS res) ELSE NULL END`)
-	return builder.String()
-}
-func checkQuery(column database.Column) string {
-	var builder database.StatementBuilder
-	builder.WriteString("CASE WHEN ")
-	column.WriteQualified(&builder)
-	builder.WriteString(` IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT encode(code, 'escape')::JSONB AS code, created_at+expiry AS "expiresAt", failed_attempts as "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = `)
 	column.WriteQualified(&builder)
 	builder.WriteString(`) AS res) ELSE NULL END`)
 	return builder.String()
