@@ -7,7 +7,7 @@ By implementing the official *System for Cross-domain Identity Management (SCIM)
 
 ## API
 
-For full reference details of Zitadel’s SCIM API, consult the API documentation [here](/docs/apis/scim2).
+For full reference details of Zitadel’s SCIM API, consult the API documentation [here](/apis/scim2).
 
 ## Provisioning domain
 
@@ -114,7 +114,7 @@ If both are provided, `displayName` always takes precedence and is the value tha
 
 ## Resources
 
-- **[Zitadel SCIM API Documentation](/docs/apis/scim2)**: Documentation of Zitadel's SCIM API implementation.
+- **[Zitadel SCIM API Documentation](/apis/scim2)**: Documentation of Zitadel's SCIM API implementation.
 - **[SCIM](https://scim.cloud/)**: The Webpage of SCIM.
 - **[RFC7643](https://tools.ietf.org/html/rfc7643) Core Schema**:
   The Core Schema provides a platform-neutral schema and extension model for representing users and groups.

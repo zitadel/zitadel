@@ -31,18 +31,18 @@ This API offers granular control through various filters, enabling you to:
 - **Target Aggregates**: Narrow down the data scope by filtering for events related to particular organizations, projects, or users.
 - **Define Time Frames**: Retrieve audit logs for precise time periods, allowing you to schedule data retrieval at desired intervals (e.g., hourly) and analyze activity within specific windows.
 
-You can find a comprehensive guide on how to use the events API for different use cases here: [Get Events from ZITADEL](/docs/guides/integrate/zitadel-apis/event-api)
+You can find a comprehensive guide on how to use the events API for different use cases here: [Get Events from ZITADEL](/guides/integrate/zitadel-apis/event-api)
 
 ## ZITADEL Actions
 
-ZITADEL [Actions](/docs/concepts/features/actions) offer a powerful mechanism for extending the platform's capabilities and integrating with external systems tailored to your specific requirements. 
+ZITADEL [Actions](/concepts/features/actions) offer a powerful mechanism for extending the platform's capabilities and integrating with external systems tailored to your specific requirements. 
 Actions are essentially custom JavaScript snippets that execute at predefined triggers during the registration or login flow of a user.
 
 In the future ZITADEL Actions will be extended to allow to not only define them during the login and register flow, but also on each API Request, Event or Predefined Functions.
 
 ### Log to stdout
 
-With the [log module](/docs/apis/actions/modules#log) you can log any custom message to stdout.
+With the [log module](/apis/actions/modules#log) you can log any custom message to stdout.
 Those logs in stdout can be collected by your external system.
 
 Example Use Case:
@@ -61,7 +61,7 @@ In my external system for example Splunk I want to be able to get an information
 
 ### Webhook/API request
 
-The [http module](/docs/apis/actions/modules#http) allows you to make a request to a REST API. 
+The [http module](/apis/actions/modules#http) allows you to make a request to a REST API. 
 This allows you to send a request at a specific point during the login or registration flow with the data you defined in your action.
 
 Example use case:

@@ -17,7 +17,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] High Availability for ZITADEL containers
   - [ ] Use a container orchestrator such as Kubernetes
   - [ ] Use serverless platform such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
-  - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/docs/self-hosting/manage/updating_scaling) ZITADEL
+  - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/self-hosting/manage/updating_scaling) ZITADEL
 - [ ] High Availability for database
   - [ ] Follow [this guide](https://www.postgresql.org/docs/current/high-availability.html) to set up the database.
   - [ ] Configure logging
@@ -27,29 +27,29 @@ To apply best practices to your production setup we created a step by step check
   - [ ] Secure database connections from outside your network and/or use an internal subnet for database connectivity
 - [ ] High Availability for critical infrastructure components (depending on your setup)
   - [ ] Loadbalancer
-  - [ ] [Reverse Proxies](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+  - [ ] [Reverse Proxies](/self-hosting/manage/reverseproxy/reverse_proxy)
   - [ ] Web Application Firewall
 
 #### Networking
 
-- [ ] Use a Layer 7 Web Application Firewall to secure ZITADEL that supports **[HTTP/2](/docs/self-hosting/manage/http2)**
+- [ ] Use a Layer 7 Web Application Firewall to secure ZITADEL that supports **[HTTP/2](/self-hosting/manage/http2)**
   - [ ] Limit the access by IP addresses if needed
-  - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [ZITADEL Cloud rate limits](/docs/legal/policies/rate-limit-policy) for reference.
+  - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [ZITADEL Cloud rate limits](/legal/policies/rate-limit-policy) for reference.
   - [ ] Check that your firewall also filters IPv6 traffic
 
 ### ZITADEL configuration
 
-- [ ] Configure a valid [SMTP Server](/docs/guides/manage/console/default-settings#smtp) and test the email delivery
-- [ ] Add [Custom Branding](/docs/guides/manage/customize/branding) if required
-- [ ] Configure a valid [SMS Service](/docs/guides/manage/console/default-settings#sms) such as Twilio if needed
+- [ ] Configure a valid [SMTP Server](/guides/manage/console/default-settings#smtp) and test the email delivery
+- [ ] Add [Custom Branding](/guides/manage/customize/branding) if required
+- [ ] Configure a valid [SMS Service](/guides/manage/console/default-settings#sms) such as Twilio if needed
 - [ ] Configure your privacy policy, terms of service and a help Link if needed
-- [ ] Keep your [masterkey](/docs/self-hosting/manage/configure) in a secure storage
+- [ ] Keep your [masterkey](/self-hosting/manage/configure) in a secure storage
 - [ ] Declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
 
 ### Security
 
-- [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/docs/self-hosting/manage/database#zitadel-credentials)
-- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/self-hosting/manage/tls_modes) connections
+- [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/self-hosting/manage/database#zitadel-credentials)
+- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/self-hosting/manage/tls_modes) connections
 - [ ] Create service accounts for applications that interact with ZITADEL's APIs
 - [ ] Make use of a CDN service to decrease the load for static assets served by ZITADEL
 - [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and deployment environment
@@ -66,4 +66,4 @@ Use an appropriate monitoring solution to have an overview about your ZITADEL in
 - [ ] Requests by URL/endpoint
 - [ ] Lifetime of TLS certificates
 - [ ] ZITADEL and database logs
-- [ ] ZITADEL [metrics](/docs/apis/observability/metrics)
+- [ ] ZITADEL [metrics](/apis/observability/metrics)

@@ -8,55 +8,55 @@ import Column from "@/components/column";
 
 ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs for popular languages and frameworks.
 
-The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/docs/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
+The [OpenID Connect & OAuth endpoints](/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
 
-[Actions](/docs/guides/manage/console/actions-overview) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
+[Actions](/guides/manage/console/actions-overview) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
 
 ## Authentication & authorization
 
 ### Authentication for human users (interactive)
 
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
-Please refer to our guides how to [authenticate users](/docs/guides/integrate/login/login-users) through an interactive authentication process.
+Please refer to our guides how to [authenticate users](/guides/integrate/login/login-users) through an interactive authentication process.
 
-For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
+For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](/docs/reference/api/session) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui).
+Additionally, you can use the [session API](/reference/api/session) to authenticate users, for example by building a [custom login UI](/guides/integrate/login-ui).
 
 ### Authenticate service users and machines
 
 Service users allow for machine-to-machine (M2M) communication.
-Follow the guides to learn how to [authenticate service users](/docs/guides/integrate/service-users/authenticate-service-users).
+Follow the guides to learn how to [authenticate service users](/guides/integrate/service-users/authenticate-service-users).
 
 Accessing the ZITADEL APIs through a service user might require additional steps, please follow the guide on how to [access ZITADEL APIs](../guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
 
 ### OpenID Connect & OAuth
 
-- [OpenID Connect endpoints](/docs/apis/openidoauth/endpoints) definition
-- Standard and reserved [scopes reference](/docs/apis/openidoauth/scopes)
-- Standard, custom, and reserved [claims reference](/docs/apis/openidoauth/claims)
+- [OpenID Connect endpoints](/apis/openidoauth/endpoints) definition
+- Standard and reserved [scopes reference](/apis/openidoauth/scopes)
+- Standard, custom, and reserved [claims reference](/apis/openidoauth/claims)
 
 The [OIDC Playground](https://zitadel.com/playgrounds/oidc) is for testing OpenID authentication requests and their parameters.
 
 ### SAML 2.0
 
-- [SAML 2.0 endpoints](/docs/apis/saml/endpoints) definition
+- [SAML 2.0 endpoints](/apis/saml/endpoints) definition
 - [Custom attributes](https://github.com/zitadel/actions/blob/main/examples/set_custom_attribute.js) can be added with an action
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/reference/api/session), get OIDC authentication request details with the [OIDC service API](/docs/reference/api/oidc) or get SAML request details with the [SAML service API](/docs/reference/api/saml).
-User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/reference/api/session), get OIDC authentication request details with the [OIDC service API](/reference/api/oidc) or get SAML request details with the [SAML service API](/reference/api/saml).
+User authorizations can be [retrieved as roles from our APIs](/guides/integrate/retrieve-user-roles).
 
-Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
+Refer to our guide to learn how to [build your own login UI](/guides/integrate/login-ui)
 
 ## ZITADEL APIs (resource-based)
 
-ZITADEL provides APIs for each [core resource](/docs/apis/v2):
+ZITADEL provides APIs for each [core resource](/apis/v2):
 
-- [User](/docs/reference/api/user)
-- [Session](/docs/reference/api/session)
-- [Settings](/docs/reference/api/settings)
+- [User](/reference/api/user)
+- [Session](/reference/api/session)
+- [Settings](/reference/api/settings)
 
 <Callout>
 We are migrating to a resource-based API approach.
@@ -98,7 +98,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/auth/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/reference/api-v1/auth)
+[OpenAPI Docs](/reference/api-v1/auth)
 
 </div>
 </Column>
@@ -131,7 +131,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/management/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/reference/api-v1/management)
+[OpenAPI Docs](/reference/api-v1/management)
 
 </div>
 </Column>
@@ -162,7 +162,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/admin/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/reference/api-v1/admin)
+[OpenAPI Docs](/reference/api-v1/admin)
 
 </div>
 </Column>
@@ -176,7 +176,7 @@ API Reference:
 
 This API is intended to manage the different ZITADEL instances within the system.
 
-Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate/zitadel-apis/access-zitadel-system-api).
+Checkout the guide how to [access the ZITADEL System API](/guides/integrate/zitadel-apis/access-zitadel-system-api).
 
 </div>
 <div className="apicard-right">
@@ -195,7 +195,7 @@ Endpoint:
 `${CUSTOM_DOMAIN}/system/v1/`
 
 API Reference:
-[OpenAPI Docs](/docs/reference/api-v1/system)
+[OpenAPI Docs](/reference/api-v1/system)
 
 </div>
 </Column>
@@ -233,7 +233,7 @@ The last API (assets) is only a REST API because ZITADEL uses multipart form dat
 
 ### SDKs
 
-ZITADEL provides some [official and community supported SDKs](/docs/sdk-examples/introduction) for multiple languages and frameworks.
+ZITADEL provides some [official and community supported SDKs](/sdk-examples/introduction) for multiple languages and frameworks.
 Most languages allow you to build a client from proto definitions, which allows you to build your own client in case an SDK is missing.
 
 ### Proto
@@ -274,7 +274,7 @@ ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or yo
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `${CUSTOM_DOMAIN}/ui/console/`.
 
-Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
+Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 

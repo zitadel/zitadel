@@ -10,7 +10,7 @@ This is useful for integrating with other systems which need specific claims in 
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/guides/manage/console/managers)
+- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
 <Callout>
@@ -20,7 +20,7 @@ In case you are using a different setup, you need to adjust the target URL accor
 
 ## Available functions
 
-The available conditions can be found under [all available Functions](/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions).
+The available conditions can be found under [all available Functions](/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions).
 
 ## Start example target
 
@@ -29,7 +29,7 @@ You will need to implement a listener that can receive HTTP requests and process
 For this example, we will use a simple Go HTTP server that will send back static data.
 
 <Callout>
-The signature of the received request can be checked, [please refer to the example for more information on how to](/docs/guides/integrate/actions/testing-request-signature).
+The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
 </Callout>
 
 ```go
@@ -97,7 +97,7 @@ You can do this by using **Webhook.site** (see [Creating a Listener with Webhook
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
 
-See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
+See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
@@ -121,7 +121,7 @@ Save the returned ID to set in the execution.
 To configure ZITADEL to call the target when a function is executed, you need to set an execution and define the function
 condition.
 
-See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
+See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
@@ -150,10 +150,10 @@ As a result 3 things happen:
 - the token has a claim "urn:zitadel:iam:claim" added with value "value"
 - the token has the log claim "urn:zitadel:iam:action:preuserinfo:log" added with values "log1", "log2" and "log3".
 
-For any further information related to [the OIDC Flow, refer to our documentation.](/docs/guides/integrate/login/oidc/login-users)
+For any further information related to [the OIDC Flow, refer to our documentation.](/guides/integrate/login/oidc/login-users)
 
 ## Conclusion
 
 You have successfully set up a target and execution to react to functions in your ZITADEL instance.
 This feature can now be used to integrate with your existing systems to create custom workflows or automate tasks based on functionality in ZITADEL.
-Find more information about the actions feature in the [API documentation](/docs/concepts/features/actions_v2).
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

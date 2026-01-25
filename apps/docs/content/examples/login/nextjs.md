@@ -32,7 +32,7 @@ You will need to provide some information about your app.
 
 Navigate to your Project, then add a new application at the top of the page.
 Select Web application type and continue.
-We use [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code)for our NextJS application.
+We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our NextJS application.
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
 
 ![Create app in console](../../../public/img/nextjs/app-create.png)

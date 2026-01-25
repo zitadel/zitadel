@@ -47,7 +47,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims             | Example                                                        | Description                                                                                                                                                                |
 |:-------------------|:---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | acr                | TBA                                                            | TBA                                                                                                                                                                        |
-| act                | `{"iss": "$CUSTOM-DOMAIN","sub": "259241944654282754"}`        | JSON object describing the actor from the `actor_token` after [token exchange](/docs/guides/integrate/token-exchange#actor-token)                                          |
+| act                | `{"iss": "$CUSTOM-DOMAIN","sub": "259241944654282754"}`        | JSON object describing the actor from the `actor_token` after [token exchange](/guides/integrate/token-exchange#actor-token)                                          |
 | address            | `Lerchenfeldstrasse 3, 9014 St. Gallen`                        | TBA                                                                                                                                                                        |
 | amr                | `pwd mfa`                                                      | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd`                     |
 | aud                | `69234237810729019`                                            | The audience of the token, by default all client id's and the project id are included                                                                                      |
@@ -78,7 +78,7 @@ Please check below the matrix for an overview where which scope is asserted.
 Custom claims are being inserted into user tokens in addition to the standard claims.
 Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
 
-You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/guides/manage/console/actions-overview).
+You can add custom claims using the [complement token flow](/apis/actions/complement-token) of the [actions feature](/guides/manage/console/actions-overview).
 
 Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
 

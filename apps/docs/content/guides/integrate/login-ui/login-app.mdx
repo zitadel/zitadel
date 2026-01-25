@@ -38,7 +38,7 @@ _Note that the illustration is just a representation of the architecture and may
 The flow starts by the `/authorize` endpoint which is intercepted by the Login app and forwarded to ZITADEL.
 ZITADEL interprets the request and specifically redirects back to the Login app.
 It does so by redirecting to `/login`.
-The Login app is then able to load an [AuthRequest](/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest).
+The Login app is then able to load an [AuthRequest](/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetAuthRequest).
 
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the Login app brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user which is then used to search for a user.
@@ -48,7 +48,7 @@ While the users continues and provides more information, the cookie is hydrated 
 The communication from the browser to the server is done by [NextJS Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
 
-If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback) for the auth request and the user is redirected back to the application.
+If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/reference/api/oidc/zitadel.oidc.v2.OIDCService.CreateCallback) for the auth request and the user is redirected back to the application.
 The application can then request a token calling the /token endpoint of the Login app which is proxied to the ZITADEL API.
 
 ### Implemented features
@@ -119,7 +119,7 @@ In order to run the new Login app, make sure to follow the instructions in the [
 #### How to setup domains for OIDC
 
 When setting up the new Login app for OIDC, the domain must be registered on your instance and use https.
-To register your login domain on your instance, [add](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain) your domain on your instances trusted domains.
+To register your login domain on your instance, [add](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain) your domain on your instances trusted domains.
 
 #### OIDC Proxy
 
@@ -140,7 +140,7 @@ You can review an example implementation of a middleware [here](https://github.c
 To deploy your own version on Vercel, navigate to your instance and create a service user.
 Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
-Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain).
+Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain).
 
 If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
 

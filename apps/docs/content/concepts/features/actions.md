@@ -33,7 +33,7 @@ Within the JavaScript code, you can read and manipulate the state.
 
 ## Further reading
 
-- [Assign users a role after they register using an external identity provider](/docs/guides/manage/customize/behavior)
-- [Actions reference](/docs/guides/manage/console/actions-overview)
+- [Assign users a role after they register using an external identity provider](/guides/manage/customize/behavior)
+- [Actions reference](/guides/manage/console/actions-overview)
 - [Actions Marketplace: Find example actions to use in ZITADEL](https://github.com/zitadel/actions)
-- [Example use cases](/docs/apis/actions/code-examples)
+- [Example use cases](/apis/actions/code-examples)

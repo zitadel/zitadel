@@ -25,7 +25,7 @@ import Postgres from './_postgres.mdx'
 
 ## Zitadel Credentials
 
-The [init phase](/docs/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user (`Database.*.User.Username` & `Database.*.User.Password`) if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
+The [init phase](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user (`Database.*.User.Username` & `Database.*.User.Password`) if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
 
 <Callout type="warn">
 The `init` command is designed to be run **only once**, during the initial setup of ZITADEL. Running `init` again after changing the database user or credentials does **not** migrate database object ownerships, nor does it reassign permissions on schemas, tables, or other objects to a new user. You must update these permissions manually if you switch users.

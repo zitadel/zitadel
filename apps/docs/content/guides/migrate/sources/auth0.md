@@ -132,7 +132,7 @@ There are two recommended authentication methods:
 ### 5.2. Import Data with the ZITADEL API
 
 - Use your **access token** or **PAT** to authorize the request.
-- Call the [Admin API – Import Data](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) endpoint, passing your generated JSON file.
+- Call the [Admin API – Import Data](/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) endpoint, passing your generated JSON file.
 - Verify that the users were imported successfully in the ZITADEL console.
 
 **Import Endpoint:**

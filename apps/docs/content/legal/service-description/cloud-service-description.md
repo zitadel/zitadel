@@ -42,8 +42,8 @@ You can freely choose the infrastructure and location to host ZITADEL.
 
 ### Responsibilities
 
-Your obligations while operating and using ZITADEL are detailed in our [terms of service](/docs/legal/terms-of-service#your-obligations) given the provisions in our [acceptable use policy](/docs/legal/policies/acceptable-use-policy).
-When using ZITADEL Cloud, we may processing data on behalf according to the [data processing agreement](/docs/legal/data-processing-agreement).
+Your obligations while operating and using ZITADEL are detailed in our [terms of service](/legal/terms-of-service#your-obligations) given the provisions in our [acceptable use policy](/legal/policies/acceptable-use-policy).
+When using ZITADEL Cloud, we may processing data on behalf according to the [data processing agreement](/legal/data-processing-agreement).
 
 In a self-hosted setup, you will be responsible for the cost, operations, and availability of your infrastructure.
 For DDoS, bot, and threat detection and protection we rely on external services in ZITADEL Cloud.
@@ -82,4 +82,4 @@ In a disaster recovery scenario, our goal is to guarantee a recovery point objec
 Under normal operations, RPO and RTO goals are below 1 minute.
 
 If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
-Please consult the [migration guides](/docs/guides/migrate/introduction) for more information.
+Please consult the [migration guides](/guides/migrate/introduction) for more information.

@@ -6,7 +6,7 @@ sidebar_label: External Identity Provider
 ## Flow
 
 The prerequisite for adding an external login (social and enterprise) to your user account is a registered identity provider on your ZITADEL instance or the organization of the user.
-If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](/docs/guides/integrate/identity-providers/introduction)
+If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](/guides/integrate/identity-providers/introduction)
 
 ![Identity Provider Flow](../../../../public/img/guides/login-ui/external-login-flow.png)
 
@@ -21,7 +21,7 @@ Send the following two URLs in the request body:
 2. ErrorURL: Page that should be shown when an error happens during the authentication
 
 In the response, you will get an authentication URL of the provider you like.
-[Start Identity Provider Intent Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.StartIdentityProviderIntent)
+[Start Identity Provider Intent Documentation](/reference/api/user/zitadel.user.v2.UserService.StartIdentityProviderIntent)
 
 ### Request
 
@@ -73,7 +73,7 @@ Note that the redirect URL is `https://${CUSTOM_DOMAIN}/idps/callback` when usin
 ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
 
 To get the information of the provider, make a request to ZITADEL.
-[Retrieve Identity Provider Intent Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent)
+[Retrieve Identity Provider Intent Documentation](/reference/api/user/zitadel.user.v2.UserService.RetrieveIdentityProviderIntent)
 
 ### Request
 
@@ -164,7 +164,7 @@ Fill the IdP links in the create user request to add a user with an external log
 The idpId is the ID of the provider in ZITADEL, the userId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
 The display name is used to list the linkings on the users.
 
-[Create User API Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.AddHumanUser)
+[Create User API Documentation](/reference/api/user/zitadel.user.v2.UserService.AddHumanUser)
 
 #### Request
 
@@ -203,7 +203,7 @@ curl --request POST \
 If you didn't get a user ID in the parameters to your success page, you know that there is no existing user in ZITADEL with that provider and you can register a new user (read previous section), or link it to an existing account.
 
 If you want to link/connect to an existing account you can perform the add identity provider link request.
-[Add IDP Link to existing user documentation](/docs/reference/api/user/zitadel.user.v2.UserService.AddIDPLink)
+[Add IDP Link to existing user documentation](/reference/api/user/zitadel.user.v2.UserService.AddIDPLink)
 
 #### Request
 

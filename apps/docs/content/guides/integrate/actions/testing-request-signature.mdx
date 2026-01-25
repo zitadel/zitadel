@@ -15,7 +15,7 @@ The examples are based on the request action, but the same principles apply to o
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/guides/manage/console/managers)
+- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 
 <Callout>
 Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
@@ -40,7 +40,7 @@ This type is recommended if the payload contains sensitive information that shou
 
 We'll start the endpoint on port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
+See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 Specify the `payloadType` according to the implementation you want to test: `PAYLOAD_TYPE_JSON`, `PAYLOAD_TYPE_JWT`, or `PAYLOAD_TYPE_JWE`.
 
@@ -105,7 +105,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/targets/<TargetID>/publickeys/
 To configure ZITADEL to call the target when an API endpoint is called, you need to set an execution and define the request
 condition.
 
-See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
+See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
@@ -237,4 +237,4 @@ the [Sent information Request](./usage#sent-information-request) payload descrip
 You have successfully set up a target and verified the payload integrity for request actions using your preferred payload type.
 You can now extend this setup to other action types and integrate it into your workflows as needed.
 Selecting the appropriate payload type ensures that your data is transmitted securely and can be validated effectively on the receiving end.
-Find more information about the actions feature in the [API documentation](/docs/concepts/features/actions_v2).
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

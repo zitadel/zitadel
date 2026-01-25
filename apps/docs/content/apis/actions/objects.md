@@ -111,7 +111,7 @@ title: Objects
 
 ## Auth Request
 
-This object contains context information about the request to the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization-endpoint).
+This object contains context information about the request to the [authorization endpoint](/apis/openidoauth/endpoints#authorization-endpoint).
 
 - `id` *string*
 - `agentId` *string*
@@ -194,7 +194,7 @@ This object represents a list of user grant stored in ZITADEL.
 - `grants` Array of
   - `id` *string*
   - `projectGrantId` *string*  
-    The id of the [project grant](/docs/guides/solution-scenarios/saas#project-grant)
+    The id of the [project grant](/guides/solution-scenarios/saas#project-grant)
   - `state` *Number*  
     <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: removed</li></ul>
   - `creationDate` *Date*

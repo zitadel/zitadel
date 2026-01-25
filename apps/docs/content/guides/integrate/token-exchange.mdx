@@ -17,9 +17,9 @@ Test the feature and add improvement or bug reports directly to the [github repo
 
 In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
 
-- Integrate your app with the [OIDC flow](/docs/guides/integrate/login/oidc/login-users) to obtain tokens
-- [Claims](/docs/apis/openidoauth/claims)
-- [Scope](/docs/apis/openidoauth/scopes)
+- Integrate your app with the [OIDC flow](/guides/integrate/login/oidc/login-users) to obtain tokens
+- [Claims](/apis/openidoauth/claims)
+- [Scope](/apis/openidoauth/scopes)
 - Audience
 
 ## The basics
@@ -49,7 +49,7 @@ When requesting an access token, token exchange will always return an opaque tok
 urn:ietf:params:oauth:token-type:refresh_token
 ```
 
-At the moment we do not support sending refresh tokens as part of the Token Exchange grant. Instead, use the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant).
+At the moment we do not support sending refresh tokens as part of the Token Exchange grant. Instead, use the [`refresh_token` grant](/apis/openidoauth/endpoints#refresh-token-grant).
 
 #### ID Token type
 
@@ -71,7 +71,7 @@ urn:ietf:params:oauth:token-type:jwt
 
 The JWT token type caries a double meaning.
 
-When used as a `subject_token_type`, ZITADEL will try to verify the `subject_token` in a similar way as a JWT Profile. The `sub` field of the JWT is used to set the subject of the requested token. Currently we only allow self-signed JWT as `subject_token` in combination with a valid `actor_token` for impersonation. A self-signed JWT is not enough to obtain other token types from the Token Exchange Grant. You will need to use the [JWT Profile grant](/docs/apis/openidoauth/endpoints#jwt-profile-grant) instead.
+When used as a `subject_token_type`, ZITADEL will try to verify the `subject_token` in a similar way as a JWT Profile. The `sub` field of the JWT is used to set the subject of the requested token. Currently we only allow self-signed JWT as `subject_token` in combination with a valid `actor_token` for impersonation. A self-signed JWT is not enough to obtain other token types from the Token Exchange Grant. You will need to use the [JWT Profile grant](/apis/openidoauth/endpoints#jwt-profile-grant) instead.
 
 When used as a `requested_token_type`, ZITADEL will return an access token as JWT.
 
@@ -119,7 +119,7 @@ Currently ZITADEL supports requesting of:
 
 #### Scope
 
-[Scope](/docs/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
+[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
 
 When scope is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any scope (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have a scope.
 
@@ -159,7 +159,7 @@ The `issued_token_type` contains one of the [token types](#token-types) describe
 
 #### Refresh token
 
-The `refresh_token` may contain a new refresh token that can be used to refresh the `access_token` at a later moment. ZITADEL does not allow using refresh tokens in the Token Exchange grant. Refresh tokens can be used for the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant) instead, including ones obtained through Token Exchange.
+The `refresh_token` may contain a new refresh token that can be used to refresh the `access_token` at a later moment. ZITADEL does not allow using refresh tokens in the Token Exchange grant. Refresh tokens can be used for the [`refresh_token` grant](/apis/openidoauth/endpoints#refresh-token-grant) instead, including ones obtained through Token Exchange.
 
 A refresh token can be obtained by setting the `offline_access` [scope](#scope) in the request or applicable token.
 
@@ -199,7 +199,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/features/instance' \
 }'
 ```
 
-If you are self-hosting, you can also enable the feature for the complete system (all instances) using the [set system level features](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures) endpoint.
+If you are self-hosting, you can also enable the feature for the complete system (all instances) using the [set system level features](/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures) endpoint.
 
 #### Application
 
@@ -314,7 +314,7 @@ This gives the following response:
 }
 ```
 
-As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/docs/apis/openidoauth/endpoints#introspection-endpoint) call with the access token. Note we use the credentials of the API here:
+As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/apis/openidoauth/endpoints#introspection-endpoint) call with the access token. Note we use the credentials of the API here:
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/introspect' \
@@ -471,7 +471,7 @@ If you want to impersonate users by Token Exchange, the security settings of the
 
 #### Impersonation permissions
 
-Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/docs/guides/manage/console/managers):
+Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/guides/manage/console/managers):
 
 | Name                   | Role                      | Description                                                       |
 | ---------------------- | ------------------------- | ----------------------------------------------------------------- |
@@ -567,7 +567,7 @@ Will give the following response:
 }
 ```
 
-In the access token [claims](/docs/apis/openidoauth/claims) we can see that the subject and audience are taken from the `subject_token`. The `act` claim contains the subject and issuer of the `actor_token`, so we can always determine the impersonator that obtained the token.
+In the access token [claims](/apis/openidoauth/claims) we can see that the subject and audience are taken from the `subject_token`. The `act` claim contains the subject and issuer of the `actor_token`, so we can always determine the impersonator that obtained the token.
 
 ```json
 {
@@ -886,7 +886,7 @@ When there was an `actor_token` present during token exchange, we also log a `Us
 
 ![Screenshot showing the user audit log with token creation and impersonation](../../../public/img/guides/token-exchange/user-audit-log.png)
 
-In the [instance event list](/docs/concepts/eventstore/overview) the `User impersonated` carries the actor in the payload:
+In the [instance event list](/concepts/eventstore/overview) the `User impersonated` carries the actor in the payload:
 
 ```json
 {

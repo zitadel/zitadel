@@ -18,16 +18,16 @@ Typical use cases for user metadata include:
 ## Before you start
 
 Before you start you need to add some metadata to an existing user.
-You can do so by using [Console](../console/users) or [setting user metadata](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata) through the management API.
+You can do so by using [Console](../console/users) or [setting user metadata](/reference/api-v1/management/zitadel.management.v1.ManagementService.SetUserMetadata) through the management API.
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout title="Getting a token">
 In case you want to test out different settings configure an application with code flow (PKCE).
-Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/apis/openidoauth/endpoints#token-endpoint).
-You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login/oidc/login-users).
+Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/apis/openidoauth/endpoints#token-endpoint).
+You will find more information in our guides on how to [authenticate users](/guides/integrate/login/oidc/login-users).
 </Callout>
 
 ## Use tokens to get user metadata
@@ -38,13 +38,13 @@ In case you want to manage metadata for other users than the currently logged in
 
 ### Request metadata from userinfo endpoint
 
-With the access token we can make a request to the [userinfo endpoint](/docs/apis/openidoauth/endpoints#introspection-endpoint) to get the user's metadata.
+With the access token we can make a request to the [userinfo endpoint](/apis/openidoauth/endpoints#introspection-endpoint) to get the user's metadata.
 This method is the preferred method to retrieve a user's information in combination with opaque tokens, to insure that the token is valid.
 
-You must pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:user:metadata` in your authentication request.
+You must pass the [reserved scope](/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:user:metadata` in your authentication request.
 If you don't include this scope the response will contain user data, but not the metadata object.
 
-Request the user information by calling the [userinfo endpoint](/docs/apis/openidoauth/endpoints#introspection-endpoint):
+Request the user information by calling the [userinfo endpoint](/apis/openidoauth/endpoints#introspection-endpoint):
 
 ```bash
 curl --request GET \
@@ -148,15 +148,15 @@ With jq installed you can also use `jq -R 'split(".") | .[1] | @base64d | fromjs
 You can use the authentication service to request and search for the user's metadata.
 
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
-Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
+Yet when accessing the authentication service, you need to pass the [reserved scope](/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](https://zitadel.com/playgrounds/oidc) or the configuration of an [example client](/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 <Callout title="Invalid audience">
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
 </Callout>
 
-You can request the user's metadata with the [List My Metadata](/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
+You can request the user's metadata with the [List My Metadata](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
 
 ```bash
 curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
@@ -215,14 +215,14 @@ An example response for your search looks like this:
 ## Register user with custom metadata
 
 When you build your own registration UI you have the possibility to have custom fields and add them to the metadata of your user.
-Learn everything about how to build your own registration UI [here](/docs/guides/integrate/onboarding/end-users#build-your-own-registration-form).
+Learn everything about how to build your own registration UI [here](/guides/integrate/onboarding/end-users#build-your-own-registration-form).
 
 ## Manage user metadata through the management API
 
 The previous methods allowed you to retrieve metadata only for the `sub` in the access token.
 In case you want to get the metadata for another user, you need to use the management service.
-The user that calls the management service must have [manager permissions](/docs/guides/manage/console/managers).
+The user that calls the management service must have [manager permissions](/guides/manage/console/managers).
 A user can be either a human user or a service user.
 
-You can get [metadata of a user filtered by your query](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserMetadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/docs/reference/api-v1/management).
+You can get [metadata of a user filtered by your query](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/reference/api-v1/management/zitadel.management.v1.ManagementService.GetUserMetadata).
+The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api-v1/management).

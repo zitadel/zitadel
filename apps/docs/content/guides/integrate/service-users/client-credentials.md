@@ -3,7 +3,7 @@ title: Configure client credential authentication for service users
 sidebar_label: Client credential authentication
 ---
 
-This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/docs/guides/manage/console/users-overview#service-users-machine-accounts) and client applications within ZITADEL.
+This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/guides/manage/console/users-overview#service-users-machine-accounts) and client applications within ZITADEL.
 
 In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](./authenticate-service-users) as alternative to the [JWT profile authentication](./authenticate-service-users).
 
@@ -40,10 +40,10 @@ curl --request POST \
   --user "$CLIENT_ID:$CLIENT_SECRET"
 ```
 
-* `CUSTOM_DOMAIN` should be set to your [custom domain](/docs/concepts/features/custom-domain)
+* `CUSTOM_DOMAIN` should be set to your [custom domain](/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](/docs/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
-* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/docs/apis/openidoauth/authn-methods)
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
+* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/apis/openidoauth/authn-methods)
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
@@ -66,7 +66,7 @@ Content-Type: application/json
 
 Per default a service user will get an opaque access token.
 If you want to get a Jason Web Token (JWT) as an access token for your user, you can change the token type in the general settings of your service account.
-To learn more about opaque and JWT tokens read our [Opaque Tokens in ZITADEL: Enhancing Application Security](/docs/concepts/knowledge/opaque-tokens) Guide
+To learn more about opaque and JWT tokens read our [Opaque Tokens in ZITADEL: Enhancing Application Security](/concepts/knowledge/opaque-tokens) Guide
 
 ![Service User Token Type](../../../../public/img/console_service_user_tokentype.png)
 
@@ -102,7 +102,7 @@ By following these steps and adhering to security best practices, you can effect
 ## Notes
 
 * Read about the [different authentication methods for service users](./authenticate-service-users)
-* [Service User API reference](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
-* [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
+* [Service User API reference](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
+* [OIDC client secret basic](/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

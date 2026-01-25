@@ -35,7 +35,7 @@ To show the user the QR to register TOTP with his Authenticator App like Google/
 Generate the QR Code with the URI from the response.
 For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
 
-More detailed information about the API: [Start TOTP Registration Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP)
+More detailed information about the API: [Start TOTP Registration Documentation](/reference/api/user/zitadel.user.v2.UserService.RegisterTOTP)
 
 Request Example:
 
@@ -67,7 +67,7 @@ Response Example:
 When the user has added the account to the authenticator app, the code from the App has to be entered to finish the registration.
 This code has to be sent to the verify endpoint in ZITADEL.
 
-More detailed information about the API: [Verify TOTP Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.VerifyTOTPRegistration)
+More detailed information about the API: [Verify TOTP Documentation](/reference/api/user/zitadel.user.v2.UserService.VerifyTOTPRegistration)
 
 Request Example:
 
@@ -93,7 +93,7 @@ curl --request POST \
 To be able to check the TOTP you need a session with a checked user. This can either happen before the TOTP check or at the same time.
 In this example we do two separate requests. So the first step is to create a new Sessions.
 
-More detailed information about the API: [Create new session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
+More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
 Example Request
 
@@ -131,7 +131,7 @@ Example Response
 Now you can show the code field to the user, where the code needs to be entered from the Authenticator App.
 With that code you have to update the existing session with a totp check.
 
-More detailed information about the API: [Update session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.SetSession)
+More detailed information about the API: [Update session Documentation](/reference/api/session/zitadel.session.v2.SessionService.SetSession)
 
 Example Request
 ```bash
@@ -164,12 +164,12 @@ When the user has decided to register the phone number to get a code as a second
 If the user already has a verified phone number you can skip this step.
 
 When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
-If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
+If ZITADEL should do it, make sure that you have registered an [SMS Provider](/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
 With an empty returnCode object in the request, ZITADEL will not send the code, but return it in the response.
 
 If you don't want the user to verify the phone number, you can also create it directly as verified, by sending the isVerified attribute.
 
-More detailed information about the API: [Add phone](/docs/reference/api/user/zitadel.user.v2.UserService.SetPhone)
+More detailed information about the API: [Add phone](/reference/api/user/zitadel.user.v2.UserService.SetPhone)
 
 Example Request:
 
@@ -190,7 +190,7 @@ curl --request POST \
 The next step is to show a screen, so the user is able to enter the code for verifying the phone number.
 Send a verify phone request with the code in the body.
 
-More detailed information about the API: [Verify phone](/docs/reference/api/user/zitadel.user.v2.UserService.VerifyPhone)
+More detailed information about the API: [Verify phone](/reference/api/user/zitadel.user.v2.UserService.VerifyPhone)
 
 Example Request:
 ```bash
@@ -208,7 +208,7 @@ curl --request POST \
 
 Now that the user has a verified phone number you can enable SMS OTP on the user.
 
-More detailed information about the API: [Add OTP SMS for a user](/docs/reference/api/user/zitadel.user.v2.UserService.AddOTPSMS)
+More detailed information about the API: [Add OTP SMS for a user](/reference/api/user/zitadel.user.v2.UserService.AddOTPSMS)
 
 Example Request:
 ```bash
@@ -231,7 +231,7 @@ To be able to check the SMS Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
+More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
 Example Request
 
@@ -296,7 +296,7 @@ For the Email second factor the already verified email address will be taken.
 
 As the user already has a verified E-Mail address you can enable E-Mail OTP on the user.
 
-More detailed information about the API: [Add OTP Email for a user](/docs/reference/api/user/zitadel.user.v2.UserService.AddOTPEmail)
+More detailed information about the API: [Add OTP Email for a user](/reference/api/user/zitadel.user.v2.UserService.AddOTPEmail)
 
 Example Request:
 ```bash
@@ -319,7 +319,7 @@ To be able to check the Email Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
+More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
 Example Request
 
@@ -380,7 +380,7 @@ curl --request PATCH \
 The user has selected to setup Universal Second Factor (U2F).
 To be able to authenticate in the browser you have to start the u2f registration within ZITADEL.
 
-More detailed information about the API: [Start U2F Registration Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.RegisterU2F)
+More detailed information about the API: [Start U2F Registration Documentation](/reference/api/user/zitadel.user.v2.UserService.RegisterU2F)
 
 Request Example:
 
@@ -450,7 +450,7 @@ Include the public key credential you got from the browser in your request.
 You can give the U2F a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-More detailed information about the API: [Verify U2F Documentation](/docs/reference/api/user/zitadel.user.v2.UserService.VerifyU2FRegistration)
+More detailed information about the API: [Verify U2F Documentation](/reference/api/user/zitadel.user.v2.UserService.VerifyU2FRegistration)
 
 Example Request:
 
@@ -491,7 +491,7 @@ In the create session request you can check for the user and directly initiate t
 For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
 Best practice is using discouraged, as this doesn't require the user to enter a PIN. With `preferred` the user might be prompted for the PIN, but it is not necessary.
 
-More detailed information about the API: [Create new session Documentation](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
+More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
 
 Example Request
 

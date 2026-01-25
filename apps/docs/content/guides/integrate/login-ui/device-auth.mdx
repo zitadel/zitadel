@@ -3,7 +3,7 @@ title: Support for the Device Authorization Grant in a Custom Login UI
 sidebar_label: Device Authorization
 ---
 
-In case one of your applications requires the [OAuth2 Device Authorization Grant](/docs/guides/integrate/login/oidc/device-authorization) this guide will show you how to implement
+In case one of your applications requires the [OAuth2 Device Authorization Grant](/guides/integrate/login/oidc/device-authorization) this guide will show you how to implement
 this in your application as well as the custom login UI.
 
 The following flow shows you the different components you need to enable OAuth2 Device Authorization Grant for your login.
@@ -72,7 +72,7 @@ Your login will have to provide a page on the `verification_uri` where the user 
 ### Get the Device Authorization Request by User Code
 
 With the user_code entered by the user you will now be able to get the information of the device authorization request.
-[Get Device Authorization Request Documentation](/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest)
+[Get Device Authorization Request Documentation](/reference/api/oidc/zitadel.oidc.v2.OIDCService.GetDeviceAuthorizationRequest)
 
 ```bash
 curl --request GET \
@@ -102,7 +102,7 @@ Present the user with the information of the device authorization request and al
 ### Perform Login
 
 After you have initialized the OIDC flow you can implement the login.
-Implement all the steps you like the user the go trough by [creating](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/docs/reference/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
+Implement all the steps you like the user the go trough by [creating](/reference/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/reference/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -117,7 +117,7 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Authorize or Deny Device Authorization Request Documentation](/docs/reference/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization)
+Read more about the [Authorize or Deny Device Authorization Request Documentation](/reference/api/oidc/zitadel.oidc.v2.OIDCService.AuthorizeOrDenyDeviceAuthorization)
 
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash

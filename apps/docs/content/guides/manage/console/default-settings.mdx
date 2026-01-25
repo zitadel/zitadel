@@ -68,7 +68,7 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
-Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [branding](/docs/guides/manage/customize/branding).
+Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [branding](/guides/manage/customize/branding).
 
 ## Notification settings
 
@@ -142,8 +142,8 @@ The Login Policy defines how the login process should look like and which authen
 | Hide password reset              | Disable the self-service option for users to reset their password.                                                                                                                                                                                                                                                                                                                                                                                            |
 | Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
 | Ignore unknown usernames         | This setting can be enabled, if no error message should be shown if the user doesn't exist. Example: A user enters the login name john@zitadel.com, the user doesn't exist, but will be redirected to the password screen. After entering a password, the user will get an error that either username or password are wrong.                                                                                                                                  |
-| Disable login with email address | By default users can additionally [login with the email attribute](/docs/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                              |
-| Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/docs/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
+| Disable login with email address | By default users can additionally [login with the email attribute](/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                              |
+| Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
 
 <img
   src="../../../../public/img/guides/console/loginpolicy.png"
@@ -211,7 +211,7 @@ Configure the different lifetimes checks for the login process:
 You can configure all kinds of external identity providers for identity brokering, which support OIDC (OpenID Connect).
 Create a new identity provider configuration and enable it in the list afterwards.
 
-For a detailed guide about how to configure a new identity provider for identity brokering have a look at our [identity provider guides](/docs/guides/integrate/identity-providers/introduction).
+For a detailed guide about how to configure a new identity provider for identity brokering have a look at our [identity provider guides](/guides/integrate/identity-providers/introduction).
 
 ## Password Complexity
 
@@ -272,7 +272,7 @@ If you enable this setting, all loginnames will be suffixed with the organizatio
 
 If this is enabled all created domains on an organization must be verified per dns/acme challenge.
 
-More about how to verify a domain [here](/docs/guides/manage/console/organizations-overview#domain-verification-guide).
+More about how to verify a domain [here](/guides/manage/console/organizations-overview#domain-verification-guide).
 If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
 
 ### SMTP Sender Address matches Custom Domain
@@ -288,7 +288,7 @@ All usernames will then be globally unique within your instance.
 
 You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
 
-Please refer to the [configuration guide](/docs/guides/solution-scenarios/configurations#use-email-to-login) for more information.
+Please refer to the [configuration guide](/guides/solution-scenarios/configurations#use-email-to-login) for more information.
 
 ## External links
 

@@ -10,7 +10,7 @@ We're working on Actions continuously. In the [roadmap](https://zitadel.com/road
 </Callout>
 
 <Callout>
-To use Actions v2, activate the "Actions" [feature flag](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) in order to manage the related resources.
+To use Actions v2, activate the "Actions" [feature flag](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) in order to manage the related resources.
 
 Actions v2 will always be executed if available, even if the feature flag is switched off. To remove any Actions v2, the related Execution must be removed.
 </Callout>
@@ -35,28 +35,28 @@ The process is that, at certain points, ZITADEL executes a defined Execution, wh
 Possible conditions for the Execution:
 - **Request:** Reacts to or manipulates requests to ZITADEL, for example, by adding information to newly created users.
 - **Response:** Reacts to or manipulates responses from ZITADEL, for example, provisioning newly created users to other systems.
-- **Function:** Reacts to various functions in ZITADEL, replacing [Actions](/docs/concepts/features/actions).
+- **Function:** Reacts to various functions in ZITADEL, replacing [Actions](/concepts/features/actions).
 - **Event:** Reacts to different events created in ZITADEL, for example, to inform someone if a user gets locked.
 
 <Callout>
-Currently, defined Actions v2 will be executed in addition to [Actions](/docs/concepts/features/actions).
+Currently, defined Actions v2 will be executed in addition to [Actions](/concepts/features/actions).
 </Callout>
 
 ## Migration
 
-- [Migrate Actions v1 to Actions v2](/docs/guides/integrate/actions/migrate-from-v1)
+- [Migrate Actions v1 to Actions v2](/guides/integrate/actions/migrate-from-v1)
 
 ## Further reading
 
-- [Actions v2 reference](/docs/guides/integrate/actions/usage)
-- [Actions v2 example execution for request](/docs/guides/integrate/actions/testing-request)
-- [Actions v2 example execution for request manipulation](/docs/guides/integrate/actions/testing-request-manipulation)
-- [Actions v2 example execution for request signature check](/docs/guides/integrate/actions/testing-request-signature)
-- [Actions v2 example execution for response](/docs/guides/integrate/actions/testing-response)
-- [Actions v2 example execution for response manipulation](/docs/guides/integrate/actions/testing-response-manipulation)
-- [Actions v2 example execution for function](/docs/guides/integrate/actions/testing-function)
-- [Actions v2 example execution for function manipulation](/docs/guides/integrate/actions/testing-function-manipulation)
-- [Actions v2 example execution for event](/docs/guides/integrate/actions/testing-event)
+- [Actions v2 reference](/guides/integrate/actions/usage)
+- [Actions v2 example execution for request](/guides/integrate/actions/testing-request)
+- [Actions v2 example execution for request manipulation](/guides/integrate/actions/testing-request-manipulation)
+- [Actions v2 example execution for request signature check](/guides/integrate/actions/testing-request-signature)
+- [Actions v2 example execution for response](/guides/integrate/actions/testing-response)
+- [Actions v2 example execution for response manipulation](/guides/integrate/actions/testing-response-manipulation)
+- [Actions v2 example execution for function](/guides/integrate/actions/testing-function)
+- [Actions v2 example execution for function manipulation](/guides/integrate/actions/testing-function-manipulation)
+- [Actions v2 example execution for event](/guides/integrate/actions/testing-event)
 
 ## Example use cases:
 The following repository contains various examples demonstrating how to use Actions v2 in different scenarios. It also includes a deployment script for testing the examples with Cloudflare Workers:

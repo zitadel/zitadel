@@ -10,7 +10,7 @@ This is useful for information provisioning in between systems or for triggering
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL [_IAM_OWNER_](/docs/guides/manage/console/managers)
+- You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 - Your ZITADEL instance needs to have the actions feature enabled.
 
 <Callout>
@@ -30,7 +30,7 @@ You will need to implement a listener that can receive HTTP requests and process
 For this example, we will use a simple Go HTTP server that will print the received request to standard output.
 
 <Callout>
-The signature of the received request can be checked, [please refer to the example for more information on how to](/docs/guides/integrate/actions/testing-request-signature).
+The signature of the received request can be checked, [please refer to the example for more information on how to](/guides/integrate/actions/testing-request-signature).
 </Callout>
 
 ```go
@@ -75,7 +75,7 @@ You can do this by using **Webhook.site** (see [Creating a Listener with Webhook
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-See [Create a target](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
+See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
@@ -99,7 +99,7 @@ Save the returned ID to set in the execution.
 To configure Zitadel to call the target when an API endpoint is called, you need to set an execution and define the response
 condition.
 
-See [Set an execution](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
+See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
@@ -211,4 +211,4 @@ The incoming request headers to the Execution are propagated via the request pay
 
 You have successfully set up a target and execution to react to API responses in your ZITADEL instance.
 This feature can now be used to provision information in between systems or for triggering workflows based on API responses in ZITADEL.
-Find more information about the actions feature in the [API documentation](/docs/concepts/features/actions_v2).
+Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

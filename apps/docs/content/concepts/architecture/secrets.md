@@ -87,7 +87,7 @@ This allows to increase cost along with growing computing power.
 ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
 
 Note however that by default, only `bcrypt` is enabled. 
-Further `Verifiers` must be enabled in the [configuration](/docs/self-hosting/manage/configure) by the system administrator. 
+Further `Verifiers` must be enabled in the [configuration](/self-hosting/manage/configure) by the system administrator. 
 </Callout>
 
 ### Encrypted Secrets
@@ -121,16 +121,16 @@ By default ZITADEL uses `RSA256` for signing purposes and `AES256` for encryptio
 ### Masterkey
 
 Since the Masterkey is used as means of protecting the Secrets Storage it cannot be stored in the storage.
-You find [here the many ways how ZITADEL can consume the Masterkey](/docs/self-hosting/manage/configure).
+You find [here the many ways how ZITADEL can consume the Masterkey](/self-hosting/manage/configure).
 
 ### TLS Material
 
 ZITADEL does support end to end TLS as such it can consume TLS Key Material.
-Please check our [TLS Modes documentation](/docs/self-hosting/manage/tls_modes) for more details.
+Please check our [TLS Modes documentation](/self-hosting/manage/tls_modes) for more details.
 
 ### Admin User
 
-The initial Admin User of ZITADEL can be configured through [ZITADELs config options](/docs/self-hosting/manage/configure).
+The initial Admin User of ZITADEL can be configured through [ZITADELs config options](/self-hosting/manage/configure).
 
 <Callout>
 To prevent elevated breaches ZITADEL forces the Admin Users password to be changed during the first login.

@@ -6,7 +6,7 @@ sidebar_label: Terraform Provider
 The [ZITADEL Terraform Provider](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs) is a tool that allows you to manage ZITADEL resources through Terraform.
 In other words, it lets you define and provision infrastructure for ZITADEL using Terraform configuration files.
 
-This Terraform provider acts as a bridge, allowing you to manage various aspects of your ZITADEL instance directly through the [ZITADEL API](/docs/apis/introduction), using Terraform's declarative configuration language.
+This Terraform provider acts as a bridge, allowing you to manage various aspects of your ZITADEL instance directly through the [ZITADEL API](/apis/introduction), using Terraform's declarative configuration language.
 It can be used to create, update, and delete ZITADEL resources, as well as to manage the relationships between those resources.
 
 ## Before you start
@@ -14,7 +14,7 @@ It can be used to create, update, and delete ZITADEL resources, as well as to ma
 Make sure you create the following resources in ZITADEL and have [Terraform installed](https://learn.hashicorp.com/tutorials/terraform/install-cli):
 
 - [A ZITADEL Instance](../start/quickstart)
-- [A service user](/docs/guides/integrate/service-users/authenticate-service-users) with [enough authorization](/docs/guides/manage/console/managers) to manage the desired resources
+- [A service user](/guides/integrate/service-users/authenticate-service-users) with [enough authorization](/guides/manage/console/managers) to manage the desired resources
 
 ## Manage ZITADEL resources through terraform
 
@@ -32,6 +32,6 @@ To provide a small guide to where to start:
 
 ## References
 
-- [Deploy ZITADEL in your infrastructure](/docs/self-hosting/deploy/overview)
-- [ZITADEL CLI](/docs/self-hosting/manage/cli/overview)
-- [Configuration Options in ZITADEL](/docs/self-hosting/manage/configure)
+- [Deploy ZITADEL in your infrastructure](/self-hosting/deploy/overview)
+- [ZITADEL CLI](/self-hosting/manage/cli/overview)
+- [Configuration Options in ZITADEL](/self-hosting/manage/configure)

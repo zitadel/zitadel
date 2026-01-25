@@ -15,7 +15,7 @@ Human users typically logon with an interactive login.
 This means that an application redirects a user to a website ("login page") where the user can provide the credentials.
 ZITADEL handles the authentication and provides the application with a token that verifies the authentication process.
 
-Read more on how to [login users with ZITADEL](/docs/guides/integrate/login/login-users).
+Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
 
 ### Service users
 
@@ -23,11 +23,11 @@ Service users are for machine-to-machine communication and you would use those t
 For example in ZITADEL you would require an authenticated Service User to access the Management API.
 The main difference between human and machine users is the type of credentials that can be used for authentication: Human users typically logon via an login prompt, but Machine users require a non-interactive logon process.
 
-Learn how to [use service users](/docs/guides/integrate/service-users/authenticate-service-users) with ZITADEL.
+Learn how to [use service users](/guides/integrate/service-users/authenticate-service-users) with ZITADEL.
 
 ### Managers
 
-Any user, human or service user, can be given a [Manager](/docs/concepts/structure/managers) role.
+Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
 Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
@@ -46,7 +46,7 @@ These invited users are called external users.
 
 ### Uniqueness of users
 
-Users can only exist within one [organization](/docs/guides/manage/console/organizations-overview).
+Users can only exist within one [organization](/guides/manage/console/organizations-overview).
 It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
@@ -61,7 +61,7 @@ Consider this general recommendation as a starting point:
 - Structure users in organizations based on common domains that are self-managed (eg, company)
 - Grant your projects to the organizations, allow Managers to give granted roles to their users
 
-You might want to adjust this general setup based on your [scenario](/docs/guides/solution-scenarios). 
+You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios). 
 
 One important consideration in the setup is that you can only have a domain once for an organization. If you have multiple teams working with the same email address, you might need to add them to one single organization that has the domain verified for the teams' domain.
 
@@ -77,5 +77,5 @@ You can use organization metadata or your own business logic to describe a hiera
 ## References
 
 - [Manage users in the Console](../../guides/manage/console/users-overview)
-- [ZITADEL APIs: Users](/docs/reference/api-v1/management)
-- [User onboarding and registration](/docs/guides/integrate/onboarding)
+- [ZITADEL APIs: Users](/reference/api-v1/management)
+- [User onboarding and registration](/guides/integrate/onboarding)

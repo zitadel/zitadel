@@ -9,7 +9,7 @@ This guide explains ZITADEL service users and their role in facilitating secure 
 
 Service users in ZITADEL represent **non-human entities** within your system.
 They are ideal for scenarios involving secure communication between applications, particularly when interacting with backend services or APIs.
-Service users in combination with [Manager](/docs/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
+Service users in combination with [Manager](/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
 Unlike regular human users, service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
 
 ## Benefits of using Service Users
@@ -126,8 +126,8 @@ However, [client credentials authentication](./client-credentials.md) might be c
 ## Further resources
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
-* [OIDC JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
+* [Service User API reference](/reference/api-v1/management/zitadel.management.v1.ManagementService.AddMachineUser)
+* [OIDC JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)
 

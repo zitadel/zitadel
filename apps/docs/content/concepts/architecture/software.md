@@ -38,15 +38,15 @@ The http server is responsible for the following functions:
 
 The API layer consist of the multiple APIs provided by Zitadel. Each serves a dedicated purpose.
 All APIs of Zitadel are always available as gRCP, gRPC-web and REST service. 
-The only exception is the [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) and [Asset API](/docs/apis/introduction#assets) due their unique nature.
+The only exception is the [OpenID Connect & OAuth](/apis/openidoauth/endpoints) and [Asset API](/apis/introduction#assets) due their unique nature.
 
-- [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) - allows to request authentication and authorization of Zitadel
-- [SAML](/docs/apis/saml/endpoints) - allows to request authentication and authorization of Zitadel through the SAML standard
-- [Authentication API](/docs/apis/introduction#authentication) - allow a user to do operation in its own context
-- [Management API](/docs/apis/introduction#management) - allows an admin or machine to manage the Zitadel resources on an organization level
-- [Administration API](/docs/apis/introduction#administration) - allows an admin or machine to manage the Zitadel resources on an instance level
-- [System API](/docs/apis/introduction#system) - allows to create and change new Zitadel instances
-- [Asset API](/docs/apis/introduction#assets) - is used to upload and download static assets
+- [OpenID Connect & OAuth](/apis/openidoauth/endpoints) - allows to request authentication and authorization of Zitadel
+- [SAML](/apis/saml/endpoints) - allows to request authentication and authorization of Zitadel through the SAML standard
+- [Authentication API](/apis/introduction#authentication) - allow a user to do operation in its own context
+- [Management API](/apis/introduction#management) - allows an admin or machine to manage the Zitadel resources on an organization level
+- [Administration API](/apis/introduction#administration) - allows an admin or machine to manage the Zitadel resources on an instance level
+- [System API](/apis/introduction#system) - allows to create and change new Zitadel instances
+- [Asset API](/apis/introduction#assets) - is used to upload and download static assets
 
 ### Core Layer
 
@@ -144,8 +144,8 @@ The storage layer of Zitadel is responsible for multiple tasks. For example:
 - Backup and restore operation for disaster recovery purpose
 
 Zitadel currently supports PostgreSQL.
-Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgre-sql) before you decide on using one of them.
+Make sure to read our [Production Guide](/self-hosting/manage/production#prefer-postgre-sql) before you decide on using one of them.
 
 <Callout>
-Zitadel v2 supported CockroachDB and PostgreSQL. Zitadel v3 only supports PostgreSQL. Please refer to [the mirror guide](/docs/self-hosting/manage/cli/mirror) to migrate to PostgreSQL.
+Zitadel v2 supported CockroachDB and PostgreSQL. Zitadel v3 only supports PostgreSQL. Please refer to [the mirror guide](/self-hosting/manage/cli/mirror) to migrate to PostgreSQL.
 </Callout>

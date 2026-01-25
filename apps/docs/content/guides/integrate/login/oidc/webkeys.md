@@ -16,7 +16,7 @@ Private keys are used to sign tokens.
 Public keys are used to verify tokens.
 OIDC clients need the public key to verify ID tokens.
 OAuth2 API apps might need the public key if they want to client-side verification of a
-JWT access tokens, instead of [introspection](/docs/apis/openidoauth/endpoints#introspection-endpoint).
+JWT access tokens, instead of [introspection](/apis/openidoauth/endpoints#introspection-endpoint).
 ZITADEL uses public key verification when API calls are made or when the userInfo or introspection
 endpoints are called with a JWT access token.
 
@@ -78,7 +78,7 @@ The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](/docs/reference/api/webkey).
+ZITADEL provides a resource based [web keys API](/reference/api/webkey).
 The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
 Applications need public keys for token verification and not all applications are capable of on-demand
@@ -90,12 +90,12 @@ This allows the keys to be distributed to the instance's apps and caches.
 Once a key is deactivated, its public key will remain available for token verification until the web key is deleted.
 Delayed deletion makes sure tokens that were signed before the key got deactivated remain valid.
 
-When the `web_key` [feature](/docs/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) is enabled the first time,
+When the `web_key` [feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) is enabled the first time,
 two web key pairs are created with one activated.
 
 ### Creation
 
-The web key [create](/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey) endpoint generates a new web key pair,
+The web key [create](/reference/api/webkey/zitadel.webkey.v2.WebKeyService.CreateWebKey) endpoint generates a new web key pair,
 using the passed generator configuration from the request. This config is a one-of field of:
 
 - RSA
@@ -192,7 +192,7 @@ curl -L 'https://$CUSTOM-DOMAIN/v2/web_keys' \
 
 ### Activation
 
-When a generated web key is [activated](/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey),
+When a generated web key is [activated](/reference/api/webkey/zitadel.webkey.v2.WebKeyService.ActivateWebKey),
 its private key will be used to sign new tokens.
 There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
@@ -203,7 +203,7 @@ at least for the duration of the max-age setting plus any time it might take for
 
 ### Deletion
 
-Non-active keys may be [deleted](/docs/reference/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey).
+Non-active keys may be [deleted](/reference/api/webkey/zitadel.webkey.v2.WebKeyService.DeleteWebKey).
 Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,
@@ -212,7 +212,7 @@ Otherwise the endpoint's response size will only grow over time, which might lea
 
 Once a key was activated and deactivated (by activation of the next key) deletion should wait:
 
-- Until access and ID tokens are expired. See [OIDC token lifetimes](/docs/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
+- Until access and ID tokens are expired. See [OIDC token lifetimes](/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
 - ID tokens may be used as `id_token_hint` in authentication and end-session requests. The hint typically doesn't expire, but becomes invalid once the key is deleted.
   It might be desirable to keep keys around long enough to minimize user impact.
 

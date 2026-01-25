@@ -3,16 +3,16 @@ title: Usage Control
 sidebar_label: Usage Control
 ---
 
-If you have a self-hosted ZITADEL environment, you can limit the usage of your [instances](/docs/concepts/structure/instance).
-For example, if you provide your customers [their own virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) with access on their own domains, you can design a pricing model based on the usage of their instances.
+If you have a self-hosted ZITADEL environment, you can limit the usage of your [instances](/concepts/structure/instance).
+For example, if you provide your customers [their own virtual instances](/concepts/structure/instance#multiple-virtual-instances) with access on their own domains, you can design a pricing model based on the usage of their instances.
 The usage control features are currently limited to the instance level only.
 
 ## Block Instances
 
-You can block an instance using the [system API](/docs/reference/api-v1/system).
+You can block an instance using the [system API](/reference/api-v1/system).
 
 Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
-However, requests to the [system API](/docs/apis/introduction#system) are still allowed.
+However, requests to the [system API](/apis/introduction#system) are still allowed.
 Requests to paths with the prefix */ui/login* return a redirect with HTTP status *302 Found* to */ui/console*, where the user is guided to *InstanceManagementURL*.
 Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 
@@ -31,15 +31,15 @@ DefaultInstance:
 
 You can restrict the maximum age of events returned by the following APIs:
 
-- [Events Search](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListEvents), See also the [Event API guide](/docs/guides/integrate/zitadel-apis/event-api)
-- [My User History](/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserChanges)
-- [A Users History](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserChanges)
-- [A Applications History](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListAppChanges)
-- [A Organizations History](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListOrgChanges)
-- [A Projects History](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectChanges)
-- [A Project Grants History](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges)
+- [Events Search](/reference/api-v1/admin/zitadel.admin.v1.AdminService.ListEvents), See also the [Event API guide](/guides/integrate/zitadel-apis/event-api)
+- [My User History](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserChanges)
+- [A Users History](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserChanges)
+- [A Applications History](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListAppChanges)
+- [A Organizations History](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListOrgChanges)
+- [A Projects History](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectChanges)
+- [A Project Grants History](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListProjectGrantChanges)
 
-You can set a global default limit as well as a default limit [for new virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
+You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
 The following snippets shows the defaults:
 
 ```yaml
@@ -55,7 +55,7 @@ DefaultInstance:
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
 ```
 
-You can also set a limit for [a specific virtual instance](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/reference/api-v1/system).
+You can also set a limit for [a specific virtual instance](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/reference/api-v1/system).
 
 ## Quotas
 
@@ -85,7 +85,7 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 ```
 
-Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/reference/api-v1/system) or the *DefaultInstances.Quotas* section.
+Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/reference/api-v1/system) or the *DefaultInstances.Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
@@ -127,7 +127,7 @@ DefaultInstance:
 
 ### Exhausted Authenticated Requests
 
-If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/docs/apis/introduction#system).
+If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
 Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 The console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 

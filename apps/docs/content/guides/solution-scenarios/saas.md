@@ -57,7 +57,7 @@ With the primary domain scope the organization will be restricted to the request
 The private labeling (branding) and the login policy of the requested organization will be set automatically.
 
 <Callout>
-More about the [Scopes](/docs/apis/openidoauth/scopes)
+More about the [Scopes](/apis/openidoauth/scopes)
 </Callout>
 
 2. Show private labeling (branding) of the project organization
@@ -68,5 +68,5 @@ If the setting is set to `Ensure Project Resource Owner Setting`, the private la
 The last possibility is to show the private labeling of the project organization and as soon as the user is identified the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
 <Callout>
-More about [Private Labeling](/docs/guides/manage/customize/branding)
+More about [Private Labeling](/guides/manage/customize/branding)
 </Callout>

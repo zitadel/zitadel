@@ -3,7 +3,7 @@ title: Caches
 sidebar_label: Caches [Beta] 
 ---
 
-ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/docs/concepts/structure/instance) information in middleware.
+ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/concepts/structure/instance) information in middleware.
 
 <Callout>
 Caches is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
@@ -32,7 +32,7 @@ Caches:
       Level: error
 ```
 
-For a full configuration reference, please see the [runtime configuration file](/docs/self-hosting/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
+For a full configuration reference, please see the [runtime configuration file](/self-hosting/manage/configure/configure#runtime-configuration-file) section's `defaults.yaml`.
 
 ## Connectors
 
@@ -129,7 +129,7 @@ Drawbacks:
 The drawbacks restricts its usefulness in distributed deployments. However simple installations running a single server can benefit greatly from this type of cache. For example test, development or home deployments.
 If inconsistency is acceptable for short periods of time, one can choose to use this type of cache in distributed deployments with short max age configuration. 
 
-**For example**: A ZITADEL deployment with 2 servers is serving 1000 req/sec total. The installation only has one instance[^1]. There is only a small amount of data cached (a few kB) so duplication is not a problem in this case. It is acceptable for [instance level setting](/docs/guides/manage/console/default-settings) to be out-dated for a short amount of time. When the memory cache is enabled for the instance objects, with a max age of 1 second, the instance only needs to be obtained from the database 2 times per second (once for each server). Saving 998 of redundant queries. Once an instance level setting is changed, it takes up to 1 second for all the servers to get the new state.
+**For example**: A ZITADEL deployment with 2 servers is serving 1000 req/sec total. The installation only has one instance[^1]. There is only a small amount of data cached (a few kB) so duplication is not a problem in this case. It is acceptable for [instance level setting](/guides/manage/console/default-settings) to be out-dated for a short amount of time. When the memory cache is enabled for the instance objects, with a max age of 1 second, the instance only needs to be obtained from the database 2 times per second (once for each server). Saving 998 of redundant queries. Once an instance level setting is changed, it takes up to 1 second for all the servers to get the new state.
 
 ## Objects
 
@@ -158,20 +158,20 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/reference/api-v1/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/reference/api-v1/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/guides/manage/console/default-settings):
 
-- Instance [features](/docs/guides/manage/console/default-settings#features)
-- Custom domains: generated and [custom](/docs/guides/manage/cloud/instances#add-custom-domain)
-- [Trusted domains](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain)
-- Security settings ([IFrame policy](/docs/guides/solution-scenarios/configurations#embedding-zitadel-in-an-i-frame))
+- Instance [features](/guides/manage/console/default-settings#features)
+- Custom domains: generated and [custom](/guides/manage/cloud/instances#add-custom-domain)
+- [Trusted domains](/reference/api-v1/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain)
+- Security settings ([IFrame policy](/guides/solution-scenarios/configurations#embedding-zitadel-in-an-i-frame))
 - Limits[^2]
-- [Allowed languages](/docs/guides/manage/console/default-settings#languages)
+- [Allowed languages](/guides/manage/console/default-settings#languages)
 
 These settings typically change infrequently in production. ***Every*** request made to ZITADEL needs to query for the instance. This is a typical case of set once, get many times where a cache can provide a significant optimization.
 
 ### Milestones
 
-Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/docs/guides/manage/console/console-overview) landing page.
+Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/guides/manage/console/console-overview) landing page.
 Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, ZITADEL must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
 
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
@@ -179,7 +179,7 @@ For single instance setups which fulfilled all milestone (*your next steps* in c
 
 ### Organization
 
-Most resources like users, project and applications are part of an [organization](/docs/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
 Organization objects are quite small and receive infrequent updates after they are created:
 
 - Change of organization name
@@ -249,6 +249,6 @@ Caches:
 ```
 ----
 
-[^1]: Many deployments of ZITADEL have only one or few [instances](/docs/concepts/structure/instance). Multiple instances are mostly used for ZITADEL cloud, where each customer gets at least one instance.
+[^1]: Many deployments of ZITADEL have only one or few [instances](/concepts/structure/instance). Multiple instances are mostly used for ZITADEL cloud, where each customer gets at least one instance.
 
 [^2]: Limits are imposed by the system API, usually when customers exceed their subscription in ZITADEL cloud.

@@ -19,7 +19,7 @@ After init and setup is done, you can start the runtime phase, that immediately 
 
 ## Scaling ZITADEL
 
-For production setups, we recommend that you [run ZITADEL in a highly available mode](/docs/self-hosting/manage/production).
+For production setups, we recommend that you [run ZITADEL in a highly available mode](/self-hosting/manage/production).
 As all shared state is managed in the database,
 the ZITADEL binary itself is stateless.
 You can easily run as many ZITADEL binaries in parallel as you want.
@@ -41,7 +41,7 @@ when the runtime processes are just executed with `zitadel start`.
 
 ## Separating Init and Setup from the Runtime
 
-If you use the [official ZITADEL Helm chart](/docs/self-hosting/deploy/kubernetes),
+If you use the [official ZITADEL Helm chart](/self-hosting/deploy/kubernetes),
 then you can stop reading now.
 The init and setup phases are already separated and executed in dedicated Kubernetes Jobs.
 If you use another orchestrator and want to separate the phases yourself,
@@ -82,7 +82,7 @@ The setup phase is idempotent if executed with the same binary version.
 The `zitadel start` command assumes the database is already initialized and set up.
 It starts serving requests within fractions of a second.
 Beware, in the background, out-of-date projections
-[recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
+[recompute their state by replaying all missed events](/concepts/eventstore/implementation#projections).
 If a new ZITADEL version is deployed, this can take quite a long time,
 depending on the amount of events to catch up.
 You probably should consider providing `--init-projections=true`-flag to the [Setup Phase](#the-setup-phase) to shift the synchronization time to previous steps and delay the startup phase until events are caught up.

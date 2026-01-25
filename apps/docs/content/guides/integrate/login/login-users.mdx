@@ -20,12 +20,12 @@ In this guide, we will walk through the different protocols, features and concep
 OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
 ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
-Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](https://zitadel.com/playgrounds/oidc) to the identity provider that contains information such as the requesting application, [scopes](/docs/apis/openidoauth/scopes), and redirect url.
-The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain)
+Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](https://zitadel.com/playgrounds/oidc) to the identity provider that contains information such as the requesting application, [scopes](/apis/openidoauth/scopes), and redirect url.
+The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/concepts/features/custom-domain)
 The user will authenticate using their credentials.
 After successful authentication, the user will be redirected back to the original application.
 
-If you want to read more about authenticating with OIDC, head over to our comprehensive [OpenID Connect Guide](/docs/guides/integrate/login/oidc).
+If you want to read more about authenticating with OIDC, head over to our comprehensive [OpenID Connect Guide](/guides/integrate/login/oidc).
 
 ### Authenticate users with SAML
 
@@ -54,12 +54,12 @@ Note that SAML might not be suitable for mobile applications.
 In case you want to integrate a mobile application, use OpenID Connect or our Session API.
 
 There are more [differences between SAML and OIDC](https://zitadel.com/blog/saml-vs-oidc) that you might want to consider.
-If you want to read more about authenticating with SAML, head over to our comprehensive [SAML Guide](/docs/guides/integrate/login/saml).
+If you want to read more about authenticating with SAML, head over to our comprehensive [SAML Guide](/guides/integrate/login/saml).
 
 ## ZITADEL's Session API
 
-ZITADEL's [Session API](/docs/reference/api/session) provides developers with a straightforward method to manage user sessions within their applications.
-The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/docs/guides/integrate/login-ui).
+ZITADEL's [Session API](/reference/api/session) provides developers with a straightforward method to manage user sessions within their applications.
+The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/guides/integrate/login-ui).
 
 ### Tokens in the Session API
 
@@ -90,7 +90,7 @@ Overall, ZITADEL's Session API simplifies session management within your applica
 
 ZITADEL provides a hosted single-sign-on page for secure user authentication within your applications.
 This centralized authentication interface simplifies application integration by offering a ready-to-use login experience.
-For a comprehensive understanding of the hosted login page and its capabilities, please refer to our [dedicated guide](/docs/guides/integrate/login/hosted-login)
+For a comprehensive understanding of the hosted login page and its capabilities, please refer to our [dedicated guide](/guides/integrate/login/hosted-login)
 
 The hosted login is particularly well-suited for scenarios where:
 
@@ -103,7 +103,7 @@ The hosted login is particularly well-suited for scenarios where:
 ## Build a custom Login UI to authenticate users
 
 In certain cases, you want to build your own login UI to optimize your user experience.
-We have dedicated guides on [how to build your custom login UI](/docs/guides/integrate/login-ui) with ZITADEL.
+We have dedicated guides on [how to build your custom login UI](/guides/integrate/login-ui) with ZITADEL.
 
 When building your own login UI, you will leverage the [Session API](#zitadel-session-api) to authenticate users and manage user sessions.
 
@@ -116,12 +116,12 @@ At the moment developers can only integrate with ZITADEL's Session API and not w
 Main reasons why developers might want to build their own login UI include:
 
 1. **Embedding Login in your application**: From a security standpoint you should follow the best practice recommendation to open a browser and then redirect to your application. For certain applications, such as games or mobile apps, you might want to embed the login for a better user experience
-2. **Customize business process**: You might want to change existing flows that are provided by the hosted login to fit your business process. Make sure to validate that your customization can't be handled by [Actions](/docs/guides/manage/customize/behavior) instead.
-3. **Customize branding**: We designed the hosted login with security in mind, which limits the [customization capabilities](/docs/guides/manage/customize/branding). Besides that we might not be able to handle all requirements for custom branding. If you believe your customization should be part of the hosted login instead, please open an [improvement idea](https://github.com/zitadel/zitadel/issues/new/choose).
+2. **Customize business process**: You might want to change existing flows that are provided by the hosted login to fit your business process. Make sure to validate that your customization can't be handled by [Actions](/guides/manage/customize/behavior) instead.
+3. **Customize branding**: We designed the hosted login with security in mind, which limits the [customization capabilities](/guides/manage/customize/branding). Besides that we might not be able to handle all requirements for custom branding. If you believe your customization should be part of the hosted login instead, please open an [improvement idea](https://github.com/zitadel/zitadel/issues/new/choose).
 4. **Independence of standards** You don't want or need to rely on industry standards for authentication such as OpenID Connect or SAML for authenticating users.
 
 ## Further reference
 
-- Learn how to [register and onboard users](/docs/guides/integrate/onboarding)
-- Learn how to [build your own login UI](/docs/guides/integrate/login-ui) based on ZITADEL
-- Learn how to [configure ZITADEL](/docs/guides/manage/console/console-overview) through the Console
+- Learn how to [register and onboard users](/guides/integrate/onboarding)
+- Learn how to [build your own login UI](/guides/integrate/login-ui) based on ZITADEL
+- Learn how to [configure ZITADEL](/guides/manage/console/console-overview) through the Console

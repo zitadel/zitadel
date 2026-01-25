@@ -66,5 +66,5 @@ As organizations navigate the complex landscape of application security, integra
 Notes: 
 
 - Read more about the differences in our [blog on JWT vs. Opaque tokens](https://zitadel.com/blog/jwt-vs-opaque-tokens)
-- Learn how to use [token introspection](/docs/guides/integrate/token-introspection) to validate access tokens
+- Learn how to use [token introspection](/guides/integrate/token-introspection) to validate access tokens
 - Decode, verify and generate valid JWT tokens with [jwt.io](https://jwt.io/)

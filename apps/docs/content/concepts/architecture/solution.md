@@ -9,7 +9,7 @@ Zitadel can be run as high available system with ease.
 Since the storage layer takes the heavy lifting of making sure that data in synched across, server, data centers or regions.
 
 Depending on your projects needs our general recommendation is to run Zitadel across multiple availability zones in the same region or across multiple regions.
-Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgre-sql) before you decide to use it.
+Make sure to read our [Production Guide](/self-hosting/manage/production#prefer-postgre-sql) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/) for more details.
 
 ## Scalability
@@ -44,7 +44,7 @@ Hence our reference design for Kubernetes is to have three application nodes and
 To scale Zitadel across regions it is recommend to create at least three clusters.
 Each cluster is a fully independent ZITADEL setup.
 To keep the data in sync across all clusters, we recommend using Postgres with read-only replicas as a storage layer.
-Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgre-sql) before you decide to use it.
+Make sure to read our [Production Guide](/self-hosting/manage/production#prefer-postgre-sql) before you decide to use it.
 Consult the [Postgres documentation](https://www.postgresql.org/docs/current/high-availability.html) for more details.
 
 
@@ -65,7 +65,7 @@ The common update involves the following steps and do not need manual interventi
 - As soon as the new version is ready to accept traffic it will signal this on the readiness endpoint `/debug/ready` 
 - At this point your network infrastructure can send traffic to the new version
 
-Users who use [Kubernetes/Helm](/docs/self-hosting/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
+Users who use [Kubernetes/Helm](/self-hosting/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
 
 <Callout>
 As a good practice we recommend creating Database Backups prior to an update.

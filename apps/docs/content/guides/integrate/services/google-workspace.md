@@ -21,7 +21,7 @@ At this time Google supports SSO with OpenID Connect only for few providers.
 Prerequisites:
 
 - You need to have a domain registered with your Google Workspace account to configure SSO profiles
-- Make sure that you [verify the same domain also in your ZITADEL organization and set it as primary domain](/docs/guides/manage/console/organizations-overview#primary-domain)
+- Make sure that you [verify the same domain also in your ZITADEL organization and set it as primary domain](/guides/manage/console/organizations-overview#primary-domain)
 - A user in Google Workspace (eg, road.runner@acme.com)
 - A user in ZITADEL with the same username (eg, road.runner@acme.com); make sure you verify the domain to set the username. This is different than the user's email address
 

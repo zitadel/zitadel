@@ -19,9 +19,9 @@ At the end of the guide you should have an application able to read the details 
 The client [SDK](https://github.com/zitadel/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [Go SDK](https://github.com/zitadel/zitadel-go).
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
-However, we recommend you read the guide on [how to access ZITADEL API](/docs/guides/integrate/zitadel-apis/access-zitadel-apis)) and the associated guides for a basic knowledge of :
- - [Recommended Authorization Flows](/docs/guides/integrate/login/oidc/oauth-recommended-flows)
- - [Service Users](/docs/guides/integrate/service-users/authenticate-service-users)
+However, we recommend you read the guide on [how to access ZITADEL API](/guides/integrate/zitadel-apis/access-zitadel-apis)) and the associated guides for a basic knowledge of :
+ - [Recommended Authorization Flows](/guides/integrate/login/oidc/oauth-recommended-flows)
+ - [Service Users](/guides/integrate/service-users/authenticate-service-users)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
@@ -83,5 +83,5 @@ api.SessionService().CreateSession(ctx, &session.CreateSessionRequest{})
 ```
 Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/next/example),
 like how you can integrate the [client in your own API](https://github.com/zitadel/zitadel-go/blob/next/example/api/client/main.go)
-or refer to our [API Docs](/docs/apis/introduction).
+or refer to our [API Docs](/apis/introduction).
 

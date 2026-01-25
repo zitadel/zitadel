@@ -364,16 +364,16 @@ There are different types of Targets:
 
 `InterruptOnError` means that the Execution gets interrupted if any of the calls return with a status code >= 400, and the next Target will not be called anymore.
 
-The API documentation to create a target can be found [here](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget)
+The API documentation to create a target can be found [here](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget)
 
 ### Content Signing
 
 To ensure the integrity of request content, each call includes a 'ZITADEL-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
 
-Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/docs/reference/api/action/zitadel.action.v2.ActionService.CreateTarget),
-and can also be newly generated when a Target is [patched](/docs/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget).
+Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget),
+and can also be newly generated when a Target is [patched](/reference/api/action/zitadel.action.v2.ActionService.UpdateTarget).
 
-For an example on how to check the signature, [refer to the example](/docs/guides/integrate/actions/testing-request-signature).
+For an example on how to check the signature, [refer to the example](/guides/integrate/actions/testing-request-signature).
 
 ## Execution
 
@@ -387,7 +387,7 @@ The condition can be defined for 4 types of processes:
 - `Functions`, handling specific functionality in the logic of ZITADEL
 - `Events`, after a specific event happened and was stored in ZITADEL
 
-The API documentation to set an Execution can be found [here](/docs/reference/api/action/zitadel.action.v2.ActionService.SetExecution)
+The API documentation to set an Execution can be found [here](/reference/api/action/zitadel.action.v2.ActionService.SetExecution)
 
 ### Condition Best Match
 
@@ -454,12 +454,12 @@ For Request and Response there are 3 levels the condition can be defined:
 - `All`, handling any request or response under the ZITADEL API
 
 The available conditions can be found under:
-- [All available Methods](/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods), for example `/zitadel.user.v2.UserService/AddHumanUser`
-- [All available Services](/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionServices), for example `zitadel.user.v2.UserService`
+- [All available Methods](/reference/api/action/zitadel.action.v2.ActionService.ListExecutionMethods), for example `/zitadel.user.v2.UserService/AddHumanUser`
+- [All available Services](/reference/api/action/zitadel.action.v2.ActionService.ListExecutionServices), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
 
-The available conditions can be found under [all available Functions](/docs/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions).
+The available conditions can be found under [all available Functions](/reference/api/action/zitadel.action.v2.ActionService.ListExecutionFunctions).
 
 ### Condition for Events
 
@@ -469,7 +469,7 @@ For event there are 3 levels the condition can be defined:
 - Group, handling a specific group of events
 - All, handling any event in ZITADEL
 
-The concept of events can be found under [Events](/docs/concepts/architecture/software#events)
+The concept of events can be found under [Events](/concepts/architecture/software#events)
 
 ### Error forwarding
 

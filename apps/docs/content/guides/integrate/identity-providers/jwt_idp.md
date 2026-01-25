@@ -47,7 +47,7 @@ The authentication flow with JWT IdP looks like this:
    - The user visits the new application, possibly via a link from the existing app.
    - If no session is found, the new app initiates an OIDC login via ZITADEL.  
      - The user either selects the JWT IdP in the ZITADEL UI,  
-     - **or** the application uses a [custom scope](/docs/apis/openidoauth/scopes#reserved-scopes) to pre-select the JWT IdP in the OIDC Authorization Request.
+     - **or** the application uses a [custom scope](/apis/openidoauth/scopes#reserved-scopes) to pre-select the JWT IdP in the OIDC Authorization Request.
 
 3. **ZITADEL redirects to the JWT Endpoint (Browser):**  
    - ZITADEL redirects the user's browser to the configured JWT Endpoint (usually behind the WAF).

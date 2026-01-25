@@ -27,7 +27,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 1. Go to the detail page of your organization
 2. Click in the top right corner the "+" button
 3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/docs/guides/manage/console/managers))
+4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
 
 ![Add org owner to service user](../../../../public/img/guides/console-service-user-org-owner.gif)
 

@@ -127,9 +127,9 @@ Useful if you trust the provided information or don't want the users to verify t
 #### Triggers
 
 - Internal Authentication
-  - [Pre Creation](/docs/apis/actions/internal-authentication#pre-creation)
+  - [Pre Creation](/apis/actions/internal-authentication#pre-creation)
 - External Authentication
-  - [Pre Creation](/docs/apis/actions/external-authentication#pre-creation)
+  - [Pre Creation](/apis/actions/external-authentication#pre-creation)
 
 <details open="">
 <summary>Code example</summary>
@@ -147,9 +147,9 @@ Allows you to add default user grants to a user after it was created or federate
 #### Triggers
 
 - Internal Authentication
-  - [Post Creation](/docs/apis/actions/internal-authentication#post-creation)
+  - [Post Creation](/apis/actions/internal-authentication#post-creation)
 - External Authentication
-  - [Post Creation](/docs/apis/actions/external-authentication#post-creation)
+  - [Post Creation](/apis/actions/external-authentication#post-creation)
 
 <details open="">
 <summary>Code example</summary>
@@ -167,11 +167,11 @@ Adding metadata to users allows you to set default metadata on users.
 #### Triggers
 
 - Internal Authentication
-  - [Pre Creation](/docs/apis/actions/internal-authentication#pre-creation)
-  - [Post Authentication](/docs/apis/actions/internal-authentication#post-authentication)
+  - [Pre Creation](/apis/actions/internal-authentication#pre-creation)
+  - [Post Authentication](/apis/actions/internal-authentication#post-authentication)
 - External Authentication
-  - [Pre Creation](/docs/apis/actions/internal-authentication#pre-creation)
-  - [Post Authentication](/docs/apis/actions/internal-authentication#post-authentication)
+  - [Pre Creation](/apis/actions/internal-authentication#pre-creation)
+  - [Post Authentication](/apis/actions/internal-authentication#post-authentication)
 
 <details open="">
 <summary>Code example</summary>
@@ -193,7 +193,7 @@ If you want to ensure that the data of a user are always up-to-date, you can aut
 
 ### Fields provided by Okta as OIDC IdP
 
-If you use [Okta as an identity provider](/docs/guides/integrate/identity-providers/okta-oidc) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta-oidc) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -206,7 +206,7 @@ https://github.com/zitadel/actions/blob/main/examples/okta_identity_provider.js
 
 ### Fields provided by Gitlab
 
-If you use [Gitlab as an identity provider](/docs/guides/integrate/identity-providers/gitlab) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Gitlab as an identity provider](/guides/integrate/identity-providers/gitlab) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -219,7 +219,7 @@ https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider.j
 
 ### Fields provided by Github
 
-If you use [Github as an identity provider](/docs/guides/integrate/identity-providers/github) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Github as an identity provider](/guides/integrate/identity-providers/github) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -232,7 +232,7 @@ https://github.com/zitadel/actions/blob/main/examples/github_identity_provider.j
 
 ### Claims provided by a generic OIDC identity provider
 
-If you use a [generic OIDC identity provider](/docs/guides/integrate/identity-providers/migrate#migrate-generic-oidc-provider) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use a [generic OIDC identity provider](/guides/integrate/identity-providers/migrate#migrate-generic-oidc-provider) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -245,7 +245,7 @@ https://github.com/zitadel/actions/blob/main/examples/set_idp_picture_metadata.j
 
 ### Attributes provided by Okta as SAML IDP
 
-If you use [Okta as an identity provider](/docs/guides/integrate/identity-providers/okta_saml#add-attribute-statements) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta_saml#add-attribute-statements) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -258,7 +258,7 @@ https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_
 
 ### Attributes provided by Microsoft Entra as SAML IDP
 
-If you use [Microsoft Entra as SAML identity provider](/docs/guides/integrate/identity-providers/azure-ad-saml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Microsoft Entra as SAML identity provider](/guides/integrate/identity-providers/azure-ad-saml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -271,7 +271,7 @@ https://github.com/zitadel/actions/blob/main/examples/entra_id_saml_prefil_regis
 
 ### Attributes provided by a generic SAML identity provider
 
-If you use a [SAML identity provider like mocksaml](/docs/guides/integrate/identity-providers/mocksaml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use a [SAML identity provider like mocksaml](/guides/integrate/identity-providers/mocksaml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -293,13 +293,13 @@ Execution paths might change based on the application initiating the authenticat
 #### Triggers
 
 - Internal Authentication
-  - [Pre Creation](/docs/apis/actions/internal-authentication#pre-creation)
-  - [Post Creation](/docs/apis/actions/internal-authentication#post-creation)
-  - [Post Authentication](/docs/apis/actions/internal-authentication#post-authentication)
+  - [Pre Creation](/apis/actions/internal-authentication#pre-creation)
+  - [Post Creation](/apis/actions/internal-authentication#post-creation)
+  - [Post Authentication](/apis/actions/internal-authentication#post-authentication)
 - External Authentication
-  - [Pre Creation](/docs/apis/actions/external-authentication#pre-creation)
-  - [Post Creation](/docs/apis/actions/external-authentication#post-creation)
-  - [Post Authentication](/docs/apis/actions/external-authentication#post-authentication)
+  - [Pre Creation](/apis/actions/external-authentication#pre-creation)
+  - [Post Creation](/apis/actions/external-authentication#post-creation)
+  - [Post Authentication](/apis/actions/external-authentication#post-authentication)
 
 <details open="">
 <summary>Code example</summary>
@@ -310,7 +310,7 @@ https://github.com/zitadel/actions/blob/main/examples/execute_action_on_specific
 
 </details>
 
-This example uses [zitadel's log module](/docs/apis/actions/modules#log)
+This example uses [zitadel's log module](/apis/actions/modules#log)
 
 ### Check authentication error
 
@@ -319,9 +319,9 @@ Your action can also check for errors during the login process.
 #### Triggers
 
 - Internal Authentication
-  - [Post Authentication](/docs/apis/actions/internal-authentication#post-authentication)
+  - [Post Authentication](/apis/actions/internal-authentication#post-authentication)
 - External Authentication
-  - [Post Authentication](/docs/apis/actions/external-authentication#post-authentication)
+  - [Post Authentication](/apis/actions/external-authentication#post-authentication)
 
 <details open="">
 <summary>Code example</summary>
@@ -332,11 +332,11 @@ https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js
 
 </details>
 
-This example uses [zitadel's log module](/docs/apis/actions/modules#log)
+This example uses [zitadel's log module](/apis/actions/modules#log)
 
 ### Throw an error
 
-Allows you to limit the user interaction. The error thrown will be shown to the user if the action is not [allowed to fail](/docs/concepts/features/actions#how-it-works).
+Allows you to limit the user interaction. The error thrown will be shown to the user if the action is not [allowed to fail](/concepts/features/actions#how-it-works).
 
 <details open="">
 <summary>Code example</summary>

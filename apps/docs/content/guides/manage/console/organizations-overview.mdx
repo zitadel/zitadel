@@ -9,7 +9,7 @@ ZITADEL is organized around the idea of multi-tenancy. An **Organization** is th
 
 Key characteristics of Organizations in ZITADEL include:
 
-* **Multi-tenancy:** Multiple organizations can be managed within one [instance](/docs/concepts/structure/instance).
+* **Multi-tenancy:** Multiple organizations can be managed within one [instance](/concepts/structure/instance).
 * **Isolation:** Users and data from one organization are separated from others.
 * **Delegation:** Organizations can grant each other rights to self-manage certain aspects of the IAM (e.g., roles for access management).
 
@@ -62,7 +62,7 @@ On the **Default settings** page (`${CUSTOM_DOMAIN}`/ui/console/orgs), you can d
 * Click the **...** on the right-hand side of the table and select **Set as default organization**.
 * The current default is marked by a "Default" label.
 
-When no specific organization is selected (e.g., during an auth request or via [Domain Discovery](/docs/guides/solution-scenarios/domain-discovery)), users are directed to this default organization for login and self-registration.
+When no specific organization is selected (e.g., during an auth request or via [Domain Discovery](/guides/solution-scenarios/domain-discovery)), users are directed to this default organization for login and self-registration.
 
 ## Usernames and Domains
 
@@ -103,7 +103,7 @@ If a user `coyote` exists in the global organization with the login name `coyote
 If the **validate org domains** setting in [Domain Settings](./default-settings#domain-settings) is set to `true`, you must prove ownership of your domain via DNS or HTTP challenge.
 
 <Callout>
-You can disable domain verification requirements in the [default settings](/docs/guides/manage/console/default-settings#domain-settings) if you are running a self-hosted instance and do not require strict validation.
+You can disable domain verification requirements in the [default settings](/guides/manage/console/default-settings#domain-settings) if you are running a self-hosted instance and do not require strict validation.
 </Callout>
 
 1.  Navigate to your **Organization Settings**.
@@ -157,4 +157,4 @@ By default, the ZITADEL Login uses the instance default settings. To trigger the
 urn:zitadel:iam:org:id:{id}
 ```
 
-This value is a [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) within ZITADEL.
+This value is a [reserved scope](/apis/openidoauth/scopes#reserved-scopes) within ZITADEL.

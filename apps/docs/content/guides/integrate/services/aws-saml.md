@@ -12,9 +12,9 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](/docs/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/docs/guides/manage/console/organizations-overview)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/docs/guides/manage/console/projects-overview)
+- existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
+- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 

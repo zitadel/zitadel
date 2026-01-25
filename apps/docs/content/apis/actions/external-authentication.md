@@ -2,7 +2,7 @@
 title: External Authentication Flow
 ---
 
-This flow is executed if the user logs in using an [identity provider](/docs/guides/integrate/identity-providers/introduction).
+This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers/introduction).
 
 The flow is represented by the following Ids in the API: `FLOW_TYPE_EXTERNAL_AUTHENTICATION` and `1`
 
@@ -30,8 +30,8 @@ The first parameter contains the following fields
     - `externalUser` [*externalUser*](./objects#external-user)
     - `authError` *string*  
       This is a verification errors string representation. If the verification succeeds, this is "none"
-    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
-    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `authRequest` [*auth request*](/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/apis/actions/objects#http-request)
     - `providerInfo` *Any*  
       Returns the response of the provider. In case the provider is a Generic OAuth Provider, the information is accessible through:
       - `rawInfo`  *Any*
@@ -78,8 +78,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
   The first parameter contains the following fields
   - `v1`
     - `user` [*human*](./objects#human-user)
-    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
-    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `authRequest` [*auth request*](/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/apis/actions/objects#http-request)
     - `org`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
@@ -126,8 +126,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_C
   The first parameter contains the following fields
   - `v1`
     - `getUser()` [*user*](./objects#user)
-    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
-    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `authRequest` [*auth request*](/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/apis/actions/objects#http-request)
     - `org`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  

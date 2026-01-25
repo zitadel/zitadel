@@ -63,7 +63,7 @@ openssl genrsa -out privatekey.pem 2048
 openssl rsa -in privatekey.pem -pubout -out publickey.pem
 ```
 
-To upload your public key, use the [User Service Add Key API](/docs/reference/api/user/zitadel.user.v2.UserService.AddKey)
+To upload your public key, use the [User Service Add Key API](/reference/api/user/zitadel.user.v2.UserService.AddKey)
 
 <Callout>
 If you generate a key in ZITADEL, make sure to download and securely store the key file right away. For security reasons, ZITADEL cannot show you the private key again after creation. If the key file is lost, you must generate and register a new one.
@@ -119,7 +119,7 @@ Payload:
 * `iat`: The Unix timestamp when the JWT is created/signed (must be no older than 1 hour).
 * `exp`: The Unix timestamp when this assertion expires.
 
-For further details, see the [JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) API reference.
+For further details, see the [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference.
 
 If you use Go, you can use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded JSON.
 There are also [many libraries](https://jwt.io/#libraries-io) available for generating and signing JWTs.
@@ -172,7 +172,7 @@ curl --request POST \
 ```
 
 * `grant_type`: Must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope`: Include any desired [Scopes](/docs/apis/openidoauth/scopes), but must include `openid`.
+* `scope`: Include any desired [Scopes](/apis/openidoauth/scopes), but must include `openid`.
 * `assertion`: The encoded JWT you created and signed with your private key.
 
 If you want to access ZITADEL APIs, make sure to include the required scope `urn:zitadel:iam:org:project:id:zitadel:aud`.
@@ -232,6 +232,6 @@ By following these steps and adhering to best practices, you can securely manage
 
 ## Notes
 
-* [JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) API reference
+* [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference
 * [Accessing ZITADEL API](../zitadel-apis/access-zitadel-apis)
 * [Token introspection with private key JWT](../token-introspection/private-key-jwt)

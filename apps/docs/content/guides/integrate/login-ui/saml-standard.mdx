@@ -43,7 +43,7 @@ For more information, see [OIDC Proxy](./login-app#oidc-proxy) for the necessary
 The version and the optional custom URI for the available login UI is configurable under the application settings.
 </Callout>
 
-Read more about the [SSO Endpoint Documentation](/docs/apis/saml/endpoints#sso-endpoint)
+Read more about the [SSO Endpoint Documentation](/apis/saml/endpoints#sso-endpoint)
 
 The endpoint will redirect you to the domain of your UI on the path /login and add the SAML Request ID as parameter.
 ```https://login.example.com/login?authRequest=V2_224908753244265546```
@@ -51,7 +51,7 @@ The endpoint will redirect you to the domain of your UI on the path /login and a
 ### Get SAML Request by ID
 
 With the ID from the redirect before you will now be able to get the information of the SAML request.
-[Get SAML Request By ID Documentation](/docs/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest)
+[Get SAML Request By ID Documentation](/reference/api/saml/zitadel.saml.v2.SAMLService.GetSAMLRequest)
 
 ```bash
 curl --request GET \
@@ -77,7 +77,7 @@ Response Example:
 ### Perform Login
 
 After you have initialized the SAML flow you can implement the login.
-Implement all the steps you like the user to go trough by [creating](/docs/reference/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/docs/reference/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
+Implement all the steps you like the user to go trough by [creating](/reference/api/session/zitadel.session.v2.SessionService.CreateSession) and [updating](/reference/api/session/zitadel.session.v2.SessionService.SetSession) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -92,7 +92,7 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Finalize SAML Request Documentation](/docs/reference/api/saml/zitadel.saml.v2.SAMLService.CreateResponse)
+Read more about the [Finalize SAML Request Documentation](/reference/api/saml/zitadel.saml.v2.SAMLService.CreateResponse)
 
 Make sure that the authorization header is from an account which is permitted to finalize the SAML Request through the `IAM_LOGIN_CLIENT` role.
 ```bash

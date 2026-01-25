@@ -7,8 +7,8 @@ Migrating users from an existing system, while minimizing impact on said users, 
 
 ## Individual Users
 
-Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser).
-Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how to create users.
+Creating individual users can be done with this endpoint: [ImportHumanUser](/reference/api-v1/management/zitadel.management.v1.ManagementService.ImportHumanUser).
+Please also consult our [guide](/guides/manage/user/reg-create-user) on how to create users.
 
 ```json
 {
@@ -42,7 +42,7 @@ Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how
 
 ## Bulk import
 
-For bulk import use the [import endpoint](/docs/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) on the admin API:
+For bulk import use the [import endpoint](/reference/api-v1/admin/zitadel.admin.v1.AdminService.ImportData) on the admin API:
 
 ```json
 {
@@ -130,7 +130,7 @@ The snippets in the sections below are parts from the bulk import endpoint, to c
 ### Passwords
 
 ZITADEL stores passwords only as irreversible hashes, never in clear text.
-Existing password hashes can be imported if they use a supported [hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
+Existing password hashes can be imported if they use a supported [hash algorithm](/concepts/architecture/secrets#hashed-secrets).
 
 Import password hashes using the import API (snippet from [bulk-import](#bulk-import)):
 ```json
@@ -158,7 +158,7 @@ Essentially, a verifier ensures ZITADEL can work with passwords hashed using var
 Regardless of the `passwordChangeRequired` setting, the password is rehashed using the configured hasher algorithm and stored.
 This ensures consistency and allows for automatic updates even when hasher configurations are changed, such as increasing salt cost for bcrypt.
 
-To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/docs/self-hosting/manage/configure/configure#runtime-configuration-file)
+To configure the default hasher for new user passwords, set the `Algorithm` of the `PasswordHasher` in the [runtime configuration file](/self-hosting/manage/configure/configure#runtime-configuration-file)
 or by the environment variable `ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM`, for example:
 
 ```
@@ -209,7 +209,7 @@ Currently it is not possible to migrate passkeys directly from another system.
 
 ## Users linked to an external IDP
 
-A users `sub` is bound to the external [IDP's Client ID](/docs/guides/manage/console/default-settings#identity-providers).
+A users `sub` is bound to the external [IDP's Client ID](/guides/manage/console/default-settings#identity-providers).
 This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
 
 Users should be imported with their `externalUserId`.
@@ -229,7 +229,7 @@ _snippet from [bulk-import](#bulk-import) example:_
 }
 ```
 
-You can use an Action with [post-creation flow](/docs/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
+You can use an Action with [post-creation flow](/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
 
 ## Metadata
 
@@ -238,11 +238,11 @@ Use metadata to store additional attributes of the users, such as organizational
 
 <Callout>
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](/docs/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata)
+[API reference: User Metadata](/reference/api-v1/management/zitadel.management.v1.ManagementService.ListUserMetadata)
 </Callout>
 
-Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
-With the [complement token flow](/docs/apis/actions/complement-token), you can also transform metadata (or roles) to custom claims.
+Request metadata from the userinfo endpoint by passing the required [reserved scope](/apis/openidoauth/scopes#reserved-scopes) in your auth request.
+With the [complement token flow](/apis/actions/complement-token), you can also transform metadata (or roles) to custom claims.
 
 ## Authorizations / Roles
 
@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 <Callout>
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/docs/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
+[API reference: User Authorization / Grants](/reference/api-v1/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
 </Callout>

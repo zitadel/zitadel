@@ -25,13 +25,13 @@ Imagine signing in without passwords! Passkeys, replacing traditional passwords,
 
 ### Developer Resources
 
-* **Documentation:** Passkeys Guide: [https://zitadel.com/docs/guides/integrate/login-ui/passkey](/docs/guides/integrate/login-ui/passkey)
-* [Create Passkey Registration Link API](/docs/guides/manage/user/reg-create-user)
+* **Documentation:** Passkeys Guide: [https://zitadel.com/docs/guides/integrate/login-ui/passkey](/guides/integrate/login-ui/passkey)
+* [Create Passkey Registration Link API](/guides/manage/user/reg-create-user)
 
 ### Notes
 
 * Passkey support is still evolving in browsers and platforms. Check compatibility for your target audience.
 * ZITADEL actively develops its passkey features. Stay updated with documentation and releases.
-* Passkeys are bound to your domain, thus we recommend configuring a [custom domain](/docs/concepts/features/custom-domain) before setting up passkeys.
+* Passkeys are bound to your domain, thus we recommend configuring a [custom domain](/concepts/features/custom-domain) before setting up passkeys.
 
 Don't hesitate to ask if you have further questions about integrating passkeys in your ZITADEL application!

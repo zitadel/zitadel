@@ -32,6 +32,6 @@ In cases where a local account exists and a user registers or logs in through an
 ### Automatic account linking
 
 You can configure your identity provider to allow automatic account linking for users with the same email or username.  
-To enable this, set "Account linking allowed" in the [identity provider template settings](/docs/guides/integrate/identity-providers/introduction#key-settings-on-the-templates).
+To enable this, set "Account linking allowed" in the [identity provider template settings](/guides/integrate/identity-providers/introduction#key-settings-on-the-templates).
 
 Automatic account linking helps users associate multiple login options with their ZITADEL account, offering flexibility—however, at login, the authentication method will be determined by the link, **not by user choice**.

@@ -13,7 +13,7 @@ You will need to provide some information about your app. We recommend creating 
 1. Navigate to your Project
 2. Add a new application at the top of the page.
 3. Select Web application type and continue.
-4. Use [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#proof-key-for-code-exchange).
+4. Use [Authorization Code](/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange).
 5. Skip the redirect settings and confirm the app creation
 6. Copy the client ID, you will need to tell MongoDB Charts about it.
 7. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
@@ -40,7 +40,7 @@ Your configuration should look similar to this:
 
 Embed a chart into your application now, following the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
-If you've done the [Angular Quickstart](/docs/examples/login/angular), your code could look something like this:
+If you've done the [Angular Quickstart](/examples/login/angular), your code could look something like this:
 
 ```html
 {/* chart.component.html */}
