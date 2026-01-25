@@ -28,8 +28,33 @@ async function run() {
   const templatePath = resolve(join(ROOT_DIR, 'buf.gen.yaml'));
 
   try {
-  // Limit concurrency to avoid OOM
-  const pLimit = (await import('p-limit')).default;
+  // Simple p-limit implementation to avoid adding dependency
+  const pLimit = (concurrency) => {
+    const queue = [];
+    let active = 0;
+
+    const next = () => {
+      active--;
+      if (queue.length > 0) {
+        queue.shift()();
+      }
+    };
+
+    const run = async (fn) => {
+      if (active >= concurrency) {
+        await new Promise((resolve) => queue.push(resolve));
+      }
+      active++;
+      try {
+        return await fn();
+      } finally {
+        next();
+      }
+    };
+
+    return run;
+  };
+  
   const limit = pLimit(2);
 
   await Promise.all(versions.map(v => limit(async () => {
