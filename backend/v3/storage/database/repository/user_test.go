@@ -198,14 +198,18 @@ func assertHumanUser(t *testing.T, expected, actual *domain.HumanUser) {
 	assertVerification(t, expected.Password.Unverified, actual.Password.Unverified, "human password unverified")
 	assert.Equal(t, expected.Password.FailedAttempts, actual.Password.FailedAttempts, "human password failed attempts")
 
-	assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
-	if expected.TOTP.LastSuccessfullyCheckedAt != nil {
-		require.NotNil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at not nil")
-		assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(*actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
+	if expected.TOTP != nil {
+		require.NotNil(t, actual.TOTP, "human totp not nil")
+		assert.True(t, expected.TOTP.VerifiedAt.Equal(actual.TOTP.VerifiedAt), "human totp verified at")
+		if expected.TOTP.LastSuccessfullyCheckedAt != nil {
+			require.NotNil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at not nil")
+			assert.True(t, expected.TOTP.LastSuccessfullyCheckedAt.Equal(*actual.TOTP.LastSuccessfullyCheckedAt), "human totp last successfully checked at")
+		} else {
+			assert.Nil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at nil")
+		}
 	} else {
-		assert.Nil(t, actual.TOTP.LastSuccessfullyCheckedAt, "human totp last successfully checked at nil")
+		assert.Nil(t, actual.TOTP, "human totp nil")
 	}
-	assertVerification(t, expected.TOTP.Unverified, actual.TOTP.Unverified, "human totp unverified")
 
 	assertIdentityProviderLinks(t, expected.IdentityProviderLinks, actual.IdentityProviderLinks)
 	assertVerifications(t, expected.Verifications, actual.Verifications)

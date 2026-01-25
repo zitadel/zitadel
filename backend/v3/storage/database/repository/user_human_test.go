@@ -471,12 +471,6 @@ func Test_humanUser_create(t *testing.T) {
 			firstName := gofakeit.FirstName()
 			lastName := gofakeit.LastName()
 			email := gofakeit.Email()
-			code := &crypto.CryptoValue{
-				CryptoType: crypto.TypeEncryption,
-				Algorithm:  "aes256",
-				KeyID:      "key-id",
-				Crypted:    []byte("crypted"),
-			}
 
 			return test{
 				name: "with totp",
@@ -498,11 +492,9 @@ func Test_humanUser_create(t *testing.T) {
 							Email: domain.HumanEmail{
 								Address: email,
 							},
-							TOTP: domain.HumanTOTP{
-								Unverified: &domain.Verification{
-									ID:   gofakeit.UUID(),
-									Code: code,
-								},
+							TOTP: &domain.HumanTOTP{
+								VerifiedAt: createdAt,
+								Secret:     []byte("secret"),
 							},
 						},
 					},
@@ -526,11 +518,9 @@ func Test_humanUser_create(t *testing.T) {
 								Password:         password,
 								IsChangeRequired: true,
 							},
-							TOTP: domain.HumanTOTP{
-								Unverified: &domain.Verification{
-									ID:   gofakeit.UUID(),
-									Code: code,
-								},
+							TOTP: &domain.HumanTOTP{
+								VerifiedAt: createdAt,
+								Secret:     []byte("secret"),
 							},
 						},
 					},

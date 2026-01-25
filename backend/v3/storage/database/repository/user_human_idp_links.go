@@ -49,6 +49,21 @@ func (u userHuman) AddIdentityProviderLink(link *domain.IdentityProviderLink) da
 	)
 }
 
+// UpdateIdentityProviderLink implements [domain.HumanUserRepository.UpdateIdentityProviderLink].
+func (u userHuman) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
+	return database.NewCTEChange(
+		func(builder *database.StatementBuilder) {
+			builder.WriteString("UPDATE zitadel.human_identity_provider_links SET ")
+			database.Changes(changes).Write(builder)
+			writeCondition(builder, database.And(
+				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
+				database.NewColumnCondition(existingHumanUser.IDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
+				condition,
+			))
+		}, nil,
+	)
+}
+
 // RemoveIdentityProviderLink implements [domain.HumanUserRepository.RemoveIdentityProviderLink].
 func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID string) database.Change {
 	return database.NewCTEChange(
@@ -81,29 +96,14 @@ func (u userHuman) RemoveIdentityProviderLink(providerID string, providedUserID 
 	)
 }
 
-// SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].
-func (u userHuman) SetIdentityProviderLinkProvidedID(providerID string, currentProvidedUserID string, newProvidedUserID string) database.Change {
-	return database.NewChange(u.providedUserIDColumn(), newProvidedUserID)
-}
-
 // SetIdentityProviderLinkUsername implements [domain.HumanUserRepository.SetIdentityProviderLinkUsername].
 func (u userHuman) SetIdentityProviderLinkUsername(providerID string, providedUserID string, username string) database.Change {
 	return database.NewChange(u.providedUsernameColumn(), username)
 }
 
-// UpdateIdentityProviderLink implements [domain.HumanUserRepository.UpdateIdentityProviderLink].
-func (u userHuman) UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change {
-	return database.NewCTEChange(
-		func(builder *database.StatementBuilder) {
-			builder.WriteString("UPDATE zitadel.human_identity_provider_links SET ")
-			database.Changes(changes).Write(builder)
-			writeCondition(builder, database.And(
-				database.NewColumnCondition(existingHumanUser.InstanceIDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
-				database.NewColumnCondition(existingHumanUser.IDColumn(), u.linkedIdentityProviderInstanceIDColumn()),
-				condition,
-			))
-		}, nil,
-	)
+// SetIdentityProviderLinkProvidedID implements [domain.HumanUserRepository.SetIdentityProviderLinkProvidedID].
+func (u userHuman) SetIdentityProviderLinkProvidedID(providerID string, currentProvidedUserID string, newProvidedUserID string) database.Change {
+	return database.NewChange(u.providedUserIDColumn(), newProvidedUserID)
 }
 
 // -------------------------------------------------------------
@@ -131,10 +131,6 @@ func (u userHuman) ProvidedUsernameCondition(username string) database.Condition
 
 func (u userHuman) linkedIdentityProviderInstanceIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedIDPLinksTableName(), "instance_id")
-}
-
-func (u userHuman) linkedIdentityProviderUserIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedIDPLinksTableName(), "user_id")
 }
 
 func (u userHuman) linkedIdentityProviderIDColumn() database.Column {

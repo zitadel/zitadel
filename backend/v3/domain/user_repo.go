@@ -113,6 +113,7 @@ type humanConditions interface {
 
 type humanChanges interface {
 	userChanges
+
 	// SetFirstName sets the first name field
 	SetFirstName(firstName string) database.Change
 	// SetLastName sets the last name field
@@ -135,23 +136,29 @@ type humanChanges interface {
 	// SkipMultifactorInitializationAt sets the multifactor initialization skipped at field
 	SkipMultifactorInitialization() database.Change
 
-	// SetPassword sets the password based on the verification
-	SetPassword(verification VerificationType) database.Change
-	// SetPasswordChangeRequired sets whether a password change is required
-	SetPasswordChangeRequired(required bool) database.Change
-	// CheckPassword sets the password check based on the check type
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckPassword(check PasswordCheckType) database.Change
-
 	// SetVerification sets the verification based on the verification type
 	SetVerification(verification VerificationType) database.Change
 
+	humanPasswordChanges
 	humanEmailChanges
 	humanPhoneChanges
 	humanTOTPChanges
 	identityProviderLinkChanges
 	humanPasskeyChanges
+}
+
+type humanPasswordChanges interface {
+	// SetPassword sets the password based on the verification
+	SetPassword(verification VerificationType) database.Change
+	// SetPasswordChangeRequired sets whether a password change is required
+	SetPasswordChangeRequired(required bool) database.Change
+	// SetLastSuccessfulPasswordCheck sets the last successful password check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.Change
+	// IncrementPhoneOTPFailedAttempts increments the phone OTP failed attempts
+	IncrementPhoneOTPFailedAttempts() database.Change
+	// ResetPhoneOTPFailedAttempts resets the phone OTP failed attempts
+	ResetPhoneOTPFailedAttempts() database.Change
 }
 
 type humanEmailChanges interface {
@@ -168,6 +175,13 @@ type humanEmailChanges interface {
 	EnableEmailOTP() database.Change
 	// DisableEmailOTP clears the enabled at time
 	DisableEmailOTP() database.Change
+	// SetLastSuccessfulEmailOTPCheck sets the last successful email OTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change
+	// IncrementEmailOTPFailedAttempts increments the email OTP failed attempts
+	IncrementEmailOTPFailedAttempts() database.Change
+	// ResetEmailOTPFailedAttempts resets the email OTP failed attempts
+	ResetEmailOTPFailedAttempts() database.Change
 }
 
 type humanPhoneChanges interface {
@@ -186,17 +200,26 @@ type humanPhoneChanges interface {
 	EnableSMSOTP() database.Change
 	// DisableSMSOTP clears the enabled at time
 	DisableSMSOTP() database.Change
+	// SetLastSuccessfulSMSOTPCheck sets the last successful SMS OTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change
+	// IncrementPhoneOTPFailedAttempts increments the phone OTP failed attempts
+	IncrementPhoneOTPFailedAttempts() database.Change
+	// ResetPhoneOTPFailedAttempts resets the phone OTP failed attempts
+	ResetPhoneOTPFailedAttempts() database.Change
 }
 
 type humanTOTPChanges interface {
-	// SetTOTP changes the TOTP secret based on the verification
-	// 	* [VerificationTypeInit] to initialize totp verification, previously verified totp remains verified
-	// 	* [VerificationTypeVerified] to mark totp as verified, a verification must exist
-	// 	* [VerificationTypeUpdate] to update totp verification, a verification must exist (e.g. resend code)
-	// 	* [VerificationTypeSkipped] to skip totp verification, existing verification is removed (e.g. admin set totp)
-	SetTOTP(verification VerificationType) database.Change
+	// SetTOTP changes the TOTP secret and verification timestamp
+	SetTOTPSecret(secret []byte) database.Change
+	// SetTOTPVerifiedAt sets the TOTP verified at time
+	// If verifiedAt is zero, it will be set to NOW()
+	SetTOTPVerifiedAt(verifiedAt time.Time) database.Change
 	// RemoveTOTP removes the TOTP
 	RemoveTOTP() database.Change
+	// SetLastSuccessfulTOTPCheck sets the last successful TOTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Change
 }
 
 type identityProviderLinkChanges interface {

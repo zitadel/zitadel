@@ -12,17 +12,6 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// RemovePhone implements [domain.HumanUserRepository.RemovePhone].
-func (u userHuman) RemovePhone() database.Change {
-	return database.NewChanges(
-		database.NewChangeToNull(u.phoneColumn()),
-		database.NewChangeToNull(u.phoneVerifiedAtColumn()),
-		database.NewChangeToNull(u.smsOTPEnabledAtColumn()),
-		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
-		database.NewChangeToNull(u.failedSMSOTPAttemptsColumn()),
-	)
-}
-
 // SetPhone implements [domain.HumanUserRepository.SetPhone].
 func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
@@ -43,9 +32,20 @@ func (u userHuman) SetPhone(verification domain.VerificationType) database.Chang
 	panic(fmt.Sprintf("type not allowed for phone verification change %T", verification))
 }
 
-// DisableSMSOTP implements [domain.HumanUserRepository.DisableSMSOTP].
-func (u userHuman) DisableSMSOTP() database.Change {
-	return database.NewChangeToNull(u.smsOTPEnabledAtColumn())
+// RemovePhone implements [domain.HumanUserRepository.RemovePhone].
+func (u userHuman) RemovePhone() database.Change {
+	return database.NewChanges(
+		database.NewChangeToNull(u.phoneColumn()),
+		database.NewChangeToNull(u.phoneVerifiedAtColumn()),
+		database.NewChangeToNull(u.smsOTPEnabledAtColumn()),
+		database.NewChangeToNull(u.lastSuccessfulSMSOTPCheckColumn()),
+		database.NewChangeToNull(u.failedSMSOTPAttemptsColumn()),
+	)
+}
+
+// EnableSMSOTPAt implements [domain.HumanUserRepository.EnableSMSOTPAt].
+func (u userHuman) EnableSMSOTPAt(enabledAt time.Time) database.Change {
+	return database.NewChange(u.smsOTPEnabledAtColumn(), enabledAt)
 }
 
 // EnableSMSOTP implements [domain.HumanUserRepository.EnableSMSOTP].
@@ -53,9 +53,24 @@ func (u userHuman) EnableSMSOTP() database.Change {
 	return database.NewChange(u.smsOTPEnabledAtColumn(), database.NowInstruction)
 }
 
-// EnableSMSOTPAt implements [domain.HumanUserRepository.EnableSMSOTPAt].
-func (u userHuman) EnableSMSOTPAt(enabledAt time.Time) database.Change {
-	return database.NewChange(u.smsOTPEnabledAtColumn(), enabledAt)
+// DisableSMSOTP implements [domain.HumanUserRepository.DisableSMSOTP].
+func (u userHuman) DisableSMSOTP() database.Change {
+	return database.NewChangeToNull(u.smsOTPEnabledAtColumn())
+}
+
+func (u userHuman) SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change {
+	if checkedAt.IsZero() {
+		return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), database.NowInstruction)
+	}
+	return database.NewChange(u.lastSuccessfulSMSOTPCheckColumn(), checkedAt)
+}
+
+func (u userHuman) IncrementPhoneOTPFailedAttempts() database.Change {
+	return database.NewIncrementColumnChange(u.failedSMSOTPAttemptsColumn())
+}
+
+func (u userHuman) ResetPhoneOTPFailedAttempts() database.Change {
+	return database.NewChange(u.failedSMSOTPAttemptsColumn(), 0)
 }
 
 // -------------------------------------------------------------

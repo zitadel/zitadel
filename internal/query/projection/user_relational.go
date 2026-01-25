@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
@@ -1942,11 +1940,11 @@ func (p *userRelationalProjection) reduceTOTPAdded(event eventstore.Event) (*han
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetTOTP(&domain.VerificationTypeInit{
-				CreatedAt: e.CreatedAt(),
-				Code:      e.Secret,
-				Value:     gu.Ptr(string(e.Secret.Crypted)),
-			}),
+			// repo.SetTOTP(&domain.VerificationTypeInit{
+			// 	CreatedAt: e.CreatedAt(),
+			// 	Code:      e.Secret,
+			// 	Value:     gu.Ptr(string(e.Secret.Crypted)),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err
@@ -1966,9 +1964,9 @@ func (p *userRelationalProjection) reduceTOTPVerified(event eventstore.Event) (*
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetTOTP(&domain.VerificationTypeVerified{
-				VerifiedAt: e.CreatedAt(),
-			}),
+			// repo.SetTOTP(&domain.VerificationTypeVerified{
+			// 	VerifiedAt: e.CreatedAt(),
+			// }),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err

@@ -12,21 +12,6 @@ import (
 // changes
 // -------------------------------------------------------------
 
-// DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
-func (u userHuman) DisableEmailOTP() database.Change {
-	return database.NewChange(u.emailOTPEnabledAtColumn(), false)
-}
-
-// EnableEmailOTP implements [domain.HumanUserRepository.EnableEmailOTP].
-func (u userHuman) EnableEmailOTP() database.Change {
-	return database.NewChange(u.emailOTPEnabledAtColumn(), database.NowInstruction)
-}
-
-// EnableEmailOTPAt implements [domain.HumanUserRepository.EnableEmailOTPAt].
-func (u userHuman) EnableEmailOTPAt(enabledAt time.Time) database.Change {
-	return database.NewChange(u.emailOTPEnabledAtColumn(), enabledAt)
-}
-
 // SetEmail implements [domain.HumanUserRepository.SetEmail].
 func (u userHuman) SetEmail(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
@@ -45,6 +30,36 @@ func (u userHuman) SetEmail(verification domain.VerificationType) database.Chang
 		return u.verification.failed(existingHumanUser.unqualifiedTableName(), existingHumanUser.InstanceIDColumn(), existingHumanUser.emailVerificationIDColumn())
 	}
 	panic(fmt.Sprintf("type not allowed for email verification change %T", verification))
+}
+
+// EnableEmailOTPAt implements [domain.HumanUserRepository.EnableEmailOTPAt].
+func (u userHuman) EnableEmailOTPAt(enabledAt time.Time) database.Change {
+	return database.NewChange(u.emailOTPEnabledAtColumn(), enabledAt)
+}
+
+// EnableEmailOTP implements [domain.HumanUserRepository.EnableEmailOTP].
+func (u userHuman) EnableEmailOTP() database.Change {
+	return database.NewChange(u.emailOTPEnabledAtColumn(), database.NowInstruction)
+}
+
+// DisableEmailOTP implements [domain.HumanUserRepository.DisableEmailOTP].
+func (u userHuman) DisableEmailOTP() database.Change {
+	return database.NewChange(u.emailOTPEnabledAtColumn(), false)
+}
+
+func (u userHuman) SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change {
+	if checkedAt.IsZero() {
+		return database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), database.NowInstruction)
+	}
+	return database.NewChange(u.lastSuccessfulEmailOTPCheckColumn(), checkedAt)
+}
+
+func (u userHuman) IncrementEmailOTPFailedAttempts() database.Change {
+	return database.NewIncrementColumnChange(u.failedEmailOTPAttemptsColumn())
+}
+
+func (u userHuman) ResetEmailOTPFailedAttempts() database.Change {
+	return database.NewChange(u.failedEmailOTPAttemptsColumn(), 0)
 }
 
 // -------------------------------------------------------------
@@ -75,4 +90,12 @@ func (u userHuman) emailVerifiedAtColumn() database.Column {
 
 func (u userHuman) emailVerificationIDColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "email_verification_id")
+}
+
+func (u userHuman) failedEmailOTPAttemptsColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "email_otp_failed_attempts")
+}
+
+func (u userHuman) lastSuccessfulEmailOTPCheckColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "email_otp_last_successful_check")
 }

@@ -40,7 +40,7 @@ CREATE TABLE zitadel.users(
 
     , password                              BYTEA       CHECK ((type = 'machine' AND password IS NULL)                              OR (type = 'human'))
     , password_change_required              BOOLEAN     CHECK ((type = 'machine' AND password_change_required IS NULL)              OR (type = 'human'))
-    , password_verified_at                   TIMESTAMPTZ CHECK ((type = 'machine' AND password_verified_at IS NULL)                   OR (type = 'human'))
+    , password_verified_at                  TIMESTAMPTZ CHECK ((type = 'machine' AND password_verified_at IS NULL)                   OR (type = 'human'))
     , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human'))
     , password_last_successful_check        TIMESTAMPTZ CHECK ((type = 'machine' AND password_last_successful_check IS NULL)        OR (type = 'human'))
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))

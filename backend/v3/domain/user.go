@@ -47,7 +47,7 @@ type HumanUser struct {
 	Phone    *HumanPhone   `json:"phone,omitempty" db:"phone"`
 	Passkeys []*Passkey    `json:"passkeys,omitempty" db:"passkeys"`
 	Password HumanPassword `json:"password,omitzero" db:"password"`
-	TOTP     HumanTOTP     `json:"totp,omitzero" db:"totp"`
+	TOTP     *HumanTOTP    `json:"totp,omitempty" db:"totp"`
 
 	IdentityProviderLinks []*IdentityProviderLink `json:"identityProviderLinks,omitempty" db:"identity_provider_links"`
 
@@ -127,8 +127,6 @@ type HumanTOTP struct {
 	// FailedAttempts is the number of consecutive failed password attempts
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"failed_attempts"`
-	// Unverified is the unverified secret
-	Unverified *Verification `json:"pendingVerification,omitempty" db:"-"`
 }
 
 type OTP struct {

@@ -132,6 +132,14 @@ func (u userHuman) create(ctx context.Context, builder *database.StatementBuilde
 		ctes[fmt.Sprintf("passkey_%d", i)] = u.AddPasskey(passkey).(database.CTEChange)
 	}
 
+	if user.Human.TOTP != nil {
+		columnValues["totp_secret"] = user.Human.TOTP.Secret
+		if !user.Human.TOTP.VerifiedAt.IsZero() {
+			columnValues["totp_verified_at"] = user.Human.TOTP.VerifiedAt
+		} else {
+			columnValues["totp_verified_at"] = database.NowInstruction
+		}
+	}
 	// TODO: fix
 	// if user.Human.TOTP.Unverified != nil {
 	// 	ctes["totp"] = u.SetTOTP(&domain.VerificationTypeInit{
@@ -365,7 +373,14 @@ func (u userHuman) CheckPassword(check domain.PasswordCheckType) database.Change
 
 // SetPasswordChangeRequired implements [domain.HumanUserRepository.SetPasswordChangeRequired].
 func (u userHuman) SetPasswordChangeRequired(required bool) database.Change {
-	return database.NewChange(u.passwordChangeRequiredColumn(), true)
+	return database.NewChange(u.passwordChangeRequiredColumn(), required)
+}
+
+func (u userHuman) SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.Change {
+	if checkedAt.IsZero() {
+		return database.NewChange(u.lastSuccessfulPasswordCheckColumn(), database.NowInstruction)
+	}
+	return database.NewChange(u.lastSuccessfulPasswordCheckColumn(), checkedAt)
 }
 
 // SetPreferredLanguage implements [domain.HumanUserRepository.SetPreferredLanguage].
@@ -529,24 +544,28 @@ func (u userHuman) preferredLanguageColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "preferred_language")
 }
 
-func (u userHuman) passwordChangeRequiredColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "password_change_required")
-}
-
-func (u userHuman) passwordVerificationIDColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "password_verification_id")
-}
-
 func (u userHuman) passwordColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password")
+}
+
+func (u userHuman) passwordChangeRequiredColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_change_required")
 }
 
 func (u userHuman) passwordVerifiedAtColumn() database.Column {
 	return database.NewColumn(u.unqualifiedTableName(), "password_verified_at")
 }
 
+func (u userHuman) passwordVerificationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_verification_id")
+}
+
+func (u userHuman) lastSuccessfulPasswordCheckColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "password_last_successful_check")
+}
+
 func (u userHuman) failedPasswordAttemptsColumn() database.Column {
-	return database.NewColumn(u.unqualifiedTableName(), "failed_password_attempts")
+	return database.NewColumn(u.unqualifiedTableName(), "password_failed_attempts")
 }
 
 // -------------------------------------------------------------
