@@ -43,7 +43,7 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return [...source.generateParams(), ...versionSource.generateParams()];
+  return source.generateParams();
 }
 
 export async function generateMetadata(

@@ -7,7 +7,7 @@ const nextConfig = {
   reactStrictMode: true,
   basePath: '/docs',
   outputFileTracingIncludes: {
-    '/**': ['./openapi/**/*'],
+    '/**': ['./openapi/**/*', './content/**/*'],
   },
   async redirects() {
     return [
