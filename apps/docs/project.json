@@ -74,6 +74,7 @@
       "cache": true,
       "inputs": [
         "default",
+        "{workspaceRoot}/proto/**/*",
         {
           "dependentTasksOutputFiles": "apps/docs/content/versions.json"
         }
