@@ -211,7 +211,7 @@ message ProjectRole {
   // ProjectID is the ID of the project the role belongs to.
   string project_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629026806489455\""}];
 
-  // Key of the project role. The key identifies the role. It's the only relevant attribute for ZITADEL and
+  // Key of the project role. The key identifies the role. It's the only relevant attribute for Zitadel and
   // will be used for authorization checks and as claim in tokens and user info responses.
   string key = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"role.super.man\""}];
 
