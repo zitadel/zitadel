@@ -269,11 +269,11 @@ func (m *mockInstance) ProjectID() string {
 	return "projectID"
 }
 
-func (m *mockInstance) ConsoleClientID() string {
+func (m *mockInstance) ManagementConsoleClientID() string {
 	return "consoleClientID"
 }
 
-func (m *mockInstance) ConsoleApplicationID() string {
+func (m *mockInstance) ManagementConsoleApplicationID() string {
 	return "consoleApplicationID"
 }
 

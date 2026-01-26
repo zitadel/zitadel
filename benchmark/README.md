@@ -23,7 +23,7 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 * `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
 * `ADMIN_PASSWORD`: password of the human user
 
-To setup the tests we use the credentials of console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
+To setup the tests we use the credentials of management console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
 * `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
 * `ADMIN_PASSWORD`: `Password1!`

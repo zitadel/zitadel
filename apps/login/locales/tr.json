@@ -315,7 +315,7 @@
       "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
     },
     "title": "Kayıt",
-    "description": "ZITADEL hesabınızı oluşturun.",
+    "description": "Zitadel hesabınızı oluşturun.",
     "noMethodAvailableWarning": "Kullanılabilir kimlik doğrulama yöntemi yok. Lütfen yöneticinizle iletişime geçin.",
     "selectMethod": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
     "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",

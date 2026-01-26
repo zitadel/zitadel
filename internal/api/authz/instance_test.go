@@ -57,7 +57,7 @@ func Test_Instance(t *testing.T) {
 			res{
 				instanceID: "instanceID",
 				projectID:  "projectID",
-				consoleID:  "consoleID",
+				consoleID:  "managementConsoleID",
 			},
 		},
 		{
@@ -79,7 +79,7 @@ func Test_Instance(t *testing.T) {
 			got := GetInstance(tt.args.ctx)
 			assert.Equal(t, tt.res.instanceID, got.InstanceID())
 			assert.Equal(t, tt.res.projectID, got.ProjectID())
-			assert.Equal(t, tt.res.consoleID, got.ConsoleClientID())
+			assert.Equal(t, tt.res.consoleID, got.ManagementConsoleClientID())
 			assert.Equal(t, tt.res.features, got.Features())
 		})
 	}
@@ -103,11 +103,11 @@ func (m *mockInstance) ProjectID() string {
 	return "projectID"
 }
 
-func (m *mockInstance) ConsoleClientID() string {
-	return "consoleID"
+func (m *mockInstance) ManagementConsoleClientID() string {
+	return "managementConsoleID"
 }
 
-func (m *mockInstance) ConsoleApplicationID() string {
+func (m *mockInstance) ManagementConsoleApplicationID() string {
 	return "appID"
 }
 

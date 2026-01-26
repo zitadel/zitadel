@@ -19,7 +19,7 @@ const (
 	KeyOIDCSingleV1SessionTermination Key = 10
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
-	KeyConsoleUseV2UserApi            Key = 15
+	KeyManagementConsoleUseV2UserApi  Key = 15
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level

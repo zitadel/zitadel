@@ -22,7 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Application Service";
     version: "2.0-beta";
-    description: "This API is intended to manage apps (SAML, OIDC, etc..) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage apps (SAML, OIDC, etc..) in a Zitadel instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -568,7 +568,7 @@ message CreateOIDCApplicationRequest {
         }
     ];
 
-    // ZITADEL will redirect to this link after a successful logout
+    // Zitadel will redirect to this link after a successful logout
     repeated string post_logout_redirect_uris = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"http://localhost:4200/signedout\"]";

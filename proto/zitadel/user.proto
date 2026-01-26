@@ -110,7 +110,7 @@ message Profile {
     ];
     string display_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "a user can set the display name, if nothing is set ZITADEL computes \"first_name last_name\""
+            description: "a user can set the display name, if nothing is set Zitadel computes \"first_name last_name\""
             example: "\"Gigi Giraffe\"";
         }
     ];

@@ -2,7 +2,7 @@ Login:
   Title: Добредојдовте назад!
   Description: Внесете ги вашите податоци за најава.
   TitleLinking: Најава за поврзување на корисник
-  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на ZITADEL.
+  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на Zitadel.
   LoginNameLabel: Корисничко име за најава
   UsernamePlaceHolder: корисничко име
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Изберете корисничка сметка
-  Description: Користете ја вашата ZITADEL корисничка сметка
+  Description: Користете ја вашата Zitadel корисничка сметка
   TitleLinking: Изберете корисничка сметка за поврзување на корисник
   DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
   OtherUser: Друг корисник

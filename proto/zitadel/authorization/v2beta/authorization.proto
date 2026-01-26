@@ -60,7 +60,7 @@ enum State {
   // An active authorization grants the user access with the roles specified on the project.
   STATE_ACTIVE = 1;
   // An inactive authorization temporarily deactivates the granted access and roles.
-  // ZITADEL will not include the specific authorization in any authorization information like an access token.
+  // Zitadel will not include the specific authorization in any authorization information like an access token.
   // But the information can still be accessed using the API.
   STATE_INACTIVE = 2;
 }

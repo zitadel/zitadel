@@ -17,7 +17,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Feature Service";
     version: "2.0";
-    description: "This API is intended to manage features for ZITADEL. Feature settings that are available on multiple \"levels\", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.";
+    description: "This API is intended to manage features for ZITADEL. Feature settings that are available on multiple \"levels\", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where Zitadel will assume a sane default, such as disabled. When over time confidence in such a feature grows, Zitadel can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -107,8 +107,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // The higher level (instance) acts as a default for the lower level (organization).
 // When a feature is set on multiple levels, the lower level takes precedence.
 //
-// Features can be experimental where ZITADEL will assume a sane default, such as disabled.
-// When over time confidence in such a feature grows, ZITADEL can default to enabling the feature.
+// Features can be experimental where Zitadel will assume a sane default, such as disabled.
+// When over time confidence in such a feature grows, Zitadel can default to enabling the feature.
 // As a final step we might choose to always enable a feature and remove the setting from this API,
 // reserving the proto field number. Such removal is not considered a breaking change.
 // Setting a removed field will effectively result in a no-op.

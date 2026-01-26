@@ -16,7 +16,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Web key Service";
     version: "2.0-beta";
-    description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nDeprecated: use webkey service v2 instead. This service will be removed in the next major version of ZITADEL.";
+    description: "This API is intended to manage web keys for a Zitadel instance, used to sign and validate OIDC tokens. This service is in beta state. It can AND will continue breaking until a stable version is released.\n\nThe public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n\nDeprecated: use webkey service v2 instead. This service will be removed in the next major version of ZITADEL.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"

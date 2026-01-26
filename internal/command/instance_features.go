@@ -20,7 +20,7 @@ type InstanceFeatures struct {
 	OIDCSingleV1SessionTermination *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
+	ManagementConsoleUseV2UserApi  *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -31,7 +31,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.DebugOIDCParentError == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.LoginV2 == nil &&
-		m.PermissionCheckV2 == nil && m.ConsoleUseV2UserApi == nil
+		m.PermissionCheckV2 == nil && m.ManagementConsoleUseV2UserApi == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

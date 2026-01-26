@@ -145,7 +145,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
-		ConsoleUseV2UserApi: gu.Ptr(true),
+		ManagementConsoleUseV2UserApi: gu.Ptr(true),
 	}
 	got, err := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -186,7 +186,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
-		ConsoleUseV2UserApi: query.FeatureSource[bool]{
+		ManagementConsoleUseV2UserApi: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},

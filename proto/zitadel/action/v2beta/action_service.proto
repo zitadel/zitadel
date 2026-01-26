@@ -23,7 +23,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
     version: "2.0-beta";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage custom executions (previously known as actions) in a Zitadel instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -498,10 +498,10 @@ message CreateTargetRequest {
     RESTWebhook rest_webhook = 2;
     // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 3;
-    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    // Call is executed in parallel to others, Zitadel does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 4;
   }
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
@@ -566,10 +566,10 @@ message UpdateTargetRequest {
     RESTWebhook rest_webhook = 3;
     // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 4;
-    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    // Call is executed in parallel to others, Zitadel does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 5;
   }
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   optional google.protobuf.Duration timeout = 6 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},

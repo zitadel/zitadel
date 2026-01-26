@@ -283,7 +283,7 @@
       "description": "Fournissez un e-mail, un prénom et un nom pour vous inscrire."
     },
     "title": "S'inscrire",
-    "description": "Créez votre compte ZITADEL.",
+    "description": "Créez votre compte Zitadel.",
     "noMethodAvailableWarning": "Aucune méthode d'authentification disponible. Veuillez contacter votre administrateur.",
     "selectMethod": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
     "agreeTo": "Pour vous inscrire, vous devez accepter les conditions d'utilisation",

@@ -92,7 +92,7 @@ func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, public
 	}
 	remaining := a.logstoreSvc.Limit(ctx, instance.InstanceID())
 	if remaining != nil {
-		if remaining != nil && *remaining > 0 {
+		if *remaining > 0 {
 			deleteCookie = true
 			return false
 		}
@@ -138,7 +138,7 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 			checkSpan.End()
 			if limited {
 				if a.redirect != "" {
-					// The console guides the user when the cookie is set
+					// The management console guides the user when the cookie is set
 					http.Redirect(wrappedWriter, request, a.redirect, http.StatusFound)
 				} else {
 					http.Error(wrappedWriter, "Your ZITADEL instance is blocked.", http.StatusTooManyRequests)

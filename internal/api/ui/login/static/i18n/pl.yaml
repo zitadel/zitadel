@@ -2,7 +2,7 @@ Login:
   Title: Witaj z powrotem!
   Description: Wprowadź swoje dane logowania.
   TitleLinking: Logowanie do połączenia z użytkownikiem
-  DescriptionLinking: Wprowadź swoje dane logowania, aby połączyć swojego zewnętrznego użytkownika z użytkownikiem ZITADEL.
+  DescriptionLinking: Wprowadź swoje dane logowania, aby połączyć swojego zewnętrznego użytkownika z użytkownikiem Zitadel.
   LoginNameLabel: Nazwa użytkownika
   UsernamePlaceHolder: nazwa użytkownika
   LoginnamePlaceHolder: nazwa użytkownika@domena
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Wybierz konto
-  Description: Użyj swojego konta ZITADEL
+  Description: Użyj swojego konta Zitadel
   TitleLinking: Wybierz konto do połączenia z użytkownikiem
   DescriptionLinking: Wybierz swoje konto, aby połączyć je z twoim zewnętrznym użytkownikiem.
   OtherUser: Inny użytkownik

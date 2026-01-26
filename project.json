@@ -8,7 +8,7 @@
       "command": "nx run @zitadel/devcontainer:compose up db"
     },
     "clean": {
-      "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Console)",
+      "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Management Console)",
       "dependsOn": [
         "@zitadel/api:clean",
         "@zitadel/login:clean",

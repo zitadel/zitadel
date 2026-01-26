@@ -24,7 +24,7 @@ message EmbeddedIframeSettings{
   ];
   repeated string allowed_origins = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "origins allowed loading ZITADEL in an iframe if enabled."
+      description: "origins allowed loading Zitadel in an iframe if enabled."
       example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];

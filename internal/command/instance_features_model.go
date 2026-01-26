@@ -73,7 +73,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
-			feature_v2.InstanceConsoleUseV2UserApi,
+			feature_v2.InstanceManagementConsoleUseV2UserApi,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -106,9 +106,9 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
-	case feature.KeyConsoleUseV2UserApi:
+	case feature.KeyManagementConsoleUseV2UserApi:
 		v := value.(bool)
-		features.ConsoleUseV2UserApi = &v
+		features.ManagementConsoleUseV2UserApi = &v
 	}
 }
 
@@ -122,6 +122,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.InstanceOIDCSingleV1SessionTerminationEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ConsoleUseV2UserApi, f.ConsoleUseV2UserApi, feature_v2.InstanceConsoleUseV2UserApi)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceManagementConsoleUseV2UserApi)
 	return cmds
 }

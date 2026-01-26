@@ -313,7 +313,7 @@
       "description": "Geef e-mail, voornaam en achternaam op om te registreren."
     },
     "title": "Registreren",
-    "description": "Maak jouw ZITADEL-account aan.",
+    "description": "Maak jouw Zitadel-account aan.",
     "noMethodAvailableWarning": "Geen authenticatiemethode beschikbaar. Neem contact op met jouw beheerder.",
     "selectMethod": "Selecteer de methode waarmee u wilt verifiëren",
     "agreeTo": "Om te registreren moet u akkoord gaan met de voorwaarden",

@@ -70,7 +70,7 @@ message IDPIntent {
   ];
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the ZITADEL user if external user already linked"
+      description: "ID of the Zitadel user if external user already linked"
       max_length: 200;
       example: "\"163840776835432345\"";
     }

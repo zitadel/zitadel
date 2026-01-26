@@ -315,7 +315,7 @@
       "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
     },
     "title": "Rejestracja",
-    "description": "Utwórz konto ZITADEL.",
+    "description": "Utwórz konto Zitadel.",
     "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
