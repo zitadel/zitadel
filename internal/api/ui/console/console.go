@@ -126,13 +126,13 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("unable to template instance management url for the management console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		limited := limitingAccessInterceptor.Limit(w, r)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ManagementConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("unable to marshal env for the management console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(environmentJSON)

@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Settings Service";
     version: "2.0";
-    description: "This API is intended to manage settings in a ZITADEL instance.";
+    description: "This API is intended to manage settings in a Zitadel instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -383,7 +383,7 @@ service SettingsService {
 
   // Get Security Settings
   //
-  // Get the security settings of the ZITADEL instance.
+  // Get the security settings of the Zitadel instance.
   // Security settings include settings like enabling impersonation and embedded iframe settings.
   //
   // Required permissions:

@@ -185,7 +185,7 @@ Use our Login widget to allow easy and secure access to your applications and en
 
 [![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
 
-### Admin Console
+### Management Console
 
 Use [Console](https://zitadel.com/docs/guides/manage/console/console-overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 

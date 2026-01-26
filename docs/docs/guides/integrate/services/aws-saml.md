@@ -18,7 +18,7 @@ Prerequisites:
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 
-> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if
+> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and if
 > the headings start with "AWS" please switch to the AWS GUI.
 
 ## **AWS**: Change to external identity provider ZITADEL
