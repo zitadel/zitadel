@@ -1240,7 +1240,7 @@ EventTypes:
       removed: Отстранет домен
     iam:
       console:
-        set: Поставена апликација на ZITADEL Management Console
+        set: Комплет на апликација за управувачка конзола ZITADEL
       project:
         set: Поставен проект на ZITADEL
     mail:
