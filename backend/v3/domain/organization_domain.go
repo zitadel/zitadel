@@ -9,7 +9,7 @@ import (
 
 type OrganizationDomain struct {
 	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID          string                `json:"orgId,omitempty" db:"org_id"`
+	OrganizationID string                `json:"organizationId,omitempty" db:"organization_id"`
 	Domain         string                `json:"domain,omitempty" db:"domain"`
 	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
@@ -21,7 +21,7 @@ type OrganizationDomain struct {
 
 type AddOrganizationDomain struct {
 	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID          string                `json:"orgId,omitempty" db:"org_id"`
+	OrganizationID string                `json:"organizationId,omitempty" db:"organization_id"`
 	Domain         string                `json:"domain,omitempty" db:"domain"`
 	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`

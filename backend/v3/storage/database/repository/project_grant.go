@@ -28,7 +28,7 @@ func (p projectGrant) Get(ctx context.Context, client database.QueryExecutor, op
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.ProjectGrant](ctx, client, builder)
+	return get[domain.ProjectGrant](ctx, client, builder)
 }
 
 func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectGrant, error) {
@@ -40,7 +40,7 @@ func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.ProjectGrant](ctx, client, builder)
+	return list[domain.ProjectGrant](ctx, client, builder)
 }
 
 const insertProjectGrantRolesStmt = `WITH added_roles AS (
@@ -51,16 +51,6 @@ const insertProjectGrantRolesStmt = `WITH added_roles AS (
 ) `
 
 func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor, projectGrant *domain.ProjectGrant) error {
-	var (
-		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
-	)
-	if !projectGrant.CreatedAt.IsZero() {
-		createdAt = projectGrant.CreatedAt
-	}
-	if !projectGrant.UpdatedAt.IsZero() {
-		updatedAt = projectGrant.UpdatedAt
-	}
-
 	// separate statement to add roles to project grant
 	builder := database.NewStatementBuilder(insertProjectGrantRolesStmt, projectGrant.RoleKeys)
 
@@ -72,8 +62,8 @@ func (p projectGrant) Create(ctx context.Context, client database.QueryExecutor,
 		projectGrant.GrantingOrganizationID,
 		projectGrant.GrantedOrganizationID,
 		projectGrant.State,
-		createdAt,
-		updatedAt,
+		defaultTimestamp(projectGrant.CreatedAt),
+		defaultTimestamp(projectGrant.UpdatedAt),
 	)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 
@@ -103,7 +93,7 @@ WHERE pg.instance_id = project_grants.instance_id
 func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, roleKeys []string, changes ...database.Change) (int64, error) {
 	// if no role keys set we only have to update the project grant table
 	if roleKeys == nil {
-		return updateOne(ctx, client, p, condition, changes...)
+		return update(ctx, client, p, condition, changes...)
 	}
 
 	// if you want to update the roles you have to have the primary key, otherwise multiple project grants get updated
@@ -130,7 +120,10 @@ func (p projectGrant) Update(ctx context.Context, client database.QueryExecutor,
 }
 
 func (p projectGrant) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return deleteOne(ctx, client, p, condition)
+	if err := checkRestrictingColumns(condition, p.InstanceIDColumn()); err != nil {
+		return 0, err
+	}
+	return delete(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------

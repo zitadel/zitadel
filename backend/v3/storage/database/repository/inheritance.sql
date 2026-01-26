@@ -44,18 +44,18 @@ FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TABLE org_objects(
-    org_id INT NOT NULL
-    , PRIMARY KEY (instance_id, org_id, id)
+    organization_id INT NOT NULL
+    , PRIMARY KEY (instance_id, organization_id, id)
     -- as foreign keys are not inherited we need to define them on the child tables
-    -- CONSTRAINT fk_org FOREIGN KEY (instance_id, org_id) REFERENCES orgs(instance_id, id),
+    -- CONSTRAINT fk_org FOREIGN KEY (instance_id, organization_id) REFERENCES orgs(instance_id, id),
     -- CONSTRAINT fk_instance FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (instance_objects);
 
 CREATE TABLE users (
     username VARCHAR(50) NOT NULL
-    , PRIMARY KEY (instance_id, org_id, id)
+    , PRIMARY KEY (instance_id, organization_id, id)
     -- as foreign keys are not inherited we need to define them on the child tables
-    -- , CONSTRAINT fk_org FOREIGN KEY (instance_id, org_id) REFERENCES orgs(instance_id, id)
+    -- , CONSTRAINT fk_org FOREIGN KEY (instance_id, organization_id) REFERENCES orgs(instance_id, id)
     -- , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (org_objects);
 
@@ -70,9 +70,9 @@ EXECUTE FUNCTION update_updated_at_column();
 CREATE TABLE human_users(
     first_name VARCHAR(50)
     , last_name VARCHAR(50)
-    , PRIMARY KEY (instance_id, org_id, id)
-    -- CONSTRAINT fk_user FOREIGN KEY (instance_id, org_id, id) REFERENCES users(instance_id, org_id, id),
-    , CONSTRAINT fk_org FOREIGN KEY (instance_id, org_id) REFERENCES orgs(instance_id, id)
+    , PRIMARY KEY (instance_id, organization_id, id)
+    -- CONSTRAINT fk_user FOREIGN KEY (instance_id, organization_id, id) REFERENCES users(instance_id, organization_id, id),
+    , CONSTRAINT fk_org FOREIGN KEY (instance_id, organization_id) REFERENCES orgs(instance_id, id)
     , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (users);
 
@@ -86,9 +86,9 @@ EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TABLE machine_users(
     description VARCHAR(50)
-    , PRIMARY KEY (instance_id, org_id, id)
-    -- , CONSTRAINT fk_user FOREIGN KEY (instance_id, org_id, id) REFERENCES users(instance_id, org_id, id)
-    , CONSTRAINT fk_org FOREIGN KEY (instance_id, org_id) REFERENCES orgs(instance_id, id)
+    , PRIMARY KEY (instance_id, organization_id, id)
+    -- , CONSTRAINT fk_user FOREIGN KEY (instance_id, organization_id, id) REFERENCES users(instance_id, organization_id, id)
+    , CONSTRAINT fk_org FOREIGN KEY (instance_id, organization_id) REFERENCES orgs(instance_id, id)
     , CONSTRAINT fk_instances FOREIGN KEY (instance_id) REFERENCES instances(id)
 ) INHERITS (users);
 
@@ -107,7 +107,7 @@ SELECT
     , updated_at
     , deleted_at
     , instance_id
-    , org_id
+    , organization_id
     , username
     , tableoid::regclass::TEXT AS type
     , first_name
@@ -124,7 +124,7 @@ SELECT
     , updated_at
     , deleted_at
     , instance_id
-    , org_id
+    , organization_id
     , username
     , tableoid::regclass::TEXT AS type
     , NULL AS first_name

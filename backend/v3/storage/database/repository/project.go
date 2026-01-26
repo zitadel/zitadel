@@ -28,7 +28,7 @@ func (p project) Get(ctx context.Context, client database.QueryExecutor, opts ..
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.Project](ctx, client, builder)
+	return get[domain.Project](ctx, client, builder)
 }
 
 func (p project) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.Project, error) {
@@ -36,7 +36,7 @@ func (p project) List(ctx context.Context, client database.QueryExecutor, opts .
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.Project](ctx, client, builder)
+	return list[domain.Project](ctx, client, builder)
 }
 
 const insertProjectStmt = `INSERT INTO zitadel.projects(
@@ -62,11 +62,14 @@ func (project) Create(ctx context.Context, client database.QueryExecutor, projec
 }
 
 func (p project) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
-	return updateOne(ctx, client, p, condition, changes...)
+	return update(ctx, client, p, condition, changes...)
 }
 
 func (p project) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return deleteOne(ctx, client, p, condition)
+	if err := checkRestrictingColumns(condition, p.InstanceIDColumn()); err != nil {
+		return 0, err
+	}
+	return delete(ctx, client, p, condition)
 }
 
 // -------------------------------------------------------------

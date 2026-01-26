@@ -83,7 +83,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 			// event org.domain.added
 			assert.Equal(t, domainName, gottenDomain.Domain)
 			assert.Equal(t, Instance.Instance.Id, gottenDomain.InstanceID)
-			assert.Equal(t, org.Id, gottenDomain.OrgID)
+			assert.Equal(t, org.Id, gottenDomain.OrganizationID)
 
 			assert.WithinRange(t, gottenDomain.CreatedAt, beforeAdd, afterAdd)
 			assert.WithinRange(t, gottenDomain.UpdatedAt, beforeAdd, afterAdd)

@@ -8,9 +8,9 @@ import (
 )
 
 type RemoveOrgDomainCommand struct {
-	OrgID      string  `json:"org_id"`
-	Name       *string `json:"name"`
-	IsVerified *bool   `json:"is_verified"`
+	OrganizationID string  `json:"organizationId"`
+	Name           *string `json:"name"`
+	IsVerified     *bool   `json:"is_verified"`
 }
 
 // Events implements Commander.
@@ -26,15 +26,15 @@ func (r *RemoveOrgDomainCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}
 
 	return []eventstore.Command{
-		org.NewDomainRemovedEvent(ctx, &org.NewAggregate(r.OrgID).Aggregate, oldDomainName, isVerified),
+		org.NewDomainRemovedEvent(ctx, &org.NewAggregate(r.OrganizationID).Aggregate, oldDomainName, isVerified),
 	}, nil
 }
 
 func NewRemoveOrgDomainCommand(orgID string, domainName *string, isDomainVerified *bool) *RemoveOrgDomainCommand {
 	return &RemoveOrgDomainCommand{
-		OrgID:      orgID,
-		Name:       domainName,
-		IsVerified: isDomainVerified,
+		OrganizationID: orgID,
+		Name:           domainName,
+		IsVerified:     isDomainVerified,
 	}
 }
 
