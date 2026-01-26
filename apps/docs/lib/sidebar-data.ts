@@ -711,7 +711,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       "guides/manage/console/console-overview",
-      //"guides/manage/cloud/egress",
+      "guides/manage/cloud/egress",
       {
         type: "category",
         label: "Customer Portal",

@@ -7,6 +7,14 @@ description: "This section contains important agreements, policies and appendice
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Terms Of Service" href="/legal/terms-of-service" icon={<FileText />} />
+    <Card title="Data Processing Agreement" href="/legal/data-processing-agreement" icon={<FileText />} />
+    <Card title="Subprocessors" href="/legal/subprocessors" icon={<FileText />} />
+    <Card title="Annex Support Services" href="/legal/annex-support-services" icon={<FileText />} />
+    <Card title="Service Description" href="/legal/service-description" icon={<Folder />} />
+    <Card title="Policies" href="/legal/policies" icon={<Folder />} />
+</Cards>

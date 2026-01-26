@@ -7,6 +7,13 @@ description: "Integrate your users and application with ZITADEL. In this section
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="OIDC & OAuth Flows" href="/guides/integrate/login/oidc" icon={<Folder />} />
+    <Card title="SCIM" href="/guides/manage/user/scim2" icon={<Folder />} />
+    <Card title="Token Introspection" href="/guides/integrate/token-introspection/index" icon={<Folder />} />
+    <Card title="Back Channel Logout" href="/guides/integrate/back-channel-logout" icon={<FileText />} />
+    <Card title="Build your own Login UI" href="/guides/integrate/login-ui" icon={<Folder />} />
+</Cards>

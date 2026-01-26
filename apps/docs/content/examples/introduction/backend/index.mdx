@@ -7,6 +7,14 @@ description: "Quickstart guides for integrating ZITADEL authentication into APIs
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Go" href="/examples/secure-api/go" icon={<FileText />} />
+    <Card title="Java Spring" href="/examples/secure-api/java-spring" icon={<FileText />} />
+    <Card title="Python Django" href="/examples/secure-api/python-django" icon={<FileText />} />
+    <Card title="Python Flask" href="/examples/secure-api/python-flask" icon={<FileText />} />
+    <Card title="Nodejs Nestjs" href="/examples/secure-api/nodejs-nestjs" icon={<FileText />} />
+    <Card title="Pylon" href="/examples/secure-api/pylon" icon={<FileText />} />
+</Cards>

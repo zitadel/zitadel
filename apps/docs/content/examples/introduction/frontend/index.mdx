@@ -7,6 +7,12 @@ description: "Quickstart guides for integrating ZITADEL authentication into fron
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Vanilla-JS" href="https://github.com/zitadel/zitadel-vanilla-js" icon={<LinkIcon />} external />
+    <Card title="React" href="/examples/login/react" icon={<FileText />} />
+    <Card title="Angular" href="/examples/login/angular" icon={<FileText />} />
+    <Card title="Vue" href="/examples/login/vue" icon={<FileText />} />
+</Cards>
