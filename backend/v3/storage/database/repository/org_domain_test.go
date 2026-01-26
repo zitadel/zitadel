@@ -26,13 +26,13 @@ func TestAddOrganizationDomain(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:                        instanceID,
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              instanceID,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	orgRepo := repository.OrganizationRepository()
@@ -226,13 +226,13 @@ func TestGetOrganizationDomain(t *testing.T) {
 	// create instance
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
-		ID:                        instanceID,
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              instanceID,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	// create organization
@@ -398,13 +398,13 @@ func TestListOrganizationDomains(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	// create organization
@@ -553,13 +553,13 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	// create organization
@@ -714,13 +714,13 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	// create organization

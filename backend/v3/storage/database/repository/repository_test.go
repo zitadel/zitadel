@@ -79,13 +79,13 @@ func savepointForRollback(t *testing.T, tx database.Transaction) (savepoint data
 func createInstance(t *testing.T, tx database.Transaction) (instanceID string) {
 	t.Helper()
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
 	err := instanceRepo.Create(t.Context(), tx, &instance)

@@ -31,13 +31,13 @@ func TestAddInstanceDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.NewCrypto().UUID(),
-		Name:                      gofakeit.BeerName(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.NewCrypto().UUID(),
+		Name:            gofakeit.BeerName(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -252,13 +252,13 @@ func TestGetInstanceDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.NewCrypto().UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.NewCrypto().UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -357,13 +357,13 @@ func TestListInstanceDomains(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.NewCrypto().UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.NewCrypto().UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -463,13 +463,13 @@ func TestUpdateInstanceDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
@@ -563,13 +563,13 @@ func TestRemoveInstanceDomain(t *testing.T) {
 
 	// create instance
 	instance := domain.Instance{
-		ID:                        gofakeit.UUID(),
-		Name:                      gofakeit.Name(),
-		DefaultOrgID:              "defaultOrgId",
-		IAMProjectID:              "iamProject",
+		ID:              gofakeit.UUID(),
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
 		ConsoleClientID: "managementConsoleClient",
 		ConsoleAppID:    "managementConsoleApp",
-		DefaultLanguage:           "defaultLanguage",
+		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
