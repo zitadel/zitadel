@@ -47,14 +47,12 @@
 
 /* --- LIGHT MODE VARIABLES --- */
 :root {
-    /* LIGHT MODE PRIMARY: Zitadel Blue (#5469d4) */
     --primary: 230 59% 58%; 
     --primary-foreground: 0 0% 100%;
     
-    --background: 0 0% 98%;   /* #FAFAFA */
+    --background: 0 0% 98%;   
     --foreground: 0 0% 10%;   
     
-    /* Card Contrast: 93% Lightness */
     --card: 0 0% 93%;         
     --card-foreground: 0 0% 10%;
     
@@ -62,7 +60,7 @@
     --muted-foreground: 0 0% 45%;
     
     --accent: 0 0% 92%;
-    --accent-foreground: 230 59% 58%; /* Blue Accent */
+    --accent-foreground: 230 59% 58%;
     
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -72,7 +70,7 @@
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 230 59% 58%; /* Blue Ring */
+    --ring: 230 59% 58%;
     
     --radius: 0.5rem;
     --overlaycolor: #6c90b420; 
@@ -80,14 +78,12 @@
 
 /* --- DARK MODE VARIABLES --- */
 :root[class~="dark"], [data-theme="dark"] {
-    /* DARK MODE PRIMARY: Zitadel Pink (#ff2069) */
     --primary: 340 100% 56%; 
     --primary-foreground: 0 0% 100%;
     
-    --background: 235 45% 14%; /* Zitadel Dark Blue (#141735) */
+    --background: 235 45% 14%; 
     --foreground: 0 0% 98%;
     
-    /* Card Contrast: 25% Lightness */
     --card: 220 40% 25%;       
     --card-foreground: 0 0% 98%;
     
@@ -129,7 +125,6 @@
 @layer components {
 
     /* 1. VISIBILITY HELPERS */
-    /* Use standard CSS for strict overriding to avoid parser issues */
     .hideondark { display: block !important; }
     .hideonlight { display: none !important; }
 
@@ -154,8 +149,6 @@
         justify-content: flex-start;
         min-width: 160px;
         min-height: 180px;
-
-        /* Padding: Bottom is larger to separate icon from border */
         padding: 2rem;
         padding-bottom: 3rem; 
     }
@@ -190,59 +183,68 @@
     .custom-rounded-texts, .custom-rounded-help, .custom-rounded-architecture { background: linear-gradient(40deg, #dc2626 30%, #db2777); }
     .custom-rounded-system, .custom-rounded-apis, .custom-rounded-policy, .custom-rounded-instance { background: linear-gradient(40deg, #1f2937, #111827); }
 
-    /* 4. B2B Cards */
+    /* 4. B2B / DIAGRAM LAYOUTS (Fixes the B2B Component) */
+    /* Container for the diagram */
+    .flexrowbetween {
+        @apply flex flex-row items-center justify-around gap-4 my-8 w-full;
+    }
+
+    /* The central arrow */
+    .arrowright {
+        @apply w-8 h-8 shrink-0 text-muted-foreground;
+    }
+
+    /* Nested Card Styles (Recursive stacking of overlaycolor creates depth) */
     .b2borg, .b2bproject, .b2bapp, .b2buser {
-        @apply rounded-xl p-4 border;
+        @apply rounded-xl p-4 border text-left;
         background: var(--overlaycolor);
         border-color: hsl(var(--border));
     }
+    
     .b2buser { @apply mt-4; }
+    
     .b2borg span, .b2bproject span, .b2bapp span, .b2buser span {
-        @apply ml-4 mb-4 block font-semibold;
+        @apply ml-4 mb-2 block font-semibold;
+    }
+    
+    /* Specific styling for the role text */
+    .b2bprojectrole {
+        @apply mt-2 ml-4 block text-sm opacity-80 font-normal;
     }
 
-    /* 5. FOOTER / PAGINATION CARDS FIX */
-    /* Use the unique class to target safely */
+    /* 5. FOOTER / PAGINATION CARDS */
     a.\@max-lg\:col-span-full {
         @apply flex flex-col p-6 rounded-xl border transition-all no-underline;
-        
-        /* Apply forces via standard CSS instead of !important inside @apply */
         background-color: hsl(var(--card)) !important;
         border-color: hsl(var(--border)) !important;
     }
     
-    /* Hover state */
     a.\@max-lg\:col-span-full:hover {
         @apply shadow-sm;
         border-color: hsl(var(--primary)) !important;
         background-color: hsl(var(--card)) !important; 
     }
 
-    /* Align Title + Arrow */
     a.\@max-lg\:col-span-full > div:first-child {
         @apply flex items-center gap-3;
     }
 
-    /* Fix SVG size and remove negative margin */
     a.\@max-lg\:col-span-full svg {
         @apply w-5 h-5 m-0;
     }
 
-    /* CRITICAL: Reset Paragraph Margins inside these cards to fix alignment */
-    /* The global p { margin-bottom: 1.5rem } was pushing text out of sync */
     a.\@max-lg\:col-span-full p {
         margin-bottom: 0 !important;
         margin-top: 0 !important;
     }
     
-    /* Description text styling */
     a.\@max-lg\:col-span-full p.text-fd-muted-foreground {
         @apply mt-2 text-sm opacity-80;
     }
 }
 
 @layer base {
-    /* 1. HEADINGS */
+    /* HEADINGS */
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-sans);
         color: hsl(var(--foreground)) !important; 
@@ -257,7 +259,6 @@
         text-decoration: none !important;
     }
 
-    /* SIZES & WEIGHTS (Semi-Bold) */
     h1 { 
         font-size: 3.5rem !important; 
         font-weight: 700 !important; 
@@ -294,13 +295,11 @@
         margin-bottom: 1.5rem; 
     }
     
-    /* 2. GLOBAL RESET */
     html, body {
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
     }
     
-    /* 3. LINKS (Dynamic color based on theme) */
     a {
         color: hsl(var(--primary));
         text-decoration: none;
