@@ -6,8 +6,8 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 
 ## Quick Start
 
-Run the following commands from the repositorys root directory to install all dependencies needed.
-Using Corepack makes sure you have the pnpm version intalled that is declared in [](../package.json).
+Run the following commands from the repositories root directory to install all dependencies needed.
+Using Corepack makes sure you have the pnpm version installed that is declared in [](../package.json).
 
 ```bash
 corepack enable
@@ -21,7 +21,7 @@ Start a docs server
 pnpm nx run @zitadel/docs:dev
 
 # Or serve a production build
-pnpm nx run @zitadel/docs:start
+pnpm nx run @zitadel/docs:prod
 ```
 
 The site will be available at http://localhost:3100

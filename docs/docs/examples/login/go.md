@@ -122,14 +122,14 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 ### Start your application
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL custom domain, e.g. my-domain.zitadel.cloud
-- `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PCKE.
+- `domain`: Your ZITADEL Custom Domain, e.g. my-domain.zitadel.cloud
+- `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PKCE.
 - `clientID`: The clientID provided by ZITADEL
 - `redirectURI`: The redirectURI registered at ZITADEL
 - `port`: The port on which the API will be accessible, default it 8089
 
 ```bash
-go run main.go --domain <your domain> --key <key> -- clientID <clientID> --redirectURI <redirectURI>
+go run main.go --domain <custom domain> --key <key> -- clientID <clientID> --redirectURI <redirectURI>
 ```
 
 This could look like:

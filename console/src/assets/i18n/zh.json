@@ -219,7 +219,7 @@
           "DC": "当您为您的组织声明一个域时，那些在其登录名中未使用此域的用户将被提示更改其登录名以匹配声明的域。",
           "INIT": "当创建用户时，他们将收到一封带有设置密码链接的电子邮件。",
           "PC": "当用户更改其密码时，如果您在通知设置中启用了此功能，他们将收到有关更改的通知。",
-          "PL": "当用户添加无密码认证方法时，他们需要通过点击电子邮件中的链接来激活它。",
+          "PL": "当用户添加Passkey认证方法时，他们需要通过点击电子邮件中的链接来激活它。",
           "PR": "当用户重置其密码时，他们将收到一封带有设置新密码链接的电子邮件。",
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "自定义登录表单。",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "允许用户名和密码",
-            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用无密码认证或外部身份提供者登录。"
+            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用Passkey认证或外部身份提供者登录。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "允许用户注册",
@@ -623,6 +623,14 @@
           "restAsync": "REST 异步"
         },
         "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
+        "PAYLOAD_TYPE": "有效负载类型",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "加密的 JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 用于验证的签名头的标准 JSON 有效负载。\nJWT: 有效负载作为已签名的 JWT 发送。验证通过 JWT 签名完成。\nJWE: JWT 另外被加密，以防止对有效负载信息的未授权访问。",
         "ENDPOINT": "端点",
         "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
         "TIMEOUT": "超时",
@@ -832,19 +840,19 @@
       "TABLESTATE": "状态",
       "NAME": "名称",
       "EMPTY": "没有可用的设备",
-      "TITLE": "无密码身份验证",
-      "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以无密码登录 ZITADEL。",
+      "TITLE": "Passkey 认证",
+      "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以使用 Passkey 登录 ZITADEL。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素认证方式。",
       "U2F": "添加方法",
       "U2F_DIALOG_TITLE": "身份验证器",
-      "U2F_DIALOG_DESCRIPTION": "输入您使用的无密码登录名",
-      "U2F_SUCCESS": "无密码验证创建成功！",
+      "U2F_DIALOG_DESCRIPTION": "输入您使用的 Passkey 登录名",
+      "U2F_SUCCESS": "Passkey 验证创建成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",
-        "2": "指纹、安全密钥、Face ID 等"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "无状态",
@@ -853,17 +861,17 @@
         "3": "已删除"
       },
       "DIALOG": {
-        "DELETE_TITLE": "删除无密码身份验证方式",
-        "DELETE_DESCRIPTION": "您即将删除无密码身份验证方法。你确定吗？",
-        "ADD_TITLE": "无密码身份验证",
-        "ADD_DESCRIPTION": "选择用于创建无密码身份验证方法的可用选项之一。",
-        "SEND_DESCRIPTION": "将无密码身份认证方式注册链接发送到您的电子邮件地址。",
+        "DELETE_TITLE": "删除 Passkey",
+        "DELETE_DESCRIPTION": "您即将删除 Passkey。你确定吗？",
+        "ADD_TITLE": "Passkey 认证",
+        "ADD_DESCRIPTION": "选择用于创建 Passkey 的可用选项之一。",
+        "SEND_DESCRIPTION": "将 Passkey 注册链接发送到您的电子邮件地址。",
         "SEND": "发送注册链接",
         "SENT": "电子邮件已成功发送。检查您的邮箱以继续设置。",
         "QRCODE_DESCRIPTION": "生成二维码以使用其他设备进行扫描。",
         "QRCODE": "生成二维码",
         "QRCODE_SCAN": "扫描此 QR 码以继续在您的设备上进行设置。",
-        "NEW_DESCRIPTION": "使用此设备设置无密码身份验证。",
+        "NEW_DESCRIPTION": "使用此设备设置 Passkey。",
         "NEW": "添加"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "用于 TOTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
-      "U2F": "指纹、安全密钥、Face ID 等",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "验证因子",
       "U2F_DIALOG_DESCRIPTION": "输入您使用的通用 Multifactor 的名称。",
       "U2F_SUCCESS": "身份验证因子添加成功！",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",
-        "2": "指纹、安全密钥、Face ID 等"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "无状态",
@@ -963,7 +971,7 @@
       "CHANGEUSERNAME_TITLE": "修改用户名称",
       "CHANGEUSERNAME_DESC": "在下面的字段中输入新名称。",
       "FIRSTNAME": "名字",
-      "LASTNAME": "姓",
+      "LASTNAME": "姓氏",
       "NICKNAME": "昵称",
       "DISPLAYNAME": "展示名称",
       "PREFERREDLOGINNAME": "首选登录名",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "电子邮件验证码已发送。",
       "OTPREMOVED": "OTP (一次性密码) 已删除。",
       "U2FREMOVED": "认证因子已删除。",
-      "PASSWORDLESSREMOVED": "无密码登录设备已删除。",
+      "PASSWORDLESSREMOVED": "Passkey 已删除。",
       "INITIALPASSWORDSET": "初始密码已设置。",
       "PASSWORDNOTIFICATIONSENT": "已发送密码更改通知。",
       "PASSWORDCHANGED": "密码修改成功。",
@@ -1152,7 +1160,7 @@
       "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL 管理角色",
+      "TITLE": "ZITADEL 管理员角色",
       "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
@@ -1549,7 +1557,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1603,7 +1613,7 @@
         "2": "电子邮件验证",
         "3": "电话号码验证",
         "4": "重置密码",
-        "5": "无密码认证初始化",
+        "5": "Passkey 初始化",
         "6": "App 验证",
         "7": "一次性密码 (OTP) - SMS",
         "8": "一次性密码 (OTP) - 电子邮件"
@@ -1682,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "通知",
       "DESCRIPTION": "确定将发送哪些更改、通知",
-      "PASSWORDCHANGE": "更改密码"
+      "PASSWORDCHANGE": "密码已更改"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",
@@ -1799,7 +1809,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1831,10 +1843,10 @@
         "usernameChangeText": "更改用户名",
         "verifyMfaOtpText": "OTP 验证",
         "verifyMfaU2fText": "通用第二身份因素验证",
-        "passwordlessPromptText": "无密码身份验证提示",
-        "passwordlessRegistrationDoneText": "无密码身份验证注册完成",
-        "passwordlessRegistrationText": "无密码身份验证注册",
-        "passwordlessText": "无密码身份验证",
+        "passwordlessPromptText": "Passkey 提示",
+        "passwordlessRegistrationDoneText": "Passkey 注册完成",
+        "passwordlessRegistrationText": "Passkey 注册",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "外部注册用户概述"
       }
     },
@@ -1848,13 +1860,13 @@
         "VEO": "验证电子邮件一次性密码",
         "PR": "重置密码",
         "DC": "域名声明",
-        "PL": "无密码身份验证",
+        "PL": "Passkey",
         "PC": "修改密码",
         "IU": "邀请用户"
       },
       "CHIPS": {
-        "firstname": "名",
-        "lastname": "姓",
+        "firstname": "名字",
+        "lastname": "姓氏",
         "code": "Code",
         "preferredLoginName": "首选登录名",
         "displayName": "展示名称",
@@ -2330,8 +2342,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "姓名属性",
+    "LASTNAMEATTRIBUTE": "姓氏属性",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2402,8 +2414,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "无密码身份认证",
-      "MULTIFACTORDESCRIPTION": "在此处为您的无密码身份认证定义多因素。",
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "在此处为您的 Passkey 认证定义多因素。",
       "SECONDFACTORTITLE": "多因素身份认证",
       "SECONDFACTORDESCRIPTION": "进一步定义您可以用来保护您的密码身份认证的可能因素。"
     },
@@ -2423,12 +2435,12 @@
     "TYPE": "类型",
     "MULTIFACTORTYPES": {
       "0": "未知",
-      "1": "指纹、安全密钥、Face ID 等"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
       "1": "身份验证应用程序的一次性密码（TOTP）",
-      "2": "指纹、安全密钥、Face ID 等",
+      "2": "Passkey",
       "3": "电子邮件一次性密码（email OTP）",
       "4": "短信一次性密码（SMS OTP）",
       "5": "恢复码"
@@ -2445,7 +2457,7 @@
       "DESCRIPTION": "您可以选择预定义或自行创建的提供程序进行身份验证。",
       "SELECTIDPS": "身份提供者"
     },
-    "PASSWORDLESS": "无密码登录",
+    "PASSWORDLESS": "Passkey 登录",
     "PASSWORDLESSTYPE": {
       "0": "不允许",
       "1": "允许"
@@ -2785,7 +2797,9 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "添加管理者",

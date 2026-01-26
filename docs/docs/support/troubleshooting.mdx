@@ -23,7 +23,7 @@ To make sure, that your new settings will trigger, please restart your mobile ph
 
 **Settings > Safari > Advanced > Experimental Features > disable: „SameSite strict enforcement (ITP)“**
 
-![Same Site Strict Enforvement](/img/manuals/errors/same-site-strict.png)
+![Same Site Strict Enforcement](/img/manuals/errors/same-site-strict.png)
 
 **Settings > Safari > disable: "Block All cookies"** 
 ![Block all cookies](/img/manuals/errors/block-cookies.png)
@@ -70,7 +70,7 @@ Instead of `urn:zitadel:iam:org:project:id:zitadel:aud` you could also use `urn:
 
 The WebFinger requirement and setup is a step a user has to take outside of their IdP set-up. WebFinger is a protocol which supports the ability for OIDC issuer discovery, and we use it to prove that the user has administrative control over the domain and to retrieve the issuer. This is a requirement we have in place for all users, regardless of their IdP, who use custom OIDC with Tailscale.
 
-On their custom domain, e.g example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
+On their Custom Domain, e.g example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
 
 The requirements and a set up guide is detailed in the [Tailscale documentation](https://tailscale.com/kb/1240/sso-custom-oidc/).
 

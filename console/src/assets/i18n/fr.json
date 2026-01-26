@@ -219,7 +219,7 @@
           "DC": "Lorsque vous revendiquez un domaine pour votre organisation, les utilisateurs qui n'utilisent pas ce domaine dans leur nom de connexion seront invités à changer leur nom de connexion pour correspondre au domaine revendiqué.",
           "INIT": "Lorsqu'un utilisateur est créé, il recevra un e-mail avec un lien pour définir son mot de passe.",
           "PC": "Lorsqu'un utilisateur change son mot de passe, il recevra une notification sur le changement si vous avez activé cela dans les paramètres de notification.",
-          "PL": "Lorsqu'un utilisateur ajoute une méthode d'authentification sans mot de passe, il doit l'activer en cliquant sur un lien dans un e-mail.",
+          "PL": "Lorsqu'un utilisateur ajoute une clé d'accès comme méthode d'authentification, il doit l'activer en cliquant sur un lien dans un e-mail.",
           "PR": "Lorsqu'un utilisateur réinitialise son mot de passe, il recevra un e-mail avec un lien pour définir un nouveau mot de passe.",
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
@@ -283,7 +283,7 @@
           "DESCRIPTION": "Personnalisez le formulaire de connexion",
           "USERNAME_PASSWORD_ALLOWED": {
             "TITLE": "Nom d'utilisateur et mot de passe autorisés",
-            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et mot de passe. Si désactivé, vos utilisateurs pourront uniquement se connecter avec une méthode d'authentification sans mot de passe ou avec un fournisseur d'identité externe"
+            "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec leur nom d'utilisateur et mot de passe. Si désactivé, vos utilisateurs pourront uniquement se connecter avec une clé d'accès ou avec un fournisseur d'identité externe"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Enregistrement de nouveaux utilisateurs autorisé",
@@ -623,6 +623,14 @@
           "restAsync": "REST Asynchrone"
         },
         "TYPES_DESCRIPTION": "Webhook, l'appel gère le code d'état mais la réponse est sans importance\nCall, l'appel gère le code d'état et la réponse\nAsync, l'appel ne gère ni le code d'état ni la réponse, mais peut être appelé en parallèle avec d'autres cibles",
+        "PAYLOAD_TYPE": "Type de charge utile",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Non spécifié",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token chiffré (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Charge utile JSON standard avec un en‑tête de signature pour la vérification.\nJWT: La charge utile est envoyée sous forme de JWT signé. La vérification se fait via la signature du JWT.\nJWE: Le JWT est en plus chiffré pour empêcher l'accès non autorisé aux informations de la charge utile.",
         "ENDPOINT": "Point de terminaison",
         "ENDPOINT_DESCRIPTION": "Entrez le point de terminaison où votre code est hébergé. Assurez-vous qu'il nous est accessible !",
         "TIMEOUT": "Délai d'attente",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Statut",
       "NAME": "Nom",
       "EMPTY": "Aucun dispositif défini",
-      "TITLE": "Authentification sans mot de passe",
-      "DESCRIPTION": "Ajoutez des méthodes d'authentification basées sur WebAuthn pour vous connecter à ZITADEL sans mot de passe.",
+      "TITLE": "Clé d'accès",
+      "DESCRIPTION": "Ajoutez des méthodes d'authentification basées sur WebAuthn pour vous connecter à ZITADEL avec une clé d'accès.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "U2F": "Ajouter une méthode",
       "U2F_DIALOG_TITLE": "Vérifier l'authentifiant",
-      "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre connexion sans mot de passe utilisée",
-      "U2F_SUCCESS": "Connexion sans mot de passe créé avec succès !",
+      "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre clé d'accès utilisée.",
+      "U2F_SUCCESS": "Clé d'accès créée avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant la configuration !",
       "U2F_NAME": "Nom de l'authentificateur",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
-        "2": "Empreinte digitale, clés de sécurité, Face ID et autres"
+        "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
         "0": "Pas d'état",
@@ -853,17 +861,17 @@
         "3": "Supprimé"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Supprimer une méthode d'authentification sans mot de passe",
-        "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une méthode d'authentification sans mot de passe. Vous êtes sûr ?",
-        "ADD_TITLE": "Authentification sans mot de passe",
-        "ADD_DESCRIPTION": "Sélectionnez l'une des options disponibles pour créer une méthode d'authentification sans mot de passe.",
+        "DELETE_TITLE": "Supprimer une clé d'accès",
+        "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une clé d'accès. Vous êtes sûr ?",
+        "ADD_TITLE": "Clé d'accès",
+        "ADD_DESCRIPTION": "Sélectionnez l'une des options disponibles pour créer une clé d'accès.",
         "SEND_DESCRIPTION": "Envoyez vous-même un lien d'enregistrement à votre adresse électronique.",
         "SEND": "Envoyer le lien d'enregistrement",
         "SENT": "L'e-mail a été délivré avec succès. Vérifiez votre boîte aux lettres électronique pour poursuivre la configuration.",
         "QRCODE_DESCRIPTION": "Générer un code QR à scanner avec un autre appareil.",
         "QRCODE": "Générer un code QR",
         "QRCODE_SCAN": "Scannez ce code QR pour poursuivre la configuration sur votre appareil.",
-        "NEW_DESCRIPTION": "Utilisez cet appareil pour configurer Passwordless.",
+        "NEW_DESCRIPTION": "Utilisez cet appareil pour configurer une clé d'accès.",
         "NEW": "Ajouter un nouveau"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
       "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
-      "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
+      "U2F": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
       "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre multifacteur universel utilisé.",
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
-        "2": "Empreinte digitale, clés de sécurité, Face ID et autres"
+        "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
         "0": "Pas d'état",
@@ -963,7 +971,7 @@
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
       "CHANGEUSERNAME_DESC": "Entrez le nouveau nom dans le champ ci-dessous.",
       "FIRSTNAME": "Prénom",
-      "LASTNAME": "Nom de famille",
+      "LASTNAME": "Nom",
       "NICKNAME": "Surnom",
       "DISPLAYNAME": "Nom d'affichage",
       "PREFERREDLOGINNAME": "Nom de connexion préféré",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "Code de vérification de l'e-mail envoyé.",
       "OTPREMOVED": "OTP supprimé.",
       "U2FREMOVED": "Facteur supprimé.",
-      "PASSWORDLESSREMOVED": "Connexion sans mot de passe supprimée.",
+      "PASSWORDLESSREMOVED": "Clé d'accès supprimée.",
       "INITIALPASSWORDSET": "Mot de passe initial défini.",
       "PASSWORDNOTIFICATIONSENT": "Notification de changement de mot de passe envoyée.",
       "PASSWORDCHANGED": "Mot de passe modifié avec succès.",
@@ -1152,7 +1160,7 @@
       "SECRETREMOVED": "Secret supprimé avec succès !"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Rôles du responsable ZITADEL",
+      "TITLE": "Rôles d'administrateur ZITADEL",
       "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'IAM.",
       "ORGCONTEXT": "Vous voyez toutes les organisations et tous les projets qui sont liés à l'organisation actuellement sélectionnée.",
       "USERCONTEXT": "Vous voyez toutes les organisations et tous les projets auxquels vous êtes autorisé. Y compris les autres organisations.",
@@ -1546,7 +1554,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1600,7 +1610,7 @@
         "2": "Vérification du courrier électronique",
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
-        "5": "Initialisation sans mot de passe",
+        "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) -e-mail"
@@ -1679,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "Notifications",
       "DESCRIPTION": "Détermine sur quels changements, les notifications seront envoyées",
-      "PASSWORDCHANGE": "Changement de mot de passe"
+      "PASSWORDCHANGE": "Mot de passe changé"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Donnez à la connexion votre style personnalisé et modifiez son comportement.",
@@ -1796,7 +1806,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1828,10 +1840,10 @@
         "usernameChangeText": "Changement de nom d'utilisateur",
         "verifyMfaOtpText": "Vérifier l'OTP",
         "verifyMfaU2fText": "Vérifier le second facteur universel",
-        "passwordlessPromptText": "Invitation sans mot de passe",
-        "passwordlessRegistrationDoneText": "Enregistrement d'une connexion sans mot de passe terminé",
-        "passwordlessRegistrationText": "Enregistrement d'une connexion sans mot de passe",
-        "passwordlessText": "Sans mot de passe",
+        "passwordlessPromptText": "Invitation de clé d'accès",
+        "passwordlessRegistrationDoneText": "Enregistrement de clé d'accès terminé",
+        "passwordlessRegistrationText": "Enregistrement de clé d'accès",
+        "passwordlessText": "Clé d'accès",
         "externalRegistrationUserOverviewText": "Enregistrement externe Aperçu de l'utilisateur"
       }
     },
@@ -1845,13 +1857,13 @@
         "VEO": "Vérifier l'OTP par courrier électronique",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
-        "PL": "Sans mot de passe",
+        "PL": "Clé d'accès",
         "PC": "Modification du mot de passe",
         "IU": "Inviter un utilisateur"
       },
       "CHIPS": {
         "firstname": "Prénom",
-        "lastname": "Nom de famille",
+        "lastname": "Nom",
         "code": "Code",
         "preferredLoginName": "Nom de connexion préféré",
         "displayName": "Nom d'affichage",
@@ -2319,8 +2331,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "E-mail attribute",
     "EMAILVERIFIEDATTRIBUTE": "E-mail verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Attribut du prénom",
+    "LASTNAMEATTRIBUTE": "Attribut du nom",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2374,8 +2386,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Sans mot de passe",
-      "MULTIFACTORDESCRIPTION": "Définissez ici vos multifacteurs pour votre authentification sans mot de passe.",
+      "MULTIFACTORTITLE": "Clé d'accès",
+      "MULTIFACTORDESCRIPTION": "Définissez ici vos multifacteurs pour votre authentification avec clé d'accès.",
       "SECONDFACTORTITLE": "Authentification multifactorielle",
       "SECONDFACTORDESCRIPTION": "Définissez d'autres facteurs possibles avec lesquels vous pouvez sécuriser votre authentification par mot de passe."
     },
@@ -2395,12 +2407,12 @@
     "TYPE": "Type",
     "MULTIFACTORTYPES": {
       "0": "Inconnu",
-      "1": "Empreinte digitale, clés de sécurité, Face ID et autres"
+      "1": "Clé d'accès"
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
       "1": "One Time Password via une application d'authentification (TOTP)",
-      "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
+      "2": "Clé d'accès",
       "3": "One Time Password par e-mail (E-mail OTP)",
       "4": "One Time Password par SMS (SMS OTP)",
       "5": "Codes de récupération"
@@ -2417,7 +2429,7 @@
       "DESCRIPTION": "Vous pouvez sélectionner des fournisseurs prédéfinis ou créés par vous-même pour l'authentification.",
       "SELECTIDPS": "Fournisseurs d'identité"
     },
-    "PASSWORDLESS": "Connexion sans mot de passe",
+    "PASSWORDLESS": "Connexion avec clé d'accès",
     "PASSWORDLESSTYPE": {
       "0": "Non autorisé",
       "1": "Autorisée"
@@ -2610,10 +2622,10 @@
         "0": "Basic",
         "1": "Post",
         "2": "Aucun",
-        "3": "Clé privée JWT"
+        "3": "Clave privada JWT"
       },
-      "TOKENTYPE": "Type de jeton d'authentification",
-      "TOKENTYPE0": "Jeton porteur",
+      "TOKENTYPE": "Auth Token Type",
+      "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "J'espère que vous savez ce que vous faites.",
       "OVERVIEWSECTION": "Vue d'ensemble",
@@ -2621,7 +2633,7 @@
       "ACCESSTOKENROLEASSERTION": "Ajouter les rôles des utilisateurs au jeton d'accès",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Si cette option est sélectionnée, les rôles demandés de l'utilisateur authentifié sont ajoutés au jeton d'accès.",
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification.",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Attribuer des rôles d'utilisateur pendant l'authentification' ou de le demander via une portée personnalisée.",
       "IDTOKENUSERINFOASSERTION": "Informations sur l'utilisateur dans le jeton d'identification",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux clients de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
       "CLOCKSKEW": "Permet aux clients de gérer le décalage d'horloge de l'OP et du client. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
@@ -2753,7 +2765,9 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

@@ -623,6 +623,14 @@
           "restAsync": "REST 비동기"
         },
         "TYPES_DESCRIPTION": "Webhook, 호출은 상태 코드를 처리하지만 응답은 중요하지 않습니다\nCall, 호출은 상태 코드와 응답을 처리합니다\nAsync, 호출은 상태 코드나 응답을 처리하지 않지만 다른 대상과 병렬로 호출할 수 있습니다",
+        "PAYLOAD_TYPE": "페이로드 유형",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "지정되지 않음",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "암호화된 JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 검증을 위한 서명 헤더가 포함된 표준 JSON 페이로드.\nJWT: 페이로드는 서명된 JWT로 전송됩니다. 검증은 JWT 서명을 통해 수행됩니다.\nJWE: JWT는 추가로 암호화되어 페이로드 정보에 대한 무단 접근을 방지합니다.",
         "ENDPOINT": "엔드포인트",
         "ENDPOINT_DESCRIPTION": "코드가 호스팅되는 엔드포인트를 입력하십시오. 우리에게 액세스할 수 있는지 확인하십시오!",
         "TIMEOUT": "시간 초과",
@@ -832,12 +840,12 @@
       "TABLESTATE": "상태",
       "NAME": "이름",
       "EMPTY": "설정된 장치 없음",
-      "TITLE": "비밀번호 없는 인증",
-      "DESCRIPTION": "ZITADEL에 비밀번호 없이 로그인할 수 있도록 WebAuthn 기반 인증 방법을 추가하세요.",
+      "TITLE": "패스키 인증",
+      "DESCRIPTION": "ZITADEL에 패스키로 로그인할 수 있도록 WebAuthn 기반 인증 방법을 추가하세요.",
       "MANAGE_DESCRIPTION": "사용자의 두 번째 인증 요소를 관리하세요.",
       "U2F": "방법 추가",
       "U2F_DIALOG_TITLE": "인증기 확인",
-      "U2F_DIALOG_DESCRIPTION": "비밀번호 없는 로그인에 사용할 이름을 입력하세요.",
+      "U2F_DIALOG_DESCRIPTION": "패스키 로그인에 사용할 이름을 입력하세요.",
       "U2F_SUCCESS": "비밀번호 없는 인증이 성공적으로 생성되었습니다!",
       "U2F_ERROR": "설정 중 오류가 발생했습니다!",
       "U2F_NAME": "인증기 이름",
@@ -853,17 +861,17 @@
         "3": "삭제됨"
       },
       "DIALOG": {
-        "DELETE_TITLE": "비밀번호 없는 인증 방법 제거",
-        "DELETE_DESCRIPTION": "비밀번호 없는 인증 방법을 삭제하려고 합니다. 진행하시겠습니까?",
-        "ADD_TITLE": "비밀번호 없는 인증",
-        "ADD_DESCRIPTION": "비밀번호 없는 인증 방법을 만들기 위해 사용할 수 있는 옵션 중 하나를 선택하세요.",
+        "DELETE_TITLE": "패스키 인증 방법 제거",
+        "DELETE_DESCRIPTION": "패스키 인증 방법을 삭제하려고 합니다. 진행하시겠습니까?",
+        "ADD_TITLE": "패스키 인증",
+        "ADD_DESCRIPTION": "패스키 인증 방법을 만들기 위해 사용할 수 있는 옵션 중 하나를 선택하세요.",
         "SEND_DESCRIPTION": "이메일 주소로 등록 링크를 보내세요.",
         "SEND": "등록 링크 보내기",
         "SENT": "이메일이 성공적으로 발송되었습니다. 메일함을 확인하여 설정을 계속 진행하세요.",
         "QRCODE_DESCRIPTION": "다른 장치로 스캔할 QR 코드를 생성하세요.",
         "QRCODE": "QR 코드 생성",
         "QRCODE_SCAN": "설정을 계속하려면 이 QR 코드를 스캔하세요.",
-        "NEW_DESCRIPTION": "이 장치를 사용하여 비밀번호 없는 인증을 설정하세요.",
+        "NEW_DESCRIPTION": "이 장치를 사용하여 패스키 인증을 설정하세요.",
         "NEW": "새로 추가"
       }
     },
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "이메일 확인 코드가 전송되었습니다.",
       "OTPREMOVED": "OTP가 제거되었습니다.",
       "U2FREMOVED": "인증 요소가 제거되었습니다.",
-      "PASSWORDLESSREMOVED": "비밀번호 없는 인증이 제거되었습니다.",
+      "PASSWORDLESSREMOVED": "패스키 인증이 제거되었습니다.",
       "INITIALPASSWORDSET": "초기 비밀번호가 설정되었습니다.",
       "PASSWORDNOTIFICATIONSENT": "비밀번호 변경 알림이 전송되었습니다.",
       "PASSWORDCHANGED": "비밀번호가 성공적으로 변경되었습니다.",
@@ -1147,7 +1155,7 @@
       "MACHINEADDED": "서비스 사용자가 생성되었습니다!",
       "DELETED": "사용자가 성공적으로 삭제되었습니다!",
       "UNLOCKED": "사용자가 성공적으로 잠금 해제되었습니다!",
-      "PASSWORDLESSREGISTRATIONSENT": "등록 링크가 성공적으로 전송되었습니다.",
+      "PASSWORDLESSREGISTRATIONSENT": "패스키 등록 링크가 성공적으로 전송되었습니다.",
       "SECRETGENERATED": "시크릿이 성공적으로 생성되었습니다!",
       "SECRETREMOVED": "시크릿이 성공적으로 제거되었습니다!"
     },
@@ -1546,7 +1554,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1600,7 +1610,7 @@
         "2": "이메일 검증",
         "3": "전화 검증",
         "4": "비밀번호 재설정",
-        "5": "비밀번호 없는 초기화",
+        "5": "패스키 초기화",
         "6": "앱 시크릿",
         "7": "일회성 비밀번호 (OTP) - SMS",
         "8": "일회성 비밀번호 (OTP) - 이메일"
@@ -1679,7 +1689,7 @@
     "NOTIFICATION": {
       "TITLE": "알림",
       "DESCRIPTION": "어떤 변경 사항에 대해 알림을 보낼지 결정합니다.",
-      "PASSWORDCHANGE": "비밀번호 변경"
+      "PASSWORDCHANGE": "비밀번호가 변경되었습니다"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "로그인을 맞춤형 스타일로 제공하고 동작을 수정하세요.",
@@ -1796,7 +1806,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "이메일 인증 완료",
@@ -1828,10 +1840,10 @@
         "usernameChangeText": "사용자 이름 변경",
         "verifyMfaOtpText": "OTP 확인",
         "verifyMfaU2fText": "U2F 확인",
-        "passwordlessPromptText": "비밀번호 없는 프롬프트",
-        "passwordlessRegistrationDoneText": "비밀번호 없는 등록 완료",
-        "passwordlessRegistrationText": "비밀번호 없는 등록",
-        "passwordlessText": "비밀번호 없음",
+        "passwordlessPromptText": "패스키 인증 초기화 요청",
+        "passwordlessRegistrationDoneText": "패스키 인증 등록 완료",
+        "passwordlessRegistrationText": "패스키 인증 등록",
+        "passwordlessText": "패스키 인증",
         "externalRegistrationUserOverviewText": "외부 등록 사용자 개요"
       }
     },
@@ -1845,7 +1857,7 @@
         "VEO": "이메일 OTP 확인",
         "PR": "비밀번호 재설정",
         "DC": "도메인 클레임",
-        "PL": "비밀번호 없음",
+        "PL": "패스키 인증",
         "PC": "비밀번호 변경",
         "IU": "사용자 초대"
       },
@@ -2395,8 +2407,8 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "비밀번호 없는 인증",
-      "MULTIFACTORDESCRIPTION": "여기서 비밀번호 없는 인증을 위한 다중 인증 요소를 정의하세요.",
+      "MULTIFACTORTITLE": "패스키",
+      "MULTIFACTORDESCRIPTION": "여기서 패스키 인증을 위한 다중 요소를 정의하세요.",
       "SECONDFACTORTITLE": "다중 인증",
       "SECONDFACTORDESCRIPTION": "비밀번호 인증을 강화할 추가 인증 요소를 정의하세요."
     },
@@ -2438,7 +2450,7 @@
       "DESCRIPTION": "인증을 위해 사전 정의된 제공자 또는 사용자가 생성한 제공자를 선택할 수 있습니다.",
       "SELECTIDPS": "아이덴티티 제공자"
     },
-    "PASSWORDLESS": "비밀번호 없는 로그인",
+    "PASSWORDLESS": "패스키 인증",
     "PASSWORDLESSTYPE": {
       "0": "허용되지 않음",
       "1": "허용됨"
@@ -2774,7 +2786,9 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "매니저 추가",

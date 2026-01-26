@@ -13,8 +13,8 @@ It covers how to:
 Prerequisites:
 
 - existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects)
+- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
 > We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Console and
@@ -41,7 +41,7 @@ This includes:
 
 All the information is filled out as an example, and to connect with any other environment you only have to change the
 used domain, for example "example.com" with "zitadel.cloud".
-Lastly, upload the certificate used to sign the reponses, provided for you under the
+Lastly, upload the certificate used to sign the responses, provided for you under the
 URL \{your_instance_domain}/saml/v2/certificate.
 
 Then just press the button "Create" and the connection on Auth0 is configured.

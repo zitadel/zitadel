@@ -56,24 +56,24 @@ export default function ApiItemWrapper(props) {
       <div className="mt-10 flex justify-start">
         {feedback === null && (
           <div
-            className="w-fit rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            className="w-full sm:w-fit rounded-xl sm:rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] p-4 sm:px-2 sm:py-2 shadow-sm transition-all duration-300"
             style={{
               display: "flex",
               flexDirection: "column",
             }}
           >
-            <div className="flex items-center justify-between flex-wrap gap-3 flex-grow">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-3 flex-grow">
               <p
-                className="font-base ml-4 mr-4 my-0"
+                className="font-base mx-0 sm:ml-4 sm:mr-4 my-0 text-center sm:text-left"
                 style={{ color: "var(--ifm-menu-color)" }}
               >
                 Was this page useful?
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-3 w-full sm:w-auto justify-center">
                 <button
                   onClick={handleNo}
                   disabled={!plausibleLoaded}
-                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-1 px-4 flex items-center"
+                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-2 px-6 sm:py-1 sm:px-4 flex items-center justify-center flex-1 sm:flex-none"
                   style={{
                     border: "none",
                     cursor: plausibleLoaded ? "pointer" : "not-allowed",
@@ -101,7 +101,7 @@ export default function ApiItemWrapper(props) {
                 <button
                   onClick={handleYes}
                   disabled={!plausibleLoaded}
-                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-1 px-4 flex items-center"
+                  className="group bg-[#00000010] dark:bg-[#00000020] rounded-full py-2 px-6 sm:py-1 sm:px-4 flex items-center justify-center flex-1 sm:flex-none"
                   style={{
                     border: "none",
                     cursor: plausibleLoaded ? "pointer" : "not-allowed",
@@ -187,7 +187,7 @@ export default function ApiItemWrapper(props) {
 
         {(feedback === "yes" || feedback === "submitted") && (
           <div
-            className="w-fit rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] px-2 py-2 shadow-sm transition-all duration-300"
+            className="w-full sm:w-fit rounded-xl sm:rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#ffffff10] p-4 sm:px-2 sm:py-2 shadow-sm transition-all duration-300"
             style={{
               display: "flex",
               flexDirection: "column",

@@ -623,6 +623,14 @@
           "restAsync": "REST Async"
         },
         "TYPES_DESCRIPTION": "Webhook, çağrı durum kodunu işler ancak yanıt önemsizdir\nCall, çağrı durum kodunu ve yanıtını işler\nAsync, çağrı ne durum kodunu ne de yanıtını işler, ancak diğer Hedeflerle paralel olarak çağrılabilir",
+        "PAYLOAD_TYPE": "Yük türü",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Belirtilmemiş",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Şifrelenmiş JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Doğrulama için imza başlığı olan standart JSON payload.\nJWT: Payload imzalı bir JWT olarak gönderilir. Doğrulama, JWT imzası ile gerçekleştirilir.\nJWE: JWT, payload bilgilerine yetkisiz erişimi önlemek için ayrıca şifrelenir.",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Kodunuzun barındırıldığı endpoint'i girin. Bize erişilebilir olduğundan emin olun!",
         "TIMEOUT": "Zaman Aşımı",
@@ -832,19 +840,19 @@
       "TABLESTATE": "Durum",
       "NAME": "Ad",
       "EMPTY": "Cihaz ayarlanmamış",
-      "TITLE": "Şifresiz Kimlik Doğrulama",
-      "DESCRIPTION": "ZITADEL'e şifresiz giriş yapmak için WebAuthn tabanlı Kimlik Doğrulama Yöntemleri ekleyin.",
+      "TITLE": "Passkey Kimlik Doğrulama",
+      "DESCRIPTION": "ZITADEL'e Passkey ile giriş yapmak için WebAuthn tabanlı Kimlik Doğrulama Yöntemleri ekleyin.",
       "MANAGE_DESCRIPTION": "Kullanıcılarınızın ikinci faktör yöntemlerini yönetin.",
       "U2F": "Yöntem ekle",
       "U2F_DIALOG_TITLE": "Kimlik doğrulayıcıyı doğrula",
-      "U2F_DIALOG_DESCRIPTION": "Kullandığınız şifresiz Giriş için bir ad girin",
-      "U2F_SUCCESS": "Şifresiz Kimlik Doğrulama başarıyla oluşturuldu!",
+      "U2F_DIALOG_DESCRIPTION": "Kullandığınız Passkey Giriş için bir ad girin",
+      "U2F_SUCCESS": "Passkey Kimlik Doğrulama başarıyla oluşturuldu!",
       "U2F_ERROR": "Kurulum sırasında bir hata oluştu!",
       "U2F_NAME": "Kimlik Doğrulayıcı Adı",
       "TYPE": {
         "0": "MFA tanımlanmamış",
         "1": "Tek Seferlik Şifre (OTP)",
-        "2": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğer"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Durum Yok",
@@ -853,17 +861,17 @@
         "3": "Silindi"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Şifresiz Kimlik Doğrulama Yöntemini Kaldır",
-        "DELETE_DESCRIPTION": "Bir şifresiz Kimlik Doğrulama yöntemini silmek üzeresiniz. Emin misiniz?",
-        "ADD_TITLE": "Şifresiz Kimlik Doğrulama",
-        "ADD_DESCRIPTION": "Şifresiz kimlik doğrulama yöntemi oluşturmak için mevcut seçeneklerden birini seçin.",
+        "DELETE_TITLE": "Passkey'i Kaldır",
+        "DELETE_DESCRIPTION": "Bir Passkey'i silmek üzeresiniz. Emin misiniz?",
+        "ADD_TITLE": "Passkey Kimlik Doğrulama",
+        "ADD_DESCRIPTION": "Passkey oluşturmak için mevcut seçeneklerden birini seçin.",
         "SEND_DESCRIPTION": "E-posta adresinize bir kayıt bağlantısı gönderin.",
         "SEND": "Kayıt bağlantısı gönder",
         "SENT": "E-posta başarıyla teslim edildi. Kuruluma devam etmek için posta kutunuzu kontrol edin.",
         "QRCODE_DESCRIPTION": "Başka bir cihazla tarama için QR kodu oluşturun.",
         "QRCODE": "QR kodu oluştur",
         "QRCODE_SCAN": "Cihazınızda kuruluma devam etmek için bu QR kodunu tarayın.",
-        "NEW_DESCRIPTION": "Şifresiz kurmak için bu cihazı kullanın.",
+        "NEW_DESCRIPTION": "Passkey kurmak için bu cihazı kullanın.",
         "NEW": "Yeni Ekle"
       }
     },
@@ -879,7 +887,7 @@
       "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması (Zamana Dayalı Tek Seferlik Şifre)",
       "OTP_DIALOG_TITLE": "OTP Ekle",
       "OTP_DIALOG_DESCRIPTION": "QR kodunu bir kimlik doğrulayıcı uygulamayla tarayın ve OTP yöntemini doğrulamak ve etkinleştirmek için aşağıya kodu girin.",
-      "U2F": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğer",
+      "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktörü Doğrula",
       "U2F_DIALOG_DESCRIPTION": "Kullandığınız evrensel Çok faktör için bir ad girin.",
       "U2F_SUCCESS": "Faktör başarıyla eklendi!",
@@ -894,7 +902,7 @@
       "TYPE": {
         "0": "MFA tanımlanmamış",
         "1": "Tek Seferlik Şifre (OTP)",
-        "2": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğer"
+        "2": "Passkey"
       },
       "STATE": {
         "0": "Durum Yok",
@@ -1134,7 +1142,7 @@
       "EMAILVERIFICATIONSENT": "E-posta doğrulama kodu gönderildi.",
       "OTPREMOVED": "OTP kaldırıldı.",
       "U2FREMOVED": "Faktör kaldırıldı.",
-      "PASSWORDLESSREMOVED": "Şifresiz kimlik doğrulama kaldırıldı.",
+      "PASSWORDLESSREMOVED": "Passkey kaldırıldı.",
       "INITIALPASSWORDSET": "İlk şifre ayarlandı.",
       "PASSWORDNOTIFICATIONSENT": "Şifre değişikliği bildirimi gönderildi.",
       "PASSWORDCHANGED": "Şifre başarıyla değiştirildi.",
@@ -1549,7 +1557,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1603,7 +1613,7 @@
         "2": "E-posta doğrulama",
         "3": "Telefon doğrulama",
         "4": "Şifre Sıfırlama",
-        "5": "Şifresiz Başlatma",
+        "5": "Passkey Başlatma",
         "6": "Uygulama Gizli Anahtarı",
         "7": "Tek Kullanımlık Şifre (OTP) - SMS",
         "8": "Tek Kullanımlık Şifre (OTP) - E-posta"
@@ -1682,7 +1692,7 @@
     "NOTIFICATION": {
       "TITLE": "Bildirim",
       "DESCRIPTION": "Hangi değişikliklerde bildirimlerin gönderileceğini belirler.",
-      "PASSWORDCHANGE": "Şifre değişikliği"
+      "PASSWORDCHANGE": "Şifre değiştirildi"
     },
     "PRIVATELABELING": {
       "DESCRIPTION": "Girişe kişiselleştirilmiş tarzınızı verin ve davranışını değiştirin.",
@@ -1799,7 +1809,9 @@
         "hu": "Magyar",
         "ko": "한국어",
         "ro": "Română",
-        "tr": "Türkçe"
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-posta doğrulama tamamlandı",
@@ -1831,10 +1843,10 @@
         "usernameChangeText": "Kullanıcı adı değişikliği",
         "verifyMfaOtpText": "OTP Doğrula",
         "verifyMfaU2fText": "Evrensel İkinci Faktörü Doğrula",
-        "passwordlessPromptText": "Şifresiz İstem",
-        "passwordlessRegistrationDoneText": "Şifresiz Kayıt Tamamlandı",
-        "passwordlessRegistrationText": "Şifresiz Kayıt",
-        "passwordlessText": "Şifresiz",
+        "passwordlessPromptText": "Passkey İstemi",
+        "passwordlessRegistrationDoneText": "Passkey Kayıt Tamamlandı",
+        "passwordlessRegistrationText": "Passkey Kayıt",
+        "passwordlessText": "Passkey",
         "externalRegistrationUserOverviewText": "Harici Kayıt Kullanıcı Özeti"
       }
     },
@@ -1848,7 +1860,7 @@
         "VEO": "E-posta OTP Doğrula",
         "PR": "Şifre Sıfırlama",
         "DC": "Domain Talebi",
-        "PL": "Şifresiz",
+        "PL": "Passkey",
         "PC": "Şifre Değişikliği",
         "IU": "Kullanıcı Davet Et"
       },
@@ -2325,8 +2337,8 @@
     "DISPLAYNAMEATTRIBUTE": "Görünen ad özniteliği",
     "EMAILATTRIBUTEATTRIBUTE": "E-posta özniteliği",
     "EMAILVERIFIEDATTRIBUTE": "E-posta doğrulandı özniteliği",
-    "FIRSTNAMEATTRIBUTE": "Ad özniteliği",
-    "LASTNAMEATTRIBUTE": "Soyad özniteliği",
+    "FIRSTNAMEATTRIBUTE": "Ad özelliği",
+    "LASTNAMEATTRIBUTE": "Soyad özelliği",
     "NICKNAMEATTRIBUTE": "Takma ad özniteliği",
     "PHONEATTRIBUTE": "Telefon özniteliği",
     "PHONEVERIFIEDATTRIBUTE": "Telefon doğrulandı özniteliği",
@@ -2398,7 +2410,7 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Şifresiz",
+      "MULTIFACTORTITLE": "Passkey",
       "MULTIFACTORDESCRIPTION": "Şifresiz kimlik doğrulama için çok faktörlü kimlik doğrulama yöntemlerinizi burada tanımlayın.",
       "SECONDFACTORTITLE": "Çok Faktörlü Kimlik Doğrulama",
       "SECONDFACTORDESCRIPTION": "Şifre kimlik doğrulamanızı güvence altına almak için kullanabileceğiniz ek faktörleri tanımlayın."
@@ -2419,12 +2431,12 @@
     "TYPE": "Tür",
     "MULTIFACTORTYPES": {
       "0": "Bilinmeyen",
-      "1": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğerleri"
+      "1": "Passkey"
     },
     "SECONDFACTORTYPES": {
       "0": "Bilinmeyen",
       "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
-      "2": "Parmak izi, Güvenlik Anahtarları, Face ID ve diğerleri",
+      "2": "Passkey",
       "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
       "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
       "5": "Kurtarma Kodları"
@@ -2441,7 +2453,7 @@
       "DESCRIPTION": "Kimlik doğrulama için önceden tanımlanmış veya kendi oluşturduğunuz sağlayıcıları seçebilirsiniz.",
       "SELECTIDPS": "Kimlik sağlayıcıları"
     },
-    "PASSWORDLESS": "Şifresiz Giriş",
+    "PASSWORDLESS": "Passkey Giriş",
     "PASSWORDLESSTYPE": {
       "0": "İzin verilmez",
       "1": "İzin verilir"
@@ -2781,7 +2793,9 @@
     "hu": "Magyar",
     "ko": "한국어",
     "ro": "Română",
-    "tr": "Türkçe"
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Yönetici Ekle",

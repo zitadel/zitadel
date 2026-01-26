@@ -27,16 +27,16 @@ There will be three major areas for future development on the audit data
 
 ### Last changes of an object
 
-You can check the last changes of most objects in the [Console](/docs/guides/manage/console/overview).
-In the following screenshot you can see an example of last changes on an [user](/docs/guides/manage/console/users).
+You can check the last changes of most objects in the [Console](/docs/guides/manage/console/console-overview).
+In the following screenshot you can see an example of last changes on an [user](/docs/guides/manage/console/users-overview).
 The same view is available on several other objects such as organization or project.
 
 ![Profile Self Manage](/img/guides/console/myprofile.png)
 
 ### Event View
 
-Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/overview).
-Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events
+Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/console-overview).
+Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM_DOMAIN/ui/console/events
 
 ![Event viewer](/img/concepts/audit-trail/event-viewer.png)
 
@@ -45,7 +45,7 @@ Go to your default settings and then click on the Tab **Events** to open the Eve
 Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
 - [Event API Guide](/docs/guides/integrate/zitadel-apis/event-api)
-- [API Documentation](/docs/apis/resources/admin/events)
+- [API Documentation](/docs/category/apis/resources/admin/events)
 
 Access to the API is possible with a [Service User](/docs/guides/integrate/service-users/authenticate-service-users) account, allowing you to integrate the events with your own business logic.
 

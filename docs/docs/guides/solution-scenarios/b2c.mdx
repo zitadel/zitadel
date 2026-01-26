@@ -16,12 +16,12 @@ This guide introduces you to the grouping and structuring of ZITADEL projects wh
 The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL within your instance, as it is the vessel for projects, roles, applications and users.
 Creation can be done from [ZITADEL Console](https://${CUSTOM_DOMAIN}.zitadel.cloud/ui/console/orgs/create). You can choose your current account for the organization owner or create a new one.
 
-Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments seperated.
+Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments separated.
 
-### Custom domain
+### Organization Domain
 
 Right after org creation you'll be greeted with the domain section of your organization.
-ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.cloud`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
+ZITADEL automatically creates an organization domain of the form `[orgname].zitadel.cloud`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
 We recommend that you create your domains early as they create a sense of confidence and trust for your application and changes later on might create additional migration effort.
 You can read more about how ZITADEL handles usernames [here](../manage/console/organizations#how-zitadel-handles-usernames).
 
@@ -39,7 +39,7 @@ Requests to the management API are rate limited. Read our [Rate limit Policy](/d
 ### User Authentication
 
 User Authentication can be performed in multiple ways. Default method in ZITADEL is username and password with MFA enabled.
-ZITADEL allows you to configure Multifactor- and Passwordless Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
+ZITADEL allows you to configure Multifactor- and Passkey Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
 To setup your organizations login policy, go to your organizations detail in [Console](https://${CUSTOM_DOMAIN}.zitadel.cloud/ui/console/org).
 
 When planning your application consider the following questions about User Authentication:
@@ -62,7 +62,7 @@ ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Pro
 ### Hosted Login
 
 ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
-It's safe and secure and comes with Multifactor, Federated Login and Passwordless capabilities.
+It's safe and secure and comes with Multifactor, Federated Login and Passkey capabilities.
 OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience.
 With SSO, ZITADEL provides a seamless experience across all your apps.
 

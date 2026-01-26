@@ -12,17 +12,20 @@ const (
 
 type smsInitData struct {
 	userData
-	Edit    bool
-	MFAType domain.MFAType
-	Phone   string
+	Edit         bool
+	MFAType      domain.MFAType
+	Phone        string
+	CountryCode  string
+	CountryCodes []domain.CountryCode
 }
 
 type smsInitFormData struct {
-	Edit     bool   `schema:"edit"`
-	Resend   bool   `schema:"resend"`
-	Phone    string `schema:"phone"`
-	NewPhone string `schema:"newPhone"`
-	Code     string `schema:"code"`
+	Edit        bool   `schema:"edit"`
+	Resend      bool   `schema:"resend"`
+	Phone       string `schema:"phone"`
+	NewPhone    string `schema:"newPhone"`
+	Code        string `schema:"code"`
+	CountryCode string `schema:"countryCode"`
 }
 
 // handleRegisterOTPSMS checks if the user has a verified phone number and will directly add OTP SMS as 2FA.
@@ -57,6 +60,10 @@ func (l *Login) renderRegisterSMS(w http.ResponseWriter, r *http.Request, authRe
 	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", err)
 	data.profileData = l.getProfileData(authReq)
 	data.MFAType = domain.MFATypeOTPSMS
+	data.CountryCodes = domain.GetCountryCodes(translator.Lang(r))
+	if data.CountryCode == "" {
+		data.CountryCode = "CH" // default to Switzerland
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFASMSInit], data, nil)
 }
 
@@ -75,7 +82,7 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 
 	ctx := setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID)
 	// save the current state
-	data := &smsInitData{Phone: formData.Phone}
+	data := &smsInitData{Phone: formData.Phone, CountryCode: formData.CountryCode}
 
 	if formData.Edit {
 		data.Edit = true
@@ -95,7 +102,15 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 	if formData.Code == "" {
 		data.Phone = formData.NewPhone
 		if formData.NewPhone != formData.Phone {
-			_, err = l.command.ChangeUserPhone(ctx, authReq.UserID, formData.NewPhone, l.userCodeAlg)
+			// Normalize phone with selected country code before saving
+			normalizedPhone, normErr := domain.PhoneNumber(formData.NewPhone).NormalizeWithRegion(formData.CountryCode)
+			if normErr != nil {
+				data.Edit = true
+				l.renderRegisterSMS(w, r, authReq, data, normErr)
+				return
+			}
+			data.Phone = string(normalizedPhone)
+			_, err = l.command.ChangeUserPhone(ctx, authReq.UserID, string(normalizedPhone), l.userCodeAlg)
 			if err != nil {
 				// stay in edit more
 				data.Edit = true

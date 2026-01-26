@@ -53,7 +53,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -66,8 +66,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -1737,7 +1737,7 @@ service UserService {
 
   // List all possible authentication methods of a user
   //
-  // List all possible authentication methods of a user like password, passwordless, (T)OTP and more..
+  // List all possible authentication methods of a user like password, passkey, (T)OTP and more..
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}/authentication_methods"

@@ -129,8 +129,9 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		trustedDomain string
+		ctx             context.Context
+		trustedDomain   string
+		errorIfNotFound bool
 	}
 	type want struct {
 		details *domain.ObjectDetails
@@ -182,19 +183,34 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "domain does not exists, error",
+			name: "domain does not exist and flag to error set should return error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				trustedDomain: "domain.com",
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				trustedDomain:   "domain.com",
+				errorIfNotFound: true,
 			},
 			want: want{
 				err: zerrors.ThrowNotFound(nil, "COMMA-de3z9", "Errors.Instance.Domain.NotFound"),
 			},
+		},
+		{
+			name: "domain does not exist and flag to error not set should return no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				trustedDomain:   "domain.com",
+				errorIfNotFound: false,
+			},
+			want: want{},
 		},
 		{
 			name: "domain remove ok",
@@ -228,7 +244,7 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.RemoveTrustedDomain(tt.args.ctx, tt.args.trustedDomain)
+			got, err := c.RemoveTrustedDomain(tt.args.ctx, tt.args.trustedDomain, tt.args.errorIfNotFound)
 			assert.ErrorIs(t, err, tt.want.err)
 			assertObjectDetails(t, tt.want.details, got)
 		})
