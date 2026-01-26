@@ -31,11 +31,11 @@ Continue and create the application.
 
 ### Client ID
 
-After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Angular client.
+After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Angular application.
 
 ## Angular setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Angular client.
+Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Angular application.
 
 ### Install Angular dependencies
 

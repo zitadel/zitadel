@@ -38,11 +38,11 @@ Continue and create the application.
 
 ### Copy Client ID
 
-After successful creation of the app, make sure copy the client ID, as you will need it to configure your React client.
+After successful creation of the app, make sure copy the client ID, as you will need it to configure your React application.
 
 ## Create a project role "admin" and assign it to your user
 
-Also note the projects resource ID, as you will need it to configure your React client.
+Also note the projects resource ID, as you will need it to configure your React application.
 
 ![Create project role "admin"](/img/react/project-role.png)
 
@@ -52,7 +52,7 @@ If you want to read your users roles from user info endpoint, make sure to enabl
 
 ## React setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your React client.
+Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your React application.
 
 ### Install React dependencies
 

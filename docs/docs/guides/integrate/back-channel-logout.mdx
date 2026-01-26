@@ -4,7 +4,7 @@ sidebar_label: Back-Channel Logout
 ---
 
 The Back-Channel Logout implements [OpenID Connect Back-Channel Logout 1.0](https://openid.net/specs/openid-connect-backchannel-1_0.html)
-and can be used to notify clients about session termination at the OpenID Provider. This guide will explain how
+and can be used to notify applications about session termination at the OpenID Provider. This guide will explain how
 back-channel logout is implemented inside ZITADEL and gives some usage examples.
 
 :::info
@@ -24,8 +24,8 @@ understanding on the following topics before starting with this guide:
 ## Concept
 
 ZITADEL provides the possibility for OpenID Connect clients to be notified about the session termination, for example
-if a user signs out from another client using the same SSO session.
-This allows the client to also invalidate the user's session without the need for an active browser session.
+if a user signs out from another application using the same SSO session.
+This allows the application to also invalidate the user's session without the need for an active browser session.
 
 ![Authentication and Back-Channel Logout Flow](/img/guides/back-channel-logout/back-channel-logout-flow.png)
 
@@ -57,7 +57,7 @@ provides the possibility to match the exact SSO session, which was terminated.
 
 ### Client
 
-To enable the back-channel logout on a client, they simply need to register a `backchannel_logout_uri` as part of their
+To enable the back-channel logout on a application, they simply need to register a `backchannel_logout_uri` as part of their
 configuration, e.g. [creating an OIDC application](https://zitadel.com/docs/category/apis/resources/mgmt/management-service-add-oidc-app).
 
 As soon as the URI is set, every new authorization request will register a back-channel notification to be sent once
@@ -66,7 +66,7 @@ the session is terminated by a user sign out.
 ## Back-Channel Request
 
 When the session is terminated, ZITADEL will send back-channel logout requests asynchronously to every registered
-client of the corresponding session.
+application of the corresponding session.
 The request is an `application/x-www-form-urlencoded` POST request to the registered URI including a `logout_token`
 parameter in the body.
 

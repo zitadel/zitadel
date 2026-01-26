@@ -35,9 +35,9 @@ You need to add the SDK into Go Modules by:
 go get -u github.com/zitadel/zitadel-go/v3
 ```
 
-### Create example client
+### Create example application
 
-Create a new go file with the content below. This will create a client and call its `GetMyOrg` function on the ManagementService.
+Create a new go file with the content below. This will create a application and call its `GetMyOrg` function on the ManagementService.
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:zitadel:aud`).
 
 ```go reference
@@ -82,6 +82,6 @@ Now you can proceed implementing our APIs by adding more calls or using a differ
 api.SessionService().CreateSession(ctx, &session.CreateSessionRequest{})
 ```
 Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/next/example),
-like how you can integrate the [client in your own API](https://github.com/zitadel/zitadel-go/blob/next/example/api/client/main.go)
+like how you can integrate the [application in your own API](https://github.com/zitadel/zitadel-go/blob/next/example/api/client/main.go)
 or refer to our [API Docs](/apis/introduction).
 

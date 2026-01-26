@@ -582,9 +582,9 @@ func loginClientFilters(orgID string, pat bool) []expect {
 func instanceSetupLoginClientConfig() *AddLoginClient {
 	return &AddLoginClient{
 		Machine: &Machine{
-			Username:        "zitadel-login-client",
-			Name:            "ZITADEL-login-client",
-			Description:     "Login Client",
+			Username:        "zitadel-login-application",
+			Name:            "ZITADEL-login-application",
+			Description:     "Login Application",
 			AccessTokenType: domain.OIDCTokenTypeBearer,
 		},
 		Pat: &AddPat{
@@ -722,9 +722,9 @@ func addLoginClientEvent(ctx context.Context, orgID, userID string) *user.Machin
 	agg := user.NewAggregate(userID, orgID)
 	return user.NewMachineAddedEvent(ctx,
 		&agg.Aggregate,
-		"zitadel-login-client",
-		"ZITADEL-login-client",
-		"Login Client",
+		"zitadel-login-application",
+		"ZITADEL-login-application",
+		"Login Application",
 		false,
 		domain.OIDCTokenTypeBearer,
 	)
@@ -970,7 +970,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			},
 		},
 		{
-			name: "human, machine and login client, ok",
+			name: "human, machine and login application, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
@@ -1099,7 +1099,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "human, machine and login client, ok",
+			name: "human, machine and login application, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
@@ -1169,9 +1169,9 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				},
 				loginClient: &AddLoginClient{
 					Machine: &Machine{
-						Username:        "zitadel-login-client",
-						Name:            "ZITADEL-login-client",
-						Description:     "Login Client",
+						Username:        "zitadel-login-application",
+						Name:            "ZITADEL-login-application",
+						Description:     "Login Application",
 						AccessTokenType: domain.OIDCTokenTypeBearer,
 					},
 					Pat: &AddPat{

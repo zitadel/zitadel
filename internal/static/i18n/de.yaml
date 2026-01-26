@@ -548,21 +548,21 @@ Errors:
   AuthRequest:
     AlreadyExists: Auth Request existiert bereits
     NotExisting: Auth Request existiert nicht
-    WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
+    WrongLoginClient: Auth Request wurde von einem anderen Login-Anwendung erstellt
     AlreadyHandled: Auth Request wurde bereits bearbeitet
   OIDCSession:
     RefreshTokenInvalid: Refresh Token ist ungültig
     Token:
       Invalid: Token ist ungültig
       Expired: Token ist abgelaufen
-    InvalidClient: Token wurde nicht für diesen Client ausgestellt
+    InvalidClient: Token wurde nicht für diesen Andwendung ausgestellt
   SAMLRequest:
     AlreadyExists: SAMLRequest existiert bereits
     NotExisting: SAMLRequest existiert nicht
-    WrongLoginClient: SAMLRequest wurde con einem andere Login-Client erstellt
+    WrongLoginClient: SAMLRequest wurde con einem andere Login-Anwendung erstellt
     AlreadyHandled: SAMLRequest wurde bereits bearbeitet
   SAMLSession:
-    InvalidClient: SAMLResponse wurde nicht für diesen Client ausgestellt
+    InvalidClient: SAMLResponse wurde nicht für diesen Anwendung ausgestellt
   DeviceAuth:
     NotFound: Die Geräteautorisierungsanforderung existiert nicht
     AlreadyHandled: Die Geräteautorisierungsanforderung wurde bereits bearbeitet

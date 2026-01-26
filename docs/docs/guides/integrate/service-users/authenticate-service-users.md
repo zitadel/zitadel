@@ -50,7 +50,7 @@ ZITADEL supports two primary authentication methods for service users:
 * ZITADEL validates the signature using the service user's public key.
 * JWTs can include expiration dates and scopes to control access.
 
-Follow our guide on using [private key JWT client authentication](./private-key-jwt) to get started authenticating service users and clients.
+Follow our guide on using [private key JWT client authentication](./private-key-jwt) to get started authenticating service users and applications.
 
 #### Benefits of private key JWT authentication
 
@@ -73,7 +73,7 @@ Follow our guide on using [private key JWT client authentication](./private-key-
 * Presents a client ID and client secret associated with the service user.
 * Simpler than the JWT profile in specific scenarios.
 
-Follow our guide on using [client credentials grant](./client-credentials) to get started authenticating service users and clients.
+Follow our guide on using [client credentials grant](./client-credentials) to get started authenticating service users and applications.
 
 This method is still available in ZITADEL but is generally considered less secure than JWT due to:
 
@@ -85,7 +85,7 @@ This method is still available in ZITADEL but is generally considered less secur
 * **Ready-to-use tokens:** Generated for specific service users and can be directly included in the authorization header of API requests.
 * **Currently available only for machine users** (service users) and not regular human users.
 
-Follow our guide on using [personal access tokens](./personal-access-token) to get started authenticating service users and clients.
+Follow our guide on using [personal access tokens](./personal-access-token) to get started authenticating service users and applications.
 
 PAT offer some benefits, such as:
 

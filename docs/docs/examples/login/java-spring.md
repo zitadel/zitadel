@@ -40,13 +40,13 @@ Continue and create the application.
 
 ### Client ID
 
-After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Java client.
+After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Java application.
 
 ![Create app in console - copy client_id](/img/java-spring/app-create-clientid.png)
 
 ## Spring setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Spring client.
+Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Spring application.
 This guide will reference the [example repository](https://github.com/zitadel/zitadel-java) and explain the necessary steps taken in there.
 If your starting from scratch, you can use the Spring Initializer with the [following setup](https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.2.1&packaging=jar&jvmVersion=17&dependencies=web,thymeleaf,security,oauth2-client,lombok) as a base.
 

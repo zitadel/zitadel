@@ -25,7 +25,7 @@ ZITADEL uses the following principles when handling Secrets across their lifecyc
 
 ## Secrets Storage
 
-By default ZITADEL stores secrets from its users, clients as well as its generated secrets like signing keys in the database.
+By default ZITADEL stores secrets from its users, applications as well as its generated secrets like signing keys in the database.
 To protect the secrets against extraction from database as well as database dumps they are encrypted with AES256.
 
 :::info

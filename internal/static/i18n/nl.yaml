@@ -335,7 +335,7 @@ Errors:
       OIDCAuthMethodNoSecret: Gekozen OIDC Auth Methode vereist geen geheim
       APIAuthMethodNoSecret: Gekozen API Auth Methode vereist geen geheim
       AuthMethodNoPrivateKeyJWT: Gekozen Auth Methode vereist geen sleutel
-      ClientSecretInvalid: Client Geheim is ongeldig
+      ClientSecretInvalid: Client Secret is ongeldig
       Key:
         AlreadyExisting: Applicatie sleutel bestaat al
         NotFound: Applicatie sleutel niet gevonden

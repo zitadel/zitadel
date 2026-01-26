@@ -162,7 +162,7 @@ const features = [
             link="/docs/apis/resources/mgmt/management-api"
             type={ICONTYPE.APIS}
             title="Organization Objects"
-            description="Mutate IAM objects like organizations, projects, clients, users etc."
+            description="Mutate IAM objects like organizations, projects, applications, users etc."
           />
           <ListElement
             link="/docs/apis/resources/admin/administration-api-aka-admin"

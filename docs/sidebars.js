@@ -1189,7 +1189,7 @@ module.exports = {
                 title: "Management API",
                 slug: "/apis/resources/mgmt",
                 description:
-                  "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+                  "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, applications, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
               },
               items: sidebar_api_mgmt,
             },

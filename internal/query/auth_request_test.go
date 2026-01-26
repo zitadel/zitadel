@@ -136,7 +136,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
 		},
 		{
-			name: "wrong login client / not permitted",
+			name: "wrong login application / not permitted",
 			args: args{
 				shouldTriggerBulk: false,
 				id:                "123",
@@ -161,7 +161,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			wantErr: zerrors.ThrowPermissionDenied(nil, "id", "not permitted"),
 		},
 		{
-			name: "other login client / permitted",
+			name: "other login application / permitted",
 			args: args{
 				shouldTriggerBulk: false,
 				id:                "123",

@@ -6,12 +6,12 @@ sidebar_position: 5
 import AppType from "../../guides/manage/console/_application-types.mdx";
 
 Applications are the entry point to your project.
-[Users](users.md) either login into one of your clients and interact with them directly or use one of your APIs.
+[Users](users.md) either login into one of your applications and interact with them directly or use one of your APIs.
 All applications share the roles and authorizations of their [project](projects.md).
 
 ## Supported application types
 
-ZITADEL supports the following client types:
+ZITADEL supports the following application types:
 
 <AppType />
 

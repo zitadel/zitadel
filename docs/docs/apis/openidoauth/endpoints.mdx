@@ -46,7 +46,7 @@ authenticate the user in exchange for an authorization_code (authorization code 
 ### Required request parameters
 
 | Parameter     | Description                                                                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
@@ -96,7 +96,7 @@ no additional parameters required
 ### Additional parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **SHOULD** be provided when using prompt `none`.                                                                                                                                                                                                                                                                                                                                                                       |
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                       |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -113,11 +113,11 @@ As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openi
 
 > The use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
 
-| Response Mode | Description                                                                                                                                                                                                                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Response Mode | Description                                                                                                                                                                                                                                                                                                                              |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/docs/guides/manage/console/applications-overview#web).                                                                                                                                     |
 | fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/docs/guides/manage/console/applications-overview#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
-| form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
+| form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                                      |
 
 [^1]: Implements [OAuth 2.0 Form Post Response Mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 
@@ -126,7 +126,7 @@ As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openi
 When your `response_type` was `code` and no error occurred, the following response will be returned:
 
 | Property | Description                                                                   |
-| -------- | ----------------------------------------------------------------------------- |
+|----------|-------------------------------------------------------------------------------|
 | code     | Opaque string which will be necessary to request tokens on the token endpoint |
 | state    | Unmodified `state` parameter from the request                                 |
 
@@ -135,7 +135,7 @@ When your `response_type` was `code` and no error occurred, the following respon
 When your `response_type` was either `id_token` or `id_token token` and no error occurred, the following response will be returned:
 
 | Property     | Description                                                                           |
-| ------------ | ------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------|
 | access_token | Only returned if `response_type` included `token`                                     |
 | expires_in   | Number of second until the expiration of the `access_token`                           |
 | id_token     | An `id_token` of the authorized user                                                  |
@@ -153,7 +153,7 @@ the error will be display directly to the user on the auth server
 :::
 
 | Property          | Description                                                          |
-| ----------------- | -------------------------------------------------------------------- |
+|-------------------|----------------------------------------------------------------------|
 | error             | An OAuth / OIDC [error_type](#authorize-errors)                      |
 | error_description | Description of the error type or additional information of the error |
 | state             | Unmodified `state` parameter from the request                        |
