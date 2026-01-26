@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Meta Veri",
     "HOME": {
-      "TITLE": "ZITADEL ile başlayın",
+      "TITLE": "Zitadel ile başlayın",
       "NEXT": {
         "TITLE": "Sonraki adımlarınız",
         "DESCRIPTION": "Uygulamanızı güvence altına almak için aşağıdaki adımları tamamlayın.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Belgeler",
-          "DESCRIPTION": "Temel kavram ve fikirlerle tanışmak için ZITADEL bilgi tabanını keşfedin. ZITADEL'in nasıl çalıştığını ve nasıl kullanılacağını öğrenin."
+          "DESCRIPTION": "Temel kavram ve fikirlerle tanışmak için Zitadel bilgi tabanını keşfedin. Zitadel'in nasıl çalıştığını ve nasıl kullanılacağını öğrenin."
         },
         "EXAMPLES": {
           "TITLE": "Örnekler ve Yazılım Geliştirme Kitleri",
-          "DESCRIPTION": "ZITADEL'i favori programlama dilleriniz ve araçlarınızla birlikte kullanmak için örneklerimizi ve SDK'larımızı inceleyin."
+          "DESCRIPTION": "Zitadel'i favori programlama dilleriniz ve araçlarınızla birlikte kullanmak için örneklerimizi ve SDK'larımızı inceleyin."
         }
       }
     },
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Eylemler",
-      "DESCRIPTION": "Kullanıcılarınız ZITADEL'de kimlik doğrulaması yaparken gerçekleşen olaylarda özel kod çalıştırın. Süreçlerinizi otomatikleştirin, kullanıcılarınızın meta verilerini ve belirteçlerini zenginleştirin veya harici sistemleri bilgilendirin.",
+      "DESCRIPTION": "Kullanıcılarınız Zitadel'de kimlik doğrulaması yaparken gerçekleşen olaylarda özel kod çalıştırın. Süreçlerinizi otomatikleştirin, kullanıcılarınızın meta verilerini ve belirteçlerini zenginleştirin veya harici sistemleri bilgilendirin.",
       "SCRIPTS": {
         "TITLE": "Betikler",
         "DESCRIPTION": "JavaScript kodunuzu bir kez yazın ve birden fazla akışta tetikleyin."
@@ -97,23 +97,23 @@
         "NEXT": "Şimdi ne yapmalı?",
         "SAML": {
           "TITLE": "SAML Kimlik Sağlayıcınızı Yapılandırın",
-          "DESCRIPTION": "ZITADEL yapılandırıldı. Şimdi SAML Kimlik Sağlayıcınızın bazı yapılandırmalara ihtiyacı var. Çoğu sağlayıcı, tüm ZITADEL metadata XML'ini yüklemenize izin verir. Diğer sağlayıcılar yalnızca belirli URL'ler sağlamanızı ister, örneğin entity ID (metadata URL), Assertion Consumer Service (ACS) URL veya Single Logout URL."
+          "DESCRIPTION": "Zitadel yapılandırıldı. Şimdi SAML Kimlik Sağlayıcınızın bazı yapılandırmalara ihtiyacı var. Çoğu sağlayıcı, tüm Zitadel metadata XML'ini yüklemenize izin verir. Diğer sağlayıcılar yalnızca belirli URL'ler sağlamanızı ister, örneğin entity ID (metadata URL), Assertion Consumer Service (ACS) URL veya Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "{{ provider }} Kimlik Sağlayıcınızı Yapılandırın",
-          "DESCRIPTION": "ZITADEL'i yapılandırabilmeniz için önce bu URL'yi Kimlik Sağlayıcınıza ileterek kimlik doğrulamasından sonra tarayıcının ZITADEL'e geri yönlendirilmesini etkinleştirin."
+          "DESCRIPTION": "Zitadel'i yapılandırabilmeniz için önce bu URL'yi Kimlik Sağlayıcınıza ileterek kimlik doğrulamasından sonra tarayıcının Zitadel'e geri yönlendirilmesini etkinleştirin."
         },
         "JWT": {
           "TITLE": "JWT'leri Federe Kimlikler Olarak Kullanın",
-          "DESCRIPTION": "JWT Kimlik Sağlayıcısı, mevcut JWT belirteçlerinizi federe kimlikler olarak kullanmanızı sağlar. Bu özellik, zaten JWT'ler için bir verici/issuer'ınız varsa kullanışlıdır. Bir JWT IdP ile, bu JWT'leri ZITADEL'de anında kullanıcı oluşturmak ve güncellemek için kullanabilirsiniz."
+          "DESCRIPTION": "JWT Kimlik Sağlayıcısı, mevcut JWT belirteçlerinizi federe kimlikler olarak kullanmanızı sağlar. Bu özellik, zaten JWT'ler için bir verici/issuer'ınız varsa kullanışlıdır. Bir JWT IdP ile, bu JWT'leri Zitadel'de anında kullanıcı oluşturmak ve güncellemek için kullanabilirsiniz."
         },
         "LDAP": {
-          "TITLE": "ZITADEL'i LDAP Kimlik Sağlayıcınıza Bağlanacak Şekilde Yapılandırın",
-          "DESCRIPTION": "LDAP sunucunuza bağlantı ayrıntılarını sağlayın ve LDAP özniteliklerinizin ZITADEL özniteliklerine eşlenmesini yapılandırın."
+          "TITLE": "Zitadel'i LDAP Kimlik Sağlayıcınıza Bağlanacak Şekilde Yapılandırın",
+          "DESCRIPTION": "LDAP sunucunuza bağlantı ayrıntılarını sağlayın ve LDAP özniteliklerinizin Zitadel özniteliklerine eşlenmesini yapılandırın."
         },
         "AUTOFILL": {
           "TITLE": "Kullanıcı Verilerini Otomatik Doldur",
-          "DESCRIPTION": "Kullanıcılarınızın deneyimini iyileştirmek için bir eylem kullanın. ZITADEL kayıt formunu kimlik sağlayıcısından gelen değerlerle önceden doldurabilirsiniz."
+          "DESCRIPTION": "Kullanıcılarınızın deneyimini iyileştirmek için bir eylem kullanın. Zitadel kayıt formunu kimlik sağlayıcısından gelen değerlerle önceden doldurabilirsiniz."
         },
         "ACTIVATE": {
           "TITLE": "IdP'yi Etkinleştir",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS Ayarları",
-        "DESCRIPTION": "Tüm ZITADEL özelliklerinin kilidini açmak için kullanıcılarınıza SMS mesajları göndermek üzere Twilio'yu yapılandırın."
+        "DESCRIPTION": "Tüm Zitadel özelliklerinin kilidini açmak için kullanıcılarınıza SMS mesajları göndermek üzere Twilio'yu yapılandırın."
       },
       "IAM_EVENTS": {
         "TITLE": "Olaylar",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Başarısız Olaylar",
-        "DESCRIPTION": "Bu sayfa, örneğinizdeki tüm başarısız olayları gösterir. ZITADEL beklediğiniz gibi davranmıyorsa, her zaman önce bu listeyi kontrol edin."
+        "DESCRIPTION": "Bu sayfa, örneğinizdeki tüm başarısız olayları gösterir. Zitadel beklediğiniz gibi davranmıyorsa, her zaman önce bu listeyi kontrol edin."
       },
       "IAM_VIEWS": {
         "TITLE": "Görünümler",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Güvenlik Ayarları",
-        "DESCRIPTION": "Güvenlik etkisi olabilecek ZITADEL özelliklerini etkinleştirin. Bu ayarları değiştirmeden önce ne yaptığınızı gerçekten bilmelisiniz."
+        "DESCRIPTION": "Güvenlik etkisi olabilecek Zitadel özelliklerini etkinleştirin. Bu ayarları değiştirmeden önce ne yaptığınızı gerçekten bilmelisiniz."
       },
       "OIDC": {
         "TITLE": "OpenID Connect Ayarları",
@@ -187,7 +187,7 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "ZITADEL örneğiniz için token'ları güvenli bir şekilde imzalamak ve doğrulamak için OIDC Web Anahtarlarınızı yönetin.",
+        "DESCRIPTION": "Zitadel örneğiniz için token'ları güvenli bir şekilde imzalamak ve doğrulamak için OIDC Web Anahtarlarınızı yönetin.",
         "TABLE": {
           "TITLE": "Aktif ve Gelecek Web Anahtarları",
           "DESCRIPTION": "Aktif ve yaklaşan web anahtarlarınız. Yeni bir anahtar etkinleştirmek mevcut olanı devre dışı bırakacaktır.",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Yeni Web Anahtarı Oluştur",
-          "DESCRIPTION": "Yeni bir web anahtarı oluşturmak bunu listenize ekler. ZITADEL varsayılan olarak SHA256 hasher ile RSA2048 anahtarları kullanır.",
+          "DESCRIPTION": "Yeni bir web anahtarı oluşturmak bunu listenize ekler. Zitadel varsayılan olarak SHA256 hasher ile RSA2048 anahtarları kullanır.",
           "KEY_TYPE": "Anahtar Türü",
           "BITS": "Bit",
           "HASHER": "Hasher",
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Giriş Adı Deseni",
-          "DESCRIPTION": "Kullanıcılarınızın giriş adlarının desenini kontrol edin. ZITADEL, kullanıcılarınız giriş adlarını girer girmez organizasyonlarını seçer. Bu nedenle giriş adlarının tüm organizasyonlar arasında benzersiz olması gerekir. Birden fazla alan adında hesabı olan kullanıcılarınız varsa, giriş adlarınızı organizasyon alan adıyla soneklendirerek benzersizliği sağlayabilirsiniz."
+          "DESCRIPTION": "Kullanıcılarınızın giriş adlarının desenini kontrol edin. Zitadel, kullanıcılarınız giriş adlarını girer girmez organizasyonlarını seçer. Bu nedenle giriş adlarının tüm organizasyonlar arasında benzersiz olması gerekir. Birden fazla alan adında hesabı olan kullanıcılarınız varsa, giriş adlarınızı organizasyon alan adıyla soneklendirerek benzersizliği sağlayabilirsiniz."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Alan Adı Doğrulama",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Harici Girişe izin verildi",
-            "DESCRIPTION": "Kullanıcılarınızın giriş yapmak için ZITADEL kullanıcısını kullanmak yerine harici kimlik sağlayıcısıyla giriş yapmalarına izin verin."
+            "DESCRIPTION": "Kullanıcılarınızın giriş yapmak için Zitadel kullanıcısını kullanmak yerine harici kimlik sağlayıcısıyla giriş yapmalarına izin verin."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Şifre Sıfırlama gizlendi",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "ZITADEL ile başlayın",
-    "DISCLAIMER": "ZITADEL verilerinizi gizli ve güvenli bir şekilde işler.",
+    "WELCOME": "Zitadel ile başlayın",
+    "DISCLAIMER": "Zitadel verilerinizi gizli ve güvenli bir şekilde işler.",
     "DISCLAIMERLINK": "Daha fazla bilgi",
     "DOCUMENTATION": {
-      "DESCRIPTION": "ZITADEL ile hızlıca başlayın."
+      "DESCRIPTION": "Zitadel ile hızlıca başlayın."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "ZITADEL ile hızlıca başlayın."
+      "DESCRIPTION": "Zitadel ile hızlıca başlayın."
     },
     "QUICKSTARTS": {
       "LABEL": "İlk Adımlar",
-      "DESCRIPTION": "ZITADEL ile hızlıca başlayın."
+      "DESCRIPTION": "Zitadel ile hızlıca başlayın."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Kısayollar",
@@ -366,7 +366,7 @@
     "COMPLETED": "tamamlandı",
     "DISMISS": "Hayır teşekkürler, ben uzmanım.",
     "CARD": {
-      "TITLE": "ZITADEL'inizi çalıştırın",
+      "TITLE": "Zitadel'inizi çalıştırın",
       "DESCRIPTION": "Bu kontrol listesi örneğinizi kurmaya yardımcı olur ve en temel adımlarda size rehberlik eder"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Uygulamanızda oturum açın",
-        "description": "Kimlik doğrulama için uygulamanızı ZITADEL ile entegre edin ve admin kullanıcınızla oturum açarak test edin.",
+        "description": "Kimlik doğrulama için uygulamanızı Zitadel ile entegre edin ve admin kullanıcınızla oturum açarak test edin.",
         "action": "Oturum aç"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Müşteri Portalı"
   },
   "QUICKSTART": {
-    "TITLE": "ZITADEL'i uygulamanıza entegre edin",
-    "DESCRIPTION": "ZITADEL'i uygulamanıza entegre edin veya dakikalar içinde başlamak için örneklerimizden birini kullanın.",
+    "TITLE": "Zitadel'i uygulamanıza entegre edin",
+    "DESCRIPTION": "Zitadel'i uygulamanıza entegre edin veya dakikalar içinde başlamak için örneklerimizden birini kullanın.",
     "BTN_START": "Uygulama Oluştur",
     "BTN_LEARNMORE": "Daha Fazla Öğren",
     "CREATEPROJECTFORAPP": "Proje Oluştur {{value}}",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Örneğiniz engellendi.",
-      "DESCRIPTION": "ZITADEL örnek yöneticinizden aboneliği güncellemesini isteyin."
+      "DESCRIPTION": "Zitadel örnek yöneticinizden aboneliği güncellemesini isteyin."
     },
     "INVALID_FORMAT": "Biçimlendirme geçersiz.",
     "NOTANEMAIL": "Verilen değer bir e-posta adresi değil.",
@@ -841,7 +841,7 @@
       "NAME": "Ad",
       "EMPTY": "Cihaz ayarlanmamış",
       "TITLE": "Passkey Kimlik Doğrulama",
-      "DESCRIPTION": "ZITADEL'e Passkey ile giriş yapmak için WebAuthn tabanlı Kimlik Doğrulama Yöntemleri ekleyin.",
+      "DESCRIPTION": "Zitadel'e Passkey ile giriş yapmak için WebAuthn tabanlı Kimlik Doğrulama Yöntemleri ekleyin.",
       "MANAGE_DESCRIPTION": "Kullanıcılarınızın ikinci faktör yöntemlerini yönetin.",
       "U2F": "Yöntem ekle",
       "U2F_DIALOG_TITLE": "Kimlik doğrulayıcıyı doğrula",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Gizli anahtar başarıyla kaldırıldı!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Yönetici Rolleri",
+      "TITLE": "Zitadel Yönetici Rolleri",
       "DESCRIPTION": "Bunlar kullanıcının tüm üyelik yetkileridir. Bunları organizasyon, proje veya IAM detay sayfalarında da değiştirebilirsiniz.",
       "ORGCONTEXT": "Şu anda seçili organizasyonla ilişkili tüm organizasyonları ve projeleri görüyorsunuz.",
       "USERCONTEXT": "Yetkiniz olan tüm organizasyonları ve projeleri görüyorsunuz. Diğer organizasyonlar dahil.",
@@ -1268,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM Depolama Yönetimi",
-      "DESCRIPTION": "ZITADEL görünümlerinizi ve başarısız olaylarınızı yönetin."
+      "DESCRIPTION": "Zitadel görünümlerinizi ve başarısız olaylarınızı yönetin."
     },
     "MEMBER": {
       "TITLE": "Yöneticiler",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Beklenen URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Doğrulama dosyası:",
         "VERIFICATION_SKIP": "Şimdilik doğrulamayı atlayabilir ve organizasyonunuzu oluşturmaya devam edebilirsiniz, ancak domain'inizi kullanmak için bu adımın tamamlanması gerekir!",
-        "VERIFICATION_VALIDATION_DESC": "ZITADEL domain'inizin sahipliğini zaman zaman yeniden kontrol edeceği için doğrulama kodunu silmeyin.",
+        "VERIFICATION_VALIDATION_DESC": "Zitadel domain'inizin sahipliğini zaman zaman yeniden kontrol edeceği için doğrulama kodunu silmeyin.",
         "VERIFICATION_NEWTOKEN_TITLE": "Yeni Token İste",
         "VERIFICATION_VALIDATION_ONGOING": "Domain'inizi doğrulamak için {{ value }} yöntemi seçildi. Doğrulama kontrolü tetiklemek veya doğrulama sürecini sıfırlamak için düğmeye tıklayın.",
         "VERIFICATION_SUCCESSFUL": "Domain başarıyla doğrulandı!",
@@ -1727,7 +1727,7 @@
       },
       "PREVIEW": {
         "TITLE": "Giriş",
-        "SECOND": "ZITADEL Hesabınızla giriş yapın.",
+        "SECOND": "Zitadel Hesabınızla giriş yapın.",
         "ERROR": "Kullanıcı bulunamadı!",
         "PRIMARYBUTTON": "ileri",
         "SECONDARYBUTTON": "kayıt ol"
@@ -1923,7 +1923,7 @@
       "DEFAULTREDIRECTURI_DESC": "Giriş bir uygulama bağlamı olmadan başlatılmışsa kullanıcının nereye yönlendirileceğini tanımlar (örn. e-postadan)",
       "ERRORMSGPOPUP": "Hatayı Dialog'ta Göster",
       "DISABLEWATERMARK": "Filigranı Gizle",
-      "DISABLEWATERMARK_DESC": "Giriş arayüzünde Powered by ZITADEL filigranını gizle"
+      "DISABLEWATERMARK_DESC": "Giriş arayüzünde Powered by Zitadel filigranını gizle"
     },
     "RESET": "Örnek varsayılanına sıfırla",
     "CREATECUSTOM": "Özel Politika Oluştur",
@@ -1977,7 +1977,7 @@
       "CREATE_DESC": "Projenizin adını girin.",
       "ROLE": "Rol",
       "NOITEMS": "Proje yok",
-      "ZITADELPROJECT": "Bu ZITADEL projesine aittir. Dikkat: Değişiklik yaparsanız ZITADEL amaçlandığı gibi davranmayabilir.",
+      "ZITADELPROJECT": "Bu Zitadel projesine aittir. Dikkat: Değişiklik yaparsanız Zitadel amaçlandığı gibi davranmayabilir.",
       "TYPE": {
         "OWNED": "Sahip Olunan Projeler",
         "OWNED_SINGULAR": "Sahip Olunan Proje",
@@ -2360,7 +2360,7 @@
     "DELETE_SELECTION_TITLE": "IdP'yi Sil",
     "DELETE_SELECTION_DESCRIPTION": "Bir kimlik sağlayıcısını silmek üzeresiniz. Sonuçta ortaya çıkan değişiklikler geri alınamaz. Gerçekten bunu yapmak istiyor musunuz?",
     "FEDERATEDLOGOUTENABLED": "Federe Çıkış Etkin",
-    "FEDERATEDLOGOUTENABLED_DESC": "Etkinleştirilirse, kullanıcı ZITADEL'de oturumu sonlandırdığında IdP'den de çıkış yapılacaktır.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Etkinleştirilirse, kullanıcı Zitadel'de oturumu sonlandırdığında IdP'den de çıkış yapılacaktır.",
     "EMPTY": "Kullanılabilir IdP yok",
     "OIDC": {
       "GENERAL": "Genel Bilgiler",
@@ -2462,7 +2462,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Sağlayıcısı",
-      "DESCRIPTION": "Bunlar ZITADEL örneğiniz için SMTP sağlayıcılarıdır. Kullanıcılarınıza bildirim göndermek için kullanmak istediğinizi etkinleştirin.",
+      "DESCRIPTION": "Bunlar Zitadel örneğiniz için SMTP sağlayıcılarıdır. Kullanıcılarınıza bildirim göndermek için kullanmak istediğinizi etkinleştirin.",
       "EMPTY": "Kullanılabilir SMTP Sağlayıcısı yok",
       "ACTIVATED": "Etkinleştirildi",
       "ACTIVATE": "Sağlayıcıyı etkinleştir",
@@ -2498,11 +2498,11 @@
         "NEXT_STEPS": "Sonraki Adımlar",
         "ACTIVATE": {
           "TITLE": "SMTP Sağlayıcınızı Etkinleştirin",
-          "DESCRIPTION": "ZITADEL bu SMTP Sağlayıcısını bildirim göndermek için etkinleştirene kadar kullanamaz. Bu sağlayıcıyı etkinleştirirseniz aktif olan diğer tüm sağlayıcılar devre dışı kalacaktır."
+          "DESCRIPTION": "Zitadel bu SMTP Sağlayıcısını bildirim göndermek için etkinleştirene kadar kullanamaz. Bu sağlayıcıyı etkinleştirirseniz aktif olan diğer tüm sağlayıcılar devre dışı kalacaktır."
         },
         "DEACTIVATE": {
           "TITLE": "SMTP Sağlayıcınızı Devre Dışı Bırakın",
-          "DESCRIPTION": "Bu SMTP Sağlayıcısını devre dışı bırakırsanız, ZITADEL onu tekrar etkinleştirene kadar bildirim göndermek için kullanamaz."
+          "DESCRIPTION": "Bu SMTP Sağlayıcısını devre dışı bırakırsanız, Zitadel onu tekrar etkinleştirene kadar bildirim göndermek için kullanamaz."
         },
         "SAVE_SETTINGS": "Ayarlarınızı kaydedin",
         "TEST": {
