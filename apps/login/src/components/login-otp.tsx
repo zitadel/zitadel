@@ -105,7 +105,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         challenges,
         requestId,
       });
-    } catch (error) {
+    } catch {
       return { error: "Could not request OTP challenge" };
     }
 
