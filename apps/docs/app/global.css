@@ -2,76 +2,118 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 @import 'fumadocs-openapi/css/preset.css';
-@import '../css/custom.css';
 
 @theme {
-    --color-fd-primary: hsl(var(--primary));
-    --color-fd-primary-foreground: hsl(var(--primary-foreground));
-    --color-fd-background: hsl(var(--background));
-    --color-fd-foreground: hsl(var(--foreground));
-    --color-fd-card: hsl(var(--card));
-    --color-fd-card-foreground: hsl(var(--card-foreground));
-    --color-fd-popover: hsl(var(--card));
-    --color-fd-popover-foreground: hsl(var(--foreground));
-    --color-fd-muted: hsl(var(--muted));
-    --color-fd-muted-foreground: hsl(var(--muted-foreground));
-    --color-fd-accent: hsl(var(--accent));
-    --color-fd-accent-foreground: hsl(var(--accent-foreground));
-    --color-fd-border: hsl(var(--border));
-    --color-fd-ring: hsl(var(--primary));
+    /* 1. REGISTER STANDARD UTILITIES */
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-card: hsl(var(--card));
+    --color-card-foreground: hsl(var(--card-foreground));
+    --color-popover: hsl(var(--popover));
+    --color-popover-foreground: hsl(var(--popover-foreground));
+    --color-primary: hsl(var(--primary));
+    --color-primary-foreground: hsl(var(--primary-foreground));
+    --color-secondary: hsl(var(--secondary));
+    --color-secondary-foreground: hsl(var(--secondary-foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-accent: hsl(var(--accent));
+    --color-accent-foreground: hsl(var(--accent-foreground));
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-foreground: hsl(var(--destructive-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+    --color-ring: hsl(var(--ring));
+
+    /* 2. MAP FUMADOCS VARIABLES */
+    --color-fd-primary: var(--color-primary);
+    --color-fd-primary-foreground: var(--color-primary-foreground);
+    --color-fd-background: var(--color-background);
+    --color-fd-foreground: var(--color-foreground);
+    --color-fd-card: var(--color-card);
+    --color-fd-card-foreground: var(--color-card-foreground);
+    --color-fd-popover: var(--color-popover);
+    --color-fd-popover-foreground: var(--color-popover-foreground);
+    --color-fd-muted: var(--color-muted);
+    --color-fd-muted-foreground: var(--color-muted-foreground);
+    --color-fd-accent: var(--color-accent);
+    --color-fd-accent-foreground: var(--color-accent-foreground);
+    --color-fd-border: var(--color-border);
+    --color-fd-ring: var(--color-ring);
 
     --color-zitadelpink: #ff2069;
-    --font-sans: "Lato", "ui-sans-serif", "system-ui";
+    --font-sans: var(--font-lato), "Lato", "ui-sans-serif", "system-ui";
 }
 
+/* --- LIGHT MODE VARIABLES --- */
 :root {
-    --primary: 340 100% 56%;
-    /* #ff2069 */
+    /* LIGHT MODE PRIMARY: Zitadel Blue (#5469d4) */
+    --primary: 230 59% 58%; 
     --primary-foreground: 0 0% 100%;
-
-    --background: 0 0% 98%;
-    --foreground: 0 0% 10%;
-
-    --card: 0 0% 100%;
+    
+    --background: 0 0% 98%;   /* #FAFAFA */
+    --foreground: 0 0% 10%;   
+    
+    /* Card Contrast: 93% Lightness */
+    --card: 0 0% 93%;         
     --card-foreground: 0 0% 10%;
-
+    
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-
+    
     --accent: 0 0% 92%;
-    --accent-foreground: 340 100% 56%;
+    --accent-foreground: 230 59% 58%; /* Blue Accent */
+    
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-
+    --ring: 230 59% 58%; /* Blue Ring */
+    
     --radius: 0.5rem;
+    --overlaycolor: #6c90b420; 
 }
 
-:root[class~="dark"],
-[data-theme="dark"] {
-    --primary: 340 100% 56%;
-    /* #ff2069 */
+/* --- DARK MODE VARIABLES --- */
+:root[class~="dark"], [data-theme="dark"] {
+    /* DARK MODE PRIMARY: Zitadel Pink (#ff2069) */
+    --primary: 340 100% 56%; 
     --primary-foreground: 0 0% 100%;
-
-    --background: 230 45% 7%;
+    
+    --background: 235 45% 14%; /* Zitadel Dark Blue (#141735) */
     --foreground: 0 0% 98%;
-
-    --card: 230 43% 12%;
+    
+    /* Card Contrast: 25% Lightness */
+    --card: 220 40% 25%;       
     --card-foreground: 0 0% 98%;
-
+    
     --muted: 230 43% 15%;
     --muted-foreground: 230 20% 70%;
-
+    
     --accent: 230 43% 20%;
     --accent-foreground: 340 100% 65%;
+    
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 230 43% 25%;
     --input: 230 43% 25%;
+    --ring: 340 100% 56%;
+    
+    --overlaycolor: #ffffff15;
 
-    --color-fd-primary: hsl(var(--primary));
-    --color-fd-primary-foreground: hsl(var(--primary-foreground));
+    /* FORCE OVERRIDE for Fumadocs Variables */
     --color-fd-background: hsl(var(--background));
     --color-fd-foreground: hsl(var(--foreground));
+    --color-fd-primary: hsl(var(--primary));
+    --color-fd-primary-foreground: hsl(var(--primary-foreground));
     --color-fd-card: hsl(var(--card));
     --color-fd-card-foreground: hsl(var(--card-foreground));
     --color-fd-popover: hsl(var(--card));
@@ -81,5 +123,190 @@
     --color-fd-accent: hsl(var(--accent));
     --color-fd-accent-foreground: hsl(var(--accent-foreground));
     --color-fd-border: hsl(var(--border));
-    --color-fd-ring: hsl(var(--primary));
+    --color-fd-ring: hsl(var(--ring));
+}
+
+@layer components {
+
+    /* 1. VISIBILITY HELPERS */
+    /* Use standard CSS for strict overriding to avoid parser issues */
+    .hideondark { display: block !important; }
+    .hideonlight { display: none !important; }
+
+    :root[class~="dark"] .hideondark, [data-theme="dark"] .hideondark { 
+        display: none !important; 
+    }
+    :root[class~="dark"] .hideonlight, [data-theme="dark"] .hideonlight { 
+        display: block !important; 
+    }
+
+    /* 2. MAIN CARD LAYOUT (Tile Wrapper) */
+    .tile-wrapper {
+        @apply flex flex-row flex-wrap gap-6 my-6;
+    }
+
+    .tile-wrapper > * {
+        @apply flex flex-col items-center text-center rounded-lg border relative;
+        
+        background-color: hsl(var(--card)) !important;
+        border-color: hsl(var(--border));
+
+        justify-content: flex-start;
+        min-width: 160px;
+        min-height: 180px;
+
+        /* Padding: Bottom is larger to separate icon from border */
+        padding: 2rem;
+        padding-bottom: 3rem; 
+    }
+
+    .tile-wrapper > * > :last-child {
+        margin-top: auto; 
+    }
+
+    .tile-wrapper > * > h3, 
+    .tile-wrapper > * > h4, 
+    .tile-wrapper > * > strong {
+        @apply mt-0;
+    }
+
+    /* 3. ICON STYLING */
+    .custom-rounded {
+        @apply flex items-center justify-center p-2 rounded-full w-14 h-14 shrink-0 m-0;
+    }
+    .custom-rounded svg { 
+        @apply fill-white h-7 w-7; 
+    }
+    .custom-rounded i {
+        @apply text-white;
+    }
+
+    /* Gradients */
+    .custom-rounded-start { background: linear-gradient(40deg, #059669 30%, #047857); }
+    .custom-rounded-password { background: linear-gradient(40deg, #f59e0b 30%, #b45309); }
+    .custom-rounded-login, .custom-rounded-register { background: linear-gradient(40deg, #059669 30%, #047857); }
+    .custom-rounded-privatelabel, .custom-rounded-phone, .custom-rounded-email, .custom-rounded-storage, .custom-rounded-service { background: linear-gradient(40deg, #ff2069 30%, #cc1a54); }
+    .custom-rounded-split { background: linear-gradient(40deg, #ff2069, #cc1a54); }
+    .custom-rounded-texts, .custom-rounded-help, .custom-rounded-architecture { background: linear-gradient(40deg, #dc2626 30%, #db2777); }
+    .custom-rounded-system, .custom-rounded-apis, .custom-rounded-policy, .custom-rounded-instance { background: linear-gradient(40deg, #1f2937, #111827); }
+
+    /* 4. B2B Cards */
+    .b2borg, .b2bproject, .b2bapp, .b2buser {
+        @apply rounded-xl p-4 border;
+        background: var(--overlaycolor);
+        border-color: hsl(var(--border));
+    }
+    .b2buser { @apply mt-4; }
+    .b2borg span, .b2bproject span, .b2bapp span, .b2buser span {
+        @apply ml-4 mb-4 block font-semibold;
+    }
+
+    /* 5. FOOTER / PAGINATION CARDS FIX */
+    /* Use the unique class to target safely */
+    a.\@max-lg\:col-span-full {
+        @apply flex flex-col p-6 rounded-xl border transition-all no-underline;
+        
+        /* Apply forces via standard CSS instead of !important inside @apply */
+        background-color: hsl(var(--card)) !important;
+        border-color: hsl(var(--border)) !important;
+    }
+    
+    /* Hover state */
+    a.\@max-lg\:col-span-full:hover {
+        @apply shadow-sm;
+        border-color: hsl(var(--primary)) !important;
+        background-color: hsl(var(--card)) !important; 
+    }
+
+    /* Align Title + Arrow */
+    a.\@max-lg\:col-span-full > div:first-child {
+        @apply flex items-center gap-3;
+    }
+
+    /* Fix SVG size and remove negative margin */
+    a.\@max-lg\:col-span-full svg {
+        @apply w-5 h-5 m-0;
+    }
+
+    /* CRITICAL: Reset Paragraph Margins inside these cards to fix alignment */
+    /* The global p { margin-bottom: 1.5rem } was pushing text out of sync */
+    a.\@max-lg\:col-span-full p {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Description text styling */
+    a.\@max-lg\:col-span-full p.text-fd-muted-foreground {
+        @apply mt-2 text-sm opacity-80;
+    }
+}
+
+@layer base {
+    /* 1. HEADINGS */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-sans);
+        color: hsl(var(--foreground)) !important; 
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+        color: inherit !important; 
+        text-decoration: none !important;
+    }
+
+    /* SIZES & WEIGHTS (Semi-Bold) */
+    h1 { 
+        font-size: 3.5rem !important; 
+        font-weight: 700 !important; 
+        line-height: 1.1 !important; 
+        margin-bottom: 1.5rem !important; 
+    }
+
+    h2 { 
+        font-size: 2.25rem !important; 
+        font-weight: 600 !important; 
+        margin-top: 3rem !important; 
+        margin-bottom: 1rem !important; 
+        padding-bottom: 0.5rem !important; 
+        border-bottom: 1px solid hsl(var(--border)) !important; 
+    }
+
+    h3 { 
+        font-size: 2rem !important; 
+        font-weight: 600 !important; 
+        margin-top: 2.5rem !important; 
+        margin-bottom: 1rem !important; 
+    }
+
+    h4 { 
+        font-size: 1.5rem !important; 
+        font-weight: 600 !important; 
+        margin-top: 2.5rem !important; 
+        margin-bottom: 1rem !important; 
+    }
+
+    p { 
+        font-size: 1rem; 
+        line-height: 1.7; 
+        margin-bottom: 1.5rem; 
+    }
+    
+    /* 2. GLOBAL RESET */
+    html, body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+    }
+    
+    /* 3. LINKS (Dynamic color based on theme) */
+    a {
+        color: hsl(var(--primary));
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+    a:hover {
+        opacity: 0.8;
+    }
 }
