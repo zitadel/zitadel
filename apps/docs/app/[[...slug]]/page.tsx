@@ -41,6 +41,7 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
 }
 
 export const dynamicParams = true;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return source.generateParams();
