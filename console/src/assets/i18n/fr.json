@@ -971,7 +971,7 @@
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
       "CHANGEUSERNAME_DESC": "Entrez le nouveau nom dans le champ ci-dessous.",
       "FIRSTNAME": "Prénom",
-      "LASTNAME": "Nom de famille",
+      "LASTNAME": "Nom",
       "NICKNAME": "Surnom",
       "DISPLAYNAME": "Nom d'affichage",
       "PREFERREDLOGINNAME": "Nom de connexion préféré",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Secret supprimé avec succès !"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Rôles du responsable ZITADEL",
+      "TITLE": "Rôles d'administrateur ZITADEL",
       "DESCRIPTION": "Il s'agit de toutes les attributions des membres de l'utilisateur. Vous pouvez également les modifier sur les pages de détails de l'organisation, du projet ou de l'IAM.",
       "ORGCONTEXT": "Vous voyez toutes les organisations et tous les projets qui sont liés à l'organisation actuellement sélectionnée.",
       "USERCONTEXT": "Vous voyez toutes les organisations et tous les projets auxquels vous êtes autorisé. Y compris les autres organisations.",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1806,7 +1807,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1861,7 +1863,7 @@
       },
       "CHIPS": {
         "firstname": "Prénom",
-        "lastname": "Nom de famille",
+        "lastname": "Nom",
         "code": "Code",
         "preferredLoginName": "Nom de connexion préféré",
         "displayName": "Nom d'affichage",
@@ -2329,8 +2331,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "E-mail attribute",
     "EMAILVERIFIEDATTRIBUTE": "E-mail verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Attribut du prénom",
+    "LASTNAMEATTRIBUTE": "Attribut du nom",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2764,7 +2766,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

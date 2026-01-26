@@ -970,8 +970,8 @@
       "CHANGEUSERNAME": "memodifikasi",
       "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
       "CHANGEUSERNAME_DESC": "Masukkan nama baru pada kolom di bawah.",
-      "FIRSTNAME": "Nama Pemberian",
-      "LASTNAME": "Nama keluarga",
+      "FIRSTNAME": "Nama depan",
+      "LASTNAME": "Nama belakang",
       "NICKNAME": "Nama panggilan",
       "DISPLAYNAME": "Nama Tampilan",
       "PREFERREDLOGINNAME": "Nama login pilihan",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "Rahasia berhasil dihapus!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Peran Manajer ZITADEL",
+      "TITLE": "Peran Administrator ZITADEL",
       "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
       "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
       "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1803,7 +1804,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -1858,8 +1860,8 @@
         "IU": "Mengundang Pengguna"
       },
       "CHIPS": {
-        "firstname": "Nama yang diberikan",
-        "lastname": "Nama keluarga",
+        "firstname": "Nama depan",
+        "lastname": "Nama belakang",
         "code": "Kode",
         "preferredLoginName": "Nama Login Pilihan",
         "displayName": "Nama tampilan",
@@ -2330,8 +2332,8 @@
     "DISPLAYNAMEATTRIBUTE": "Atribut nama tampilan",
     "EMAILATTRIBUTEATTRIBUTE": "Atribut email",
     "EMAILVERIFIEDATTRIBUTE": "Atribut terverifikasi email",
-    "FIRSTNAMEATTRIBUTE": "Atribut nama yang diberikan",
-    "LASTNAMEATTRIBUTE": "Atribut nama keluarga",
+    "FIRSTNAMEATTRIBUTE": "Atribut nama depan",
+    "LASTNAMEATTRIBUTE": "Atribut nama belakang",
     "NICKNAMEATTRIBUTE": "Atribut nama panggilan",
     "PHONEATTRIBUTE": "Atribut telepon",
     "PHONEVERIFIEDATTRIBUTE": "Atribut terverifikasi telepon",
@@ -2787,7 +2789,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",

@@ -1,3 +1,5 @@
+import { idpTypeToSlug } from "@/lib/idp";
+import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
@@ -8,11 +10,9 @@ import {
   getOrgsByDomain,
   getSAMLRequest,
   getSecuritySettings,
-  startIdentityProviderFlow,
   ServiceConfig,
+  startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { idpTypeToSlug } from "@/lib/idp";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -107,7 +107,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const idp = identityProviders.find((idp) => idp.id === idpId);
 
       if (idp) {
-        const origin = request.nextUrl.origin;
         const identityProviderType = identityProviders[0].type;
 
         if (identityProviderType === IdentityProviderType.LDAP) {
@@ -136,8 +135,8 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           serviceConfig,
           idpId,
           urls: {
-            successUrl: `${origin}/idp/${provider}/process?` + new URLSearchParams(params),
-            failureUrl: `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
+            successUrl: constructUrl(request, `/idp/${provider}/process?${params.toString()}`).toString(),
+            failureUrl: constructUrl(request, `/idp/${provider}/failure?${params.toString()}`).toString(),
           },
         });
 

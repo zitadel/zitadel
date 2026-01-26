@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: следно
   CancelButtonText: откажи
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Потврда на 2-факторска автентикација
   DescriptionPhone: Направете двофакторна автентикација. Внесете го вашиот телефонски број за да го потврдите.
   DescriptionCode: Направете двофакторна автентикација. Внесете го примениот код за да го потврдите вашиот телефонски број.
+  CountryCodeLabel: Земја
   PhoneLabel: Телефонски број
   CodeLabel: Код
   EditButtonText: Уредување
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Овластување преку уред
@@ -446,8 +450,8 @@ Errors:
       NotFound: Профилот не е пронајден
       NotChanged: Профилот не е променет
       Empty: Профилот е празен
-      FirstNameEmpty: Името во профилот е празно
-      LastNameEmpty: Презимето во профилот е празно
+      FirstNameEmpty: Полето за име на профилот е празно
+      LastNameEmpty: Полето за презиме на профилот е празно
       IDMissing: ID на профил е празно
     Email:
       NotFound: Е-поштата не е пронајдена

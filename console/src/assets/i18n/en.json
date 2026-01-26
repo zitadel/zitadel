@@ -971,8 +971,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "Given Name",
-      "LASTNAME": "Family Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERREDLOGINNAME": "Preferred login name",
@@ -1161,7 +1161,7 @@
       "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roles",
+      "TITLE": "ZITADEL Administrator Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
@@ -1559,7 +1559,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1810,7 +1811,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1864,8 +1866,8 @@
         "IU": "Invite User"
       },
       "CHIPS": {
-        "firstname": "Given name",
-        "lastname": "Family name",
+        "firstname": "First name",
+        "lastname": "Last name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -2336,8 +2338,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Given name attribute",
-    "LASTNAMEATTRIBUTE": "Family name attribute",
+    "FIRSTNAMEATTRIBUTE": "First name attribute",
+    "LASTNAMEATTRIBUTE": "Last name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2793,7 +2795,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

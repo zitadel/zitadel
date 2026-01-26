@@ -1558,7 +1558,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1809,7 +1810,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-posta doğrulama tamamlandı",
@@ -2335,8 +2337,8 @@
     "DISPLAYNAMEATTRIBUTE": "Görünen ad özniteliği",
     "EMAILATTRIBUTEATTRIBUTE": "E-posta özniteliği",
     "EMAILVERIFIEDATTRIBUTE": "E-posta doğrulandı özniteliği",
-    "FIRSTNAMEATTRIBUTE": "Ad özniteliği",
-    "LASTNAMEATTRIBUTE": "Soyad özniteliği",
+    "FIRSTNAMEATTRIBUTE": "Ad özelliği",
+    "LASTNAMEATTRIBUTE": "Soyad özelliği",
     "NICKNAMEATTRIBUTE": "Takma ad özniteliği",
     "PHONEATTRIBUTE": "Telefon özniteliği",
     "PHONEVERIFIEDATTRIBUTE": "Telefon doğrulandı özniteliği",
@@ -2792,7 +2794,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Yönetici Ekle",

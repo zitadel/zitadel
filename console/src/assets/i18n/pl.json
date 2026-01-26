@@ -1159,7 +1159,7 @@
       "SECRETREMOVED": "Sekret usunięty pomyślnie!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Role menedżera ZITADEL",
+      "TITLE": "Role administratora ZITADEL",
       "DESCRIPTION": "To są wszystkie uprawnienia członków użytkownika. Możesz je również modyfikować na stronach szczegółów organizacji, projektu lub IAM.",
       "ORGCONTEXT": "Widzisz wszystkie organizacje i projekty, które są związane z aktualnie wybraną organizacją.",
       "USERCONTEXT": "Widzisz wszystkie organizacje i projekty, do których masz dostęp. Włączając inne organizacje.",
@@ -1554,7 +1554,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1805,7 +1806,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2328,8 +2330,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Atrybut imienia",
+    "LASTNAMEATTRIBUTE": "Atrybut nazwiska",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2763,7 +2765,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",
