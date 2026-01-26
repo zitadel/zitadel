@@ -204,6 +204,7 @@
         @apply ml-4 mb-2 block font-semibold;
     }
     
+    /* Specific styling for the role text */
     .b2bprojectrole {
         @apply mt-2 ml-4 block text-sm opacity-80 font-normal;
     }

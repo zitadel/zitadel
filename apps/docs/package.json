@@ -37,7 +37,6 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^19.2.1",
     "react-google-charts": "^5.2.1",
-    "react-player": "^3.4.0",
     "shiki": "^3.19.0",
     "tailwind-merge": "^2.6.0",
     "vanilla-cookieconsent": "3.0.0"
