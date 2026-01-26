@@ -22,7 +22,7 @@ type InstanceFeatures struct {
 	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
-	ConsoleUseV2UserApi            *bool
+	ManagementConsoleUseV2UserApi  *bool
 	EnableRelationalTables         *bool
 }
 
@@ -37,7 +37,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
-		m.ConsoleUseV2UserApi == nil &&
+		m.ManagementConsoleUseV2UserApi == nil &&
 		m.EnableRelationalTables == nil)
 }
 

@@ -18,7 +18,7 @@ Prerequisites:
 - existing Atlassian Access setup, including verified domain
 
 > We have to switch between ZITADEL and Atlassian. If the headings begin with "ZITADEL" switch to the ZITADEL
-> Console and
+> Management Console and
 > if the headings start with "Atlassian" please switch to the Atlassian Admin GUI.
 
 ## **Atlassian**: Create a new external identity provider

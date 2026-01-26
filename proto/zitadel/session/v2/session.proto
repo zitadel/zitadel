@@ -29,7 +29,7 @@ message Session {
   Factors factors = 5;
 
   // Metadata contains custom key value pairs set by the user.
-  // The metadata is not interpreted by ZITADEL and can be used to store any information
+  // The metadata is not interpreted by Zitadel and can be used to store any information
   // relevant to the session.
   map<string, bytes> metadata = 6;
 

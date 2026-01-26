@@ -153,8 +153,8 @@ func TestCreateIDProvider(t *testing.T) {
 						Name:            gofakeit.Name(),
 						DefaultOrgID:    "defaultOrgId",
 						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
+						ConsoleClientID: "managementConsoleCLient",
+						ConsoleAppID:    "managementConsoleApp",
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository()

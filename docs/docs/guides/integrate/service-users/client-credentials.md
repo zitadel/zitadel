@@ -44,7 +44,7 @@ curl --request POST \
 * `CUSTOM_DOMAIN` should be set to your [Custom Domain](/docs/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
-* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/docs/apis/openidoauth/authn-methods)
+* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Management Console when generating a new secret to enable [basic authentication](/docs/apis/openidoauth/authn-methods)
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.

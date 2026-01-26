@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: Impossibile contattare con il server SMTP utilizzando TLS, controllare la porta, problemi di firewall ...
     CouldNotCreateClient: impossibile creare il client SMTP
     CouldNotStartTLS: impossibile avviare tls
-    CouldNotAuth: impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da ZITADEL
+    CouldNotAuth: impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da Zitadel
     CouldNotSetSender: impossibile impostare il mittente
     CouldNotSetRecipient: impossibile impostare il destinatario
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organizzazione non trovata
     NotChanged: Organizzazione non cambiata
     DefaultOrgNotDeletable: L'organizzazione predefinita non deve essere cancellata
-    ZitadelOrgNotDeletable: L'organizzazione con il progetto ZITADEL non deve essere cancellata
+    ZitadelOrgNotDeletable: L'organizzazione con il progetto Zitadel non deve essere cancellata
     InvalidDomain: Dominio non valido
     DomainMissing: Dominio mancante
     DomainNotOnOrg: Il dominio non esistente nell'organizzazione
@@ -1111,20 +1111,20 @@ EventTypes:
         changed: Le impostazioni di blocco della password sono state cambiate.
   iam:
     setup:
-      started: Avviato il setup di ZITADEL
-      done: setup di ZITADEL fatto
+      started: Avviato il setup di Zitadel
+      done: setup di Zitadel fatto
     global:
       org:
-        set: Organizzazione glabale di ZITADEL salvata
+        set: Organizzazione glabale di Zitadel salvata
     project:
       iam:
-        set: progetto ZITADEL salvato
+        set: progetto Zitadel salvato
     member:
-      added: ZITADEL membro aggiunto
-      changed: ZITADEL membro cambiato
-      removed: ZITADEL membro rimosso
+      added: Zitadel membro aggiunto
+      changed: Zitadel membro cambiato
+      removed: Zitadel membro rimosso
       cascade:
-        removed: Membro ZITADEL rimosso a cascata
+        removed: Membro Zitadel rimosso a cascata
     idp:
       config:
         added: Configurazione IDP aggiunta
@@ -1237,9 +1237,9 @@ EventTypes:
       removed: Dominio rimosso
     iam:
       console:
-        set: Set di applicazioni per console ZITADEL
+        set: Set di applicazioni per la console di gestione Zitadel
       project:
-        set: Set progetto ZITADEL
+        set: Set progetto Zitadel
     mail:
       template:
         added: Aggiunto modello di posta elettronica
