@@ -37,7 +37,6 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^19.2.1",
     "react-google-charts": "^5.2.1",
-    "react-player": "^3.4.0",
     "shiki": "^3.19.0",
     "tailwind-merge": "^2.6.0",
     "vanilla-cookieconsent": "3.0.0"
@@ -46,6 +45,7 @@
     "@bufbuild/buf": "^1.61.0",
     "@eslint/eslintrc": "^3.3.3",
     "@tailwindcss/postcss": "^4.1.17",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/mdx": "^2.0.13",
     "@types/node": "^24.10.2",
     "@types/react": "^19.2.7",
@@ -59,6 +59,7 @@
     "remark-heading-id": "^1.0.1",
     "semver": "^7.7.3",
     "tailwindcss": "^4.1.17",
+    "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "yaml-loader": "^0.8.1"
