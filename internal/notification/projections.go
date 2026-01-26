@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
@@ -27,6 +28,7 @@ func Register(
 	ctx context.Context,
 	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	notificationWorkerConfig handlers.WorkerConfig,
+	backChannelLogoutWorkerConfig handlers.BackChannelLogoutWorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -35,7 +37,7 @@ func Register(
 	queries *query.Queries,
 	es *eventstore.Eventstore,
 	otpEmailTmpl, fileSystemPath string,
-	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
+	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
 	queue *queue.Queue,
 ) {
@@ -46,6 +48,13 @@ func Register(
 	// make sure the slice does not contain old values
 	projections = nil
 
+	backChannelLogoutWorkerConfig = handlers.BackChannelLogoutWorkerConfig{
+		Workers:             notificationWorkerConfig.Workers,
+		TransactionDuration: notificationWorkerConfig.TransactionDuration,
+		MaxAttempts:         notificationWorkerConfig.MaxAttempts,
+		MaxTtl:              notificationWorkerConfig.MaxTtl,
+	}
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
@@ -53,13 +62,11 @@ func Register(
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
 		ctx,
 		projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig),
-		commands,
 		q,
-		es,
-		keysEncryptionAlg,
-		c,
-		tokenLifetime,
+		queue,
+		backChannelLogoutWorkerConfig.MaxAttempts,
 	))
+	queue.AddWorkers(handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, tokenLifetime, id.SonyFlakeGenerator()))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}

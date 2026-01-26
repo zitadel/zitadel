@@ -60,6 +60,7 @@ type Config struct {
 	Profiler            *instrumentation.LegacyProfileConfig
 	Projections         projection.Config
 	Notifications       handlers.WorkerConfig
+	BackChannelLogout   handlers.BackChannelLogoutWorkerConfig
 	Executions          execution.WorkerConfig
 	Auth                auth_es.Config
 	Admin               admin_es.Config

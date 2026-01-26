@@ -34,25 +34,26 @@ import (
 )
 
 type Config struct {
-	ForMirror       bool
-	Database        database.Config
-	Caches          *connector.CachesConfig
-	SystemDefaults  systemdefaults.SystemDefaults
-	InternalAuthZ   authz.Config
-	SystemAuthZ     authz.Config
-	ExternalDomain  string
-	ExternalPort    uint16
-	ExternalSecure  bool
-	Instrumentation instrumentation.Config
-	Log             *logging.Config
-	Metrics         *instrumentation.LegacyMetricConfig
-	EncryptionKeys  *encryption.EncryptionKeyConfig
-	DefaultInstance command.InstanceSetup
-	Machine         *id.Config
-	Projections     projection.Config
-	Notifications   handlers.WorkerConfig
-	Executions      execution.WorkerConfig
-	Eventstore      *eventstore.Config
+	ForMirror         bool
+	Database          database.Config
+	Caches            *connector.CachesConfig
+	SystemDefaults    systemdefaults.SystemDefaults
+	InternalAuthZ     authz.Config
+	SystemAuthZ       authz.Config
+	ExternalDomain    string
+	ExternalPort      uint16
+	ExternalSecure    bool
+	Instrumentation   instrumentation.Config
+	Log               *logging.Config
+	Metrics           *instrumentation.LegacyMetricConfig
+	EncryptionKeys    *encryption.EncryptionKeyConfig
+	DefaultInstance   command.InstanceSetup
+	Machine           *id.Config
+	Projections       projection.Config
+	Notifications     handlers.WorkerConfig
+	BackChannelLogout handlers.BackChannelLogoutWorkerConfig
+	Executions        execution.WorkerConfig
+	Eventstore        *eventstore.Config
 
 	InitProjections InitProjections
 	AssetStorage    static_config.AssetStorageConfig
