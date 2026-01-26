@@ -2,7 +2,7 @@ Login:
   Title: 欢迎回来！
   Description: 输入您的登录数据。
   TitleLinking: 登录以进行用户链接
-  DescriptionLinking: 输入您的登录数据以将您的外部用户与 ZITADEL 用户关联。
+  DescriptionLinking: 输入您的登录数据以将您的外部用户与 Zitadel 用户关联。
   LoginNameLabel: 登录名
   UsernamePlaceHolder: 用户名
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: 选择账户
-  Description: 使用您的 ZITADEL 帐户
+  Description: 使用您的 Zitadel 帐户
   TitleLinking: 选择用于用户链接的帐户
   DescriptionLinking: 选择您的帐户以与您的外部用户关联。
   OtherUser: 其他用户
