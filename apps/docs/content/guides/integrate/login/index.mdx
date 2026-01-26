@@ -7,6 +7,11 @@ description: "Sign-in users and application with ZITADEL. In this section you wi
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Login Users" href="/guides/integrate/login/login-users" icon={<FileText />} />
+    <Card title="Hosted Login" href="/guides/integrate/login/hosted-login" icon={<FileText />} />
+    <Card title="Logout" href="/guides/integrate/login/oidc/logout" icon={<FileText />} />
+</Cards>

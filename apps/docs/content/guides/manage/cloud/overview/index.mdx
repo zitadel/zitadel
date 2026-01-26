@@ -7,6 +7,13 @@ description: "Our customer portal is used to manage all your ZITADEL instances. 
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Start" href="/guides/manage/cloud/start" icon={<FileText />} />
+    <Card title="Instances" href="/guides/manage/cloud/instances" icon={<FileText />} />
+    <Card title="Settings" href="/guides/manage/cloud/settings" icon={<FileText />} />
+    <Card title="Billing" href="/guides/manage/cloud/billing" icon={<FileText />} />
+    <Card title="Users" href="/guides/manage/cloud/users" icon={<FileText />} />
+</Cards>

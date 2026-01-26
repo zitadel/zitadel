@@ -7,6 +7,10 @@ description: "Description of services and service levels for ZITADEL Cloud and E
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Service Description" href="/legal/service-description" icon={<Folder />} />
+    <Card title="Billing" href="https://help.zitadel.com/pricing-and-billing-of-zitadel-services" icon={<LinkIcon />} external />
+</Cards>

@@ -7,6 +7,20 @@ description: "In the following guides you will learn how to create your own logi
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="Session Validation" href="/guides/integrate/login-ui/session-validation" icon={<FileText />} />
+    <Card title="Username Password" href="/guides/integrate/login-ui/username-password" icon={<FileText />} />
+    <Card title="External Login" href="/guides/integrate/login-ui/external-login" icon={<FileText />} />
+    <Card title="Passkey" href="/guides/integrate/login-ui/passkey" icon={<FileText />} />
+    <Card title="Mfa" href="/guides/integrate/login-ui/mfa" icon={<FileText />} />
+    <Card title="Select Account" href="/guides/integrate/login-ui/select-account" icon={<FileText />} />
+    <Card title="Password Reset" href="/guides/integrate/login-ui/password-reset" icon={<FileText />} />
+    <Card title="Logout" href="/guides/integrate/login-ui/logout" icon={<FileText />} />
+    <Card title="Oidc Standard" href="/guides/integrate/login-ui/oidc-standard" icon={<FileText />} />
+    <Card title="Saml Standard" href="/guides/integrate/login-ui/saml-standard" icon={<FileText />} />
+    <Card title="Device Auth" href="/guides/integrate/login-ui/device-auth" icon={<FileText />} />
+    <Card title="Login App" href="/guides/integrate/login-ui/login-app" icon={<FileText />} />
+</Cards>

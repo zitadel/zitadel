@@ -8,6 +8,10 @@ These guides will explain the built-in solution for onboarding new tenants, cust
   ANY MANUAL CHANGES WILL BE OVERWRITTEN.
 */}
 
-import { Cards } from 'fumadocs-ui/components/card';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileText, Folder, Link as LinkIcon } from 'lucide-react';
 
-<Cards />
+<Cards>
+    <Card title="B2b" href="/guides/integrate/onboarding/b2b" icon={<FileText />} />
+    <Card title="End Users" href="/guides/integrate/onboarding/end-users" icon={<FileText />} />
+</Cards>
