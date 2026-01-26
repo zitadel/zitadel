@@ -184,17 +184,14 @@
     .custom-rounded-system, .custom-rounded-apis, .custom-rounded-policy, .custom-rounded-instance { background: linear-gradient(40deg, #1f2937, #111827); }
 
     /* 4. B2B / DIAGRAM LAYOUTS (Fixes the B2B Component) */
-    /* Container for the diagram */
     .flexrowbetween {
         @apply flex flex-row items-center justify-around gap-4 my-8 w-full;
     }
 
-    /* The central arrow */
     .arrowright {
         @apply w-8 h-8 shrink-0 text-muted-foreground;
     }
 
-    /* Nested Card Styles (Recursive stacking of overlaycolor creates depth) */
     .b2borg, .b2bproject, .b2bapp, .b2buser {
         @apply rounded-xl p-4 border text-left;
         background: var(--overlaycolor);
@@ -207,7 +204,6 @@
         @apply ml-4 mb-2 block font-semibold;
     }
     
-    /* Specific styling for the role text */
     .b2bprojectrole {
         @apply mt-2 ml-4 block text-sm opacity-80 font-normal;
     }
@@ -240,6 +236,28 @@
     
     a.\@max-lg\:col-span-full p.text-fd-muted-foreground {
         @apply mt-2 text-sm opacity-80;
+    }
+
+    /* 6. VIDEO PLAYER WRAPPER */
+    /* Fixes aspect ratio for ReactPlayer embeds */
+    .player-wrapper {
+        @apply relative mb-8;
+        padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    }
+    .react-player {
+        @apply absolute top-0 left-0;
+    }
+
+    /* 7. GET STARTED BUTTON */
+    .get-started {
+        @apply inline-flex items-center justify-center px-6 py-2 rounded-full font-bold border-2 transition-all;
+        border-color: #ff2069;
+        background-color: #ff2069;
+        color: white;
+    }
+    .get-started:hover {
+        @apply opacity-90;
+        color: white !important;
     }
 }
 
