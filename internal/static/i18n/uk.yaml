@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: не вдалося зв'язатися з SMTP сервером через TLS, перевірте порт, проблеми з брандмауером...
     CouldNotCreateClient: не вдалося створити smtp клієнт
     CouldNotStartTLS: не вдалося запустити tls
-    CouldNotAuth: не вдалося додати smtp аутентифікацію, перевірте чи правильні ваші користувач та пароль, якщо вони правильні, можливо ваш провайдер вимагає метод аутентифікації, не підтримуваний ZITADEL
+    CouldNotAuth: не вдалося додати smtp аутентифікацію, перевірте чи правильні ваші користувач та пароль, якщо вони правильні, можливо ваш провайдер вимагає метод аутентифікації, не підтримуваний Zitadel
     CouldNotSetSender: не вдалося встановити відправника
     CouldNotSetRecipient: не вдалося встановити отримувача
   SMTPConfig:
@@ -203,7 +203,7 @@ Errors:
     NotFound: Організація не знайдена
     NotChanged: Організація не змінена
     DefaultOrgNotDeletable: Організація за замовчуванням не може бути видалена
-    ZitadelOrgNotDeletable: Організація з проектом ZITADEL не може бути видалена
+    ZitadelOrgNotDeletable: Організація з проектом Zitadel не може бути видалена
     InvalidDomain: Недійсний домен
     DomainMissing: Відсутній домен
     DomainNotOnOrg: Домен не існує в організації
@@ -1110,20 +1110,20 @@ EventTypes:
         changed: Політика блокування паролів змінена
   iam:
     setup:
-      started: Налаштування ZITADEL розпочато
-      done: Налаштування ZITADEL завершено
+      started: Налаштування Zitadel розпочато
+      done: Налаштування Zitadel завершено
     global:
       org:
         set: Глобальна організація встановлена
     project:
       iam:
-        set: Проект ZITADEL встановлено
+        set: Проект Zitadel встановлено
     member:
-      added: Член ZITADEL доданий
-      changed: Член ZITADEL змінений
-      removed: Член ZITADEL видалений
+      added: Член Zitadel доданий
+      changed: Член Zitadel змінений
+      removed: Член Zitadel видалений
       cascade:
-        removed: Член ZITADEL каскадно видалений
+        removed: Член Zitadel каскадно видалений
     idp:
       config:
         added: Конфігурація IDP додана
@@ -1236,9 +1236,9 @@ EventTypes:
       removed: Домен видалений
     iam:
       console:
-        set: Програма консолі керування ZITADEL налаштована
+        set: Програма консолі керування Zitadel налаштована
       project:
-        set: Проект ZITADEL встановлено
+        set: Проект Zitadel встановлено
     mail:
       template:
         added: Шаблон електронної пошти доданий

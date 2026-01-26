@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: kon geen contact maken met de SMTP-server via TLS, controleer de poort, firewallproblemen...
     CouldNotCreateClient: kan geen smtp-client maken
     CouldNotStartTLS: kon tls niet starten
-    CouldNotAuth: kon geen smtp-authenticatie toevoegen, controleer of zowel uw gebruiker als uw wachtwoord correct zijn. Als ze correct zijn, vereist uw provider misschien een auth-methode die niet door ZITADEL wordt ondersteund
+    CouldNotAuth: kon geen smtp-authenticatie toevoegen, controleer of zowel uw gebruiker als uw wachtwoord correct zijn. Als ze correct zijn, vereist uw provider misschien een auth-methode die niet door Zitadel wordt ondersteund
     CouldNotSetSender: kon de afzender niet instellen
     CouldNotSetRecipient: Kan de ontvanger niet instellen
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organisatie niet gevonden
     NotChanged: Organisatie is niet veranderd
     DefaultOrgNotDeletable: Standaard organisatie kan niet worden verwijderd
-    ZitadelOrgNotDeletable: Organisatie met ZITADEL-project kan niet worden verwijderd
+    ZitadelOrgNotDeletable: Organisatie met Zitadel-project kan niet worden verwijderd
     InvalidDomain: Ongeldig domein
     DomainMissing: Domein ontbreekt
     DomainNotOnOrg: Domein bestaat niet op organisatie
@@ -1115,20 +1115,20 @@ EventTypes:
         changed: Wachtwoord lockout beleid gewijzigd
   iam:
     setup:
-      started: ZITADEL setup gestart
-      done: ZITADEL setup voltooid
+      started: Zitadel setup gestart
+      done: Zitadel setup voltooid
     global:
       org:
         set: Globale organisatie ingesteld
     project:
       iam:
-        set: ZITADEL project ingesteld
+        set: Zitadel project ingesteld
     member:
-      added: ZITADEL lid toegevoegd
-      changed: ZITADEL lid gewijzigd
-      removed: ZITADEL lid verwijderd
+      added: Zitadel lid toegevoegd
+      changed: Zitadel lid gewijzigd
+      removed: Zitadel lid verwijderd
       cascade:
-        removed: ZITADEL lid cascade verwijderd
+        removed: Zitadel lid cascade verwijderd
     idp:
       config:
         added: IDP-configuratie toegevoegd
@@ -1238,9 +1238,9 @@ EventTypes:
       removed: Domein verwijderd
     iam:
       console:
-        set: ZITADEL Management Console-applicatie ingesteld
+        set: Zitadel Management Console-applicatie ingesteld
       project:
-        set: ZITADEL project ingesteld
+        set: Zitadel project ingesteld
     mail:
       template:
         added: E-Mail sjabloon toegevoegd

@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: 无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题...
     CouldNotCreateClient: 无法创建 smtp 客户端
     CouldNotStartTLS: 无法启动 tls
-    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 ZITADEL 不支持的身份验证方法
+    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 Zitadel 不支持的身份验证方法
     CouldNotSetSender: 无法设置发件人
     CouldNotSetRecipient: 无法设置收件人
   SMTPConfig:
@@ -209,7 +209,7 @@ Errors:
     NotFound: 未找到组织
     NotChanged: 组织信息未改变
     DefaultOrgNotDeletable: 默认组织不应删除
-    ZitadelOrgNotDeletable: 不得删除与ZITADEL项目有关的组织
+    ZitadelOrgNotDeletable: 不得删除与Zitadel项目有关的组织
     InvalidDomain: 无效的域名
     DomainMissing: 域名缺失
     DomainNotOnOrg: 组织中不存在域
@@ -1116,20 +1116,20 @@ EventTypes:
         changed: 更改密码锁定策略
   iam:
     setup:
-      started: 开始 ZITADEL 配置
-      done: ZITADEL 配置完成
+      started: 开始 Zitadel 配置
+      done: Zitadel 配置完成
     global:
       org:
         set: 设置全局组织
     project:
       iam:
-        set: 设置 ZITADEL 项目
+        set: 设置 Zitadel 项目
     member:
-      added: 添加 ZITADEL 成员
-      changed: 更改 ZITADEL 成员
-      removed: 删除 ZITADEL 成员
+      added: 添加 Zitadel 成员
+      changed: 更改 Zitadel 成员
+      removed: 删除 Zitadel 成员
       cascade:
-        removed: 删除 ZITADEL 成员级联
+        removed: 删除 Zitadel 成员级联
     idp:
       config:
         added: 添加 IDP 配置
@@ -1242,9 +1242,9 @@ EventTypes:
       removed: 域名已删除
     iam:
       console:
-        set: ZITADEL管理控制台应用程序已设置
+        set: Zitadel管理控制台应用程序已设置
       project:
-        set: ZITADEL 项目集
+        set: Zitadel 项目集
     mail:
       template:
         added: 添加了电子邮件模板

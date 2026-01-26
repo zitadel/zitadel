@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: kunde inte kontakta SMTP-servern med TLS, kontrollera porten, brandväggsproblem...
     CouldNotCreateClient: kunde inte skapa smtp-klient
     CouldNotStartTLS: kunde inte starta tls
-    CouldNotAuth: kunde inte lägga till smtp auth, kontrollera om både din användare och lösenord är korrekta, om de är korrekta kanske din leverantör kräver en auth-metod som inte stöds av ZITADEL
+    CouldNotAuth: kunde inte lägga till smtp auth, kontrollera om både din användare och lösenord är korrekta, om de är korrekta kanske din leverantör kräver en auth-metod som inte stöds av Zitadel
     CouldNotSetSender: kunde inte ställa in avsändare
     CouldNotSetRecipient: kunde inte ange mottagare
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organisationen hittades inte
     NotChanged: Organisationen ändrades inte
     DefaultOrgNotDeletable: Standardorganisationen får inte raderas
-    ZitadelOrgNotDeletable: Organisationen med ZITADEL-projekt får inte raderas
+    ZitadelOrgNotDeletable: Organisationen med Zitadel-projekt får inte raderas
     InvalidDomain: Ogiltig domän
     DomainMissing: Domän saknas
     DomainNotOnOrg: Domänen finns inte på organisationen
@@ -1115,20 +1115,20 @@ EventTypes:
         changed: Lösenordslåsningpolicy ändrad
   iam:
     setup:
-      started: ZITADEL-setup startad
-      done: ZITADEL-setup klar
+      started: Zitadel-setup startad
+      done: Zitadel-setup klar
     global:
       org:
         set: Global org satt
     project:
       iam:
-        set: ZITADEL-projekt satt
+        set: Zitadel-projekt satt
     member:
-      added: ZITADEL-medlem tillagd
-      changed: ZITADEL-medlem ändrad
-      removed: ZITADEL-medlem borttagen
+      added: Zitadel-medlem tillagd
+      changed: Zitadel-medlem ändrad
+      removed: Zitadel-medlem borttagen
       cascade:
-        removed: ZITADEL-medlem kaskad borttagen
+        removed: Zitadel-medlem kaskad borttagen
     idp:
       config:
         added: IDP-konfiguration tillagd
@@ -1241,9 +1241,9 @@ EventTypes:
       removed: Domän borttagen
     iam:
       console:
-        set: ZITADEL-hanteringskonsol inställd
+        set: Zitadel-hanteringskonsol inställd
       project:
-        set: ZITADEL-projekt inställt
+        set: Zitadel-projekt inställt
     mail:
       template:
         added: E-postmall tillagd
