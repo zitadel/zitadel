@@ -33,7 +33,6 @@ import { PasswordComplexityValidatorFactoryService } from 'src/app/services/pass
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { NewOrganizationService } from '../../../../services/new-organization.service';
 
 type PwdForm = ReturnType<UserCreateV2Component['buildPwdForm']>;
 type AuthenticationFactor =
@@ -98,9 +97,9 @@ export class UserCreateV2Component implements OnInit {
 
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
-      username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
-      givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-      familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
+      firstName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      lastName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       emailVerified: new FormControl(false, { nonNullable: true }),
       authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
         nonNullable: true,
