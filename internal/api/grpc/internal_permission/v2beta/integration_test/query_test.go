@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -19,9 +18,9 @@ import (
 func TestServer_ListAdministrators(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	projectName := gofakeit.AppName()
+	projectName := integration.ProjectName()
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
@@ -536,6 +535,10 @@ func TestServer_ListAdministrators(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Administrators, len(tt.want.Administrators)) {
 					for i := range tt.want.Administrators {
+						// need to set the project grant ID as it is generated
+						if grant := got.Administrators[i].GetProjectGrant(); grant != nil {
+							tt.want.Administrators[i].GetProjectGrant().Id = grant.Id
+						}
 						assert.EqualExportedValues(ttt, tt.want.Administrators[i], got.Administrators[i])
 					}
 				}
@@ -551,7 +554,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func createInstanceAdministrator(ctx context.Context, instance *integration.Instance, t *testing.T) *internal_permission.Administrator {
-	email := gofakeit.Email()
+	email := integration.Email()
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateInstanceMembership(t, ctx, userResp.GetId())
 	return &internal_permission.Administrator{
@@ -571,7 +574,7 @@ func createInstanceAdministrator(ctx context.Context, instance *integration.Inst
 }
 
 func createOrganizationAdministrator(ctx context.Context, instance *integration.Instance, t *testing.T) *internal_permission.Administrator {
-	email := gofakeit.Email()
+	email := integration.Email()
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateOrgMembership(t, ctx, instance.DefaultOrg.Id, userResp.GetId())
 	return &internal_permission.Administrator{
@@ -594,7 +597,7 @@ func createOrganizationAdministrator(ctx context.Context, instance *integration.
 }
 
 func createProjectAdministrator(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, projectID, projectName string) *internal_permission.Administrator {
-	email := gofakeit.Email()
+	email := integration.Email()
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateProjectMembership(t, ctx, projectID, userResp.GetId())
 	return &internal_permission.Administrator{
@@ -618,7 +621,7 @@ func createProjectAdministrator(ctx context.Context, instance *integration.Insta
 }
 
 func createProjectGrantAdministrator(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, projectID, projectName, grantedOrgID string) *internal_permission.Administrator {
-	email := gofakeit.Email()
+	email := integration.Email()
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateProjectGrantMembership(t, ctx, projectID, grantedOrgID, userResp.GetId())
 	return &internal_permission.Administrator{
@@ -632,7 +635,8 @@ func createProjectGrantAdministrator(ctx context.Context, instance *integration.
 		},
 		Resource: &internal_permission.Administrator_ProjectGrant{
 			ProjectGrant: &internal_permission.ProjectGrant{
-				Id:                    grantedOrgID,
+				// left empty as generated
+				Id:                    "",
 				ProjectId:             projectID,
 				ProjectName:           projectName,
 				OrganizationId:        orgID,
@@ -650,7 +654,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 
 	projectName := integration.ProjectName()
 	projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
@@ -1163,6 +1167,10 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Administrators, len(tt.want.Administrators)) {
 					for i := range tt.want.Administrators {
+						// set as project grant id is generated
+						if grant := got.Administrators[i].GetProjectGrant(); grant != nil {
+							tt.want.Administrators[i].GetProjectGrant().Id = grant.Id
+						}
 						assert.EqualExportedValues(ttt, tt.want.Administrators[i], got.Administrators[i])
 					}
 				}

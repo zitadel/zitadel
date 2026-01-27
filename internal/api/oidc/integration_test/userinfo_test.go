@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -30,6 +29,13 @@ func TestServer_UserInfo(t *testing.T) {
 
 	clientID, projectID := createClient(t, Instance)
 	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
+
+	// create user groups
+	group1 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), "group1")
+	group2 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), "group2")
+	// add the user to groups
+	Instance.AddUsersToGroup(CTXIAM, t, group1.GetId(), []string{User.GetUserId()})
+	Instance.AddUsersToGroup(CTXIAM, t, group2.GetId(), []string{User.GetUserId()})
 
 	tests := []struct {
 		name       string
@@ -77,14 +83,14 @@ func TestServer_UserInfo(t *testing.T) {
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
 				_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 					Id:                   projectID,
-					Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
+					Name:                 integration.ProjectName(),
 					ProjectRoleAssertion: true,
 				})
 				require.NoError(t, err)
 				t.Cleanup(func() {
 					_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 						Id:                   projectID,
-						Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
+						Name:                 integration.ProjectName(),
 						ProjectRoleAssertion: false,
 					})
 					require.NoError(t, err)
@@ -155,6 +161,39 @@ func TestServer_UserInfo(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:    "custom group scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeCustomUserGroups},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, info *oidc.UserInfo) {
+					expectedUserGroups := []map[string]interface{}{
+						{"id": group1.GetId(), "name": "group1"},
+						{"id": group2.GetId(), "name": "group2"},
+					}
+					userGroupsClaim := info.Claims[oidc_api.ClaimCustomUserGroups]
+					require.Len(t, userGroupsClaim, len(expectedUserGroups))
+					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)
+				},
+			},
+		},
+		{
+			name:    "group scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeUserGroups},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, info *oidc.UserInfo) {
+					expectedUserGroups := []string{"group1", "group2"}
+					userGroupsClaim := info.Claims[oidc_api.ClaimUserGroups]
+					require.Len(t, userGroupsClaim, len(expectedUserGroups))
+					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -187,7 +226,7 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 
 	_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 		Id:                   projectID,
-		Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
+		Name:                 integration.ProjectName(),
 		ProjectRoleAssertion: true,
 	})
 	require.NoError(t, err)
@@ -251,7 +290,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	projectID := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false).GetId()
+	projectID := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false).GetId()
 	user, _, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)
@@ -296,7 +335,7 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 // addProjectOrgGrant adds a new organization which will be granted on the projectID with the specified roles.
 // The userID will be granted in the new organization to the project with the same roles.
 func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string) (grantedOrgID string) {
-	grantedOrg := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%s", gofakeit.AppName()), gofakeit.Email())
+	grantedOrg := Instance.CreateOrganization(CTXIAM, integration.OrganizationName(), integration.Email())
 	projectGrant, err := Instance.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
 		ProjectId:    projectID,
 		GrantedOrgId: grantedOrg.GetOrganizationId(),

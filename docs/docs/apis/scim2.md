@@ -11,7 +11,7 @@ deprovisioning.
 ## Supported endpoints
 
 The Zitadel SCIM v2.0 service provider implementation supports the following endpoints.
-The base URL for the SCIM endpoint in Zitadel is: `https://${ZITADEL_DOMAIN}/scim/v2/{orgId}`.
+The base URL for the SCIM endpoint in Zitadel is: `https://${CUSTOM_DOMAIN}/scim/v2/{orgId}`.
 
 | Endpoint                                                                | Remarks                                                    |
 |-------------------------------------------------------------------------|------------------------------------------------------------|
@@ -300,7 +300,7 @@ curl -X POST "https://${DOMAIN}/scim/v2/${ORG_ID}/Users" \
 
 </details>
 <details>
-<summary>`GET /Users/{id}`: Retrive a known user</summary>
+<summary>`GET /Users/{id}`: Retrieve a known user</summary>
 
 ```bash
 curl -G "https://${DOMAIN}/scim/v2/${ORG_ID}/Users/${USER_ID}" \

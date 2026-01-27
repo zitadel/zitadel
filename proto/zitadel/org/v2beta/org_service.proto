@@ -23,7 +23,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Organization Service (Beta)";
     version: "2.0-beta";
-    description: "This API is intended to manage organizations in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage organizations in a Zitadel instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -59,8 +59,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -107,6 +107,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// This service is intended to manage organizations in a Zitadel instance.
+//
+// Deprecated: use organization service v2 instead. This service will be removed in the next major version of ZITADEL.
 service OrganizationService {
 
   // Create Organization
@@ -125,7 +128,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.create"
+        permission: "authenticated"
       }
     };
 
@@ -148,6 +151,8 @@ service OrganizationService {
 
   // Update Organization
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Change the name of the organization.
   //
   // Required permission:
@@ -160,7 +165,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -189,10 +194,12 @@ service OrganizationService {
 
   // List Organizations
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
   //
   // Required permission:
-  //  - `iam.read`
+  //  - `org.read`
   //
   // Deprecated: Use [ListOrganizations](/apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead to list organizations.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
@@ -203,7 +210,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "iam.read";
+        permission: "authenticated";
       }
     };
 
@@ -217,6 +224,8 @@ service OrganizationService {
 
   // Delete Organization
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
   //
   // Required permission:
@@ -228,7 +237,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.delete";
+        permission: "authenticated";
       }
     };
 
@@ -250,6 +259,8 @@ service OrganizationService {
 
   // Set Organization Metadata
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
   //
   // Required permission:
@@ -262,7 +273,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -282,6 +293,8 @@ service OrganizationService {
 
   // List Organization Metadata
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // List metadata of an organization filtered by query.
   //
   // Required permission:
@@ -293,7 +306,7 @@ service OrganizationService {
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
-        permission: "org.read"
+        permission: "authenticated"
       }
     };
 
@@ -307,6 +320,8 @@ service OrganizationService {
 
   // Delete Organization Metadata
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Delete metadata objects from an organization with a specific key.
   //
   // Required permission:
@@ -318,7 +333,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -332,6 +347,8 @@ service OrganizationService {
 
   // Add Organization Domain
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
   //
   // Required permission:
@@ -344,7 +361,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -364,6 +381,8 @@ service OrganizationService {
 
   // List Organization Domains
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs. 
   //
   // Required permission:
@@ -376,7 +395,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.read"
+        permission: "authenticated"
       }
     };
 
@@ -390,6 +409,8 @@ service OrganizationService {
 
   // Delete Organization Domain
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
   //
   // Required permission:
@@ -401,7 +422,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -415,6 +436,8 @@ service OrganizationService {
 
   // Generate Organization Domain Validation
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
   //
   // Required permission:
@@ -427,7 +450,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -446,7 +469,9 @@ service OrganizationService {
 
   // Verify Organization Domain
   //
-  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). Zitadel will check it and set the domain as verified if it was successful. A verify domain has to be unique.
   //
   // Required permission:
   //  - `org.write`
@@ -458,7 +483,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -470,6 +495,8 @@ service OrganizationService {
   }
 
   // Deactivate Organization
+  //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
   //
@@ -483,7 +510,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 
@@ -497,6 +524,8 @@ service OrganizationService {
 
   // Activate Organization
   //
+  // Deprecated: please move to the corresponding endpoint under organization service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
   //
   // Required permission:
@@ -509,7 +538,7 @@ service OrganizationService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "authenticated"
       }
     };
 

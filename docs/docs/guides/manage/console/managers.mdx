@@ -8,7 +8,7 @@ import ManagerDescription from "../../../concepts/structure/_manager_description
 <ManagerDescription name="ManagerDescription" />
 
 To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
-In the right part of the console you can finde **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
+In the right part of the management console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
 
 <img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
 
@@ -39,7 +39,7 @@ import AddManager from "./_add_manager.mdx";
 | Project Owner Viewer          | PROJECT_OWNER_VIEWER          | View everything within a project.                                                                            |
 | Project Owner Global          | PROJECT_OWNER_GLOBAL          | Same as PROJECT_OWNER, but in the global organization.                                                       |
 | Project Owner Viewer Global   | PROJECT_OWNER_VIEWER_GLOBAL   | Same as PROJECT_OWNER_VIEWER, but in the global organization.                                                |
-| Project Grant Owner           | PROJECT_GRANT_OWNER           | Same as PROJECT_OWNER but for a granted proejct.                                                             |
+| Project Grant Owner           | PROJECT_GRANT_OWNER           | Same as PROJECT_OWNER but for a granted project.                                                             |
 
 ## Configure roles
 
@@ -56,3 +56,12 @@ InternalAuthZ:
         - "iam.read"
         - "iam.write"
 ```
+
+import PermissionTable from '@site/src/components/PermissionTable';
+import permissionData from '@site/docs/self-hosting/manage/configure/defaults.yaml';
+
+# Manager Permission Matrix
+
+This table is generated dynamically from our configuration file.
+
+<PermissionTable data={permissionData} />

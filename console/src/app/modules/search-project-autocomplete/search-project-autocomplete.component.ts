@@ -21,6 +21,7 @@ export enum ProjectAutocompleteType {
   selector: 'cnsl-search-project-autocomplete',
   templateUrl: './search-project-autocomplete.component.html',
   styleUrls: ['./search-project-autocomplete.component.scss'],
+  standalone: false,
 })
 export class SearchProjectAutocompleteComponent implements OnInit, OnDestroy {
   public removable: boolean = true;

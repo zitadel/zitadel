@@ -5,11 +5,17 @@ import (
 
 	"connectrpc.com/connect"
 
+	instancev2 "github.com/zitadel/zitadel/backend/v3/api/instance/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
-func (s *Server) GetInstance(ctx context.Context, _ *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+func (s *Server) GetInstance(ctx context.Context, request *connect.Request[instance.GetInstanceRequest]) (*connect.Response[instance.GetInstanceResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.GetInstanceBeta(ctx, request)
+	}
+
 	inst, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
@@ -21,6 +27,10 @@ func (s *Server) GetInstance(ctx context.Context, _ *connect.Request[instance.Ge
 }
 
 func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instance.ListInstancesRequest]) (*connect.Response[instance.ListInstancesResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListInstancesBeta(ctx, req)
+	}
+
 	queries, err := ListInstancesRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
@@ -38,6 +48,10 @@ func (s *Server) ListInstances(ctx context.Context, req *connect.Request[instanc
 }
 
 func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[instance.ListCustomDomainsRequest]) (*connect.Response[instance.ListCustomDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListCustomDomainsBeta(ctx, req)
+	}
+
 	queries, err := ListCustomDomainsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err
@@ -55,6 +69,10 @@ func (s *Server) ListCustomDomains(ctx context.Context, req *connect.Request[ins
 }
 
 func (s *Server) ListTrustedDomains(ctx context.Context, req *connect.Request[instance.ListTrustedDomainsRequest]) (*connect.Response[instance.ListTrustedDomainsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.ListTrustedDomainsBeta(ctx, req)
+	}
+
 	queries, err := ListTrustedDomainsRequestToModel(req.Msg, s.systemDefaults)
 	if err != nil {
 		return nil, err

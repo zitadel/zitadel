@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
@@ -81,15 +80,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[0],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},
@@ -97,15 +96,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[1],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},
@@ -337,7 +336,7 @@ func TestServer_ImportData(t *testing.T) {
 					{
 						Type:    "project_grant",
 						Id:      orgIDs[3] + "_" + projectIDs[2] + "_" + orgIDs[4],
-						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists Parent=(ERROR: duplicate key value violates unique constraint \"unique_constraints_pkey\" (SQLSTATE 23505))",
+						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists",
 					},
 				},
 				Success: &admin.ImportDataSuccess{
@@ -408,15 +407,15 @@ func TestServer_ImportData(t *testing.T) {
 									{
 										UserId: userIDs[2],
 										User: &management.ImportHumanUserRequest{
-											UserName: gofakeit.Username(),
+											UserName: integration.Username(),
 											Profile: &management.ImportHumanUserRequest_Profile{
-												FirstName:         gofakeit.FirstName(),
-												LastName:          gofakeit.LastName(),
-												DisplayName:       gofakeit.Username(),
-												PreferredLanguage: gofakeit.LanguageBCP(),
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
 											},
 											Email: &management.ImportHumanUserRequest_Email{
-												Email:           gofakeit.Email(),
+												Email:           integration.Email(),
 												IsEmailVerified: true,
 											},
 										},
@@ -488,6 +487,180 @@ func TestServer_ImportData(t *testing.T) {
 								},
 							},
 						},
+					},
+				},
+			},
+		},
+		{
+			name: "success with recovery codes",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[7],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[3],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-001"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-002"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-003"}},
+											},
+										},
+									},
+									{
+										UserId: userIDs[4],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Raw{Raw: "code-101"}},
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "$2a$12$3UWLT4aUQsgO/Jn/rydRmuqF39JTXox6G4dwea/UOvbstI/Qba20y"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: (5 * time.Minute).String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[7],
+							HumanUserIds: userIDs[3:5],
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "empty recovery codes",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[8],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[5],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: time.Minute.String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[8],
+							HumanUserIds: userIDs[5:6],
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid recovery code hash",
+			req: &admin.ImportDataRequest{
+				Data: &admin.ImportDataRequest_DataOrgs{
+					DataOrgs: &admin.ImportDataOrg{
+						Orgs: []*admin.DataOrg{
+							{
+								OrgId: orgIDs[9],
+								Org: &management.AddOrgRequest{
+									Name: integration.OrganizationName(),
+								},
+								HumanUsers: []*v1.DataHumanUser{
+									{
+										UserId: userIDs[6],
+										User: &management.ImportHumanUserRequest{
+											UserName: integration.Username(),
+											Profile: &management.ImportHumanUserRequest_Profile{
+												FirstName:         integration.FirstName(),
+												LastName:          integration.LastName(),
+												DisplayName:       integration.Username(),
+												PreferredLanguage: integration.Language(),
+											},
+											Email: &management.ImportHumanUserRequest_Email{
+												Email:           integration.Email(),
+												IsEmailVerified: true,
+											},
+											RecoveryCodes: []*management.ImportHumanUserRequest_RecoveryCode{
+												{CodeType: &management.ImportHumanUserRequest_RecoveryCode_Hash{Hash: "invalid-hash"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Timeout: time.Minute.String(),
+			},
+			want: &admin.ImportDataResponse{
+				Success: &admin.ImportDataSuccess{
+					Orgs: []*admin.ImportDataSuccessOrg{
+						{
+							OrgId:        orgIDs[9],
+							HumanUserIds: userIDs[6:7],
+						},
+					},
+				},
+				Errors: []*admin.ImportDataError{
+					{
+						Type:    "human_user_recovery_codes",
+						Id:      userIDs[6],
+						Message: "ID=DOMAIN-JDk4t Message=Errors.Hash.NotSupported",
 					},
 				},
 			},

@@ -3,17 +3,25 @@ package execution
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"io"
 	"net/http"
-	"strings"
+	"sync"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -26,28 +34,29 @@ type ContextInfo interface {
 	SetHTTPResponseBody([]byte) error
 }
 
-type Target interface {
-	GetTargetID() string
-	IsInterruptOnError() bool
-	GetEndpoint() string
-	GetTargetType() domain.TargetType
-	GetTimeout() time.Duration
-	GetSigningKey() string
-}
+type GetActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error)
 
 // CallTargets call a list of targets in order with handling of error and responses
 func CallTargets(
 	ctx context.Context,
-	targets []Target,
+	targets []target_domain.Target,
 	info ContextInfo,
+	alg crypto.EncryptionAlgorithm,
+	activeSigningKey GetActiveSigningWebKey,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// We make sure the signer and its key are only fetched once per CallTargets call.
+	signerOnce := sign.GetSignerOnce(activeSigningKey)
+	// Create a map to cache encrypters by key ID to avoid recreating them for each target.
+	encrypters := &sync.Map{}
+
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info)
+		resp, err := CallTarget(ctx, target, info, alg, signerOnce, encrypters)
 		// handle error if interrupt is set
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "target", target.GetTargetID()).OnError(err).Error("error calling target")
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
 		}
@@ -68,28 +77,147 @@ type ContextInfoRequest interface {
 // CallTarget call the desired type of target with handling of responses
 func CallTarget(
 	ctx context.Context,
-	target Target,
+	target target_domain.Target,
 	info ContextInfoRequest,
+	alg crypto.EncryptionAlgorithm,
+	signerOnce sign.SignerFunc,
+	encrypters *sync.Map,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	signingKey, err := target.GetSigningKey(alg)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
+	}
+	body, err := payload(ctx, info.GetHTTPRequestBody(), target, signerOnce, encrypters)
+	if err != nil {
+		return nil, err
+	}
+
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
-	case domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
+	case target_domain.TargetTypeWebhook:
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
 	// get request, return response and error
-	case domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
-	case domain.TargetTypeAsync:
-		go func(ctx context.Context, target Target, info []byte) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
+	case target_domain.TargetTypeCall:
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
+	case target_domain.TargetTypeAsync:
+		go func(ctx context.Context, target target_domain.Target, info []byte) {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, signingKey); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
-		}(context.WithoutCancel(ctx), target, info.GetHTTPRequestBody())
+		}(context.WithoutCancel(ctx), target, body)
 		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
+	}
+}
+
+func payload(ctx context.Context, payload []byte, target target_domain.Target, signerOnce sign.SignerFunc, encrypters *sync.Map) ([]byte, error) {
+	switch target.GetPayloadType() {
+	case target_domain.PayloadTypeUnspecified,
+		target_domain.PayloadTypeJSON:
+		return payload, nil
+	case target_domain.PayloadTypeJWT:
+		return payloadJWT(ctx, payload, signerOnce)
+	case target_domain.PayloadTypeJWE:
+		return payloadJWE(ctx, payload, target, signerOnce, encrypters)
+	default:
+		return payload, nil
+	}
+}
+
+func payloadJWT(ctx context.Context, payload []byte, signerOnce sign.SignerFunc) ([]byte, error) {
+	signer, _, err := signerOnce(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sig, err := signer.Sign(payload)
+	if err != nil {
+		return nil, err
+	}
+	data, err := sig.CompactSerialize()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(data), nil
+}
+
+func loadEncrypter(target target_domain.Target, encrypters *sync.Map) (jose.Encrypter, error) {
+	if encrypter, ok := encrypters.Load(target.GetEncryptionKeyID()); ok {
+		return encrypter.(jose.Encrypter), nil
+	}
+	encryptionKey := target.GetEncryptionKey()
+	if len(encryptionKey) == 0 {
+		return nil, zerrors.ThrowInternal(nil, "EXEC-2n8fhs7g", "Errors.Execution.MissingEncryptionKey")
+	}
+	publicKey, algorithm, err := publicKeyFromBytes(encryptionKey)
+	if err != nil {
+		return nil, err
+	}
+
+	encrypter, err := jose.NewEncrypter(
+		jose.A256GCM,
+		jose.Recipient{
+			Algorithm: algorithm,
+			Key:       publicKey,
+			KeyID:     target.GetEncryptionKeyID(),
+		},
+		(&jose.EncrypterOptions{}).
+			WithType("JWT").
+			WithContentType("JWT"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	encrypters.Store(target.GetEncryptionKeyID(), encrypter)
+	return encrypter, nil
+}
+
+func payloadJWE(
+	ctx context.Context,
+	payload []byte,
+	target target_domain.Target,
+	signerOnce sign.SignerFunc,
+	encrypters *sync.Map,
+) ([]byte, error) {
+	payload, err := payloadJWT(ctx, payload, signerOnce)
+	if err != nil {
+		return nil, err
+	}
+	encrypter, err := loadEncrypter(target, encrypters)
+	if err != nil {
+		return nil, err
+	}
+
+	enc, err := encrypter.Encrypt(payload)
+	if err != nil {
+		return nil, err
+	}
+	crypted, err := enc.CompactSerialize()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(crypted), nil
+}
+
+func publicKeyFromBytes(data []byte) (any, jose.KeyAlgorithm, error) {
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return nil, "", zerrors.ThrowInternal(nil, "EXEC-3n8fhs7g", "Errors.Execution.InvalidPublicKey")
+	}
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, "", err
+	}
+	switch pk := publicKey.(type) {
+	case *rsa.PublicKey:
+		return pk, jose.RSA_OAEP_256, nil
+	case *ecdsa.PublicKey:
+		return pk, jose.ECDH_ES_A256KW, nil
+	default:
+		return nil, "", zerrors.ThrowInternal(nil, "EXEC-NKJe2", "Errors.Execution.InvalidPublicKey")
 	}
 }
 
@@ -157,58 +285,29 @@ type ErrorBody struct {
 	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
 }
 
-type ExecutionTargetsQueries interface {
-	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
-	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
-}
-
-func QueryExecutionTargetsForRequestAndResponse(
+func QueryExecutionTargetsForRequest(
 	ctx context.Context,
-	queries ExecutionTargetsQueries,
 	fullMethod string,
-) ([]Target, []Target) {
+) []target_domain.Target {
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.End()
 
-	targets, err := queries.TargetsByExecutionIDs(ctx,
-		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
-		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
-	)
-	requestTargets := make([]Target, 0, len(targets))
-	responseTargets := make([]Target, 0, len(targets))
-	if err != nil {
-		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
-		return requestTargets, responseTargets
-	}
-
-	for _, target := range targets {
-		if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeRequest)) {
-			requestTargets = append(requestTargets, target)
-		} else if strings.HasPrefix(target.GetExecutionID(), execution.IDAll(domain.ExecutionTypeResponse)) {
-			responseTargets = append(responseTargets, target)
-		}
-	}
-
-	return requestTargets, responseTargets
+	requestTargets, _ := authz.GetInstance(ctx).ExecutionRouter().GetEventBestMatch(execution.ID(domain.ExecutionTypeRequest, fullMethod))
+	return requestTargets
 }
 
-func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {
-	return []string{execution.ID(executionType, fullMethod), execution.ID(executionType, serviceFromFullMethod(fullMethod)), execution.IDAll(executionType)}
+func QueryExecutionTargetsForResponse(
+	ctx context.Context,
+	fullMethod string,
+) []target_domain.Target {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	responseTargets, _ := authz.GetInstance(ctx).ExecutionRouter().GetEventBestMatch(execution.ID(domain.ExecutionTypeResponse, fullMethod))
+	return responseTargets
 }
 
-func serviceFromFullMethod(s string) string {
-	parts := strings.Split(s, "/")
-	return parts[1]
-}
-
-func QueryExecutionTargetsForFunction(ctx context.Context, query ExecutionTargetsQueries, function string) ([]Target, error) {
-	queriedActionsV2, err := query.TargetsByExecutionID(ctx, []string{function})
-	if err != nil {
-		return nil, err
-	}
-	executionTargets := make([]Target, len(queriedActionsV2))
-	for i, action := range queriedActionsV2 {
-		executionTargets[i] = action
-	}
-	return executionTargets, nil
+func QueryExecutionTargetsForFunction(ctx context.Context, function string) []target_domain.Target {
+	executionTargets, _ := authz.GetInstance(ctx).ExecutionRouter().GetEventBestMatch(function)
+	return executionTargets
 }

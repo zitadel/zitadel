@@ -61,10 +61,10 @@ We understand that these advisories may include breaking changes, and we aim to 
       Since Angular Material v15 many of the UI components have been refactored
       to be based on the official Material Design Components for Web (MDC).
       These refactored components do not support dynamic styling, so in order to
-      keep the library up-to-date, the console UI will loose its dynamic theming
+      keep the library up-to-date, the management console UI will loose its dynamic theming
       capability. If you need users to have your branding settings (background-,
       button-, link and text coloring) you should implement your own user
-      facing UI yourself and not use ZITADELs console UI.
+      facing UI yourself and not use ZITADELs management console UI.
       ZITADEL hosted Login-UI is not affected by this change.
     </td>
     <td>2.40.0</td>
@@ -90,10 +90,10 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>
       <a href="./advisory/a10004">A-10004</a>
     </td>
-    <td>Sequence uniquenes</td>
+    <td>Sequence uniqueness</td>
     <td>Breaking Behavior Change</td>
     <td>
-      Due to storage optimisations ZITADEL changes the behavior of sequences.
+      Due to storage optimizations ZITADEL changes the behavior of sequences.
       This change improves command (create, update, delete) performance of ZITADEL.
       Sequences are no longer unique inside an instance.
       From now on sequences are upcounting per aggregate id. 
@@ -111,7 +111,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Expected downtime during upgrade</td>
     <td>
       Migrating to versions &gt;= 2.39 from &lt; 2.39 will cause down time during setup starts and the new version is started.
-      This is caused by storage optimisations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
+      This is caused by storage optimizations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
       All existing events are migrated during the execution of the `zitadel setup` command.
       New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
     </td>
@@ -194,7 +194,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>
       <a href="./advisory/a10012">A-10012</a>
     </td>
-    <td>Tncreased transaction duration for projections</td>
+    <td>Increased transaction duration for projections</td>
     <td>Breaking Behavior Change</td>
     <td>
         In version 2.63.0 we've increased the transaction duration for projections to resolve outdated projections or dead-locks.

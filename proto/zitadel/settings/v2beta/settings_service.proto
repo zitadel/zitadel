@@ -25,7 +25,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Settings Service";
     version: "2.0-beta";
-    description: "This API is intended to manage settings in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage settings in a Zitadel instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -48,7 +48,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -61,8 +61,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -109,9 +109,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// Deprecated: use settings service v2 instead. This service will be removed in the next major version of ZITADEL.
 service SettingsService {
 
   // Get basic information over the instance
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings"
@@ -124,6 +127,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get basic information over the instance";
       description: "Return the basic information of the instance for the requested context"
       responses: {
@@ -136,6 +140,8 @@ service SettingsService {
   }
 
   // Get the login settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/login"
@@ -148,6 +154,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the login settings";
       description: "Return the settings for the requested context"
       responses: {
@@ -160,6 +167,8 @@ service SettingsService {
   }
 
   // Get the current active identity providers
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/login/idps"
@@ -172,6 +181,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the current active identity providers";
       description: "Return the current active identity providers for the requested context"
       responses: {
@@ -184,6 +194,8 @@ service SettingsService {
   }
 
   // Get the password complexity settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/password/complexity"
@@ -196,6 +208,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the password complexity settings";
       description: "Return the password complexity settings for the requested context"
       responses: {
@@ -208,6 +221,8 @@ service SettingsService {
   }
 
   // Get the password expiry settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetPasswordExpirySettings (GetPasswordExpirySettingsRequest) returns (GetPasswordExpirySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/password/expiry"
@@ -220,6 +235,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the password expiry settings";
       description: "Return the password expiry settings for the requested context"
       responses: {
@@ -232,6 +248,8 @@ service SettingsService {
   }
 
   // Get the current active branding settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/branding"
@@ -244,6 +262,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the current active branding settings";
       description: "Return the current active branding settings for the requested context"
       responses: {
@@ -256,6 +275,8 @@ service SettingsService {
   }
 
   // Get the domain settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/domain"
@@ -268,6 +289,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the domain settings";
       description: "Return the domain settings for the requested context"
       responses: {
@@ -280,6 +302,8 @@ service SettingsService {
   }
 
   // Get the legal and support settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/legal_support"
@@ -292,6 +316,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the legal and support settings";
       description: "Return the legal settings for the requested context"
       responses: {
@@ -304,6 +329,8 @@ service SettingsService {
   }
 
   // Get the lockout settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/lockout"
@@ -316,6 +343,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get the lockout settings";
       description: "Return the lockout settings for the requested context, which define when a user will be locked"
       responses: {
@@ -328,6 +356,8 @@ service SettingsService {
   }
 
 // Get the security settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
     option (google.api.http) = {
       get: "/v2beta/settings/security";
@@ -340,12 +370,15 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get Security Settings";
-      description: "Returns the security settings of the ZITADEL instance."
+      description: "Returns the security settings of the Zitadel instance."
     };
   }
 
 // Set the security settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
       put: "/v2beta/policies/security";
@@ -359,12 +392,15 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Set Security Settings";
-      description: "Set the security settings of the ZITADEL instance."
+      description: "Set the security settings of the Zitadel instance."
     };
   }
 
   // Set Organization Settings
+  //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Sets the settings specific to an organization.
   // Organization scopes usernames defines that the usernames have to be unique in the organization scope, can only be changed if the usernames of the users are unique in the scope.
@@ -373,6 +409,7 @@ service SettingsService {
   //   - `iam.policy.write`
   rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -395,12 +432,15 @@ service SettingsService {
 
   // Delete Organization Settings
   //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Delete the settings specific to an organization.
   //
   // Required permissions:
   //   - `iam.policy.delete`
   rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -423,6 +463,8 @@ service SettingsService {
 
   // List Organization Settings
   //
+  // Deprecated: please move to the corresponding endpoint under settings service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns a list of organization settings.
   //
   // Required permission:
@@ -441,6 +483,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {

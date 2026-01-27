@@ -166,6 +166,11 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err := setOrgID(ctx, repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
+	if request.UserID != "" && request.UserOrgID == "" {
+		if err := repo.selectUser(ctx, request, request.UserID); err != nil {
+			return nil, err
+		}
+	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.WithFields("login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Info("login hint invalid")
@@ -350,6 +355,13 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, 
 			return zerrors.ThrowNotFound(nil, "AUTH-2d3f4", "Errors.UserSession.NotFound")
 		}
 	}
+	if err := repo.selectUser(ctx, request, userID); err != nil {
+		return err
+	}
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) selectUser(ctx context.Context, request *domain.AuthRequest, userID string) error {
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
 	if err != nil {
 		return err
@@ -362,7 +374,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, 
 		username = user.PreferredLoginName
 	}
 	request.SetUserInfo(user.ID, username, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
-	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	return nil
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -458,6 +470,16 @@ func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, reso
 		return err
 	}
 	return repo.Command.HumanCheckOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) VerifyMFARecoveryCode(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckRecoveryCode(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
@@ -611,9 +633,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		return err
 	}
 	if len(metadatas) > 0 {
-		// user context necessary due to permission check in command
-		userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: request.UserID, OrgID: request.UserOrgID})
-		_, err := repo.Command.BulkSetUserMetadata(userCtx, request.UserID, request.UserOrgID, metadatas...)
+		_, err := repo.Command.BulkSetUserMetadata(ctx, request.UserID, request.UserOrgID, nil, metadatas...)
 		if err != nil {
 			return err
 		}
@@ -1126,7 +1146,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
-	expired := passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	var expired bool
+	if isInternalLogin && user.PasswordSet {
+		expired = passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	}
 	if expired || user.PasswordChangeRequired {
 		steps = append(steps, &domain.ChangePasswordStep{Expired: expired})
 	}
@@ -1643,6 +1666,8 @@ var (
 		user_repo.UserIDPLoginCheckSucceededType,
 		user_repo.HumanMFAOTPCheckSucceededType,
 		user_repo.HumanMFAOTPCheckFailedType,
+		user_repo.HumanRecoveryCodeCheckSucceededType,
+		user_repo.HumanRecoveryCodeCheckFailedType,
 		user_repo.HumanSignedOutType,
 		user_repo.HumanPasswordlessTokenCheckSucceededType,
 		user_repo.HumanPasswordlessTokenCheckFailedType,
@@ -1692,6 +1717,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.UserIDPLoginCheckSucceededType,
 			user_repo.HumanMFAOTPCheckSucceededType,
 			user_repo.HumanMFAOTPCheckFailedType,
+			user_repo.HumanRecoveryCodeCheckSucceededType,
+			user_repo.HumanRecoveryCodeCheckFailedType,
 			user_repo.HumanSignedOutType,
 			user_repo.HumanPasswordlessTokenCheckSucceededType,
 			user_repo.HumanPasswordlessTokenCheckFailedType,

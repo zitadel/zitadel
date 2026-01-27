@@ -11,11 +11,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetSystemFeatures(t *testing.T) {
+	t.Parallel()
+
 	aggregate := feature_v2.NewAggregate("SYSTEM", "SYSTEM")
 
 	type args struct {
@@ -50,7 +53,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
@@ -68,7 +71,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
@@ -86,7 +89,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemEnableBackChannelLogout, true,
 					),
@@ -102,17 +105,21 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, true,
+					),
+					feature_v2.NewSetEvent(
+						context.Background(), aggregate,
+						feature_v2.SystemEnableRelationalTables, true,
 					),
 				),
 			),
@@ -120,6 +127,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(true),
+				EnableRelationalTables:         gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -130,7 +138,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				// throw in some set events, reset and set again.
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -138,21 +146,21 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, false,
 					),
@@ -170,6 +178,8 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			c := &Commands{
 				eventstore: tt.eventstore(t),
 			}
@@ -199,7 +209,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -214,7 +224,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "success",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -231,7 +241,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "no change after previous reset",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -263,6 +273,35 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			got, err := c.ResetSystemFeatures(context.Background())
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestSystemFeatures_isEmpty(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		sysFeatures *SystemFeatures
+		want        bool
+	}{
+		{name: "nil features", sysFeatures: nil, want: true},
+		{name: "empty features", sysFeatures: &SystemFeatures{}, want: true},
+		{name: "LoginDefaultOrg set", sysFeatures: &SystemFeatures{LoginDefaultOrg: gu.Ptr(true)}, want: false},
+		{name: "UserSchema set", sysFeatures: &SystemFeatures{UserSchema: gu.Ptr(true)}, want: false},
+		{name: "TokenExchange set", sysFeatures: &SystemFeatures{TokenExchange: gu.Ptr(true)}, want: false},
+		{name: "ImprovedPerformance set", sysFeatures: &SystemFeatures{ImprovedPerformance: []feature.ImprovedPerformanceType{}}, want: false},
+		{name: "OIDCSingleV1SessionTermination set", sysFeatures: &SystemFeatures{OIDCSingleV1SessionTermination: gu.Ptr(true)}, want: false},
+		{name: "EnableBackChannelLogout set", sysFeatures: &SystemFeatures{EnableBackChannelLogout: gu.Ptr(true)}, want: false},
+		{name: "LoginV2 set", sysFeatures: &SystemFeatures{LoginV2: &feature.LoginV2{}}, want: false},
+		{name: "PermissionCheckV2 set", sysFeatures: &SystemFeatures{PermissionCheckV2: gu.Ptr(true)}, want: false},
+		{name: "EnableRelationalTables set", sysFeatures: &SystemFeatures{EnableRelationalTables: gu.Ptr(true)}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := tt.sysFeatures.isEmpty()
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

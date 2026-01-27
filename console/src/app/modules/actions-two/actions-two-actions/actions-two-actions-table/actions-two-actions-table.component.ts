@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Inp
 import { combineLatestWith, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-two-add-action-dialog.component';
 
@@ -11,6 +11,7 @@ import { CorrectlyTypedExecution } from '../../actions-two-add-action/actions-tw
   templateUrl: './actions-two-actions-table.component.html',
   styleUrls: ['./actions-two-actions-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsTableComponent {
   @Output()

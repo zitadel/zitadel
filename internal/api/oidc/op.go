@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -21,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -108,6 +108,7 @@ func NewServer(
 	query *query.Queries,
 	repo repository.Repository,
 	encryptionAlg crypto.EncryptionAlgorithm,
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
@@ -162,6 +163,7 @@ func NewServer(
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
 		encAlg:                     encryptionAlg,
+		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
 		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(),
 	}
@@ -171,7 +173,8 @@ func NewServer(
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("oidc"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,

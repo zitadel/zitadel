@@ -1,5 +1,5 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
 import localeCs from '@angular/common/locales/cs';
@@ -20,7 +20,9 @@ import localeHu from '@angular/common/locales/hu';
 import localeKo from '@angular/common/locales/ko';
 import localeRo from '@angular/common/locales/ro';
 import localeTr from '@angular/common/locales/tr';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import localeUk from '@angular/common/locales/uk';
+import localeAr from '@angular/common/locales/ar';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -74,6 +76,10 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
 import { PosthogService } from './services/posthog.service';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { provideNgIconsConfig } from '@ng-icons/core';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -115,6 +121,10 @@ registerLocaleData(localeRo);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ro.json'));
 registerLocaleData(localeTr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/tr.json'));
+registerLocaleData(localeUk);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/uk.json'));
+registerLocaleData(localeAr);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ar.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -143,8 +153,11 @@ const authConfig: AuthConfig = {
 
 @NgModule({
   declarations: [AppComponent],
+  bootstrap: [AppComponent],
+  exports: [],
   imports: [
     AppRoutingModule,
+
     CommonModule,
     BrowserModule,
     HeaderModule,
@@ -160,7 +173,6 @@ const authConfig: AuthConfig = {
     HasRoleModule,
     InfoOverlayModule,
     BrowserAnimationsModule,
-    HttpClientModule,
     MatIconModule,
     MatTooltipModule,
     FooterModule,
@@ -171,23 +183,20 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
+    CdkOverlayOrigin,
   ],
   providers: [
     ThemeService,
     EnvironmentService,
     ExhaustedService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFn,
-      multi: true,
-      deps: [GrpcService],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: stateHandlerFn,
-      multi: true,
-      deps: [StatehandlerService],
-    },
+    provideAppInitializer(() => {
+      const initializerFn = appInitializerFn(inject(GrpcService));
+      return initializerFn();
+    }),
+    provideAppInitializer(() => {
+      const initializerFn = stateHandlerFn(inject(StatehandlerService));
+      return initializerFn();
+    }),
     {
       provide: AuthConfig,
       useValue: authConfig,
@@ -245,8 +254,12 @@ const authConfig: AuthConfig = {
     LanguagesService,
     PosthogService,
     { provide: 'windowObject', useValue: window },
+    provideTanStackQuery(new QueryClient(), withDevtools()),
+    provideNgIconsConfig({
+      size: '1rem',
+    }),
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {
   constructor() {}

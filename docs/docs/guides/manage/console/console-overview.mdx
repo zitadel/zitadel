@@ -1,0 +1,57 @@
+---
+title: Management Console
+sidebar_label: Management Console
+---
+
+## Overview
+
+The ZITADEL Management Console is the web-based Dashboard UI designed to facilitate the management and administration of ZITADEL resources and configurations. It serves as a central hub where [Managers](/docs/concepts/structure/managers) can perform tasks related to identity and access management, configure authentication methods, and manage the organization's infrastructure.
+
+While the Management Console is primarily a tool for administrators, it can also be accessed by end-users to manage their own profiles (e.g., password reset, MFA setup), unless you [restrict access](/docs/guides/solution-scenarios/restrict-console) to build your own custom UI.
+
+## Accessing the Management Console
+
+The management console is available by navigating to the [Custom Domain](/docs/concepts/features/custom-domain) of your instance and appending the path `/ui/console`.
+
+## Navigation and Context
+
+When logged in, you are greeted by the home page, which allows you to set shortcuts to frequently used settings and projects.
+
+### Context Switcher
+ZITADEL is a multi-tenant system. The Management Console features a **Context Switcher** in the **top-left** corner. This allows you to switch between the different **Organizations** you manage.
+
+Depending on your use case:
+* **B2C:** You might stick to your global organization.
+* **B2B:** You will frequently switch between multiple organizations to manage specific customer settings.
+
+<img
+  src="/docs/img/guides/console/contextswitcher.png"
+  alt="Context switcher"
+  width="400px"
+/>
+
+To understand how to structure your organizations, read our [Solution Scenario](/docs/guides/solution-scenarios/configurations) guides.
+
+## Key Capabilities
+
+The Management Console enables administrators to perform the following critical tasks:
+
+1.  **Default Settings:** Managers can configure global system defaults. This includes authentication methods, security policies (like password complexity or lockout policies), and other system-wide parameters.
+2.  **Resource Management:** Create, update, and delete essential resources such as [Organizations](./organizations-overview), [Projects](./projects-overview), and [Applications](./applications-overview).
+3.  **User Management:** Manage the lifecycle of [User accounts](./users-overview). This includes creating new users, updating profiles, resetting passwords, and deactivating accounts.
+4.  **Access Control:** Define and manage permissions. Administrators can assign [Roles](/docs/guides/manage/console/roles) to users and configure fine-grained access controls for specific resources.
+5.  **Manager Assignment:** Delegate administrative tasks by assigning **Administrator** roles (e.g., Org Owner, Project Owner) to specific users, ensuring proper oversight and segregation of duties.
+6.  **Customization and Branding:** Customize the look and feel of ZITADEL. You can upload custom logos, select color schemes, and apply [branding](/docs/guides/manage/customize/branding) to match your corporate identity.
+7.  **Audit Logging:** Access [Audit Logs](/docs/concepts/features/audit-trail) to track user activity and configuration changes. This is essential for monitoring security events and maintaining regulatory compliance.
+
+## Security and Restrictions
+
+### Prevent Management Console Access
+In many implementations, specifically white-label B2C scenarios, you may want to prevent end-users from accessing the generic ZITADEL Management Console entirely.
+
+Administrators can restrict access to the management console, forcing users to interact only with your own applications or custom user interfaces.
+Please follow the [Restrict Management Console Access guide](/docs/guides/solution-scenarios/restrict-console) to achieve this.
+
+## References
+
+* [Administrator Roles Concept](/docs/concepts/structure/managers)

@@ -430,7 +430,7 @@ func (h *AddHuman) ensureDisplayName() {
 // - and either:
 //   - have no verified email
 //     and / or
-//   - have no authentication method (password / passwordless)
+//   - have no authentication method (password / passkey)
 func (h *AddHuman) shouldAddInitCode() bool {
 	return len(h.Links) == 0 &&
 		(!h.Email.Verified ||

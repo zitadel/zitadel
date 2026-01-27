@@ -30,7 +30,7 @@ import (
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
@@ -190,6 +190,10 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeCustomUserGroups:
+			setUserInfoCustomUserGroups(user.UserGroups, out)
+		case ScopeUserGroups:
+			setUserInfoUserGroups(user.UserGroups, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -287,12 +291,28 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
+func setUserInfoCustomUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	out.AppendClaims(ClaimCustomUserGroups, userGroups)
+}
+
+func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
+	if len(userGroups) == 0 {
+		return
+	}
+	groups := make([]string, len(userGroups))
+	for i, userGroup := range userGroups {
+		groups[i] = userGroup.Name
+	}
+	out.AppendClaims(ClaimUserGroups, groups)
+}
+
 //nolint:gocognit
 func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: userInfo.Subject, ResourceOwner: qu.User.ResourceOwner})
 
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
@@ -388,7 +408,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 							Key:   key,
 							Value: value,
 						}
-						if _, err = s.command.SetUserMetadata(userCtx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+						if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -429,10 +449,8 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	if function == "" {
 		return nil
 	}
-	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, s.query, function)
-	if err != nil {
-		return err
-	}
+
+	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
 	info := &ContextInfo{
 		Function:     function,
 		UserInfo:     userInfo,
@@ -443,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey)
 	if err != nil {
 		return err
 	}
@@ -453,7 +471,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	}
 	claimLogs := make([]string, 0)
 	for _, metadata := range contextInfoResponse.SetUserMetadata {
-		if _, err = s.command.SetUserMetadata(userCtx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
 			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}

@@ -41,20 +41,20 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type contextRequest struct {
-	Request *addHumanUserRequestWrapper `json:"request"`
+	Request *createUserRequestWrapper `json:"request"`
 }
 
-// addHumanUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
-type addHumanUserRequestWrapper struct {
-	user.AddHumanUserRequest
+// createUserRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type createUserRequestWrapper struct {
+	user.CreateUserRequest
 }
 
-func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
+func (r *createUserRequestWrapper) MarshalJSON() ([]byte, error) {
 	data, err := protojson.Marshal(r)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (r *addHumanUserRequestWrapper) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-func (r *addHumanUserRequestWrapper) UnmarshalJSON(data []byte) error {
+func (r *createUserRequestWrapper) UnmarshalJSON(data []byte) error {
 	return protojson.Unmarshal(data, r)
 }
 
@@ -82,14 +82,17 @@ func call(w http.ResponseWriter, req *http.Request) {
 	if err := json.Unmarshal(sentBody, request); err != nil {
 		http.Error(w, "error", http.StatusInternalServerError)
 	}
-    
+
 	// build the response from the received request
 	response := request.Request
 	// manipulate the request to send back as response
-	if response.Metadata == nil {
-		response.Metadata = make([]*user.SetMetadataEntry, 0)
+	metadata := response.GetHuman().GetMetadata()
+	if metadata == nil {
+		metadata = make([]*user.Metadata, 0)
 	}
-	response.Metadata = append(response.Metadata, &user.SetMetadataEntry{Key: "organization", Value: []byte("company")})
+	metadata = append(metadata, &user.Metadata{Key: "organization", Value: []byte("dunder mifflin")})
+
+	response.GetHuman().Metadata = metadata
 
 	// marshal the request into json
 	data, err := json.Marshal(response)
@@ -113,6 +116,12 @@ func main() {
 
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
@@ -120,7 +129,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -143,14 +152,14 @@ To call the target just created before, with the intention to manipulate the req
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
@@ -161,21 +170,31 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "344648897353810062",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
@@ -184,21 +203,35 @@ Your server should now manipulate the request to something like the following. C
 the [Sent information Request](./usage#sent-information-request) payload description.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "344648897353810062",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        },
+        "metadata":
+        [
+            {
+                "key": "organization",
+                "value": "ZHVuZGVyIG1pZmZsaW4="
+            }
+        ]
     }
-    "metadata": [
-        {"key": "organization", "value": "Y29tcGFueQ=="}
-    ]
 }'
 ```
 

@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
+import { Condition } from '@zitadel/proto/zitadel/action/v2/execution_pb';
 
 @Pipe({
   name: 'condition',
+  standalone: false,
 })
 export class ActionConditionPipe implements PipeTransform {
   transform(condition?: Condition): string {

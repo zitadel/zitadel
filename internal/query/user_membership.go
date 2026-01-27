@@ -90,6 +90,10 @@ func NewMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnGrantedOrgID, id, TextEquals)
 }
 
+func NewMembershipNotGrantedSearchQuery() (SearchQuery, error) {
+	return NewIsNullQuery(ProjectGrantColumnGrantedOrgID)
+}
+
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
 }
@@ -100,6 +104,10 @@ func NewMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
 
 func NewMembershipIsIAMQuery() (SearchQuery, error) {
 	return NewNotNullQuery(InstanceMemberIAMID)
+}
+
+func NewMembershipRoleQuery(role string) (SearchQuery, error) {
+	return NewTextQuery(membershipRoles, role, TextListContains)
 }
 
 func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

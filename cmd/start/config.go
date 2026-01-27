@@ -1,12 +1,16 @@
 package start
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -34,12 +38,10 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/serviceping"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
-	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
-	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
-	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
 
 type Config struct {
+	Instrumentation     instrumentation.Config
 	Log                 *logging.Config
 	Port                uint16
 	ExternalPort        uint16
@@ -53,9 +55,9 @@ type Config struct {
 	WebAuthNName        string
 	Database            database.Config
 	Caches              *connector.CachesConfig
-	Tracing             tracing.Config
-	Metrics             metrics.Config
-	Profiler            profiler.Config
+	Tracing             *instrumentation.LegacyTraceConfig
+	Metrics             *instrumentation.LegacyMetricConfig
+	Profiler            *instrumentation.LegacyProfileConfig
 	Projections         projection.Config
 	Notifications       handlers.WorkerConfig
 	Executions          execution.WorkerConfig
@@ -93,7 +95,44 @@ type QuotasConfig struct {
 	Execution *logstore.EmitterConfig
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
+	config, err := readConfig(v)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to read config: %w", err)
+	}
+
+	config.Instrumentation.Trace.SetLegacyConfig(config.Tracing)
+	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	config.Instrumentation.Profile.SetLegacyConfig(config.Profiler)
+	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
+	}
+
+	// Legacy logger
+	err = config.Log.SetLogger()
+	if err != nil {
+		err = errors.Join(err, shutdown(ctx))
+		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
+	}
+
+	id.Configure(config.Machine)
+	if config.Actions != nil {
+		actions.SetHTTPConfig(&config.Actions.HTTP)
+	}
+
+	err = config.SystemDefaults.Validate()
+	if err != nil {
+		err = errors.Join(err, shutdown(ctx))
+		return nil, nil, fmt.Errorf("system defaults config invalid: %w", err)
+	}
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
+
+	return config, shutdown, nil
+}
+
+func readConfig(v *viper.Viper) (*Config, error) {
 	config := new(Config)
 
 	err := v.Unmarshal(config,
@@ -115,27 +154,5 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read config")
-
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
-	err = config.Tracing.NewTracer()
-	logging.OnError(err).Fatal("unable to set tracer")
-
-	err = config.Metrics.NewMeter()
-	logging.OnError(err).Fatal("unable to set meter")
-
-	err = config.Profiler.NewProfiler()
-	logging.OnError(err).Fatal("unable to set profiler")
-
-	id.Configure(config.Machine)
-	if config.Actions != nil {
-		actions.SetHTTPConfig(&config.Actions.HTTP)
-	}
-
-	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
-	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
-
-	return config
+	return config, err
 }

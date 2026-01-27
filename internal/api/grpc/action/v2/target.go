@@ -2,6 +2,8 @@ package action
 
 import (
 	"context"
+	"strings"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
@@ -9,8 +11,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
@@ -64,20 +66,74 @@ func (s *Server) DeleteTarget(ctx context.Context, req *connect.Request[action.D
 	}), nil
 }
 
+func (s *Server) AddPublicKey(ctx context.Context, req *connect.Request[action.AddPublicKeyRequest]) (*connect.Response[action.AddPublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	var expirationDate time.Time
+	if req.Msg.GetExpirationDate() != nil {
+		expirationDate = req.Msg.GetExpirationDate().AsTime()
+	}
+	key := &command.TargetPublicKey{
+		TargetID:   strings.TrimSpace(req.Msg.GetTargetId()),
+		PublicKey:  req.Msg.GetPublicKey(),
+		Expiration: expirationDate,
+	}
+	creationDate, err := s.command.AddTargetPublicKey(ctx, key, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.AddPublicKeyResponse{
+		KeyId:        key.KeyID,
+		CreationDate: timestamppb.New(creationDate),
+	}), nil
+}
+
+func (s *Server) ActivatePublicKey(ctx context.Context, req *connect.Request[action.ActivatePublicKeyRequest]) (*connect.Response[action.ActivatePublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	changeDate, err := s.command.ActivateTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.ActivatePublicKeyResponse{
+		ChangeDate: timestamppb.New(changeDate),
+	}), nil
+}
+
+func (s *Server) DeactivatePublicKey(ctx context.Context, req *connect.Request[action.DeactivatePublicKeyRequest]) (*connect.Response[action.DeactivatePublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	changeDate, err := s.command.DeactivateTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.DeactivatePublicKeyResponse{
+		ChangeDate: timestamppb.New(changeDate),
+	}), nil
+}
+
+func (s *Server) RemovePublicKey(ctx context.Context, req *connect.Request[action.RemovePublicKeyRequest]) (*connect.Response[action.RemovePublicKeyResponse], error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	deletionDate, err := s.command.RemoveTargetPublicKey(ctx, strings.TrimSpace(req.Msg.GetTargetId()), strings.TrimSpace(req.Msg.GetKeyId()), instanceID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.RemovePublicKeyResponse{
+		DeletionDate: timestamppb.New(deletionDate),
+	}), nil
+}
+
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 	var (
-		targetType       domain.TargetType
+		targetType       target_domain.TargetType
 		interruptOnError bool
 	)
 	switch t := req.GetTargetType().(type) {
 	case *action.CreateTargetRequest_RestWebhook:
-		targetType = domain.TargetTypeWebhook
+		targetType = target_domain.TargetTypeWebhook
 		interruptOnError = t.RestWebhook.InterruptOnError
 	case *action.CreateTargetRequest_RestCall:
-		targetType = domain.TargetTypeCall
+		targetType = target_domain.TargetTypeCall
 		interruptOnError = t.RestCall.InterruptOnError
 	case *action.CreateTargetRequest_RestAsync:
-		targetType = domain.TargetTypeAsync
+		targetType = target_domain.TargetTypeAsync
 	}
 	return &command.AddTarget{
 		Name:             req.GetName(),
@@ -85,6 +141,22 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 		Endpoint:         req.GetEndpoint(),
 		Timeout:          req.GetTimeout().AsDuration(),
 		InterruptOnError: interruptOnError,
+		PayloadType:      payloadTypeToDomain(req.GetPayloadType()),
+	}
+}
+
+func payloadTypeToDomain(payloadType action.PayloadType) target_domain.PayloadType {
+	switch payloadType {
+	case action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED:
+		return target_domain.PayloadTypeUnspecified
+	case action.PayloadType_PAYLOAD_TYPE_JSON:
+		return target_domain.PayloadTypeJSON
+	case action.PayloadType_PAYLOAD_TYPE_JWT:
+		return target_domain.PayloadTypeJWT
+	case action.PayloadType_PAYLOAD_TYPE_JWE:
+		return target_domain.PayloadTypeJWE
+	default:
+		return target_domain.PayloadTypeUnspecified
 	}
 }
 
@@ -102,17 +174,18 @@ func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarge
 		Name:                 req.Name,
 		Endpoint:             req.Endpoint,
 		ExpirationSigningKey: expirationSigningKey,
+		PayloadType:          payloadTypeToDomain(req.GetPayloadType()),
 	}
 	if req.TargetType != nil {
 		switch t := req.GetTargetType().(type) {
 		case *action.UpdateTargetRequest_RestWebhook:
-			target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeWebhook)
 			target.InterruptOnError = gu.Ptr(t.RestWebhook.InterruptOnError)
 		case *action.UpdateTargetRequest_RestCall:
-			target.TargetType = gu.Ptr(domain.TargetTypeCall)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeCall)
 			target.InterruptOnError = gu.Ptr(t.RestCall.InterruptOnError)
 		case *action.UpdateTargetRequest_RestAsync:
-			target.TargetType = gu.Ptr(domain.TargetTypeAsync)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeAsync)
 			target.InterruptOnError = gu.Ptr(false)
 		}
 	}

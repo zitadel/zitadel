@@ -10,8 +10,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/codes"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	_ "github.com/zitadel/zitadel/internal/statik"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -75,7 +75,10 @@ func RegisterGrpcTotalRequestCounter(ctx context.Context) {
 }
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, path string, err error) {
-	statusCode := connect.CodeOf(err)
+	statusCode := connect.Code(codes.OK)
+	if err != nil {
+		statusCode = connect.CodeOf(err)
+	}
 	var labels = map[string]attribute.Value{
 		GrpcMethod: attribute.StringValue(path),
 		ReturnCode: attribute.IntValue(runtime.HTTPStatusFromCode(codes.Code(statusCode))),

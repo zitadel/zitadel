@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -11,18 +11,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const { loginName, organization, userId } = searchParams;
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
-  const sessionFactors = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: { loginName, organization },
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
   }).catch((error) => {
     console.warn("Error loading session:", error);
   });
@@ -33,9 +29,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     throw Error("Failed to get user id");
   }
 
-  const userResponse = await getUserByID({
-    serviceUrl,
-    userId: id,
+  const userResponse = await getUserByID({ serviceConfig, userId: id,
   });
 
   let user: User | undefined;
@@ -50,7 +44,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="successTitle" namespace="verify" />
         </h1>
@@ -67,14 +61,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           ></UserAvatar>
         ) : (
           user && (
-            <UserAvatar
-              loginName={user.preferredLoginName}
-              displayName={human?.profile?.displayName}
-              showDropdown={false}
-            />
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
           )
         )}
       </div>
+      <div className="w-full"></div>
     </DynamicTheme>
   );
 }

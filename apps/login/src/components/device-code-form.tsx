@@ -20,7 +20,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       userCode: userCode || "",
     },
@@ -66,7 +66,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             type="text"
             autoComplete="one-time-code"
             {...register("userCode", { required: t("usercode.required.code") })}
-            label="Code"
+            label={t("usercode.labels.code")}
             data-testid="code-text-input"
           />
         </div>
@@ -88,8 +88,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             onClick={handleSubmit(submitCodeAndContinue)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-            <Translated i18nKey="verify.submit" namespace="verify" />
+            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="usercode.submit" namespace="device" />
           </Button>
         </div>
       </form>

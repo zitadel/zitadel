@@ -9,7 +9,8 @@ import (
 
 	"github.com/riverqueue/river"
 
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/crypto"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
@@ -17,7 +18,10 @@ type Worker struct {
 	river.WorkerDefaults[*exec_repo.Request]
 
 	config WorkerConfig
-	now    nowFunc
+	now    NowFunc
+
+	targetEncAlg     crypto.EncryptionAlgorithm
+	activeSigningKey GetActiveSigningWebKey
 }
 
 // Timeout implements the Timeout-function of [river.Worker].
@@ -42,7 +46,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args))
+	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey)
 	if err != nil {
 		// If there is an error returned from the targets, it means that the execution was interrupted
 		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
@@ -50,8 +54,8 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 	return nil
 }
 
-// nowFunc makes [time.Now] mockable
-type nowFunc func() time.Time
+// NowFunc makes [time.Now] mockable
+type NowFunc func() time.Time
 
 type WorkerConfig struct {
 	Workers             uint8
@@ -61,10 +65,15 @@ type WorkerConfig struct {
 
 func NewWorker(
 	config WorkerConfig,
+	targetEncAlg crypto.EncryptionAlgorithm,
+	activeSigningKey GetActiveSigningWebKey,
+	now NowFunc,
 ) *Worker {
 	return &Worker{
-		config: config,
-		now:    time.Now,
+		config:           config,
+		now:              now,
+		targetEncAlg:     targetEncAlg,
+		activeSigningKey: activeSigningKey,
 	}
 }
 
@@ -77,14 +86,10 @@ func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueC
 	}
 }
 
-func TargetsFromRequest(e *exec_repo.Request) ([]Target, error) {
-	var execTargets []*query.ExecutionTarget
-	if err := json.Unmarshal(e.TargetsData, &execTargets); err != nil {
+func TargetsFromRequest(e *exec_repo.Request) ([]target_domain.Target, error) {
+	var targets []target_domain.Target
+	if err := json.Unmarshal(e.TargetsData, &targets); err != nil {
 		return nil, err
-	}
-	targets := make([]Target, len(execTargets))
-	for i, target := range execTargets {
-		targets[i] = target
 	}
 	return targets, nil
 }

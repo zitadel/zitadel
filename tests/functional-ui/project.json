@@ -1,0 +1,56 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "run-db": {
+      "continuous": true,
+      "description": "Runs a local ephemeral Postgres database for functional UI (Console) tests.",
+      "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
+    },
+    "run-api": {
+      "description": "Sets up and runs the Zitadel API with the embedded Management Console against which the functional UI tests are run.",
+      "continuous": true,
+      "dependsOn": [
+        "@zitadel/api:build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run @zitadel/api:prod:test-functional-ui --excludeTaskDependencies"
+      }
+    },
+    "open": {
+      "description": "Opens the Cypress Test Runner for interactive testing.",
+      "continuous": true,
+      "dependsOn": [
+        "@zitadel/console:dev",
+        "run-db",
+        "run-api"
+      ]
+    },
+    "test": {
+      "description": "Runs the functional UI (Console) tests against a Zitadel API and a specified browser. Pass an installed browser as an argument, like --browser electron. The 'electron' browser should always be available.",
+      "dependsOn": [
+        "run-db",
+        "run-api"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "cwd": "{projectRoot}",
+        "commands": [
+          "cypress install",
+          "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${CYPRESS_BACKEND_URL}/debug/ready\"",
+          "DISPLAY='' cypress run",
+          "nx run @zitadel/functional-ui:stop"
+        ]
+      },
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "stop": {
+      "description": "Stops the local Postgres database used for functional UI (Console) tests.",
+      "command": "nx run @zitadel/devcontainer:compose down --volumes db-functional-ui"
+    }
+  }
+}

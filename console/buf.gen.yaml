@@ -9,6 +9,6 @@ plugins:
   - plugin: buf.build/grpc/web:v1.5.0
     out: src/app/proto/generated
     opt: import_style=typescript,mode=grpcweb
-  - plugin: buf.build/grpc-ecosystem/openapiv2
+  - plugin: buf.build/grpc-ecosystem/openapiv2:v2.27.4
     out: src/app/proto/generated
     opt: allow_delete_body

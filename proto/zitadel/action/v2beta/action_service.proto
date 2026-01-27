@@ -23,7 +23,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
     version: "2.0-beta";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage custom executions (previously known as actions) in a Zitadel instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -59,8 +59,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -109,17 +109,18 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 // Service to manage custom executions.
 // The service provides methods to create, update, delete and list targets and executions.
+//
+// Deprecated: use action service v2 instead. This service will be removed in the next major version of ZITADEL.
 service ActionService {
 
   // Create Target
+  //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Create a new target to your endpoint, which can be used in executions.
   //
   // Required permission:
   //   - `action.target.write`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets"
@@ -133,6 +134,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -156,14 +158,13 @@ service ActionService {
 
   // Update Target
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Update an existing target.
   // To generate a new signing key set the optional expirationSigningKey.
   //
   // Required permission:
   //   - `action.target.write`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc UpdateTarget (UpdateTargetRequest) returns (UpdateTargetResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets/{id}"
@@ -177,6 +178,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -200,15 +202,14 @@ service ActionService {
 
   // Delete Target
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Delete an existing target. This will remove it from any configured execution as well.
   // In case the target is not found, the request will return a successful response as
   // the desired state is already achieved.
   //
   // Required permission:
   //   - `action.target.delete`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
     option (google.api.http) = {
       delete: "/v2beta/actions/targets/{id}"
@@ -221,6 +222,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -238,13 +240,12 @@ service ActionService {
 
   // Get Target
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns the target identified by the requested ID.
   //
   // Required permission:
   //   - `action.target.read`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
     option (google.api.http) = {
       get: "/v2beta/actions/targets/{id}"
@@ -257,6 +258,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -280,14 +282,13 @@ service ActionService {
 
   // List targets
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // List all matching targets. By default all targets of the instance are returned.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
   //   - `action.target.read`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/targets/search",
@@ -301,6 +302,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -324,14 +326,13 @@ service ActionService {
 
   // Set Execution
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Sets an execution to call a target or include the targets of another execution.
   // Setting an empty list of targets will remove all targets from the execution, making it a noop.
   //
   // Required permission:
   //   - `action.execution.write`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
       put: "/v2beta/actions/executions"
@@ -345,6 +346,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -362,14 +364,13 @@ service ActionService {
 
   // List Executions
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // List all matching executions. By default all executions of the instance are returned that have at least one execution target.
   // Make sure to include a limit and sorting for pagination.
   //
   // Required permission:
   //   - `action.execution.read`
-  //
-  // Required feature flag:
-  //   - `actions`
   rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
     option (google.api.http) = {
       post: "/v2beta/actions/executions/search"
@@ -383,6 +384,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -400,6 +402,8 @@ service ActionService {
 
   // List Execution Functions
   //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // List all available functions which can be used as condition for executions.
   rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
     option (google.api.http) = {
@@ -413,6 +417,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -423,6 +428,8 @@ service ActionService {
   }
 
   // List Execution Methods
+  //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // List all available methods which can be used as condition for executions.
   rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
@@ -437,6 +444,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -447,6 +455,8 @@ service ActionService {
   }
 
   // List Execution Services
+  //
+  // Deprecated: please move to the corresponding endpoint under action service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // List all available services which can be used as condition for executions.
   rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
@@ -461,6 +471,7 @@ service ActionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -487,10 +498,10 @@ message CreateTargetRequest {
     RESTWebhook rest_webhook = 2;
     // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 3;
-    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    // Call is executed in parallel to others, Zitadel does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 4;
   }
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
@@ -555,10 +566,10 @@ message UpdateTargetRequest {
     RESTWebhook rest_webhook = 3;
     // Wait for response and response body is used, status is checked, call is sent as post.
     RESTCall rest_call = 4;
-    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    // Call is executed in parallel to others, Zitadel does not wait until the call is finished. The state is ignored, call is sent as post.
     RESTAsync rest_async = 5;
   }
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
   optional google.protobuf.Duration timeout = 6 [
     (validate.rules).duration = {gte: {}, lte: {seconds: 270}},

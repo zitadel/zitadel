@@ -51,7 +51,7 @@ func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.Se
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
@@ -144,6 +144,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	}
 	if otp := checks.GetOtpEmail(); otp != nil {
 		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetCode()))
+	}
+	if recoveryCode := checks.GetRecoveryCode(); recoveryCode != nil {
+		sessionChecks = append(sessionChecks, command.CheckRecoveryCode(recoveryCode.GetCode()))
 	}
 	return sessionChecks, nil
 }

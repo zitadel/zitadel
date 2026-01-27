@@ -49,6 +49,17 @@ func TimestampMethodPbToQuery(method filter.TimestampFilterMethod) query.Timesta
 	}
 }
 
+func ByteMethodPbToQuery(method filter.ByteFilterMethod) query.BytesComparison {
+	switch method {
+	case filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS:
+		return query.BytesEquals
+	case filter.ByteFilterMethod_BYTE_FILTER_METHOD_NOT_EQUALS:
+		return query.BytesNotEquals
+	default:
+		return -1
+	}
+}
+
 func PaginationPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
 	limit = defaults.DefaultQueryLimit
 	if query == nil {

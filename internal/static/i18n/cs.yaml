@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: nelze se spojit se serverem SMTP pomocí TLS, zkontrolovat port, problémy s firewallem...
     CouldNotCreateClient: nelze vytvořit smtp klienta
     CouldNotStartTLS: nelze spustit tls
-    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou ZITADEL nepodporuje
+    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou Zitadel nepodporuje
     CouldNotSetSender: nelze nastavit odesílatele
     CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Inicializační kód nenalezen
     UsernameNotChanged: Uživatelské jméno nezměněno
     InvalidURLTemplate: Šablona URL je neplatná
+    Locked: Uživatel je uzamčen
     Profile:
       NotFound: Profil nenalezen
       NotChanged: Profil nezměněn
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F neexistuje
       Passwordless:
         NotExisting: Bezheslové přihlášení neexistuje
+      RecoveryCodes:
+        InvalidCode: Neplatný kód pro obnovení
+        MaxCountExceeded: Maximální počet kódů pro obnovení překročen
+        NotReady: Kódy pro obnovení nejsou připraveny k použití
+        ConfigInvalid: Konfigurace kódů pro obnovení je neplatná
     WebAuthN:
       NotFound: WebAuthN token nenalezen
       BeginRegisterFailed: Registrace WebAuthN selhala
@@ -202,7 +208,7 @@ Errors:
     NotFound: Organizace nenalezena
     NotChanged: Organizace nezměněna
     DefaultOrgNotDeletable: Výchozí organizace nesmí být smazána
-    ZitadelOrgNotDeletable: Organizaci s projektem ZITADEL nelze smazat
+    ZitadelOrgNotDeletable: Organizaci s projektem Zitadel nelze smazat
     InvalidDomain: Neplatná doména
     DomainMissing: Doména chybí
     DomainNotOnOrg: Doména v organizaci neexistuje
@@ -567,6 +573,10 @@ Errors:
     NoTimeout: Cíl nemá časový limit
     InvalidURL: Cíl má neplatnou adresu URL
     NotFound: Cíl nenalezen
+    InvalidExpirationDate: Datum vypršení platnosti klíče musí být v budoucnosti
+    PublicKeyExpired: Veřejný klíč cíle vypršel
+    PublicKeyActive: Nelze odstranit aktivní veřejný klíč cíle
+    InvalidPublicKey: Veřejný klíč je neplatný. Musí být PEM kódovaný RSA nebo ECDSA veřejný klíč ve formátu PKCS#8
   Execution:
     ConditionInvalid: Podmínka provedení je neplatná
     Invalid: Provedení je neplatné
@@ -575,6 +585,7 @@ Errors:
     NoTargets: Nejsou definovány žádné cíle
     Failed: Provedení se nezdařilo
     ResponseIsNotValidJSON: Odpověď není platný JSON
+    MissingEncryptionKey: Chybí klíč pro šifrování
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:
@@ -1102,20 +1113,20 @@ EventTypes:
         changed: Politika uzamčení hesla změněna
   iam:
     setup:
-      started: Nastavení ZITADEL zahájeno
-      done: Nastavení ZITADEL dokončeno
+      started: Nastavení Zitadel zahájeno
+      done: Nastavení Zitadel dokončeno
     global:
       org:
         set: Globální organizace nastavena
     project:
       iam:
-        set: Projekt ZITADEL nastaven
+        set: Projekt Zitadel nastaven
     member:
-      added: Člen ZITADEL přidán
-      changed: Člen ZITADEL změněn
-      removed: Člen ZITADEL odstraněn
+      added: Člen Zitadel přidán
+      changed: Člen Zitadel změněn
+      removed: Člen Zitadel odstraněn
       cascade:
-        removed: Člen ZITADEL kaskádově odstraněn
+        removed: Člen Zitadel kaskádově odstraněn
     idp:
       config:
         added: Konfigurace IDP přidána
@@ -1228,9 +1239,9 @@ EventTypes:
       removed: Doména odstraněna
     iam:
       console:
-        set: Aplikace ZITADEL Console nastavena
+        set: Aplikace Zitadel Konzole pro správu nastavena
       project:
-        set: Projekt ZITADEL nastaven
+        set: Projekt Zitadel nastaven
     mail:
       template:
         added: Šablona e-mailu přidána

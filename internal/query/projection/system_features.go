@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SystemFeatureTable = "projections.system_features"
+	SystemFeatureTable = "projections.system_features2"
 
 	SystemFeatureKeyCol          = "key"
 	SystemFeatureCreationDateCol = "creation_date"

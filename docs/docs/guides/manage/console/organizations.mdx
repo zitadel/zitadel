@@ -23,7 +23,7 @@ If you choose your logged in user as organization manager, a membership for the 
   alt="Select Organization"
 />
 
-If you want to enable your customers to create their organization by themselves, we provide a creation form for an organization. `<https://$CUSTOM-DOMAIN/ui/login/register/org`
+If you want to enable your customers to create their organization by themselves, we provide a creation form for an organization. `https://${CUSTOM_DOMAIN}/ui/login/register/org`
 The customer needs to fill in the form with the organization name and the contact details.
 
 <img
@@ -42,7 +42,7 @@ At the moment the username only allows e-mail formatted input. (This will be cha
 If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
 This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./default-settings#domain-settings).
 
-Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
+Those loginnames consist of the format `{username}@{domainname}.${CUSTOM_DOMAIN}`.
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
 This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
 
@@ -59,7 +59,7 @@ Users that you create within your organization will be suffixed with this domain
 
 You can improve the user experience, by suffixing users with a domain name that is in your control.
 If the "validate org domains" settings in the [Domain Settings](./default-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
-If the setting is set to false, the created domain will automatically be set to verifed.
+If the setting is set to false, the created domain will automatically be set to verified.
 
 An organization can have multiple domain names, but only one domain can be primary.
 The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
@@ -105,11 +105,11 @@ Those settings are the same as your default settings.
 
 > Note: that the following links, redirect to default settings to omit redundancy.
 
-- [**Login Behavior and Access**](./default-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
+- [**Login Behavior and Access**](./default-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether passkeys are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
 - [**Identity Providers**](./default-settings#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](./default-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Lockout**](./default-settings#lockout): Set the maximum attempts a user can try to enter the password or any (T)OTP method. When the number is exceeded, the user gets locked out and has to be unlocked.
-- [**Verified domains**](/docs/guides/manage/console/organizations#verify-your-domain-name): This is where you manage your organization specific domains which can be used to build usernames
+- [**Verified domains**](/docs/guides/manage/console/organizations-overview#usernames-and-domains): This is where you manage your organization specific domains which can be used to build usernames
 - [**Domain settings**](./default-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
 - [**Branding**](./default-settings#branding): Appearance of the login interface.
 - [**Message Texts**](./default-settings#message-texts): Text and internationalization for emails
@@ -135,7 +135,7 @@ Read more about the [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or t
 
 ## Default organization
 
-On the Default settings page ($YOUR_DOMAIN//ui/console/orgs) you can set an organization as default organization.
+On the Default settings page (`${CUSTOM_DOMAIN}`/ui/console/orgs) you can set an organization as default organization.
 Click the "..." on the right hand side of the table and select "Set as default organization".
 
 The current default organization is marked by a label "Default".

@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { COLORS } from 'src/app/utils/color';
+import { NewAuthService } from 'src/app/services/new-auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cnsl-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  standalone: false,
 })
 export class HomeComponent {
   public greendark: string = COLORS[6][700];
@@ -21,10 +25,14 @@ export class HomeComponent {
 
   public dark: boolean = true;
 
+  protected readonly PolicyComponentServiceType = PolicyComponentServiceType;
+
   constructor(
     public authService: GrpcAuthService,
+    private readonly newAuthService: NewAuthService,
     breadcrumbService: BreadcrumbService,
     public themeService: ThemeService,
+    private readonly router: Router,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,

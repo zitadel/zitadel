@@ -46,7 +46,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				req, err := http.NewRequestWithContext(
 					CTX,
 					"POST",
-					fmt.Sprintf("http://%s/admin/v1/idps/github", net.JoinHostPort(isoInstance.Domain, "8080")),
+					fmt.Sprintf("http://%s/admin/v1/idps/github", net.JoinHostPort(isoInstance.Domain, "8082")),
 					strings.NewReader(`{
 	"name": "`+randomHttpIdpName+`",
 	"clientId": "client-id",
@@ -68,7 +68,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				req, err := http.NewRequestWithContext(
 					CTX,
 					"GET",
-					fmt.Sprintf("http://%s/.well-known/openid-configuration", net.JoinHostPort(isoInstance.Domain, "8080")),
+					fmt.Sprintf("http://%s/.well-known/openid-configuration", net.JoinHostPort(isoInstance.Domain, "8082")),
 					nil,
 				)
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
@@ -82,7 +82,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				req, err := http.NewRequestWithContext(
 					CTX,
 					"GET",
-					fmt.Sprintf("http://%s/ui/login/login/externalidp/callback", net.JoinHostPort(isoInstance.Domain, "8080")),
+					fmt.Sprintf("http://%s/ui/login/login/externalidp/callback", net.JoinHostPort(isoInstance.Domain, "8082")),
 					nil,
 				)
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
@@ -101,11 +101,11 @@ func TestServer_Limits_Block(t *testing.T) {
 				req, err := http.NewRequestWithContext(
 					CTX,
 					"GET",
-					fmt.Sprintf("http://%s/ui/console/", net.JoinHostPort(isoInstance.Domain, "8080")),
+					fmt.Sprintf("http://%s/ui/console/", net.JoinHostPort(isoInstance.Domain, "8082")),
 					nil,
 				)
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
-					// the console is not blocked so we can render a link to an instance management portal.
+					// the management console is not blocked so we can render a link to an instance management portal.
 					// A CDN can cache these assets easily
 					// We also don't care about a cookie because the environment.json already takes care of that.
 					assertLimitResponse(ttt, response, false)
@@ -117,7 +117,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				req, err := http.NewRequestWithContext(
 					CTX,
 					"GET",
-					fmt.Sprintf("http://%s/ui/console/assets/environment.json", net.JoinHostPort(isoInstance.Domain, "8080")),
+					fmt.Sprintf("http://%s/ui/console/assets/environment.json", net.JoinHostPort(isoInstance.Domain, "8082")),
 					nil,
 				)
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
@@ -205,7 +205,7 @@ func publicAPIBlockingTest(domain string) *test {
 	return &test{
 		name: "public API",
 		testGrpc: func(tt assert.TestingT, expectBlocked bool) {
-			conn, err := grpc.DialContext(CTX, net.JoinHostPort(domain, "8080"),
+			conn, err := grpc.DialContext(CTX, net.JoinHostPort(domain, "8082"),
 				grpc.WithBlock(),
 				grpc.WithTransportCredentials(insecure.NewCredentials()),
 			)
@@ -217,7 +217,7 @@ func publicAPIBlockingTest(domain string) *test {
 			req, err := http.NewRequestWithContext(
 				CTX,
 				"GET",
-				fmt.Sprintf("http://%s/admin/v1/healthz", net.JoinHostPort(domain, "8080")),
+				fmt.Sprintf("http://%s/admin/v1/healthz", net.JoinHostPort(domain, "8082")),
 				nil,
 			)
 			return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {

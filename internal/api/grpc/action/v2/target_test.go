@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
@@ -30,6 +30,7 @@ func Test_createTargetToCommand(t *testing.T) {
 				Endpoint:         "",
 				Timeout:          0,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeUnspecified,
 			},
 		},
 		{
@@ -40,14 +41,16 @@ func Test_createTargetToCommand(t *testing.T) {
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.RESTWebhook{},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
-				TargetType:       domain.TargetTypeWebhook,
+				TargetType:       target_domain.TargetTypeWebhook,
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeJSON,
 			},
 		},
 		{
@@ -58,14 +61,16 @@ func Test_createTargetToCommand(t *testing.T) {
 				TargetType: &action.CreateTargetRequest_RestAsync{
 					RestAsync: &action.RESTAsync{},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JWT,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
-				TargetType:       domain.TargetTypeAsync,
+				TargetType:       target_domain.TargetTypeAsync,
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: false,
+				PayloadType:      target_domain.PayloadTypeJWT,
 			},
 		},
 		{
@@ -78,14 +83,16 @@ func Test_createTargetToCommand(t *testing.T) {
 						InterruptOnError: true,
 					},
 				},
-				Timeout: durationpb.New(10 * time.Second),
+				Timeout:     durationpb.New(10 * time.Second),
+				PayloadType: action.PayloadType_PAYLOAD_TYPE_JWE,
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
-				TargetType:       domain.TargetTypeCall,
+				TargetType:       target_domain.TargetTypeCall,
 				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				InterruptOnError: true,
+				PayloadType:      target_domain.PayloadTypeJWE,
 			},
 		},
 	}
@@ -155,7 +162,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
-				TargetType:       gu.Ptr(domain.TargetTypeWebhook),
+				TargetType:       gu.Ptr(target_domain.TargetTypeWebhook),
 				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
 				InterruptOnError: gu.Ptr(false),
@@ -175,7 +182,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
-				TargetType:       gu.Ptr(domain.TargetTypeWebhook),
+				TargetType:       gu.Ptr(target_domain.TargetTypeWebhook),
 				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
 				InterruptOnError: gu.Ptr(true),
@@ -193,7 +200,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
-				TargetType:       gu.Ptr(domain.TargetTypeAsync),
+				TargetType:       gu.Ptr(target_domain.TargetTypeAsync),
 				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
 				InterruptOnError: gu.Ptr(false),
@@ -213,7 +220,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
-				TargetType:       gu.Ptr(domain.TargetTypeCall),
+				TargetType:       gu.Ptr(target_domain.TargetTypeCall),
 				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
 				InterruptOnError: gu.Ptr(true),

@@ -8,7 +8,7 @@ import crypto from "crypto";
 import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
-import { getUserByID } from "./zitadel";
+import { getUserByID, ServiceConfig } from "./zitadel";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -20,9 +20,7 @@ export function checkPasswordChangeRequired(
   let isOutdated = false;
   if (expirySettings?.maxAgeDays && humanUser?.passwordChanged) {
     const maxAgeDays = Number(expirySettings.maxAgeDays); // Convert bigint to number
-    const passwordChangedDate = moment(
-      timestampDate(humanUser.passwordChanged),
-    );
+    const passwordChangedDate = moment(timestampDate(humanUser.passwordChanged));
     const outdatedPassword = passwordChangedDate.add(maxAgeDays, "days");
     isOutdated = moment().isAfter(outdatedPassword);
   }
@@ -33,10 +31,7 @@ export function checkPasswordChangeRequired(
     });
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        session.factors?.user?.organizationId as string,
-      );
+      params.append("organization", session.factors?.user?.organizationId as string);
     }
 
     if (requestId) {
@@ -47,12 +42,7 @@ export function checkPasswordChangeRequired(
   }
 }
 
-export function checkEmailVerified(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string,
-) {
+export function checkEmailVerified(session: Session, humanUser?: HumanUser, organization?: string, requestId?: string) {
   if (!humanUser?.email?.isVerified) {
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -61,10 +51,7 @@ export function checkEmailVerified(
     });
 
     if (organization || session.factors?.user?.organizationId) {
-      paramsVerify.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      paramsVerify.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     if (requestId) {
@@ -75,16 +62,8 @@ export function checkEmailVerified(
   }
 }
 
-export function checkEmailVerification(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string,
-) {
-  if (
-    !humanUser?.email?.isVerified &&
-    process.env.EMAIL_VERIFICATION === "true"
-  ) {
+export function checkEmailVerification(session: Session, humanUser?: HumanUser, organization?: string, requestId?: string) {
+  if (!humanUser?.email?.isVerified && process.env.EMAIL_VERIFICATION === "true") {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       send: "true", // set this to true as we dont expect old email codes to be valid anymore
@@ -95,10 +74,7 @@ export function checkEmailVerification(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     return { redirect: `/verify?` + params };
@@ -106,7 +82,7 @@ export function checkEmailVerification(
 }
 
 export async function checkMFAFactors(
-  serviceUrl: string,
+  serviceConfig: ServiceConfig,
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],
@@ -115,13 +91,13 @@ export async function checkMFAFactors(
 ) {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
+      m === AuthenticationMethodType.TOTP ||
+      m === AuthenticationMethodType.OTP_SMS ||
+      m === AuthenticationMethodType.OTP_EMAIL ||
+      m === AuthenticationMethodType.U2F,
   );
 
-  const hasAuthenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt &&
-    session.factors?.webAuthN?.userVerified;
+  const hasAuthenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
 
   // escape further checks if user has authenticated with passkey
   if (hasAuthenticatedWithPasskey) {
@@ -139,14 +115,11 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
+    // if passkey is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {
@@ -166,59 +139,47 @@ export async function checkMFAFactors(
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     return { redirect: `/mfa?` + params };
-  } else if (
-    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableMultiFactors.length
-  ) {
+  } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       force: "true", // this defines if the mfa is forced in the settings
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
 
+    if (session.id) {
+      params.append("sessionId", session.id);
+    }
+
     if (requestId) {
       params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
-    (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
-      loginSettings.mfaInitSkipLifetime.seconds > 0) &&
+    (loginSettings.mfaInitSkipLifetime.nanos > 0 || loginSettings.mfaInitSkipLifetime.seconds > 0) &&
     !availableMultiFactors.length &&
-    session?.factors?.user?.id
+    session?.factors?.user?.id &&
+    shouldEnforceMFA(session, loginSettings)
   ) {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session.factors?.user?.id,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: session.factors?.user?.id });
 
-    const humanUser =
-      userResponse?.user?.type.case === "human"
-        ? userResponse?.user.type.value
-        : undefined;
+    const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser?.mfaInitSkipped) {
       const mfaInitSkippedTimestamp = timestampDate(humanUser.mfaInitSkipped);
 
       const mfaInitSkipLifetimeMillis =
-        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 +
-        loginSettings.mfaInitSkipLifetime.nanos / 1000000;
+        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 + loginSettings.mfaInitSkipLifetime.nanos / 1000000;
       const currentTime = Date.now();
       const mfaInitSkippedTime = mfaInitSkippedTimestamp.getTime();
       const timeDifference = currentTime - mfaInitSkippedTime;
@@ -237,20 +198,67 @@ export async function checkMFAFactors(
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
 
+    if (session.id) {
+      params.append("sessionId", session.id);
+    }
+
     if (requestId) {
       params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
+      params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   }
+}
+
+/**
+ * Determines if MFA should be enforced based on the authentication method used and login settings
+ * @param session - The current session
+ * @param loginSettings - The login settings containing MFA enforcement rules
+ * @returns true if MFA should be enforced, false otherwise
+ */
+export function shouldEnforceMFA(session: Session, loginSettings: LoginSettings | undefined): boolean {
+  if (!loginSettings) {
+    return false;
+  }
+
+  // Check if user authenticated with passkey (passkeys are inherently multi-factor)
+  const authenticatedWithPasskey = session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
+
+  // If user authenticated with passkey, MFA is not required regardless of settings
+  if (authenticatedWithPasskey) {
+    return false;
+  }
+
+  // If forceMfa is enabled, MFA is required for ALL authentication methods (except passkeys)
+  if (loginSettings.forceMfa) {
+    return true;
+  }
+
+  // If forceMfaLocalOnly is enabled, MFA is only required for local/password authentication
+  if (loginSettings.forceMfaLocalOnly) {
+    // Check if user authenticated with password (local authentication)
+    const authenticatedWithPassword = !!session.factors?.password?.verifiedAt;
+
+    // Check if user authenticated with IDP (external authentication)
+    const authenticatedWithIDP = !!session.factors?.intent?.verifiedAt;
+
+    // If user authenticated with IDP, MFA is not required for forceMfaLocalOnly
+    if (authenticatedWithIDP) {
+      return false;
+    }
+
+    // If user authenticated with password, MFA is required for forceMfaLocalOnly
+    if (authenticatedWithPassword) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export async function checkUserVerification(userId: string): Promise<boolean> {
@@ -264,24 +272,17 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
     return false;
   }
 
-  const verificationCheck = crypto
-    .createHash("sha256")
-    .update(`${userId}:${fingerPrintCookie.value}`)
-    .digest("hex");
+  const verificationCheck = crypto.createHash("sha256").update(`${userId}:${fingerPrintCookie.value}`).digest("hex");
 
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
-    console.warn(
-      "User verification check cookie not found. User verification check failed.",
-    );
+    console.warn("User verification check cookie not found. User verification check failed.");
     return false;
   }
 
   if (cookieValue !== verificationCheck) {
-    console.warn(
-      `User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`,
-    );
+    console.warn(`User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`);
     return false;
   }
 

@@ -40,7 +40,9 @@ DECLARE
     "aggregate" RECORD;
     current_sequence BIGINT;
     current_owner TEXT;
+    created_at TIMESTAMPTZ;
 BEGIN
+    created_at := statement_timestamp();
     FOR "aggregate" IN 
         SELECT DISTINCT
             instance_id
@@ -67,11 +69,11 @@ BEGIN
             , c.command_type -- AS event_type
             , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER () -- AS sequence
             , c.revision
-            , NOW() -- AS created_at
+            , created_at
             , c.payload
             , c.creator
             , COALESCE(current_owner, c.owner) -- AS owner
-            , EXTRACT(EPOCH FROM NOW()) -- AS position
+            , EXTRACT(EPOCH FROM created_at) -- AS position
             , c.ordinality::{{ .InTxOrderType }} -- AS in_tx_order
         FROM
             UNNEST(commands) WITH ORDINALITY AS c

@@ -18,7 +18,7 @@ When you configure your default settings, you can set the following:
 - **Organizations**: A list of your organizations
 - [**Features**](#features): Feature Settings let you try out new features before they become generally available. You can also disable features you are not interested in.
 - [**Notification settings**](#notification-settings): Setup Notification and Email Server settings for initialization-, verification- and other mails. Setup Twilio as SMS notification provider.
-- [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
+- [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether passkeys are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
 - [**Identity Providers**](#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Password Expiry**](#password-expiry): Set an expiry for passwords. After the expiration, a user will be prompted to change their password during the next login.
@@ -44,7 +44,7 @@ If a feature is set to `Inherit`, it becomes available once its enabled per defa
   width="700px"
 />
 
-Features can range from UI changes in the console, to new APIs or performance improvements.
+Features can range from UI changes in the management console, to new APIs or performance improvements.
 
 :::warning
 Be careful on which features you enable as they can be in an experimental state.
@@ -56,19 +56,19 @@ We recommend setting your Branding and SMTP settings initially as it will comfor
 
 ![Private Labeling](/img/console_private_labeling.png)
 
-In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, and choose between multiple behavours. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
+In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, and choose between multiple behaviors. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
 
 | Setting           | Description                                                                                                                                                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Logo              | Upload your logo for the light and the dark design. This is used mainly in the login interface.                                                                                                                            |
-| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in console on the top left as the home button.                                                                      |
+| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in management console on the top left as the home button.                                                                      |
 | Colors            | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color)                                                                                                       |
 | Font              | Upload your custom font                                                                                                                                                                                                    |
 | Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
-Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization settiong](./organizations#branding).
+Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization setting](./organizations#branding).
 
 ## Notification settings
 
@@ -87,7 +87,7 @@ You can configure on which changes the users will be notified. The text of the m
 
 ### SMTP
 
-On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a custom domain on your instance.
+On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a Custom Domain on your instance.
 
 You can configure many SMTP providers using templates for popular providers. The templates will add known settings like host, port or default user and will suggest values for user and/or password.
 
@@ -95,7 +95,14 @@ You can configure many SMTP providers using templates for popular providers. The
 You have to activate your SMTP provider so Zitadel can use it to send your emails. Only one provider can be active.
 :::
 
-Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
+:::warning
+The built-in SMTP provider is intended **only for testing and evaluation purposes**.  
+Email delivery through this service may be **delayed or temporarily unstable**.  
+
+For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
+:::
+
+Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a Custom Domain.
 
 To configure your custom SMTP please fill the following fields:
 
@@ -133,14 +140,14 @@ The Login Policy defines how the login process should look like and which authen
 | Register allowed                 | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers                                                                                                                                                                                                                                                                                             |
 | External IDP allowed             | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc), If you like to allow external Identity providers add them to the providers list                                                                                                                                                                                                                                                                                           |
 | Hide password reset              | Disable the self-service option for users to reset their password.                                                                                                                                                                                                                                                                                                                                                                                            |
-| Domain discovery allowed         | If this setting is enabled, the user does't not mandatory have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
+| Domain discovery allowed         | If this setting is enabled, the user doesn't have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and Entra ID as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the Entra ID. |
 | Ignore unknown usernames         | This setting can be enabled, if no error message should be shown if the user doesn't exist. Example: A user enters the login name john@zitadel.com, the user doesn't exist, but will be redirected to the password screen. After entering a password, the user will get an error that either username or password are wrong.                                                                                                                                  |
 | Disable login with email address | By default users can additionally [login with the email attribute](/docs/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                              |
 | Disable login with phone number  | By default users can additionally [login with the phonenumber attribute](/docs/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable.                                                                                                                                                                                                                                                          |
 
 <img
   src="/docs/img/guides/console/loginpolicy.png"
-  alt="Login Bahaviour and Access"
+  alt="Login Behavior and Access"
   width="800px"
 />
 
@@ -149,16 +156,16 @@ The Login Policy defines how the login process should look like and which authen
 The Default Redirect URI will be used, if a user calls the login page directly.
 More specifically, typically a client will initiate login with an auth request.
 The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
-If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://<custom_domain>/ui/console/`
+If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 
 Reasons why ZITADEL doesn't have a redirect URI:
 
 - The login has not been called with an OIDC authorize request
 - The user landed on the login through an email link, e.g. Password Reset, Initialize User
 
-We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
+We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL Management Console.
 
-Change default redirect url of instance: `https://<custom_domain>/ui/console/settings?id=login`
+Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
 <img
   src="/docs//img/guides/solution-scenarios/console-default-redirect.png"
@@ -166,14 +173,14 @@ Change default redirect url of instance: `https://<custom_domain>/ui/console/set
   width="600px"
 />
 
-### Passwordless
+### Passkeys
 
-Passwordless authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
+Passkey authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
 There are two different types one is depending on the device (e.g. Fingerprint, Face recognition, WindowsHello) and the other is independent (eg. Yubikey, Solokey).
 
 ### Multifactor (MFA)
 
-In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
+In the multifactors section you can configure what kind of multifactors should be allowed. For passkeys to work, it's required to enable U2F (Universal Second Factor) with PIN. There is no other option at the moment.
 Multifactors:
 
 - U2F (Universal Second Factor) with PIN, e.g FaceID, WindowsHello, Fingerprint, Hardwaretokens like Yubikey
@@ -251,7 +258,7 @@ The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 - Maximum OTP Attempts: When the user has reached the maximum (T)OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 
-If an account is locked, the administrator has to unlock it in the ZITADEL console
+If an account is locked, the administrator has to unlock it in the ZITADEL Management Console
 
 <img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
@@ -265,12 +272,12 @@ If you enable this setting, all loginnames will be suffixed with the organizatio
 
 If this is enabled all created domains on an organization must be verified per dns/acme challenge.
 
-More about how to verify a domain [here](/guides/manage/console/organizations#domain-verification-and-primary-domain).
+More about how to verify a domain [here](/guides/manage/console/organizations-overview#domain-verification-guide).
 If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
 
-### SMTP Sender Address matches Instance Domain
+### SMTP Sender Address matches Custom Domain
 
-If enabled, the SMTP server address must match the instance's primary domain.
+If enabled, the SMTP server address must match the instance's primary Custom Domain.
 With that you can ensure that users receive notifications from the same domain that is used for login.
 
 ### Use email as username
@@ -289,7 +296,7 @@ With this setting you are able to configure your privacy policy, terms of servic
 
 On register each user has to accept these policies.
 
-This policy can be also be overriden by your organizations.
+This policy can be also be overridden by your organizations.
 
 When focused on an input field you can see the language attribute, which can then be integrated into your link.
 
@@ -302,7 +309,7 @@ Example:
   width="600px"
 />
 
-Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
+Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the management console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
 
 <img
   src="/docs/img/guides/console/external_links_2.png"
@@ -315,13 +322,13 @@ Also you can set the link associated to the Documentation button in the console.
 These are the texts for your notification mails. Available for change are:
 
 | Message Text    | Description                                                                                                                |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------|
 | Domain Claim    | The Mail after an organisation claimed a domain for itself. Users on other organisations with this domain will be notified |
 | Initialization  | The mail after a user has been created. A code is part of the message which then must be verified on first login           |
-| Passwordless    | The Mail to register an additional passwordless device by a link                                                           |
+| Passkey         | The Mail to register an additional passkey device by a link                                                                |
 | Password Reset  | The Mail to reset the password by a link                                                                                   |
 | Verify Email    | The mail after the email has been changed. A code is part of the message which then must be verified on the next login     |
-| Password Change | Notify the user, that the password has been changed. Can be configured in [Notification](#notification)                    |
+| Password Changed | Notify the user, that the password has been changed. Can be configured in [Notification](#notification)                    |
 
 You can set the locale of the translations on the right.
 
@@ -375,7 +382,7 @@ The following secrets can be configured:
 - Email verification code
 - Phone verification code
 - Password reset code
-- Passwordless initialization code
+- Passkey initialization code
 - Application secrets
 - One Time Password (OTP) - SMS
 - One Time Password (OTP) - Email

@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	CallURL string
-	Method  string
-	Headers http.Header
+	CallURL    string
+	Method     string
+	Headers    http.Header
+	SigningKey string
 }
 
 func (w *Config) Validate() error {

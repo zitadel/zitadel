@@ -5,10 +5,11 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getMostRecentCookieWithLoginname } from "./cookies";
-import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes } from "./zitadel";
+import { shouldEnforceMFA } from "./verify-helper";
+import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes, ServiceConfig } from "./zitadel";
 
 type LoadMostRecentSessionParams = {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   sessionParams: {
     loginName?: string;
     organization?: string;
@@ -16,7 +17,7 @@ type LoadMostRecentSessionParams = {
 };
 
 export async function loadMostRecentSession({
-  serviceUrl,
+  serviceConfig,
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
@@ -24,84 +25,87 @@ export async function loadMostRecentSession({
     organization: sessionParams.organization,
   });
 
-  return getSession({
-    serviceUrl,
-    sessionId: recent.id,
-    sessionToken: recent.token,
-  }).then((resp: GetSessionResponse) => resp.session);
+  if (!recent) {
+    return undefined;
+  }
+
+  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then(
+    (resp: GetSessionResponse) => resp.session,
+  );
 }
 
 /**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-export async function isSessionValid({ serviceUrl, session }: { serviceUrl: string; session: Session }): Promise<boolean> {
+export async function isSessionValid({
+  serviceConfig,
+  session,
+}: {
+  serviceConfig: ServiceConfig;
+  session: Session;
+}): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
-    console.warn("Session has no user");
     return false;
   }
 
   let mfaValid = true;
 
-  const authMethodTypes = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session.factors.user.id,
-  });
+  // Check if user authenticated via different methods
+  const validIDP = session?.factors?.intent?.verifiedAt;
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
 
-  const authMethods = authMethodTypes.authMethodTypes;
-  if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
-    mfaValid = !!session.factors.totp?.verifiedAt;
-    if (!mfaValid) {
-      console.warn("Session has no valid totpEmail factor", session.factors.totp?.verifiedAt);
-    }
-  } else if (authMethods && authMethods.includes(AuthenticationMethodType.OTP_EMAIL)) {
-    mfaValid = !!session.factors.otpEmail?.verifiedAt;
-    if (!mfaValid) {
-      console.warn("Session has no valid otpEmail factor", session.factors.otpEmail?.verifiedAt);
-    }
-  } else if (authMethods && authMethods.includes(AuthenticationMethodType.OTP_SMS)) {
-    mfaValid = !!session.factors.otpSms?.verifiedAt;
-    if (!mfaValid) {
-      console.warn("Session has no valid otpSms factor", session.factors.otpSms?.verifiedAt);
-    }
-  } else if (authMethods && authMethods.includes(AuthenticationMethodType.U2F)) {
-    mfaValid = !!session.factors.webAuthN?.verifiedAt;
-    if (!mfaValid) {
-      console.warn("Session has no valid u2f factor", session.factors.webAuthN?.verifiedAt);
-    }
-  } else {
-    // only check settings if no auth methods are available, as this would require a setup
-    const loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: session.factors?.user?.organizationId,
-    });
-    if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
+  // Get login settings to determine if MFA is actually required by policy
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors?.user?.organizationId });
+
+  // Use the existing shouldEnforceMFA function to determine if MFA is required
+  const isMfaRequired = shouldEnforceMFA(session, loginSettings);
+
+  // Only enforce MFA validation if MFA is required by policy
+  if (isMfaRequired) {
+    const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+
+    const authMethods = authMethodTypes.authMethodTypes;
+    // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+    const mfaMethods = authMethods?.filter(
+      (method) =>
+        method === AuthenticationMethodType.TOTP ||
+        method === AuthenticationMethodType.OTP_EMAIL ||
+        method === AuthenticationMethodType.OTP_SMS ||
+        method === AuthenticationMethodType.U2F,
+    );
+
+    if (mfaMethods && mfaMethods.length > 0) {
+      // Check if any of the configured MFA methods have been verified
+      const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
+      const otpEmailValid =
+        mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
+      const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
+      const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
+
+      mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
+    } else {
+      // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
+      // (excluding IDP which should be handled separately)
       const otpEmail = session.factors.otpEmail?.verifiedAt;
       const otpSms = session.factors.otpSms?.verifiedAt;
       const totp = session.factors.totp?.verifiedAt;
       const webAuthN = session.factors.webAuthN?.verifiedAt;
-      const idp = session.factors.intent?.verifiedAt; // TODO: forceMFA should not consider this as valid factor
+      // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
 
-      // must have one single check
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN || idp);
-      if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
-      }
-    } else {
-      mfaValid = true;
+      mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
     }
   }
 
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const validIDP = session?.factors?.intent?.verifiedAt;
+  // If MFA is not required by policy, mfaValid remains true
 
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
 
   if (!stillValid) {
     console.warn(
-      "Session is expired",
+      "[Session] Session is expired",
       session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
     );
     return false;
@@ -114,20 +118,18 @@ export async function isSessionValid({ serviceUrl, session }: { serviceUrl: stri
   }
 
   if (!mfaValid) {
+    console.warn("[Session] MFA is required but not valid");
     return false;
   }
 
   // Check email verification if EMAIL_VERIFICATION environment variable is enabled
   if (process.env.EMAIL_VERIFICATION === "true") {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session.factors.user.id,
-    });
+    const userResponse = await getUserByID({ serviceConfig, userId: session.factors.user.id });
 
     const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser && !humanUser.email?.isVerified) {
-      console.warn("Session invalid: Email not verified and EMAIL_VERIFICATION is enabled", session.factors.user.id);
+      console.warn("[Session] Email is not verified");
       return false;
     }
   }
@@ -136,12 +138,12 @@ export async function isSessionValid({ serviceUrl, session }: { serviceUrl: stri
 }
 
 export async function findValidSession({
-  serviceUrl,
+  serviceConfig,
   sessions,
   authRequest,
   samlRequest,
 }: {
-  serviceUrl: string;
+  serviceConfig: ServiceConfig;
   sessions: Session[];
   authRequest?: AuthRequest;
   samlRequest?: SAMLRequest;
@@ -154,7 +156,8 @@ export async function findValidSession({
       return s.factors?.user?.loginName === authRequest.loginHint;
     }
     if (samlRequest) {
-      // TODO: do whatever
+      // SAML requests don't contain user hints like OIDC (hintUserId/loginHint)
+      // so we return all sessions for further processing
       return true;
     }
     return true;
@@ -173,7 +176,7 @@ export async function findValidSession({
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid({ serviceUrl, session })) {
+    if (await isSessionValid({ serviceConfig, session })) {
       return session;
     }
   }

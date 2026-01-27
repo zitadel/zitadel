@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -25,6 +26,7 @@ var (
 		` projections.targets2.endpoint,` +
 		` projections.targets2.interrupt_on_error,` +
 		` projections.targets2.signing_key,` +
+		` projections.targets2.payload_type,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.targets2`
 	prepareTargetsCols = []string{
@@ -38,6 +40,7 @@ var (
 		"endpoint",
 		"interrupt_on_error",
 		"signing_key",
+		"payload_type",
 		"count",
 	}
 
@@ -50,7 +53,8 @@ var (
 		` projections.targets2.timeout,` +
 		` projections.targets2.endpoint,` +
 		` projections.targets2.interrupt_on_error,` +
-		` projections.targets2.signing_key` +
+		` projections.targets2.signing_key,` +
+		` projections.targets2.payload_type` +
 		` FROM projections.targets2`
 	prepareTargetCols = []string{
 		"id",
@@ -63,6 +67,7 @@ var (
 		"endpoint",
 		"interrupt_on_error",
 		"signing_key",
+		"payload_type",
 	}
 )
 
@@ -103,7 +108,7 @@ func Test_TargetPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							"target-name",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							1 * time.Second,
 							"https://example.com",
 							true,
@@ -113,6 +118,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJSON,
 						},
 					},
 				),
@@ -130,7 +136,7 @@ func Test_TargetPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 						},
 						Name:             "target-name",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: true,
@@ -140,6 +146,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJSON,
 					},
 				},
 			},
@@ -158,7 +165,7 @@ func Test_TargetPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							"target-name1",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							1 * time.Second,
 							"https://example.com",
 							true,
@@ -168,6 +175,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJSON,
 						},
 						{
 							"id-2",
@@ -175,7 +183,7 @@ func Test_TargetPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							"target-name2",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							1 * time.Second,
 							"https://example.com",
 							false,
@@ -185,6 +193,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJWT,
 						},
 						{
 							"id-3",
@@ -192,7 +201,7 @@ func Test_TargetPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							"target-name3",
-							domain.TargetTypeAsync,
+							target_domain.TargetTypeAsync,
 							1 * time.Second,
 							"https://example.com",
 							false,
@@ -202,6 +211,7 @@ func Test_TargetPrepares(t *testing.T) {
 								KeyID:      "encKey",
 								Crypted:    []byte("crypted"),
 							},
+							target_domain.PayloadTypeJWE,
 						},
 					},
 				),
@@ -219,7 +229,7 @@ func Test_TargetPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 						},
 						Name:             "target-name1",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: true,
@@ -229,6 +239,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJSON,
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -238,7 +249,7 @@ func Test_TargetPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 						},
 						Name:             "target-name2",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: false,
@@ -248,6 +259,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJWT,
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -257,7 +269,7 @@ func Test_TargetPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 						},
 						Name:             "target-name3",
-						TargetType:       domain.TargetTypeAsync,
+						TargetType:       target_domain.TargetTypeAsync,
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: false,
@@ -267,6 +279,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						PayloadType: target_domain.PayloadTypeJWE,
 					},
 				},
 			},
@@ -319,7 +332,7 @@ func Test_TargetPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						"target-name",
-						domain.TargetTypeWebhook,
+						target_domain.TargetTypeWebhook,
 						1 * time.Second,
 						"https://example.com",
 						true,
@@ -329,6 +342,7 @@ func Test_TargetPrepares(t *testing.T) {
 							KeyID:      "encKey",
 							Crypted:    []byte("crypted"),
 						},
+						target_domain.PayloadTypeJSON,
 					},
 				),
 			},
@@ -340,7 +354,7 @@ func Test_TargetPrepares(t *testing.T) {
 					ResourceOwner: "ro",
 				},
 				Name:             "target-name",
-				TargetType:       domain.TargetTypeWebhook,
+				TargetType:       target_domain.TargetTypeWebhook,
 				Timeout:          1 * time.Second,
 				Endpoint:         "https://example.com",
 				InterruptOnError: true,
@@ -350,6 +364,7 @@ func Test_TargetPrepares(t *testing.T) {
 					KeyID:      "encKey",
 					Crypted:    []byte("crypted"),
 				},
+				PayloadType: target_domain.PayloadTypeJSON,
 			},
 		},
 		{

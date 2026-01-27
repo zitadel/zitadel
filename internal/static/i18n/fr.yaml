@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: Impossible de contacter le serveur SMTP via TLS, vérifiez le port, problèmes de pare-feu...
     CouldNotCreateClient: impossible de créer un client SMTP
     CouldNotStartTLS: je n'ai pas pu démarrer tls
-    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par ZITADEL.
+    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par Zitadel.
     CouldNotSetSender: impossible de définir l'expéditeur
     CouldNotSetRecipient: impossible de définir le destinataire
   SMTPConfig:
@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Code d'initialisation non trouvé
     UsernameNotChanged: Nom d'utilisateur non modifié
     InvalidURLTemplate: Le modèle d'URL n'est pas valide
+    Locked: L'utilisateur est verrouillé
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
@@ -176,7 +177,12 @@ Errors:
       U2F:
         NotExisting: L'U2F n'existe pas
       Passwordless:
-        NotExisting: Passwordless n'existe pas
+        NotExisting: Paskey n'existe pas
+      RecoveryCodes:
+        InvalidCode: Code de récupération invalide fourni
+        MaxCountExceeded: Nombre maximum de codes de récupération dépassé
+        NotReady: Les codes de récupération ne sont pas prêts à être utilisés
+        ConfigInvalid: La configuration des codes de récupération est invalide
     WebAuthN:
       NotFound: Le token WebAuthN n'a pas été trouvé
       BeginRegisterFailed: L'enregistrement de WebAuthN a échoué
@@ -202,7 +208,7 @@ Errors:
     NotFound: Organisation non trouvée
     NotChanged: L'organisation n'a pas changé
     DefaultOrgNotDeletable: L'organisation par défault ne doit pas être supprimée
-    ZitadelOrgNotDeletable: L'organisation avec ZITADEL project ne doit pas être supprimée
+    ZitadelOrgNotDeletable: L'organisation avec Zitadel project ne doit pas être supprimée
     InvalidDomain: Domaine non valide
     DomainMissing: Domaine manquant
     DomainNotOnOrg: Le domaine n'existe pas dans l'organisation
@@ -569,6 +575,10 @@ Errors:
     NoTimeout: La cible n'a pas de délai d'attente
     InvalidURL: La cible a une URL non valide
     NotFound: La cible introuvable
+    InvalidExpirationDate: La date d'expiration de la clé doit être dans le futur
+    PublicKeyExpired: La clé publique de la cible a expiré
+    PublicKeyActive: Impossible de supprimer une clé publique active de la cible
+    InvalidPublicKey: La clé publique est invalide. Elle doit être une clé publique RSA ou ECDSA encodée PEM au format PKCS#8
   Execution:
     ConditionInvalid: La condition d'exécution n'est pas valide
     Invalid: L'exécution est invalide
@@ -577,6 +587,7 @@ Errors:
     NoTargets: Aucune cible définie
     Failed: Exécution échouée
     ResponseIsNotValidJSON: La réponse n'est pas un JSON valide
+    MissingEncryptionKey: Clé de chiffrement manquante pour l'exécution
   UserSchema:
     NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
     Type:
@@ -1099,20 +1110,20 @@ EventTypes:
         changed: Modification de la politique de verrouillage des mots de passe
   iam:
     setup:
-      started: L'installation de ZITADEL a commencé
-      done: Installation de ZITADEL terminée
+      started: L'installation de Zitadel a commencé
+      done: Installation de Zitadel terminée
     global:
       org:
         set: Global org set
     lockout:
       iam:
-        set: set du projet ZITADEL
+        set: set du projet Zitadel
     member:
-      added: ZITADEL membre ajouté
-      changed: membre de ZITADEL modifié
-      removed: membre ZITADEL supprimé
+      added: Zitadel membre ajouté
+      changed: membre de Zitadel modifié
+      removed: membre Zitadel supprimé
       cascade:
-        removed: Membre ZITADEL supprimé en cascade
+        removed: Membre Zitadel supprimé en cascade
     idp:
       config:
         added: Ajout de la configuration IDP
@@ -1225,9 +1236,9 @@ EventTypes:
       removed: Domaine supprimé
     iam:
       console:
-        set: Ensemble d'applications Console ZITADEL
+        set: Ensemble d'applications Console de gestion Zitadel
       project:
-        set: ZITADEL project set
+        set: Zitadel project set
     mail:
       template:
         added: Modèle de courrier électronique ajouté

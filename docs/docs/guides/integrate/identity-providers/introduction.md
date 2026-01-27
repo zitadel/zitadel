@@ -85,8 +85,8 @@ In ZITADEL, you have the flexibility to link an external Identity Provider (IdP)
 The login policy can be set as a default at the instance level and can be customized for each organization. The configuration process varies slightly depending on your focus:
 
 
-- **For default settings**, navigate to: `$YOUR-DOMAIN/ui/console/instance?id=general`
-- **For specific organization settings**, select the organization from the menu and visit: `$YOUR-DOMAIN/ui/console/org-settings?id=login`
+- **For default settings**, navigate to: `${CUSTOM_DOMAIN}/ui/console/instance?id=general`
+- **For specific organization settings**, select the organization from the menu and visit: `${CUSTOM_DOMAIN}/ui/console/org-settings?id=login`
 
 
 Once in the settings:
@@ -103,7 +103,7 @@ Once in the settings:
 Access the settings page of your instance or the specific organization and select **Identity Providers**.
 
 
-The ZITADEL Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
+The ZITADEL Management Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
 
 ![Identity Provider Overview](/img/guides/zitadel_identity_provider_overview.png)
 
@@ -179,5 +179,5 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 ## References
 
 - [Identity brokering in ZITADEL](/docs/concepts/features/identity-brokering)
-- [The ZITADEL API reference for managing external IdPs](/docs/apis/resources/admin/identity-providers)
+- [The ZITADEL API reference for managing external IdPs](/docs/category/apis/resources/admin/identity-providers)
 - [Handle external logins in a custom login UI](/docs/guides/integrate/login-ui/external-login)

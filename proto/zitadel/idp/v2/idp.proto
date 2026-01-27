@@ -64,6 +64,13 @@ enum SAMLBinding {
   SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLSignatureAlgorithm {
+  SAML_SIGNATURE_UNSPECIFIED = 0;
+  SAML_SIGNATURE_RSA_SHA1 = 1;
+  SAML_SIGNATURE_RSA_SHA256 = 2;
+  SAML_SIGNATURE_RSA_SHA512 = 3;
+}
+
 enum SAMLNameIDFormat {
   SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
   SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
@@ -135,32 +142,32 @@ message OAuthConfig {
         example:
           "\"client-id\"";
       } ];
-  // The endpoint where ZITADEL send the user to authenticate.
+  // The endpoint where Zitadel send the user to authenticate.
   string authorization_endpoint = 2
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
           "\"https://accounts.google.com/o/oauth2/v2/auth\"";
       } ];
-  // The endpoint where ZITADEL can get the token.
+  // The endpoint where Zitadel can get the token.
   string token_endpoint = 3
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
           "\"https://oauth2.googleapis.com/token\"";
       } ];
-  // The endpoint where ZITADEL can get the user information.
+  // The endpoint where Zitadel can get the user information.
   string user_endpoint = 4
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
           "\"https://openidconnect.googleapis.com/v1/userinfo\"";
       } ];
-  // The scopes requested by ZITADEL during the request on the identity
+  // The scopes requested by Zitadel during the request on the identity
   // provider.
   repeated string scopes = 5
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
           "[\"openid\", \"profile\", \"email\"]";
       } ];
-  // Defines how the attribute is called where ZITADEL can get the id of the
+  // Defines how the attribute is called where Zitadel can get the id of the
   // user.
   string id_attribute = 6
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -182,7 +189,7 @@ message GenericOIDCConfig {
         example:
           "\"client-id\"";
       } ];
-  // The scopes requested by ZITADEL during the request on the identity
+  // The scopes requested by Zitadel during the request on the identity
   // provider.
   repeated string scopes = 3
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -205,7 +212,7 @@ message GitHubConfig {
         example:
           "\"client-id\"";
       } ];
-  // The scopes requested by ZITADEL during the request to GitHub.
+  // The scopes requested by Zitadel during the request to GitHub.
   repeated string scopes = 2
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -223,7 +230,7 @@ message GitHubEnterpriseServerConfig {
   string authorization_endpoint = 2;
   string token_endpoint = 3;
   string user_endpoint = 4;
-  // The scopes requested by ZITADEL during the request to GitHub.
+  // The scopes requested by Zitadel during the request to GitHub.
   repeated string scopes = 5
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -238,7 +245,7 @@ message GoogleConfig {
         example:
           "\"client-id\"";
       } ];
-  // The scopes requested by ZITADEL during the request to Google.
+  // The scopes requested by Zitadel during the request to Google.
   repeated string scopes = 2
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -253,7 +260,7 @@ message GitLabConfig {
         example:
           "\"client-id\"";
       } ];
-  // The scopes requested by ZITADEL during the request to GitLab.
+  // The scopes requested by Zitadel during the request to GitLab.
   repeated string scopes = 2
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -269,7 +276,7 @@ message GitLabSelfHostedConfig {
         example:
           "\"client-id\"";
       } ];
-  // The scopes requested by ZITADEL during the request to GitLab.
+  // The scopes requested by Zitadel during the request to GitLab.
   repeated string scopes = 3
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -303,9 +310,12 @@ message SAMLConfig {
   // in case the nameid-format returned is
   // `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
   optional string transient_mapping_attribute_name = 5;
-  // Boolean weather federated logout is enabled. If enabled, ZITADEL will send a logout request to the identity provider,
+  // Boolean weather federated logout is enabled. If enabled, Zitadel will send a logout request to the identity provider,
   // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
   optional bool federated_logout_enabled = 6;
+  // Specify a Signature Algorithm that should used to sign SAML requests and responses.
+  // Can be set only if `with_signed_request` is set.
+  SAMLSignatureAlgorithm signature_algorithm = 7;
 }
 
 message AzureADConfig {
@@ -319,10 +329,10 @@ message AzureADConfig {
   // Organizational, All).
   AzureADTenant tenant = 2;
   // Azure AD doesn't send if the email has been verified. Enable this if the
-  // user email should always be added verified in ZITADEL (no verification
+  // user email should always be added verified in Zitadel (no verification
   // emails will be sent).
   bool email_verified = 3;
-  // The scopes requested by ZITADEL during the request to Azure AD.
+  // The scopes requested by Zitadel during the request to Azure AD.
   repeated string scopes = 4
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
@@ -331,19 +341,19 @@ message AzureADConfig {
 }
 
 message Options {
-  // Enable if users should be able to link an existing ZITADEL user with an
+  // Enable if users should be able to link an existing Zitadel user with an
   // external account.
   bool is_linking_allowed = 1;
-  // Enable if users should be able to create a new account in ZITADEL when
+  // Enable if users should be able to create a new account in Zitadel when
   // using an external account.
   bool is_creation_allowed = 2;
-  // Enable if a new account in ZITADEL should be created automatically when
+  // Enable if a new account in Zitadel should be created automatically when
   // login with an external account.
   bool is_auto_creation = 3;
-  // Enable if a the ZITADEL account fields should be updated automatically on
+  // Enable if a the Zitadel account fields should be updated automatically on
   // each login.
   bool is_auto_update = 4;
-  // Enable if users should get prompted to link an existing ZITADEL user to an
+  // Enable if users should get prompted to link an existing Zitadel user to an
   // external account if the selected attribute matches.
   AutoLinkingOption auto_linking = 5;
 }
@@ -352,10 +362,10 @@ enum AutoLinkingOption {
   // AUTO_LINKING_OPTION_UNSPECIFIED disables the auto linking prompt.
   AUTO_LINKING_OPTION_UNSPECIFIED = 0;
   // AUTO_LINKING_OPTION_USERNAME will use the username of the external user to
-  // check for a corresponding ZITADEL user.
+  // check for a corresponding Zitadel user.
   AUTO_LINKING_OPTION_USERNAME = 1;
   // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check
-  // for a corresponding ZITADEL user with the same verified email Note that in
+  // for a corresponding Zitadel user with the same verified email Note that in
   // case multiple users match, no prompt will be shown.
   AUTO_LINKING_OPTION_EMAIL = 2;
 }
@@ -415,7 +425,7 @@ message AppleConfig {
         example:
           "\"OGKDK25KD\"";
       } ];
-  // The scopes requested by ZITADEL during the request to Apple.
+  // The scopes requested by Zitadel during the request to Apple.
   repeated string scopes = 4
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:

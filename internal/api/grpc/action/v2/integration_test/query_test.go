@@ -11,8 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
@@ -54,7 +55,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -71,7 +72,8 @@ func TestServer_GetTarget(t *testing.T) {
 					TargetType: &action.Target_RestWebhook{
 						RestWebhook: &action.RESTWebhook{},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -81,7 +83,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeAsync, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -98,7 +100,8 @@ func TestServer_GetTarget(t *testing.T) {
 					TargetType: &action.Target_RestAsync{
 						RestAsync: &action.RESTAsync{},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -108,7 +111,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -127,7 +130,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: true,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -137,7 +141,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -156,7 +160,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: false,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -166,7 +171,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -185,7 +190,8 @@ func TestServer_GetTarget(t *testing.T) {
 							InterruptOnError: true,
 						},
 					},
-					Timeout: durationpb.New(5 * time.Second),
+					Timeout:     durationpb.New(5 * time.Second),
+					PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 				},
 			},
 		},
@@ -261,7 +267,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp.GetId()},
@@ -291,7 +297,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -301,7 +308,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := integration.TargetName()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					request.Filters[0].Filter = &action.TargetSearchFilter_TargetNameFilter{
 						TargetNameFilter: &action.TargetNameFilter{
 							TargetName: name,
@@ -331,7 +338,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -344,9 +352,9 @@ func TestServer_ListTargets(t *testing.T) {
 					name1 := integration.TargetName()
 					name2 := integration.TargetName()
 					name3 := integration.TargetName()
-					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", domain.TargetTypeWebhook, false)
-					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", domain.TargetTypeCall, true)
-					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", domain.TargetTypeAsync, false)
+					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
+					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JWT)
+					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", target_domain.TargetTypeAsync, false, action.PayloadType_PAYLOAD_TYPE_JWE)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
@@ -386,7 +394,8 @@ func TestServer_ListTargets(t *testing.T) {
 						TargetType: &action.Target_RestAsync{
 							RestAsync: &action.RESTAsync{},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JWE,
 					},
 					{
 						Endpoint: "https://example.com",
@@ -395,7 +404,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: true,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JWT,
 					},
 					{
 						Endpoint: "https://example.com",
@@ -404,7 +414,8 @@ func TestServer_ListTargets(t *testing.T) {
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(5 * time.Second),
+						Timeout:     durationpb.New(5 * time.Second),
+						PayloadType: action.PayloadType_PAYLOAD_TYPE_JSON,
 					},
 				},
 			},
@@ -445,7 +456,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 
 	type args struct {
 		ctx context.Context
@@ -523,7 +534,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
-					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON)
 					// add target as Filter to the request
 					request.Filters[0] = &action.ExecutionSearchFilter{
 						Filter: &action.ExecutionSearchFilter_TargetFilter{
@@ -779,5 +790,336 @@ func TestServer_ListExecutions(t *testing.T) {
 				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
 			}, retryDuration, tick, "timeout waiting for expected execution Executions")
 		})
+	}
+}
+
+func TestServer_ListPublicKeys(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false, action.PayloadType_PAYLOAD_TYPE_JSON).GetId()
+	activeKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:  targetID,
+		PublicKey: publicKeyBytes,
+	})
+	require.NoError(t, err)
+	changeDate, err := instance.Client.ActionV2.ActivatePublicKey(isolatedIAMOwnerCTX, &action.ActivatePublicKeyRequest{
+		TargetId: targetID,
+		KeyId:    activeKey.GetKeyId(),
+	})
+	require.NoError(t, err)
+	expirationDate := timestamppb.New(time.Now().Add(24 * time.Hour))
+	inactiveKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:       targetID,
+		PublicKey:      rsaPublicKeyBytes,
+		ExpirationDate: expirationDate,
+	})
+	require.NoError(t, err)
+	anotherKey, err := instance.Client.ActionV2.AddPublicKey(isolatedIAMOwnerCTX, &action.AddPublicKeyRequest{
+		TargetId:  targetID,
+		PublicKey: rsaPublicKeyBytes,
+	})
+	require.NoError(t, err)
+	type args struct {
+		ctx context.Context
+		req *action.ListPublicKeysRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *action.ListPublicKeysResponse
+		wantErr bool
+	}{
+		{
+			name: "missing permission",
+			args: args{
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+				req: &action.ListPublicKeysRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid target id",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: "notfound",
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+				},
+			},
+		},
+		{
+			name: "list all",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  3,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list only active",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ActiveFilter{
+								ActiveFilter: true,
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  1,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list only inactive",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ActiveFilter{
+								ActiveFilter: false,
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  2,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list with expiration date filter (boefore or equals)",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ExpirationDateFilter{
+								ExpirationDateFilter: &filter.TimestampFilter{
+									Timestamp: expirationDate,
+									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  1,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          inactiveKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: expirationDate,
+						CreationDate:   inactiveKey.GetCreationDate(),
+						ChangeDate:     inactiveKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list with expiration date filter (after incl. no expiration)",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_ExpirationDateFilter{
+								ExpirationDateFilter: &filter.TimestampFilter{
+									Timestamp: expirationDate,
+									Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					AppliedLimit: 100,
+					TotalResult:  2,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+					{
+						KeyId:          activeKey.GetKeyId(),
+						Active:         true,
+						PublicKey:      publicKeyBytes,
+						Fingerprint:    fingerprint,
+						ExpirationDate: nil,
+						CreationDate:   activeKey.GetCreationDate(),
+						ChangeDate:     changeDate.GetChangeDate(),
+					},
+				},
+			},
+		},
+		{
+			name: "list by key id",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.ListPublicKeysRequest{
+					TargetId: targetID,
+					Filters: []*action.PublicKeySearchFilter{
+						{
+							Filter: &action.PublicKeySearchFilter_KeyIdsFilter{
+								KeyIdsFilter: &filter.InIDsFilter{
+									Ids: []string{activeKey.GetKeyId(), anotherKey.GetKeyId()},
+								},
+							},
+						},
+					},
+					SortingColumn: action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CHANGE_DATE,
+					Pagination: &filter.PaginationRequest{
+						Limit:  1,
+						Offset: 1,
+						Asc:    true,
+					},
+				},
+			},
+			want: &action.ListPublicKeysResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 1,
+				},
+				PublicKeys: []*action.PublicKey{
+					{
+						KeyId:          anotherKey.GetKeyId(),
+						Active:         false,
+						PublicKey:      rsaPublicKeyBytes,
+						Fingerprint:    rsaFingerprint,
+						ExpirationDate: nil,
+						CreationDate:   anotherKey.GetCreationDate(),
+						ChangeDate:     anotherKey.GetCreationDate(),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 10*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instance.Client.ActionV2.ListPublicKeys(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, err, "Error: "+err.Error())
+					return
+				}
+				assert.NoError(ttt, err)
+				assertPublicKeys(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected public keys")
+		})
+	}
+}
+
+func assertPublicKeys(ttt *assert.CollectT, want *action.ListPublicKeysResponse, got *action.ListPublicKeysResponse) {
+	assert.EqualExportedValues(ttt, want.Pagination, got.Pagination)
+	assert.Len(ttt, got.PublicKeys, len(want.PublicKeys))
+	for i := range want.PublicKeys {
+		assert.Equal(ttt, want.PublicKeys[i].GetKeyId(), got.PublicKeys[i].GetKeyId())
+		assert.Equal(ttt, want.PublicKeys[i].GetActive(), got.PublicKeys[i].GetActive())
+		assert.Equal(ttt, want.PublicKeys[i].GetFingerprint(), got.PublicKeys[i].GetFingerprint())
+		assert.Equal(ttt, want.PublicKeys[i].GetPublicKey(), got.PublicKeys[i].GetPublicKey())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetExpirationDate().AsTime(), want.PublicKeys[i].GetExpirationDate().AsTime(), want.PublicKeys[i].GetExpirationDate().AsTime())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetCreationDate().AsTime(), want.PublicKeys[i].GetCreationDate().AsTime(), want.PublicKeys[i].GetCreationDate().AsTime())
+		assertDateWithinRangeClockSkew(ttt, got.PublicKeys[i].GetChangeDate().AsTime(), want.PublicKeys[i].GetChangeDate().AsTime(), want.PublicKeys[i].GetChangeDate().AsTime())
 	}
 }

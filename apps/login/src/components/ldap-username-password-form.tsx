@@ -24,7 +24,7 @@ type Props = {
 
 export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const t = useTranslations("ldap");
@@ -69,7 +69,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
         type="text"
         autoComplete="username"
         {...register("loginName", { required: t("required.username") })}
-        label={t("username")}
+        label={t("labels.username")}
         data-testid="username-text-input"
       />
 
@@ -78,7 +78,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
           type="password"
           autoComplete="password"
           {...register("password", { required: t("required.password") })}
-          label={t("password")}
+          label={t("labels.password")}
           data-testid="password-text-input"
         />
       </div>

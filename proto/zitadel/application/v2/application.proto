@@ -1,0 +1,216 @@
+syntax = "proto3";
+
+package zitadel.application.v2;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/application/v2/api.proto";
+import "zitadel/application/v2/oidc.proto";
+import "zitadel/application/v2/saml.proto";
+import "zitadel/filter/v2/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
+
+message Application {
+  // The unique identifier of the application.
+  string application_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""}];
+
+  // The timestamp of the application creation.
+  google.protobuf.Timestamp creation_date = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+
+  // The timestamp of the last update to the application.
+  google.protobuf.Timestamp change_date = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+
+  // The current state of the application.
+  ApplicationState state = 4;
+
+  // The name of the application. This can be displayed to users.
+  string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Console\""}];
+
+  // Depending on the application type, this field contains the specific configuration.
+  // Only one of the configurations will be set.
+  oneof configuration {
+    OIDCConfiguration oidc_configuration = 6;
+    APIConfiguration api_configuration = 7;
+    SAMLConfiguration saml_configuration = 8;
+  }
+
+  // The ProjectID represents the ID of the project the application belongs to.
+  string project_id = 9;
+}
+
+enum ApplicationState {
+  APPLICATION_STATE_UNSPECIFIED = 0;
+  APPLICATION_STATE_ACTIVE = 1;
+  APPLICATION_STATE_INACTIVE = 2;
+  APPLICATION_STATE_REMOVED = 3;
+}
+
+enum ApplicationSorting {
+  APPLICATION_SORT_BY_ID = 0;
+  APPLICATION_SORT_BY_NAME = 1;
+  APPLICATION_SORT_BY_STATE = 2;
+  APPLICATION_SORT_BY_CREATION_DATE = 3;
+  APPLICATION_SORT_BY_CHANGE_DATE = 4;
+}
+
+message ApplicationSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Filter the projectID the application has to belong to.
+    ProjectIDFilter project_id_filter = 1;
+
+    // Filter the applications by their name.
+    ApplicationNameFilter name_filter = 2;
+
+    // Filter the applications by their state.
+    ApplicationState state_filter = 3;
+
+    // Filter for specific application types.
+    ApplicationType type_filter = 4 [(validate.rules).enum = {defined_only: true, not_in:[0]}];
+
+    // Filter the applications by the clientID
+    // This is only applicable for OIDC and API applications.
+    ClientIDFilter client_id_filter = 5;
+
+    // Filter the applications by their entityID
+    // This is only applicable for SAML applications.
+    EntityIDFilter entity_id_filter = 6;
+  }
+}
+
+message ProjectIDFilter {
+  // Search for application belonging to the project with this ID.
+  string project_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ApplicationNameFilter {
+  // The name of the application to search for.
+  string name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"Conso\""}
+  ];
+
+  // The method to use for text comparison. If not set, defaults to EQUALS.
+  zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ClientIDFilter {
+  // The clientID to search for. The search is performed as an exact match.
+  string client_id = 1 [
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"client-12345\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message EntityIDFilter {
+  // The entityID to search for. The search is performed as an exact match.
+  string entity_id = 1 [
+    (validate.rules).string = {
+      min_len: 1,
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"https://example.com/saml/v2/metadata\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+enum ApplicationType {
+  APPLICATION_TYPE_UNSPECIFIED = 0;
+  APPLICATION_TYPE_OIDC = 1;
+  APPLICATION_TYPE_API = 2;
+  APPLICATION_TYPE_SAML = 3;
+}
+
+enum ApplicationKeysSorting {
+  APPLICATION_KEYS_SORT_BY_ID = 0;
+  APPLICATION_KEYS_SORT_BY_PROJECT_ID = 1;
+  APPLICATION_KEYS_SORT_BY_APPLICATION_ID = 2;
+  APPLICATION_KEYS_SORT_BY_CREATION_DATE = 3;
+  APPLICATION_KEYS_SORT_BY_ORGANIZATION_ID = 4;
+  APPLICATION_KEYS_SORT_BY_EXPIRATION = 5;
+  APPLICATION_KEYS_SORT_BY_TYPE = 6;
+}
+
+message ApplicationKeySearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Filter the application keys by the application ID they belong to.
+    ApplicationKeyApplicationIDFilter application_id_filter = 1;
+
+    // Filter the application keys by the project ID the corresponding application belong to.
+    ApplicationKeyProjectIDFilter project_id_filter = 2;
+
+    // Filter the application keys by the organization ID the corresponding application belong to.
+    ApplicationKeyOrganizationIDFilter organization_id_filter = 3;
+  }
+}
+
+message ApplicationKeyApplicationIDFilter {
+  // Search for application keys belonging to the application with this ID.
+  string application_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ApplicationKeyProjectIDFilter {
+  // Search for application keys belonging to applications in the project with this ID.
+  string project_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ApplicationKeyOrganizationIDFilter {
+  // Search for application keys belonging to applications in the organization with this ID.
+  string organization_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"69629023906488334\""},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ApplicationKey {
+  // The unique identifier of the application key.
+  string key_id = 1;
+
+  // The identifier of the application this key belongs to.
+  string application_id = 2;
+
+  // The identifier of the project this application belongs to.
+  string project_id = 3;
+
+  // The timestamp of the key creation.
+  google.protobuf.Timestamp creation_date = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+
+  // The identifier of the organization this application belongs to.
+  string organization_id = 5;
+
+  // The timestamp the key expires.
+  google.protobuf.Timestamp expiration_date = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"2024-12-18T07:50:47.492Z\""}];
+}

@@ -493,6 +493,176 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 		{
+			name: "usergrant for project, and removed project grant on same resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+								[]string{"rolekey1"},
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for project, and project grant on same resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+								[]string{"rolekey1"},
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:         "user1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"rolekey1"},
+					State:          domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
 			name: "usergrant without resource owner on project, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -683,14 +853,14 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							project.NewGrantAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectgrant1",
-								"org1",
+								"org2",
 								[]string{"rolekey1"},
 							),
 						),
 					),
 					expectPush(
 						usergrant.NewUserGrantAddedEvent(context.Background(),
-							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							&usergrant.NewAggregate("usergrant1", "org2").Aggregate,
 							"user1",
 							"project1",
 							"projectgrant1",
@@ -709,7 +879,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
+						ResourceOwner: "org2",
 					},
 				},
 			},
@@ -717,7 +887,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				want: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "usergrant1",
-						ResourceOwner: "org1",
+						ResourceOwner: "org2",
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
@@ -728,55 +898,32 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 	}
-	t.Run("without permission check", func(t *testing.T) {
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				r := &Commands{
-					eventstore: tt.fields.eventstore(t),
-				}
-				if tt.fields.idGenerator != nil {
-					r.idGenerator = tt.fields.idGenerator(t)
-				}
-				got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, nil)
-				if tt.res.err == nil {
-					assert.NoError(t, err)
-				}
-				if tt.res.err != nil && !tt.res.err(err) {
-					t.Errorf("got wrong err: %v ", err)
-				}
-				if tt.res.err == nil {
-					assert.Equal(t, tt.res.want, got)
-				}
-			})
-		}
-	})
-	t.Run("with succeeding permission check", func(t *testing.T) {
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				r := &Commands{
-					eventstore: tt.fields.eventstore(t),
-				}
-				if tt.fields.idGenerator != nil {
-					r.idGenerator = tt.fields.idGenerator(t)
-				}
-				// we use an empty context and only rely on the permission check implementation
-				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, succeedingUserGrantPermissionCheck)
-				if tt.res.err == nil {
-					assert.NoError(t, err)
-				}
-				if tt.res.err != nil && !tt.res.err(err) {
-					t.Errorf("got wrong err: %v ", err)
-				}
-				if tt.res.err == nil {
-					assert.Equal(t, tt.res.want, got)
-				}
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			if tt.fields.idGenerator != nil {
+				r.idGenerator = tt.fields.idGenerator(t)
+			}
+			got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, succeedingUserGrantPermissionCheck)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddUserGrant_permission_failed(t *testing.T) {
 	t.Run("with failing permission check", func(t *testing.T) {
 		r := &Commands{
-			eventstore: eventstoreExpect(
-				t,
+			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -808,7 +955,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 				),
-			),
+			)(t),
 		}
 		// we use an empty context and only rely on the permission check implementation
 		_, err := r.AddUserGrant(context.Background(), &domain.UserGrant{
@@ -925,9 +1072,10 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID: "user1",
 				},
+				permissionCheck: failingUserGrantPermissionCheck,
 			},
 			res: res{
-				err: zerrors.IsPermissionDenied,
+				err: isMockedPermissionCheckErr,
 			},
 		},
 		{
@@ -1479,10 +1627,106 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								&usergrant.NewAggregate("usergrant1", "org2").Aggregate,
 								"user1",
 								"project1",
 								"projectgrant1", []string{"rolekey1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey2",
+								"rolekey2",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rolekey1", "rolekey2"},
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org2").Aggregate,
+							"user1",
+							[]string{"rolekey1", "rolekey2"},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org2",
+					},
+					UserID:         "user1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"rolekey1", "rolekey2"},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org2",
+					},
+					UserID:         "user1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"rolekey1", "rolekey2"},
+					State:          domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for projectgrant same resource owner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
 						),
 					),
 					expectFilter(
@@ -1550,7 +1794,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
-					ProjectGrantID: "projectgrant1",
+					ProjectGrantID: "",
 					RoleKeys:       []string{"rolekey1", "rolekey2"},
 				},
 			},
@@ -1562,7 +1806,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
-					ProjectGrantID: "projectgrant1",
+					ProjectGrantID: "",
 					RoleKeys:       []string{"rolekey1", "rolekey2"},
 					State:          domain.UserGrantStateActive,
 				},

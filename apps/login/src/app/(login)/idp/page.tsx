@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { getActiveIdentityProviders, getBrandingSettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -9,47 +9,45 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("idp");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const identityProviders = await getActiveIdentityProviders({
-    serviceUrl,
-    orgId: organization,
+  const identityProviders = await getActiveIdentityProviders({ serviceConfig, orgId: organization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="idp" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="idp" />
         </p>
+      </div>
 
+      <div className="w-full">
         {!!identityProviders?.length && (
           <SignInWithIdp
             identityProviders={identityProviders}
             requestId={requestId}
             organization={organization}
+            postErrorRedirectUrl="/idp"
+            showLabel={false}
           ></SignInWithIdp>
         )}
       </div>

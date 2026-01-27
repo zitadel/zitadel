@@ -6,7 +6,7 @@ This page describes the options you have when writing ZITADEL actions scripts.
 
 ## Language
 
-ZITADEL interpretes the scripts as JavaScript.
+ZITADEL interprets the scripts as JavaScript.
 Make sure your scripts are ECMAScript 5.1(+) compliant.
 Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed reference about the underlying library features and limitations.
 
@@ -49,7 +49,7 @@ Currently ZITADEL provides the following flows:
 - [Internal Authentication](./internal-authentication)
 - [External Authentication](./external-authentication)
 - [Complement Token](./complement-token)
-- [Customize SAML Response](./customize-samlresponse)
+- [Complement SAML Response](./customize-samlresponse)
 
 ## Available Modules inside Javascript
 

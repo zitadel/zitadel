@@ -321,14 +321,14 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
 		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -521,8 +521,10 @@ func (l *Login) handleExternalUserAuthenticated(
 
 // checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
 // The decision, which information will be checked is based on the IdP template option.
-// The function returns a boolean whether a user was found or not.
+// The function returns a boolean whether a user was found or not, resp. if it was linked.
 // If single a user was found, it will be automatically linked.
+// Before the actual linking, it will check if the user's organization allows external IdP and
+// has activated the correspond IdP.
 func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, human *domain.Human) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
@@ -539,10 +541,7 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 			if err != nil {
 				return false, nil
 			}
-			if err = l.autoLinkUser(r, authReq, user); err != nil {
-				return false, err
-			}
-			return true, nil
+			return l.autoLinkUser(r, authReq, user)
 		}
 		// If a specific org has been requested, we'll check the username (org policy (suffixed or not) is already applied)
 		// against usernames (of that org).
@@ -571,21 +570,36 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 	if err != nil {
 		return false, nil
 	}
-	if err = l.autoLinkUser(r, authReq, user); err != nil {
-		return false, err
-	}
-	return true, nil
+	return l.autoLinkUser(r, authReq, user)
 }
 
-func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) error {
+func (l *Login) checkAutoLinkingAllowedForUserAndIdP(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	policy, err := l.getLoginPolicy(r, user.ResourceOwner)
+	if err != nil {
+		return false, err
+	}
+	if !policy.AllowExternalIDPs {
+		return false, nil
+	}
+	return slices.ContainsFunc(policy.IDPLinks, func(link *query.IDPLoginPolicyLink) bool {
+		return link.IDPID == authReq.SelectedIDPConfigID
+	}), nil
+}
+
+// autoLink user will link the external user to the found user in case the user's organization
+// has the corresponding IdP activated. In case it doesn't, the function returns false and no error.
+func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	if allowed, err := l.checkAutoLinkingAllowedForUserAndIdP(r, authReq, user); err != nil || !allowed {
+		return false, nil
+	}
 	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID, false); err != nil {
-		return err
+		return false, err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
-		return err
+		return false, err
 	}
 	authReq.UserID = user.ID
-	return nil
+	return true, nil
 }
 
 // createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
@@ -1113,22 +1127,26 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 }
 
 func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
-	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	key, err := crypto.Decrypt(identityProvider.Key, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	opts := make([]saml.ProviderOpts, 0, 6)
-	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+	if identityProvider.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
-	if identityProvider.SAMLIDPTemplate.Binding != "" {
-		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	if identityProvider.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.Binding))
 	}
-	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
-		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	if identityProvider.WithSignedRequest &&
+		identityProvider.SignatureAlgorithm != "" {
+		opts = append(opts, saml.WithSignatureAlgorithm(identityProvider.SignatureAlgorithm))
 	}
-	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
-		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
+	if identityProvider.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.NameIDFormat.V))
+	}
+	if identityProvider.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
@@ -1154,8 +1172,8 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	return saml.New(
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLogin+"/",
-		identityProvider.SAMLIDPTemplate.Metadata,
-		identityProvider.SAMLIDPTemplate.Certificate,
+		identityProvider.Metadata,
+		identityProvider.Certificate,
 		key,
 		opts...,
 	)
@@ -1320,6 +1338,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 		return s.Tokens
 	case *oauth.Session:
 		return s.Tokens
+	case *github.Session:
+		return s.Tokens()
 	case *azuread.Session:
 		return s.Tokens()
 	case *apple.Session:
@@ -1591,5 +1611,5 @@ func WrapIdPError(err error) *IdPError {
 	if errors.As(err, &zErr) {
 		id = zErr.ID
 	}
-	return &IdPError{err: zerrors.CreateZitadelError(err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
+	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
 }

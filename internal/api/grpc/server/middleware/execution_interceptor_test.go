@@ -1,61 +1,41 @@
 package middleware
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
 
-var _ execution.Target = &mockExecutionTarget{}
-
-type mockExecutionTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-	SigningKey       string
-}
-
-func (e *mockExecutionTarget) SetEndpoint(endpoint string) {
-	e.Endpoint = endpoint
-}
-func (e *mockExecutionTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *mockExecutionTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *mockExecutionTarget) GetTargetType() domain.TargetType {
-	return e.TargetType
-}
-func (e *mockExecutionTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-func (e *mockExecutionTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *mockExecutionTarget) GetExecutionID() string {
-	return e.ExecutionID
-}
-func (e *mockExecutionTarget) GetSigningKey() string {
-	return e.SigningKey
-}
+var (
+	privateKey = func() *rsa.PrivateKey {
+		privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+		return privateKey
+	}()
+	encryptionKey = func() []byte {
+		data, _ := crypto.PublicKeyToBytes(&privateKey.PublicKey)
+		return data
+	}()
+	encryptionKeyID  = "encryption-key-id"
+	signingAlgorithm = jose.RS256
+)
 
 func newMockContentRequest(content string) proto.Message {
 	return &structpb.Struct{
@@ -84,18 +64,20 @@ func newMockContextInfoResponse(fullMethod, request, response string) *ContextIn
 
 func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type target struct {
-		reqBody    execution.ContextInfo
-		sleep      time.Duration
-		statusCode int
-		respBody   interface{}
+		reqBody             execution.ContextInfo
+		sleep               time.Duration
+		statusCode          int
+		respBody            interface{}
+		requestVerification func(*testing.T) func([]byte, []byte) bool
 	}
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
-		targets          []target
-		fullMethod       string
-		req              interface{}
+		executionTargets       []target_domain.Target
+		targets                []target
+		fullMethod             string
+		req                    interface{}
+		getActiveSigningWebKey execution.GetActiveSigningWebKey
 	}
 	type res struct {
 		want    interface{}
@@ -123,7 +105,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 			},
 			res{
@@ -135,12 +117,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
 					},
@@ -157,22 +138,21 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeCall,
+						TargetType:  target_domain.TargetTypeCall,
 						Timeout:     time.Minute,
-						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -186,24 +166,23 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -217,23 +196,22 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -247,19 +225,20 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
-					{reqBody: newMockContextInfoRequest("/service/method", "wrong")},
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "wrong"),
+						requestVerification: validateJSONPayload,
+					},
 				},
 				req: newMockContentRequest("content"),
 			},
@@ -272,23 +251,22 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -302,22 +280,21 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeAsync,
+						TargetType:  target_domain.TargetTypeAsync,
 						Timeout:     time.Second,
-						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -331,22 +308,21 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeAsync,
+						TargetType:  target_domain.TargetTypeAsync,
 						Timeout:     time.Minute,
-						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -360,22 +336,21 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						sleep:      0,
-						statusCode: http.StatusInternalServerError,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						sleep:               0,
+						statusCode:          http.StatusInternalServerError,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -389,23 +364,22 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -419,23 +393,22 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -449,54 +422,51 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentRequest("content2"),
-						sleep:      0,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content1"),
+						respBody:            newMockContentRequest("content2"),
+						sleep:               0,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentRequest("content3"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content2"),
+						respBody:            newMockContentRequest("content3"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
@@ -510,59 +480,120 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentRequest("content2"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusBadRequest,
+						reqBody:             newMockContextInfoRequest("/service/method", "content1"),
+						respBody:            newMockContentRequest("content2"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusBadRequest,
+						requestVerification: validateJSONPayload,
 					},
 					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentRequest("content3"),
-						sleep:      5 * time.Second,
-						statusCode: http.StatusOK,
+						reqBody:             newMockContextInfoRequest("/service/method", "content2"),
+						respBody:            newMockContentRequest("content3"),
+						sleep:               5 * time.Second,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
 					},
 				},
 				req: newMockContentRequest("content"),
 			},
 			res{
 				wantErr: true,
+			},
+		},
+		{
+			"payload JWT, ok",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						PayloadType:      target_domain.PayloadTypeJWT,
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJWTPayload,
+					},
+				},
+				req:                    newMockContentRequest("content"),
+				getActiveSigningWebKey: mockGetActiveSigningWebKey(),
+			},
+			res{
+				want: newMockContentRequest("content"),
+			},
+		},
+		{
+			"payload JWE, ok",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						PayloadType:      target_domain.PayloadTypeJWE,
+						EncryptionKey:    encryptionKey,
+						EncryptionKeyID:  encryptionKeyID,
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentRequest("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJWEPayload,
+					},
+				},
+				req:                    newMockContentRequest("content"),
+				getActiveSigningWebKey: mockGetActiveSigningWebKey(),
+			},
+			res{
+				want: newMockContentRequest("content"),
 			},
 		},
 	}
@@ -575,10 +606,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					target.sleep,
 					target.statusCode,
 					target.respBody,
+					target.requestVerification(t),
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -587,6 +618,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.executionTargets,
 				tt.args.fullMethod,
 				tt.args.req,
+				nil,
+				tt.args.getActiveSigningWebKey,
 			)
 
 			if tt.res.wantErr {
@@ -608,6 +641,7 @@ func testServerCall(
 	sleep time.Duration,
 	statusCode int,
 	respBody interface{},
+	requestVerification func(expected, sent []byte) bool,
 ) (string, func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(reqBody)
@@ -622,7 +656,7 @@ func testServerCall(
 			return
 		}
 
-		if !reflect.DeepEqual(data, sentBody) {
+		if !requestVerification(data, sentBody) {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -640,7 +674,7 @@ func testServerCall(
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
-		if _, err := io.WriteString(w, string(resp)); err != nil {
+		if _, err := w.Write(resp); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -649,6 +683,45 @@ func testServerCall(
 	server := httptest.NewServer(http.HandlerFunc(handler))
 
 	return server.URL, server.Close
+}
+
+func mockGetActiveSigningWebKey() func(ctx context.Context) (*jose.JSONWebKey, error) {
+	return func(ctx context.Context) (*jose.JSONWebKey, error) {
+		return &jose.JSONWebKey{
+			Key:       privateKey,
+			Algorithm: string(signingAlgorithm),
+			Use:       "sig",
+		}, nil
+	}
+}
+
+func validateJSONPayload(t *testing.T) func(expected, sent []byte) bool {
+	return bytes.Equal
+}
+
+func validateJWTPayload(t *testing.T) func(expected, sent []byte) bool {
+	return func(expected, sent []byte) bool {
+		jws, err := jose.ParseSigned(string(sent), []jose.SignatureAlgorithm{jose.RS256})
+		require.NoError(t, err)
+		payload, err := jws.Verify(privateKey.Public())
+		require.NoError(t, err)
+		return bytes.Equal(expected, payload)
+	}
+}
+
+func validateJWEPayload(t *testing.T) func(expected, sent []byte) bool {
+	return func(expected, sent []byte) bool {
+		parsedJWE, err := jose.ParseEncrypted(string(sent), []jose.KeyAlgorithm{jose.RSA_OAEP_256, jose.ECDH_ES_A256KW}, []jose.ContentEncryption{jose.A256GCM})
+		if err != nil {
+			return false
+		}
+		require.Equal(t, encryptionKeyID, parsedJWE.Header.KeyID)
+		require.Equal(t, "JWT", parsedJWE.Header.ExtraHeaders[jose.HeaderContentType].(string))
+
+		decryptedJWS, err := parsedJWE.Decrypt(privateKey)
+		require.NoError(t, err)
+		return validateJWTPayload(t)(expected, decryptedJWS)
+	}
 }
 
 func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
@@ -661,7 +734,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
+		executionTargets []target_domain.Target
 		targets          []target
 		fullMethod       string
 		req              interface{}
@@ -694,7 +767,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 				resp:             newMockContentRequest("response"),
 			},
@@ -707,15 +780,13 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -738,15 +809,13 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:       "instance",
+				executionTargets: []target_domain.Target{
+					{
 						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
-						TargetType:       domain.TargetTypeCall,
+						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -774,10 +843,10 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					target.sleep,
 					target.statusCode,
 					target.respBody,
+					validateJSONPayload(t),
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -787,6 +856,8 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.fullMethod,
 				tt.args.req,
 				tt.args.resp,
+				nil,
+				mockGetActiveSigningWebKey(),
 			)
 
 			if tt.res.wantErr {

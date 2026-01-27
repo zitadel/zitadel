@@ -37,7 +37,7 @@ https://login.example.com/oauth/v2/authorize?client_id=170086824411201793%40your
 The auth request includes all the relevant information for the OIDC standard and in this example we also have a login hint for the login name "minnie-mouse".
 
 You now have to proxy the auth request from your own UI to the authorize Endpoint of ZITADEL.
-For more information, see [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
+For more information, see [OIDC Proxy](./login-app#oidc-proxy) for the necessary headers.
 
 :::note
 The version and the optional custom URI for the available login UI is configurable under the application settings.
@@ -55,7 +55,7 @@ With the ID from the redirect before you will now be able to get the information
 
 ```bash
 curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
+  --url https://${CUSTOM_DOMAIN}/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Authorization: Bearer '"$TOKEN"''
 ```
 
@@ -100,7 +100,7 @@ Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/o
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
+  --url ${CUSTOM_DOMAIN}/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

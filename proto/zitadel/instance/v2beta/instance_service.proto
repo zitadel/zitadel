@@ -42,7 +42,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -55,8 +55,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -105,9 +105,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 // Service to manage instances and their domains.
 // The service provides methods to create, update, delete and list instances and their domains.
+//
+// Deprecated: use instance service v2 instead. This service will be removed in the next major version of ZITADEL.
 service InstanceService {
 
   // Delete Instance
+  //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
   //
   // Deletes an instance with the given ID.
   //
@@ -115,6 +119,7 @@ service InstanceService {
   //   - `system.instance.delete`
   rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -136,6 +141,8 @@ service InstanceService {
 
   // Get Instance
   //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Returns the instance in the current context.
   //
   // The instance_id in the input message will be used in the future.
@@ -144,6 +151,7 @@ service InstanceService {
   //   - `iam.read`
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -165,7 +173,9 @@ service InstanceService {
 
   // Update Instance
   //
-  // Updates instance in context with the given name.
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Updates instance in context with the provided name.
   //
   // The instance_id in the input message will be used in the future.
   //
@@ -173,6 +183,7 @@ service InstanceService {
   //   - `iam.write`
   rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -195,6 +206,8 @@ service InstanceService {
 
   // List Instances
   //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Lists instances matching the given query.
   // The query can be used to filter either by instance ID or domain.
   // The request is paginated and returns 100 results by default.
@@ -203,6 +216,7 @@ service InstanceService {
   //  - `system.instance.read`
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -225,7 +239,9 @@ service InstanceService {
   
   // Add Custom Domain
   //
-  // Adds a custom domain to the instance in context.
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Adds a Custom Domain to the instance in context.
   //
   // The instance_id in the input message will be used in the future
   //
@@ -233,10 +249,11 @@ service InstanceService {
   //   - `system.domain.write`
   rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
-          description: "The added custom domain.";
+          description: "The added Custom Domain.";
         }
       };
     };
@@ -255,7 +272,9 @@ service InstanceService {
 
   // Remove Custom Domain
   //
-  // Removes a custom domain from the instance.
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Removes a Custom Domain from the instance.
   //
   // The instance_id in the input message will be used in the future.
   //
@@ -263,10 +282,11 @@ service InstanceService {
   //  - `system.domain.write`
   rpc RemoveCustomDomain(RemoveCustomDomainRequest) returns (RemoveCustomDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
-          description: "The removed custom domain.";
+          description: "The removed Custom Domain.";
         }
       };
     };
@@ -284,7 +304,9 @@ service InstanceService {
 
   // List Custom Domains
   //
-  // Lists custom domains of the instance.
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Lists Custom Domains of the instance.
   //
   // The instance_id in the input message will be used in the future.
   //
@@ -292,10 +314,11 @@ service InstanceService {
   //  - `iam.read`
   rpc ListCustomDomains(ListCustomDomainsRequest) returns (ListCustomDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
-          description: "The list of custom domains.";
+          description: "The list of Custom Domains.";
         }
       };
     };
@@ -314,6 +337,8 @@ service InstanceService {
 
   // Add Trusted Domain
   //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Adds a trusted domain to the instance.
   //
   // The instance_id in the input message will be used in the future.
@@ -322,6 +347,7 @@ service InstanceService {
   //  - `iam.write`
   rpc AddTrustedDomain(AddTrustedDomainRequest) returns (AddTrustedDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -344,6 +370,8 @@ service InstanceService {
 
   // Remove Trusted Domain
   //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Removes a trusted domain from the instance.
   //
   // The instance_id in the input message will be used in the future.
@@ -352,6 +380,7 @@ service InstanceService {
   //  - `iam.write`
   rpc RemoveTrustedDomain(RemoveTrustedDomainRequest) returns (RemoveTrustedDomainResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -374,6 +403,8 @@ service InstanceService {
   
   // List Trusted Domains
   //
+  // Deprecated: please move to the corresponding endpoint under instance service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
   // Lists trusted domains of the instance.
   //
   // The instance_id in the input message will be used in the future.
@@ -382,6 +413,7 @@ service InstanceService {
   //   - `iam.read`
   rpc ListTrustedDomains(ListTrustedDomainsRequest) returns (ListTrustedDomainsResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200";
         value: {

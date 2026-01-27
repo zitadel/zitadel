@@ -22,6 +22,7 @@ type Props = {
   requestId: string | undefined;
   loginSettings: LoginSettings | undefined;
   organization?: string;
+  defaultOrganization?: string;
   suffix?: string;
   submit: boolean;
   allowRegister: boolean;
@@ -31,13 +32,14 @@ export function UsernameForm({
   loginName,
   requestId,
   organization,
+  defaultOrganization,
   suffix,
   loginSettings,
   submit,
   allowRegister,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       loginName: loginName ? loginName : "",
     },
@@ -56,11 +58,13 @@ export function UsernameForm({
     const res = await sendLoginname({
       loginName: values.loginName,
       organization,
+      defaultOrganization,
       requestId,
       suffix,
+      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
     })
       .catch(() => {
-        setError("An internal error occurred");
+        setError(t("errors.internalError"));
         return;
       })
       .finally(() => {
@@ -86,16 +90,13 @@ export function UsernameForm({
     }
   }, []);
 
-  let inputLabel = "Loginname";
-  if (
-    loginSettings?.disableLoginWithEmail &&
-    loginSettings?.disableLoginWithPhone
-  ) {
-    inputLabel = "Username";
+  let inputLabel = t("labels.loginname");
+  if (loginSettings?.disableLoginWithEmail && loginSettings?.disableLoginWithPhone) {
+    inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
-    inputLabel = "Username or phone number";
+    inputLabel = t("labels.usernameOrPhoneNumber");
   } else if (loginSettings?.disableLoginWithPhone) {
-    inputLabel = "Username or email";
+    inputLabel = t("labels.usernameOrEmail");
   }
 
   return (

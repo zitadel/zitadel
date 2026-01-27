@@ -6,14 +6,14 @@ with domain as (
 ), instance_features as (
 	select i.*
 	from domain d
-	join projections.instance_features2 i on d.instance_id = i.instance_id
+	join projections.instance_features3 i on d.instance_id = i.instance_id
 ), features as (
 	select instance_id, json_object_agg(
 		coalesce(i.key, s.key),
 		coalesce(i.value, s.value)
 	) features
 	from domain d
-	cross join projections.system_features s
+	cross join projections.system_features2 s
 	full outer join instance_features i using (instance_id, key)
 	group by instance_id
 ), external_domains as (
@@ -26,6 +26,37 @@ with domain as (
 	from domain d
 	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
 	group by td.instance_id
+), execution_targets as (
+	select instance_id, json_agg(x.execution_targets) as execution_targets from (
+		select e.instance_id, json_build_object(
+			'execution_id', et.execution_id,
+			'target_id', t.id,
+			'target_type', t.target_type,
+			'endpoint', t.endpoint,
+			'timeout', t.timeout,
+			'interrupt_on_error', t.interrupt_on_error,
+			'signing_key', t.signing_key,
+			'payload_type', t.payload_type,
+            'encryption_key', encode(k.public_key, 'base64'),
+            'encryption_key_id', k.id
+		) as execution_targets
+		from domain d
+		join projections.executions1 e
+			on d.instance_id = e.instance_id
+		join projections.executions1_targets et
+			on e.instance_id = et.instance_id
+			and e.id = et.execution_id
+		join projections.targets2 t
+			on et.instance_id = t.instance_id
+			and et.target_id = t.id
+        left join projections.authn_keys2 k
+            on k.instance_id = et.instance_id
+            and k.object_id = t.id
+            and k.enabled = true
+            and (k.expiration IS NULL or k.expiration > now())
+		order by et.position asc
+	) as x
+	group by instance_id
 )
 select
     i.id,
@@ -41,11 +72,13 @@ select
     l.block,
 	f.features,
 	ed.domains as external_domains,
-	td.domains as trusted_domains
+	td.domains as trusted_domains,
+	et.execution_targets
 from domain d
 join projections.instances i on i.id = d.instance_id
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
 left join external_domains ed on i.id = ed.instance_id
-left join trusted_domains td on i.id = td.instance_id;
+left join trusted_domains td on i.id = td.instance_id
+left join execution_targets et on i.id = et.instance_id;

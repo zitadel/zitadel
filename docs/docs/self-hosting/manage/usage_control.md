@@ -9,7 +9,7 @@ The usage control features are currently limited to the instance level only.
 
 ## Block Instances
 
-You can block an instance using the [system API](/apis/resources/system/limits).
+You can block an instance using the [system API](/docs/category/apis/resources/system/limits).
 
 Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
 However, requests to the [system API](/apis/introduction#system) are still allowed.
@@ -55,7 +55,7 @@ DefaultInstance:
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
 ```
 
-You can also set a limit for [a specific virtual instance](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/limits).
+You can also set a limit for [a specific virtual instance](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/category/apis/resources/system/limits).
 
 ## Quotas
 
@@ -85,7 +85,7 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 ```
 
-Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/quotas) or the *DefaultInstances.Quotas* section.
+Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/docs/category/apis/resources/system/quotas) or the *DefaultInstances.Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
@@ -129,7 +129,7 @@ DefaultInstance:
 
 If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
 Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
-The console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
+The management console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 
 ### Exhausted Action Run Seconds
 

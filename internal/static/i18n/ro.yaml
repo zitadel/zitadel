@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: Nu s-a putut contacta serverul SMTP folosind TLS, verificați portul, probleme de firewall...
     CouldNotCreateClient: Nu s-a putut crea clientul smtp
     CouldNotStartTLS: Nu s-a putut porni tls
-    CouldNotAuth: Nu s-a putut adăuga autentificare smtp, verificați dacă numele de utilizator și parola sunt corecte, dacă sunt corecte, poate furnizorul dvs. necesită o metodă de autentificare nesuportată de ZITADEL
+    CouldNotAuth: Nu s-a putut adăuga autentificare smtp, verificați dacă numele de utilizator și parola sunt corecte, dacă sunt corecte, poate furnizorul dvs. necesită o metodă de autentificare nesuportată de Zitadel
     CouldNotSetSender: Nu s-a putut seta expeditorul
     CouldNotSetRecipient: Nu s-a putut seta destinatarul
   SMTPConfig:
@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: Codul de inițializare nu a fost găsit
     UsernameNotChanged: Numele de utilizator nu a fost schimbat
     InvalidURLTemplate: Șablonul URL este invalid
+    Locked: Utilizatorul este blocat
     Profile:
       NotFound: Profilul nu a fost găsit
       NotChanged: Profilul nu a fost schimbat
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2F nu există
       Passwordless:
         NotExisting: Fără parolă nu există
+      RecoveryCodes:
+        InvalidCode: Codul de recuperare furnizat este invalid
+        MaxCountExceeded: Numărul maxim de coduri de recuperare a fost depășit
+        NotReady: Codurile de recuperare nu sunt gata pentru utilizare
+        ConfigInvalid: Configurația codurilor de recuperare este invalidă
     WebAuthN:
       NotFound: Token-ul WebAuthN nu a putut fi găsit
       BeginRegisterFailed: Înregistrarea WebAuthN a început, dar a eșuat
@@ -203,7 +209,7 @@ Errors:
     NotFound: Organizația nu a fost găsită
     NotChanged: Organizația nu a fost schimbată
     DefaultOrgNotDeletable: Organizația implicită nu trebuie să fie ștearsă
-    ZitadelOrgNotDeletable: Organizația cu proiectul ZITADEL nu trebuie să fie ștearsă
+    ZitadelOrgNotDeletable: Organizația cu proiectul Zitadel nu trebuie să fie ștearsă
     InvalidDomain: Domeniu invalid
     DomainMissing: Domeniu lipsă
     DomainNotOnOrg: Domeniul nu există în organizație
@@ -565,6 +571,10 @@ Errors:
         NoTimeout: Ținta nu are timp de așteptare
         InvalidURL: Ținta are un URL invalid
         NotFound: Ținta nu a fost găsită
+        InvalidExpirationDate: Data de expirare a cheii trebuie să fie în viitor
+        PublicKeyExpired: Cheia publică a destinației a expirat
+        PublicKeyActive: Nu se poate șterge cheia publică activă a destinației
+        InvalidPublicKey: Cheia publică este invalidă. Trebuie să fie o cheie publică RSA sau ECDSA codificată PEM în format PKCS#8
       Execution:
         ConditionInvalid: Condiția de execuție este invalidă
         Invalid: Execuția este invalidă
@@ -573,6 +583,7 @@ Errors:
         NoTargets: Nu sunt definite ținte
         Failed: Execuția a eșuat
         ResponseIsNotValidJSON: Răspunsul nu este un JSON valid
+        MissingEncryptionKey: Lipsește cheia de criptare pentru execuție
       UserSchema:
         NotEnabled: Caracteristica "Schema de utilizator" nu este activată
         Type:
@@ -1100,20 +1111,20 @@ Errors:
             changed: Politică de blocare a parolei schimbată
       iam:
         setup:
-          started: Configurarea ZITADEL a început
-          done: Configurarea ZITADEL a fost finalizată
+          started: Configurarea Zitadel a început
+          done: Configurarea Zitadel a fost finalizată
         global:
           org:
             set: Organizație globală setată
         project:
           iam:
-            set: Proiect ZITADEL setat
+            set: Proiect Zitadel setat
         member:
-          added: Membru ZITADEL adăugat
-          changed: Membru ZITADEL schimbat
-          removed: Membru ZITADEL șters
+          added: Membru Zitadel adăugat
+          changed: Membru Zitadel schimbat
+          removed: Membru Zitadel șters
           cascade:
-            removed: Membru ZITADEL cascadă șters
+            removed: Membru Zitadel cascadă șters
         idp:
           config:
             added: Configurație IDP adăugată
@@ -1226,9 +1237,9 @@ Errors:
               removed: Domeniu șters
             iam:
               console:
-                set: Aplicația ZITADEL Console setată
+                set: Aplicație Consolă de Gestionare Zitadel configurată
               project:
-                set: Proiectul ZITADEL setat
+                set: Proiectul Zitadel setat
             mail:
               template:
                 added: Șablon de e-mail adăugat

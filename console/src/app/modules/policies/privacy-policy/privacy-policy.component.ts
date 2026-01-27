@@ -26,6 +26,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-privacy-policy',
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.scss'],
+  standalone: false,
 })
 export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   public service!: ManagementService | AdminService;
@@ -146,7 +147,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
-            // Reload console as links may have changed
+            // Reload management console as links may have changed
             this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
@@ -165,7 +166,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
-            // Reload console as links may have changed
+            // Reload management console as links may have changed
             this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
@@ -185,7 +186,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         .then(() => {
           this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
           this.loadData();
-          // Reload console as links may have changed
+          // Reload management console as links may have changed
           this.reloadConsole();
         })
         .catch((error) => this.toast.showError(error));

@@ -131,6 +131,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
+								false,
 							)
 							if err != nil {
 								logging.WithError(err).Info("unable to get org metadata in action")
@@ -169,6 +170,7 @@ const (
 	authMethodOTP          authMethod = "OTP"
 	authMethodOTPSMS       authMethod = "OTP SMS"
 	authMethodOTPEmail     authMethod = "OTP Email"
+	authMethodRecoveryCode authMethod = "recovery code"
 	authMethodU2F          authMethod = "U2F"
 	authMethodPasswordless authMethod = "passwordless"
 )
@@ -325,6 +327,7 @@ func (l *Login) runPreCreationActions(
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
+								false,
 							)
 							if err != nil {
 								logging.WithError(err).Info("unable to get org metadata in action")
@@ -400,6 +403,7 @@ func (l *Login) runPostCreationActions(
 								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {

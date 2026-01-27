@@ -2,6 +2,9 @@ package setup
 
 import (
 	"bytes"
+	"context"
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -9,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -27,7 +31,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
-	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 )
 
 type Config struct {
@@ -40,8 +43,9 @@ type Config struct {
 	ExternalDomain  string
 	ExternalPort    uint16
 	ExternalSecure  bool
+	Instrumentation instrumentation.Config
 	Log             *logging.Config
-	Metrics         metrics.Config
+	Metrics         *instrumentation.LegacyMetricConfig
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
@@ -66,7 +70,7 @@ type InitProjections struct {
 	BulkLimit        uint64
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -85,20 +89,28 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read default config")
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to read default config: %w", err)
+	}
+
+	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
+	}
 
 	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
-	err = config.Metrics.NewMeter()
-	logging.OnError(err).Fatal("unable to set meter")
+	if err != nil {
+		err = errors.Join(err, shutdown(ctx))
+		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
+	}
 
 	id.Configure(config.Machine)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
 
-	return config
+	return config, shutdown, nil
 }
 
 type Steps struct {
@@ -157,6 +169,14 @@ type Steps struct {
 	s58ReplaceLoginNames3View               *ReplaceLoginNames3View
 	s59SetupWebkeys                         *SetupWebkeys
 	s60GenerateSystemID                     *GenerateSystemID
+	s61IDPTemplate6SAMLSignatureAlgorithm   *IDPTemplate6SAMLSignatureAlgorithm
+	s62HTTPProviderAddSigningKey            *HTTPProviderAddSigningKey
+	s63AlterResourceCounts                  *AlterResourceCounts
+	s64ChangePushPosition                   *ChangePushPosition
+	s65FixUserMetadata5Index                *FixUserMetadata5Index
+	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
+	s67SyncMemberRoleFields                 *SyncMemberRoleFields
+	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

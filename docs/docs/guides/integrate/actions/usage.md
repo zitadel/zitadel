@@ -10,7 +10,7 @@ The Action API provides a flexible mechanism for customizing and extending the f
 - Custom Code will be triggered and executed
 
 **Use Cases:**
-- User Management: Automate provisioning user data to external systems when users are crreated, updated or deleted.
+- User Management: Automate provisioning user data to external systems when users are created, updated or deleted.
 - Security: Implement IP blocking or rate limiting based on API usage patterns.
 - Extend Workflows: Automatically setup resources in your application, when a new organization in ZITADEL is created. 
 - Token extension: Add custom claims to the tokens.
@@ -485,3 +485,7 @@ If you want to forward a specific error from the Target through ZITADEL, you can
 Only values from 400 to 499 will be forwarded through ZITADEL, other StatusCodes will end in a PreconditionFailed error.
 
 If the Target returns any other status code than >= 200 and < 299, the execution is looked at as failed, and a PreconditionFailed error is logged.
+
+:::important
+To interrupt the execution while forwarding this error, "interruptOnError" must be **true** for the Target
+:::

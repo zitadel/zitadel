@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm nx run @zitadel/docs:build",
   "github": {
     "enabled": true
   },
@@ -18,31 +20,9 @@
     }
   ],
   "redirects": [
-    { "source": "/", "destination": "/docs" },
     {
-      "source": "/docs/category/apis/:slug*",
-      "destination": "/docs/apis/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/mgmt/:slug*",
-      "destination": "/docs/apis/resources/mgmt/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/auth/:slug*",
-      "destination": "/docs/apis/resources/auth/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/system/:slug*",
-      "destination": "/docs/apis/resources/system/:slug*",
-      "permanent": true
-    },
-    {
-      "source": "/docs/apis/admin/:slug*",
-      "destination": "/docs/apis/resources/admin/:slug*",
-      "permanent": true
+      "source": "/",
+      "destination": "/docs"
     },
     {
       "source": "/docs/apis/actionsv2/introduction",
@@ -217,6 +197,76 @@
     {
       "source": "/docs/guides/integrate/login/login-users#password-reset",
       "destination": "/docs/guides/integrate/login/hosted-login#password-reset",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login-ui/typescript-repo",
+      "destination": "/docs/guides/integrate/login-ui/login-app",
+      "permanent": true
+    },
+    {
+      "source": "/docs/legal/service-description/billing",
+      "destination": "https://help.zitadel.com/pricing-and-billing-of-zitadel-services",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/overview",
+      "destination": "/docs/guides/manage/console/console-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/organizations",
+      "destination": "/docs/guides/manage/console/organizations-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/organizations",
+      "destination": "/docs/guides/manage/console/organizations-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/projects",
+      "destination": "/docs/guides/manage/console/projects-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/projects",
+      "destination": "/docs/guides/manage/console/projects-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/applications",
+      "destination": "/docs/guides/manage/console/applications-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/applications",
+      "destination": "/docs/guides/manage/console/applications-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/users",
+      "destination": "/docs/guides/manage/console/users-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/users",
+      "destination": "/docs/guides/manage/console/users-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/console/actions",
+      "destination": "/docs/guides/manage/console/actions-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/actions/introduction",
+      "destination": "/docs/guides/manage/console/actions-overview",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/features/console",
+      "destination": "/docs/guides/manage/console/console-overview",
       "permanent": true
     }
   ]

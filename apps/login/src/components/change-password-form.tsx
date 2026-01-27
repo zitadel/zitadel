@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
-import {
-  checkSessionAndSetPassword,
-  sendPassword,
-} from "@/lib/server/password";
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { checkSessionAndSetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -40,17 +32,11 @@ type Props = {
   organization?: string;
 };
 
-export function ChangePasswordForm({
-  passwordComplexitySettings,
-  sessionId,
-  loginName,
-  requestId,
-  organization,
-}: Props) {
+export function ChangePasswordForm({ passwordComplexitySettings, sessionId, loginName, requestId, organization }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       password: "",
       comfirmPassword: "",
@@ -65,29 +51,24 @@ export function ChangePasswordForm({
   async function submitChange(values: Inputs) {
     setLoading(true);
 
-    const changeResponse = checkSessionAndSetPassword({
+    const changeResponse = await checkSessionAndSetPassword({
       sessionId,
       password: values.password,
-    })
-      .catch(() => {
-        setError("Could not change password");
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
+      return;
+    });
 
     if (changeResponse && "error" in changeResponse && changeResponse.error) {
-      setError(
-        typeof changeResponse.error === "string"
-          ? changeResponse.error
-          : "Unknown error",
-      );
+      setError(typeof changeResponse.error === "string" ? changeResponse.error : t("change.errors.unknownError"));
+      setLoading(false);
       return;
     }
 
     if (!changeResponse) {
-      setError("Could not change password");
+      setError(t("change.errors.couldNotChangePassword"));
+      setLoading(false);
       return;
     }
 
@@ -102,27 +83,19 @@ export function ChangePasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("change.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
         setLoading(false);
       });
 
-    if (
-      passwordResponse &&
-      "error" in passwordResponse &&
-      passwordResponse.error
-    ) {
+    if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
       setError(passwordResponse.error);
       return;
     }
 
-    if (
-      passwordResponse &&
-      "redirect" in passwordResponse &&
-      passwordResponse.redirect
-    ) {
+    if (passwordResponse && "redirect" in passwordResponse && passwordResponse.redirect) {
       return router.push(passwordResponse.redirect);
     }
 
@@ -134,9 +107,7 @@ export function ChangePasswordForm({
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
 
-  const hasMinLength =
-    passwordComplexitySettings &&
-    watchPassword?.length >= passwordComplexitySettings.minLength;
+  const hasMinLength = passwordComplexitySettings && watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
@@ -161,7 +132,7 @@ export function ChangePasswordForm({
             {...register("password", {
               required: t("change.required.newPassword"),
             })}
-            label="New Password"
+            label={t("change.labels.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-change-text-input"
           />
@@ -174,7 +145,7 @@ export function ChangePasswordForm({
             {...register("confirmPassword", {
               required: t("change.required.confirmPassword"),
             })}
-            label="Confirm Password"
+            label={t("change.labels.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-change-confirm-text-input"
           />
@@ -196,17 +167,11 @@ export function ChangePasswordForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={
-            loading ||
-            !policyIsValid ||
-            !formState.isValid ||
-            watchPassword !== watchConfirmPassword
-          }
+          disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
           onClick={handleSubmit(submitChange)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="change.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="change.submit" namespace="password" />
         </Button>
       </div>
     </form>

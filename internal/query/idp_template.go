@@ -163,6 +163,7 @@ type SAMLIDPTemplate struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
+	SignatureAlgorithm            string
 	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
 	FederatedLogoutEnabled        bool
@@ -717,6 +718,10 @@ var (
 		name:  projection.SAMLWithSignedRequestCol,
 		table: samlIdpTemplateTable,
 	}
+	SAMLSignatureAlgorithmCol = Column{
+		name:  projection.SAMLSignatureAlgorithmCol,
+		table: samlIdpTemplateTable,
+	}
 	SAMLNameIDFormatCol = Column{
 		name:  projection.SAMLNameIDFormatCol,
 		table: samlIdpTemplateTable,
@@ -951,6 +956,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLSignatureAlgorithmCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
 			SAMLFederatedLogoutEnabledCol.identifier(),
@@ -1071,6 +1077,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
+			samlSignatureAlgorithm := sql.NullString{}
 			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 			samlTransientMappingAttributeName := sql.NullString{}
 			samlFederatedLogoutEnabled := sql.NullBool{}
@@ -1189,6 +1196,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&samlCertificate,
 				&samlBinding,
 				&samlWithSignedRequest,
+				&samlSignatureAlgorithm,
 				&samlNameIDFormat,
 				&samlTransientMappingAttributeName,
 				&samlFederatedLogoutEnabled,
@@ -1329,6 +1337,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Certificate:                   samlCertificate,
 					Binding:                       samlBinding.String,
 					WithSignedRequest:             samlWithSignedRequest.Bool,
+					SignatureAlgorithm:            samlSignatureAlgorithm.String,
 					NameIDFormat:                  samlNameIDFormat,
 					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 					FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
@@ -1463,6 +1472,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLSignatureAlgorithmCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
 			SAMLFederatedLogoutEnabledCol.identifier(),
@@ -1588,6 +1598,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
+				samlSignatureAlgorithm := sql.NullString{}
 				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 				samlTransientMappingAttributeName := sql.NullString{}
 				samlFederatedLogoutEnabled := sql.NullBool{}
@@ -1706,6 +1717,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&samlCertificate,
 					&samlBinding,
 					&samlWithSignedRequest,
+					&samlSignatureAlgorithm,
 					&samlNameIDFormat,
 					&samlTransientMappingAttributeName,
 					&samlFederatedLogoutEnabled,
@@ -1845,6 +1857,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						Certificate:                   samlCertificate,
 						Binding:                       samlBinding.String,
 						WithSignedRequest:             samlWithSignedRequest.Bool,
+						SignatureAlgorithm:            samlSignatureAlgorithm.String,
 						NameIDFormat:                  samlNameIDFormat,
 						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 						FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,

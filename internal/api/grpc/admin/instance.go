@@ -29,7 +29,7 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		return nil, err
 	}
 	return &admin_pb.ListInstanceDomainsResponse{
-		Result: instance_grpc.DomainsToPb(domains.Domains),
+		Result:        instance_grpc.DomainsToPb(domains.Domains),
 		SortingColumn: req.SortingColumn,
 		Details: object.ToListDetails(
 			domains.Count,
@@ -49,7 +49,7 @@ func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.L
 		return nil, err
 	}
 	return &admin_pb.ListInstanceTrustedDomainsResponse{
-		Result: instance_grpc.TrustedDomainsToPb(domains.Domains),
+		Result:        instance_grpc.TrustedDomainsToPb(domains.Domains),
 		SortingColumn: req.SortingColumn,
 		Details: object.ToListDetails(
 			domains.Count,
@@ -70,7 +70,7 @@ func (s *Server) AddInstanceTrustedDomain(ctx context.Context, req *admin_pb.Add
 }
 
 func (s *Server) RemoveInstanceTrustedDomain(ctx context.Context, req *admin_pb.RemoveInstanceTrustedDomainRequest) (*admin_pb.RemoveInstanceTrustedDomainResponse, error) {
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain)
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain, true)
 	if err != nil {
 		return nil, err
 	}

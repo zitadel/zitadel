@@ -1,18 +1,12 @@
 import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import {
-  getBrandingSettings,
-  getDefaultOrg,
-  getDeviceAuthorizationRequest,
-} from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/service-url";
+import { getBrandingSettings, getDefaultOrg, getDeviceAuthorizationRequest } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const userCode = searchParams?.user_code;
@@ -28,11 +22,9 @@ export default async function Page(props: {
   }
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({
-    serviceUrl,
-    userCode,
+  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode,
   });
 
   if (!deviceAuthorizationRequest) {
@@ -45,17 +37,13 @@ export default async function Page(props: {
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+    const org: Organization | null = await getDefaultOrg({ serviceConfig, });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization,
   });
 
   const params = new URLSearchParams();
@@ -70,13 +58,9 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
-          <Translated
-            i18nKey="request.title"
-            namespace="device"
-            data={{ appName: deviceAuthorizationRequest?.appName }}
-          />
+          <Translated i18nKey="request.title" namespace="device" data={{ appName: deviceAuthorizationRequest?.appName }} />
         </h1>
 
         <p className="ztdl-p">
@@ -86,7 +70,9 @@ export default async function Page(props: {
             data={{ appName: deviceAuthorizationRequest?.appName }}
           />
         </p>
+      </div>
 
+      <div className="w-full">
         <ConsentScreen
           deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
           scope={deviceAuthorizationRequest.scope}

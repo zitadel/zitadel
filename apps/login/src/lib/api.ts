@@ -3,19 +3,17 @@ import { readFile } from 'fs/promises'
 
 // The key token is only loaded once from disk per process.
 // If the file was loaded you need to restart the process to switch the key.
-let keyToken: Promise<string> | null = null
+let keyToken: Promise<string> | undefined
 
 async function getTokenFromFile(): Promise<string> {
-  if(keyToken === null) {
-      keyToken = readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
-  } 
+  keyToken ??= readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
 
   try {
     return await keyToken
-  } catch (e) {
+  } catch (error) {
     // if the file doesn't exist, don't cache it
-    keyToken = null
-    throw e
+    keyToken = undefined
+    throw error
   }
 }
 

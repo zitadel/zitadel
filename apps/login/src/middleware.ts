@@ -3,28 +3,16 @@ import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_se
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../constants/csp";
-import { getServiceUrlFromHeaders } from "./lib/service-url";
+import { getServiceConfig } from "./lib/service-url";
 export const config = {
-  matcher: [
-    "/.well-known/:path*",
-    "/oauth/:path*",
-    "/oidc/:path*",
-    "/idps/callback/:path*",
-    "/saml/:path*",
-    "/:path*",
-  ],
+  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
 
-async function loadSecuritySettings(
-  request: NextRequest,
-): Promise<SecuritySettings | null> {
+async function loadSecuritySettings(request: NextRequest): Promise<SecuritySettings | null> {
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 
   if (!securityResponse.ok) {
-    console.error(
-      "Failed to fetch security settings:",
-      securityResponse.statusText,
-    );
+    console.error("Failed to fetch security settings:", securityResponse.statusText);
     return null;
   }
 
@@ -49,40 +37,28 @@ export async function middleware(request: NextRequest) {
   }
 
   // Only run the rest of the logic for the original matcher paths
-  const proxyPaths = [
-    "/.well-known/",
-    "/oauth/",
-    "/oidc/",
-    "/idps/callback/",
-    "/saml/",
-  ];
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
 
-  const isMatched = proxyPaths.some((prefix) =>
-    request.nextUrl.pathname.startsWith(prefix),
-  );
+  const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
-  // escape proxy if the environment is setup for multitenancy
-  if (
-    !isMatched ||
-    !process.env.ZITADEL_API_URL ||
-    !process.env.ZITADEL_SERVICE_USER_TOKEN
-  ) {
-    // For all other routes, just add the header and continue
+  // Only proxy in self-hosted mode
+  if (!isMatched) {
+    // For multi-tenant or non-proxied routes, just add the header and continue
     return NextResponse.next({
       request: { headers: requestHeaders },
     });
   }
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const instanceHost = `${serviceUrl}`
-    .replace("https://", "")
-    .replace("http://", "");
-
-  // Add additional headers as before
-  requestHeaders.set("x-zitadel-public-host", `${request.nextUrl.host}`);
-  requestHeaders.set("x-zitadel-instance-host", instanceHost);
+  // add additional headers if available
+  if (serviceConfig.publicHost) {
+    requestHeaders.set("x-zitadel-public-host", serviceConfig.publicHost);
+  }
+  if (serviceConfig.instanceHost) {
+    requestHeaders.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+  }
 
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
@@ -98,7 +74,7 @@ export async function middleware(request: NextRequest) {
     responseHeaders.delete("X-Frame-Options");
   }
 
-  request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  request.nextUrl.href = `${serviceConfig.baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
 
   return NextResponse.rewrite(request.nextUrl, {
     request: {

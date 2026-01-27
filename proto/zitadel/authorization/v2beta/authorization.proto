@@ -60,7 +60,7 @@ enum State {
   // An active authorization grants the user access with the roles specified on the project.
   STATE_ACTIVE = 1;
   // An inactive authorization temporarily deactivates the granted access and roles.
-  // ZITADEL will not include the specific authorization in any authorization information like an access token.
+  // Zitadel will not include the specific authorization in any authorization information like an access token.
   // But the information can still be accessed using the API.
   STATE_INACTIVE = 2;
 }
@@ -108,6 +108,8 @@ message AuthorizationsSearchFilter {
     // Search for authorizations by the ID of the project grant the user was granted the authorization for.
     // This will also include authorizations granted for project grants of the same project.
     zitadel.filter.v2beta.IDFilter project_grant_id = 11;
+    // Search for authorizations by the IDs of the users who were granted the authorizations.
+    zitadel.filter.v2beta.InIDsFilter in_user_ids = 12;
   }
 }
 

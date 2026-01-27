@@ -15,8 +15,8 @@ It covers how to:
 Prerequisites:
 
 - existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects)
+- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - running Gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
 
 <CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
@@ -36,12 +36,12 @@ gitlab_rails['omniauth_providers'] = [
   {
     name: "openid_connect",
     label: "ZITADEL",
-    icon: "https://<YOUR_DOMAIN>/ui/console/assets/icons/favicon-32x32.png",
+    icon: "https://${CUSTOM_DOMAIN}/ui/console/assets/icons/favicon-32x32.png",
     args: {
       name: "openid_connect",
       scope: ["openid","profile","email"],
       response_type: "code",
-      issuer: "https://<YOUR_DOMAIN>",
+      issuer: "https://${CUSTOM_DOMAIN}",
       discovery: true,
       client_options: {
         identifier: "<CLIENT ID from ZITADEL>",

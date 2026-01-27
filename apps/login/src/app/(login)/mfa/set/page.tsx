@@ -5,7 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -22,7 +22,7 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("mfa");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
 function isSessionValid(session: Partial<Session>): {
@@ -30,27 +30,27 @@ function isSessionValid(session: Partial<Session>): {
   verifiedAt?: Timestamp;
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
+  const validIDP = session?.factors?.intent?.verifiedAt;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
+
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, checkAfter, force, requestId, organization, sessionId } =
-    searchParams;
+  const { loginName, checkAfter, force, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -63,13 +63,9 @@ export default async function Page(props: {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    }).then((methods) => {
-      return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser =
-          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+    return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
+      return getUserByID({ serviceConfig, userId }).then((user) => {
+        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
           id: session.id,
@@ -83,12 +79,9 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionByLoginname(
-    loginName?: string,
-    organization?: string,
-  ) {
+  async function loadSessionByLoginname(loginName?: string, organization?: string) {
     return loadMostRecentSession({
-      serviceUrl,
+      serviceConfig,
       sessionParams: {
         loginName,
         organization,
@@ -100,29 +93,27 @@ export default async function Page(props: {
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
       return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
   const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    serviceConfig,
+    organization: sessionWithData?.factors?.user?.organizationId,
   });
 
-  const { valid } = isSessionValid(sessionWithData);
+  const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="mfa" />
         </h1>
@@ -139,23 +130,23 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
-        {!(loginName || sessionId) && (
-          <Alert>
-            <Translated i18nKey="unknownContext" namespace="error" />
-          </Alert>
-        )}
+      <div className="w-full">
+        <div className="flex flex-col space-y-4">
+          {!(loginName || sessionId) && (
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          )}
 
-        {!valid && (
-          <Alert>
-            <Translated i18nKey="sessionExpired" namespace="error" />
-          </Alert>
-        )}
+          {!valid && (
+            <Alert>
+              <Translated i18nKey="sessionExpired" namespace="error" />
+            </Alert>
+          )}
 
-        {isSessionValid(sessionWithData).valid &&
-          loginSettings &&
-          sessionWithData &&
-          sessionWithData.factors?.user?.id && (
+          {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
             <ChooseSecondFactorToSetup
               userId={sessionWithData.factors?.user?.id}
               loginName={loginName}
@@ -171,9 +162,10 @@ export default async function Page(props: {
             ></ChooseSecondFactorToSetup>
           )}
 
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
+          <div className="mt-8 flex w-full flex-row items-center">
+            <BackButton />
+            <span className="flex-grow"></span>
+          </div>
         </div>
       </div>
     </DynamicTheme>

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
@@ -15,11 +16,12 @@ type TargetWriteModel struct {
 	eventstore.WriteModel
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
 	SigningKey       *crypto.CryptoValue
+	PayloadType      target_domain.PayloadType
 
 	State domain.TargetState
 }
@@ -44,6 +46,7 @@ func (wm *TargetWriteModel) Reduce() error {
 			wm.Timeout = e.Timeout
 			wm.State = domain.TargetActive
 			wm.SigningKey = e.SigningKey
+			wm.PayloadType = e.PayloadType
 		case *target.ChangedEvent:
 			if e.Name != nil {
 				wm.Name = *e.Name
@@ -62,6 +65,9 @@ func (wm *TargetWriteModel) Reduce() error {
 			}
 			if e.SigningKey != nil {
 				wm.SigningKey = e.SigningKey
+			}
+			if e.PayloadType != target_domain.PayloadTypeUnspecified {
+				wm.PayloadType = e.PayloadType
 			}
 		case *target.RemovedEvent:
 			wm.State = domain.TargetRemoved
@@ -86,11 +92,12 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
 	name *string,
-	targetType *domain.TargetType,
+	targetType *target_domain.TargetType,
 	endpoint *string,
 	timeout *time.Duration,
 	interruptOnError *bool,
 	signingKey *crypto.CryptoValue,
+	payloadType target_domain.PayloadType,
 ) *target.ChangedEvent {
 	changes := make([]target.Changes, 0)
 	if name != nil && wm.Name != *name {
@@ -111,6 +118,9 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	// if signingkey is set, update it as it is encrypted
 	if signingKey != nil {
 		changes = append(changes, target.ChangeSigningKey(signingKey))
+	}
+	if payloadType != target_domain.PayloadTypeUnspecified && wm.PayloadType != payloadType {
+		changes = append(changes, target.ChangePayloadType(payloadType))
 	}
 	if len(changes) == 0 {
 		return nil

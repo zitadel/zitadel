@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -17,10 +18,11 @@ type AddTarget struct {
 	models.ObjectRoot
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	PayloadType      target_domain.PayloadType
 
 	SigningKey string
 }
@@ -76,6 +78,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		add.Timeout,
 		add.InterruptOnError,
 		code.Crypted,
+		add.PayloadType,
 	))
 	if err != nil {
 		return time.Time{}, err
@@ -90,10 +93,11 @@ type ChangeTarget struct {
 	models.ObjectRoot
 
 	Name             *string
-	TargetType       *domain.TargetType
+	TargetType       *target_domain.TargetType
 	Endpoint         *string
 	Timeout          *time.Duration
 	InterruptOnError *bool
+	PayloadType      target_domain.PayloadType
 
 	ExpirationSigningKey bool
 	SigningKey           *string
@@ -152,6 +156,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		change.Timeout,
 		change.InterruptOnError,
 		changedSigningKey,
+		change.PayloadType,
 	)
 	if changedEvent == nil {
 		return existing.WriteModel.ChangeDate, nil

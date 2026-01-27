@@ -261,6 +261,7 @@ enum SecondFactorType {
     SECOND_FACTOR_TYPE_U2F = 2;
     SECOND_FACTOR_TYPE_OTP_EMAIL = 3;
     SECOND_FACTOR_TYPE_OTP_SMS = 4;
+    SECOND_FACTOR_TYPE_RECOVERY_CODES = 5;
 }
 
 enum MultiFactorType {
@@ -316,7 +317,7 @@ message PasswordAgePolicy {
             example: "\"365\""
         }
     ];
-    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint64 expire_warn_days = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"10\""
@@ -374,19 +375,19 @@ message PrivacyPolicy {
     ];
     string docs_link = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to documentation to be shown in the console.";
+            description: "Link to documentation to be shown in the management console.";
             example: "\"https://zitadel.com/docs\"";
         }
     ];
     string custom_link = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Link to an external resource that will be available to users in the console.";
+            description: "Link to an external resource that will be available to users in the management console.";
             example: "\"https://external.link\"";
         }
     ];
     string custom_link_text = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The button text that would be shown in console pointing to custom link.";
+            description: "The button text that would be shown in the management console pointing to custom link.";
             example: "\"External\"";
         }
     ];

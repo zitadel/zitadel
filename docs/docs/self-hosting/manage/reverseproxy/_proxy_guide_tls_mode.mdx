@@ -9,7 +9,7 @@ export const Description = ({mode, name}) => {
             break;
         case "external":
             desc = <>{name} terminates TLS and forwards the requests to Zitadel via unencrypted h2c.
-                This example uses an unsafe self-signed certificate for {name}</>;
+                This example uses an unsafe self-signed certificate for {name}.</>;
             break;
         case "enabled":
             desc = <>{name} terminates TLS and forwards the requests to Zitadel via encrypted HTTP/2.
@@ -19,7 +19,7 @@ export const Description = ({mode, name}) => {
     return (
         <>
             {desc}
-            <>By executing the commands below, you will download the files necessary to run Zitadel behind {name} with the following config:</>
+            <> By executing the commands below, you will download the files necessary to run Zitadel behind {name} with the following config:</>
         </>)
 }
 
@@ -82,7 +82,7 @@ export const LoginURL = ({mode}) => {
 - **username**: *zitadel-admin@<span></span>zitadel.127.0.0.1.sslip.io*
 - **password**: *Password1!*
 
-If the console loads normally, you know that the HTTP and gRPC-Web and gRPC APIs are working correctly.
+If the management console loads normally, you know that the HTTP and gRPC-Web and gRPC APIs are working correctly.
 
 <CodeBlock language="bash">
     {'# You can now stop the database, the Zitadel API, the Zitadel login and '}{props.providername}{'.'}{'\n'}

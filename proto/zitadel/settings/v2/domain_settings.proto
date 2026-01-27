@@ -8,26 +8,19 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2/settings.proto";
 
 message DomainSettings {
-  bool login_name_includes_domain = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the username has to end with the domain of its organization"
-    }
-  ];
-  bool require_org_domain_verification = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
-    }
-  ];
-  bool smtp_sender_address_matches_instance_domain = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if the SMTP sender address domain should match an existing domain on the instance"
-    }
-  ];
-  // resource_owner_type returns if the setting is managed on the organization or on the instance
-  ResourceOwnerType resource_owner_type = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "resource_owner_type returns if the setting is managed on the organization or on the instance";
-    }
-  ];
+  // If enabled, the login name will automatically be suffixed with the domain of the organization.
+  // This ensures that the login name is unique across the instance.
+  bool login_name_includes_domain = 1;
+
+  // If enabled, organization domains must be verified (through an DNS or HTTP challenge) upon creation.
+  // If disabled, organization domains will be created as already verified automatically.
+  bool require_org_domain_verification = 2;
+
+  // If enabled, the SMTP sender address domain must match Custom Domain on the instance.
+  bool smtp_sender_address_matches_instance_domain = 3;
+
+  // ResourceOwnerType returns if the setting is managed on the organization explicitly or
+  // fell back on the instance settings.
+  ResourceOwnerType resource_owner_type = 6;
 }
 

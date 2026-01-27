@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/saml/pkg/provider"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -17,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -42,6 +42,7 @@ func NewProvider(
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
+	targetEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	projections *database.DB,
 	instanceHandler,
@@ -56,6 +57,7 @@ func NewProvider(
 		repo,
 		encAlg,
 		certEncAlg,
+		targetEncAlg,
 		es,
 		projections,
 		fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
@@ -69,7 +71,8 @@ func NewProvider(
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("saml"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
@@ -114,6 +117,7 @@ func newStorage(
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
+	targetEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	db *database.DB,
 	defaultLoginURL string,
@@ -123,6 +127,7 @@ func newStorage(
 	return &Storage{
 		encAlg:            encAlg,
 		certEncAlg:        certEncAlg,
+		targetEncAlg:      targetEncAlg,
 		locker:            crdb.NewLocker(db.DB, locksTable, signingKey),
 		eventstore:        es,
 		repo:              repo,

@@ -23,19 +23,15 @@ type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string;
   organization?: string;
+  defaultOrganization?: string;
   requestId?: string;
 };
 
-export function PasswordForm({
-  loginSettings,
-  loginName,
-  organization,
-  requestId,
-}: Props) {
+export function PasswordForm({ loginSettings, loginName, organization, defaultOrganization, requestId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
   });
-  
+
   const t = useTranslations("password");
 
   const [info, setInfo] = useState<string>("");
@@ -52,13 +48,14 @@ export function PasswordForm({
     const response = await sendPassword({
       loginName,
       organization,
+      defaultOrganization,
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("verify.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -83,10 +80,11 @@ export function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
+      defaultOrganization,
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("errors.couldNotSendResetLink"));
         return;
       })
       .finally(() => {
@@ -94,11 +92,11 @@ export function PasswordForm({
       });
 
     if (response && "error" in response) {
-      setError(response.error);
+      setError(response.error as string);
       return;
     }
 
-    setInfo("Password was reset. Please check your email.");
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
@@ -122,7 +120,7 @@ export function PasswordForm({
           type="password"
           autoComplete="password"
           {...register("password", { required: t("verify.required.password") })}
-          label="Password"
+          label={t("verify.labels.password")}
           data-testid="password-text-input"
         />
         {!loginSettings?.hidePasswordReset && (
@@ -137,14 +135,7 @@ export function PasswordForm({
           </button>
         )}
 
-        {loginName && (
-          <input
-            type="hidden"
-            name="loginName"
-            autoComplete="username"
-            value={loginName}
-          />
-        )}
+        {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
       </div>
 
       {info && (
@@ -170,8 +161,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="verify.submit" namespace="password" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
         </Button>
       </div>
     </form>

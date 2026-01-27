@@ -2,7 +2,6 @@ package webauthn
 
 import (
 	"context"
-	"strings"
 
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -16,11 +15,11 @@ func WebAuthNsToCredentials(ctx context.Context, webAuthNs []*domain.WebAuthNTok
 	for _, webAuthN := range webAuthNs {
 		// only add credentials that are ready and
 		// either match the rpID or
-		// if they were added through Console / old login UI, there is no stored rpID set;
+		// if they were added through Management Console / old login UI, there is no stored rpID set;
 		// then we check if the requested rpID matches the instance domain
 		if webAuthN.State == domain.MFAStateReady &&
 			(webAuthN.RPID == rpID ||
-				(webAuthN.RPID == "" && rpID == strings.Split(http.DomainContext(ctx).InstanceHost, ":")[0])) {
+				(webAuthN.RPID == "" && rpID == http.DomainContext(ctx).InstanceDomain())) {
 			creds = append(creds, webauthn.Credential{
 				ID:              webAuthN.KeyID,
 				PublicKey:       webAuthN.PublicKey,

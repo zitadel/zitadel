@@ -29,7 +29,7 @@ Learn how to [use service users](/docs/guides/integrate/service-users/authentica
 ### Managers
 
 Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
-Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
+A user with an administrator role is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
 
@@ -47,7 +47,7 @@ These invited users are called external users.
 
 ### Uniqueness of users
 
-Users can only exist within one [organization](/concepts/structure/organizations).
+Users can only exist within one [organization](/guides/manage/console/organizations-overview).
 It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
@@ -77,6 +77,6 @@ You can use organization metadata or your own business logic to describe a hiera
 
 ## References
 
-- [Manage users in the Console](../../guides/manage/console/users)
-- [ZITADEL APIs: Users](/docs/apis/resources/mgmt/users)
+- [Manage users in the Management Console](../../guides/manage/console/users-overview)
+- [ZITADEL APIs: Users](/docs/category/apis/resources/mgmt/users)
 - [User onboarding and registration](/docs/guides/integrate/onboarding)

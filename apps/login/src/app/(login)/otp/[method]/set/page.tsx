@@ -5,15 +5,9 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  addOTPEmail,
-  addOTPSMS,
-  getBrandingSettings,
-  getLoginSettings,
-  registerTOTP,
-} from "@/lib/zitadel";
+import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -26,25 +20,18 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const { loginName, organization, sessionId, requestId, checkAfter } =
-    searchParams;
+  const { loginName, organization, sessionId, requestId, checkAfter } = searchParams;
   const { method } = params;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
+  const branding = await getBrandingSettings({ serviceConfig, organization,
   });
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
+  const loginSettings = await getLoginSettings({ serviceConfig, organization,
   });
 
-  const session = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: {
+  const session = await loadMostRecentSession({ serviceConfig, sessionParams: {
       loginName,
       organization,
     },
@@ -53,9 +40,7 @@ export default async function Page(props: {
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await registerTOTP({ serviceConfig, userId: session.factors.user.id,
       })
         .then((resp) => {
           if (resp) {
@@ -66,17 +51,13 @@ export default async function Page(props: {
           error = err;
         });
     } else if (method === "sms") {
-      await addOTPSMS({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await addOTPSMS({ serviceConfig, userId: session.factors.user.id,
       }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
-      await addOTPEmail({
-        serviceUrl,
-        userId: session.factors.user.id,
+      await addOTPEmail({ serviceConfig, userId: session.factors.user.id,
       }).catch((_error) => {
         // TODO: Throw this error?
         new Error("Could not add OTP via Email");
@@ -125,10 +106,25 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="otp" />
         </h1>
+
+        {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
+          <p className="ztdl-p">
+            <Translated i18nKey="set.totpRegisterDescription" namespace="otp" />
+          </p>
+        ) : (
+          <p className="ztdl-p">
+            {method === "email"
+              ? "Code via email was successfully added."
+              : method === "sms"
+                ? "Code via SMS was successfully added."
+                : ""}
+          </p>
+        )}
+
         {!session && (
           <div className="py-4">
             <Alert>
@@ -151,53 +147,33 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
+      <div className="w-full">
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
-          <>
-            <p className="ztdl-p">
-              <Translated
-                i18nKey="set.totpRegisterDescription"
-                namespace="otp"
-              />
-            </p>
-            <div>
-              <TotpRegister
-                uri={totpResponse.uri as string}
-                secret={totpResponse.secret as string}
-                loginName={loginName}
-                sessionId={sessionId}
-                requestId={requestId}
-                organization={organization}
-                checkAfter={checkAfter === "true"}
-                loginSettings={loginSettings}
-              ></TotpRegister>
-            </div>{" "}
-          </>
+          <div>
+            <TotpRegister
+              uri={totpResponse.uri as string}
+              secret={totpResponse.secret as string}
+              loginName={loginName}
+              sessionId={sessionId}
+              requestId={requestId}
+              organization={organization}
+              checkAfter={checkAfter === "true"}
+              loginSettings={loginSettings}
+            ></TotpRegister>
+          </div>
         ) : (
-          <>
-            <p className="ztdl-p">
-              {method === "email"
-                ? "Code via email was successfully added."
-                : method === "sms"
-                  ? "Code via SMS was successfully added."
-                  : ""}
-            </p>
+          <div className="mt-8 flex w-full flex-row items-center">
+            <BackButton />
+            <span className="flex-grow"></span>
 
-            <div className="mt-8 flex w-full flex-row items-center">
-              <BackButton />
-              <span className="flex-grow"></span>
-
-              <Link href={urlToContinue}>
-                <Button
-                  type="submit"
-                  className="self-end"
-                  variant={ButtonVariants.Primary}
-                >
-                  <Translated i18nKey="set.submit" namespace="otp" />
-                </Button>
-              </Link>
-            </div>
-          </>
+            <Link href={urlToContinue}>
+              <Button type="submit" className="self-end" variant={ButtonVariants.Primary}>
+                <Translated i18nKey="set.submit" namespace="otp" />
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
     </DynamicTheme>

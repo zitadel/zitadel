@@ -39,7 +39,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -52,8 +52,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -100,7 +100,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// Deprecated: use oidc service v2 instead. This service will be removed in the next major version of ZITADEL.
 service OIDCService {
+  // Get AuthRequest
+  //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request.
   rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
     option (google.api.http) = {
       get: "/v2beta/oidc/auth_requests/{auth_request_id}"
@@ -113,8 +119,7 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get OIDC Auth Request details";
-      description: "Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request."
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -124,6 +129,14 @@ service OIDCService {
     };
   }
 
+  // Create Callback
+  //
+  // Deprecated: please move to the corresponding endpoint under oidc service v2. This endpoint will be removed with the next major version of ZITADEL.
+  //
+  // Finalize an Auth Request and get the callback URL for success or failure.
+  // The user must be redirected to the URL in order to inform the application about the success or failure.
+  // On success, the URL contains details for the application to obtain the tokens.
+  // This method can only be called once for an Auth request.
   rpc CreateCallback (CreateCallbackRequest) returns (CreateCallbackResponse) {
     option (google.api.http) = {
       post: "/v2beta/oidc/auth_requests/{auth_request_id}"
@@ -137,8 +150,7 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Finalize an Auth Request and get the callback URL.";
-      description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
+      deprecated: true;
       responses: {
         key: "200"
         value: {

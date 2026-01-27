@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
@@ -14,8 +15,8 @@ var emptyInstance = &instance{}
 type Instance interface {
 	InstanceID() string
 	ProjectID() string
-	ConsoleClientID() string
-	ConsoleApplicationID() string
+	ManagementConsoleClientID() string
+	ManagementConsoleApplicationID() string
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
@@ -23,21 +24,26 @@ type Instance interface {
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
+	ExecutionRouter() target.Router
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(ctx context.Context, host, publicDomain string) (Instance, error)
+	// InstanceByHost returns the instance for the given instanceDomain or publicDomain.
+	// Previously it used the host (hostname[:port]) to find the instance, but is now using the domain (hostname) only.
+	// For preventing issues in backports, the name of the method is not changed.
+	InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (Instance, error)
 	InstanceByID(ctx context.Context, id string) (Instance, error)
 }
 
 type instance struct {
-	id              string
-	projectID       string
-	appID           string
-	clientID        string
-	orgID           string
-	defaultLanguage language.Tag
-	features        feature.Features
+	id               string
+	projectID        string
+	appID            string
+	clientID         string
+	orgID            string
+	defaultLanguage  language.Tag
+	features         feature.Features
+	executionTargets target.Router
 }
 
 func (i *instance) Block() *bool {
@@ -56,11 +62,11 @@ func (i *instance) ProjectID() string {
 	return i.projectID
 }
 
-func (i *instance) ConsoleClientID() string {
+func (i *instance) ManagementConsoleClientID() string {
 	return i.clientID
 }
 
-func (i *instance) ConsoleApplicationID() string {
+func (i *instance) ManagementConsoleApplicationID() string {
 	return i.appID
 }
 
@@ -82,6 +88,10 @@ func (i *instance) EnableImpersonation() bool {
 
 func (i *instance) Features() feature.Features {
 	return i.features
+}
+
+func (i *instance) ExecutionRouter() target.Router {
+	return i.executionTargets
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -114,7 +124,7 @@ func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) cont
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsole(ctx context.Context, projectID, appID string) context.Context {
+func WithManagementConsole(ctx context.Context, projectID, appID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
@@ -125,7 +135,7 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 	return context.WithValue(ctx, instanceKey, i)
 }
 
-func WithConsoleClientID(ctx context.Context, clientID string) context.Context {
+func WithManagementConsoleClientID(ctx context.Context, clientID string) context.Context {
 	i, ok := ctx.Value(instanceKey).(*instance)
 	if !ok {
 		i = new(instance)
@@ -140,5 +150,14 @@ func WithFeatures(ctx context.Context, f feature.Features) context.Context {
 		i = new(instance)
 	}
 	i.features = f
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithExecutionRouter(ctx context.Context, router target.Router) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.executionTargets = router
 	return context.WithValue(ctx, instanceKey, i)
 }

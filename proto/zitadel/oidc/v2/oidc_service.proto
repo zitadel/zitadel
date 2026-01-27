@@ -39,7 +39,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -52,8 +52,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -101,6 +101,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service OIDCService {
+  // Get Auth Request
+  //
+  // Get OIDC Auth Request details by ID, obtained from the redirect URL.
+  // Returns details that are parsed from the application's Auth Request.
+  //
+  // Required permissions:
+  //   - `session.read`
   rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
     option (google.api.http) = {
       get: "/v2/oidc/auth_requests/{auth_request_id}"
@@ -113,8 +120,6 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get OIDC Auth Request details";
-      description: "Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request."
       responses: {
         key: "200"
         value: {
@@ -124,6 +129,15 @@ service OIDCService {
     };
   }
 
+  // Create Callback
+  //
+  // Finalize an Auth Request and get the callback URL for success or failure.
+  // The user must be redirected to the URL in order to inform the application about the success or failure.
+  // On success, the URL contains details for the application to obtain the tokens.
+  // This method can only be called once for an Auth request.
+  //
+  // Required permissions:
+  //   - `session.link`
   rpc CreateCallback (CreateCallbackRequest) returns (CreateCallbackResponse) {
     option (google.api.http) = {
       post: "/v2/oidc/auth_requests/{auth_request_id}"
@@ -137,8 +151,6 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Finalize an Auth Request and get the callback URL.";
-      description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
       responses: {
         key: "200"
         value: {
@@ -148,11 +160,14 @@ service OIDCService {
     };
   }
 
-  // Get device authorization request
+  // Get Device Authorization Request
   //
   // Get the device authorization based on the provided "user code".
   // This will return the device authorization request, which contains the device authorization id
   // that is required to authorize the request once the user signed in or to deny it.
+  //
+  // Required permissions:
+  //   - `session.read`
   rpc GetDeviceAuthorizationRequest(GetDeviceAuthorizationRequestRequest) returns (GetDeviceAuthorizationRequestResponse) {
     option (google.api.http) = {
       get: "/v2/oidc/device_authorization/{user_code}"
@@ -174,9 +189,12 @@ service OIDCService {
     };
   }
 
-  // Authorize or deny device authorization
+  // Authorize or Deny Device Authorization
   //
   // Authorize or deny the device authorization request based on the provided device authorization id.
+  //
+  // Required permissions:
+  //   - `session.link`
   rpc AuthorizeOrDenyDeviceAuthorization(AuthorizeOrDenyDeviceAuthorizationRequest) returns (AuthorizeOrDenyDeviceAuthorizationResponse) {
     option (google.api.http) = {
       post: "/v2/oidc/device_authorization/{device_authorization_id}"
@@ -202,12 +220,13 @@ service OIDCService {
 }
 
 message GetAuthRequestRequest {
+  // The ID of the Auth Request, as obtained from the redirect URL.
   string auth_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "ID of the Auth Request, as obtained from the redirect URL.";
       example: "\"163840776835432705\"";
     }
   ];
@@ -218,52 +237,59 @@ message GetAuthRequestResponse {
 }
 
 message CreateCallbackRequest {
+  // The ID of the Auth Request to finalize.
   string auth_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the Auth Request.";
       example: "\"163840776835432705\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 
+  // The result of the authorization flow, either success with the user's session or failure with an error.
   oneof callback_kind {
     option (validate.required) = true;
+
+    // The session of the authenticated user, to finalize the authorization request.
     Session session = 2;
-    AuthorizationError error = 3 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
-        ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
-      }
-    ];
+
+    // The error that occurred during the authorization flow, to inform the application.
+    // This creates a callback URL with the error details set.
+    // See: https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+    AuthorizationError error = 3;
   }
 }
 
 message Session {
+  // ID of the session, used to login the user. Connects the session to the Auth Request.
   string session_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "ID of the session, used to login the user. Connects the session to the Auth Request.";
       example: "\"163840776835432705\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 
+  // Token of the session used to login the user. This token verifies that the session is valid.
   string session_token = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "Token to verify the session is valid";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 
 message CreateCallbackResponse {
   zitadel.object.v2.Details details = 1;
+  // The callback URL where the user should be redirected using an HTTP "302 FOUND" status.
+  // This contains details for the application to obtain the tokens on success, or error details on failure.
+  // Note that this field must be treated as credentials, as the contained code can be used to obtain tokens on behalf of the user."
   string callback_url = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Callback URL where the user should be redirected, using a \"302 FOUND\" status. Contains details for the application to obtain the tokens on success, or error details on failure. Note that this field must be treated as credentials, as the contained code can be used to obtain tokens on behalve of the user.";
       example: "\"https://client.example.org/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj\""
     }
   ];
@@ -277,7 +303,8 @@ message GetDeviceAuthorizationRequestRequest {
       min_length: 9;
       max_length: 9;
       example: "\"K9LV-3DMQ\"";
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 }
 
@@ -292,7 +319,8 @@ message AuthorizeOrDenyDeviceAuthorizationRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-    }
+    },
+    (google.api.field_behavior) = REQUIRED
   ];
 
   // The decision of the user to authorize or deny the device authorization request.

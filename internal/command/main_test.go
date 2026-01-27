@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -192,12 +193,12 @@ func (m *mockInstance) ProjectID() string {
 	return "projectID"
 }
 
-func (m *mockInstance) ConsoleClientID() string {
-	return "consoleID"
+func (m *mockInstance) ManagementConsoleClientID() string {
+	return "managementConsoleID"
 }
 
-func (m *mockInstance) ConsoleApplicationID() string {
-	return "consoleApplicationID"
+func (m *mockInstance) ManagementConsoleApplicationID() string {
+	return "managementConsoleApplicationID"
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
@@ -218,6 +219,10 @@ func (m *mockInstance) EnableImpersonation() bool {
 
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
+}
+
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {
@@ -247,6 +252,17 @@ func newMockProjectPermissionCheckOIDCNotAllowed() domain.ProjectPermissionCheck
 func newMockProjectPermissionCheckSAMLNotAllowed() domain.ProjectPermissionCheck {
 	return func(ctx context.Context, clientID, userID string) (err error) {
 		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied")
+	}
+}
+
+func newMockOrganizationPermissionCheckNotAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "", "Errors.PermissionDenied")
+	}
+}
+func newMockOrganizationPermissionCheckAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return nil
 	}
 }
 

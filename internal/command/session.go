@@ -43,6 +43,7 @@ type SessionCommands struct {
 	getCodeVerifier      func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
+	tarpit               func(failedAttempts uint64)
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
@@ -60,6 +61,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		getCodeVerifier:      c.phoneCodeVerifierFromConfig,
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
+		tarpit:               c.tarpit,
 	}
 }
 
@@ -76,7 +78,7 @@ func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag)
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
+		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil, cmd.tarpit)
 		if err != nil {
 			return commands, err
 		}
@@ -135,6 +137,7 @@ func CheckTOTP(code string) SessionCommand {
 			cmd.eventstore.FilterToQueryReducer,
 			cmd.totpAlg,
 			nil,
+			cmd.tarpit,
 		)
 		if err != nil {
 			return commands, err
@@ -214,6 +217,10 @@ func (s *SessionCommands) OTPEmailChallenged(ctx context.Context, code *crypto.C
 
 func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Time) {
 	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) RecoveryCodeChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewRecoveryCodeCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
@@ -301,7 +308,7 @@ func (c *Commands) CreateSession(
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, ""); err != nil {
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -311,7 +318,7 @@ func (c *Commands) CreateSession(
 
 func (c *Commands) UpdateSession(
 	ctx context.Context,
-	sessionID, sessionToken string,
+	sessionID string,
 	cmds []SessionCommand,
 	metadata map[string][]byte,
 	lifetime time.Duration,
@@ -321,7 +328,7 @@ func (c *Commands) UpdateSession(
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, sessionToken); err != nil {
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -400,14 +407,10 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	return changed, nil
 }
 
-// checkSessionWritePermission will check that the provided sessionToken is correct or
-// if empty, check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
-// In case the user is not set and the userResourceOwner is not set (also the case for the session creation),
+// checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
+// In case the user is not set, and the userResourceOwner is not set (also the case for the session creation),
 // it will check permission on the instance.
-func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel, sessionToken string) error {
-	if sessionToken != "" {
-		return c.sessionTokenVerifier(ctx, sessionToken, model.AggregateID, model.TokenID)
-	}
+func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel) error {
 	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
 	if err != nil {
 		return err

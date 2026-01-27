@@ -67,6 +67,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
+			feature_v2.SystemEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -101,6 +102,9 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
+	case feature.KeyEnableRelationalTables:
+		v := value.(bool)
+		features.EnableRelationalTables = &v
 	}
 }
 
@@ -115,23 +119,24 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.SystemEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.SystemLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.SystemPermissionCheckV2)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.SystemEnableRelationalTables)
 	return cmds
 }
 
 func appendFeatureUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValue, newValue *T, eventType eventstore.EventType) []eventstore.Command {
 	if newValue != nil && (oldValue == nil || *oldValue != *newValue) {
-		cmds = append(cmds, feature_v2.NewSetEvent[T](ctx, aggregate, eventType, *newValue))
+		cmds = append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, *newValue))
 	}
 	return cmds
 }
 
 func appendFeatureSliceUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValues, newValues []T, eventType eventstore.EventType) []eventstore.Command {
 	if len(newValues) != len(oldValues) {
-		return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+		return append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, newValues))
 	}
 	for i, oldValue := range oldValues {
 		if oldValue != newValues[i] {
-			return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+			return append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, newValues))
 		}
 	}
 	return cmds

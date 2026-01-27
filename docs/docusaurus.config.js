@@ -1,3 +1,5 @@
+const { themes } = require('prism-react-renderer');
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: "ZITADEL Docs",
@@ -182,6 +184,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     prism: {
+      theme: themes.github,
+      darkTheme: themes.dracula,
       additionalLanguages: [
         "csharp",
         "dart",
@@ -339,7 +343,7 @@ module.exports = {
           },
           action_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/action/v2beta/action_service.swagger.json",
+              ".artifacts/openapi/zitadel/action/v2/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -366,7 +370,7 @@ module.exports = {
           },
           org_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
+              ".artifacts/openapi3/zitadel/org/v2/org_service.openapi.yaml",
             outputDir: "docs/apis/resources/org_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -382,18 +386,9 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
-          org_v2beta: {
+          project_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/org/v2beta/org_service.openapi.yaml",
-            outputDir: "docs/apis/resources/org_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          project_v2beta: {
-            specPath:
-              ".artifacts/openapi3/zitadel/project/v2beta/project_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/project/v2/project_service.openapi.yaml",
             outputDir: "docs/apis/resources/project_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -401,7 +396,7 @@ module.exports = {
             },
           },
           application_v2: {
-            specPath: ".artifacts/openapi3/zitadel/app/v2beta/app_service.openapi.yaml",
+            specPath: ".artifacts/openapi3/zitadel/application/v2/application_service.openapi.yaml",
             outputDir: "docs/apis/resources/application_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -410,7 +405,7 @@ module.exports = {
           },
           instance_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/instance/v2beta/instance_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/instance/v2/instance_service.openapi.yaml",
             outputDir: "docs/apis/resources/instance_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -419,7 +414,7 @@ module.exports = {
           },
           authorization_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/authorization/v2beta/authorization_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/authorization/v2/authorization_service.openapi.yaml",
             outputDir: "docs/apis/resources/authorization_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -428,7 +423,7 @@ module.exports = {
           },
           internal_permission_v2: {
             specPath:
-              ".artifacts/openapi3/zitadel/internal_permission/v2beta/internal_permission_service.openapi.yaml",
+              ".artifacts/openapi3/zitadel/internal_permission/v2/internal_permission_service.openapi.yaml",
             outputDir: "docs/apis/resources/internal_permission_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -450,9 +445,27 @@ module.exports = {
         },
       };
     },
+    function (context, options) {
+      return {
+        name: 'docusaurus-yaml-loader',
+        configureWebpack(config, isServer) {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.ya?ml$/,
+                  use: 'yaml-loader',
+                },
+              ],
+            },
+          };
+        },
+      };
+    },
   ],
   markdown: {
-    mermaid:true,
+    mermaid: true,
+    emoji: false
   },
   themes: [
     "docusaurus-theme-github-codeblock",

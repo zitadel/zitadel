@@ -21,7 +21,7 @@ import {
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { firstValueFrom, Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-feature-toggle/login-v2-feature-toggle.component';
 
@@ -36,6 +36,7 @@ const FEATURE_KEYS = [
   'oidcTokenExchange',
   'permissionCheckV2',
   'userSchema',
+  'enableRelationalTables',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
@@ -64,7 +65,6 @@ export type ToggleStateKeys = keyof ToggleStates;
     FeatureToggleComponent,
     LoginV2FeatureToggleComponent,
   ],
-  standalone: true,
   selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],

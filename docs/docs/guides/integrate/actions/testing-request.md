@@ -65,6 +65,12 @@ func main() {
 }
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
@@ -72,7 +78,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -96,14 +102,14 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
@@ -114,43 +120,84 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## Example call
 
-Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Test",
-        "familyName": "User"
-    },
-    "email": {
-        "email": "example@test.com"
+    "organizationId": "344648897353810062",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini+test@mouse.com"
+        }
     }
 }'
 ```
 
 Your server should now print out something like the following. Check out
-the [Sent information Request](./usage#sent-information-request) payload description.
+the [Sent information Request](./usage#sent-information-request) payload description. 
+The incoming request headers to the Execution are propagated via the request payload to the target.
 
-```shell
+```json
 {
-  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
-  "instanceID": "262851882718855632",
-  "orgID": "262851882718921168",
-  "projectID": "262851882719052240",
-  "userID": "262851882718986704",
-  "request": {
-    "profile": {
-      "given_name": "Test",
-      "family_name": "User"
-    },
-    "email": {
-      "email": "example@test.com"
+  "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
+  "instanceID": "344648897353744526",
+  "orgID": "344648897353810062",
+  "projectID": "344648897353875598",
+  "userID": "344648897354465422",
+  "request":
+  {
+    "organizationId": "344648897353810062",
+    "human":
+    {
+      "profile":
+      {
+        "givenName": "Minnie",
+        "familyName": "Mouse",
+        "nickName": "Mini",
+        "displayName": "Minnie Mouse",
+        "preferredLanguage": "en",
+        "gender": "GENDER_FEMALE"
+      },
+      "email":
+      {
+        "email": "mini+test@mouse.com"
+      }
     }
+  },
+  "headers":
+  {
+    "Content-Type":
+    [
+      "application/grpc"
+    ],
+    "Host":
+    [
+      "localhost:8080"
+    ],
+    "X-Forwarded-For":
+    [
+      "::1"
+    ],
+    "X-Forwarded-Host":
+    [
+      "localhost:8080"
+    ]
   }
 }
 ```

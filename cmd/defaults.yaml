@@ -1,13 +1,101 @@
+Instrumentation:
+  ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables trace exporting
+      # "stdOut": Exports traces to standard output
+      # "stdErr": Exports traces to standard error
+      # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
+      # "http": Exports traces using the OTEL HTTP exporter
+      # "google": Exports traces to Google Cloud. Need to configure GoogleProjectID below!
+      Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
+      # Interval for batching traces before export
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_GOOGLEPROJECTID
+  Metric:
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables metric exporting
+      # "stdOut": Exports metrics to standard output
+      # "stdErr": Exports metrics to standard error
+      # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
+      # "http": Exports metrics using the OTEL HTTP exporter
+      # "google": Exports metrics to Google Cloud. Need to configure GoogleProjectID below!
+      # "prometheus": Exposes metrics via an HTTP endpoint for Prometheus to scrape
+      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
+  
+  # Structured logging can print logs on standard error and/or export them using OTEL.
+  Log:
+    # Log lines lower than this level are not emitted.
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Enable printing structured logs to standard error in the specified format.
+    # The following formats are supported:
+    #   - "disabled": Disables logging
+    #   - "text": Logs are printed on StdErr as human-readable text
+    #   - "json": Logs are printed on StdErr as JSON objects
+    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
+    Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    # Adds the source file and line number where the log line was emitted.
+    # Not to be confused with the source of an error.
+    AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    # Configure how errors are logged.
+    Errors:
+      # Adds the source file, line number and function where the error was created.
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      # Adds stack traces to logged errors.
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
+    Exporter:
+      # The following exporter types are supported:
+      #   - "none": Disables OTEL log exporter
+      #   - "stdOut": Exports OTEL logs to standard output
+      #   - "stdErr": Exports OTEL logs to standard error
+      #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
+      #   - "http": Exports OTEL logs using the OTEL HTTP exporter
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
+  Profile:
+    Exporter:
+      # The following profiler types are supported:
+      # "none": Disables profiling
+      # "google": Exports profiling data to Google Cloud Profiler
+      Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
+      # Project ID for Google Cloud Profiler
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_GOOGLEPROJECTID
+
+# Legacy logging (Deprecated, see Instrumentation.Slog)
 Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 
-# Exposes metrics on /debug/metrics
+# Exposes metrics on /debug/metrics (Deprecated, see Instrumentation.Metric.Prometheus)
 Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
   Type: otel # ZITADEL_METRICS_TYPE
 
+
+# Collects and exports tracing information (Deprecated, see Instrumentation.Trace)
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
   # Depending on the type there are different configuration options
@@ -118,6 +206,7 @@ Database:
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
+    AwaitInitialConn: 0m # ZITADEL_DATABASE_POSTGRES_AWAITINITIALCONN
     MaxOpenConns: 10 # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
     MaxIdleConns: 5 # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
@@ -387,6 +476,12 @@ Projections:
   # Maximum amount of instances cached as active
   # If set to 0, every instance is always considered active
   MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
+  # Limits the amount of concurrently running projection triggers
+  # If set to 0, 1/3 of database.MaxOpenConns is used
+  # The number must be lower than the Database.MaxOpenConns
+  # A good starting point is to set this to Database.MaxOpenConns / 3
+  # so that there are enough connections free for other operations (e.g. writing events, reading projections, notifications, ...)
+  MaxParallelTriggers: 0 # ZITADEL_PROJECTIONS_MAXPARALLELTRIGGERS
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
@@ -528,7 +623,9 @@ OIDC:
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
   DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  # Internal cache age for public keys to speed up validations (e.g. id_token_hints) on the authorization endpoint.
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
+  # Lifetime of the token used to notify clients through OIDC back-channel logout when the feature is enabled and registered on the client.
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
@@ -733,6 +830,24 @@ SystemDefaults:
       # If this is empty, the issuer is the requested domain
       # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
+    RecoveryCodes:
+      # The maximum number of recovery codes that a user can hold at any given time
+      MaxCount: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
+      # The format of the recovery codes, supported: uuid, alphanumeric
+      Format: alphanumeric # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_FORMAT
+      # Length of the recovery codes (only applies to alphanumeric format)
+      Length: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_LENGTH
+      # Whether to include hyphens in the recovery codes (alphanumeric: hyphen in middle, uuid: keep/remove all hyphens)
+      WithHyphen: true # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_WITHHYPHEN
+  Tarpit:
+    # The amount of failed attempts, the tarpit should start.
+    MinFailedAttempts: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_MINFAILEDATTEMPTS
+    # The seconds that will be added per step.
+    StepDuration: 1s # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPDURATION
+    # The failed attempts that are needed to increase the tarpit by one step.
+    StepSize: 5 # ZITADEL_SYSTEMDEFAULTS_TARPIT_STEPSIZE
+    # The maximum duration the tarpit can reach.
+    MaxDuration: 10s # ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH
@@ -948,7 +1063,7 @@ DefaultInstance:
     AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
-    # DefaultRedirectURL is empty by default because we use the Console UI
+    # DefaultRedirectURL is empty by default because we use the Management Console UI
     DefaultRedirectURI: # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
     # 240h = 10d
     PasswordCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDCHECKLIFETIME
@@ -1126,10 +1241,8 @@ DefaultInstance:
   # will be ignored until instance level features are reset.
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
-    # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
-    # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
-    # UserSchema: false # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
-    # TokenExchange: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
+    UserSchema: # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
+    TokenExchange: # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
     ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
     # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
     #   - 1 # OrgByID
@@ -1137,15 +1250,15 @@ DefaultInstance:
     #   - 3 # Project
     #   - 4 # UserGrant
     #   - 5 # OrgDomainVerified
-    # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
-    # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
-    # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
-    # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
+    DebugOIDCParentError: # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
+    OIDCSingleV1SessionTermination: # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
+    EnableBackChannelLogout: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
     LoginV2:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
-    #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
-    # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
-    # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+      BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
+    PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
+    ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
@@ -1238,6 +1351,9 @@ ServicePing:
     ResourceCount:
       Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
       # The number of counts that are sent in one batch.
+      # The bulk size is used to prevent large requests that might fail due to their size.
+      # Each report will log its size before sending it to the endpoint,
+      # so you can adjust the bulk size if you see that the requests are too large.
       BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
@@ -1371,6 +1487,13 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1407,6 +1530,8 @@ InternalAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1466,6 +1591,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1494,6 +1626,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1558,6 +1692,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1596,6 +1737,8 @@ InternalAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1615,6 +1758,8 @@ InternalAuthZ:
         - "project.role.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1636,6 +1781,8 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -1666,6 +1813,8 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
@@ -1931,6 +2080,13 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1967,6 +2123,8 @@ SystemAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -2026,6 +2184,13 @@ SystemAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2054,6 +2219,8 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2099,6 +2266,8 @@ SystemAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

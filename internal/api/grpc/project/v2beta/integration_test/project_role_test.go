@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
@@ -19,7 +18,7 @@ import (
 func TestServer_AddProjectRole(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.ProjectName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.ProjectName(), integration.Email())
 	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 	alreadyExistingProjectRoleName := integration.RoleDisplayName()
 	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
@@ -111,7 +110,7 @@ func TestServer_AddProjectRole(t *testing.T) {
 func TestServer_AddProjectRole_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 	alreadyExistingProjectRoleName := integration.RoleKey()
 	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
@@ -268,7 +267,7 @@ func assertAddProjectRoleResponse(t *testing.T, creationDate, changeDate time.Ti
 
 func TestServer_UpdateProjectRole(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -399,7 +398,7 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 
 func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -585,7 +584,7 @@ func assertUpdateProjectRoleResponse(t *testing.T, creationDate, changeDate time
 
 func TestServer_DeleteProjectRole(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name             string
@@ -664,7 +663,7 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 
 func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type test struct {
 		name             string

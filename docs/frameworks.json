@@ -65,7 +65,7 @@
 		"id": "spring",
 		"title": "Spring",
 		"imgSrcDark": "/docs/img/tech/spring.svg",
-		"docsLink": "/docs/sdk-examples/java"
+		"docsLink": "/docs/sdk-examples/spring"
 	},
 	{
 		"title": "NestJS",
@@ -81,15 +81,22 @@
 	},
 	{
 		"id": "django",
-		"title": "Python Django",
+		"title": "Django",
 		"imgSrcDark": "/docs/img/tech/django.svg",
-		"docsLink": "/docs/sdk-examples/python-django"
+		"docsLink": "/docs/sdk-examples/django"
 	},
 	{
-		"title": "Python Flask",
+		"id": "flask",
+		"title": "Flask",
 		"imgSrcDark": "/docs/img/tech/flask.svg",
 		"imgSrcLight": "/docs/img/tech/flask.svg",
-		"docsLink": "/docs/sdk-examples/python-flask"
+		"docsLink": "/docs/sdk-examples/flask"
+	},
+	{
+		"id": "fastapi",
+		"title": "FastAPI",
+		"imgSrcDark": "/docs/img/tech/fastapi.svg",
+		"docsLink": "/docs/sdk-examples/fastapi"
 	},
 	{
 		"id": "react",
@@ -126,12 +133,6 @@
 		"external": true
 	},
 	{
-		"title": "FastAPI",
-		"imgSrcDark": "/docs/img/tech/fastapi.svg",
-		"docsLink": "https://github.com/cleanenergyexchange/fastapi-zitadel-auth",
-		"external": true
-	},
-	{
 		"title": "NextAuth",
 		"imgSrcDark": "/docs/img/tech/nextjs.svg",
 		"imgSrcLight": "/docs/img/tech/nextjslight.svg",
@@ -164,5 +165,65 @@
 		"imgSrcDark": "/docs/img/tech/pylon.svg",
 		"docsLink": "https://github.com/getcronit/pylon",
 		"external": true
+	},
+		{
+		"title": "Vanilla-JS",
+		"imgSrcDark": "/docs/img/tech/javascript.svg",
+		"docsLink": "https://github.com/zitadel/zitadel-vanilla-js",
+		"external": true
+	},
+	{
+		"id": "astro",
+		"title": "Astro",
+		"imgSrcDark": "/docs/img/tech/astro.svg",
+		"docsLink": "/docs/sdk-examples/astro"
+	},
+	{
+		"id": "expressjs",
+		"title": "Express.js",
+		"imgSrcDark": "/docs/img/tech/expressjs.svg",
+		"docsLink": "/docs/sdk-examples/expressjs"
+	},
+	{
+		"id": "fastify",
+		"title": "Fastify",
+		"imgSrcDark": "/docs/img/tech/fastify.svg",
+		"docsLink": "/docs/sdk-examples/fastify"
+	},
+	{
+		"id": "hono",
+		"title": "Hono",
+		"imgSrcDark": "/docs/img/tech/hono.svg",
+		"docsLink": "/docs/sdk-examples/hono"
+	},
+	{
+		"id": "nuxtjs",
+		"title": "Nuxt.js",
+		"imgSrcDark": "/docs/img/tech/nuxtjs.svg",
+		"docsLink": "/docs/sdk-examples/nuxtjs"
+	},
+	{
+		"id": "qwik",
+		"title": "Qwik",
+		"imgSrcDark": "/docs/img/tech/qwik.svg",
+		"docsLink": "/docs/sdk-examples/qwik"
+	},
+	{
+		"id": "solidstart",
+		"title": "SolidStart",
+		"imgSrcDark": "/docs/img/tech/solidstart.svg",
+		"docsLink": "/docs/sdk-examples/solidstart"
+	},
+	{
+		"id": "sveltekit",
+		"title": "SvelteKit",
+		"imgSrcDark": "/docs/img/tech/sveltekit.svg",
+		"docsLink": "/docs/sdk-examples/sveltekit"
+	},
+	{
+		"id": "laravel",
+		"title": "Laravel",
+		"imgSrcDark": "/docs/img/tech/laravel.svg",
+		"docsLink": "/docs/sdk-examples/laravel"
 	}
 ]

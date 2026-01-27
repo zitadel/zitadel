@@ -11,9 +11,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 )
 
 const (
@@ -57,6 +59,21 @@ func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.Li
 	}), nil
 }
 
+func (s *Server) ListPublicKeys(ctx context.Context, req *connect.Request[action.ListPublicKeysRequest]) (*connect.Response[action.ListPublicKeysResponse], error) {
+	queries, err := s.listPublicKeysRequestToQuery(req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchAuthNKeys(ctx, queries, query.JoinFilterTarget, nil)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&action.ListPublicKeysResponse{
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
+		PublicKeys: publicKeysToPb(res.AuthNKeys),
+	}), nil
+}
+
 func (s *Server) ListExecutions(ctx context.Context, req *connect.Request[action.ListExecutionsRequest]) (*connect.Response[action.ListExecutionsResponse], error) {
 	queries, err := s.ListExecutionsRequestToModel(req.Msg)
 	if err != nil {
@@ -82,18 +99,19 @@ func targetsToPb(targets []*query.Target) []*action.Target {
 
 func targetToPb(t *query.Target) *action.Target {
 	target := &action.Target{
-		Id:         t.ID,
-		Name:       t.Name,
-		Timeout:    durationpb.New(t.Timeout),
-		Endpoint:   t.Endpoint,
-		SigningKey: t.SigningKey,
+		Id:          t.ID,
+		Name:        t.Name,
+		Timeout:     durationpb.New(t.Timeout),
+		Endpoint:    t.Endpoint,
+		SigningKey:  t.SigningKey,
+		PayloadType: payloadTypeToPb(t.PayloadType),
 	}
 	switch t.TargetType {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.RESTWebhook{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		target.TargetType = &action.Target_RestCall{RestCall: &action.RESTCall{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		target.TargetType = &action.Target_RestAsync{RestAsync: &action.RESTAsync{}}
 	default:
 		target.TargetType = nil
@@ -106,6 +124,21 @@ func targetToPb(t *query.Target) *action.Target {
 		target.CreationDate = timestamppb.New(t.CreationDate)
 	}
 	return target
+}
+
+func payloadTypeToPb(payloadType target_domain.PayloadType) action.PayloadType {
+	switch payloadType {
+	case target_domain.PayloadTypeUnspecified:
+		return action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED
+	case target_domain.PayloadTypeJSON:
+		return action.PayloadType_PAYLOAD_TYPE_JSON
+	case target_domain.PayloadTypeJWT:
+		return action.PayloadType_PAYLOAD_TYPE_JWT
+	case target_domain.PayloadTypeJWE:
+		return action.PayloadType_PAYLOAD_TYPE_JWE
+	default:
+		return action.PayloadType_PAYLOAD_TYPE_UNSPECIFIED
+	}
 }
 
 func (s *Server) ListTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {
@@ -401,4 +434,99 @@ func includeEventToCondition(id string) *action.Condition {
 
 func includeFunctionToCondition(id string) *action.Condition {
 	return &action.Condition{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: strings.TrimPrefix(id, "/")}}}
+}
+
+func (s *Server) listPublicKeysRequestToQuery(req *action.ListPublicKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
+	queries, err := publicKeyFiltersToQuery(req.Filters, req.GetTargetId())
+	if err != nil {
+		return nil, err
+	}
+	return &query.AuthNKeySearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: publicKeyFieldNameToSortingColumn(req.GetSortingColumn()),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func publicKeyFiltersToQuery(filters []*action.PublicKeySearchFilter, targetID string) (_ []query.SearchQuery, err error) {
+	f := make([]query.SearchQuery, len(filters)+1)
+	for i, filter := range filters {
+		f[i], err = publicKeyFilterToQuery(filter)
+		if err != nil {
+			return nil, err
+		}
+	}
+	f[len(filters)], err = query.NewAuthNKeyIdentifyerQuery(targetID)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func publicKeyFilterToQuery(filter *action.PublicKeySearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *action.PublicKeySearchFilter_KeyIdsFilter:
+		return publicKeyKeyIDsFilterToQuery(q.KeyIdsFilter)
+	case *action.PublicKeySearchFilter_ActiveFilter:
+		return publicKeyActiveFilterToQuery(q.ActiveFilter)
+	case *action.PublicKeySearchFilter_ExpirationDateFilter:
+		return publicKeyExpirationFilterToQuery(q.ExpirationDateFilter)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+	}
+}
+
+func publicKeyKeyIDsFilterToQuery(idsFilter *filter_pb.InIDsFilter) (query.SearchQuery, error) {
+	return query.NewAuthNKeyInIDsSearchQuery(idsFilter.GetIds())
+}
+
+func publicKeyActiveFilterToQuery(activeFilter bool) (query.SearchQuery, error) {
+	return query.NewAuthNKeyEnabledSearchQuery(activeFilter)
+}
+
+func publicKeyExpirationFilterToQuery(f *filter_pb.TimestampFilter) (query.SearchQuery, error) {
+	return query.NewAuthNKeyExpirationDateQuery(f.GetTimestamp().AsTime(), filter.TimestampMethodPbToQuery(f.Method))
+}
+
+func publicKeyFieldNameToSortingColumn(column action.PublicKeyFieldName) query.Column {
+	switch column {
+	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_UNSPECIFIED:
+		return query.AuthNKeyColumnCreationDate
+	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CREATION_DATE:
+		return query.AuthNKeyColumnCreationDate
+	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_CHANGE_DATE:
+		return query.AuthNKeyColumnChangeDate
+	case action.PublicKeyFieldName_PUBLIC_KEY_FIELD_NAME_EXPIRATION_DATE:
+		return query.AuthNKeyColumnExpiration
+	default:
+		return query.AuthNKeyColumnCreationDate
+	}
+}
+
+func publicKeysToPb(keys []*query.AuthNKey) []*action.PublicKey {
+	pks := make([]*action.PublicKey, len(keys))
+	for i, key := range keys {
+		var expiration *timestamppb.Timestamp
+		if !key.Expiration.IsZero() {
+			expiration = timestamppb.New(key.Expiration)
+		}
+		pks[i] = &action.PublicKey{
+			KeyId:          key.ID,
+			Active:         key.Enabled,
+			PublicKey:      key.PublicKey,
+			Fingerprint:    key.Fingerprint,
+			ExpirationDate: expiration,
+			CreationDate:   timestamppb.New(key.CreationDate),
+			ChangeDate:     timestamppb.New(key.ChangeDate),
+		}
+	}
+	return pks
 }

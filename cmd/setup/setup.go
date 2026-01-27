@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -61,23 +62,45 @@ func New() *cobra.Command {
 		Long: `sets up data to start ZITADEL.
 Requirements:
 - postgreSQL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel setup command failed", "err", err)
+				}
+			}()
+
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return fmt.Errorf("invalid tlsMode: %w", err)
+			}
 
 			err = BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
+			}
 
 			err = bindForMirror(cmd)
-			logging.OnError(err).Fatal("unable to bind \"for-mirror\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"for-mirror\" flag: %w", err)
+			}
 
-			config := MustNewConfig(viper.GetViper())
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
 			steps := MustNewSteps(viper.New())
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return fmt.Errorf("no master key provided: %w", err)
+			}
 
 			Setup(cmd.Context(), config, steps, masterKey)
+			return nil
 		},
 	}
 
@@ -218,6 +241,14 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
 	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
 	steps.s60GenerateSystemID = &GenerateSystemID{eventstore: eventstoreClient}
+	steps.s61IDPTemplate6SAMLSignatureAlgorithm = &IDPTemplate6SAMLSignatureAlgorithm{dbClient: dbClient}
+	steps.s62HTTPProviderAddSigningKey = &HTTPProviderAddSigningKey{dbClient: dbClient}
+	steps.s63AlterResourceCounts = &AlterResourceCounts{dbClient: dbClient}
+	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
+	steps.s65FixUserMetadata5Index = &FixUserMetadata5Index{dbClient: dbClient}
+	steps.s66SessionRecoveryCodeCheckedAt = &SessionRecoveryCodeCheckedAt{dbClient: dbClient}
+	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
+	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -266,6 +297,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s57CreateResourceCounts,
 		steps.s58ReplaceLoginNames3View,
 		steps.s60GenerateSystemID,
+		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
+		steps.s62HTTPProviderAddSigningKey,
+		steps.s63AlterResourceCounts,
+		steps.s64ChangePushPosition,
+		steps.s65FixUserMetadata5Index,
+		steps.s67SyncMemberRoleFields,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -283,6 +320,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
 			defaults:       config.SystemDefaults,
+		},
+		&TransactionalTables{
+			dbClient: dbClient,
 		},
 		&projectionTables{
 			es:      eventstoreClient,
@@ -325,6 +365,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
 		steps.s59SetupWebkeys, // this step needs commands.
+		steps.s66SessionRecoveryCodeCheckedAt,
+		steps.s68TargetAddPayloadTypeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -466,6 +508,8 @@ func startCommandsQueries(
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -569,8 +613,6 @@ func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
 ) error {
-	logging.Info("init-projections is currently in beta")
-
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
 			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")

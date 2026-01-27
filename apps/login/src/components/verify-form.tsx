@@ -2,8 +2,9 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
@@ -25,18 +26,11 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  organization,
-  requestId,
-  code,
-  isInvite,
-}: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       code: code ?? "",
     },
@@ -52,12 +46,19 @@ export function VerifyForm({
     setError("");
     setLoading(true);
 
+    // do not send code for dummy userid that is set to prevent user enumeration
+    if (userId === UNKNOWN_USER_ID) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setLoading(false);
+      return;
+    }
+
     const response = await resendVerification({
       userId,
       isInvite: isInvite,
     })
       .catch(() => {
-        setError("Could not resend email");
+        setError(t("errors.couldNotResendEmail"));
         return;
       })
       .finally(() => {
@@ -72,10 +73,11 @@ export function VerifyForm({
     return response;
   }
 
+  const processedCode = useRef<string | undefined>(undefined);
+
   const fcn = useCallback(
-    async function submitCodeAndContinue(
-      value: Inputs,
-    ): Promise<boolean | void> {
+    async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
+      setError("");
       setLoading(true);
 
       const response = await sendVerification({
@@ -87,7 +89,7 @@ export function VerifyForm({
         requestId: requestId,
       })
         .catch(() => {
-          setError("Could not verify user");
+          setError(t("errors.couldNotVerifyUser"));
           return;
         })
         .finally(() => {
@@ -107,7 +109,8 @@ export function VerifyForm({
   );
 
   useEffect(() => {
-    if (code) {
+    if (code && code !== processedCode.current) {
+      processedCode.current = code;
       fcn({ code });
     }
   }, [code, fcn]);
@@ -139,7 +142,7 @@ export function VerifyForm({
             type="text"
             autoComplete="one-time-code"
             {...register("code", { required: t("verify.required.code") })}
-            label="Code"
+            label={t("verify.labels.code")}
             data-testid="code-text-input"
           />
         </div>

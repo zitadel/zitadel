@@ -5,6 +5,7 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
@@ -473,12 +474,14 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAML
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -491,12 +494,14 @@ func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *comman
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -514,6 +519,21 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPRedirectBinding
 	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
 		return saml.HTTPArtifactBinding
+	default:
+		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
 	default:
 		return ""
 	}

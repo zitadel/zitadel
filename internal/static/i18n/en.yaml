@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: could not contact with the SMTP server using TLS, check the port, firewall issues...
     CouldNotCreateClient: could not create smtp client
     CouldNotStartTLS: could not start tls
-    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by ZITADEL
+    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by Zitadel
     CouldNotSetSender: could not set sender
     CouldNotSetRecipient: could not set recipient
   SMTPConfig:
@@ -70,7 +70,7 @@ Errors:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
     AlreadyDeactivated: SMTP configuration already deactivated
-    SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
+    SenderAdressNotCustomDomain: The sender address must be configured as Custom Domain on the instance.
     TestEmailNotFound: Email address for test not found
   Notification:
     NoDomain: No Domain found for message
@@ -96,12 +96,13 @@ Errors:
     InitCodeNotFound: Initialization Code not found
     UsernameNotChanged: Username not changed
     InvalidURLTemplate: URL Template is invalid
+    Locked: User is locked
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: Given name in profile is empty
-      LastNameEmpty: Family name in profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -177,7 +178,12 @@ Errors:
       U2F:
         NotExisting: U2F does not exist
       Passwordless:
-        NotExisting: Passwordless does not exist
+        NotExisting: Passkey does not exist
+      RecoveryCodes:
+        InvalidCode: Invalid recovery code provided
+        MaxCountExceeded: Maximum number of recovery codes exceeded
+        NotReady: Recovery codes are not ready for use
+        ConfigInvalid: Recovery codes configuration is invalid
     WebAuthN:
       NotFound: WebAuthN Token could not be found
       BeginRegisterFailed: WebAuthN begin registration failed
@@ -203,7 +209,7 @@ Errors:
     NotFound: Organisation not found
     NotChanged: Organisation not changed
     DefaultOrgNotDeletable: Default Organisation must not be deleted
-    ZitadelOrgNotDeletable: Organisation with ZITADEL project must not be deleted
+    ZitadelOrgNotDeletable: Organisation with Zitadel project must not be deleted
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organization
@@ -570,6 +576,10 @@ Errors:
     NoTimeout: Target has no timeout
     InvalidURL: Target has an invalid URL
     NotFound: Target not found
+    InvalidExpirationDate: Key expiration date must be in the future
+    PublicKeyExpired: Target public key is expired
+    PublicKeyActive: Cannot delete active target public key
+    InvalidPublicKey: The public key is invalid. Must be a PEM encoded RSA or ECDSA public key in PKCS#8 format
   Execution:
     ConditionInvalid: Execution condition is invalid
     Invalid: Execution is invalid
@@ -578,6 +588,7 @@ Errors:
     NoTargets: No targets defined
     Failed: Execution failed
     ResponseIsNotValidJSON: Response is not valid JSON
+    MissingEncryptionKey: No encryption key found for target
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:
@@ -796,24 +807,24 @@ EventTypes:
           skipped: Multifactor initialization skipped
       passwordless:
         token:
-          added: Token for Passwordless Login added
-          verified: Token for Passwordless Login verified
-          removed: Token for Passwordless Login removed
+          added: Token for Passkey Login added
+          verified: Token for Passkey Login verified
+          removed: Token for Passkey Login removed
           begin:
-            login: Passwordless Login check started
+            login: Passkey Login check started
           check:
-            succeeded: Passwordless Login check succeeded
-            failed: Passwordless Login check failed
+            succeeded: Passkey Login check succeeded
+            failed: Passkey Login check failed
           signcount:
-            changed: Checksum of the Passwordless Login Token has been changed
+            changed: Checksum of the Passkey Login Token has been changed
         initialization:
           code:
-            added: Passwordless initialization code added
-            sent: Passwordless initialization code sent
-            requested: Passwordless initialization code requested
+            added: Passkey initialization code added
+            sent: Passkey initialization code sent
+            requested: Passkey initialization code requested
             check:
-              succeeded: Passwordless initialization code successfully checked
-              failed: Passwordless initialization code check failed
+              succeeded: Passkey initialization code successfully checked
+              failed: Passkey initialization code check failed
       signed:
         out: User signed out
       refresh:
@@ -1105,20 +1116,20 @@ EventTypes:
         changed: Password lockout policy changed
   iam:
     setup:
-      started: ZITADEL setup started
-      done: ZITADEL setup done
+      started: Zitadel setup started
+      done: Zitadel setup done
     global:
       org:
         set: Global org set
     project:
       iam:
-        set: ZITADEL project set
+        set: Zitadel project set
     member:
-      added: ZITADEL member added
-      changed: ZITADEL member changed
-      removed: ZITADEL member removed
+      added: Zitadel member added
+      changed: Zitadel member changed
+      removed: Zitadel member removed
       cascade:
-        removed: ZITADEL member cascade removed
+        removed: Zitadel member cascade removed
     idp:
       config:
         added: IDP configuration added
@@ -1231,9 +1242,9 @@ EventTypes:
       removed: Domain removed
     iam:
       console:
-        set: ZITADEL Console application set
+        set: Zitadel Management Console application set
       project:
-        set: ZITADEL project set
+        set: Zitadel project set
     mail:
       template:
         added: E-Mail template added
@@ -1365,8 +1376,6 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
-
-
   web_key:
     added: Web Key added
     activated: Web Key activated
@@ -1382,8 +1391,8 @@ Application:
       NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
       Code:
         RedirectUris:
-          HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
-          CustomOnlyForNative: Grant type code only allows custom redirect uris for apptype native  (e.g appname:// )
+          HttpOnlyForWeb: Grant type "code" only allows http redirect uris for apptype "web".
+          CustomOnlyForNative: Grant type "code" only allows custom redirect uris for apptype "native"  (e.g appname:// )
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris

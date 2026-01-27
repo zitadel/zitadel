@@ -7,11 +7,8 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionTwoAddTargetDialogComponent } from '../actions-two-add-target/actions-two-add-target-dialog.component';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
-import {
-  CreateTargetRequestSchema,
-  UpdateTargetRequestSchema,
-} from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
+import { CreateTargetRequestSchema, UpdateTargetRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
 import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
@@ -19,6 +16,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
   templateUrl: './actions-two-targets.component.html',
   styleUrls: ['./actions-two-targets.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoTargetsComponent {
   protected readonly targets$: Observable<Target[]>;

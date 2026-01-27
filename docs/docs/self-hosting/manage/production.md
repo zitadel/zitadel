@@ -32,7 +32,7 @@ Also, not all configuration options are available as environment variables.
 - To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/self-hosting/manage/tls_modes).
 - If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/self-hosting/manage/http2)**.
 - You can also refer to some **[example reverse proxy configurations](/docs/self-hosting/manage/reverseproxy/reverse_proxy)**.
-- The ZITADEL Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
+- The ZITADEL Management Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
 - Serving and caching the assets using a content delivery network could improve network latencies and shield your ZITADEL runtime.
 
 ## Monitoring
@@ -99,7 +99,7 @@ The following table describes the milestones that are sent to the endpoints:
 | An authentication succeeded for the first time on an instance.                    | This is the first authentication with the instances automatically created admin user during the instance setup, which can be a human or a machine. |
 | A project is created for the first time in a virtual instance.                    | The ZITADEL project that is automatically created during the instance setup is omitted.                                                            |
 | An application is created for the first time in a virtual instance.               | The applications in the ZITADEL project that are automatically created during the instance setup are omitted.                                      |
-| An authentication succeeded for the first time in a virtal instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
+| An authentication succeeded for the first time in a virtual instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
 | A virtual instance is deleted.                                                    | This data point is sent when a virtual instance is deleted via ZITADELs system API                                                                 |
 
 
@@ -227,7 +227,7 @@ DefaultInstance:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
-- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
+- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/console-overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform-provider).
 

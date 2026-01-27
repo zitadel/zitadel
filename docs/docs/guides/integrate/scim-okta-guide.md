@@ -18,7 +18,7 @@ SCIM provisioning in ZITADEL is accomplished by authenticating a Service User wi
 
 1. **Create a Service User**:
 
-   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users) to create a Service User within your ZITADEL Organization.
+   * Follow [this guide](https://zitadel.com/docs/guides/manage/console/users-overview) to create a Service User within your ZITADEL Organization.
 
 2. **Assign the Role**:
 
@@ -111,7 +111,7 @@ Review and adjust attribute mappings in Okta as needed:
 
 * [Authenticate users with SAML](https://zitadel.com/docs/guides/integrate/login/saml)
 
-* [ZITADEL: Creating Service Users](https://zitadel.com/docs/guides/manage/console/users)
+* [ZITADEL: Creating Service Users](https://zitadel.com/docs/guides/manage/console/users-overview)
 
 * [ZITADEL: Service User Authentication](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users)
 

@@ -1,6 +1,6 @@
 ---
-title: OpenID Connect and Oauth2 web keys
-sidebar_label: Web keys [Beta]
+title: OpenID Connect and OAuth2 web keys
+sidebar_label: Web Keys
 ---
 
 Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
@@ -95,7 +95,7 @@ two web key pairs are created with one activated.
 
 ### Creation
 
-The web key [create](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-create-web-key) endpoint generates a new web key pair,
+The web key [create](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-create-web-key) endpoint generates a new web key pair,
 using the passed generator configuration from the request. This config is a one-of field of:
 
 - RSA
@@ -106,7 +106,7 @@ When the request does not contain any specific configuration,
 [RSA](#rsa) is used as default with the default options as described below:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
+curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -130,7 +130,7 @@ The RSA generator config takes two enum values.
 For example, to create a RSA web key with the size of 3072 bits and the SHA512 algorithm (RS512):
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
+curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -154,7 +154,7 @@ The ECDSA generator config takes a single `curve` enum value which determines bo
 For example, to create a ECDSA web key with a P-256 curve and the SHA256 algorithm:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
+curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -178,7 +178,7 @@ Clients which support both curves must inspect `crv` header value to assert the 
 For example, to create a ed25519 web key:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
+curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -192,7 +192,7 @@ curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
 
 ### Activation
 
-When a generated web key is [activated](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-activate-web-key),
+When a generated web key is [activated](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-activate-web-key),
 its private key will be used to sign new tokens.
 There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
@@ -203,7 +203,7 @@ at least for the duration of the max-age setting plus any time it might take for
 
 ### Deletion
 
-Non-active keys may be [deleted](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-delete-web-key).
+Non-active keys may be [deleted](/docs/apis/resources/webkey_service_v2/zitadel-webkey-v-2-web-key-service-delete-web-key).
 Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,
@@ -214,7 +214,7 @@ Once a key was activated and deactivated (by activation of the next key) deletio
 
 - Until access and ID tokens are expired. See [OIDC token lifetimes](/docs/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
 - ID tokens may be used as `id_token_hint` in authentication and end-session requests. The hint typically doesn't expire, but becomes invalid once the key is deleted.
-  It might be desired to keep keys around long enough to minimalize user impact.
+  It might be desirable to keep keys around long enough to minimize user impact.
 
 ### Rotation example
 
@@ -228,7 +228,7 @@ This strategy aims to fulfill the following requirements:
   Users that haven't logged in / refreshed tokens with the client app for that period,
   will need to re-enter their username.
 
-When the feature flag was enabled the first time, the instance got two keys with the first one activated. When this feature becomes general available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
+When the instance was created, resp. the feature was rolled out, the instance got two keys with the first one activated. When this feature becomes generally available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
 
 | id  | created    | changed    | state           |
 | --- | ---------- | ---------- | --------------- |
@@ -240,11 +240,11 @@ For the sake of this example we will use simplified IDs and restrict timestamps 
 After one month, on 2025-02-01, we wish to activate the next available key and create a new key to be available for activation next month. This fulfills requirements 1 and 2.
 
 ```bash
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/web_keys/2/_activate' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/web_keys/2/_activate' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 
-curl -L 'https://$CUSTOM-DOMAIN/v2beta/web_keys' \
+curl -L 'https://${CUSTOM_DOMAIN}/v2/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -276,7 +276,7 @@ In addition to the activate and create calls we made on this iteration,
 we can now safely delete the oldest key, as both requirement 3 and 4 are now fulfilled:
 
 ```bash
-curl -L -X DELETE 'https://$CUSTOM-DOMAIN/v2beta/web_keys/1' \
+curl -L -X DELETE 'https://${CUSTOM_DOMAIN}/v2/web_keys/1' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -296,7 +296,7 @@ Next month, Key ID 6 will be activated, an new key added and Key ID 2 can be del
 ## JSON web key set
 
 The JSON web key set (JWKS) endpoint serves all available public keys for the instance on
-`{your_domain}/oauth/v2/keys`. This includes activated, newly non-activated and deactivated web keys. The response format is defined in [RFC7517, section 5: JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517#section-5).
+`${CUSTOM_DOMAIN}/oauth/v2/keys`. This includes activated, newly non-activated and deactivated web keys. The response format is defined in [RFC7517, section 5: JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517#section-5).
 
 And looks like:
 

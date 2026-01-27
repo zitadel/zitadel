@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -19,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -66,12 +66,12 @@ var (
 		name:  projection.InstanceColumnProjectID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleID = Column{
-		name:  projection.InstanceColumnConsoleID,
+	InstanceColumnManagementConsoleID = Column{
+		name:  projection.InstanceColumnManagementConsoleID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleAppID = Column{
-		name:  projection.InstanceColumnConsoleAppID,
+	InstanceColumnManagementConsoleAppID = Column{
+		name:  projection.InstanceColumnManagementConsoleAppID,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultLanguage = Column{
@@ -99,12 +99,12 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
+	DefaultOrgID           string
+	IAMProjectID           string
+	ManagementConsoleID    string
+	ManagementConsoleAppID string
+	DefaultLang            language.Tag
+	Domains                []*InstanceDomain
 }
 
 type Instances struct {
@@ -200,20 +200,17 @@ var (
 	instanceByIDQuery string
 )
 
-func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (_ authz.Instance, err error) {
 	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+			err = fmt.Errorf("unable to get instance by domain: instanceDomain %s, publicHostname %s: %w", instanceDomain, publicDomain, err)
 		} else {
 			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
-
-	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
-	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
 	if ok {
@@ -246,6 +243,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+
 	if err == nil {
 		q.caches.instance.Set(ctx, instance)
 	}
@@ -282,8 +280,8 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 				InstanceColumnName.identifier(),
 				InstanceColumnDefaultOrgID.identifier(),
 				InstanceColumnProjectID.identifier(),
-				InstanceColumnConsoleID.identifier(),
-				InstanceColumnConsoleAppID.identifier(),
+				InstanceColumnManagementConsoleID.identifier(),
+				InstanceColumnManagementConsoleAppID.identifier(),
 				InstanceColumnDefaultLanguage.identifier(),
 				InstanceDomainDomainCol.identifier(),
 				InstanceDomainIsPrimaryCol.identifier(),
@@ -330,8 +328,8 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -387,8 +385,8 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 			InstanceColumnName.identifier(),
 			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnManagementConsoleID.identifier(),
+			InstanceColumnManagementConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
@@ -422,8 +420,8 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -460,19 +458,20 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 }
 
 type authzInstance struct {
-	ID              string                     `json:"id,omitempty"`
-	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
-	ConsoleID       string                     `json:"console_id,omitempty"`
-	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
-	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
-	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
-	CSP             csp                        `json:"csp,omitempty"`
-	Impersonation   bool                       `json:"impersonation,omitempty"`
-	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
-	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
-	Feature         feature.Features           `json:"feature,omitempty"`
-	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
-	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ID                     string                     `json:"id,omitempty"`
+	IAMProjectID           string                     `json:"iam_project_id,omitempty"`
+	ManagementConsoleID    string                     `json:"console_id,omitempty"`
+	ManagementConsoleAppID string                     `json:"console_app_id,omitempty"`
+	DefaultLang            language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID           string                     `json:"default_org_id,omitempty"`
+	CSP                    csp                        `json:"csp,omitempty"`
+	Impersonation          bool                       `json:"impersonation,omitempty"`
+	IsBlocked              *bool                      `json:"is_blocked,omitempty"`
+	LogRetention           *time.Duration             `json:"log_retention,omitempty"`
+	Feature                feature.Features           `json:"feature,omitempty"`
+	ExternalDomains        database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains         database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets       target_domain.Router       `json:"execution_targets,omitzero"`
 }
 
 type csp struct {
@@ -488,12 +487,12 @@ func (i *authzInstance) ProjectID() string {
 	return i.IAMProjectID
 }
 
-func (i *authzInstance) ConsoleClientID() string {
-	return i.ConsoleID
+func (i *authzInstance) ManagementConsoleClientID() string {
+	return i.ManagementConsoleID
 }
 
-func (i *authzInstance) ConsoleApplicationID() string {
-	return i.ConsoleAppID
+func (i *authzInstance) ManagementConsoleApplicationID() string {
+	return i.ManagementConsoleAppID
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
@@ -525,6 +524,10 @@ func (i *authzInstance) AuditLogRetention() *time.Duration {
 
 func (i *authzInstance) Features() feature.Features {
 	return i.Feature
+}
+
+func (i *authzInstance) ExecutionRouter() target_domain.Router {
+	return i.ExecutionTargets
 }
 
 var errPublicDomain = "public domain %q not trusted"
@@ -562,13 +565,14 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
+			executionTargetsBytes []byte
 		)
 		err := row.Scan(
 			&instance.ID,
 			&instance.DefaultOrgID,
 			&instance.IAMProjectID,
-			&instance.ConsoleID,
-			&instance.ConsoleAppID,
+			&instance.ManagementConsoleID,
+			&instance.ManagementConsoleAppID,
 			&lang,
 			&enableIframeEmbedding,
 			&instance.CSP.AllowedOrigins,
@@ -578,6 +582,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&features,
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
+			&executionTargetsBytes,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -594,11 +599,17 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		}
 		instance.CSP.EnableIframeEmbedding = enableIframeEmbedding.Bool
 		instance.Impersonation = enableImpersonation.Bool
-		if len(features) == 0 {
-			return nil
+		if len(features) > 0 {
+			if err = json.Unmarshal(features, &instance.Feature); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+			}
 		}
-		if err = json.Unmarshal(features, &instance.Feature); err != nil {
-			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+		if len(executionTargetsBytes) > 0 {
+			var targets []target_domain.Target
+			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
+			}
+			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
 		return nil
 	}
@@ -616,6 +627,8 @@ func (c *Caches) registerInstanceInvalidation() {
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
+	projection.ExecutionProjection.RegisterCacheInvalidation(invalidate)
+	projection.TargetProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {

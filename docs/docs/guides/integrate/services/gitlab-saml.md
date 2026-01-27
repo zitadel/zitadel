@@ -13,12 +13,12 @@ It covers how to:
 Prerequisites:
 
 - existing ZITADEL Instance, if not present follow [this guide](/guides/start/quickstart)
-- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations)
-- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects)
+- existing ZITADEL Organization, if not present follow [this guide](/guides/manage/console/organizations-overview)
+- existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Gitlab SaaS Setup in the premium tier
 
 > We have to switch between ZITADEL and Gitlab. If the headings begin with "ZITADEL" switch to the ZITADEL
-> Console and
+> Management Console and
 > if the headings start with "Gitlab" please switch to the Gitlab GUI.
 
 ## **Gitlab**: Create a new external identity provider
@@ -51,7 +51,7 @@ Check your application, if everything is correct, press "Create".
 
 Complete the configuration as follows:
 
-- `Identity provider single sign-on URL`: $CUSTOM-DOMAIN/saml/v2/SSO
+- `Identity provider single sign-on URL`: `${CUSTOM_DOMAIN}/saml/v2/SSO`
 - `Certificate fingerprint`: You need to download the certificate from \{your_instance_domain}/saml/v2/certificate and create a SHA1 fingerprint
 
 Save the changes.

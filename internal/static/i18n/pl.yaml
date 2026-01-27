@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: nie można połączyć się z serwerem SMTP przy użyciu protokołu TLS, sprawdź port, problemy z zaporą sieciową...
     CouldNotCreateClient: nie można utworzyć klienta smtp
     CouldNotStartTLS: nie można rozpocząć tls
-    CouldNotAuth: nie można dodać uwierzytelnienia smtp, sprawdź, czy zarówno użytkownik, jak i hasło są poprawne, jeśli są poprawne, być może Twój dostawca wymaga metody uwierzytelniania nieobsługiwanej przez ZITADEL
+    CouldNotAuth: nie można dodać uwierzytelnienia smtp, sprawdź, czy zarówno użytkownik, jak i hasło są poprawne, jeśli są poprawne, być może Twój dostawca wymaga metody uwierzytelniania nieobsługiwanej przez Zitadel
     CouldNotSetSender: nie można ustawić nadawcy
     CouldNotSetRecipient: nie można ustawić odbiorcy
   SMTPConfig:
@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kod inicjalizacji nie znaleziony
     UsernameNotChanged: Nazwa użytkownika nie została zmieniona
     InvalidURLTemplate: Szablon URL jest nieprawidłowy
+    Locked: Użytkownik jest zablokowany
     Profile:
       NotFound: Profil nie znaleziony
       NotChanged: Profil nie zmieniony
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F nie istnieje
       Passwordless:
         NotExisting: Bezhasłowe nie istnieje
+      RecoveryCodes:
+        InvalidCode: Podano nieprawidłowy kod odzyskiwania
+        MaxCountExceeded: Przekroczono maksymalną liczbę kodów odzyskiwania
+        NotReady: Kody odzyskiwania nie są gotowe do użycia
+        ConfigInvalid: Konfiguracja kodów odzyskiwania jest nieprawidłowa
     WebAuthN:
       NotFound: Token WebAuthN nie został znaleziony
       BeginRegisterFailed: Rozpoczęcie rejestracji WebAuthN nie powiodło się
@@ -202,7 +208,7 @@ Errors:
     NotFound: Organizacja nie znaleziona
     NotChanged: Organizacja nie zmieniona
     DefaultOrgNotDeletable: Domyślna organizacja nie może być usunięta
-    ZitadelOrgNotDeletable: Organizacja z projektem ZITADEL nie może być usunięta
+    ZitadelOrgNotDeletable: Organizacja z projektem Zitadel nie może być usunięta
     InvalidDomain: Nieprawidłowa domena
     DomainMissing: Brak domeny
     DomainNotOnOrg: Domena nie istnieje w organizacji
@@ -569,6 +575,10 @@ Errors:
     NoTimeout: Cel nie ma limitu czasu
     InvalidURL: Cel ma nieprawidłowy adres URL
     NotFound: Nie znaleziono celu
+    InvalidExpirationDate: Data wygaśnięcia klucza musi być w przyszłości
+    PublicKeyExpired: Publiczny klucz docelowy wygasł
+    PublicKeyActive: Nie można usunąć aktywnego publicznego klucza docelowego
+    InvalidPublicKey: Klucz publiczny jest nieprawidłowy. Musi być to klucz publiczny RSA lub ECDSA zakodowany w PEM w formacie PKCS#8
   Execution:
     ConditionInvalid: Warunek wykonania jest nieprawidłowy
     Invalid: Wykonanie jest nieprawidłowe
@@ -577,6 +587,7 @@ Errors:
     NoTargets: Nie zdefiniowano celów
     Failed: Wykonanie nie powiodło się
     ResponseIsNotValidJSON: Odpowiedź nie jest prawidłowym JSON-em
+    MissingEncryptionKey: Brak klucza szyfrowania dla wykonania
   UserSchema:
     NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
     Type:
@@ -1104,20 +1115,20 @@ EventTypes:
         changed: Zmieniono politykę blokowania hasła
   iam:
     setup:
-      started: rozpoczęta konfiguracja ZITADEL
-      done: ukończona konfiguracja ZITADEL
+      started: rozpoczęta konfiguracja Zitadel
+      done: ukończona konfiguracja Zitadel
     global:
       org:
         set: Ustawienie globalnej organizacji
     project:
       iam:
-        set: Ustawiono projekt ZITADEL
+        set: Ustawiono projekt Zitadel
     member:
-      added: Dodano członka ZITADEL
-      changed: Zmieniono członka ZITADEL
-      removed: Usunięto członka ZITADEL
+      added: Dodano członka Zitadel
+      changed: Zmieniono członka Zitadel
+      removed: Usunięto członka Zitadel
       cascade:
-        removed: Usunięto kaskadowo członka ZITADEL
+        removed: Usunięto kaskadowo członka Zitadel
     idp:
       config:
         added: Dodano konfigurację IDP
@@ -1230,9 +1241,9 @@ EventTypes:
       removed: Domena usunięta
     iam:
       console:
-        set: Ustawienie aplikacji ZITADEL Console
+        set: Aplikacja Konsoli Zarządzania Zitadel ustawiona
       project:
-        set: Ustawienie projektu ZITADEL
+        set: Ustawienie projektu Zitadel
     mail:
       template:
         added: Dodanie szablonu e-mail

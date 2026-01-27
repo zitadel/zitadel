@@ -20,7 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Session Service";
     version: "2.0-beta";
-    description: "This API is intended to manage sessions in a ZITADEL instance. Follow the guides on how to [build your own Login UI](/docs/guides/integrate/login-ui) and learn how to use the Session API. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage sessions in a Zitadel instance. Follow the guides on how to [build your own Login UI](/docs/guides/integrate/login-ui) and learn how to use the Session API. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -43,7 +43,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -56,8 +56,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -104,9 +104,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// Deprecated: use session service v2 instead. This service will be removed in the next major version of ZITADEL.
 service SessionService {
 
   // Search sessions
+  //
+  // Deprecated: please move to the corresponding endpoint under session service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
       post: "/v2beta/sessions/search"
@@ -120,6 +123,7 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Search sessions";
       description: "Search for sessions"
       responses: {
@@ -143,6 +147,8 @@ service SessionService {
   }
 
   // GetSession a session
+  //
+  // Deprecated: please move to the corresponding endpoint under session service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
       get: "/v2beta/sessions/{session_id}"
@@ -155,6 +161,7 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Get a session";
       description: "Get a session and all its information like the time of the user or password verification"
       responses: {
@@ -167,6 +174,8 @@ service SessionService {
   }
 
   // Create a new session
+  //
+  // Deprecated: please move to the corresponding endpoint under session service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {
     option (google.api.http) = {
       post: "/v2beta/sessions"
@@ -183,6 +192,7 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Create a new session";
       description: "Create a new session. A token will be returned, which is required for further updates of the session."
       responses: {
@@ -195,6 +205,8 @@ service SessionService {
   }
 
   // Update a session
+  //
+  // Deprecated: please move to the corresponding endpoint under session service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc SetSession (SetSessionRequest) returns (SetSessionResponse) {
     option (google.api.http) = {
       patch: "/v2beta/sessions/{session_id}"
@@ -208,6 +220,7 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Update an existing session";
       description: "Update an existing session with new information."
       responses: {
@@ -220,6 +233,8 @@ service SessionService {
   }
 
   // Terminate a session
+  //
+  // Deprecated: please move to the corresponding endpoint under session service v2. This endpoint will be removed with the next major version of ZITADEL.
   rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
     option (google.api.http) = {
       delete: "/v2beta/sessions/{session_id}"
@@ -233,6 +248,7 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       summary: "Terminate an existing session";
       description: "Terminate your own session or if granted any other session."
       responses: {
