@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione è selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
       "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definisce dove l'utente verrà reindirizzato se l'accesso è stato avviato senza un contesto dell'applicazione (ad es. dalla posta)",
+      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana",
       "DISABLEWATERMARK_DESC": "Nascondi filigrana Powered by Zitadel nell'interfaccia di accesso"

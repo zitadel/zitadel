@@ -1921,7 +1921,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Om alternativet är valt kommer lösenordsskärmen att visas i inloggningsprocessen även om användaren inte hittades. Felet vid lösenordskontrollen kommer inte att avslöja om användarnamnet eller lösenordet var fel.",
       "ALLOWDOMAINDISCOVERY_DESC": "Om alternativet är valt kommer suffixet (@domain.com) av ett okänt användarnamn som anges på inloggningsskärmen att matchas mot organisationsdomänerna och omdirigeras till registreringen av den organisationen vid framgång.",
       "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
-      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en applikationskontext (t.ex. från e-post)",
+      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en appkontext (t.ex. från e-post)",
       "ERRORMSGPOPUP": "Visa fel i dialog",
       "DISABLEWATERMARK": "Dölj Vattenstämpel",
       "DISABLEWATERMARK_DESC": "Dölj Powered by Zitadel vattenstämpel i inloggningsgränssnittet"

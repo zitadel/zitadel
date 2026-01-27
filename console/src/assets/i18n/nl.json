@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
       "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
-      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naartoe wordt omgeleid als de login is gestart zonder een applicatiecontext (bijv. vanuit e-mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
       "DISABLEWATERMARK_DESC": "Verberg Powered by Zitadel watermerk in de login interface"

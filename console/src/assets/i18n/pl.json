@@ -1916,7 +1916,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Jeśli ta opcja jest zaznaczona, ekran hasła pojawi się w procesie logowania, nawet jeśli użytkownik nie zostanie znaleziony. Błąd podczas sprawdzania hasła nie ujawni, czy nazwa użytkownika lub hasło były błędne.",
       "ALLOWDOMAINDISCOVERY_DESC": "Jeśli ta opcja jest zaznaczona, sufiks (@domain.com) nieznanej nazwy użytkownika podanej na ekranie logowania będzie dopasowywany do domen organizacji i po pomyślnym dopasowaniu przekieruje do rejestracji tej organizacji.",
       "DEFAULTREDIRECTURI": "Domyślny adres przekierowania URI",
-      "DEFAULTREDIRECTURI_DESC": "Definiuje, gdzie użytkownik zostanie przekierowany, jeśli logowanie zostało rozpoczęte bez kontekstu aplikacji (np. z poczty)",
+      "DEFAULTREDIRECTURI_DESC": "Określa, dokąd użytkownik zostanie przekierowany, jeśli logowanie rozpocznie się bez kontekstu aplikacji (np. z poczty e-mail)",
       "ERRORMSGPOPUP": "Pokazuj błąd w oknie dialogowym",
       "DISABLEWATERMARK": "Ukryj znak wodny",
       "DISABLEWATERMARK_DESC": "Ukrywa znak wodny 'Powered by Zitadel' na interfejsie logowania"

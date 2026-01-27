@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "옵션이 선택되면, 사용자를 찾을 수 없는 경우에도 로그인 과정에서 비밀번호 화면이 표시됩니다. 비밀번호 확인 오류가 사용자 이름 또는 비밀번호의 오류를 공개하지 않습니다.",
       "ALLOWDOMAINDISCOVERY_DESC": "옵션이 선택되면, 로그인 화면에서 알 수 없는 사용자 이름의 접미사 (@domain.com)가 조직 도메인과 일치하고, 일치할 경우 해당 조직의 등록 화면으로 리디렉션됩니다.",
       "DEFAULTREDIRECTURI": "기본 리디렉션 URI",
-      "DEFAULTREDIRECTURI_DESC": "로그인이 애플리케이션 컨텍스트 없이 시작된 경우(예: 메일에서) 사용자가 리디렉션될 위치를 정의합니다.",
+      "DEFAULTREDIRECTURI_DESC": "앱 컨텍스트 없이 로그인 시작 시 (예: 이메일에서) 사용자가 리디렉션될 위치를 정의합니다.",
       "ERRORMSGPOPUP": "팝업에 오류 표시",
       "DISABLEWATERMARK": "워터마크 숨기기",
       "DISABLEWATERMARK_DESC": "로그인 인터페이스에서 'Powered by Zitadel' 워터마크를 숨깁니다."

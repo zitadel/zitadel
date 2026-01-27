@@ -1918,7 +1918,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Pokud je možnost vybrána, obrazovka pro zadání hesla se zobrazí během přihlašovacího procesu i v případě, že nebyl uživatel nalezen. Chyba při kontrole hesla neodhalí, zda bylo špatné uživatelské jméno nebo heslo.",
       "ALLOWDOMAINDISCOVERY_DESC": "Pokud je možnost vybrána, přípona (@domain.com) neznámého uživatelského jména zadávaného na přihlašovací obrazovce bude porovnána s doménami organizace a při úspěchu dojde k přesměrování na registraci dané organizace.",
       "DEFAULTREDIRECTURI": "Výchozí URI přesměrování",
-      "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení spuštěno bez kontextu aplikace (např. z pošty)",
+      "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení zahájeno bez kontextu aplikace (např. z e-mailu)",
       "ERRORMSGPOPUP": "Zobrazit chybu v dialogovém okně",
       "DISABLEWATERMARK": "Skrýt vodoznak",
       "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by Zitadel v přihlašovacím rozhraní"

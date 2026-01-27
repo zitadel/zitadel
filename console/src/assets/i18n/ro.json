@@ -1915,7 +1915,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Dacă opțiunea este selectată, ecranul cu parolă va fi afișat în procesul de conectare chiar dacă utilizatorul nu a fost găsit. Eroarea la verificarea parolei nu va dezvălui dacă numele de utilizator sau parola au fost greșite.",
       "ALLOWDOMAINDISCOVERY_DESC": "Dacă opțiunea este selectată, sufixul (@domain.com) al unei intrări de nume de utilizator necunoscut pe ecranul de conectare va fi comparat cu domeniile organizației și va redirecționa către înregistrarea organizației respective în caz de succes.",
       "DEFAULTREDIRECTURI": "URI implicit de redirecționare",
-      "DEFAULTREDIRECTURI_DESC": "Definește unde va fi redirecționat utilizatorul dacă autentificarea a început fără un context de aplicație (de exemplu, din e-mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definește unde va fi redirecționat utilizatorul dacă conectarea a început fără un context de aplicație (de exemplu, din e-mail)",
       "ERRORMSGPOPUP": "Afișați mesajul de eroare într-o casetă de dialog",
       "DISABLEWATERMARK": "Ascundeți filigranul",
       "DISABLEWATERMARK_DESC": "Ascundeți filigranul Alimentat de Zitadel în interfața de conectare"

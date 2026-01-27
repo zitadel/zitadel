@@ -1920,7 +1920,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Seçenek işaretlenmişse, kullanıcı bulunamasa bile giriş sürecinde şifre ekranı gösterilecektir. Şifre kontrolündeki hata, kullanıcı adının mı yoksa şifrenin mi yanlış olduğunu açığa çıkarmayacaktır.",
       "ALLOWDOMAINDISCOVERY_DESC": "Seçenek işaretlenmişse, giriş ekranındaki bilinmeyen kullanıcı adı girişinin soneki (@domain.com) organizasyon domain'leri ile eşleştirilecek ve başarı durumunda o organizasyonun kaydına yönlendirecektir.",
       "DEFAULTREDIRECTURI": "Varsayılan Yönlendirme URI",
-      "DEFAULTREDIRECTURI_DESC": "Oturum açma bir uygulama bağlamı olmadan başlatıldıysa (ör. postadan) kullanıcının nereye yönlendirileceğini tanımlar",
+      "DEFAULTREDIRECTURI_DESC": "Giriş bir uygulama bağlamı olmadan başlatılmışsa kullanıcının nereye yönlendirileceğini tanımlar (örn. e-postadan)",
       "ERRORMSGPOPUP": "Hatayı Dialog'ta Göster",
       "DISABLEWATERMARK": "Filigranı Gizle",
       "DISABLEWATERMARK_DESC": "Giriş arayüzünde Powered by Zitadel filigranını gizle"

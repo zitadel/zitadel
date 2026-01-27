@@ -1915,7 +1915,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Jika opsi ini dipilih, layar kata sandi akan ditampilkan dalam proses login meskipun pengguna tidak ditemukan. Kesalahan pada pemeriksaan kata sandi tidak akan mengungkapkan apakah nama pengguna atau kata sandi salah.",
       "ALLOWDOMAINDISCOVERY_DESC": "Jika opsi ini dipilih, akhiran (@domain.com) dari nama pengguna yang tidak diketahui yang dimasukkan pada layar masuk akan dicocokkan dengan domain organisasi dan akan dialihkan ke pendaftaran organisasi tersebut jika berhasil.",
       "DEFAULTREDIRECTURI": "URI Pengalihan Default",
-      "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika login telah dimulai tanpa konteks aplikasi (misalnya dari email)",
+      "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika proses masuk dimulai tanpa konteks aplikasi (misalnya dari email)",
       "ERRORMSGPOPUP": "Tampilkan Kesalahan dalam Dialog",
       "DISABLEWATERMARK": "Sembunyikan Tanda Air",
       "DISABLEWATERMARK_DESC": "Sembunyikan tanda air Powered by Zitadel di antarmuka login"

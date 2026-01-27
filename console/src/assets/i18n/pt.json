@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se a opção estiver selecionada, a tela de senha será exibida no processo de login, mesmo se o usuário não for encontrado. O erro na verificação de senha não revelará se o nome de usuário ou a senha estavam incorretos.",
       "ALLOWDOMAINDISCOVERY_DESC": "Se a opção estiver selecionada, o sufixo (@domain.com) de um nome de usuário desconhecido inserido na tela de login será comparado com os domínios da organização e será redirecionado para o registro dessa organização em caso de sucesso.",
       "DEFAULTREDIRECTURI": "URI de redirecionamento padrão",
-      "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login tiver sido iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
+      "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login for iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
       "ERRORMSGPOPUP": "Mostrar Erro em Diálogo",
       "DISABLEWATERMARK": "Ocultar Marca d'água",
       "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by Zitadel na interface de login"

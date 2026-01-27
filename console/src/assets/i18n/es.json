@@ -1918,7 +1918,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si esta opción es seleccionada, la pantalla de contraseña se mostrará durante el proceso de inicio de sesión aunque no exista el usuario. El error en la comprobación de la contraseña no revelará si fue el usuario o la contraseña el que era incorrecto.",
       "ALLOWDOMAINDISCOVERY_DESC": "Si esta opción es seleccionada, el sufijo (@dominio.com) de un nombre de usuario desconocido en la pantalla de inicio de sesión será comprobado contra los dominios de la organización y se redirigirá a la organización en cuestión en caso de éxito.",
       "DEFAULTREDIRECTURI": "URI de redirección por defecto",
-      "DEFAULTREDIRECTURI_DESC": "Define a dónde se redirigirá al usuario si el inicio de sesión se ha iniciado sin un contexto de aplicación (por ejemplo, desde el correo)",
+      "DEFAULTREDIRECTURI_DESC": "Define a dónde se redirigirá el usuario si el inicio de sesión ha comenzado sin un contexto de aplicación (p.e desde un email)",
       "ERRORMSGPOPUP": "Mostrar error en diálogo",
       "DISABLEWATERMARK": "Ocultar marca de agua",
       "DISABLEWATERMARK_DESC": "Ocultar la marca de agua Powered by Zitadel en la interfaz de inicio de sesión"

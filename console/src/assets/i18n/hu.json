@@ -1915,7 +1915,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ha ezt az opciót választod, a jelszó képernyő megjelenik a bejelentkezési folyamatban akkor is, ha a felhasználó nem található. A jelszó ellenőrzése során fellépő hiba nem fogja felfedni, hogy a felhasználónév vagy a jelszó volt-e rossz.",
       "ALLOWDOMAINDISCOVERY_DESC": "Ha ezt az opciót választod, egy ismeretlen felhasználónév bemeneti utótagja (@domain.com) a bejelentkezési képernyőn összepárosítható a szervezet domainjeivel, és sikeres egyezés esetén átirányít a regisztrációra az adott szervezetnél.",
       "DEFAULTREDIRECTURI": "Alapértelmezett átirányítási URI",
-      "DEFAULTREDIRECTURI_DESC": "Meghatározza, hogy a felhasználó hová lesz átirányítva, ha a bejelentkezés alkalmazáskörnyezet nélkül indult (pl. levélből)",
+      "DEFAULTREDIRECTURI_DESC": "Meghatározza, hová lesz a felhasználó átirányítva, ha a bejelentkezés alkalmazás kontextus nélkül indul (pl. e-mailből)",
       "ERRORMSGPOPUP": "Hiba megjelenítése párbeszédablakban",
       "DISABLEWATERMARK": "Vízjel elrejtése",
       "DISABLEWATERMARK_DESC": "A Zitadel által működtetett vízjel elrejtése a bejelentkezési felületen"
