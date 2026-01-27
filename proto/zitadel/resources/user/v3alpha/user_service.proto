@@ -22,7 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
     version: "3.0-alpha";
-    description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
+    description: "This API is intended to manage users with your own data schema in a Zitadel instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -1354,7 +1354,7 @@ message ResendContactEmailCodeRequest {
   ];
   // if no verification is specified, an email is sent
   oneof verification {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendEmailVerificationCode send_code = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnEmailVerificationCode return_code = 5;
@@ -1453,7 +1453,7 @@ message ResendContactPhoneCodeRequest {
   ];
   // if no verification is specified, a SMS is sent
   oneof verification {
-    // Let ZITADEL send the link to the user via SMS.
+    // Let Zitadel send the link to the user via SMS.
     SendPhoneVerificationCode send_code = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnPhoneVerificationCode return_code = 5;
@@ -1578,9 +1578,9 @@ message RequestPasswordResetRequest {
   ];
   // If no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendPasswordResetEmail send_email = 4;
-    // Let ZITADEL send the link to the user via SMS.
+    // Let Zitadel send the link to the user via SMS.
     SendPasswordResetSMS send_sms = 5;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnPasswordResetCode return_code = 6;
@@ -1691,7 +1691,7 @@ message CreateWebAuthNRegistrationLinkRequest {
   ];
   // if no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let ZITADEL send the link to the user via email.
+    // Let Zitadel send the link to the user via email.
     SendWebAuthNRegistrationLink send_link = 4;
     // Get the code back to provide it to the user in your preferred mechanism.
     ReturnWebAuthNRegistrationCode return_code = 5;
@@ -2169,7 +2169,7 @@ message GetIdentityProviderIntentResponse {
   // Information returned by the identity provider (IDP) such as the identification of the user
   // and detailed / profile information.
   IDPInformation idp_information = 2;
-  // If the user was already federated and linked to a ZITADEL user, it's id will be returned.
+  // If the user was already federated and linked to a Zitadel user, it's id will be returned.
   optional string id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432345\"";

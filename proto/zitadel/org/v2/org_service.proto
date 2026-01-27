@@ -29,7 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Organization Service";
     version: "2.0";
-    description: "This API is intended to manage organizations in a ZITADEL instance.";
+    description: "This API is intended to manage organizations in a Zitadel instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -113,7 +113,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-// This service is intended to manage organizations in a ZITADEL instance.
+// This service is intended to manage organizations in a Zitadel instance.
 service OrganizationService {
 
   // Add Organization
@@ -458,7 +458,7 @@ service OrganizationService {
 
   // Verify Organization Domain
   //
-  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
+  // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). Zitadel will check it and set the domain as verified if it was successful. A verify domain has to be unique.
   //
   // Required permission:
   //  - `org.write`
@@ -577,6 +577,7 @@ message AddOrganizationRequest{
   // which is the recommended way. The generated ID will be returned in the response.
   //
   // Deprecated: use 'organization_id' field instead.
+  // If both org_id and organization_id are set, organization_id will take precedence.
   optional string org_id = 3 [
     deprecated = true,
     (validate.rules).string = {min_len: 1, max_len: 200},

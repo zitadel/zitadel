@@ -2,7 +2,7 @@ Login:
   Title: ようこそ！
   Description: ログイン情報を入力してください。
   TitleLinking: ユーザーリンク用のログイン
-  DescriptionLinking: ログインデータを入力して、外部ユーザーをZITADELユーザーにリンクします。
+  DescriptionLinking: ログインデータを入力して、外部ユーザーをZitadelユーザーにリンクします。
   LoginNameLabel: ログイン名
   UsernamePlaceHolder: ユーザー名
   LoginnamePlaceHolder: ユーザー名@ドメイン
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: アカウントの選択
-  Description: ZITADELアカウントを使用します。
+  Description: Zitadelアカウントを使用します。
   TitleLinking: ユーザーリンクのアカウント選択
   DescriptionLinking: アカウントを選択して、外部ユーザーにリンクします。
   OtherUser: その他のユーザー
@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: 次へ
   CancelButtonText: キャンセル
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: 二要素認証
   DescriptionPhone: 二要素認証を作成します。確認するには電話番号を入力してください。
   DescriptionCode: 二要素認証を作成します。受信したコードを入力して電話番号を確認します。
+  CountryCodeLabel: 国
   PhoneLabel: 電話番号
   CodeLabel: コード
   EditButtonText: 編集
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: デバイス認証

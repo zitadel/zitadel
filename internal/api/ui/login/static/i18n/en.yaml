@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verification
   DescriptionPhone: Create your 2-factor. Enter your phone number to verify it.
   DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
+  CountryCodeLabel: Country
   PhoneLabel: Phone
   CodeLabel: Code
   EditButtonText: Edit
@@ -268,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -314,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -394,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Device Authorization
   UserCode:
