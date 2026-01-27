@@ -64,14 +64,6 @@ func (a *xoauth2Auth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 		return "", nil, zerrors.ThrowInternal(nil, "SMTP-eRJLyi", "wrong host name")
 	}
 
-	var err error
-	if tokenSourceCache == nil {
-		tokenSourceCache, err = lru.New2Q[string, oauth2.TokenSource](100)
-		if err != nil {
-			return "", nil, zerrors.ThrowInternal(nil, "SMTP-xcQ4WA", "failed to create token source cache")
-		}
-	}
-
 	hash := a.config.Hash()
 	tokenSource, ok := tokenSourceCache.Get(hash)
 	if !ok {
