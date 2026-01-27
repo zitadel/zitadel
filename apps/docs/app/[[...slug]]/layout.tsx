@@ -4,7 +4,6 @@ import { baseOptions } from '@/lib/layout.shared';
 import { buildCustomTree } from '@/lib/custom-tree';
 import versions from '@/content/versions.json';
 import { VersionSelector } from '@/components/version-selector';
-import { InkeepSearch } from '@/components/inkeep-search';
 
 export default async function Layout(props: { children: React.ReactNode; params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
@@ -59,10 +58,7 @@ export default async function Layout(props: { children: React.ReactNode; params:
       {...baseOptions()}
       sidebar={{
         banner: (
-          <div className="flex flex-col gap-2">
             <VersionSelector />
-            <InkeepSearch />
-          </div>
         ),
       }}
     >
