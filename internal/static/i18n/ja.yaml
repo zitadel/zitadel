@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: TLS を使用して SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
     CouldNotCreateClient: SMTPクライアントを作成できませんでした
     CouldNotStartTLS: TLSを開始できませんでした
-    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが ZITADEL でサポートされていない認証方法を必要としている可能性があります。
+    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが Zitadel でサポートされていない認証方法を必要としている可能性があります。
     CouldNotSetSender: 送信者を設定できませんでした
     CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:
@@ -1116,20 +1116,20 @@ EventTypes:
         changed: パスワードロックアウトポリシーの変更
   iam:
     setup:
-      started: ZITADELセットアップの開始
-      done: ZITADELセットアップの完了
+      started: Zitadelセットアップの開始
+      done: Zitadelセットアップの完了
     global:
       org:
         set: グローバル組織のセット
     project:
       iam:
-        set: ZITADELプロジェクトのセット
+        set: Zitadelプロジェクトのセット
     member:
-      added: ZITADELメンバーの追加
-      changed: ZITADELメンバーの変更
-      removed: ZITADELメンバーの削除
+      added: Zitadelメンバーの追加
+      changed: Zitadelメンバーの変更
+      removed: Zitadelメンバーの削除
       cascade:
-        removed: ZITADELメンバーカスケードの削除
+        removed: Zitadelメンバーカスケードの削除
     idp:
       config:
         added: IDP構成の追加
@@ -1242,9 +1242,9 @@ EventTypes:
       removed: ドメインの削除
     iam:
       console:
-        set: ZITADELコンソールアプリケーションのセット
+        set: Zitadel管理コンソールアプリケーションのセット
       project:
-        set: ZITADELプロジェクトのセット
+        set: Zitadelプロジェクトのセット
     mail:
       template:
         added: メールテンプレートの追加

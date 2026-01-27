@@ -46,7 +46,7 @@ You can let ZITADEL generate a private key for you, **or** upload your own (exte
 
 #### Option A: Generate and download a private key from ZITADEL
 
-1. Open the ZITADEL web console and go to your service user.
+1. Open the ZITADEL web management console and go to your service user.
 2. Click on the **Keys** tab.
 3. Click **New**.
 4. Optionally set an expiration date for the key, or leave empty for no expiration.
