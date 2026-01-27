@@ -12,7 +12,7 @@ This page lists the static Egress (outgoing) IP addresses used by ZITADEL Cloud 
 
 You need to allowlist these IP addresses if you use features where ZITADEL initiates a connection to your systems. This is commonly required for the following scenarios:
 
-### [Identity Providers & Federation](/docs/guides/integrate/identity-providers/introduction)
+### [Identity Providers & Federation](/guides/integrate/identity-providers/introduction)
 If you are federating an external Identity Provider (IdP) that sits behind a firewall:
 * **LDAP / Active Directory:** When ZITADEL connects to your LDAP server (typically port `636` for LDAPS).
 * **OIDC / OAuth:** When ZITADEL connects to your IdP for:
@@ -22,14 +22,14 @@ If you are federating an external Identity Provider (IdP) that sits behind a fir
   * **Keys:** Fetching signing keys from the `jwks_uri`.
 * **SAML:** If ZITADEL needs to fetch the `metadata.xml` or artifact resolution services from an internal SAML IdP.
 
-### [Notification Providers](/docs/guides/manage/customize/notification-providers)
-* [**SMTP:**](/docs/guides/manage/customize/notification-providers#smtp-providers) If you configured a custom SMTP sender pointing to your own mail server.
-* [**Webhook / HTTP provider:**](/docs/guides/manage/customize/notification-providers#webhook--http-provider) If you use a custom gateway for SMS or Emails.
+### [Notification Providers](/guides/manage/customize/notification-providers)
+* [**SMTP:**](/guides/manage/customize/notification-providers#smtp-providers) If you configured a custom SMTP sender pointing to your own mail server.
+* [**Webhook / HTTP provider:**](/guides/manage/customize/notification-providers#webhook-http-provider) If you use a custom gateway for SMS or Emails.
 
 
 ### Custom Logic
-* **[Actions V1](/docs/concepts/features/actions)**
-* **[Actions V2](/docs/concepts/features/actions_v2)**
+* **[Actions V1](/concepts/features/actions)**
+* **[Actions V2](/concepts/features/actions_v2)**
 
 ## IP Addresses by Region
 
