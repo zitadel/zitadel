@@ -31,7 +31,7 @@ Enter the name `Demo-Vendor`, and click "Create". Then click on that organizatio
 
 To setup this sample you have to create a project and an application in the vendor organization (`Demo-Vendor`) first.
 
-Open the Console (`https://$CUSTOM_DOMAIN.zitadel.cloud/ui/console/projects`) and create a new project. Let's call it `Portal`.
+Open the Management Console (`https://$CUSTOM_DOMAIN.zitadel.cloud/ui/console/projects`) and create a new project. Let's call it `Portal`.
 
 Then on the project detail page click on new application and enter a name for this app.
 Let's call this one `portal-web`.
@@ -62,7 +62,7 @@ This makes sure that roles, which is used by the application to enable UI compon
 ### Service User
 
 To make the application work you need a service user which loads granted-projects and user-grants for you.
-In the B2B-Demo organization, navigate to `Users` in navigation of Console, click on `Service Users` and create a new user.
+In the B2B-Demo organization, navigate to `Users` in navigation of Management Console, click on `Service Users` and create a new user.
 Let's set its username to `nextjs` and its name to `NextJS`. Then press `create`.
 
 On the detail page of that user, navigate to "Personal Access Tokens" and add a new entry, set an optional expiration date.

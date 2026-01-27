@@ -2,7 +2,7 @@ Login:
   Title: 欢迎回来！
   Description: 输入您的登录数据。
   TitleLinking: 登录以进行用户链接
-  DescriptionLinking: 输入您的登录数据以将您的外部用户与 ZITADEL 用户关联。
+  DescriptionLinking: 输入您的登录数据以将您的外部用户与 Zitadel 用户关联。
   LoginNameLabel: 登录名
   UsernamePlaceHolder: 用户名
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: 选择账户
-  Description: 使用您的 ZITADEL 帐户
+  Description: 使用您的 Zitadel 帐户
   TitleLinking: 选择用于用户链接的帐户
   DescriptionLinking: 选择您的帐户以与您的外部用户关联。
   OtherUser: 其他用户
@@ -269,6 +269,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -315,6 +316,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -395,6 +397,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: 设备授权
   UserCode:

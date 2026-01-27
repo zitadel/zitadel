@@ -207,7 +207,7 @@
             "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
         },
         "build-console": {
-            "description": "Builds the Console and copies its static files to the API.",
+            "description": "Builds the Management Console and copies its static files to the API.",
             "dependsOn": [
                 "@zitadel/console:build"
             ],

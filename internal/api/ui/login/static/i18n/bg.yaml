@@ -4,7 +4,7 @@ Login:
   TitleLinking: Влезте за потребителско свързване
   DescriptionLinking: >-
     Въведете вашите данни за вход, за да свържете вашия външен потребител с
-    потребител на ZITADEL.
+    потребител на Zitadel.
   LoginNameLabel: Потребителско име
   UsernamePlaceHolder: потребителско име
   LoginnamePlaceHolder: потребителско име@домейн
@@ -20,7 +20,7 @@ LDAP:
   NextButtonText: следващия
 SelectAccount:
   Title: Изберете акаунт
-  Description: Използвайте вашия ZITADEL-акаунт
+  Description: Използвайте вашия Zitadel-акаунт
   TitleLinking: Изберете акаунт за свързване на потребител
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
@@ -265,6 +265,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -310,6 +311,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -384,6 +386,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
