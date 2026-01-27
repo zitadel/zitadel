@@ -10,6 +10,13 @@
     ]
   },
   "targetDefaults": {
+    "nx:run-commands": {
+      "options": {
+        "env": {
+          "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+        }
+      }
+    },
     "generate": {
       "cache": true,
       "inputs": [
