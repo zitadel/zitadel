@@ -21,6 +21,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "2.1.3",
+    "@inkeep/cxkit-react": "^0.5.113",
     "@scalar/api-reference": "^1.40.4",
     "@types/js-yaml": "^4.0.9",
     "clsx": "1.2.1",
