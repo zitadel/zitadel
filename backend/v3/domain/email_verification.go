@@ -5,7 +5,7 @@ package domain
 // 	"time"
 // )
 
-// // EmailVerifiedCommand verifies an email address for a user.
+// // EmailVerifiedCommand verifies an email address for a User (Human).
 // type EmailVerifiedCommand struct {
 // 	UserID string `json:"userId"`
 // 	Email  *Email `json:"email"`
@@ -43,7 +43,7 @@ package domain
 // 	setEmailCmd.verification = cmd
 // }
 
-// // SendCodeCommand sends a verification code to the user's email address.
+// // SendCodeCommand sends a verification code to the User (Human)'s email address.
 // // If the URLTemplate is not set it will use the default of the organization / instance.
 // type SendCodeCommand struct {
 // 	UserID      string  `json:"userId"`

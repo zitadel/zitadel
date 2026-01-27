@@ -225,7 +225,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (Human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -293,7 +293,7 @@ var (
 		"username",
 		"login_names",
 		"preferred_login_name",
-		// human
+		// User (Human)
 		"user_id",
 		"first_name",
 		"last_name",
@@ -717,7 +717,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (Human)
 						"id",
 						"first_name",
 						"last_name",
@@ -780,7 +780,7 @@ func Test_UserPrepares(t *testing.T) {
 						"username",
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
-						// human
+						// User (Human)
 						"id",
 						"first_name",
 						"last_name",
@@ -867,7 +867,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (Human)
 							"id",
 							"first_name",
 							"last_name",
@@ -952,7 +952,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (Human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1042,7 +1042,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (Human)
 							"id",
 							"first_name",
 							"last_name",
@@ -1077,7 +1077,7 @@ func Test_UserPrepares(t *testing.T) {
 							"username",
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
-							// human
+							// User (Human)
 							nil,
 							nil,
 							nil,

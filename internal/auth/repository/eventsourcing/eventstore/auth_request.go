@@ -820,7 +820,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	// if there's an active (human) user, let's use it
+	// if there's an active User (Human), let's use it
 	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
 		request.SetUserInfo(user.ID, loginNameInput, preferredLoginName, "", "", user.ResourceOwner)
 		return nil

@@ -185,7 +185,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			if !userInfoAssertion {
 				continue
 			}
-			// TODO: handle address for human users as soon as implemented
+			// TODO: handle address for User (Human)s as soon as implemented
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
