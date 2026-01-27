@@ -43,7 +43,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/sdk-examples/introduction"
+              link="/docs/examples/introduction"
               type={ICONTYPE.APIS}
               title="Example Apps"
               description=""
@@ -52,7 +52,7 @@ const features = [
               link="/docs/guides/manage/console/console-overview"
               type={ICONTYPE.LOGIN}
               title="Manage"
-              description="All about Console"
+              description="All about Management Console"
             />
             <ListElement
               link="/docs/guides/integrate"
@@ -89,7 +89,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/support/troubleshooting"
+              link="/docs/guides/manage/cloud/support"
               type={ICONTYPE.HELP}
               title="Support"
               description=""
@@ -120,13 +120,13 @@ const features = [
             description="The ultimate guide to get started with ZITADEL."
           />
           <ListElement
-            link="/docs/examples/login/angular"
+            link="/docs/examples/introduction/frontend"
             type={ICONTYPE.APIS}
             title="Frontend Quickstart Guides"
             description=""
           />
           <ListElement
-            link="/docs/examples/secure-api/go"
+            link="/docs/examples/introduction/backend"
             type={ICONTYPE.APIS}
             title="Backend Quickstart Guides"
             description=""

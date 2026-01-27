@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	ProjectSetEventType eventstore.EventType = "instance.iam.project.set"
-	ConsoleSetEventType eventstore.EventType = "instance.iam.console.set"
+	ProjectSetEventType           eventstore.EventType = "instance.iam.project.set"
+	ManagementConsoleSetEventType eventstore.EventType = "instance.iam.console.set"
 )
 
 type ProjectSetEvent struct {
@@ -53,45 +53,45 @@ func ProjectSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	return e, nil
 }
 
-type ConsoleSetEvent struct {
+type ManagementConsoleSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ClientID string `json:"clientId"`
 	AppID    string `json:"appId"`
 }
 
-func (e *ConsoleSetEvent) Payload() interface{} {
+func (e *ManagementConsoleSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ConsoleSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *ManagementConsoleSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewIAMConsoleSetEvent(
+func NewIAMManagementConsoleSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	clientID,
 	appID *string,
-) *ConsoleSetEvent {
-	return &ConsoleSetEvent{
+) *ManagementConsoleSetEvent {
+	return &ManagementConsoleSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			ConsoleSetEventType,
+			ManagementConsoleSetEventType,
 		),
 		ClientID: *clientID,
 		AppID:    *appID,
 	}
 }
 
-func ConsoleSetMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &ConsoleSetEvent{
+func ManagementConsoleSetMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &ManagementConsoleSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal console set")
+		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal management console set")
 	}
 
 	return e, nil

@@ -23,7 +23,7 @@ ExternalPort: 8080
 ExternalSecure: false
 ```
 
-For productive setups however, we recommend using HTTPS and a custom domain:
+For productive setups however, we recommend using HTTPS and a Custom Domain:
 
 ```yaml
 ExternalDomain: 'zitadel.my.domain'
@@ -56,7 +56,7 @@ Be aware that you won't automatically have the organizations context when you ac
 ## Generated Subdomains
 
 ZITADEL creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
-You can immediately access the ZITADEL Console and APIs using these subdomains without further actions.
+You can immediately access the ZITADEL Management Console and APIs using these subdomains without further actions.
 
 ## More Information
 

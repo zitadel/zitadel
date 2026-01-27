@@ -190,7 +190,7 @@ These preparation steps are needed for all Token Exchange interaction, including
 As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
 
 ```bash
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/features/instance' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/features/instance' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \
@@ -218,7 +218,7 @@ For this example we have the following projects in our organization:
 - **portal** contains the end user interfaces. In this case a web-app that initiated user login and performs operations on other APIs. The web-app has the token exchange grant type enabled;
 - **aggregates** a project that contains APIs of low privilege which aggregate public data to return to the user;
 - **settings** a project that contains APIs for settings and other privileged operations;
-- **ZITADEL** the build-in project used for the zitadel console and APIs;
+- **ZITADEL** the build-in project used for the zitadel management console and APIs;
 
 #### Authenticated user tokens
 
@@ -829,7 +829,7 @@ And the `subject_token`:
 }
 ```
 
-In both cases the issuer is the web application, the audience must be the zitadel domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
+In both cases the issuer is the web application, the audience must be the Custom Domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
 
 Response:
 
@@ -880,7 +880,7 @@ Above we gave some of the most straightforward use cases. Of course, you can com
 
 ## Audit trail
 
-In the user view of the console we can see whenever a new access token is created for a user.
+In the user view of the management console we can see whenever a new access token is created for a user.
 The existing `Access Token created` event is also used in the case of a token exchange.
 When there was an `actor_token` present during token exchange, we also log a `User impersonated` event.
 

@@ -27,7 +27,7 @@ Inside ZITADEL, you can use regular lower-case role names without prefixes, if y
 
 In your project settings make sure the "Assert Roles On Authentication" is enabled.
 
-![Project settings in console](/img/symfony/project-settings.png)
+![Project settings in management console](/img/symfony/project-settings.png)
 
 In the project Role tab, add 2 special roles:
 
@@ -36,11 +36,11 @@ In the project Role tab, add 2 special roles:
 
 A `user` role is not required. This role is assumed by default for any authenticated user in Symfony.
 
-![Project roles in console](/img/symfony/project-roles.png)
+![Project roles in management console](/img/symfony/project-roles.png)
 
 Finally, we can assign the roles to users in the project's authorizations tab.
 
-![Project authorizations in console](/img/symfony/project-authorizations.png)
+![Project authorizations in management console](/img/symfony/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -50,11 +50,11 @@ In your Project, add a new application at the top of the page.
 Select Web application type and continue.
 We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Symfony application.
 
-![Create app in console](/img/symfony/app-create.png)
+![Create app in management console](/img/symfony/app-create.png)
 
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated 
 
-![Configure app authentication method in console](/img/symfony/app-auth-method.png)
+![Configure app authentication method in management console](/img/symfony/app-auth-method.png)
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
@@ -63,7 +63,7 @@ For the example application we are writing use:
 - `http://localhost:8000/login_check` as Redirect URI
 - `http://localhost:8000/logout` as post-logout URI.
 
-![Configure app redirects console](/img/symfony/app-redirects.png)
+![Configure app redirects management console](/img/symfony/app-redirects.png)
 
 After the final step you are presented with a client ID and secret.
 Copy and paste them to a safe location for later use by the application.
@@ -320,8 +320,8 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/templates/profile.html
 
 #### User list
 
-The user list controller displays all users from the database, that were created during OIDC login.
-Only users with an admin role will have access to this page.
+The user list controller displays all users from the database that were created during OIDC login.
+Only users with an administrator role will have access to this page.
 
 ```php reference
 https://github.com/zitadel/example-symfony-oidc/blob/main/src/Controller/UserListController.php
@@ -375,7 +375,7 @@ OIDC_CLIENT_ID="248680248240075805@dev"
 OIDC_CLIENT_SECRET="BJPhEJULSUXseC4geqg5Yg4wWMoy7RgZKar86mbIpt8ZekC5kixMzYGcXLDeeJv7"
 ```
 
-> The well-known URL needs to be adjusted to your own custom domain.
+> The well-known URL needs to be adjusted to your own Custom Domain.
 
 Activate the route that is used as callback by the OIDC bundle:
 
@@ -392,10 +392,10 @@ symfony server:start --no-tls
 ```
 
 Visit http://localhost:8000 and click around.
-When you go to profile you will be redirected to login your user on ZITADEL.
-After login you should see some profile data of the current user.
-Upon clicking logout you are redirected to the homepage.
-Now you can click "users" and login with an account that has the admin role.
+When you go to profile, you will be redirected to login your user on ZITADEL.
+After login, you should see some profile data of the current user.
+Upon clicking logout, you are redirected to the homepage.
+Now you can click "users" and log in with an account that has the administrator role.
 
 ## Completion
 
@@ -405,4 +405,4 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.
+Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.

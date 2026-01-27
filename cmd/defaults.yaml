@@ -49,10 +49,17 @@ Instrumentation:
     #   - "text": Logs are printed on StdErr as human-readable text
     #   - "json": Logs are printed on StdErr as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
     Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    # Configure how errors are logged.
+    Errors:
+      # Adds the source file, line number and function where the error was created.
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      # Adds stack traces to logged errors.
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables OTEL log exporter
@@ -1056,7 +1063,7 @@ DefaultInstance:
     AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
-    # DefaultRedirectURL is empty by default because we use the Console UI
+    # DefaultRedirectURL is empty by default because we use the Management Console UI
     DefaultRedirectURI: # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
     # 240h = 10d
     PasswordCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDCHECKLIFETIME

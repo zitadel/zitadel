@@ -1,51 +1,80 @@
 ---
 title: Angular
 sidebar_label: Angular
+framework_url: https://angular.dev
+auth_library: "@edgeflare/ngx-oidc"
+auth_library_url: https://www.npmjs.com/package/@edgeflare/ngx-oidc
+example_repo: https://github.com/zitadel/example-auth-angular
+auth_flow: pkce
+status: stable
 ---
 
-<table>
-    <tr>
-        <td width="100px">
-            <img width="100px" src="/docs/img/tech/angular.svg" alt="angular logo"/>
-        </td>
-        <td>
-            <a href="https://angular.io/" target="_blank">Angular</a> is a popular JavaScript framework for building single-page applications (SPAs) that is known for its two-way data binding, dependency injection, and modular architecture.
-            Integrate authentication to your Angular application easily by using the <a href="https://github.com/zitadel/zitadel-angular" target="_blank">zitadel-angular</a> Example.
-        </td>
-    </tr>
-</table>
+## Overview
 
-### Resources
-- [Angular Example Application with ZITADEL Login](https://github.com/zitadel/zitadel-angular)
-- [Step-By-Step Guide](/docs/examples/login/angular)
-- [ZITADEL Console](https://github.com/zitadel/zitadel/tree/main/console) is built with Angular and can also be used as a reference
+[Angular](https://angular.dev) is a TypeScript-based framework for building web applications. This example demonstrates how to integrate **Zitadel** using the **[OAuth 2.0 PKCE flow](https://oauth.net/2/pkce/)** to authenticate users securely and maintain sessions across your Angular application.
 
+#### Auth library
 
-### Angular SDK
+This example uses **[@edgeflare/ngx-oidc](https://www.npmjs.com/package/@edgeflare/ngx-oidc)** (built on **[oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts)**) to implement the [OpenID Connect (OIDC)](https://zitadel.com/docs/apis/openidoauth/endpoints) protocol, manage [PKCE](https://oauth.net/2/pkce/) code challenge generation, perform secure token exchange, and provide session management helpers.
 
-ZITADEL does not provide an Angular specific SDK.
-But you can integrate ZITADEL to your application by using any OIDC Library such as [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).
+---
 
-Check out our [Example Application](/docs/sdk-examples/angular#example-application)
+## What this example demonstrates
 
-### Example Application
+This Angular application showcases a complete authentication pattern using [Zitadel](https://zitadel.com/docs) with [PKCE](https://oauth.net/2/pkce/). Users begin on a public landing page where they can initiate sign-in with Zitadel's authorization server. After successful authentication, the app handles the OAuth callback and redirects users to a protected profile page displaying their [user information and claims](https://zitadel.com/docs/apis/openidoauth/claims).
 
-The [zitadel-angular](https://github.com/zitadel/zitadel-angular) repository includes an Example Application ready to start and show how an Angular application looks like with integrated ZITADEL Login.
+The application integrates authentication logic into Angular routing: protected routes use router guards to automatically redirect unauthenticated users to the sign-in flow, and callback routes complete the PKCE exchange and restore session state. The example requests standard OIDC scopes (`openid`, `profile`, `email`), `offline_access` for refresh tokens, and Zitadel-specific scopes for metadata and role information.
 
-What does the Example include:
-- Home Page with Login Button
-- Authenticating user with OIDC PKCE Flow
-- Private Page: Shows user information of authenticated user, only accessible after login
-- Logout
+The example includes secure sign-out functionality implementing **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** through Zitadel's end-session endpoint, which terminates both the local application session and the Zitadel session, then redirects the user back to the application.
 
-### Step-By-Step Guide
+---
 
-The [Step-By-Step Guide](/docs/examples/login/angular) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated Login.
+## Getting started
 
-After completing the Step-By-Step Guide you will have:
-1. Example Web Application with integrated ZITADEL Login
-2. Example page accessible by authenticated user showing retrieved user information
-3. Logout
-4. Correct setup for your application in ZITADEL
+### Prerequisites
 
-![App in console](/img/angular/app-screen.png)
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+
+1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
+2. Configure it to use the PKCE authentication method
+3. Set up your redirect URIs (e.g., `http://localhost:3000/auth/callback` for development)
+4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
+5. Copy your **Client ID** for use in the next steps
+6. Optionally enable [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) in Token Settings for long-lived sessions
+
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production deployments, always use HTTPS URLs and disable Dev Mode.
+
+### Run the example
+
+Once you have your [Zitadel application configured](https://zitadel.com/docs/guides/integrate/login/oidc/login-users):
+
+1. Clone the [repository](https://github.com/zitadel/example-auth-angular).
+2. Create a `.env` file (copy from `.env.example`) and configure it with the values from your [Zitadel application](https://zitadel.com/docs/guides/manage/console/applications). Use these environment variable names exactly as shown:
+   ```
+   NODE_ENV=development
+   PORT=3000
+   NG_APP_ZITADEL_DOMAIN=https://your-zitadel-domain
+   NG_APP_ZITADEL_CLIENT_ID=your-zitadel-application-client-id
+   NG_APP_ZITADEL_CLIENT_SECRET=
+   NG_APP_ZITADEL_CALLBACK_URL=http://localhost:3000/auth/callback
+   NG_APP_ZITADEL_POST_LOGIN_URL=/profile
+   NG_APP_ZITADEL_POST_LOGOUT_URL=http://localhost:3000/auth/logout/callback
+   ```
+   Replace these values with:
+	- Your actual [Zitadel instance URL](https://zitadel.com/docs/guides/manage/console/default-settings) (the **NG_APP_ZITADEL_DOMAIN**)
+	- The **Client ID** you copied when creating the application
+	- The **redirect URIs** you configured in the PKCE setup (must match exactly)
+	- The **post-logout redirect URIs** you configured (must match exactly)
+3. Install dependencies using [npm](https://www.npmjs.com) and start the development server to verify the authentication flow end-to-end.
+
+---
+
+## Learn more and resources
+
+* [PKCE concept](https://oauth.net/2/pkce/)
+* [Federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)
+* [OIDC integration guide](https://zitadel.com/docs/guides/integrate/login/oidc/login-users)
+* [Angular documentation](https://angular.dev)
+* [@edgeflare/ngx-oidc package](https://www.npmjs.com/package/@edgeflare/ngx-oidc)
+* [oidc-client-ts package](https://www.npmjs.com/package/oidc-client-ts)
+* [Example repository](https://github.com/zitadel/example-auth-angular)

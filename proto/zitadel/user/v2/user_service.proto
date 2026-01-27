@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
     version: "2.0";
-    description: "This API is intended to manage users in a ZITADEL instance.";
+    description: "This API is intended to manage users in a Zitadel instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -53,7 +53,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -66,8 +66,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -3175,7 +3175,7 @@ message RetrieveIdentityProviderIntentResponse{
   IDPInformation idp_information = 2;
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the user in ZITADEL if external user is linked"
+      description: "ID of the user in Zitadel if external user is linked"
       example: "\"163840776835432345\"";
     }
   ];

@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
-      "TITLE": "Get started with ZITADEL",
+      "TITLE": "Get started with Zitadel",
       "NEXT": {
         "TITLE": "Your next steps",
         "DESCRIPTION": "Complete the following steps to secure your application.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Documentation",
-          "DESCRIPTION": "Explore ZITADELs knowledge base to familiarize yourself with core concepts and ideas. Learn how ZITADEL works and how to use it."
+          "DESCRIPTION": "Explore Zitadels knowledge base to familiarize yourself with core concepts and ideas. Learn how Zitadel works and how to use it."
         },
         "EXAMPLES": {
           "TITLE": "Examples and Software Development Kits",
-          "DESCRIPTION": "Browse our examples and SDKs to use ZITADEL together with your favorite programming languages and tools."
+          "DESCRIPTION": "Browse our examples and SDKs to use Zitadel together with your favorite programming languages and tools."
         }
       }
     },
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Actions",
-      "DESCRIPTION": "Run custom code on events that happen as your users authenticate at ZITADEL. Automate your processes, enrich your users metadata and their tokens or notify external systems.",
+      "DESCRIPTION": "Run custom code on events that happen as your users authenticate at Zitadel. Automate your processes, enrich your users metadata and their tokens or notify external systems.",
       "SCRIPTS": {
         "TITLE": "Scripts",
         "DESCRIPTION": "Write your JavaScript code once and trigger it in multiple flows."
@@ -97,23 +97,23 @@
         "NEXT": "What now?",
         "SAML": {
           "TITLE": "Configure your SAML Identity Provider",
-          "DESCRIPTION": "ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
+          "DESCRIPTION": "Zitadel is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole Zitadel metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
         },
         "CALLBACK": {
           "TITLE": "Configure your {{ provider }} Identity Provider",
-          "DESCRIPTION": "Before you can configure ZITADEL, pass this URL to your Identity Provider to enable the browser redirection back to ZITADEL after authentication."
+          "DESCRIPTION": "Before you can configure Zitadel, pass this URL to your Identity Provider to enable the browser redirection back to Zitadel after authentication."
         },
         "JWT": {
           "TITLE": "Use JWTs as federated Identities",
-          "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in ZITADEL on-the-fly."
+          "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in Zitadel on-the-fly."
         },
         "LDAP": {
-          "TITLE": "Configure ZITADEL to connect to your LDAP Identity Provider",
-          "DESCRIPTION": "Provide the connection details to your LDAP server and configure the mapping of your LDAP attributes to ZITADEL attributes."
+          "TITLE": "Configure Zitadel to connect to your LDAP Identity Provider",
+          "DESCRIPTION": "Provide the connection details to your LDAP server and configure the mapping of your LDAP attributes to Zitadel attributes."
         },
         "AUTOFILL": {
           "TITLE": "Autofill user data",
-          "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill ZITADELs registration form with values from the identity provider."
+          "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill Zitadels registration form with values from the identity provider."
         },
         "ACTIVATE": {
           "TITLE": "Activate the IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "External Links",
-        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the console. Add a custom external link and a custom text for that link in the console, or set them empty to hide that button."
+        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the management console. Add a custom external link and a custom text for that link in the management console, or set them empty to hide that button."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP Settings",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS Settings",
-        "DESCRIPTION": "To unlock all ZITADEL features, configure Twilio to send SMS messages to your users."
+        "DESCRIPTION": "To unlock all Zitadel features, configure Twilio to send SMS messages to your users."
       },
       "IAM_EVENTS": {
         "TITLE": "Events",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Failed Events",
-        "DESCRIPTION": "This page shows all failed events in your instance. If ZITADEL doesn't behave as you expect, always check this this list first."
+        "DESCRIPTION": "This page shows all failed events in your instance. If Zitadel doesn't behave as you expect, always check this this list first."
       },
       "IAM_VIEWS": {
         "TITLE": "Views",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Security Settings",
-        "DESCRIPTION": "Enable ZITADEL features that can have security impacts. You really should know what you are doing before you change these settings."
+        "DESCRIPTION": "Enable Zitadel features that can have security impacts. You really should know what you are doing before you change these settings."
       },
       "OIDC": {
         "TITLE": "OpenID Connect Settings",
@@ -187,7 +187,7 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your ZITADEL instance.",
+        "DESCRIPTION": "Manage your OIDC Web Keys to securely sign and validate tokens for your Zitadel instance.",
         "TABLE": {
           "TITLE": "Active and Future Web Keys",
           "DESCRIPTION": "Your active and upcoming web keys. Activating a new key will deactivate the current one.",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Create new Web Key",
-          "DESCRIPTION": "Creating a new web key adds it to your list. ZITADEL uses RSA2048 keys with a SHA256 hasher by default.",
+          "DESCRIPTION": "Creating a new web key adds it to your list. Zitadel uses RSA2048 keys with a SHA256 hasher by default.",
           "KEY_TYPE": "Key Type",
           "BITS": "Bits",
           "HASHER": "Hasher",
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Login Name Pattern",
-          "DESCRIPTION": "Control the pattern of your users login names. ZITADEL selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the organization domain."
+          "DESCRIPTION": "Control the pattern of your users login names. Zitadel selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the organization domain."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Domain Verification",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "External Login allowed",
-            "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
+            "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the Zitadel user to log in."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Password Reset hidden",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Get started with ZITADEL",
-    "DISCLAIMER": "ZITADEL treats your data confidentially and securely.",
+    "WELCOME": "Get started with Zitadel",
+    "DISCLAIMER": "Zitadel treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "DESCRIPTION": "Get started with Zitadel quickly."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
@@ -366,7 +366,7 @@
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
     "CARD": {
-      "TITLE": "Get your ZITADEL running",
+      "TITLE": "Get your Zitadel running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Log in to your app",
-        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "description": "Integrate your application with Zitadel for authentication and test it by logging in with your admin user.",
         "action": "Log in"
       },
       "user.human.added": {
@@ -439,8 +439,8 @@
     "CUSTOMERPORTAL": "Customer Portal"
   },
   "QUICKSTART": {
-    "TITLE": "Integrate ZITADEL into your application",
-    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
+    "TITLE": "Integrate Zitadel into your application",
+    "DESCRIPTION": "Integrate Zitadel into your application or use one of our samples to get started in minutes.",
     "BTN_START": "Create Application",
     "BTN_LEARNMORE": "Learn More",
     "CREATEPROJECTFORAPP": "Create Project {{value}}",
@@ -677,7 +677,7 @@
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
+      "TEXT": "All organization settings and tables in the Management Console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
       "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
@@ -745,7 +745,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Your instance is blocked.",
-      "DESCRIPTION": "Ask your ZITADEL instance administrator to update the subscription."
+      "DESCRIPTION": "Ask your Zitadel instance administrator to update the subscription."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
@@ -842,7 +842,7 @@
       "NAME": "Name",
       "EMPTY": "No device set",
       "TITLE": "Passkey Authentication",
-      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL with a passkey.",
+      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto Zitadel with a passkey.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "U2F": "Add method",
       "U2F_DIALOG_TITLE": "Verify authenticator",
@@ -971,8 +971,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "Given Name",
-      "LASTNAME": "Family Name",
+      "FIRSTNAME": "First Name",
+      "LASTNAME": "Last Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERREDLOGINNAME": "Preferred login name",
@@ -1161,7 +1161,7 @@
       "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roles",
+      "TITLE": "Zitadel Administrator Roles",
       "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
@@ -1227,7 +1227,7 @@
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warning",
-      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the management console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
@@ -1269,7 +1269,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM Storage Administration",
-      "DESCRIPTION": "Manage your ZITADEL views and failed events."
+      "DESCRIPTION": "Manage your Zitadel views and failed events."
     },
     "MEMBER": {
       "TITLE": "Managers",
@@ -1413,7 +1413,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Expected URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Verification file:",
         "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time.",
+        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as Zitadel will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
         "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
@@ -1559,7 +1559,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1663,8 +1664,8 @@
         "DISABLED": "\"Disabled\" is inherited"
       },
       "RESET": "Set all to inherit",
-      "CONSOLEUSEV2USERAPI": "Use V2 Api in Console for User creation",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
+      "CONSOLEUSEV2USERAPI": "Use V2 Api in the Management Console for User creation",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the Management Console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
       "LOGINV2_BASEURI": "Base URI",
@@ -1711,7 +1712,7 @@
       "RELEASE": "Release",
       "DROPFONT": "Drop font file here",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
+      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in management console",
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
@@ -1727,7 +1728,7 @@
       },
       "PREVIEW": {
         "TITLE": "Login",
-        "SECOND": "login with your ZITADEL-Account.",
+        "SECOND": "login with your Zitadel-Account.",
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
@@ -1767,9 +1768,9 @@
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
       "SUPPORTEMAIL": "Support Email",
-      "DOCSLINK": "Docs Link (Console)",
-      "CUSTOMLINK": "Custom Link (Console)",
-      "CUSTOMLINKTEXT": "Custom Link Text (Console)",
+      "DOCSLINK": "Docs Link (Management Console)",
+      "CUSTOMLINK": "Custom Link (Management Console)",
+      "CUSTOMLINKTEXT": "Custom Link Text (Management Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
@@ -1810,7 +1811,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1864,8 +1866,8 @@
         "IU": "Invite User"
       },
       "CHIPS": {
-        "firstname": "Given name",
-        "lastname": "Family name",
+        "firstname": "First name",
+        "lastname": "Last name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -1922,7 +1924,7 @@
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
-      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface"
+      "DISABLEWATERMARK_DESC": "Hide Powered by Zitadel watermark in the login interface"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
@@ -1976,7 +1978,7 @@
       "CREATE_DESC": "Insert your project's name.",
       "ROLE": "Role",
       "NOITEMS": "No projects",
-      "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
+      "ZITADELPROJECT": "This belongs to the Zitadel project. Beware: If you make changes Zitadel may not behave as intended.",
       "TYPE": {
         "OWNED": "Owned Projects",
         "OWNED_SINGULAR": "Owned Project",
@@ -2336,8 +2338,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Given name attribute",
-    "LASTNAMEATTRIBUTE": "Family name attribute",
+    "FIRSTNAMEATTRIBUTE": "First name attribute",
+    "LASTNAMEATTRIBUTE": "Last name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -2359,7 +2361,7 @@
     "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "FEDERATEDLOGOUTENABLED": "Federated Logout Enabled",
-    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in Zitadel.",
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",
@@ -2461,7 +2463,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "These are the SMTP providers for your ZITADEL instance. Activate the one you want to use to send notifications to your users.",
+      "DESCRIPTION": "These are the SMTP providers for your Zitadel instance. Activate the one you want to use to send notifications to your users.",
       "EMPTY": "No SMTP Provider available",
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
@@ -2497,11 +2499,11 @@
         "NEXT_STEPS": "Next Steps",
         "ACTIVATE": {
           "TITLE": "Activate your SMTP Provider",
-          "DESCRIPTION": "ZITADEL cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
+          "DESCRIPTION": "Zitadel cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
         },
         "DEACTIVATE": {
           "TITLE": "Deactivate your SMTP Provider",
-          "DESCRIPTION": "If you deactivate this SMTP Provider, ZITADEL cannot use it to send notifications until you activate it again."
+          "DESCRIPTION": "If you deactivate this SMTP Provider, Zitadel cannot use it to send notifications until you activate it again."
         },
         "SAVE_SETTINGS": "Save your settings",
         "TEST": {
@@ -2793,7 +2795,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

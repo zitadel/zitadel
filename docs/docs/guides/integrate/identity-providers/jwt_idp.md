@@ -74,7 +74,7 @@ The authentication flow with JWT IdP looks like this:
 
          // 2. Prepare the ZITADEL endpoint URL and copy all query params
          const userUrl = new URL(request.url);
-         // Important: The ZITADEL_JWT_IDP_ENDPOINT should be your ZITADEL custom domain plus "/idps/jwt"
+         // Important: The ZITADEL_JWT_IDP_ENDPOINT should be your ZITADEL Custom Domain plus "/idps/jwt"
          // For example: https://accounts.test.com/idps/jwt
          const zitadelUrl = new URL(env.ZITADEL_JWT_IDP_ENDPOINT);
          userUrl.searchParams.forEach((v, k) => zitadelUrl.searchParams.set(k, v));
@@ -99,7 +99,7 @@ The authentication flow with JWT IdP looks like this:
      }
      ```
      *(Replace `getJwtForCurrentSession` with your logic for retrieving/creating a JWT from the user's WAF session.
-     Note: `env.ZITADEL_JWT_IDP_ENDPOINT` should be set to the custom domain of your ZITADEL instance
+     Note: `env.ZITADEL_JWT_IDP_ENDPOINT` should be set to the Custom Domain of your ZITADEL instance
      with the `/idps/jwt` path, e.g. `https://accounts.test.com/idps/jwt`.)*
 
 5. **ZITADEL receives and validates the JWT (Server-side):**  

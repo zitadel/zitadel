@@ -23,7 +23,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
     version: "2.0";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.";
+    description: "This API is intended to manage custom executions (previously known as actions) in a Zitadel instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -59,8 +59,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -650,13 +650,13 @@ message CreateTargetRequest {
     RESTCall rest_call = 3;
 
     // The HTTP call to this target will be a POST request.
-    // The call is sent asynchronously and ZITADEL does not wait for the response.
+    // The call is sent asynchronously and Zitadel does not wait for the response.
     // The response of the target is ignored, no status or body is checked.
     // This is typically used for executions of type "events".
     RESTAsync rest_async = 4;
   }
 
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
   // Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called.
   // In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
@@ -715,7 +715,7 @@ message CreateTargetResponse {
 
   // Key used to sign and check payload sent to the target.
   // The key can be used to verify the integrity and authenticity of the request
-  // on the receiver side. The key should be treated as a secret and only known to ZITADEL and the receiver.
+  // on the receiver side. The key should be treated as a secret and only known to Zitadel and the receiver.
   // The signature is included in the request header `X-ZITADEL-Signature`
   // and calculated over the raw body of the request using HMAC with SHA256.
   string signing_key = 3 [
@@ -767,13 +767,13 @@ message UpdateTargetRequest {
     RESTCall rest_call = 4;
 
     // The HTTP call to this target will be a POST request.
-    // The call is sent asynchronously and ZITADEL does not wait for the response.
+    // The call is sent asynchronously and Zitadel does not wait for the response.
     // The response of the target is ignored, no status or body is checked.
     // This is typically used for executions of type "events".
     RESTAsync rest_async = 5;
   }
 
-  // Timeout defines the duration until ZITADEL cancels the execution.
+  // Timeout defines the duration until Zitadel cancels the execution.
   // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails.
   // Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called.
   // In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
@@ -843,7 +843,7 @@ message UpdateTargetResponse {
 
   // Key used to sign and check payload sent to the target.
   // The key can be used to verify the integrity and authenticity of the request
-  // on the receiver side. The key should be treated as a secret and only known to ZITADEL and the receiver.
+  // on the receiver side. The key should be treated as a secret and only known to Zitadel and the receiver.
   // The signature is included in the request header `X-ZITADEL-Signature`
   // and calculated over the raw body of the request using HMAC with SHA256.
   // The key is only returned if expirationSigningKey was set in the request.

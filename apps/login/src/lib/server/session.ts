@@ -13,8 +13,8 @@ import { create, Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -192,12 +192,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
-    if (!checks) {
-      throw error;
-    }
-
-    const loginNameForCreation = options.loginName || recentSession.loginName;
-    const orgForCreation = options.organization || recentSession.organization;
+    const loginNameForCreation = options.loginName || recentSession?.loginName;
+    const orgForCreation = options.organization || recentSession?.organization;
 
     if (!loginNameForCreation) {
       throw error;
@@ -212,7 +208,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
       const user = users.result[0];
       const newChecks = create(ChecksSchema, {
-        ...checks,
+        ...(checks || {}),
         user: { search: { case: "userId", value: user.userId } } as any,
       });
 

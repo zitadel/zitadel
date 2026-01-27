@@ -6,7 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;applicat
 
 message LoginVersion {
   oneof version {
-    // Allow the user to sign in through the ZITADEL hosted login UI.
+    // Allow the user to sign in through the Zitadel hosted login UI.
     LoginV1 login_v1 = 1;
     // Allow the user to sign in though the new login UI or even your own UI by specifying a base_uri.
     LoginV2 login_v2 = 2;

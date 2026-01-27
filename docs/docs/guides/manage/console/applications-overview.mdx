@@ -15,7 +15,7 @@ Applications are the entry point to your [Project](projects-overview.mdx). Users
 
 All applications within a project share the same **Roles** and **Authorizations**. This means you define a role once (e.g., `admin`) on the Project level, and it applies across all your web, mobile, and API applications.
 
-To access your applications, navigate to your Project in the Console and select your application.
+To access your applications, navigate to your Project in the Management Console and select your application.
 
 <img
   alt="Granted project"
@@ -139,7 +139,7 @@ When IPv6 URIs are used as redirects in development mode, square brackets must b
 
 After creating an application, you can modify its configuration.
 * **Auth Method:** You can switch authentication methods (e.g., from Basic to Private Key JWT) via the toggle or dropdowns.
-* **OIDC Compliance:** The Console checks if your configuration is OIDC compliant and shows tasks for completion if anything is missing.
+* **OIDC Compliance:** The Management Console checks if your configuration is OIDC compliant and shows tasks for completion if anything is missing.
 
 :::caution
 You **cannot** change the Application Type (e.g., from Web to Native) after creation. You must delete and recreate the application.
@@ -178,7 +178,7 @@ If your application makes requests from domains other than the Redirect URI (e.g
 
 Ensure the configuration of application settings is limited to authorized users only.
 
-* Use [Manager roles](./managers) to limit permissions for your users to make changes to your applications.
+* Use [Administrator roles](./managers) to limit permissions for your users to make changes to your applications.
 * When [granting projects](../../../concepts/structure/granted_projects.md) to other organizations, the receiving organization **cannot** see or change the application configuration. They can only assign roles.
 
 ## References

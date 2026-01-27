@@ -123,12 +123,12 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent(
 						ctx, aggregate,
-						feature_v2.InstanceConsoleUseV2UserApi, true,
+						feature_v2.InstanceManagementConsoleUseV2UserApi, true,
 					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				ConsoleUseV2UserApi: gu.Ptr(true),
+				ManagementConsoleUseV2UserApi: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},

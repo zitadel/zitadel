@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metaadatok",
     "HOME": {
-      "TITLE": "Kezdd el a ZITADEL használatát",
+      "TITLE": "Kezdd el a Zitadel használatát",
       "NEXT": {
         "TITLE": "A következő lépések",
         "DESCRIPTION": "Teljesítsd a következő lépéseket az alkalmazásod biztonságáért.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Dokumentáció",
-          "DESCRIPTION": "Fedezd fel a ZITADEL tudásbázisát, hogy megismerkedj az alapvető fogalmakkal és ötletekkel. Tanuld meg, hogyan működik a ZITADEL, és hogyan használd."
+          "DESCRIPTION": "Fedezd fel a Zitadel tudásbázisát, hogy megismerkedj az alapvető fogalmakkal és ötletekkel. Tanuld meg, hogyan működik a Zitadel, és hogyan használd."
         },
         "EXAMPLES": {
           "TITLE": "Példák és Software Development Kit-ek",
-          "DESCRIPTION": "Böngészd példáinkat és SDK-jainkat, hogy a ZITADEL-t a kedvenc programozási nyelveiddel és eszközeiddel együtt használd."
+          "DESCRIPTION": "Böngészd példáinkat és SDK-jainkat, hogy a Zitadel-t a kedvenc programozási nyelveiddel és eszközeiddel együtt használd."
         }
       }
     },
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Műveletek",
-      "DESCRIPTION": "Futtass egyéni kódot az események során, amikor a felhasználóid a ZITADEL-nél hitelesítenek. Automatizáld a folyamataidat, gazdagítsd a felhasználóid metaadatait és tokeneit, vagy értesíts külső rendszereket.",
+      "DESCRIPTION": "Futtass egyéni kódot az események során, amikor a felhasználóid a Zitadel-nél hitelesítenek. Automatizáld a folyamataidat, gazdagítsd a felhasználóid metaadatait és tokeneit, vagy értesíts külső rendszereket.",
       "SCRIPTS": {
         "TITLE": "Scriptek",
         "DESCRIPTION": "Írd meg a JavaScript kódodat egyszer, és használd több folyamatban."
@@ -97,23 +97,23 @@
         "NEXT": "Mi most?",
         "SAML": {
           "TITLE": "Konfiguráld a SAML identitásszolgáltatódat",
-          "DESCRIPTION": "A ZITADEL konfigurálva van. Most a SAML identitásszolgáltatódnak van szüksége némi konfigurációra. A legtöbb szolgáltatónál elég, ha feltöltöd a teljes ZITADEL metadat XML-t. Más szolgáltatók csak néhány külön URL megadását kérik, például az entitásazonosítót (metadata URL), az Assertion Consumer Service (ACS) URL-t vagy a Single Logout URL-t."
+          "DESCRIPTION": "A Zitadel konfigurálva van. Most a SAML identitásszolgáltatódnak van szüksége némi konfigurációra. A legtöbb szolgáltatónál elég, ha feltöltöd a teljes Zitadel metadat XML-t. Más szolgáltatók csak néhány külön URL megadását kérik, például az entitásazonosítót (metadata URL), az Assertion Consumer Service (ACS) URL-t vagy a Single Logout URL-t."
         },
         "CALLBACK": {
           "TITLE": "Konfiguráld a {{ provider }} Identity Providered",
-          "DESCRIPTION": "Mielőtt konfigurálnád a ZITADEL-t, add meg ezt az URL-t az Identity Providerednek, hogy engedélyezze a böngésző visszairányítását a ZITADEL-hez hitelesítés után."
+          "DESCRIPTION": "Mielőtt konfigurálnád a Zitadel-t, add meg ezt az URL-t az Identity Providerednek, hogy engedélyezze a böngésző visszairányítását a Zitadel-hez hitelesítés után."
         },
         "JWT": {
           "TITLE": "Használd a JWT-ket mint federált identitások",
-          "DESCRIPTION": "A JWT Identity Provider lehetővé teszi, hogy a meglévő JWT tokenjeidet federált identitásként használd. Ez a funkció praktikus, ha már van kibocsátód a JWT-khez. A JWT IdP-vel ezeket a JWT-ket használhatod felhasználók létrehozására és frissítésére ZITADEL-ben menet közben."
+          "DESCRIPTION": "A JWT Identity Provider lehetővé teszi, hogy a meglévő JWT tokenjeidet federált identitásként használd. Ez a funkció praktikus, ha már van kibocsátód a JWT-khez. A JWT IdP-vel ezeket a JWT-ket használhatod felhasználók létrehozására és frissítésére Zitadel-ben menet közben."
         },
         "LDAP": {
-          "TITLE": "Konfiguráld a ZITADEL-t, hogy csatlakozzon az LDAP Identity Provideredhez",
-          "DESCRIPTION": "Add meg a kapcsolódási adatokat az LDAP szerveredhez és konfiguráld az LDAP attribútumaid ZITADEL attribútumokká való leképezését."
+          "TITLE": "Konfiguráld a Zitadel-t, hogy csatlakozzon az LDAP Identity Provideredhez",
+          "DESCRIPTION": "Add meg a kapcsolódási adatokat az LDAP szerveredhez és konfiguráld az LDAP attribútumaid Zitadel attribútumokká való leképezését."
         },
         "AUTOFILL": {
           "TITLE": "Felhasználói adatok automatikus kitöltése",
-          "DESCRIPTION": "Használj műveletet a felhasználói élmény javítására. Előre kitöltheted a ZITADEL regisztrációs űrlapját az identity provider értékeivel."
+          "DESCRIPTION": "Használj műveletet a felhasználói élmény javítására. Előre kitöltheted a Zitadel regisztrációs űrlapját az identity provider értékeivel."
         },
         "ACTIVATE": {
           "TITLE": "Aktiváld az IdP-t",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Külső linkek",
-        "DESCRIPTION": "Irányítsd felhasználóidat egyedi külső forrásokhoz, amelyek a bejelentkezési oldalon jelennek meg. A felhasználóknak el kell fogadniuk a Szolgáltatási feltételeket és az Adatvédelmi irányelveket, mielőtt regisztrálhatnának. Módosítsd a linket a dokumentációdra, vagy állítsd be üres szövegre, hogy elrejtsd a dokumentáció gombot a konzolból. Adj hozzá egyedi külső linket és egyedi szöveget ehhez a linkhez a konzolban, vagy állítsd be üresre, hogy elrejtsd ezt a gombot."
+        "DESCRIPTION": "Irányítsd felhasználóidat egyedi külső forrásokhoz, amelyek a bejelentkezési oldalon jelennek meg. A felhasználóknak el kell fogadniuk a Szolgáltatási feltételeket és az Adatvédelmi irányelveket, mielőtt regisztrálhatnának. Módosítsd a linket a dokumentációdra, vagy állítsd be üres szövegre, hogy elrejtsd a dokumentáció gombot a felügyeleti konzolból. Adj hozzá egyedi külső linket és egyedi szöveget ehhez a linkhez a felügyeleti konzolban, vagy állítsd be üresre, hogy elrejtsd ezt a gombot."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP beállítások",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS beállítások",
-        "DESCRIPTION": "A ZITADEL összes funkciójának eléréséhez konfiguráld a Twilio-t SMS üzenetek küldésére a felhasználóidnak."
+        "DESCRIPTION": "A Zitadel összes funkciójának eléréséhez konfiguráld a Twilio-t SMS üzenetek küldésére a felhasználóidnak."
       },
       "IAM_EVENTS": {
         "TITLE": "Események",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Sikertelen események",
-        "DESCRIPTION": "Ez az oldal megmutatja az összes sikertelen eseményt a példányodban. Ha a ZITADEL nem úgy viselkedik, ahogy várnád, mindig nézd meg először ezt a listát."
+        "DESCRIPTION": "Ez az oldal megmutatja az összes sikertelen eseményt a példányodban. Ha a Zitadel nem úgy viselkedik, ahogy várnád, mindig nézd meg először ezt a listát."
       },
       "IAM_VIEWS": {
         "TITLE": "Nézetek",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Biztonsági beállítások",
-        "DESCRIPTION": "Engedélyezd a ZITADEL funkciókat, amelyek biztonsági kockázatot jelenthetnek. Tényleg tudnod kell, mit csinálsz, mielőtt ezeket a beállításokat módosítod."
+        "DESCRIPTION": "Engedélyezd a Zitadel funkciókat, amelyek biztonsági kockázatot jelenthetnek. Tényleg tudnod kell, mit csinálsz, mielőtt ezeket a beállításokat módosítod."
       },
       "OIDC": {
         "TITLE": "OpenID Connect beállítások",
@@ -187,7 +187,7 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Kezelje az OIDC Webkulcsokat, hogy biztonságosan aláírja és érvényesítse a tokeneket a ZITADEL példányában.",
+        "DESCRIPTION": "Kezelje az OIDC Webkulcsokat, hogy biztonságosan aláírja és érvényesítse a tokeneket a Zitadel példányában.",
         "TABLE": {
           "TITLE": "Aktív és Jövőbeli Webkulcsok",
           "DESCRIPTION": "Az aktív és közelgő webkulcsai. Egy új kulcs aktiválása deaktiválja az aktuálisat.",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Új Webkulcs létrehozása",
-          "DESCRIPTION": "Egy új webkulcs létrehozása hozzáadja azt a listájához. A ZITADEL alapértelmezés szerint RSA2048 kulcsokat használ SHA256 hasheléssel.",
+          "DESCRIPTION": "Egy új webkulcs létrehozása hozzáadja azt a listájához. A Zitadel alapértelmezés szerint RSA2048 kulcsokat használ SHA256 hasheléssel.",
           "KEY_TYPE": "Kulcstípus",
           "BITS": "Bitek",
           "HASHER": "Hasher",
@@ -241,7 +241,7 @@
         },
         "LOGIN_NAME_PATTERN": {
           "TITLE": "Bejelentkezési név mintája",
-          "DESCRIPTION": "Irányítsd felhasználóid bejelentkezési neveinek mintáját. A ZITADEL kiválasztja a felhasználóid szervezetét, amint beírják bejelentkezési nevüket. Ezért a bejelentkezési neveknek egyedinek kell lenniük az összes szervezet között. Ha vannak felhasználóid, akik több domainben rendelkeznek fiókkal, az egyediség biztosítható a bejelentkezési nevek szervezeti domainnal való utótagolásával."
+          "DESCRIPTION": "Irányítsd felhasználóid bejelentkezési neveinek mintáját. A Zitadel kiválasztja a felhasználóid szervezetét, amint beírják bejelentkezési nevüket. Ezért a bejelentkezési neveknek egyedinek kell lenniük az összes szervezet között. Ha vannak felhasználóid, akik több domainben rendelkeznek fiókkal, az egyediség biztosítható a bejelentkezési nevek szervezeti domainnal való utótagolásával."
         },
         "DOMAIN_VERIFICATION": {
           "TITLE": "Domain ellenőrzés",
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Külső bejelentkezés engedélyezve",
-            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy egy külső azonosítószolgáltatóval jelentkezzenek be ahelyett, hogy a ZITADEL felhasználót használják a bejelentkezéshez."
+            "DESCRIPTION": "Engedd meg a felhasználóidnak, hogy egy külső azonosítószolgáltatóval jelentkezzenek be ahelyett, hogy a Zitadel felhasználót használják a bejelentkezéshez."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Jelszó visszaállítás elrejtve",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Kezdd el a ZITADEL használatát",
-    "DISCLAIMER": "A ZITADEL bizalmasan és biztonságosan kezeli az adataidat.",
+    "WELCOME": "Kezdd el a Zitadel használatát",
+    "DISCLAIMER": "A Zitadel bizalmasan és biztonságosan kezeli az adataidat.",
     "DISCLAIMERLINK": "További információ",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+      "DESCRIPTION": "Kezdd el gyorsan a Zitadel használatát."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+      "DESCRIPTION": "Kezdd el gyorsan a Zitadel használatát."
     },
     "QUICKSTARTS": {
       "LABEL": "Első lépések",
-      "DESCRIPTION": "Kezdd el gyorsan a ZITADEL használatát."
+      "DESCRIPTION": "Kezdd el gyorsan a Zitadel használatát."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Gyorsbillentyűk",
@@ -366,7 +366,7 @@
     "COMPLETED": "befejezve",
     "DISMISS": "Nem, kösz, profi vagyok.",
     "CARD": {
-      "TITLE": "Indítsd el a ZITADEL-t",
+      "TITLE": "Indítsd el a Zitadel-t",
       "DESCRIPTION": "Ez az ellenőrzőlista segít beállítani az instanciádat és végigvezet a legfontosabb lépéseken"
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Jelentkezz be az alkalmazásodba",
-        "description": "Integráld az alkalmazásodat a ZITADEL-lel az autentikációhoz, és teszteld az admin felhasználóddal történő bejelentkezéssel.",
+        "description": "Integráld az alkalmazásodat a Zitadel-lel az autentikációhoz, és teszteld az admin felhasználóddal történő bejelentkezéssel.",
         "action": "Bejelentkezés"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Ügyfélportál"
   },
   "QUICKSTART": {
-    "TITLE": "Integráld a ZITADEL szolgáltatást az alkalmazásodba",
-    "DESCRIPTION": "Integráld a ZITADEL szolgáltatást az alkalmazásodba, vagy használd egy mintánkat, hogy percek alatt elindulhass.",
+    "TITLE": "Integráld a Zitadel szolgáltatást az alkalmazásodba",
+    "DESCRIPTION": "Integráld a Zitadel szolgáltatást az alkalmazásodba, vagy használd egy mintánkat, hogy percek alatt elindulhass.",
     "BTN_START": "Alkalmazás létrehozása",
     "BTN_LEARNMORE": "Tudj meg többet",
     "CREATEPROJECTFORAPP": "Projekt létrehozása {{value}}",
@@ -744,7 +744,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Az instance-od blokkolva van.",
-      "DESCRIPTION": "Kérd meg az ZITADEL instance adminisztrátorát, hogy frissítse az előfizetést."
+      "DESCRIPTION": "Kérd meg az Zitadel instance adminisztrátorát, hogy frissítse az előfizetést."
     },
     "INVALID_FORMAT": "A formázás érvénytelen.",
     "NOTANEMAIL": "A megadott érték nem egy e-mail cím.",
@@ -841,7 +841,7 @@
       "NAME": "Név",
       "EMPTY": "Nincs eszköz beállítva",
       "TITLE": "Passkey Hitelesítés",
-      "DESCRIPTION": "Adj hozzá WebAuthn alapú hitelesítési módszereket a Passkey-vel való bejelentkezéshez a ZITADEL-be.",
+      "DESCRIPTION": "Adj hozzá WebAuthn alapú hitelesítési módszereket a Passkey-vel való bejelentkezéshez a Zitadel-be.",
       "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második faktoros módszereit.",
       "U2F": "Módszer hozzáadása",
       "U2F_DIALOG_TITLE": "Hitelesítő eszköz ellenőrzése",
@@ -1160,7 +1160,7 @@
       "SECRETREMOVED": "A titok sikeresen eltávolítva!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL kezelői szerepkörök",
+      "TITLE": "Zitadel rendszergazdai szerepkörök",
       "DESCRIPTION": "Ezek a felhasználó összes tagsági jogosultságai. Ezeket módosíthatod szervezet, projekt vagy IAM részletező oldalakon is.",
       "ORGCONTEXT": "Láthatod az összes szervezetet és projektet, amelyek a jelenleg kiválasztott szervezethez kapcsolódnak.",
       "USERCONTEXT": "Láthatod az összes szervezetet és projektet, amelyekhez jogosultságod van, beleértve más szervezeteket is.",
@@ -1226,7 +1226,7 @@
     "ALLOWEDTOFAIL": "Megengedett a hibázás",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Figyelmeztetés",
-      "DESCRIPTION": "Ha letiltod ezt a beállítást, azzal azt okozhatod, hogy a szervezeted felhasználói nem tudnak bejelentkezni. Emellett nem fogsz tudni hozzáférni a konzolhoz, hogy letiltsd a műveletet. Javasoljuk, hogy hozz létre egy adminisztrátori felhasználót egy külön szervezetben, vagy először tesztelj scripteket egy fejlesztési környezetben vagy egy fejlesztési szervezetben."
+      "DESCRIPTION": "Ha letiltod ezt a beállítást, azzal azt okozhatod, hogy a szervezeted felhasználói nem tudnak bejelentkezni. Emellett nem fogsz tudni hozzáférni a felügyeleti konzolhoz, hogy letiltsd a műveletet. Javasoljuk, hogy hozz létre egy adminisztrátori felhasználót egy külön szervezetben, vagy először tesztelj scripteket egy fejlesztési környezetben vagy egy fejlesztési szervezetben."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Folyamat típus",
@@ -1268,7 +1268,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "IAM tárhely adminisztráció",
-      "DESCRIPTION": "Kezeld a ZITADEL nézeteidet és a sikertelen eseményeket."
+      "DESCRIPTION": "Kezeld a Zitadel nézeteidet és a sikertelen eseményeket."
     },
     "MEMBER": {
       "TITLE": "Menedzserek",
@@ -1412,7 +1412,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Várt URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Ellenőrző fájl:",
         "VERIFICATION_SKIP": "Most átugorhatod az ellenőrzést és folytathatod a szervezeted létrehozását, de ahhoz, hogy használhasd a domained, ezt a lépést be kell fejezni!",
-        "VERIFICATION_VALIDATION_DESC": "Ne töröld az ellenőrző kódot, mivel a ZITADEL időnként újra ellenőrzi a domained tulajdonjogát.",
+        "VERIFICATION_VALIDATION_DESC": "Ne töröld az ellenőrző kódot, mivel a Zitadel időnként újra ellenőrzi a domained tulajdonjogát.",
         "VERIFICATION_NEWTOKEN_TITLE": "Új Token Kérése",
         "VERIFICATION_VALIDATION_ONGOING": "A {{ value }} módszer lett kiválasztva a domained ellenőrzésére. Kattints a gombra, hogy elindítsd az ellenőrzést vagy újrakezd az ellenőrzési folyamatot.",
         "VERIFICATION_SUCCESSFUL": "A domain sikeresen ellenőrizve!",
@@ -1555,7 +1555,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       }
     },
     "SMTP": {
@@ -1657,8 +1658,8 @@
         "DISABLED": "\"Letiltva\" öröklődik"
       },
       "RESET": "Mindent állíts öröklésre",
-      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
+      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a felügyeleti konzolban felhasználók létrehozásához",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a felügyeleti konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
       "LOGINV2": "Bejelentkezés V2",
       "LOGINV2_DESCRIPTION": "Ennek engedélyezésével aktiválódik az új, TypeScript-alapú bejelentkezési felület, amely jobb biztonságot, teljesítményt és testreszabhatóságot nyújt.",
       "LOGINV2_BASEURI": "Alap URI",
@@ -1705,7 +1706,7 @@
       "RELEASE": "Engedélyezés",
       "DROPFONT": "Húzd ide a betűfájlokat",
       "RELEASEFONT": "Engedélyezés",
-      "USEOFLOGO": "A logódat a bejelentkezésnél és az e-mailekben használjuk, míg az ikont kisebb UI elemekhez, például a konzolban lévő szervezetváltóban használjuk",
+      "USEOFLOGO": "A logódat a bejelentkezésnél és az e-mailekben használjuk, míg az ikont kisebb UI elemekhez, például a felügyeleti konzolban lévő szervezetváltóban használjuk",
       "MAXSIZE": "A maximális méret 524 kB-ig van korlátozva",
       "EMAILNOSVG": "Az SVG fájlformátum nem támogatott az e-mailekben. Ezért töltsd fel a logódat PNG vagy más támogatott formátumban.",
       "MAXSIZEEXCEEDED": "A maximális méret, 524kB, túllépve.",
@@ -1721,7 +1722,7 @@
       },
       "PREVIEW": {
         "TITLE": "Bejelentkezés",
-        "SECOND": "jelentkezz be a ZITADEL-fiókoddal.",
+        "SECOND": "jelentkezz be a Zitadel-fiókoddal.",
         "ERROR": "A felhasználó nem található!",
         "PRIMARYBUTTON": "következő",
         "SECONDARYBUTTON": "regisztráció"
@@ -1761,9 +1762,9 @@
       "POLICYLINK": "Adatvédelmi Szabályzat Linkje",
       "HELPLINK": "Segítség Link",
       "SUPPORTEMAIL": "Támogatási E-mail",
-      "DOCSLINK": "Dokumentáció Link (Konzol)",
-      "CUSTOMLINK": "Egyéni Link (Konzol)",
-      "CUSTOMLINKTEXT": "Egyéni Link Szöveg (Konzol)",
+      "DOCSLINK": "Dokumentáció Link (Felügyeleti Konzol)",
+      "CUSTOMLINK": "Egyéni Link (Felügyeleti Konzol)",
+      "CUSTOMLINKTEXT": "Egyéni Link Szöveg (Felügyeleti Konzol)",
       "SAVED": "Sikeresen mentve!",
       "RESET_TITLE": "Alapértelmezett értékek visszaállítása",
       "RESET_DESCRIPTION": "Az ÁSZF és az Adatvédelmi Szabályzat alapértelmezett linkjeit készülsz visszaállítani. Tényleg folytatni szeretnéd?"
@@ -1804,7 +1805,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "uk": "Українська"
+        "uk": "Українська",
+        "ar": "العربية"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -1916,7 +1918,7 @@
       "DEFAULTREDIRECTURI_DESC": "Meghatározza, hová lesz a felhasználó átirányítva, ha a bejelentkezés alkalmazás kontextus nélkül indul (pl. e-mailből)",
       "ERRORMSGPOPUP": "Hiba megjelenítése párbeszédablakban",
       "DISABLEWATERMARK": "Vízjel elrejtése",
-      "DISABLEWATERMARK_DESC": "A ZITADEL által működtetett vízjel elrejtése a bejelentkezési felületen"
+      "DISABLEWATERMARK_DESC": "A Zitadel által működtetett vízjel elrejtése a bejelentkezési felületen"
     },
     "RESET": "Visszaállítás az alapértelmezett példányra",
     "CREATECUSTOM": "Egyéni szabály létrehozása",
@@ -1970,7 +1972,7 @@
       "CREATE_DESC": "Add meg a projekted nevét.",
       "ROLE": "Szerepkör",
       "NOITEMS": "Nincsenek projektek",
-      "ZITADELPROJECT": "Ez a ZITADEL projekthez tartozik. Vigyázz: Ha változtatásokat hajtasz végre, a ZITADEL lehet, hogy nem fog a szándékod szerint működni.",
+      "ZITADELPROJECT": "Ez a Zitadel projekthez tartozik. Vigyázz: Ha változtatásokat hajtasz végre, a Zitadel lehet, hogy nem fog a szándékod szerint működni.",
       "TYPE": {
         "OWNED": "Saját Projektek",
         "OWNED_SINGULAR": "Saját Projekt",
@@ -2353,7 +2355,7 @@
     "DELETE_SELECTION_TITLE": "IDP törlése",
     "DELETE_SELECTION_DESCRIPTION": "Egy identity providert készülsz törölni. A változások visszafordíthatatlanok. Biztosan folytatni akarod?",
     "FEDERATEDLOGOUTENABLED": "Szövetséges kijelentkezés engedélyezve",
-    "FEDERATEDLOGOUTENABLED_DESC": "Ha engedélyezve van, a felhasználó ki lesz jelentkezve az IdP-ből is, ha a felhasználó megszakítja a munkamenetet a ZITADEL-ben.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Ha engedélyezve van, a felhasználó ki lesz jelentkezve az IdP-ből is, ha a felhasználó megszakítja a munkamenetet a Zitadel-ben.",
     "EMPTY": "Nincs elérhető IDP",
     "OIDC": {
       "GENERAL": "Általános információk",
@@ -2455,7 +2457,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Szolgáltató",
-      "DESCRIPTION": "Itt találhatók az SMTP szolgáltatók a ZITADEL példányodhoz. Aktiváld azt, amelyiket használni szeretnéd a felhasználóidnak küldött értesítésekhez.",
+      "DESCRIPTION": "Itt találhatók az SMTP szolgáltatók a Zitadel példányodhoz. Aktiváld azt, amelyiket használni szeretnéd a felhasználóidnak küldött értesítésekhez.",
       "EMPTY": "Nincs elérhető SMTP Szolgáltató",
       "ACTIVATED": "Aktiválva",
       "ACTIVATE": "Szolgáltató aktiválása",
@@ -2491,11 +2493,11 @@
         "NEXT_STEPS": "Következő lépések",
         "ACTIVATE": {
           "TITLE": "Aktiváld az SMTP szolgáltatót",
-          "DESCRIPTION": "A ZITADEL nem tudja használni ezt az SMTP szolgáltatót értesítések küldésére, amíg nem aktiválod. Ha aktiválod ezt a szolgáltatót, bármely másik aktív szolgáltató inaktív lesz."
+          "DESCRIPTION": "A Zitadel nem tudja használni ezt az SMTP szolgáltatót értesítések küldésére, amíg nem aktiválod. Ha aktiválod ezt a szolgáltatót, bármely másik aktív szolgáltató inaktív lesz."
         },
         "DEACTIVATE": {
           "TITLE": "Deaktiváld az SMTP szolgáltatót",
-          "DESCRIPTION": "Ha deaktiválod ezt az SMTP szolgáltatót, a ZITADEL nem tudja használni értesítések küldésére, amíg újra nem aktiválod."
+          "DESCRIPTION": "Ha deaktiválod ezt az SMTP szolgáltatót, a Zitadel nem tudja használni értesítések küldésére, amíg újra nem aktiválod."
         },
         "SAVE_SETTINGS": "Mentés",
         "TEST": {
@@ -2787,7 +2789,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "uk": "Українська"
+    "uk": "Українська",
+    "ar": "العربية"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy menedzsert",

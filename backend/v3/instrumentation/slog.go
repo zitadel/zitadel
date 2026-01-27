@@ -9,21 +9,22 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/muhlemmer/sloggcp"
 	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
+	"github.com/zitadel/sloggcp"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
 	"google.golang.org/grpc"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LogFormat int
 
-//go:generate enumer -type=LogFormat -trimprefix=LogFormat -text -linecomment
+//go:generate enumer -type=LogFormat -trimprefix=LogFormat -text -linecomment -transform=snake
 const (
 	// Empty line comment sets empty string of unspecified value
 	LogFormatUndefined LogFormat = iota //
@@ -32,19 +33,24 @@ const (
 	LogFormatJSON
 	// JSON formatted logs compatible with Google Cloud Platform
 	LogFormatGCP
+	LogFormatGCPErrorReporting
 )
 
 type LogConfig struct {
-	Level           slog.Level
-	Format          LogFormat
-	AddSource       bool
-	GoogleProjectID string
-	GoogleLogName   string
-	Exporter        ExporterConfig
+	Level     slog.Level
+	Format    LogFormat
+	AddSource bool
+	Errors    ErrorConfig
+	Exporter  ExporterConfig
+}
+
+type ErrorConfig struct {
+	ReportLocation bool
+	StackTrace     bool
 }
 
 // setLogger configures the global slog logger.
-// Logs are sent to StdErr and/or the [log.LoggerProvider].
+// Logs are sent to [os.Stderr] and/or the [log.LoggerProvider].
 //
 // When present in the context, each line emitted contains:
 //   - Trace ID
@@ -70,7 +76,14 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	case LogFormatGCP:
 		options.ReplaceAttr = sloggcp.ReplaceAttr
 		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
+	case LogFormatGCPErrorReporting:
+		zerrors.GCPErrorReportingEnabled(true)
+		options.ReplaceAttr = replaceErrAttr
+		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
 	}
+
+	zerrors.EnableReportLocation(cfg.Errors.ReportLocation)
+	zerrors.EnableStackTrace(cfg.Errors.StackTrace)
 
 	stdErrHandler = slogctx.NewHandler(
 		stdErrHandler,
@@ -194,4 +207,12 @@ func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) 
 		return r.attrs()
 	}
 	return nil
+}
+
+// replaceErrAttr renames the "err" attribute to the Google Cloud Platform compatible error key.
+func replaceErrAttr(groups []string, a slog.Attr) slog.Attr {
+	if len(groups) == 0 && a.Key == "err" {
+		a.Key = sloggcp.ErrorKey
+	}
+	return a
 }

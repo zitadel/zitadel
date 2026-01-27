@@ -1,5 +1,5 @@
 InitCode:
-  Title: ZITADEL - User initialisieren
+  Title: Zitadel - User initialisieren
   PreHeader: User initialisieren
   Subject: User initialisieren
   Greeting: Hallo {{.DisplayName}},

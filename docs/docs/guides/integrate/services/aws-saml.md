@@ -18,7 +18,7 @@ Prerequisites:
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 
-> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if
+> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and if
 > the headings start with "AWS" please switch to the AWS GUI.
 
 ## **AWS**: Change to external identity provider ZITADEL
@@ -45,7 +45,7 @@ can connect to ZITADEL as a SAML2 IDP.
 4. Download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
    You can download the certificate from following
-   URL: \{your_instance_domain}/saml/v2/certificate
+   URL: `${CUSTOM_DOMAIN}/saml/v2/certificate`
 
 5. Then upload the ".crt"-file to AWS and click "next".
 
