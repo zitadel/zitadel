@@ -52,7 +52,7 @@ const features = [
               link="/docs/guides/manage/console/console-overview"
               type={ICONTYPE.LOGIN}
               title="Manage"
-              description="All about Console"
+              description="All about Management Console"
             />
             <ListElement
               link="/docs/guides/integrate"

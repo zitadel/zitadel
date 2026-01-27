@@ -6,18 +6,18 @@ sidebar_label: Retrieve User Roles
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
 
 ## What are roles/authorizations/grants in ZITADEL? 
-User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific administrator roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
+User roles, user grants, or authorizations refer to the roles that are assigned to a user. These terms are used interchangeably to mean the roles assigned to the user, e.g., the ZITADEL Management Console refers to the pairing of roles and users as authorizations, whereas the APIs refer to them as grants. This guide will use the term roles for application-specific roles (e.g., `admin`, `accountant`, `employee`, `hr`, etc.) and ZITADEL-specific administrator roles (e.g., `IAM_OWNER`, `ORG_OWNER`, `PROJECT_OWNER`, etc.). 
 
 Roles are critical to managing permissions in a single-tenant or multi-tenant application. It can, however, be tricky to retrieve them, especially when spanning multiple organizations and projects. 
 
 ## Assign roles and memberships
 
-Human or service users can be assigned roles. You can do this via the ZITADEL Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`. 
+Human or service users can be assigned roles. You can do this via the ZITADEL Management Console or the ZITADEL APIs. As mentioned earlier, there are two types of roles in ZITADEL. You can have your own application-specific roles, and alternatively, ZITADEL also has administrator roles, such as `ORG_OWNER` and `IAM_OWNER`. 
 
 Follow the links below to assign roles to your users. 
 
-- [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
-- [Add administrator roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add application roles via the ZITADEL Management Console](/docs/guides/manage/console/roles)
+- [Add administrator roles via the ZITADEL Management Console](/docs/guides/manage/console/managers)
 - [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
 - [Add administrator roles to users via the ZITADEL Management API](/docs/category/apis/resources/mgmt/members)
 
@@ -34,7 +34,7 @@ How to generate a token:
 - [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service users](/docs/guides/integrate/service-users/authenticate-service-users)
 
-In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
+In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL management console before requesting the token. 
 
 ### Determine the audience
 
@@ -60,7 +60,7 @@ Let's assume you have a frontend application and a backend application under dif
 
 And you can also use the same to access the ZITADEL APIs. 
 
-### Role settings in the ZITADEL Console 
+### Role settings in the ZITADEL Management Console 
 
 If you need user roles returned from the userinfo endpoint, you must select the **’Assert Roles on Authentication’** checkbox in your project under general settings. 
 

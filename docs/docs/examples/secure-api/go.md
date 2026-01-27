@@ -24,7 +24,7 @@ All that is required, is to create your API, create a private key and a personal
 Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch.
 
-Starting from the homepage of your console, click on Create Application
+Starting from the homepage of your management console, click on Create Application
 
 ![Create app in homepage](/img/go/api-create_application.png)
 
@@ -199,17 +199,17 @@ permission denied: missing required role: `admin`
 
 ### Add administrator role
 
-So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Console
+So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Management Console
 and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
 Finally, create the role as shown below:
 
-![Create project role in console](/img/go/api-project-role.png)
+![Create project role in management console](/img/go/api-project-role.png)
 
 After you have created the role, let's grant it the user, who requested the tasks.
 Click on `Authorization` in the navigation and create a new one by selecting the user and the `admin` role.
 After successful creation, it should look like:
 
-![Created authorization in console](/img/go/api-project-auth.png)
+![Created authorization in management console](/img/go/api-project-auth.png)
 
 So you should now be able to add a new task:
 

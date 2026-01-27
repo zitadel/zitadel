@@ -44,7 +44,7 @@ If a feature is set to `Inherit`, it becomes available once its enabled per defa
   width="700px"
 />
 
-Features can range from UI changes in the console, to new APIs or performance improvements.
+Features can range from UI changes in the management console, to new APIs or performance improvements.
 
 :::warning
 Be careful on which features you enable as they can be in an experimental state.
@@ -61,7 +61,7 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 | Setting           | Description                                                                                                                                                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Logo              | Upload your logo for the light and the dark design. This is used mainly in the login interface.                                                                                                                            |
-| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in console on the top left as the home button.                                                                      |
+| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in management console on the top left as the home button.                                                                      |
 | Colors            | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color)                                                                                                       |
 | Font              | Upload your custom font                                                                                                                                                                                                    |
 | Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
@@ -163,7 +163,7 @@ Reasons why ZITADEL doesn't have a redirect URI:
 - The login has not been called with an OIDC authorize request
 - The user landed on the login through an email link, e.g. Password Reset, Initialize User
 
-We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
+We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL Management Console.
 
 Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
@@ -258,7 +258,7 @@ The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 - Maximum OTP Attempts: When the user has reached the maximum (T)OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 
-If an account is locked, the administrator has to unlock it in the ZITADEL console
+If an account is locked, the administrator has to unlock it in the ZITADEL Management Console
 
 <img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
@@ -309,7 +309,7 @@ Example:
   width="600px"
 />
 
-Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
+Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the management console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
 
 <img
   src="/docs/img/guides/console/external_links_2.png"

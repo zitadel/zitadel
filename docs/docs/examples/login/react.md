@@ -22,7 +22,7 @@ Navigate to your project, then add a new application at the top of the page.
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all single page applications.
 
-![Create app in console](/img/react/app-create.png)
+![Create app in management console](/img/react/app-create.png)
 
 ### Redirect URIs
 
@@ -109,12 +109,12 @@ This application includes all the functionalities mentioned in this quickstart.
 You can start by cloning the repository and changing the arguments to `createZitadelAuth` to fit your requirements.
 If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-react/issues).
 
-![App in console](/img/react/app-screen.png)
+![App in management console](/img/react/app-screen.png)
 
 ### What's next?
 
 Now that you have enabled authentication, you are ready to add authorization to your application by using ZITADEL APIs.
-To do this, [refer to the API docs](/apis/introduction) or check out [the ZITADEL Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+To do this, [refer to the API docs](/apis/introduction) or check out [the ZITADEL Management Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create a React application, you can refer to [Create React App](https://github.com/facebook/create-react-app).
 If you want to learn more about the libraries wrapped by [@zitadel/react](https://www.npmjs.com/package/@zitadel/react), read the docs for [oidc-client-ts](https://github.com/authts/oidc-client-ts).

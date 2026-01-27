@@ -170,7 +170,7 @@ curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 
 ## Example call
 
-Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
 by calling the ZITADEL API to create a human user.
 
 ```shell
