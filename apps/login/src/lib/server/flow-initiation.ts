@@ -20,6 +20,8 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
@@ -145,22 +147,31 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }
 
         if (response.fields) {
-          const hiddenInputs = Object.entries(response.fields)
-            .map(([key, value]) => `<input type="hidden" name="${key}" value="${value}" />`)
-            .join("\n");
+          const form = createElement(
+            "form",
+            { action: response.url, method: "post" },
+            Object.entries(response.fields).map(([key, value]) =>
+              createElement("input", { type: "hidden", name: key, value: value, key: key }),
+            ),
+            createElement(
+              "noscript",
+              null,
+              createElement("button", { type: "submit" }, "Continue"),
+            ),
+          );
 
-          const html = `
-            <html>
-              <body onload="document.forms[0].submit()">
-                <form action="${response.url}" method="post">
-                  ${hiddenInputs}
-                  <noscript>
-                    <button type="submit">Continue</button>
-                  </noscript>
-                </form>
-              </body>
-            </html>
-          `;
+          const html = renderToStaticMarkup(
+            createElement(
+              "html",
+              null,
+              createElement(
+                "body",
+                { onLoad: "document.forms[0].submit()" },
+                form,
+              ),
+            ),
+          );
+
           return new NextResponse(html, {
             headers: { "Content-Type": "text/html" },
           });
@@ -424,19 +435,29 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     if (url && binding.case === "redirect") {
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {
-      const html = `
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="${url}" method="post">
-              <input type="hidden" name="RelayState" value="${binding.value.relayState}" />
-              <input type="hidden" name="SAMLResponse" value="${binding.value.samlResponse}" />
-              <noscript>
-                <button type="submit">Continue</button>
-              </noscript>
-            </form>
-          </body>
-        </html>
-      `;
+      const form = createElement(
+        "form",
+        { action: url, method: "post" },
+        createElement("input", { type: "hidden", name: "RelayState", value: binding.value.relayState }),
+        createElement("input", { type: "hidden", name: "SAMLResponse", value: binding.value.samlResponse }),
+        createElement(
+          "noscript",
+          null,
+          createElement("button", { type: "submit" }, "Continue"),
+        ),
+      );
+
+      const html = renderToStaticMarkup(
+        createElement(
+          "html",
+          null,
+          createElement(
+            "body",
+            { onLoad: "document.forms[0].submit()" },
+            form,
+          ),
+        ),
+      );
 
       return new NextResponse(html, {
         headers: { "Content-Type": "text/html" },
