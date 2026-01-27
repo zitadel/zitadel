@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
   getLoginSettings,
@@ -11,6 +12,8 @@ import {
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
+
+const logger = createLogger("verify");
 import crypto from "crypto";
 
 import { create } from "@zitadel/client";
@@ -62,11 +65,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify invite:", { error });
         return { error: t("errors.couldNotVerifyInvite") };
       })
     : await verifyEmail({ serviceConfig, userId: command.userId, verificationCode: command.code }).catch((error) => {
-        console.warn(error);
+        logger.warn("Could not verify email:", { error });
         return { error: t("errors.couldNotVerifyEmail") };
       });
 
@@ -101,7 +104,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
       .catch((error) => {
         // user session is not found, so we create a new one
-        console.warn("[verify] user session is not found, so we create a new one", error);
+        logger.warn("[verify] user session is not found, so we create a new one", { error });
         return undefined;
       });
   }

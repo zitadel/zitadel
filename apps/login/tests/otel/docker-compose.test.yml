@@ -1,0 +1,33 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./output:/tmp/otel
+    ports:
+      - "4318:4318" # OTLP HTTP
+      - "8888:8888" # Prometheus metrics exposed by collector
+      - "13133:13133" # Health check
+
+  login-app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    environment:
+      - OTEL_SERVICE_NAME=zitadel-login-test
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_LOG_LEVEL=info
+      - OTEL_METRICS_EXPORT_INTERVAL_MS=5000
+      # Simulate GCP Cloud Run environment
+      - GOOGLE_CLOUD_PROJECT=test-project-123
+      - K_SERVICE=zitadel-login
+      - K_REVISION=zitadel-login-00001-abc
+      - K_CONFIGURATION=zitadel-login
+      - GOOGLE_CLOUD_REGION=us-central1
+    ports:
+      - "3000:3000"
+      - "9464:9464"  # Prometheus metrics scraping
+    depends_on:
+      - otel-collector

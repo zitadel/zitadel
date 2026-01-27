@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createPasskeyRegistrationLink,
   getLoginSettings,
@@ -9,6 +10,8 @@ import {
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
+
+const logger = createLogger("passkeys");
 import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -103,7 +106,7 @@ export async function registerPasskeyLink(
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
-      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
+      logger.info("hasValidUserVerificationCheck", { hasValidUserVerificationCheck });
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
@@ -289,7 +292,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   try {
     userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    logger.error("Error fetching user by ID:", { error });
     return { error: t("verify.errors.couldNotGetUser") };
   }
 

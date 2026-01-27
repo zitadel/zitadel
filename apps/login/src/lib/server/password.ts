@@ -1,5 +1,7 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
+import { recordAuthAttempt, recordAuthSuccess, recordAuthFailure } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   getLockoutSettings,
@@ -30,6 +32,8 @@ import {
   checkUserVerification,
 } from "../verify-helper";
 import { getPublicHostWithProtocol } from "./host";
+
+const logger = createLogger("password");
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -132,6 +136,8 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
   const { serviceConfig } = getServiceConfig(_headers);
   const t = await getTranslations("password");
 
+  recordAuthAttempt("password", command.organization);
+
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
@@ -150,7 +156,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         let lifetime = loginSettingsByUser.passwordCheckLifetime;
 
         if (!lifetime || !lifetime.seconds) {
-          console.warn("No password lifetime provided, defaulting to 24 hours");
+          logger.warn("No password lifetime provided, defaulting to 24 hours");
           lifetime = {
             seconds: BigInt(60 * 60 * 24), // default to 24 hours
             nanos: 0,
@@ -168,7 +174,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
         throw new Error("Could not load login settings");
       }
     } catch {
-      console.warn("[Password] Could not update session");
+      logger.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
       sessionCookie = undefined;
@@ -370,7 +376,7 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 
   if (command.requestId && session.id) {
     // OIDC/SAML flow - use completeFlowOrGetUrl for proper handling
-    console.log("Password auth: OIDC/SAML flow with requestId:", command.requestId, "sessionId:", session.id);
+    logger.info("Password auth: OIDC/SAML flow with requestId:", { requestId: command.requestId, sessionId: session.id });
     const result = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
@@ -379,14 +385,20 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
       },
       loginSettingsByUser?.defaultRedirectUri,
     );
-    console.log("Password auth: OIDC/SAML flow result:", result);
+    logger.info("Password auth: OIDC/SAML flow result:", { result });
 
     // Safety net - ensure we always return a valid object
     if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
-      console.error("Password auth: Invalid result from completeFlowOrGetUrl (OIDC/SAML):", result);
+      logger.error("Password auth: Invalid result from completeFlowOrGetUrl (OIDC/SAML):", { result });
+      recordAuthFailure("password", "navigation_failed", command.organization);
       return { error: "Authentication completed but navigation failed" };
     }
 
+    if ("redirect" in result) {
+      recordAuthSuccess("password", command.organization);
+    } else if ("error" in result) {
+      recordAuthFailure("password", "flow_error", command.organization);
+    }
     return result;
   }
 
@@ -402,10 +414,16 @@ export async function sendPassword(command: UpdateSessionCommand): Promise<{ err
 
   // Safety net - ensure we always return a valid object
   if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
-    console.error("Password auth: Invalid result from completeFlowOrGetUrl:", result);
+    logger.error("Password auth: Invalid result from completeFlowOrGetUrl:", { result });
+    recordAuthFailure("password", "navigation_failed", command.organization);
     return { error: "Authentication completed but navigation failed" };
   }
 
+  if ("redirect" in result) {
+    recordAuthSuccess("password", command.organization);
+  } else if ("error" in result) {
+    recordAuthFailure("password", "flow_error", command.organization);
+  }
   return result;
 }
 
@@ -478,7 +496,7 @@ export async function checkSessionAndSetPassword({ sessionId, password }: CheckS
     });
     session = sessionResponse.session;
   } catch (error) {
-    console.error("Error getting session:", error);
+    logger.error("Error getting session:", { error });
     return { error: "Could not load session" };
   }
 

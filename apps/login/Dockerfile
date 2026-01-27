@@ -10,7 +10,9 @@ COPY --chown=nextjs:nodejs .next/standalone ./
 USER nextjs
 ENV HOSTNAME="::" \
     PORT="3000" \
-    NODE_ENV="production"
+    NODE_ENV="production" \
+    OTEL_SERVICE_NAME="zitadel-login" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
