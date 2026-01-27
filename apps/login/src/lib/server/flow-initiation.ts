@@ -21,19 +21,11 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
+import escapeHtml from "escape-html";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
-
-function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
 
 const gotoAccounts = ({
   request,
