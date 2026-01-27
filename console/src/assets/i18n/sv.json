@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekt",
-      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Till exempel kan du ha ett enda projekt med 3 applikationer; en för din webbfrontend, en för din mobilapp och en för din backend. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
+      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Du kan till exempel ha ett enda projekt med 3 applikationer: en för din webbfrontend, din mobilapplikation och dina backend-tjänster. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem tillgång till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få tillgång.",
       "OWNED": {
         "TITLE": "Ägda projekt",
         "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktiva och framtida webbnycklar",
           "DESCRIPTION": "Dina aktiva och kommande webbnycklar. Aktivering av en ny nyckel kommer att inaktivera den nuvarande.",
-          "NOTE": "Observera: JWKs OIDC-slutpunkten returnerar ett cachebart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske ännu inte är tillgänglig i cache och för klienter.",
+          "NOTE": "Obs: JWKs OIDC-slutpunkten returnerar ett cachelagringsbart svar (standard 5 min). Undvik att aktivera en nyckel för tidigt, eftersom den kanske inte är tillgänglig för cacheminnen och applikationer/klienter än.",
           "ACTIVATE": "Aktivera nästa webbnyckel",
           "ACTIVE": "För närvarande aktiv",
           "NEXT": "Nästa i kön",
@@ -386,12 +386,12 @@
         "action": "Skapa projekt"
       },
       "APPLICATION_CREATED": {
-        "title": "Registrera din app",
+        "title": "Registrera din ansökan",
         "description": "Registrera din webb-, native-, API- eller SAML-applikation och ställ in ett autentiseringsflöde.",
-        "action": "Registrera app"
+        "action": "Registrera ansökan"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logga in på din app",
+        "title": "Logga in på din applikation",
         "description": "Integrera din applikation med Zitadel för autentisering och testa det genom att logga in med din administratörsanvändare.",
         "action": "Logga in"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Utvecklingsläge är aktiverat som standard. Du kan uppdatera värden för produktion senare.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bläddra bland Exempel och SDKs",
-    "DUPLICATEAPPRENAME": "En app med samma namn finns redan. Vänligen välj ett annat namn.",
+    "DUPLICATEAPPRENAME": "En applikation med samma namn finns redan. Välj ett annat namn.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Byt Ramverk",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Har behörighet att skapa och hantera användare",
     "IAM_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från alla organisationer",
     "IAM_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från alla organisationer",
-    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsklienter",
+    "IAM_LOGIN_CLIENT": "Har behörighet att hantera inloggningsapplikationer",
     "ORG_OWNER": "Har behörighet över hela organisationen",
     "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
     "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Lägg till en andra faktor för att säkerställa optimal säkerhet för ditt konto.",
       "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
       "ADD": "Lägg till faktor",
-      "OTP": "Autentiseringsapp för TOTP (Tidsbaserat engångslösenord)",
+      "OTP": "Autentiseringsapplikation för TOTP (tidsbaserat engångslösenord)",
       "OTP_DIALOG_TITLE": "Lägg till OTP",
-      "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
+      "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapplikation och ange koden nedan för att verifiera och aktivera OTP-metoden.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifiera faktor",
       "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella tvåfaktor.",
@@ -1615,7 +1615,7 @@
         "3": "Telefonverifiering",
         "4": "Återställning av lösenord",
         "5": "Passkey-initiering",
-        "6": "App-hemlighet",
+        "6": "Applikationshemlighet",
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
       },
@@ -1650,7 +1650,7 @@
       "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
       "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela applikationer om sessionsavslut hos OpenID-leverantören.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
       "STATES": {
@@ -1921,7 +1921,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Om alternativet är valt kommer lösenordsskärmen att visas i inloggningsprocessen även om användaren inte hittades. Felet vid lösenordskontrollen kommer inte att avslöja om användarnamnet eller lösenordet var fel.",
       "ALLOWDOMAINDISCOVERY_DESC": "Om alternativet är valt kommer suffixet (@domain.com) av ett okänt användarnamn som anges på inloggningsskärmen att matchas mot organisationsdomänerna och omdirigeras till registreringen av den organisationen vid framgång.",
       "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
-      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en appkontext (t.ex. från e-post)",
+      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en applikationskontext (t.ex. från e-post)",
       "ERRORMSGPOPUP": "Visa fel i dialog",
       "DISABLEWATERMARK": "Dölj Vattenstämpel",
       "DISABLEWATERMARK_DESC": "Dölj Powered by Zitadel vattenstämpel i inloggningsgränssnittet"
@@ -2435,7 +2435,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Okänd",
-      "1": "Engångslösenord via autentiseringsapp (TOTP)",
+      "1": "Engångslösenord med autentiseringsapplikation (TOTP)",
       "2": "Passkey",
       "3": "Engångslösenord via e-post (E-post OTP)",
       "4": "Engångslösenord via SMS (SMS OTP)",
@@ -2663,8 +2663,8 @@
       "IDTOKENROLEASSERTION": "Användarroller i ID-token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Om valt, läggs de begärda rollerna för den autentiserade användaren till ID-token.",
       "IDTOKENUSERINFOASSERTION": "Användarinformation i ID-token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Möjliggör för klienter att hämta profil, e-post, telefon och adressanspråk från ID-token.",
-      "CLOCKSKEW": "Möjliggör för klienter att hantera klockförskjutning av OP och klient. Varaktigheten (0-5s) kommer att läggas till exp-anspråket och dras av från iats, auth_time och nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Gör det möjligt för applikationer att hämta profil-, e-post-, telefon- och adressanspråk från ID-token.",
+      "CLOCKSKEW": "Gör det möjligt för applikationer att hantera klocksnedvridning av OP och klient. Varaktigheten (0-5s) kommer att läggas till exp-anspråket och subtraheras från iats, auth_time och nbf.",
       "RECOMMENDED": "rekommenderad",
       "NOTRECOMMENDED": "inte rekommenderad",
       "SELECTION": {

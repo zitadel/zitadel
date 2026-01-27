@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "프로젝트",
-      "DESCRIPTION": "프로젝트는 하나 이상의 애플리케이션을 호스팅하여 사용자를 인증할 수 있습니다. 예를 들어, 웹 프론트엔드, 모바일 앱, 백엔드용으로 각각 하나씩, 총 3개의 애플리케이션을 가진 단일 프로젝트를 가질 수 있습니다. 또한 프로젝트를 통해 사용자에게 권한을 부여할 수 있습니다. 다른 조직의 사용자가 애플리케이션에 로그인할 수 있도록 프로젝트에 대한 액세스를 부여하세요.<br/><br/>프로젝트를 찾을 수 없는 경우 프로젝트 소유자 또는 관련 권한이 있는 사람에게 문의하여 액세스를 얻으세요.",
+      "DESCRIPTION": "프로젝트는 사용자를 인증하는 데 사용할 수 있는 하나 이상의 애플리케이션을 호스팅합니다. 예를 들어 웹 프런트엔드, 모바일 애플리케이션 및 백엔드 서비스에 각각 하나씩 3개의 애플리케이션이 있는 단일 프로젝트가 있을 수 있습니다. 또한 프로젝트를 통해 사용자를 승인할 수도 있습니다. 다른 조직의 사용자가 애플리케이션에 로그인할 수 있도록 하려면 프로젝트에 대한 액세스 권한을 부여하십시오.<br/><br/>프로젝트를 찾을 수 없는 경우 프로젝트 소유자 또는 해당 권한이 있는 사람에게 연락하여 액세스 권한을 얻으십시오.",
       "OWNED": {
         "TITLE": "소유한 프로젝트",
         "DESCRIPTION": "이 프로젝트는 사용자가 소유한 프로젝트입니다. 프로젝트 설정, 권한 및 애플리케이션을 관리할 수 있습니다."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "활성 및 예정된 웹 키",
           "DESCRIPTION": "현재 활성화된 웹 키와 앞으로 활성화될 웹 키입니다. 새로운 키를 활성화하면 기존 키는 비활성화됩니다.",
-          "NOTE": "참고: JWKs OIDC 엔드포인트는 캐시 가능한 응답을 반환합니다 (기본값: 5분). 키를 너무 빨리 활성화하면 캐시 및 클라이언트에서 아직 사용할 수 없을 수 있습니다.",
+          "NOTE": "참고: JWKs OIDC 끝점은 캐시 가능한 응답(기본값 5분)을 반환합니다. 키가 캐시 및 애플리케이션/클라이언트에 아직 사용 가능하지 않을 수 있으므로 너무 빨리 키를 활성화하지 마십시오.",
           "ACTIVATE": "다음 웹 키 활성화",
           "ACTIVE": "현재 활성화됨",
           "NEXT": "대기 중인 다음 키",
@@ -386,12 +386,12 @@
         "action": "프로젝트 생성"
       },
       "APPLICATION_CREATED": {
-        "title": "앱 등록",
+        "title": "애플리케이션 등록",
         "description": "웹, 네이티브, API 또는 SAML 애플리케이션을 등록하고 인증 플로우를 설정하세요.",
-        "action": "앱 등록"
+        "action": "애플리케이션 등록"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "앱에 로그인",
+        "title": "애플리케이션에 로그인",
         "description": "Zitadel로 애플리케이션을 통합하고 관리자 사용자로 로그인하여 테스트하세요.",
         "action": "로그인"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "개발 모드가 기본으로 활성화되어 있습니다. 운영 환경에서는 나중에 설정 값을 변경할 수 있습니다.",
     "GUIDE": "가이드",
     "BROWSEEXAMPLES": "예제 및 SDK 둘러보기",
-    "DUPLICATEAPPRENAME": "같은 이름의 앱이 이미 존재합니다. 다른 이름을 선택하세요.",
+    "DUPLICATEAPPRENAME": "같은 이름의 애플리케이션이 이미 있습니다. 다른 이름을 선택하십시오.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "프레임워크 변경",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
-    "IAM_LOGIN_CLIENT": "로그인 클라이언트를 관리할 수 있는 권한이 있습니다",
+    "IAM_LOGIN_CLIENT": "로그인 애플리케이션을 관리할 수 있는 권한이 있습니다.",
     "ORG_OWNER": "조직에 대한 전체 권한이 있습니다",
     "ORG_USER_MANAGER": "조직의 사용자를 생성하고 관리할 수 있는 권한이 있습니다",
     "ORG_OWNER_VIEWER": "조직 전체를 검토할 수 있는 권한이 있습니다",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "계정의 보안을 위해 두 번째 인증 요소를 추가하세요.",
       "MANAGE_DESCRIPTION": "사용자의 두 번째 인증 방법을 관리하세요.",
       "ADD": "인증 요소 추가",
-      "OTP": "TOTP (시간 기반 일회용 비밀번호)용 인증 앱",
+      "OTP": "TOTP(시간 기반 일회용 암호)용 인증 앱",
       "OTP_DIALOG_TITLE": "OTP 추가",
-      "OTP_DIALOG_DESCRIPTION": "인증 앱으로 QR 코드를 스캔하고, 아래에 코드를 입력하여 OTP 방법을 검증하고 활성화하세요.",
+      "OTP_DIALOG_DESCRIPTION": "인증 앱으로 QR 코드를 스캔하고 아래 코드를 입력하여 OTP 방법을 확인하고 활성화하십시오.",
       "U2F": "지문, 보안 키, Face ID 및 기타",
       "U2F_DIALOG_TITLE": "인증 요소 확인",
       "U2F_DIALOG_DESCRIPTION": "사용할 다중 인증의 이름을 입력하세요.",
@@ -1611,7 +1611,7 @@
         "3": "전화 검증",
         "4": "비밀번호 재설정",
         "5": "패스키 초기화",
-        "6": "앱 시크릿",
+        "6": "애플리케이션 비밀",
         "7": "일회성 비밀번호 (OTP) - SMS",
         "8": "일회성 비밀번호 (OTP) - 이메일"
       },
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "디버그 OIDC 부모 오류",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "플래그가 활성화되면 OIDC 부모 오류가 콘솔에 기록됩니다.",
       "ENABLEBACKCHANNELLOGOUT": "백채널 로그아웃 활성화",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며 OpenID 공급자에서 세션 종료를 애플리케이션에 알리는 데 사용할 수 있습니다.",
       "PERMISSIONCHECKV2": "권한 확인 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "옵션이 선택되면, 사용자를 찾을 수 없는 경우에도 로그인 과정에서 비밀번호 화면이 표시됩니다. 비밀번호 확인 오류가 사용자 이름 또는 비밀번호의 오류를 공개하지 않습니다.",
       "ALLOWDOMAINDISCOVERY_DESC": "옵션이 선택되면, 로그인 화면에서 알 수 없는 사용자 이름의 접미사 (@domain.com)가 조직 도메인과 일치하고, 일치할 경우 해당 조직의 등록 화면으로 리디렉션됩니다.",
       "DEFAULTREDIRECTURI": "기본 리디렉션 URI",
-      "DEFAULTREDIRECTURI_DESC": "앱 컨텍스트 없이 로그인 시작 시 (예: 이메일에서) 사용자가 리디렉션될 위치를 정의합니다.",
+      "DEFAULTREDIRECTURI_DESC": "로그인이 애플리케이션 컨텍스트 없이 시작된 경우(예: 메일에서) 사용자가 리디렉션될 위치를 정의합니다.",
       "ERRORMSGPOPUP": "팝업에 오류 표시",
       "DISABLEWATERMARK": "워터마크 숨기기",
       "DISABLEWATERMARK_DESC": "로그인 인터페이스에서 'Powered by Zitadel' 워터마크를 숨깁니다."
@@ -2432,7 +2432,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "알 수 없음",
-      "1": "인증 앱을 통한 일회성 비밀번호(TOTP)",
+      "1": "인증 앱에 의한 일회용 암호(TOTP)",
       "2": "지문, 보안 키, Face ID 및 기타",
       "3": "이메일을 통한 일회성 비밀번호(이메일 OTP)",
       "4": "SMS를 통한 일회성 비밀번호(SMS OTP)",
@@ -2660,8 +2660,8 @@
       "IDTOKENROLEASSERTION": "ID 토큰에 사용자 역할 추가",
       "IDTOKENROLEASSERTION_DESCRIPTION": "선택 시 인증된 사용자의 요청된 역할이 ID 토큰에 추가됩니다.",
       "IDTOKENUSERINFOASSERTION": "ID 토큰 내 사용자 정보",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "클라이언트가 ID 토큰에서 프로필, 이메일, 전화번호 및 주소 클레임을 검색할 수 있습니다.",
-      "CLOCKSKEW": "OP와 클라이언트 간의 시간 오차를 처리할 수 있도록 허용합니다. (0-5초) 동안 exp 클레임에 추가되고 iats, auth_time 및 nbf에서 감소됩니다.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "애플리케이션이 ID 토큰에서 프로필, 이메일, 전화 및 주소 클레임을 검색할 수 있도록 합니다.",
+      "CLOCKSKEW": "애플리케이션이 OP 및 클라이언트의 클럭 스큐를 처리할 수 있도록 합니다. 기간(0-5초)은 exp 클레임에 추가되고 iats, auth_time 및 nbf에서 차감됩니다.",
       "RECOMMENDED": "권장",
       "NOTRECOMMENDED": "권장하지 않음",
       "SELECTION": {

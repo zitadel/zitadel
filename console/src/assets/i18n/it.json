@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Progetti",
-      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua app mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "DESCRIPTION": "Un progetto ospita una o più applicazioni che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un unico progetto con 3 applicazioni: una per il tuo frontend web, la tua applicazione mobile e i tuoi servizi di backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per consentire agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "OWNED": {
         "TITLE": "Progetti di Proprietà",
         "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chiavi Web Attive e Future",
           "DESCRIPTION": "Le tue chiavi web attive e future. L'attivazione di una nuova chiave disattiverà quella attuale.",
-          "NOTE": "Nota: L'endpoint JWKs OIDC restituisce una risposta memorizzabile nella cache (predefinito 5 min). Evita di attivare una chiave troppo presto, poiché potrebbe non essere ancora disponibile nelle cache e nei client.",
+          "NOTE": "Nota: l'endpoint JWKs OIDC restituisce una risposta memorizzabile nella cache (impostazione predefinita 5 min). Evita di attivare una chiave troppo presto, poiché potrebbe non essere ancora disponibile per cache e applicazioni/client.",
           "ACTIVATE": "Attiva la prossima Chiave Web",
           "ACTIVE": "Attualmente attiva",
           "NEXT": "Prossima in coda",
@@ -386,12 +386,12 @@
         "action": "Crea progetto"
       },
       "APPLICATION_CREATED": {
-        "title": "Registra la tua app",
+        "title": "Registra la tua applicazione",
         "description": "Registra la tua applicazione web, nativa, api o saml e configura un flusso di autenticazione.",
-        "action": "Registra app"
+        "action": "Registra applicazione"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Accedi alla tua app",
+        "title": "Accedi alla tua applicazione",
         "description": "Integra la tua applicazione con Zitadel per l'autenticazione e testala accedendo con il tuo utente amministratore.",
         "action": "Accedi"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
     "GUIDE": "Guida",
     "BROWSEEXAMPLES": "Esplora esempi e SDK",
-    "DUPLICATEAPPRENAME": "Un'app con lo stesso nome esiste già. Scegli un nome diverso.",
+    "DUPLICATEAPPRENAME": "Esiste già un'applicazione con lo stesso nome. Scegli un nome diverso.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifica framework",
@@ -655,7 +655,7 @@
     "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
     "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
     "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
-    "IAM_LOGIN_CLIENT": "Ha il permesso di gestire i client di accesso",
+    "IAM_LOGIN_CLIENT": "Ha il permesso di gestire le applicazioni di accesso",
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
@@ -883,9 +883,9 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "App di autenticazione per TOTP (Time-based One-Time Password)",
+      "OTP": "Applicazione di autenticazione per TOTP (password monouso a tempo)",
       "OTP_DIALOG_TITLE": "Aggiungi TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'applicazione di autenticazione e inserisci il codice qui sotto per verificare e attivare il metodo OTP.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se il flag è abilitato, l'errore OIDC originante verrà registrato nella console.",
       "ENABLEBACKCHANNELLOGOUT": "Abilita Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare ai client la terminazione della sessione presso il provider OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare alle applicazioni la chiusura della sessione presso l'OpenID Provider.",
       "PERMISSIONCHECKV2": "Controllo permessi V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se il flag è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
       "STATES": {
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione è selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
       "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
+      "DEFAULTREDIRECTURI_DESC": "Definisce dove l'utente verrà reindirizzato se l'accesso è stato avviato senza un contesto dell'applicazione (ad es. dalla posta)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana",
       "DISABLEWATERMARK_DESC": "Nascondi filigrana Powered by Zitadel nell'interfaccia di accesso"
@@ -2411,7 +2411,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password per Authenticator App (TOTP)",
+      "1": "Password monouso tramite applicazione di autenticazione (TOTP)",
       "2": "Passkey",
       "3": "One Time Password per Email (Email OTP)",
       "4": "One Time Password per SMS (SMS OTP)",
@@ -2635,8 +2635,8 @@
       "IDTOKENROLEASSERTION": "Aggiungi ruoli nell'ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selezionato, i ruoli richiesti dall'utente autenticato sono aggiunti all'ID Token.",
       "IDTOKENUSERINFOASSERTION": "Aggiungi le informazioni dell'utente nell'ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Aggiungi le richieste di profilo, email, telefono o indirizzo nell'ID Token.",
-      "CLOCKSKEW": "Permette ai clienti di gestire lo skew di OP e client. La durata (0-5s) sarà aggiunta a exp claim e sottratta da iats, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Consente alle applicazioni di recuperare i claim di profilo, email, telefono e indirizzo dal token ID.",
+      "CLOCKSKEW": "Consente alle applicazioni di gestire l'inclinazione dell'orologio di OP e client. La durata (0-5s) verrà aggiunta al claim exp e sottratta da iats, auth_time e nbf.",
       "RECOMMENDED": "raccomandato",
       "NOTRECOMMENDED": "non raccomandato",
       "SELECTION": {

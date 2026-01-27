@@ -2506,7 +2506,7 @@
       "DATECREATED": "Criado",
       "DATECHANGED": "Alterado",
       "URLS": "URLs",
-      "DELETE": "Excluir Application",
+      "DELETE": "Excluir App",
       "JUMPTOPROJECT": "Para configurar funções, autorizações e muito mais, navegue até o projeto.",
       "DETAIL": {
         "TITLE": "Detalhe",
@@ -2521,7 +2521,7 @@
           "TITLE": "Alterar Configuração OIDC"
         },
         "DELETE": {
-          "TITLE": "Excluir Application",
+          "TITLE": "Excluir App",
           "DESCRIPTION": "Você realmente deseja excluir este aplicativo?"
         }
       },
