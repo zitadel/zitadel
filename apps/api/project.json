@@ -212,7 +212,7 @@
             "dependsOn": [
                 "@zitadel/console:build"
             ],
-            "command": "find internal/api/ui/console/static -mindepth 1 ! -name '.gitkeep' -delete && cp -r console/dist/console/* internal/api/ui/console/static",
+            "command": "find internal/api/ui/console/static -mindepth 1 ! -name 'gitkeep' -delete && cp -r console/dist/console/* internal/api/ui/console/static",
             "cache": true,
             "inputs": [
                 "{workspaceRoot}/console/dist/console/**/*"
