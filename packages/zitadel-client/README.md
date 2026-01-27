@@ -24,6 +24,7 @@ You can import and use the services provided by this package to interact with ZI
 
 ```ts
 import { createSettingsServiceClient, makeReqCtx } from "@zitadel/client/v2";
+import { createServerTransport } from "@zitadel/client/node";
 
 // Example usage
 const transport = createServerTransport(process.env.ZITADEL_SERVICE_USER_TOKEN!, { baseUrl: process.env.ZITADEL_API_URL! });

@@ -54,6 +54,7 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
   selector: 'cnsl-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
+  standalone: false,
 })
 export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;
@@ -85,7 +86,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public fontName = '';
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
-  public org!: Org.AsObject;
+  public org!: string;
   public InfoSectionType: any = InfoSectionType;
   private iconChanged: boolean = false;
 
@@ -152,7 +153,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org));
             case PolicyComponentServiceType.ADMIN:
               return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData));
           }
@@ -160,7 +161,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (theme === Theme.LIGHT) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org));
             case PolicyComponentServiceType.ADMIN:
               return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData));
           }
@@ -182,7 +183,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
-        const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
+        const org = this.storageService.getItem(StorageKey.organizationId, StorageLocation.session);
 
         if (org) {
           this.org = org;
@@ -209,7 +210,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
-            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org));
           case PolicyComponentServiceType.ADMIN:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
@@ -334,7 +335,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (theme === Theme.DARK) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org));
               break;
             case PolicyComponentServiceType.ADMIN:
               this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData));
@@ -344,7 +345,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (theme === Theme.LIGHT) {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
-              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org));
               break;
             case PolicyComponentServiceType.ADMIN:
               this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData));

@@ -155,7 +155,7 @@
           matTooltip="copy to clipboard"
           cnslCopyToClipboard
           [valueToCopy]="otpsecret"
-          (copiedValue)="this.copied = $event"
+          (copiedValue)="copied = $event"
           mat-icon-button
         >
           <i *ngIf="copied !== otpsecret" class="las la-clipboard"></i>

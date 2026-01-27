@@ -17,6 +17,7 @@ interface State {
   selector: 'cnsl-language-settings',
   templateUrl: './language-settings.component.html',
   styleUrls: ['./language-settings.component.scss'],
+  standalone: false,
 })
 export class LanguageSettingsComponent {
   public canWriteRestrictions$: Observable<boolean> = this.authService.isAllowed(['iam.restrictions.write']);

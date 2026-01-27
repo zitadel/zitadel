@@ -8,6 +8,7 @@ import { requiredValidator } from '../../form-field/validators/validators';
   selector: 'cnsl-ldap-attributes',
   templateUrl: './ldap-attributes.component.html',
   styleUrls: ['./ldap-attributes.component.scss'],
+  standalone: false,
 })
 export class LDAPAttributesComponent implements OnChanges, OnDestroy {
   @Input() public initialAttributes?: LDAPAttributes.AsObject;

@@ -14,6 +14,7 @@ import { DomainVerificationComponent } from './domain-verification/domain-verifi
   selector: 'cnsl-domains',
   templateUrl: './domains.component.html',
   styleUrls: ['./domains.component.scss'],
+  standalone: false,
 })
 export class DomainsComponent implements OnInit {
   public domains: Domain.AsObject[] = [];

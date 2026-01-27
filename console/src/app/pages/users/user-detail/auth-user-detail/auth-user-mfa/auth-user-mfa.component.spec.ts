@@ -117,6 +117,7 @@ describe('AuthUserMfaComponent', () => {
 
     expect(serviceStub.listMyMultiFactors).toHaveBeenCalled();
     // Our stub returns 3 items
+    // @ts-ignore
     expect(component.dataSource.data.length).toBe(3);
 
     // Use the public getter methods to access protected properties

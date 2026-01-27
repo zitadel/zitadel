@@ -13,6 +13,7 @@ export interface PageEvent {
   selector: 'cnsl-paginator',
   templateUrl: './paginator.component.html',
   styleUrls: ['./paginator.component.scss'],
+  standalone: false,
 })
 export class PaginatorComponent {
   @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;

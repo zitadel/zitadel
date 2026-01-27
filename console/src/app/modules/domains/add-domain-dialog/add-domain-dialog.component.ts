@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-add-domain-dialog',
   templateUrl: './add-domain-dialog.component.html',
   styleUrls: ['./add-domain-dialog.component.scss'],
+  standalone: false,
 })
 export class AddDomainDialogComponent {
   public newdomain: string = '';

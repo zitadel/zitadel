@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable, Signal } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -7,9 +7,7 @@ import {
   CreateInviteCodeResponse,
   CreatePasskeyRegistrationLinkRequestSchema,
   CreatePasskeyRegistrationLinkResponse,
-  DeactivateUserRequestSchema,
   DeactivateUserResponse,
-  DeleteUserRequestSchema,
   DeleteUserResponse,
   GetUserByIDResponse,
   ListAuthenticationFactorsRequestSchema,
@@ -18,24 +16,14 @@ import {
   ListPasskeysResponse,
   ListUsersRequestSchema,
   ListUsersResponse,
-  LockUserRequestSchema,
-  LockUserResponse,
-  PasswordResetRequestSchema,
-  ReactivateUserRequestSchema,
   ReactivateUserResponse,
-  RemoveOTPEmailRequestSchema,
   RemoveOTPEmailResponse,
-  RemoveOTPSMSRequestSchema,
   RemoveOTPSMSResponse,
   RemovePasskeyRequestSchema,
   RemovePasskeyResponse,
-  RemovePhoneRequestSchema,
   RemovePhoneResponse,
-  RemoveTOTPRequestSchema,
   RemoveTOTPResponse,
-  RemoveU2FRequestSchema,
   RemoveU2FResponse,
-  ResendInviteCodeRequestSchema,
   ResendInviteCodeResponse,
   SetEmailRequestSchema,
   SetEmailResponse,
@@ -43,94 +31,93 @@ import {
   SetPasswordResponse,
   SetPhoneRequestSchema,
   SetPhoneResponse,
-  UnlockUserRequestSchema,
   UnlockUserResponse,
   UpdateHumanUserRequestSchema,
   UpdateHumanUserResponse,
 } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
 import type { MessageInitShape } from '@bufbuild/protobuf';
-import {
-  AccessTokenType,
-  Gender,
-  HumanProfile,
-  HumanProfileSchema,
-  HumanUser,
-  HumanUserSchema,
-  MachineUser,
-  MachineUserSchema,
-  User as UserV2,
-  UserSchema,
-  UserState,
-} from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { create } from '@bufbuild/protobuf';
-import { Timestamp as TimestampV2, TimestampSchema } from '@bufbuild/protobuf/wkt';
-import { Details, DetailsSchema } from '@zitadel/proto/zitadel/object/v2/object_pb';
-import { Human, Machine, Phone, Profile, User } from '../proto/generated/zitadel/user_pb';
-import { ObjectDetails } from '../proto/generated/zitadel/object_pb';
-import { Timestamp } from '../proto/generated/google/protobuf/timestamp_pb';
-import { HumanPhone, HumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { debounceTime, EMPTY, Observable, of, ReplaySubject, shareReplay, switchAll, switchMap } from 'rxjs';
-import { catchError, filter, map, startWith } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private user$$ = new ReplaySubject<Observable<UserV2>>(1);
-  public user$ = this.user$$.pipe(
-    startWith(this.getUser()),
-    // makes sure if many subscribers reset the observable only one wins
-    debounceTime(10),
-    switchAll(),
-    catchError((err) => {
-      // reset user observable on error
-      this.user$$.next(this.getUser());
-      throw err;
-    }),
-  );
+  private readonly payload: Signal<unknown | undefined>;
+  public readonly userId: Signal<string | undefined>;
+  public readonly isExpired: Signal<boolean>;
+
+  public userQuery() {
+    return injectQuery(() => this.userQueryOptions());
+  }
+
+  public userQueryOptions() {
+    const userId = this.userId();
+    return queryOptions({
+      queryKey: [userId, 'user'],
+      queryFn: userId ? () => this.getUserById(userId).then((resp) => resp.user) : skipToken,
+    });
+  }
 
   constructor(
     private readonly grpcService: GrpcService,
     private readonly oauthService: OAuthService,
-  ) {}
-
-  private getUserId() {
-    return this.oauthService.events.pipe(
-      filter((event) => event.type === 'token_received'),
-      map(() => this.oauthService.getIdToken()),
-      startWith(this.oauthService.getIdToken()),
-      filter(Boolean),
-      switchMap((token) => {
-        // we do this in a try catch so the observable will retry this logic if it fails
-        try {
-          // split jwt and get base64 encoded payload
-          const unparsedPayload = atob(token.split('.')[1]);
-          // parse payload
-          const payload: unknown = JSON.parse(unparsedPayload);
-          // check if sub is in payload and is a string
-          if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
-            return of(payload.sub);
-          }
-          return EMPTY;
-        } catch {
-          return EMPTY;
-        }
-      }),
-    );
+  ) {
+    this.payload = this.getPayload();
+    this.userId = this.getUserId(this.payload);
+    this.isExpired = this.getIsExpired(this.payload);
   }
 
-  private getUser() {
-    return this.getUserId().pipe(
-      switchMap((id) => this.getUserById(id)),
-      map((resp) => resp.user),
-      filter(Boolean),
-      shareReplay({ refCount: true, bufferSize: 1 }),
+  private getPayload() {
+    const idToken$ = this.oauthService.events.pipe(
+      filter((event) => event.type === 'token_received'),
+      // can actually return null
+      // https://github.com/manfredsteyer/angular-oauth2-oidc/blob/c724ad73eadbb28338b084e3afa5ed49a0ea058c/projects/lib/src/oauth-service.ts#L2365
+      map(() => this.oauthService.getIdToken() as string | null),
     );
+    const idToken = toSignal(idToken$, { initialValue: this.oauthService.getIdToken() as string | null });
+
+    return computed(() => {
+      try {
+        // split jwt and get base64 encoded payload
+        const unparsedPayload = atob((idToken() ?? '').split('.')[1]);
+        // parse payload
+        return JSON.parse(unparsedPayload) as unknown;
+      } catch {
+        return undefined;
+      }
+    });
+  }
+
+  private getUserId(payloadSignal: Signal<unknown | undefined>) {
+    return computed(() => {
+      const payload = payloadSignal();
+      if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
+        return payload.sub;
+      }
+      return undefined;
+    });
+  }
+
+  private getIsExpired(payloadSignal: Signal<unknown | undefined>) {
+    const expSignal = computed(() => {
+      const payload = payloadSignal();
+      if (payload && typeof payload === 'object' && 'exp' in payload && typeof payload.exp === 'number') {
+        return new Date(payload.exp * 1000);
+      }
+      return undefined;
+    });
+
+    return computed(() => {
+      const exp = expSignal();
+      return exp ? exp <= new Date() : true;
+    });
   }
 
   public addHumanUser(req: MessageInitShape<typeof AddHumanUserRequestSchema>): Promise<AddHumanUserResponse> {
-    return this.grpcService.userNew.addHumanUser(create(AddHumanUserRequestSchema, req));
+    return this.grpcService.userNew.addHumanUser(req);
   }
 
   public listUsers(req: MessageInitShape<typeof ListUsersRequestSchema>): Promise<ListUsersResponse> {
@@ -142,90 +129,82 @@ export class UserService {
   }
 
   public deactivateUser(userId: string): Promise<DeactivateUserResponse> {
-    return this.grpcService.userNew.deactivateUser(create(DeactivateUserRequestSchema, { userId }));
+    return this.grpcService.userNew.deactivateUser({ userId });
   }
 
   public reactivateUser(userId: string): Promise<ReactivateUserResponse> {
-    return this.grpcService.userNew.reactivateUser(create(ReactivateUserRequestSchema, { userId }));
+    return this.grpcService.userNew.reactivateUser({ userId });
   }
 
   public deleteUser(userId: string): Promise<DeleteUserResponse> {
-    return this.grpcService.userNew.deleteUser(create(DeleteUserRequestSchema, { userId }));
+    return this.grpcService.userNew.deleteUser({ userId });
   }
 
   public updateUser(req: MessageInitShape<typeof UpdateHumanUserRequestSchema>): Promise<UpdateHumanUserResponse> {
-    return this.grpcService.userNew.updateHumanUser(create(UpdateHumanUserRequestSchema, req));
-  }
-
-  public lockUser(userId: string): Promise<LockUserResponse> {
-    return this.grpcService.userNew.lockUser(create(LockUserRequestSchema, { userId }));
+    return this.grpcService.userNew.updateHumanUser(req);
   }
 
   public unlockUser(userId: string): Promise<UnlockUserResponse> {
-    return this.grpcService.userNew.unlockUser(create(UnlockUserRequestSchema, { userId }));
+    return this.grpcService.userNew.unlockUser({ userId });
   }
 
   public listAuthenticationFactors(
     req: MessageInitShape<typeof ListAuthenticationFactorsRequestSchema>,
   ): Promise<ListAuthenticationFactorsResponse> {
-    return this.grpcService.userNew.listAuthenticationFactors(create(ListAuthenticationFactorsRequestSchema, req));
+    return this.grpcService.userNew.listAuthenticationFactors(req);
   }
 
   public listPasskeys(req: MessageInitShape<typeof ListPasskeysRequestSchema>): Promise<ListPasskeysResponse> {
-    return this.grpcService.userNew.listPasskeys(create(ListPasskeysRequestSchema, req));
+    return this.grpcService.userNew.listPasskeys(req);
   }
 
   public removePasskeys(req: MessageInitShape<typeof RemovePasskeyRequestSchema>): Promise<RemovePasskeyResponse> {
-    return this.grpcService.userNew.removePasskey(create(RemovePasskeyRequestSchema, req));
+    return this.grpcService.userNew.removePasskey(req);
   }
 
   public createPasskeyRegistrationLink(
     req: MessageInitShape<typeof CreatePasskeyRegistrationLinkRequestSchema>,
   ): Promise<CreatePasskeyRegistrationLinkResponse> {
-    return this.grpcService.userNew.createPasskeyRegistrationLink(create(CreatePasskeyRegistrationLinkRequestSchema, req));
+    return this.grpcService.userNew.createPasskeyRegistrationLink(req);
   }
 
   public removePhone(userId: string): Promise<RemovePhoneResponse> {
-    return this.grpcService.userNew.removePhone(create(RemovePhoneRequestSchema, { userId }));
+    return this.grpcService.userNew.removePhone({ userId });
   }
 
   public setPhone(req: MessageInitShape<typeof SetPhoneRequestSchema>): Promise<SetPhoneResponse> {
-    return this.grpcService.userNew.setPhone(create(SetPhoneRequestSchema, req));
+    return this.grpcService.userNew.setPhone(req);
   }
 
   public setEmail(req: MessageInitShape<typeof SetEmailRequestSchema>): Promise<SetEmailResponse> {
-    return this.grpcService.userNew.setEmail(create(SetEmailRequestSchema, req));
+    return this.grpcService.userNew.setEmail(req);
   }
 
   public removeTOTP(userId: string): Promise<RemoveTOTPResponse> {
-    return this.grpcService.userNew.removeTOTP(create(RemoveTOTPRequestSchema, { userId }));
+    return this.grpcService.userNew.removeTOTP({ userId });
   }
 
   public removeU2F(userId: string, u2fId: string): Promise<RemoveU2FResponse> {
-    return this.grpcService.userNew.removeU2F(create(RemoveU2FRequestSchema, { userId, u2fId }));
+    return this.grpcService.userNew.removeU2F({ userId, u2fId });
   }
 
   public removeOTPSMS(userId: string): Promise<RemoveOTPSMSResponse> {
-    return this.grpcService.userNew.removeOTPSMS(create(RemoveOTPSMSRequestSchema, { userId }));
+    return this.grpcService.userNew.removeOTPSMS({ userId });
   }
 
   public removeOTPEmail(userId: string): Promise<RemoveOTPEmailResponse> {
-    return this.grpcService.userNew.removeOTPEmail(create(RemoveOTPEmailRequestSchema, { userId }));
+    return this.grpcService.userNew.removeOTPEmail({ userId });
   }
 
   public resendInviteCode(userId: string): Promise<ResendInviteCodeResponse> {
-    return this.grpcService.userNew.resendInviteCode(create(ResendInviteCodeRequestSchema, { userId }));
+    return this.grpcService.userNew.resendInviteCode({ userId });
   }
 
   public createInviteCode(req: MessageInitShape<typeof CreateInviteCodeRequestSchema>): Promise<CreateInviteCodeResponse> {
-    return this.grpcService.userNew.createInviteCode(create(CreateInviteCodeRequestSchema, req));
-  }
-
-  public passwordReset(req: MessageInitShape<typeof PasswordResetRequestSchema>) {
-    return this.grpcService.userNew.passwordReset(create(PasswordResetRequestSchema, req));
+    return this.grpcService.userNew.createInviteCode(req);
   }
 
   public setPassword(req: MessageInitShape<typeof SetPasswordRequestSchema>): Promise<SetPasswordResponse> {
-    return this.grpcService.userNew.setPassword(create(SetPasswordRequestSchema, req));
+    return this.grpcService.userNew.setPassword(req);
   }
 }

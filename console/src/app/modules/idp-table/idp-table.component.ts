@@ -43,6 +43,7 @@ import { first } from 'rxjs/operators';
   selector: 'cnsl-idp-table',
   templateUrl: './idp-table.component.html',
   styleUrls: ['./idp-table.component.scss'],
+  standalone: false,
 })
 export class IdpTableComponent implements OnInit, OnDestroy {
   @Input() public serviceType!: PolicyComponentServiceType;

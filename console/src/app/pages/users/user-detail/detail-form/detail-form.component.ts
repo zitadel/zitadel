@@ -31,6 +31,7 @@ function toHumanProfile(profile: HumanProfile | Profile): HumanProfile {
   selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
+  standalone: false,
 })
 export class DetailFormComponent implements OnInit {
   @Input() public showEditImage: boolean = false;

@@ -13,6 +13,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() title: string = '';
