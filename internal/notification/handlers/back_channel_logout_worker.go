@@ -57,12 +57,6 @@ func (w *BackChannelLogoutWorker) Work(ctx context.Context, job *river.Job[*back
 		return w.createNotificationJobs(ctx, job.Args)
 	}
 	return w.sendLogoutRequest(ctx, job.Args)
-
-	//// if the error explicitly specifies, we cancel the notification
-	//if errors.Is(err, &channels.CancelError{}) {
-	//	return river.JobCancel(err)
-	//}
-	//return err
 }
 
 func (w *BackChannelLogoutWorker) createNotificationJobs(ctx context.Context, request *backchannel.LogoutRequest) error {

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
@@ -35,17 +34,9 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 )
 
-const (
-// notificationID = "notificationID"
-)
-
 func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 	testNow := time.Now()
-	sessionlogoutAgg := &sessionlogout.NewAggregate(sessionID, instanceID).Aggregate
-	//testBackOff := func(current time.Duration) time.Duration {
-	//	return time.Second
-	//}
-	//sendError := errors.New("send error")
+	sessionLogoutAgg := &sessionlogout.NewAggregate(sessionID, instanceID).Aggregate
 	type fields struct {
 		es          func(*testing.T) *eventstore.Eventstore
 		queue       func(*gomock.Controller) Queue
@@ -93,7 +84,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						CreatedAt: time.Now().Add(-1 * time.Hour),
 					},
 					Args: &backchannel.LogoutRequest{
-						Aggregate: sessionlogoutAgg,
+						Aggregate: sessionLogoutAgg,
 					},
 				},
 			},
@@ -130,7 +121,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						CreatedAt: testNow,
 					},
 					Args: &backchannel.LogoutRequest{
-						Aggregate: sessionlogoutAgg,
+						Aggregate: sessionLogoutAgg,
 						SessionID: sessionID,
 					},
 				},
@@ -147,7 +138,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						eventFromEventPusher(
 							sessionlogout.NewBackChannelLogoutRegisteredEvent(
 								context.Background(),
-								sessionlogoutAgg,
+								sessionLogoutAgg,
 								"oidc-session-id1",
 								"user-id",
 								"client-id1",
@@ -157,7 +148,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						eventFromEventPusher(
 							sessionlogout.NewBackChannelLogoutRegisteredEvent(
 								context.Background(),
-								sessionlogoutAgg,
+								sessionLogoutAgg,
 								"oidc-session-id2",
 								"user-id",
 								"client-id2",
@@ -170,7 +161,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 					q := mock.NewMockQueue(ctrl)
 					q.EXPECT().Insert(gomock.Any(),
 						&backchannel.LogoutRequest{
-							Aggregate:            sessionlogoutAgg,
+							Aggregate:            sessionLogoutAgg,
 							SessionID:            sessionID,
 							TriggeredAtOrigin:    "",
 							TriggeringEventType:  "",
@@ -184,7 +175,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						gomock.AssignableToTypeOf(reflect.TypeOf(queue.WithMaxAttempts(1))),
 					).Return(nil)
 					q.EXPECT().Insert(gomock.Any(), &backchannel.LogoutRequest{
-						Aggregate:            sessionlogoutAgg,
+						Aggregate:            sessionLogoutAgg,
 						SessionID:            sessionID,
 						TriggeredAtOrigin:    "",
 						TriggeringEventType:  "",
@@ -219,7 +210,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						CreatedAt: testNow,
 					},
 					Args: &backchannel.LogoutRequest{
-						Aggregate: sessionlogoutAgg,
+						Aggregate: sessionLogoutAgg,
 						SessionID: sessionID,
 					},
 				},
@@ -291,7 +282,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 						CreatedAt: testNow,
 					},
 					Args: &backchannel.LogoutRequest{
-						Aggregate:            sessionlogoutAgg,
+						Aggregate:            sessionLogoutAgg,
 						SessionID:            sessionID,
 						TriggeredAtOrigin:    "",
 						TriggeringEventType:  "",
@@ -307,186 +298,118 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 				err: nil,
 			},
 		},
-		//		{
-		//			name: "previous domain",
-		//			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-		//				givenTemplate := "{{.LogoURL}}"
-		//				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-		//				w.message = &messages.Email{
-		//					Recipients:          []string{verifiedEmail},
-		//					Subject:             "Domain has been claimed",
-		//					Content:             expectContent,
-		//					TriggeringEventType: user.UserDomainClaimedType,
-		//				}
-		//				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-		//				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
-		//				return fieldsWorker{
-		//						queries:  queries,
-		//						commands: commands,
-		//						es: eventstore.NewEventstore(&eventstore.Config{
-		//							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-		//						}),
-		//						userDataCrypto: nil,
-		//						now:            testNow,
-		//					},
-		//					argsWorker{
-		//						job: &river.Job[*backchannel.LogoutRequest]{
-		//							JobRow: &rivertype.JobRow{
-		//								CreatedAt: time.Now(),
-		//							},
-		//							Args: &backchannel.LogoutRequest{
-		//								Aggregate: &eventstore.Aggregate{
-		//									InstanceID:    instanceID,
-		//									ID:            userID,
-		//									ResourceOwner: orgID,
-		//								},
-		//								UserID:                        userID,
-		//								UserResourceOwner:             orgID,
-		//								TriggeredAtOrigin:             eventOrigin,
-		//								EventType:                     user.UserDomainClaimedType,
-		//								MessageType:                   domain.DomainClaimedMessageType,
-		//								NotificationType:              domain.NotificationTypeEmail,
-		//								URLTemplate:                   login.LoginLink(eventOrigin, orgID),
-		//								CodeExpiry:                    0,
-		//								Code:                          nil,
-		//								UnverifiedNotificationChannel: false,
-		//								IsOTP:                         false,
-		//								RequiresPreviousDomain:        true,
-		//								Args: &domain.NotificationArguments{
-		//									TempUsername: "tempUsername",
-		//								},
-		//							},
-		//						},
-		//					}, w
-		//			},
-		//		},
-		//		{
-		//			name: "send failed, retry",
-		//			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-		//				givenTemplate := "{{.LogoURL}}"
-		//				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-		//				w.message = &messages.Email{
-		//					Recipients:          []string{lastEmail},
-		//					Subject:             "Invitation to APP",
-		//					Content:             expectContent,
-		//					TriggeringEventType: user.HumanInviteCodeAddedType,
-		//				}
-		//				w.sendError = sendError
-		//				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
-		//					return errors.Is(err, sendError)
-		//				}
-		//				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-		//				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-		//				return fieldsWorker{
-		//						queries:  queries,
-		//						commands: commands,
-		//						es: eventstore.NewEventstore(&eventstore.Config{
-		//							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-		//						}),
-		//						userDataCrypto: codeAlg,
-		//						now:            testNow,
-		//						backOff:        testBackOff,
-		//					},
-		//					argsWorker{
-		//						job: &river.Job[*backchannel.LogoutRequest]{
-		//							JobRow: &rivertype.JobRow{
-		//								ID:        1,
-		//								CreatedAt: time.Now(),
-		//							},
-		//							Args: &backchannel.LogoutRequest{
-		//								Aggregate: &eventstore.Aggregate{
-		//									InstanceID:    instanceID,
-		//									ID:            notificationID,
-		//									ResourceOwner: instanceID,
-		//								},
-		//								UserID:                        userID,
-		//								UserResourceOwner:             orgID,
-		//								TriggeredAtOrigin:             eventOrigin,
-		//								EventType:                     user.HumanInviteCodeAddedType,
-		//								MessageType:                   domain.InviteUserMessageType,
-		//								NotificationType:              domain.NotificationTypeEmail,
-		//								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-		//								CodeExpiry:                    1 * time.Hour,
-		//								Code:                          code,
-		//								UnverifiedNotificationChannel: true,
-		//								IsOTP:                         false,
-		//								RequiresPreviousDomain:        false,
-		//								Args: &domain.NotificationArguments{
-		//									ApplicationName: "APP",
-		//								},
-		//							},
-		//						},
-		//					},
-		//					w
-		//			},
-		//		},
-		//		{
-		//			name: "send failed (max attempts), cancel",
-		//			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
-		//				givenTemplate := "{{.LogoURL}}"
-		//				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-		//				w.message = &messages.Email{
-		//					Recipients:          []string{lastEmail},
-		//					Subject:             "Invitation to APP",
-		//					Content:             expectContent,
-		//					TriggeringEventType: user.HumanInviteCodeAddedType,
-		//				}
-		//				w.sendError = sendError
-		//				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
-		//					return err != nil
-		//				}
-		//
-		//				codeAlg, code := cryptoValue(t, ctrl, "testcode")
-		//				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-		//				return fieldsWorker{
-		//						queries:  queries,
-		//						commands: commands,
-		//						es: eventstore.NewEventstore(&eventstore.Config{
-		//							Querier: es_repo_mock.NewRepo(t).MockQuerier,
-		//						}),
-		//						userDataCrypto: codeAlg,
-		//						now:            testNow,
-		//						backOff:        testBackOff,
-		//					},
-		//					argsWorker{
-		//						job: &river.Job[*backchannel.LogoutRequest]{
-		//							JobRow: &rivertype.JobRow{
-		//								CreatedAt: time.Now(),
-		//							},
-		//							Args: &backchannel.LogoutRequest{
-		//								Aggregate: &eventstore.Aggregate{
-		//									InstanceID:    instanceID,
-		//									ID:            userID,
-		//									ResourceOwner: orgID,
-		//								},
-		//								UserID:                        userID,
-		//								UserResourceOwner:             orgID,
-		//								TriggeredAtOrigin:             eventOrigin,
-		//								EventType:                     user.HumanInviteCodeAddedType,
-		//								MessageType:                   domain.InviteUserMessageType,
-		//								NotificationType:              domain.NotificationTypeEmail,
-		//								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-		//								CodeExpiry:                    1 * time.Hour,
-		//								Code:                          code,
-		//								UnverifiedNotificationChannel: true,
-		//								IsOTP:                         false,
-		//								RequiresPreviousDomain:        false,
-		//								Args: &domain.NotificationArguments{
-		//									ApplicationName: "APP",
-		//								},
-		//							},
-		//						},
-		//					},
-		//					w
-		//			},
-		//		},
+		{
+			name: "job creation failed",
+			fields: fields{
+				es: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							sessionlogout.NewBackChannelLogoutRegisteredEvent(
+								context.Background(),
+								sessionLogoutAgg,
+								"oidc-session-id1",
+								"user-id",
+								"client-id1",
+								"back-channel-logout-uri1",
+							),
+						),
+					),
+				),
+				queue: func(ctrl *gomock.Controller) Queue {
+					q := mock.NewMockQueue(ctrl)
+					q.EXPECT().Insert(gomock.Any(),
+						gomock.Any(),
+						gomock.AssignableToTypeOf(reflect.TypeOf(queue.WithQueueName(backchannel.QueueName))),
+						gomock.AssignableToTypeOf(reflect.TypeOf(queue.WithMaxAttempts(1))),
+					).Return(assert.AnError)
+					return q
+				},
+				commands: func(ctrl *gomock.Controller) Commands {
+					c := mock.NewMockCommands(ctrl)
+					return c
+				},
+				queries: func(ctrl *gomock.Controller) Queries {
+					q := mock.NewMockQueries(ctrl)
+					return q
+				},
+				channel: func(ctrl *gomock.Controller) channels.NotificationChannel {
+					c := channel_mock.NewMockNotificationChannel(ctrl)
+					return c
+				},
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args: args{
+				job: &river.Job[*backchannel.LogoutRequest]{
+					JobRow: &rivertype.JobRow{
+						CreatedAt: testNow,
+					},
+					Args: &backchannel.LogoutRequest{
+						Aggregate: sessionLogoutAgg,
+						SessionID: sessionID,
+					},
+				},
+			},
+			want: want{
+				err: assert.AnError,
+			},
+		},
+
+		{
+			name: "send logout request failed",
+			fields: fields{
+				es: expectEventstore(),
+				queue: func(ctrl *gomock.Controller) Queue {
+					q := mock.NewMockQueue(ctrl)
+					return q
+				},
+				commands: func(ctrl *gomock.Controller) Commands {
+					c := mock.NewMockCommands(ctrl)
+					return c
+				},
+				queries: func(ctrl *gomock.Controller) Queries {
+					q := mock.NewMockQueries(ctrl)
+					q.EXPECT().GetActiveSigningWebKey(gomock.Any()).Return(
+						&jose.JSONWebKey{
+							Key:       privateKey,
+							Algorithm: string(signingAlgorithm),
+							Use:       "sig",
+						}, nil)
+					return q
+				},
+				channel: func(ctrl *gomock.Controller) channels.NotificationChannel {
+					c := channel_mock.NewMockNotificationChannel(ctrl)
+					c.EXPECT().HandleMessage(gomock.Any()).Return(assert.AnError)
+					return c
+				},
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
+			},
+			args: args{
+				job: &river.Job[*backchannel.LogoutRequest]{
+					JobRow: &rivertype.JobRow{
+						CreatedAt: testNow,
+					},
+					Args: &backchannel.LogoutRequest{
+						Aggregate:            sessionLogoutAgg,
+						SessionID:            sessionID,
+						TriggeredAtOrigin:    "",
+						TriggeringEventType:  "",
+						TokenID:              "id1",
+						UserID:               "user-id",
+						OIDCSessionID:        "oidc-session-id",
+						ClientID:             "client-id",
+						BackChannelLogoutURI: "back-channel-logout-uri",
+					},
+				},
+			},
+			want: want{
+				err: assert.AnError,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			err := newBackChannelLogoutWorker(
-				t,
-				ctrl,
 				tt.fields.queries(ctrl),
 				tt.fields.commands(ctrl),
 				tt.fields.es(t),
@@ -503,18 +426,7 @@ func Test_backChannelLogoutWorker_reduceNotificationRequested(t *testing.T) {
 	}
 }
 
-func newBackChannelLogoutWorker(t *testing.T, ctrl *gomock.Controller, queries Queries, commands Commands, es *eventstore.Eventstore, queue Queue, channel channels.NotificationChannel, idGenerator id.Generator, testNow func() time.Time) *BackChannelLogoutWorker {
-	//queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
-	//channel := channel_mock.NewMockNotificationChannel(ctrl)
-	//if w.message != nil {
-	//	channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
-	//}
-	//if w.messageSMS != nil {
-	//	channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
-	//		message.VerificationID = gu.Ptr(verificationID)
-	//		return w.sendError
-	//	})
-	//}
+func newBackChannelLogoutWorker(queries Queries, commands Commands, es *eventstore.Eventstore, queue Queue, channel channels.NotificationChannel, idGenerator id.Generator, testNow func() time.Time) *BackChannelLogoutWorker {
 	return &BackChannelLogoutWorker{
 		commands: commands,
 		queries: NewNotificationQueries(
@@ -594,13 +506,3 @@ var (
 	}()
 	signingAlgorithm = jose.RS256
 )
-
-func validateJWTPayload(t *testing.T) func(expected, sent []byte) bool {
-	return func(expected, sent []byte) bool {
-		jws, err := jose.ParseSigned(string(sent), []jose.SignatureAlgorithm{jose.RS256})
-		require.NoError(t, err)
-		payload, err := jws.Verify(privateKey.Public())
-		require.NoError(t, err)
-		return bytes.Equal(expected, payload)
-	}
-}
