@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekty",
-      "DESCRIPTION": "Projekt hostuje jednu nebo více aplikací, které můžete použít k ověření svých uživatelů. Můžete mít například jeden projekt se 3 aplikacemi: jednu pro váš webový frontend, vaši mobilní aplikaci a vaše backendové služby. Také můžete autorizovat své uživatele pomocí projektů. Chcete-li uživatelům z jiných organizací povolit přihlášení k vašim aplikacím, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nemůžete projekt najít, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy, abyste získali přístup.",
+      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Například můžete mít jeden projekt se 3 aplikacemi; jednu pro váš webový frontend, jednu pro vaši mobilní aplikaci a jednu pro váš backend. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
       "OWNED": {
         "TITLE": "Vlastněné projekty",
         "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, oprávnění a aplikace."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktivní a budoucí webové klíče",
           "DESCRIPTION": "Vaše aktivní a nadcházející webové klíče. Aktivací nového klíče dojde k deaktivaci aktuálního.",
-          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď, kterou lze ukládat do mezipaměti (výchozí 5 minut). Neaktivujte klíč příliš brzy, protože ještě nemusí být k dispozici pro mezipaměti a aplikace/klienty.",
+          "NOTE": "Poznámka: Koncový bod JWKs OIDC vrací odpověď uložitelnou do mezipaměti (výchozí 5 minut). Vyhněte se příliš brzké aktivaci klíče, protože nemusí být dostupný v mezipaměti a aplikacím.",
           "ACTIVATE": "Aktivovat další webový klíč",
           "ACTIVE": "Aktuálně aktivní",
           "NEXT": "Další v řadě",
@@ -391,7 +391,7 @@
         "action": "Zaregistrovat aplikaci"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Přihlaste se do své aplikace",
+        "title": "Přihlašte se do své aplikace",
         "description": "Integrujte vaši aplikaci se Zitadel pro autentizaci a otestujte ji přihlášením se vaším administrátorským uživatelem.",
         "action": "Přihlásit se"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Dev Mode je ve výchozím nastavení povolen. Hodnoty pro produkci můžete aktualizovat později.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Procházet ukázky",
-    "DUPLICATEAPPRENAME": "Aplikace se stejným názvem již existuje. Zvolte prosím jiný název.",
+    "DUPLICATEAPPRENAME": "Aplikace se stejným neme již existuje. Vyberte prosím jiný název.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Rámec změn",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Přidat druhý faktor pro zajištění optimální bezpečnosti vašeho účtu.",
       "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
       "ADD": "Přidat faktor",
-      "OTP": "Aplikace Authenticator pro TOTP (časově omezené jednorázové heslo)",
+      "OTP": "Autentizační aplikace pro TOTP (časově omezené jednorázové heslo)",
       "OTP_DIALOG_TITLE": "Přidat OTP",
-      "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí aplikace authenticator a zadejte kód níže pro ověření a aktivaci metody OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí autentizační aplikace a zadejte kód níže pro ověření a aktivaci metody OTP.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Ověřit faktor",
       "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše univerzální vícefaktorové zařízení.",
@@ -1611,7 +1611,7 @@
         "3": "Ověření telefonem",
         "4": "Resetování hesla",
         "5": "Inicializace Passkey",
-        "6": "Tajemství aplikace",
+        "6": "Tajemství pomocí aplikace",
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
       },
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debugování chyby rodiče OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Pokud je příznak povolen, chyba rodiče OIDC bude zaznamenána v konzoli.",
       "ENABLEBACKCHANNELLOGOUT": "Povolit Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Odhlášení ze zadního kanálu implementuje OpenID Connect Back-Channel Logout 1.0 a lze jej použít k upozornění aplikací на ukončení relace u poskytovatele OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování aplikací o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
@@ -2419,7 +2419,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Neznámý",
-      "1": "Jednorázové heslo pomocí aplikace Authenticator (TOTP)",
+      "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
       "2": "Passkey",
       "3": "Jednorázové heslo e-mailem (Email OTP)",
       "4": "Jednorázové heslo SMS (SMS OTP)",
@@ -2643,8 +2643,8 @@
       "IDTOKENROLEASSERTION": "Role uživatele uvnitř ID tokenu",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Pokud je vybráno, požadované role ověřeného uživatele jsou přidány do ID tokenu.",
       "IDTOKENUSERINFOASSERTION": "Informace o uživateli uvnitř ID tokenu",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje aplikacím načítat nároky na profil, e-mail, telefon a adresu z tokenu ID.",
-      "CLOCKSKEW": "Umožňuje aplikacím zpracovávat zkreslení hodin OP a klienta. Doba trvání (0-5 s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje aplikacím získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
+      "CLOCKSKEW": "Umožňuje aplikacím zvládnout rozdíl času mezi OP a aplikací. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
       "RECOMMENDED": "doporučeno",
       "NOTRECOMMENDED": "nedoporučeno",
       "SELECTION": {

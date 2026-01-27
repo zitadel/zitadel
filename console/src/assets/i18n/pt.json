@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projetos",
-      "DESCRIPTION": "Um projeto hospeda um ou mais aplicativos que você pode usar para autenticar seus usuários. Por exemplo, você pode ter um único projeto com 3 aplicativos: um para o seu frontend da web, seu aplicativo móvel e seus serviços de backend. Você também pode autorizar seus usuários com projetos. Para permitir que usuários de outras organizações façam login em seus aplicativos, conceda a eles acesso ao seu projeto.<br/><br/>Se você не puder encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso.",
+      "DESCRIPTION": "Um projeto hospeda um ou mais aplicativos, que você pode usar para autenticar seus usuários. Por exemplo, você pode ter um único projeto com 3 aplicativos; um para o seu frontend da web, um para o seu aplicativo móvel e um para o seu backend. Você também pode autorizar seus usuários com projetos. Para permitir que usuários de outras organizações façam login em seus aplicativos, conceda-lhes acesso ao seu projeto.<br/><br/>Se você não conseguir encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso.",
       "OWNED": {
         "TITLE": "Projetos Proprietários",
         "DESCRIPTION": "Estes são os projetos que você possui. Você pode gerenciar as configurações desses projetos, autorizações e aplicativos."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chaves Web Ativas e Futuras",
           "DESCRIPTION": "Suas chaves web ativas e futuras. Ativar uma nova chave desativará a atual.",
-          "NOTE": "Observação: o ponto de extremidade JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão de 5 minutos). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível para caches e aplicativos/clientes.",
+          "NOTE": "Nota: O endpoint JWKs OIDC retorna uma resposta que pode ser armazenada em cache (padrão: 5 min). Evite ativar uma chave muito cedo, pois ela pode ainda não estar disponível no cache e para os aplicativos.",
           "ACTIVATE": "Ativar próxima Chave Web",
           "ACTIVE": "Atualmente ativa",
           "NEXT": "Próxima na fila",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "O modo Dev está habilitado por padrão. Você pode atualizar os valores para produção posteriormente.",
     "GUIDE": "Guia",
     "BROWSEEXAMPLES": "Navegar por exemplos",
-    "DUPLICATEAPPRENAME": "Já existe um aplicativo com o mesmo nome. Escolha um nome diferente.",
+    "DUPLICATEAPPRENAME": "Já existe um aplicativo com o mesmo neme. Escolha um nome diferente.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Alterar Quadro",
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Adicione um segundo fator para garantir a segurança ideal da sua conta.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "ADD": "Adicionar Fator",
-      "OTP": "Aplicativo autenticador para TOTP (senha de uso único baseada em tempo)",
+      "OTP": "Aplicativo de Autenticação para TOTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Adicionar OTP",
       "OTP_DIALOG_DESCRIPTION": "Digitalize o código QR com um aplicativo autenticador e insira o código abaixo para verificar e ativar o método OTP.",
       "U2F": "Impressão digital, Chaves de Segurança, Face ID e outros",
@@ -1647,7 +1647,7 @@
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
       "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Canal Traseiro implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os aplicativos sobre o término da sessão no Provedor OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os aplicativos sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se a bandeira estiver ativada, você poderá usar a nova API e seus recursos.",
       "STATES": {
@@ -2406,7 +2406,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconhecido",
-      "1": "Senha de uso único por aplicativo autenticador (TOTP)",
+      "1": "Senha de uso único para o aplicativo autenticador (TOTP)",
       "2": "Impressão digital, Chaves de Segurança, Face ID e outros",
       "3": "Senha de uso único para e-mail (Email OTP)",
       "4": "Senha de uso único para SMS (SMS OTP)",
@@ -2630,8 +2630,8 @@
       "IDTOKENROLEASSERTION": "Funções do usuário no ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selecionado, as funções solicitadas do usuário autenticado serão adicionadas ao ID token.",
       "IDTOKENUSERINFOASSERTION": "Informações do usuário no ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os aplicativos recuperem declarações de perfil, e-mail, telefone e endereço do token de ID.",
-      "CLOCKSKEW": "Permite que os aplicativos lidem com a distorção do relógio do OP e do cliente. A duração (0-5s) será adicionada à declaração exp e subtraída de iats, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que os aplicativos obtenham claims de perfil, e-mail, telefone e endereço do ID token.",
+      "CLOCKSKEW": "Permite que os aplicativos lidem com a discrepância de tempo do OP e do aplicativo. A duração (0-5s) será adicionada ao claim exp e subtraída de iat, auth_time e nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "não recomendado",
       "SELECTION": {

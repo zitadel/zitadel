@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projeler",
-      "DESCRIPTION": "Bir proje, kullanıcılarınızın kimliğini doğrulamak için kullanabileceğiniz bir veya daha fazla uygulamayı barındırır. Örneğin, web ön ucunuz, mobil uygulamanız ve arka uç hizmetleriniz için birer tane olmak üzere 3 uygulamalı tek bir projeniz olabilir. Ayrıca kullanıcılarınızı projelerle yetkilendirebilirsiniz. Diğer kuruluşlardan kullanıcıların uygulamalarınızda oturum açmasına izin vermek için onlara projenize erişim izni verin.<br/><br/>Bir proje bulamazsanız, erişim elde etmek için projenin sahibiyle veya ilgili haklara sahip biriyle iletişime geçin.",
+      "DESCRIPTION": "Bir proje, kullanıcılarınızı doğrulamak için kullanabileceğiniz bir veya daha fazla uygulamayı barındırır. Örneğin, web ön ucunuz, mobil uygulamanız ve arka ucunuz için birer tane olmak üzere 3 uygulamalı tek bir projeniz olabilir. Ayrıca kullanıcılarınızı projelerle yetkilendirebilirsiniz. Diğer organizasyonlardan kullanıcıların uygulamalarınıza giriş yapmasına izin vermek için onlara projenize erişim izni verin.<br/><br/>Bir proje bulamazsanız, proje sahibiyle veya ilgili haklara sahip biriyle iletişime geçerek erişim sağlayın.",
       "OWNED": {
         "TITLE": "Sahip Olunan Projeler",
         "DESCRIPTION": "Bunlar sahip olduğunuz projelerdir. Bu proje ayarlarını, yetkilendirmelerini ve uygulamalarını yönetebilirsiniz."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktif ve Gelecek Web Anahtarları",
           "DESCRIPTION": "Aktif ve yaklaşan web anahtarlarınız. Yeni bir anahtar etkinleştirmek mevcut olanı devre dışı bırakacaktır.",
-          "NOTE": "Not: JWKs OIDC uç noktası, önbelleğe alınabilir bir yanıt döndürür (varsayılan 5 dakika). Önbellekler ve uygulamalar/istemciler için henüz mevcut olmayabileceğinden bir anahtarı çok erken etkinleştirmekten kaçının.",
+          "NOTE": "Not: JWKs OIDC endpoint önbelleğe alınabilir bir yanıt döndürür (varsayılan 5 dk). Henüz önbelleklerde ve uygulamalarda mevcut olmayabileceği için bir anahtarı çok erken etkinleştirmekten kaçının.",
           "ACTIVATE": "Sonraki Web Anahtarını Etkinleştir",
           "ACTIVE": "Şu anda aktif",
           "NEXT": "Sırada",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Dev Mode varsayılan olarak etkindir. Değerleri daha sonra üretim için güncelleyebilirsiniz.",
     "GUIDE": "Kılavuz",
     "BROWSEEXAMPLES": "Örnekleri ve SDK'ları Gözat",
-    "DUPLICATEAPPRENAME": "Aynı ada sahip bir uygulama zaten var. Lütfen farklı bir ad seçin.",
+    "DUPLICATEAPPRENAME": "Aynı ada sahip bir uygulama zaten mevcut. Lütfen farklı bir ad seçin.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework Değiştir",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Kullanıcıları oluşturma ve yönetme iznine sahiptir",
     "IAM_ADMIN_IMPERSONATOR": "Tüm organizasyonlardan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_END_USER_IMPERSONATOR": "Tüm organizasyonlardan son kullanıcıların kimliğine bürünme iznine sahiptir",
-    "IAM_LOGIN_CLIENT": "Oturum açma uygulamalarını yönetme iznine sahip",
+    "IAM_LOGIN_CLIENT": "Giriş uygulamalarını yönetme iznine sahiptir",
     "ORG_OWNER": "Tüm organizasyon üzerinde izne sahiptir",
     "ORG_USER_MANAGER": "Organizasyonun kullanıcılarını oluşturma ve yönetme iznine sahiptir",
     "ORG_OWNER_VIEWER": "Tüm organizasyonu gözden geçirme iznine sahiptir",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Hesabınız için optimal güvenliği sağlamak için ikinci bir faktör ekleyin.",
       "MANAGE_DESCRIPTION": "Kullanıcılarınızın ikinci faktör yöntemlerini yönetin.",
       "ADD": "Faktör Ekle",
-      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması (Zamana Dayalı Tek Kullanımlık Şifre)",
+      "OTP": "TOTP için Kimlik Doğrulayıcı Uygulaması (Zamana Dayalı Tek Seferlik Şifre)",
       "OTP_DIALOG_TITLE": "OTP Ekle",
-      "OTP_DIALOG_DESCRIPTION": "Bir kimlik doğrulayıcı uygulamasıyla QR kodunu tarayın ve OTP yöntemini doğrulamak ve etkinleştirmek için aşağıdaki kodu girin.",
+      "OTP_DIALOG_DESCRIPTION": "QR kodunu bir kimlik doğrulayıcı uygulamayla tarayın ve OTP yöntemini doğrulamak ve etkinleştirmek için aşağıya kodu girin.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktörü Doğrula",
       "U2F_DIALOG_DESCRIPTION": "Kullandığınız evrensel Çok faktör için bir ad girin.",
@@ -1614,7 +1614,7 @@
         "3": "Telefon doğrulama",
         "4": "Şifre Sıfırlama",
         "5": "Passkey Başlatma",
-        "6": "Uygulama Sırrı",
+        "6": "Uygulama Gizli Anahtarı",
         "7": "Tek Kullanımlık Şifre (OTP) - SMS",
         "8": "Tek Kullanımlık Şifre (OTP) - E-posta"
       },
@@ -1649,7 +1649,7 @@
       "DEBUGOIDCPARENTERROR": "OIDC Üst Hatayı Hata Ayıkla",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Bayrak etkinleştirilirse, OIDC üst hatası konsolda günlüğe kaydedilecektir.",
       "ENABLEBACKCHANNELLOGOUT": "Arka Kanal Çıkışını Etkinleştir",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Arka Kanal Oturumu Kapatma, OpenID Connect Arka Kanal Oturumu Kapatma 1.0'ı uygular ve OpenID Sağlayıcısında oturumun sonlandırılması hakkında uygulamaları bilgilendirmek için kullanılabilir.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Arka Kanal Çıkışı OpenID Connect Arka Kanal Çıkışı 1.0'ı uygular ve OpenID Sağlayıcısında oturum sonlandırma hakkında uygulamaları bilgilendirmek için kullanılabilir.",
       "PERMISSIONCHECKV2": "İzin Kontrolü V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Bayrak etkinleştirilirse, yeni API'yi ve özelliklerini kullanabileceksiniz.",
       "STATES": {
@@ -2435,7 +2435,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Bilinmeyen",
-      "1": "Kimlik Doğrulayıcı Uygulaması ile Tek Kullanımlık Şifre (TOTP)",
+      "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
       "2": "Passkey",
       "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
       "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
@@ -2663,8 +2663,8 @@
       "IDTOKENROLEASSERTION": "ID Token içinde kullanıcı rolleri",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Seçilirse, kimliği doğrulanmış kullanıcının istenen rolleri ID token'a eklenir.",
       "IDTOKENUSERINFOASSERTION": "ID Token içinde Kullanıcı Bilgisi",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Uygulamaların kimlik belirtecinden profil, e-posta, telefon ve adres taleplerini almasını sağlar.",
-      "CLOCKSKEW": "Uygulamaların OP ve istemcinin saat sapmasını işlemesini sağlar. Süre (0-5sn), exp talebine eklenecek ve iats, auth_time ve nbf'den çıkarılacaktır.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Uygulamaların ID token'dan profil, e-posta, telefon ve adres bilgilerini almasını sağlar.",
+      "CLOCKSKEW": "Uygulamaların OP ve uygulama saat farklılığını ele almasını sağlar. Süre (0-5s) exp claim'ine eklenecek ve iats, auth_time ve nbf'den çıkarılacaktır.",
       "RECOMMENDED": "önerilen",
       "NOTRECOMMENDED": "önerilmeyen",
       "SELECTION": {

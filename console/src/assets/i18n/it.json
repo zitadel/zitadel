@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Progetti",
-      "DESCRIPTION": "Un progetto ospita una o più applicazioni che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un unico progetto con 3 applicazioni: una per il tuo frontend web, la tua applicazione mobile e i tuoi servizi di backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per consentire agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Ad esempio, potresti avere un singolo progetto con 3 applicazioni: una per il tuo frontend web, una per la tua applicazione mobile e una per il tuo backend. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "OWNED": {
         "TITLE": "Progetti di Proprietà",
         "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Chiavi Web Attive e Future",
           "DESCRIPTION": "Le tue chiavi web attive e future. L'attivazione di una nuova chiave disattiverà quella attuale.",
-          "NOTE": "Nota: l'endpoint JWKs OIDC restituisce una risposta memorizzabile nella cache (impostazione predefinita 5 min). Evita di attivare una chiave troppo presto, poiché potrebbe non essere ancora disponibile per cache e applicazioni/client.",
+          "NOTE": "Nota: L'endpoint JWKs OIDC restituisce una risposta memorizzabile nella cache (predefinito 5 min). Evita di attivare una chiave troppo presto, poiché potrebbe non essere ancora disponibile nelle cache e nelle applicazioni.",
           "ACTIVATE": "Attiva la prossima Chiave Web",
           "ACTIVE": "Attualmente attiva",
           "NEXT": "Prossima in coda",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
     "GUIDE": "Guida",
     "BROWSEEXAMPLES": "Esplora esempi e SDK",
-    "DUPLICATEAPPRENAME": "Esiste già un'applicazione con lo stesso nome. Scegli un nome diverso.",
+    "DUPLICATEAPPRENAME": "Un'applicazione con lo stesso nome esiste già. Scegli un nome diverso.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifica framework",
@@ -883,9 +883,9 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "Applicazione di autenticazione per TOTP (password monouso a tempo)",
+      "OTP": "Applicazione di autenticazione per TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'applicazione di autenticazione e inserisci il codice qui sotto per verificare e attivare il metodo OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'applicazione di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se il flag è abilitato, l'errore OIDC originante verrà registrato nella console.",
       "ENABLEBACKCHANNELLOGOUT": "Abilita Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare alle applicazioni la chiusura della sessione presso l'OpenID Provider.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Il Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 e può essere utilizzato per notificare alle applicazioni la terminazione della sessione presso il provider OpenID.",
       "PERMISSIONCHECKV2": "Controllo permessi V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Se il flag è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
       "STATES": {
@@ -2411,7 +2411,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "Password monouso tramite applicazione di autenticazione (TOTP)",
+      "1": "One Time Password per applicazione di autenticazione (TOTP)",
       "2": "Passkey",
       "3": "One Time Password per Email (Email OTP)",
       "4": "One Time Password per SMS (SMS OTP)",
@@ -2635,8 +2635,8 @@
       "IDTOKENROLEASSERTION": "Aggiungi ruoli nell'ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Se selezionato, i ruoli richiesti dall'utente autenticato sono aggiunti all'ID Token.",
       "IDTOKENUSERINFOASSERTION": "Aggiungi le informazioni dell'utente nell'ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Consente alle applicazioni di recuperare i claim di profilo, email, telefono e indirizzo dal token ID.",
-      "CLOCKSKEW": "Consente alle applicazioni di gestire l'inclinazione dell'orologio di OP e client. La durata (0-5s) verrà aggiunta al claim exp e sottratta da iats, auth_time e nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Aggiungi le richieste di profilo, email, telefono o indirizzo nell'ID Token.",
+      "CLOCKSKEW": "Permette alle applicazioni di gestire lo skew di OP e applicazione. La durata (0-5s) sarà aggiunta a exp claim e sottratta da iats, auth_time e nbf.",
       "RECOMMENDED": "raccomandato",
       "NOTRECOMMENDED": "non raccomandato",
       "SELECTION": {

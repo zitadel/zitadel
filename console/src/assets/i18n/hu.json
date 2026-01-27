@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projektek",
-      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyekkel hitelesítheti felhasználóit. Lehet például egyetlen projektje 3 alkalmazással: egy a webes frontendhez, egy a mobilalkalmazáshoz és egy a háttérszolgáltatásokhoz. A felhasználókat projektekkel is engedélyezheti. Ha engedélyezni szeretné, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaiba, adjon nekik hozzáférést a projektjéhez.<br/><br/>Ha nem talál egy projektet, lépjen kapcsolatba a projekt tulajdonosával vagy valakivel, aki rendelkezik a megfelelő jogosultságokkal a hozzáféréshez.",
+      "DESCRIPTION": "Egy projekt egy vagy több alkalmazást tartalmaz, amelyeket a felhasználók hitelesítésére használhatsz. Például lehet egyetlen projekted 3 alkalmazással; egy a webes frontendhez, egy a mobilalkalmazásodhoz és egy a backendhez. Emellett a projektjeiddel felhatalmazhatod a felhasználóidat. Ha azt szeretnéd, hogy más szervezetek felhasználói bejelentkezhessenek az alkalmazásaidba, adj nekik hozzáférést a projekthez.<br/><br/>Ha nem találsz egy projektet, vedd fel a kapcsolatot a projekt tulajdonosával vagy valakivel, akinek megvannak a megfelelő jogai, hogy hozzáférést kapj.",
       "OWNED": {
         "TITLE": "Tulajdonolt Projektek",
         "DESCRIPTION": "Ezek a te tulajdonodban lévő projektek. Ezeknek a projekteknek a beállításait, jogosultságait és alkalmazásait te menedzselheted."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktív és Jövőbeli Webkulcsok",
           "DESCRIPTION": "Az aktív és közelgő webkulcsai. Egy új kulcs aktiválása deaktiválja az aktuálisat.",
-          "NOTE": "Megjegyzés: A JWKs OIDC végpont gyorsítótárazható választ ad vissza (alapértelmezés szerint 5 perc). Kerülje a kulcs túl korai aktiválását, mivel előfordulhat, hogy még nem érhető el a gyorsítótárak és az alkalmazások/kliensek számára.",
+          "NOTE": "Megjegyzés: A JWKs OIDC végpont egy gyorsítótárazható választ ad vissza (alapértelmezett: 5 perc). Kerülje a kulcs túl korai aktiválását, mivel lehet, hogy még nem érhető el a gyorsítótárakban és az alkalmazásoknál.",
           "ACTIVATE": "Következő Webkulcs aktiválása",
           "ACTIVE": "Jelenleg aktív",
           "NEXT": "Következő a sorban",
@@ -386,12 +386,12 @@
         "action": "Projekt létrehozása"
       },
       "APPLICATION_CREATED": {
-        "title": "Regisztrálja alkalmazását",
+        "title": "Regisztráld az alkalmazásodat",
         "description": "Regisztráld a webes, natív, api vagy saml alkalmazásodat és állítsd be az autentikációs folyamatot.",
         "action": "Alkalmazás regisztrálása"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Jelentkezzen be az alkalmazásába",
+        "title": "Jelentkezz be az alkalmazásodba",
         "description": "Integráld az alkalmazásodat a Zitadel-lel az autentikációhoz, és teszteld az admin felhasználóddal történő bejelentkezéssel.",
         "action": "Bejelentkezés"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "A fejlesztői mód alapértelmezetten engedélyezve van. A termelési értékeket később frissítheted.",
     "GUIDE": "Útmutató",
     "BROWSEEXAMPLES": "Példák és SDK-k böngészése",
-    "DUPLICATEAPPRENAME": "Már létezik azonos nevű alkalmazás. Kérjük, válasszon másik nevet.",
+    "DUPLICATEAPPRENAME": "Már létezik egy alkalmazás ugyanezzel a névvel. Kérlek, válassz másik nevet.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Keret megváltoztatása",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
-    "IAM_LOGIN_CLIENT": "Engedélye van a bejelentkezési alkalmazások kezelésére",
+    "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési alkalmazások kezelésére",
     "ORG_OWNER": "Engedélye van az egész szervezet fölött",
     "ORG_USER_MANAGER": "Engedélye van a szervezet felhasználóinak létrehozására és kezelésére",
     "ORG_OWNER_VIEWER": "Engedélye van az egész szervezet áttekintésére",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Adj hozzá egy második tényezőt a fiókod optimális biztonsága érdekében.",
       "MANAGE_DESCRIPTION": "Kezeld a felhasználóid második tényező módszereit.",
       "ADD": "Tényező hozzáadása",
-      "OTP": "Hitelesítő alkalmazás a TOTP-hez (időalapú egyszeri jelszó)",
+      "OTP": "Hitelesítő alkalmazás TOTP-hez (ideiglenes egyedi jelszó időalapú)",
       "OTP_DIALOG_TITLE": "OTP hozzáadása",
-      "OTP_DIALOG_DESCRIPTION": "Olvassa be a QR-kódot egy hitelesítő alkalmazással, és adja meg az alábbi kódot az OTP-módszer ellenőrzéséhez és aktiválásához.",
+      "OTP_DIALOG_DESCRIPTION": "Olvasd be a QR-kódot egy hitelesítő alkalmazással, majd írd be a kódot alul, hogy ellenőrizd és aktiváld az OTP módszert.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor ellenőrzése",
       "U2F_DIALOG_DESCRIPTION": "Adj meg egy nevet a használt univerzális Multifactor-odnak.",
@@ -1609,7 +1609,7 @@
         "3": "Telefonos ellenőrzés",
         "4": "Jelszó visszaállítás",
         "5": "Passkey inicializálás",
-        "6": "Alkalmazás titka",
+        "6": "Alkalmazás titok",
         "7": "Egyszer használatos jelszó (OTP) - SMS",
         "8": "Egyszer használatos jelszó (OTP) - Email"
       },
@@ -1644,7 +1644,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az alkalmazások értesítésére a munkamenet megszakításáról az OpenID szolgáltatónál.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az alkalmazások értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
       "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
@@ -2430,7 +2430,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Ismeretlen",
-      "1": "Egyszeri jelszó hitelesítő alkalmazással (TOTP)",
+      "1": "Egyszeri Jelszó az Authenticator alkalmazással (TOTP)",
       "2": "Passkey",
       "3": "Egyszeri Jelszó Emailben (Email OTP)",
       "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
@@ -2658,8 +2658,8 @@
       "IDTOKENROLEASSERTION": "Felhasználói szerepkörök az ID Tokenben",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Ha kiválasztod, a hitelesített felhasználó kért szerepkörei hozzá lesznek adva az ID tokenhez.",
       "IDTOKENUSERINFOASSERTION": "Felhasználói információk az ID Tokenben",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Lehetővé teszi az alkalmazások számára, hogy lekérjék a profil-, e-mail-, telefon- és címadatokat az azonosító tokenből.",
-      "CLOCKSKEW": "Lehetővé teszi az alkalmazások számára az OP és az ügyfél óraeltérésének kezelését. Az időtartam (0-5 mp) hozzáadódik az exp igényléshez, és kivonódik az iats, auth_time és nbf értékekből.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Lehetővé teszi az alkalmazások számára, hogy lekérjék a profil-, e-mail-, telefon- és címadatokat az ID tokenből.",
+      "CLOCKSKEW": "Lehetővé teszi az alkalmazások számára az OP és az alkalmazás óraeltolódásának kezelését. Az időtartam (0-5 másodperc) hozzá lesz adva az exp igényhez, és levonásra kerül az iats, auth_time és nbf értékeiből.",
       "RECOMMENDED": "ajánlott",
       "NOTRECOMMENDED": "nem ajánlott",
       "SELECTION": {

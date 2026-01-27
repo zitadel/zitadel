@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Proyectos",
-      "DESCRIPTION": "Un proyecto aloja una o más aplicaciones que puede usar para autenticar a sus usuarios. Por ejemplo, puede tener un solo proyecto con 3 aplicaciones: una para su frontend web, su aplicación móvil y sus servicios de backend. También puede autorizar a sus usuarios con proyectos. Para permitir que los usuarios de otras organizaciones inicien sesión en sus aplicaciones, concédales acceso a su proyecto.<br/><br/>Si no puede encontrar un proyecto, comuníquese con el propietario del proyecto o con alguien con los derechos correspondientes para obtener acceso.",
+      "DESCRIPTION": "Un proyecto alberga una o más aplicaciones, que puedes usar para autenticar a tus usuarios. Por ejemplo, podrías tener un solo proyecto con 3 aplicaciones: una para tu frontend web, otra para tu aplicación móvil y otra para tus servicios backend. También puedes autorizar a tus usuarios con proyectos. Para permitir que usuarios de otras organizaciones se registren en tus aplicaciones, otórgales acceso a tu proyecto.<br/><br/>Si no encuentras un proyecto, contacta al dueño del proyecto o alguien con los derechos correspondientes para obtener acceso.",
       "OWNED": {
         "TITLE": "Proyectos Propios",
         "DESCRIPTION": "Estos son los proyectos que posees. Puedes gestionar los ajustes de estos proyectos, autorizaciones y aplicaciones."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Claves Web Activas y Futuras",
           "DESCRIPTION": "Tus claves web activas y próximas. Activar una nueva clave desactivará la actual.",
-          "NOTE": "Nota: El punto final JWKs OIDC devuelve una respuesta almacenable en caché (predeterminado 5 minutos). Evite activar una clave demasiado pronto, ya que es posible que aún no esté disponible para cachés y aplicaciones/clientes.",
+          "NOTE": "Nota: El endpoint JWKs OIDC devuelve una respuesta almacenable en caché (por defecto 5 min). Evita activar una clave demasiado pronto, ya que puede que aún no esté disponible en cachés y aplicaciones.",
           "ACTIVATE": "Activar la siguiente Clave Web",
           "ACTIVE": "Actualmente activa",
           "NEXT": "Siguiente en la cola",
@@ -386,12 +386,12 @@
         "action": "Crear proyecto"
       },
       "APPLICATION_CREATED": {
-        "title": "Registre su aplicación",
+        "title": "Registra tu aplicación",
         "description": "Registra tu aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
         "action": "Registrar aplicación"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Inicie sesión en su aplicación",
+        "title": "Inicia sesión en tu aplicación",
         "description": "Integra tu aplicación con Zitadel para la autenticación y pruébala iniciando sesión con tu usuario administrador.",
         "action": "Iniciar sesión"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "El modo de desarrollo está habilitado de forma predeterminada. Puede actualizar los valores para la producción más adelante.",
     "GUIDE": "Guía",
     "BROWSEEXAMPLES": "Explora ejemplos",
-    "DUPLICATEAPPRENAME": "Ya existe una aplicación con el mismo nombre. Por favor, elija un nombre diferente.",
+    "DUPLICATEAPPRENAME": "Ya existe una aplicación con el mismo nombre. Por favor, elige un nombre diferente.",
     "DIALOG": {
       "CAMBIAR": {
         "TITLE": "Cambio framework",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios",
     "IAM_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de todas las organizaciones",
     "IAM_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de todas las organizaciones",
-    "IAM_LOGIN_CLIENT": "Tiene permiso para administrar aplicaciones de inicio de sesión",
+    "IAM_LOGIN_CLIENT": "Tiene permiso para gestionar las aplicaciones de inicio de sesión",
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Añade un doble factor para configurar una seguridad óptima de tu cuenta.",
       "MANAGE_DESCRIPTION": "Gestiona el método de doble factor para tus usuarios.",
       "ADD": "Añadir factor",
-      "OTP": "Aplicación de autenticación para TOTP (contraseña de un solo uso basada en el tiempo)",
+      "OTP": "Aplicación autenticadora para TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Añadir TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Escanee el código QR con una aplicación de autenticación e ingrese el código a continuación para verificar y activar el método OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Escanea el código QR con una aplicación autenticadora introduciendo el siguiente código para verificar y activar el método OTP.",
       "U2F": "Llave de acceso (Huella dactilar, claves de seguridad, Face ID y otros)",
       "U2F_DIALOG_TITLE": "Verificar factor",
       "U2F_DIALOG_DESCRIPTION": "Introduce un nombre para tu Multifactor universal.",
@@ -1612,7 +1612,7 @@
         "3": "Verificación de teléfono",
         "4": "Restablecimiento de contraseña",
         "5": "Inicialización de llave de acceso",
-        "6": "Secreto de la aplicación",
+        "6": "Secreto de aplicación",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
@@ -1647,7 +1647,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
       "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El cierre de sesión del canal posterior implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a las aplicaciones sobre la finalización de la sesión en el proveedor de OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a las aplicaciones sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
@@ -2407,7 +2407,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconocido",
-      "1": "Contraseña de un solo uso por aplicación de autenticación (TOTP)",
+      "1": "One Time Password por aplicación autenticadora (TOTP)",
       "2": "Llave de acceso",
       "3": "One Time Password por email (Email OTP)",
       "4": "One Time Password por SMS (SMS OTP)",
@@ -2631,8 +2631,8 @@
       "IDTOKENROLEASSERTION": "Roles de usuario dentro del Token de ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Si se selecciona, los roles solicitados para el usuario autenticado se añaden al token de ID.",
       "IDTOKENUSERINFOASSERTION": "Información del usuario dentro del Token de ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite que las aplicaciones recuperen notificaciones de perfil, correo electrónico, teléfono y dirección del token de ID.",
-      "CLOCKSKEW": "Permite que las aplicaciones manejen el sesgo de reloj de OP y el cliente. La duración (0-5 s) se agregará a la notificación de exp y se restará de iats, auth_time y nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permite a las aplicaciones obtener los claims de perfil, email, teléfono y dirección del token de ID.",
+      "CLOCKSKEW": "Permite a las aplicaciones manejar el sesgo de reloj de OP y la aplicación. La duración (0-5 s) se agregará al claim exp y se restará de iats, auth_time y nbf.",
       "RECOMMENDED": "recomendado",
       "NOTRECOMMENDED": "no recomendado",
       "SELECTION": {
