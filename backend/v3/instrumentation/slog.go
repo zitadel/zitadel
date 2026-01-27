@@ -13,6 +13,7 @@ import (
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
+	old_logging "github.com/zitadel/logging"
 	"github.com/zitadel/sloggcp"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
@@ -36,6 +37,10 @@ const (
 	LogFormatGCPErrorReporting
 )
 
+func (f LogFormat) isDisabled() bool {
+	return f == LogFormatUndefined || f == LogFormatDisabled
+}
+
 type LogConfig struct {
 	Level     slog.Level
 	Streams   []Stream
@@ -43,6 +48,21 @@ type LogConfig struct {
 	AddSource bool
 	Errors    ErrorConfig
 	Exporter  ExporterConfig
+}
+
+func (c *LogConfig) SetLegacyConfig(lc *old_logging.Config) {
+	if lc == nil || c.Format.isDisabled() {
+		return
+	}
+	err := c.Level.UnmarshalText([]byte(lc.Level))
+	if err != nil {
+		c.Level = slog.LevelInfo
+	}
+	c.Format, err = LogFormatString(lc.Formatter.Format)
+	if err != nil {
+		c.Format = LogFormatText
+	}
+	c.AddSource = lc.AddSource
 }
 
 type ErrorConfig struct {

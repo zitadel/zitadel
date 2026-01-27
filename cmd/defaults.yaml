@@ -52,13 +52,15 @@ Instrumentation:
       - action # Logs for execution target workers (actions v2).
       - notification # Logs for notification sending workers.
     # Enable printing structured logs to standard error in the specified format.
+    # When disabled, the legacy Log configuration is used.
+    # Important: when legacy Log is customized, please add a format and customize before upgrading to v5
     # The following formats are supported:
     #   - "disabled": Disables logging
     #   - "text": Logs are printed on StdErr as human-readable text
     #   - "json": Logs are printed on StdErr as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
     #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
-    Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE

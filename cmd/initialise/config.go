@@ -7,7 +7,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	old_config "github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/database"
@@ -18,7 +18,7 @@ type Config struct {
 	Instrumentation instrumentation.Config
 	Database        database.Config
 	Machine         *id.Config
-	Log             *old_config.Config
+	Log             *old_logging.Config
 }
 
 func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
@@ -32,6 +32,8 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to read config: %w", err)
 	}
+
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)

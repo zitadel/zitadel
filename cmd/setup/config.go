@@ -95,6 +95,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 	}
 
 	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)

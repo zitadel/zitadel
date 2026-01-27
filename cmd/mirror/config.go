@@ -68,6 +68,7 @@ func newProjectionsConfig(ctx context.Context, v *viper.Viper) (*ProjectionsConf
 }
 
 func startInstrumentation(ctx context.Context, cfg instrumentation.Config, logConfig *old_logging.Config) (instrumentation.ShutdownFunc, error) {
+	cfg.Log.SetLegacyConfig(logConfig)
 	shutdown, err := instrumentation.Start(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start instrumentation: %w", err)

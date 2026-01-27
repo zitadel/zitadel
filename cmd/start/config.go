@@ -103,6 +103,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	config.Instrumentation.Trace.SetLegacyConfig(config.Tracing)
 	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	config.Instrumentation.Profile.SetLegacyConfig(config.Profiler)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {
