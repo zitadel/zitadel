@@ -315,7 +315,7 @@
       "description": "请提供所有必需的数据。"
     },
     "title": "注册",
-    "description": "创建您的 ZITADEL 账户。",
+    "description": "创建您的 Zitadel 账户。",
     "noMethodAvailableWarning": "没有可用的认证方法。请联系您的系统管理员。",
     "selectMethod": "选择您想使用的认证方法",
     "agreeTo": "注册即表示您同意条款和条件",

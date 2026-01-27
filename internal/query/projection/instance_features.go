@@ -97,7 +97,7 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceConsoleUseV2UserApi,
+				Event:  feature_v2.InstanceManagementConsoleUseV2UserApi,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{

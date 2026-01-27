@@ -1,114 +1,135 @@
 ---
-title: Migrate from Actions v1 to v2
+title: Migrate from Actions V1 to V2
+sidebar_label: Migrate from V1 to V2
 ---
 
-In this guide, you will have all necessary information to migrate from Actions v1 to Actions v2 with all currently [available Flow Types](/guides/manage/console/actions-overview#available-flow-types).
+This guide helps existing users understand the shift from Actions V1 (Embedded) to V2 (Webhook), and provides guidance for new users on how to work with Actions V2.
 
-## Internal Authentication
+:::caution Deprecation Notice
+Actions V1 APIs are planned to be sunsetted in ZITADEL V5. While a definitive V5 release date is not yet available, this is the final timeline for V1 API removal. Actions V1 will receive no new features, and all new implementations must use V2.
+:::
 
-### Post Authentication
+## Why Actions Changed from V1 to V2
 
-A user has authenticated directly at ZITADEL.
-ZITADEL validated the users inputs for password, one-time password or passkey factor.
+ZITADEL Actions evolved from V1 to V2 to address fundamental architectural limitations. While Actions V1 executed JavaScript code directly within ZITADEL's runtime, Actions V2 uses external HTTP endpoints.
 
-To react to different authentication actions, the session service, `zitadel.session.v2.SessionService`, provides the different endpoints. As a rule of thumb, use response triggers if you primarily want to handle successful and failed authentications. On the other hand, use event triggers if you need more fine-granular handling, for example by the used authentication factors.  
+This shift enables:
 
-Some use-cases:
+- **Better Scalability:** Distributed, serverless execution
+- **Greater Flexibility:** Support for any technology stack (not just JavaScript)
+- **Improved Resilience:** Isolating custom logic from core ZITADEL services
+- **Cost Optimization:** Pay-per-execution models with serverless providers
+- **Enhanced Monitoring:** Better debugging and observability of custom extensions
 
-- Handle successful authentication through the response of `/zitadel.session.v2.SessionService/CreateSession` and `/zitadel.session.v2.SessionService/SetSession`, [Action Response Example](./testing-response)
-- Handle failed authentication through the response of `/zitadel.session.v2.SessionService/CreateSession` and `/zitadel.session.v2.SessionService/SetSession`, [Action Response Example](./testing-response)
-- Handle session with password checked through the creation of event `session.password.checked`, [Action Event Example](./testing-event)
-- Handle successful authentication through the creation of event `user.human.password.check.succeeded`, [Action Event Example](./testing-event)
-- Handle failed authentication through the creation of event `user.human.password.check.failed`, [Action Event Example](./testing-event)
+The transition represents a move from "embedded extensions" to "true webhooks," aligning ZITADEL with industry patterns (GitHub Actions, Zapier, etc.).
 
-### Pre Creation
+## Architecture Deep Dive: V1 vs V2
 
-A user registers directly at ZITADEL.
-ZITADEL did not create the user yet.
+### Actions V1: The Embedded Model
 
-Some use-cases:
+Custom JavaScript code executed directly inside ZITADEL's process. For a complete list of V1 flow types, see [Actions V1 Flow Types](/guides/manage/console/actions-overview#available-flow-types).
 
-- Before a user is created through the request on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Request Example](./testing-request)
-- Add information to the user through the request on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Request Manipulation Example](./testing-request-manipulation)
+- **Context:** Embedded goja JavaScript engine
+- **Risks:** Shared memory space; errors could affect core functionality
+- **Constraints:** Bound to ZITADEL process resources; limited timeout configuration
+- **V1 Triggers:** Pre-event hooks (fire before operation) and Post-event hooks (fire after success)
 
-### Post Creation
+### Actions V2: The Webhook Model
 
-A user registers directly at ZITADEL.  
-ZITADEL successfully created the user.
+Custom logic lives in external HTTP endpoints called via webhooks.
 
-Some use-cases:
+- **Context:** Runs on your infrastructure (Cloudflare Workers, AWS Lambda, etc.)
+- **Isolation:** Completely isolated memory; failures do not crash ZITADEL
+- **Scaling:** Endpoints scale independently of ZITADEL
 
-- After user is created through the response on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Response Example](./testing-response)
-- At the event of a user creation on `user.human.added`, [Action Event Example](./testing-event)
+**V2 Execution Types:**
 
-## External Authentication
+| Type | Description |
+|------|-------------|
+| **Request** | Triggers when a specific API request occurs |
+| **Response** | Triggers when a specific API response occurs |
+| **Function** | Triggers when specific functionality is used (useful for adding custom claims to tokens or executing external code during OIDC/SAML flows) |
+| **Event** | Triggers reactively when ZITADEL events occur |
 
-### Post Authentication
+### Key Architectural Differences
 
-A user has authenticated externally. ZITADEL retrieved and mapped the external information.
+| Aspect | Actions V1 | Actions V2 |
+|--------|-----------|-----------|
+| Execution Environment | Embedded in ZITADEL (sandboxed JavaScript) | External webhooks (Cloudflare Workers, AWS Lambda, etc.) |
+| Code Location | Inline in ZITADEL Console | Hosted on your infrastructure |
+| Language | JavaScript (limited runtime) | Any language |
+| API Access | `ctx` and `api` objects provided by ZITADEL | ZITADEL REST/gRPC APIs via HTTP calls |
+| Triggers | Flow + Trigger (e.g., "Pre Access Token Creation") | Specific API methods or webhook events |
+| Dependencies | Limited (`zitadel/http`, `zitadel/log`) | Any framework |
+| Security | Managed by ZITADEL | HMAC signature verification required (to validate incoming webhook requests from ZITADEL) |
+| Scalability | Limited by ZITADEL instance | Independent scaling |
 
-Some use-cases:
+### Business Benefits
 
-- Handle the information mapping from the external authentication to internal structure through the response on `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`, [Action Response Example](./testing-response)
-  - information about the link to the external IDP available in the response under [`idpInformation`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent)
-  - information if a new user has to be created available in the response under [`addHumanUser`](/apis/resources/user_service_v2/user-service-retrieve-identity-provider-intent), including metadata and link to external IDP
+- **Technology Flexibility:** Use your preferred language instead of being locked into JavaScript
+- **Operational Resilience:** Isolates failures to prevent cascading outages
+- **Cost Optimization:** Leverage serverless "scale to zero" pricing for custom logic
+- **Observability:** Integrate with tools such as Datadog and Sentry
 
-### Pre Creation
+## When to Use Each V2 Execution Type
 
-A user registers directly at ZITADEL.
-ZITADEL did not create the user yet.
+We provide a collection of [ready-to-deploy Cloudflare Worker examples](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers) that integrate with ZITADEL Actions V2. Each script demonstrates how to handle ZITADEL events, signatures, and responses directly from a serverless Cloudflare Worker environment. While the examples are designed for Cloudflare Workers, the code can be adapted to deploy on the platform of your choice (AWS Lambda, Azure Functions, etc.).
 
-Some use-cases:
+| If You Need To... | Use This V2 Type | When It Fires | Example |
+|-------------------|------------------|---------------|---------|
+| Add custom token claims | Function (`preaccesstoken`) | Before access token generated | [custom-claims](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/CUSTOM-CLAIMS.md) |
+| Map roles to permissions | Function (`preaccesstoken`) | Before access token generated | [authorization](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/AUTHORIZATION.md) |
+| Add "groups" claim from roles | Function (`preaccesstoken`/`preuserinfo`) | Before token/userinfo generated | [groups-claim](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/GROUPS-CLAIM.md) |
+| Block login | Function (`preuserinfo`) + `interruptOnError: true` | Before userinfo generated | [block-login](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/BLOCK-LOGIN.md) |
+| Track last login time | Function (`preuserinfo`) | Before userinfo generated | [set-user-metadata](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SET-USER-METADATA.md) |
+| Add custom SAML attributes | Function (`presamlresponse`) | Before SAML response sent | [saml-attributes](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SAML-ATTRIBUTES.md) |
+| Migrate users on first login | Request + Response (API methods) | Before/after user lookup & session | [jit-users-migration](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/JIT-USERS-MIGRATION.md) |
+| Map IDP attributes | Response (`/RetrieveIdentityProviderIntent`) | After IDP authentication | [idp-mapping](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/IDP-MAPPING.md) |
+| Auto-assign roles to new users | Event (`user.human.added`) | When user created | [set-role](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SET-ROLE.md) |
+| Forward events to monitoring | Event (any event) | When event occurs | [datadog-forwarder](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/DATADOG-FORWARDER.md) |
 
-- Before a user is created through the request on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Request Example](./testing-request)
-- Add information to the user through the request on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Request Manipulation Example](./testing-request-manipulation)
+## Detailed Flow Explanations
 
-### Post Creation
+### Flow 1: Internal Authentication
 
-A user registers directly at ZITADEL.  
-ZITADEL successfully created the user.
+Maps user registration and login triggers to Request (Pre-operation) and Response (Post-operation) execution types.
 
-Some use-cases:
+**Example Scripts:**
 
-- After user is created through the response on `/zitadel.user.v2.UserService/AddHumanUser`, [Action Response Example](./testing-response)
-- At the event of a user creation on `user.human.added`, [Action Event Example](./testing-event)
+- Block/validate requests: [block-login-flow.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/BLOCK-LOGIN.md)
+- Add metadata post-creation: [metadata.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SET-USER-METADATA.md)
 
-## Complement Token
+### Flow 2: External Authentication
 
-These are executed during the creation of tokens and token introspection.
+Handles IDP logins and JIT (Just-in-Time) provisioning via Response (Intent retrieval) and standard User Creation hooks.
 
-### Pre Userinfo
+**Example Scripts:**
 
-These are called before userinfo are set in the id_token or userinfo and introspection endpoint response.
+- Map IDP attributes: [idp-mapping.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/IDP-MAPPING.md)
+- JIT user migration: [jit-user-migration.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/JIT-USERS-MIGRATION.md)
 
-Some use-cases:
+### Flow 3: Complement Token
 
-- Add claims to the userinfo through function on `preuserinfo`, [Action Function Example](./testing-function)
-- Add metadata to user through function on `preuserinfo`, [Action Function Example](./testing-function)
-- Add logs to the log claim through function on `preuserinfo`, [Action Function Example](./testing-function)
+Moves from implicit hooks to specific V2 functions, primarily Function (`preaccesstoken`).
 
-### Pre Access Token
+**Example Scripts:**
 
-These are called before the claims are set in the access token and the token type is `jwt`.
+- Add custom claims: [custom-claims.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/CUSTOM-CLAIMS.md)
+- Add permissions claim: [authorization.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/AUTHORIZATION.md)
 
-Some use-cases:
+### Flow 4: Customize SAML Response
 
-- Add claims to the userinfo through function on `preaccesstoken`, [Action Function Example](./testing-function)
-- Add metadata to user through function on `preaccesstoken`, [Action Function Example](./testing-function)
-- Add logs to the log claim through function on `preaccesstoken`, [Action Function Example](./testing-function)
+Moves to the Function (`presamlresponse`).
 
-## Complement SAML Response
+**Example Scripts:**
 
-These are executed before the return of the SAML Response.
+- Add SAML attributes: [saml-attributes.js](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SAML-ATTRIBUTES.md)
 
-### Pre SAMLResponse Creation
+## Additional Resources
 
-These are called before attributes are set in the SAMLResponse.
-
-Some use-cases:
-
-- Add custom attributes to the response through function on `presamlresponse`, [Action Function Example](./testing-function)
-- Add metadata to user through function on `presamlresponse`, [Action Function Example](./testing-function)
+- [ZITADEL Actions V2 Documentation](/concepts/features/actions_v2)
+- [Using Actions Guide](./usage)
+- [Actions V2 Examples Repository](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers)
 
 
 

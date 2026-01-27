@@ -957,7 +957,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 								),
 							),
 							eventstore.FilterPagination(
-								// used because we need to check for first login and an app which is not console
+								// used because we need to check for first login and an app which is not management console
 								eventstore.PositionGreater(decimal.NewFromInt(12), 4),
 							),
 						),

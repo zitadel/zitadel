@@ -8,7 +8,7 @@ import ProjectDescription from './\_project_description.mdx';
 
 <ProjectDescription name="ProjectDescription" />
 
-To learn how to set up a project read this console guide [here](../../guides/manage/console/projects-overview.mdx).
+To learn how to set up a project read this management console guide [here](../../guides/manage/console/projects-overview.mdx).
 
 ## Applications
 
@@ -29,7 +29,7 @@ More about granted projects: [Granted Projects](./granted_projects)
 
 A role consists of different attributes. Only the key is relevant to the authorization and must therefore be unique.
 The display name is only to provide a human-readable name if needed.
-And the group should enable a better handling in ZITADEL console, like give a user all the roles of a specific group. (Not implemented yet)
+And the group should enable a better handling in ZITADEL management console, like give a user all the roles of a specific group. (Not implemented yet)
 
 All applications in a project share the roles. Read more about roles [here](../../guides/manage/console/roles)
 
