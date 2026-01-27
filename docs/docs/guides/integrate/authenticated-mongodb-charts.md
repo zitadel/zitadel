@@ -20,7 +20,7 @@ You will need to provide some information about your app. We recommend creating 
 
 Your application configuration should now look similar to this:
 
-![Create app in console](/img/integrations/mongodb-charts-app-create-light.png)
+![Create app in management console](/img/integrations/mongodb-charts-app-create-light.png)
 
 ## Setup Custom JWT Provider for MongoDB Charts
 

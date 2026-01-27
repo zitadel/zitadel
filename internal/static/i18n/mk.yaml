@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: не можев да контактираме со SMTP-серверот користејќи TLS, проверете ја портата, проблеми со заштитен ѕид...
     CouldNotCreateClient: не можев да креирам smtp клиент
     CouldNotStartTLS: не можеше да започне tls
-    CouldNotAuth: не можев да додадам smtp auth, проверете дали и корисникот и лозинката се точни, дали се точни, можеби вашиот провајдер бара метод за автетика што не е поддржан од ZITADEL
+    CouldNotAuth: не можев да додадам smtp auth, проверете дали и корисникот и лозинката се точни, дали се точни, можеби вашиот провајдер бара метод за автетика што не е поддржан од Zitadel
     CouldNotSetSender: не може да се постави испраќач
     CouldNotSetRecipient: не може да се постави примач
   SMTPConfig:
@@ -207,7 +207,7 @@ Errors:
     NotFound: Организацијата не е пронајдена
     NotChanged: Организацијата не е променета
     DefaultOrgNotDeletable: Стандардната организација не смее да биде избришана
-    ZitadelOrgNotDeletable: Организацијата со ZITADEL проект не смее да биде избришана
+    ZitadelOrgNotDeletable: Организацијата со Zitadel проект не смее да биде избришана
     InvalidDomain: Невалиден домен
     DomainMissing: Недостасува домен
     DomainNotOnOrg: Доменот не постои во организацијата
@@ -1114,20 +1114,20 @@ EventTypes:
         changed: Променета политика за заклучување на лозинка
   iam:
     setup:
-      started: Започнато ZITADEL поставување
-      done: Завршено ZITADEL поставување
+      started: Започнато Zitadel поставување
+      done: Завршено Zitadel поставување
     global:
       org:
         set: Поставена глобална организација
     project:
       iam:
-        set: Поставен ZITADEL проект
+        set: Поставен Zitadel проект
     member:
-      added: Додаден ZITADEL член
-      changed: Променет ZITADEL член
-      removed: Отстранет ZITADEL член
+      added: Додаден Zitadel член
+      changed: Променет Zitadel член
+      removed: Отстранет Zitadel член
       cascade:
-        removed: Отстранети ZITADEL членови
+        removed: Отстранети Zitadel членови
     idp:
       config:
         added: Додадена IDP конфигурација
@@ -1240,9 +1240,9 @@ EventTypes:
       removed: Отстранет домен
     iam:
       console:
-        set: Поставена апликација на ZITADEL конзола
+        set: Комплет на апликација за управувачка конзола Zitadel
       project:
-        set: Поставен проект на ZITADEL
+        set: Поставен проект на Zitadel
     mail:
       template:
         added: Додаден е-пошта шаблон

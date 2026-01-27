@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
+//go:generate mockgen -typed -package mock -destination ./mock/commands.mock.go . Commands
 type Commands interface {
 	HumanInitCodeSent(ctx context.Context, orgID, userID string) error
 	HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error

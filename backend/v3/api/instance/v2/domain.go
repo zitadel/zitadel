@@ -22,7 +22,7 @@ import (
 
 func AddCustomDomainBeta(ctx context.Context, request *connect.Request[instance_v2beta.AddCustomDomainRequest]) (*connect.Response[instance_v2beta.AddCustomDomainResponse], error) {
 	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetDomain(), domain.DomainTypeCustom)
-	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
+	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ManagementConsoleApplicationID())
 
 	batchExec := domain.BatchExecutors(
 		addCustomDomainCmd,
@@ -157,7 +157,7 @@ func ListTrustedDomainsBeta(ctx context.Context, request *connect.Request[instan
 
 func AddCustomDomain(ctx context.Context, request *connect.Request[instance_v2.AddCustomDomainRequest]) (*connect.Response[instance_v2.AddCustomDomainResponse], error) {
 	addCustomDomainCmd := domain.NewAddInstanceDomainCommand(request.Msg.GetInstanceId(), request.Msg.GetCustomDomain(), domain.DomainTypeCustom)
-	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetCustomDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID())
+	oidcConfigUpdateCmd := domain.NewOIDCConfigurationUpdate(request.Msg.GetCustomDomain(), authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ManagementConsoleApplicationID())
 
 	batchExec := domain.BatchExecutors(
 		addCustomDomainCmd,

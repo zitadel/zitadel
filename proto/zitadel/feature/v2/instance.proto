@@ -81,7 +81,7 @@ message SetInstanceFeaturesRequest{
   optional bool console_use_v2_user_api = 15 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+      description: "If this is enabled the management console web client will use the new User v2 API for certain calls";
     }
   ];
 
@@ -182,7 +182,7 @@ message GetInstanceFeaturesResponse {
   FeatureFlag console_use_v2_user_api = 16 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+      description: "If this is enabled the management console web client will use the new User v2 API for certain calls";
     }
   ];
 

@@ -129,7 +129,7 @@ DefaultInstance:
 
 If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
 Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
-The console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
+The management console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 
 ### Exhausted Action Run Seconds
 
