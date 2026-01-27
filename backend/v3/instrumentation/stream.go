@@ -7,6 +7,7 @@ type Stream int
 //go:generate enumer -type=Stream -trimprefix=Stream -transform=snake -text
 const (
 	StreamRuntime      Stream = iota // Top-level commands, such as starting the application or running migrations.
+	StreamReady                      // Readiness and liveness checks.
 	StreamRequest                    // API request handling.
 	StreamEventPusher                // Event pushing to the database (not implemented yet).
 	StreamEventHandler               // Event handling and processing.

@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _StreamName = "runtimerequestevent_pusherevent_handleractionnotification"
+const _StreamName = "runtimereadyrequestevent_pusherevent_handleractionnotification"
 
-var _StreamIndex = [...]uint8{0, 7, 14, 26, 39, 45, 57}
+var _StreamIndex = [...]uint8{0, 7, 12, 19, 31, 44, 50, 62}
 
-const _StreamLowerName = "runtimerequestevent_pusherevent_handleractionnotification"
+const _StreamLowerName = "runtimereadyrequestevent_pusherevent_handleractionnotification"
 
 func (i Stream) String() string {
 	if i < 0 || i >= Stream(len(_StreamIndex)-1) {
@@ -25,37 +25,41 @@ func (i Stream) String() string {
 func _StreamNoOp() {
 	var x [1]struct{}
 	_ = x[StreamRuntime-(0)]
-	_ = x[StreamRequest-(1)]
-	_ = x[StreamEventPusher-(2)]
-	_ = x[StreamEventHandler-(3)]
-	_ = x[StreamAction-(4)]
-	_ = x[StreamNotification-(5)]
+	_ = x[StreamReady-(1)]
+	_ = x[StreamRequest-(2)]
+	_ = x[StreamEventPusher-(3)]
+	_ = x[StreamEventHandler-(4)]
+	_ = x[StreamAction-(5)]
+	_ = x[StreamNotification-(6)]
 }
 
-var _StreamValues = []Stream{StreamRuntime, StreamRequest, StreamEventPusher, StreamEventHandler, StreamAction, StreamNotification}
+var _StreamValues = []Stream{StreamRuntime, StreamReady, StreamRequest, StreamEventPusher, StreamEventHandler, StreamAction, StreamNotification}
 
 var _StreamNameToValueMap = map[string]Stream{
 	_StreamName[0:7]:        StreamRuntime,
 	_StreamLowerName[0:7]:   StreamRuntime,
-	_StreamName[7:14]:       StreamRequest,
-	_StreamLowerName[7:14]:  StreamRequest,
-	_StreamName[14:26]:      StreamEventPusher,
-	_StreamLowerName[14:26]: StreamEventPusher,
-	_StreamName[26:39]:      StreamEventHandler,
-	_StreamLowerName[26:39]: StreamEventHandler,
-	_StreamName[39:45]:      StreamAction,
-	_StreamLowerName[39:45]: StreamAction,
-	_StreamName[45:57]:      StreamNotification,
-	_StreamLowerName[45:57]: StreamNotification,
+	_StreamName[7:12]:       StreamReady,
+	_StreamLowerName[7:12]:  StreamReady,
+	_StreamName[12:19]:      StreamRequest,
+	_StreamLowerName[12:19]: StreamRequest,
+	_StreamName[19:31]:      StreamEventPusher,
+	_StreamLowerName[19:31]: StreamEventPusher,
+	_StreamName[31:44]:      StreamEventHandler,
+	_StreamLowerName[31:44]: StreamEventHandler,
+	_StreamName[44:50]:      StreamAction,
+	_StreamLowerName[44:50]: StreamAction,
+	_StreamName[50:62]:      StreamNotification,
+	_StreamLowerName[50:62]: StreamNotification,
 }
 
 var _StreamNames = []string{
 	_StreamName[0:7],
-	_StreamName[7:14],
-	_StreamName[14:26],
-	_StreamName[26:39],
-	_StreamName[39:45],
-	_StreamName[45:57],
+	_StreamName[7:12],
+	_StreamName[12:19],
+	_StreamName[19:31],
+	_StreamName[31:44],
+	_StreamName[44:50],
+	_StreamName[50:62],
 }
 
 // StreamString retrieves an enum value from the enum constants string name.

@@ -40,6 +40,7 @@ type Stream = instrumentation.Stream
 
 const (
 	StreamRuntime      = instrumentation.StreamRuntime      // Application runtime logs.
+	StreamReady        = instrumentation.StreamReady        // Readiness and liveness checks.
 	StreamRequest      = instrumentation.StreamRequest      // API request handling.
 	StreamEventPusher  = instrumentation.StreamEventPusher  // Event pushing to the database (not implemented yet).
 	StreamEventHandler = instrumentation.StreamEventHandler // Event handling and processing.
