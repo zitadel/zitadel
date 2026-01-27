@@ -260,6 +260,84 @@
         @apply opacity-90;
         color: white !important;
     }
+    
+    /* Target any div that uses the callout color variable */
+    div[style*="--callout-color"] {
+        @apply rounded-lg shadow-sm mb-4;
+        
+        /* Force Docusaurus Layout: Left Border Only */
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-left-width: 4px !important;
+        
+        /* Hide the default Fumadocs vertical colored bar inside */
+        & > div[role="none"] {
+            display: none !important;
+        }
+    }
+
+    /* --- INFO (Blue) --- */
+    /* We match the variable name in the style string */
+    div[style*="--color-fd-info"] {
+        background-color: #eff6ff !important;
+        border-left-color: #3b82f6 !important;
+        color: #1e3a8a !important;
+    }
+    div[style*="--color-fd-info"] svg {
+        color: #3b82f6 !important;
+        fill: transparent !important; /* Remove fill to look cleaner */
+    }
+    /* Dark Mode Info */
+    :is(.dark div[style*="--color-fd-info"]) {
+        background-color: rgba(59, 130, 246, 0.1) !important;
+        color: #dbeafe !important;
+        border-top-color: rgba(255,255,255,0.05) !important;
+        border-right-color: rgba(255,255,255,0.05) !important;
+        border-bottom-color: rgba(255,255,255,0.05) !important;
+    }
+
+    /* --- WARNING (Amber) --- */
+    div[style*="--color-fd-warn"] {
+        background-color: #fffbeb !important;
+        border-left-color: #f59e0b !important;
+        color: #78350f !important;
+    }
+    div[style*="--color-fd-warn"] svg {
+        color: #f59e0b !important;
+        fill: transparent !important;
+    }
+    /* Dark Mode Warning */
+    :is(.dark div[style*="--color-fd-warn"]) {
+        background-color: rgba(245, 158, 11, 0.1) !important;
+        color: #fef3c7 !important;
+        border-top-color: rgba(255,255,255,0.05) !important;
+        border-right-color: rgba(255,255,255,0.05) !important;
+        border-bottom-color: rgba(255,255,255,0.05) !important;
+    }
+
+    /* --- ERROR (Red) --- */
+    div[style*="--color-fd-error"] {
+        background-color: #fef2f2 !important;
+        border-left-color: #ef4444 !important;
+        color: #7f1d1d !important;
+    }
+    div[style*="--color-fd-error"] svg {
+        color: #ef4444 !important;
+        fill: transparent !important;
+    }
+    /* Dark Mode Error */
+    :is(.dark div[style*="--color-fd-error"]) {
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        color: #fee2e2 !important;
+        border-top-color: rgba(255,255,255,0.05) !important;
+        border-right-color: rgba(255,255,255,0.05) !important;
+        border-bottom-color: rgba(255,255,255,0.05) !important;
+    }
+    
+    /* --- TITLE BOLD --- */
+    div[style*="--callout-color"] strong, 
+    div[style*="--callout-color"] p:first-child strong {
+        font-weight: 700 !important;
+    }
 }
 
 @layer base {
