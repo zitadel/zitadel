@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekte",
-      "DESCRIPTION": "Ein Projekt enthält eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Zum Beispiel könntest du ein einziges Projekt mit 3 Anwendungen haben; eine für dein Web-Frontend, eine für deine mobile Application und eine für dein Backend. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
+      "DESCRIPTION": "Ein Projekt hostet eine oder mehrere Anwendungen, mit denen Sie Ihre Benutzer authentifizieren können. Sie könnten beispielsweise ein einzelnes Projekt mit 3 Anwendungen haben: eine für Ihr Web-Frontend, Ihre mobile Anwendung und Ihre Backend-Dienste. Sie können Ihre Benutzer auch mit Projekten autorisieren. Um Benutzern aus anderen Organisationen die Anmeldung bei Ihren Anwendungen zu ermöglichen, gewähren Sie ihnen Zugriff auf Ihr Projekt.<br/><br/>Wenn Sie ein Projekt nicht finden können, wenden Sie sich an den Eigentümer des Projekts oder an jemanden mit den entsprechenden Rechten, um Zugriff zu erhalten.",
       "OWNED": {
         "TITLE": "Eigene Projekte",
         "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktive und zukünftige Web Keys",
           "DESCRIPTION": "Deine aktiven und kommenden Web Keys. Das Aktivieren eines neuen Schlüssels deaktiviert den aktuellen.",
-          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard: 5 Min.). Vermeide es, einen Schlüssel zu früh zu aktivieren, da er möglicherweise noch nicht in Caches und Clients verfügbar ist.",
+          "NOTE": "Hinweis: Der JWKs OIDC-Endpunkt gibt eine zwischenspeicherbare Antwort zurück (Standard 5 Minuten). Vermeiden Sie es, einen Schlüssel zu früh zu aktivieren, da er für Caches und Anwendungen/Clients möglicherweise noch nicht verfügbar ist.",
           "ACTIVATE": "Nächsten Web Key aktivieren",
           "ACTIVE": "Derzeit aktiv",
           "NEXT": "Als Nächstes in der Warteschlange",
@@ -386,12 +386,12 @@
         "action": "Projekt erstellen"
       },
       "APPLICATION_CREATED": {
-        "title": "Registriere deine Application",
+        "title": "Registrieren Sie Ihre Anwendung",
         "description": "Registriere deine erste Web-, Nativ-, API- oder SAML-Applikation und konfiguriere den Authentification-Flow.",
-        "action": "Application registrieren"
+        "action": "Anwendung registrieren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Logge dich in deine Application ein",
+        "title": "Melden Sie sich bei Ihrer Anwendung an",
         "description": "Integriere deine Applikation mit ZITADEL für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
         "action": "Einloggen"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Beispiele durchsuchen",
-    "DUPLICATEAPPRENAME": "Es gibt bereits eine Application mit gleichem Namen. Bitte wähle einen anderen Namen.",
+    "DUPLICATEAPPRENAME": "Eine Anwendung mit demselben Namen ist bereits vorhanden. Bitte wählen Sie einen anderen Namen.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework ändern",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
-    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeclients zu verwalten",
+    "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeanwendungen zu verwalten",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "Authentikator Application für TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator-Anwendung für TOTP (zeitbasiertes Einmalkennwort)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
-      "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator Application und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
+      "OTP_DIALOG_DESCRIPTION": "Scannen Sie den QR-Code mit einer Authentifizierungsanwendung und geben Sie den folgenden Code ein, um die OTP-Methode zu überprüfen und zu aktivieren.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Faktor hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
@@ -1611,7 +1611,7 @@
         "3": "Telefonnummer Verifikationscode",
         "4": "Passwort Zurücksetzen Code",
         "5": "Passkey Initialisierungscode",
-        "6": "Applicationssecret",
+        "6": "Anwendungsgeheimnis",
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Anwendungen über die Beendigung der Sitzung beim OpenID Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
       "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne Application-Kontext gestartet wurde (z. B. von Mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne Anwendungskontext gestartet wurde (z. B. per E-Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
       "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"
@@ -2410,7 +2410,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password per Authenticator App (TOTP)",
+      "1": "Einmalkennwort per Authenticator-Anwendung (TOTP)",
       "2": "Passkey",
       "3": "One Time Password per Email (Email OTP)",
       "4": "One Time Password per SMS (SMS OTP)",
@@ -2634,8 +2634,8 @@
       "IDTOKENROLEASSERTION": "Benutzerrollen im ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Bei Auswahl werden dem ID Token die angeforderten Rollen des authentifizierten Benutzers hinzugefügt.",
       "IDTOKENUSERINFOASSERTION": "User Info im ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Ermöglich OIDC clients claims von profile, email, phone und address direkt vom ID Token zu beziehen.",
-      "CLOCKSKEW": "ermöglicht Clients, den Taktversatz von OP und Client zu verarbeiten. Die Dauer (0-5s) wird der exp addiert und von iats, auth_time und nbf abgezogen.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Ermöglicht Anwendungen, Profil-, E-Mail-, Telefon- und Adressansprüche aus dem ID-Token abzurufen.",
+      "CLOCKSKEW": "Ermöglicht Anwendungen, die Zeitverschiebung von OP und Client zu handhaben. Die Dauer (0-5s) wird zum exp-Anspruch hinzugefügt und von iats, auth_time und nbf subtrahiert.",
       "RECOMMENDED": "Empfohlen",
       "NOTRECOMMENDED": "nicht empfohlen",
       "SELECTION": {

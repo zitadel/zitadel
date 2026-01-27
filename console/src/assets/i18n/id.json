@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Proyek",
-      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Misalnya, Anda mungkin memiliki satu proyek dengan 3 aplikasi; satu untuk frontend web Anda, satu untuk aplikasi seluler Anda, dan satu untuk backend Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
+      "DESCRIPTION": "Sebuah proyek menampung satu atau beberapa aplikasi yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Misalnya, Anda mungkin memiliki satu proyek dengan 3 aplikasi: satu untuk frontend web Anda, aplikasi seluler Anda, dan layanan backend Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses.",
       "OWNED": {
         "TITLE": "Proyek Milik",
         "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, otorisasi, dan aplikasi proyek ini."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Kunci Web Aktif dan Mendatang",
           "DESCRIPTION": "Kunci web Anda yang aktif dan akan datang. Mengaktifkan kunci baru akan menonaktifkan kunci yang sedang digunakan.",
-          "NOTE": "Catatan: Endpoint JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia di cache dan klien.",
+          "NOTE": "Catatan: Titik akhir JWKs OIDC mengembalikan respons yang dapat di-cache (default 5 menit). Hindari mengaktifkan kunci terlalu cepat, karena mungkin belum tersedia untuk cache dan aplikasi/klien.",
           "ACTIVATE": "Aktifkan Kunci Web Berikutnya",
           "ACTIVE": "Saat ini aktif",
           "NEXT": "Berikutnya dalam antrean",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Mode Pengembang diaktifkan secara default. Anda dapat memperbarui nilai untuk produksi nanti.",
     "GUIDE": "Memandu",
     "BROWSEEXAMPLES": "Telusuri Contoh dan SDK",
-    "DUPLICATEAPPRENAME": "Aplikasi dengan nama yang sama sudah ada. Silakan pilih nama lain.",
+    "DUPLICATEAPPRENAME": "Aplikasi dengan nama yang sama sudah ada. Silakan pilih nama yang berbeda.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Ubah Kerangka",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
     "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
     "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
-    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola klien masuk",
+    "IAM_LOGIN_CLIENT": "Memiliki izin untuk mengelola aplikasi login",
     "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
     "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
     "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Tambahkan faktor kedua untuk memastikan keamanan optimal untuk akun Anda.",
       "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
       "ADD": "Tambahkan Faktor",
-      "OTP": "Aplikasi Authenticator untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
+      "OTP": "Aplikasi Pengautentikasi untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
       "OTP_DIALOG_TITLE": "Tambahkan OTP",
-      "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi autentikator dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi pengautentikasi dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verifikasi Faktor",
       "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Multifaktor universal yang Anda gunakan.",
@@ -1643,7 +1643,7 @@
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Logout Saluran Belakang mengimplementasikan OpenID Connect Back-Channel Logout 1.0 dan dapat digunakan untuk memberi tahu aplikasi tentang penghentian sesi di Penyedia OpenID.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": {
@@ -1915,7 +1915,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Jika opsi ini dipilih, layar kata sandi akan ditampilkan dalam proses login meskipun pengguna tidak ditemukan. Kesalahan pada pemeriksaan kata sandi tidak akan mengungkapkan apakah nama pengguna atau kata sandi salah.",
       "ALLOWDOMAINDISCOVERY_DESC": "Jika opsi ini dipilih, akhiran (@domain.com) dari nama pengguna yang tidak diketahui yang dimasukkan pada layar masuk akan dicocokkan dengan domain organisasi dan akan dialihkan ke pendaftaran organisasi tersebut jika berhasil.",
       "DEFAULTREDIRECTURI": "URI Pengalihan Default",
-      "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika proses masuk dimulai tanpa konteks aplikasi (misalnya dari email)",
+      "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika login telah dimulai tanpa konteks aplikasi (misalnya dari email)",
       "ERRORMSGPOPUP": "Tampilkan Kesalahan dalam Dialog",
       "DISABLEWATERMARK": "Sembunyikan Tanda Air",
       "DISABLEWATERMARK_DESC": "Sembunyikan tanda air Powered by ZITADEL di antarmuka login"
@@ -2430,7 +2430,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Tidak dikenal",
-      "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
+      "1": "Kata Sandi Sekali Pakai oleh Aplikasi Pengautentikasi (TOTP)",
       "2": "Passkey",
       "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
       "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)",
@@ -2658,8 +2658,8 @@
       "IDTOKENROLEASSERTION": "Peran pengguna di dalam Token ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Jika dipilih, peran yang diminta dari pengguna yang diautentikasi akan ditambahkan ke token ID.",
       "IDTOKENUSERINFOASSERTION": "Info Pengguna di dalam Token ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan klien untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
-      "CLOCKSKEW": "Memungkinkan klien untuk menangani kemiringan jam OP dan klien. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan aplikasi untuk mengambil klaim profil, email, telepon, dan alamat dari token ID.",
+      "CLOCKSKEW": "Memungkinkan aplikasi untuk menangani kemiringan jam OP dan klien. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
       "RECOMMENDED": "direkomendasikan",
       "NOTRECOMMENDED": "tidak disarankan",
       "SELECTION": {

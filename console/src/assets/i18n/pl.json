@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projekty",
-      "DESCRIPTION": "Projekt gości jedną lub więcej aplikacji, których możesz użyć do uwierzytelniania swoich użytkowników. Na przykład, możesz mieć jeden projekt z 3 aplikacjami; jedną dla swojego frontendu internetowego, jedną dla swojej aplikacji mobilnej i jedną dla swojego backendu. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do twoich aplikacji, udziel im dostępu do twojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą z odpowiednimi uprawnieniami, aby uzyskać dostęp.",
+      "DESCRIPTION": "Projekt hostuje jedną lub więcej aplikacji, których można używać do uwierzytelniania użytkowników. Na przykład, możesz mieć jeden projekt z 3 aplikacjami: jedną dla interfejsu internetowego, jedną dla aplikacji mobilnej i jedną dla usług zaplecza. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do Twoich aplikacji, przyznaj im dostęp do swojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą posiadającą odpowiednie uprawnienia, aby uzyskać dostęp.",
       "OWNED": {
         "TITLE": "Posiadane projekty",
         "DESCRIPTION": "To są projekty, które posiadasz. Możesz zarządzać ustawieniami tych projektów, uprawnieniami i aplikacjami."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Aktywne i Przyszłe Klucze Internetowe",
           "DESCRIPTION": "Twoje aktywne i nadchodzące klucze internetowe. Aktywacja nowego klucza spowoduje dezaktywację obecnego.",
-          "NOTE": "Uwaga: Punkt końcowy JWKs OIDC zwraca odpowiedź możliwą do buforowania (domyślnie 5 minut). Unikaj zbyt wczesnej aktywacji klucza, ponieważ może on nie być jeszcze dostępny w pamięci podręcznej i dla klientów.",
+          "NOTE": "Uwaga: Punkt końcowy JWKs OIDC zwraca odpowiedź, którą można buforować (domyślnie 5 min). Unikaj zbyt wczesnego aktywowania klucza, ponieważ może on nie być jeszcze dostępny dla pamięci podręcznych i aplikacji/klientów.",
           "ACTIVATE": "Aktywuj następny klucz internetowy",
           "ACTIVE": "Obecnie aktywny",
           "NEXT": "Następny w kolejce",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Tryb deweloperski jest domyślnie włączony. Możesz później zaktualizować wartości dla produkcji.",
     "GUIDE": "Przewodnik",
     "BROWSEEXAMPLES": "Przeglądaj przykłady",
-    "DUPLICATEAPPRENAME": "Aplikacja o tej samej nazwie już istnieje. Proszę wybrać inną nazwę.",
+    "DUPLICATEAPPRENAME": "Aplikacja o tej samej nazwie już istnieje. Wybierz inną nazwę.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Ramy zmian",
@@ -655,7 +655,7 @@
     "IAM_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami",
     "IAM_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych ze wszystkich organizacji",
     "IAM_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych ze wszystkich organizacji",
-    "IAM_LOGIN_CLIENT": "Ma uprawnienia do zarządzania klientami logowania",
+    "IAM_LOGIN_CLIENT": "Ma uprawnienia do zarządzania aplikacjami logowania",
     "ORG_OWNER": "Ma uprawnienie nad całą organizacją",
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
@@ -883,7 +883,7 @@
       "DESCRIPTION": "Dodaj drugi czynnik, aby zapewnić optymalne bezpieczeństwo twojego konta.",
       "MANAGE_DESCRIPTION": "Zarządzaj metodami drugiego czynnika swoich użytkowników.",
       "ADD": "Dodaj czynnik",
-      "OTP": "Aplikacja uwierzytelniająca TOTP (jednorazowe hasło)",
+      "OTP": "Aplikacja uwierzytelniająca dla TOTP (jednorazowe hasło oparte na czasie)",
       "OTP_DIALOG_TITLE": "Dodaj TOTP",
       "OTP_DIALOG_DESCRIPTION": "Zeskanuj kod QR za pomocą aplikacji uwierzytelniającej i wprowadź poniższy kod, aby zweryfikować i aktywować metodę OTP.",
       "U2F": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne",
@@ -1645,7 +1645,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Błąd nadrzędny",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Jeśli flaga jest włączona, błąd nadrzędny OIDC zostanie zarejestrowany w konsoli.",
       "ENABLEBACKCHANNELLOGOUT": "Włącz Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 i może być używany do powiadamiania klientów o zakończeniu sesji u dostawcy OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Wylogowanie z kanału zwrotnego implementuje OpenID Connect Back-Channel Logout 1.0 i może być używane do powiadamiania aplikacji o zakończeniu sesji u dostawcy OpenID.",
       "PERMISSIONCHECKV2": "Sprawdzanie uprawnień V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
       "STATES": {
@@ -1916,7 +1916,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Jeśli ta opcja jest zaznaczona, ekran hasła pojawi się w procesie logowania, nawet jeśli użytkownik nie zostanie znaleziony. Błąd podczas sprawdzania hasła nie ujawni, czy nazwa użytkownika lub hasło były błędne.",
       "ALLOWDOMAINDISCOVERY_DESC": "Jeśli ta opcja jest zaznaczona, sufiks (@domain.com) nieznanej nazwy użytkownika podanej na ekranie logowania będzie dopasowywany do domen organizacji i po pomyślnym dopasowaniu przekieruje do rejestracji tej organizacji.",
       "DEFAULTREDIRECTURI": "Domyślny adres przekierowania URI",
-      "DEFAULTREDIRECTURI_DESC": "Określa, dokąd użytkownik zostanie przekierowany, jeśli logowanie rozpocznie się bez kontekstu aplikacji (np. z poczty e-mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definiuje, gdzie użytkownik zostanie przekierowany, jeśli logowanie zostało rozpoczęte bez kontekstu aplikacji (np. z poczty)",
       "ERRORMSGPOPUP": "Pokazuj błąd w oknie dialogowym",
       "DISABLEWATERMARK": "Ukryj znak wodny",
       "DISABLEWATERMARK_DESC": "Ukrywa znak wodny 'Powered by ZITADEL' na interfejsie logowania"
@@ -2410,7 +2410,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "1": "Jednorazowe hasło za pomocą aplikacji uwierzytelniającej (TOTP)",
       "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
       "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
       "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)",
@@ -2634,8 +2634,8 @@
       "IDTOKENROLEASSERTION": "Role użytkownika w tokenie ID",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Jeśli zaznaczone, żądane role uwierzytelnionego użytkownika zostaną dodane do tokenu ID.",
       "IDTOKENUSERINFOASSERTION": "Informacje o użytkowniku w tokenie ID",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umożliwia klientom pobieranie twierdzeń profilu, e-mail, telefonu i adresu z tokenu ID.",
-      "CLOCKSKEW": "Umożliwia klientom obsługę opóźnienia zegara OP i klienta. Czas trwania (0-5s) zostanie dodany do twierdzenia exp i odjęty od iats, auth_time i nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umożliwia aplikacjom pobieranie roszczeń profilu, adresu e-mail, numeru telefonu i adresu z tokenu ID.",
+      "CLOCKSKEW": "Umożliwia aplikacjom obsługę odchylenia zegara OP i klienta. Czas trwania (0-5s) zostanie dodany do roszczenia exp i odjęty od iats, auth_time i nbf.",
       "RECOMMENDED": "zalecane",
       "NOTRECOMMENDED": "niezalecane",
       "SELECTION": {

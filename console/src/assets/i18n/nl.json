@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projecten",
-      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Bijvoorbeeld, je zou een enkel project kunnen hebben met 3 applicaties; een voor je web frontend, een voor je mobiele application, en een voor je backend. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "DESCRIPTION": "Een project host een of meer applicaties die u kunt gebruiken om uw gebruikers te authenticeren. U kunt bijvoorbeeld één project hebben met 3 applicaties: één voor uw webfrontend, uw mobiele applicatie en uw backend-services. U kunt uw gebruikers ook autoriseren met projecten. Om gebruikers van andere organisaties toe te staan zich aan te melden bij uw applicaties, geeft u hen toegang tot uw project.<br/><br/>Als u een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
       "OWNED": {
         "TITLE": "Eigen Projecten",
         "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Actieve en Toekomstige Websleutels",
           "DESCRIPTION": "Je actieve en aankomende websleutels. Het activeren van een nieuwe sleutel deactiveert de huidige.",
-          "NOTE": "Opmerking: Het JWKs OIDC-eindpunt geeft een cachebare respons terug (standaard 5 minuten). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is in caches en bij clients.",
+          "NOTE": "Opmerking: het JWKs OIDC-eindpunt retourneert een cachebaar antwoord (standaard 5 min). Vermijd het te vroeg activeren van een sleutel, omdat deze mogelijk nog niet beschikbaar is voor caches en applicaties/clients.",
           "ACTIVATE": "Volgende Websleutel activeren",
           "ACTIVE": "Momenteel actief",
           "NEXT": "Volgende in de wachtrij",
@@ -386,12 +386,12 @@
         "action": "Project aanmaken"
       },
       "APPLICATION_CREATED": {
-        "title": "Registreer uw application",
+        "title": "Registreer uw applicatie",
         "description": "Registreer uw web-, native-, api- of saml-applicatie en stel een authenticatiestroom in.",
-        "action": "Application registreren"
+        "action": "Applicatie registreren"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "Log in op uw application",
+        "title": "Log in op uw applicatie",
         "description": "Integreer uw applicatie met ZITADEL voor authenticatie en test het door in te loggen met uw beheerdersgebruiker.",
         "action": "Log in"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bekijk voorbeelden",
-    "DUPLICATEAPPRENAME": "Er bestaat al een application met dezelfde aartsvijand. Kies een andere naam.",
+    "DUPLICATEAPPRENAME": "Er bestaat al een applicatie met dezelfde naam. Kies een andere naam.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Verander Framework",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
     "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
     "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
-    "IAM_LOGIN_CLIENT": "Heeft toestemming om aanmeldklanten te beheren",
+    "IAM_LOGIN_CLIENT": "Heeft toestemming om inlogapplicaties te beheren",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Voeg een tweede factor toe om optimale beveiliging voor uw account te garanderen.",
       "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
       "ADD": "Factor toevoegen",
-      "OTP": "Authenticator Application voor TOTP (Time-based One-Time Password)",
+      "OTP": "Authenticator-applicatie voor TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Voeg OTP toe",
-      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-application en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
+      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-applicatie en voer de onderstaande code in om de OTP-methode te verifiëren en te activeren.",
       "U2F": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere",
       "U2F_DIALOG_TITLE": "Verifieer factor",
       "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte universele multifactor.",
@@ -1611,7 +1611,7 @@
         "3": "Telefoon verificatie",
         "4": "Wachtwoord Reset",
         "5": "Passkey Initialisatie",
-        "6": "Application Secret",
+        "6": "Applicatiegeheim",
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om applicaties op de hoogte te stellen van sessiebeëindiging bij de OpenID Provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
       "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
-      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een application context (bijv. vanuit mail)",
+      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naartoe wordt omgeleid als de login is gestart zonder een applicatiecontext (bijv. vanuit e-mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
       "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"
@@ -2429,7 +2429,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Onbekend",
-      "1": "Eenmalig wachtwoord door Authenticator Application (TOTP)",
+      "1": "Eenmalig wachtwoord door Authenticator-applicatie (TOTP)",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
       "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
       "4": "Eenmalig wachtwoord per SMS (SMS OTP)",
@@ -2653,8 +2653,8 @@
       "IDTOKENROLEASSERTION": "Gebruikersrollen in ID Token",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Indien geselecteerd, worden de aangevraagde rollen van de geauthenticeerde gebruiker toegevoegd aan het ID-token.",
       "IDTOKENUSERINFOASSERTION": "Gebruikersinformatie in ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Hiermee kunnen clients profiel-, e-mail-, telefoon- en adresclaims van ID-token ophalen.",
-      "CLOCKSKEW": "Hiermee kunnen clients de klok skew van OP en client verwerken. De duur (0-5s) wordt toegevoegd aan exp claim en afgetrokken van iats, auth_time en nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Stelt applicaties in staat om profiel-, e-mail-, telefoon- en adresclaims op te halen uit het ID-token.",
+      "CLOCKSKEW": "Stelt applicaties in staat om de klokafwijking van OP en client af te handelen. De duur (0-5s) wordt toegevoegd aan de exp-claim en afgetrokken van iats, auth_time en nbf.",
       "RECOMMENDED": "aanbevolen",
       "NOTRECOMMENDED": "niet aanbevolen",
       "SELECTION": {

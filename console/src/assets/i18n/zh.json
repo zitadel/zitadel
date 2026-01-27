@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "项目",
-      "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。例如，你可能有一个包含3个应用的项目；一个用于你的Web前端，一个用于你的移动应用，一个用于你的后端。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
+      "DESCRIPTION": "一个项目托管一个或多个可用于对用户进行身份验证的应用程序。例如，您可能有一个包含 3 个应用程序的单个项目：一个用于您的 Web 前端，一个用于您的移动应用程序，一个用于您的后端服务。您还可以使用项目授权您的用户。要允许来自其他组织的用户登录您的应用程序，请授予他们访问您的项目的权限。<br/><br/>如果您找不到项目，请联系项目所有者或具有相应权限的人员以获取访问权限。",
       "OWNED": {
         "TITLE": "所拥有的项目",
         "DESCRIPTION": "这些是你拥有的项目。你可以管理这些项目的设置、权限和应用。"
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "活动和未来的 Web 密钥",
           "DESCRIPTION": "您的当前活动和即将启用的 Web 密钥。激活新密钥将会停用当前密钥。",
-          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认 5 分钟）。请避免过早激活密钥，否则它可能尚未在缓存或客户端中可用。",
+          "NOTE": "注意：JWKs OIDC 端点返回可缓存的响应（默认为 5 分钟）。避免过早激活密钥，因为它可能尚未对缓存和应用程序/客户端可用。",
           "ACTIVATE": "激活下一个 Web 密钥",
           "ACTIVE": "当前活动",
           "NEXT": "队列中的下一个",
@@ -386,12 +386,12 @@
         "action": "创建项目"
       },
       "APPLICATION_CREATED": {
-        "title": "注册你的应用程序",
+        "title": "注册您的应用程序",
         "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
-        "action": "创建应用程序"
+        "action": "注册应用程序"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
-        "title": "登录你的应用程序",
+        "title": "登录到您的应用程序",
         "description": "将你的应用程序与 ZITADEL 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
         "action": "登录"
       },
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "GUIDE": "指南",
     "BROWSEEXAMPLES": "浏览示例",
-    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DUPLICATEAPPRENAME": "已存在同名应用程序。请选择其他名称。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "有权创建和管理用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
-    "IAM_LOGIN_CLIENT": "具有管理登录客户端的权限",
+    "IAM_LOGIN_CLIENT": "有权管理登录应用程序",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "用于 TOTP 的身份验证器应用程序",
+      "OTP": "用于 TOTP（基于时间的一次性密码）的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
-      "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
+      "OTP_DIALOG_DESCRIPTION": "使用身份验证器应用程序扫描二维码并输入以下代码以验证并激活 OTP 方法。",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "验证因子",
       "U2F_DIALOG_DESCRIPTION": "输入您使用的通用 Multifactor 的名称。",
@@ -1614,7 +1614,7 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "Passkey 初始化",
-        "6": "Application 验证",
+        "6": "应用程序机密",
         "7": "一次性密码 (OTP) - SMS",
         "8": "一次性密码 (OTP) - 电子邮件"
       },
@@ -1649,7 +1649,7 @@
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
       "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "反向通道注销实现 OpenID Connect 反向通道注销 1.0，可用于在 OpenID 提供商处通知应用程序会话终止。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
@@ -1920,7 +1920,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
       "ALLOWDOMAINDISCOVERY_DESC": "如果选择该选项，在登录屏幕上输入的未知用户名的后缀（@domain.com）将与组织的域名进行匹配，成功后将重定向到组织的注册。",
       "DEFAULTREDIRECTURI": "默认重定向 URI",
-      "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
+      "DEFAULTREDIRECTURI_DESC": "定义如果登录是在没有应用程序上下文的情况下启动的（例如来自邮件），用户将被重定向到的位置",
       "ERRORMSGPOPUP": "在对话框中显示错误",
       "DISABLEWATERMARK": "隐藏水印",
       "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印"
@@ -2439,7 +2439,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
-      "1": "身份验证应用程序的一次性密码（TOTP）",
+      "1": "通过身份验证器应用程序获取一次性密码 (TOTP)",
       "2": "Passkey",
       "3": "电子邮件一次性密码（email OTP）",
       "4": "短信一次性密码（SMS OTP）",
@@ -2667,8 +2667,8 @@
       "IDTOKENROLEASSERTION": "在 ID Token 中包含用户角色",
       "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则已验证用户的请求角色将添加到 ID Token 中。",
       "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含用户信息",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使客户端能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
-      "CLOCKSKEW": "使客户端能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使应用程序能够从 ID 令牌中检索个人资料、电子邮件、电话和地址声明。",
+      "CLOCKSKEW": "使应用程序能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
       "RECOMMENDED": "推荐的",
       "NOTRECOMMENDED": "不推荐的",
       "SELECTION": {

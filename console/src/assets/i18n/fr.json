@@ -34,7 +34,7 @@
     },
     "PROJECTS": {
       "TITLE": "Projets",
-      "DESCRIPTION": "Un projet héberge une ou plusieurs applications, que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pourriez avoir un seul projet avec 3 applications : une pour votre frontend web, une pour votre application mobile et une pour votre backend. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour permettre aux utilisateurs d'autres organisations de se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas un projet, contactez le propriétaire du projet ou quelqu'un avec les droits correspondants pour obtenir l'accès.",
+      "DESCRIPTION": "Un projet héberge une ou plusieurs applications que vous pouvez utiliser pour authentifier vos utilisateurs. Par exemple, vous pouvez avoir un seul projet avec 3 applications : une pour votre interface Web, votre application mobile et vos services principaux. Vous pouvez également autoriser vos utilisateurs avec des projets. Pour autoriser les utilisateurs d'autres organisations à se connecter à vos applications, accordez-leur l'accès à votre projet.<br/><br/>Si vous ne trouvez pas de projet, contactez le propriétaire du projet ou une personne disposant des droits correspondants pour y accéder.",
       "OWNED": {
         "TITLE": "Projets Possédés",
         "DESCRIPTION": "Ce sont les projets que vous possédez. Vous pouvez gérer les paramètres de ces projets, les autorisations et les applications."
@@ -191,7 +191,7 @@
         "TABLE": {
           "TITLE": "Clés Web Actives et Futures",
           "DESCRIPTION": "Vos clés Web actives et à venir. L'activation d'une nouvelle clé désactivera l'actuelle.",
-          "NOTE": "Remarque : Le point de terminaison JWKs OIDC renvoie une réponse mise en cache (par défaut 5 min). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les clients.",
+          "NOTE": "Remarque : le point de terminaison JWKs OIDC renvoie une réponse pouvant être mise en cache (5 min par défaut). Évitez d'activer une clé trop tôt, car elle pourrait ne pas encore être disponible pour les caches et les applications/clients.",
           "ACTIVATE": "Activer la prochaine Clé Web",
           "ACTIVE": "Actuellement active",
           "NEXT": "Prochaine dans la file d'attente",
@@ -386,9 +386,9 @@
         "action": "Créez un projet"
       },
       "APPLICATION_CREATED": {
-        "title": "Créez votre application",
+        "title": "Enregistrez votre application",
         "description": "Créez votre application web, native, api ou saml et configurez un flux d'authentification.",
-        "action": "Créez l'application"
+        "action": "Enregistrer l'application"
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Connectez-vous à votre application",
@@ -453,7 +453,7 @@
     "DEVMODEWARN": "Le mode développement est activé par défaut. Vous pouvez mettre à jour les valeurs pour la production ultérieurement.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Parcourez les exemples",
-    "DUPLICATEAPPRENAME": "Une application avec ce nom existe déjà. Veuillez choisir un autre nom.",
+    "DUPLICATEAPPRENAME": "Une application du même nom existe déjà. Veuillez choisir un autre nom.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifier le framework",
@@ -656,7 +656,7 @@
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
     "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
     "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
-    "IAM_LOGIN_CLIENT": "A la permission de gérer les clients de connexion",
+    "IAM_LOGIN_CLIENT": "A l'autorisation de gérer les applications de connexion",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
@@ -884,9 +884,9 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP": "Application d'authentification pour TOTP (mot de passe à usage unique basé sur le temps)",
       "OTP_DIALOG_TITLE": "Ajouter un TOTP",
-      "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
+      "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et entrez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
       "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre multifacteur universel utilisé.",
@@ -1646,7 +1646,7 @@
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si le drapeau est activé, l'erreur parent OIDC sera enregistrée dans la console.",
       "ENABLEBACKCHANNELLOGOUT": "Activer le Backchannel Logout",
-      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "La déconnexion du canal arrière implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisée pour notifier les applications de la fin de session sur le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
@@ -1917,7 +1917,7 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si l'option est sélectionnée, l'écran du mot de passe sera affiché dans le processus de connexion même si l'utilisateur n'a pas été trouvé. L'erreur sur la vérification du mot de passe ne révélera pas si le nom d'utilisateur ou le mot de passe était erroné.",
       "ALLOWDOMAINDISCOVERY_DESC": "Si l'option est sélectionnée, le suffixe (@domain.com) d'un nom d'utilisateur inconnu saisi sur l'écran de connexion sera comparé aux domaines organisation et redirigera vers l'enregistrement de cette organisation en cas de succès.",
       "DEFAULTREDIRECTURI": "URI de redirection par défaut",
-      "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du courrier électronique).",
+      "DEFAULTREDIRECTURI_DESC": "Définit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple depuis un e-mail)",
       "ERRORMSGPOPUP": "Afficher l'erreur dans la boîte de dialogue",
       "DISABLEWATERMARK": "Cacher le filigrane",
       "DISABLEWATERMARK_DESC": "Masquer le filigrane Powered by ZITADEL dans l'interface de connexion"
@@ -2411,7 +2411,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "One Time Password via une application d'authentification (TOTP)",
+      "1": "Mot de passe à usage unique par application d'authentification (TOTP)",
       "2": "Clé d'accès",
       "3": "One Time Password par e-mail (E-mail OTP)",
       "4": "One Time Password par SMS (SMS OTP)",
@@ -2635,8 +2635,8 @@
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
       "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Attribuer des rôles d'utilisateur pendant l'authentification' ou de le demander via une portée personnalisée.",
       "IDTOKENUSERINFOASSERTION": "Informations sur l'utilisateur dans le jeton d'identification",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux clients de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
-      "CLOCKSKEW": "Permet aux clients de gérer le décalage d'horloge de l'OP et du client. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux applications de récupérer les revendications de profil, d'e-mail, de téléphone et d'adresse à partir du jeton d'identification.",
+      "CLOCKSKEW": "Permet aux applications de gérer le décalage d'horloge de l'OP et du client. La durée (0-5s) sera ajoutée à la revendication exp et soustraite de iats, auth_time et nbf.",
       "RECOMMENDED": "recommandé",
       "NOTRECOMMENDED": "non recommandé",
       "SELECTION": {
