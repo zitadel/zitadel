@@ -44,7 +44,7 @@ export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
 ): Promise<{ redirect: string } | { error: string }> {
-  console.debug("[client] completeFlowOrGetUrl called", { command, defaultRedirectUri });
+  console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
   // Complete OIDC/SAML flows directly with server action
   if (
@@ -52,22 +52,22 @@ export async function completeFlowOrGetUrl(
     "requestId" in command &&
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
-    console.debug("[client] OIDC/SAML flow detected");
+    console.log("completeFlowOrGetUrl: OIDC/SAML flow detected");
     // This completes the flow and returns a redirect URL or error
     const result = await completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.debug("[client] OIDC/SAML flow result", { result });
+    console.log("completeFlowOrGetUrl: OIDC/SAML flow result:", result);
     return result;
   }
 
-  console.debug("[client] Regular flow, getting next URL");
+  console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.debug("[client] Next URL", { url });
+  console.log("completeFlowOrGetUrl: Next URL:", url);
   const result = { redirect: url };
-  console.debug("[client] Final result", { result });
+  console.log("completeFlowOrGetUrl: Final result:", result);
   return result;
 }
 
@@ -81,7 +81,7 @@ export async function getNextUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
 ): Promise<string> {
-  console.debug("[client] getNextUrl called", { command, defaultRedirectUri });
+  console.log("getNextUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
   // finish Device Authorization Flow
   if (
@@ -93,7 +93,7 @@ export async function getNextUrl(
       ...command,
       organization: command.organization,
     });
-    console.debug("[client] Device flow result", { result });
+    console.log("getNextUrl: Device flow result:", result);
     return result;
   }
 
@@ -101,11 +101,11 @@ export async function getNextUrl(
   // This function only handles device flows and fallback navigation
 
   if (defaultRedirectUri) {
-    console.debug("[client] Using defaultRedirectUri", { defaultRedirectUri });
+    console.log("getNextUrl: Using defaultRedirectUri:", defaultRedirectUri);
     return defaultRedirectUri;
   }
 
   const result = goToSignedInPage(command);
-  console.debug("[client] Using goToSignedInPage result", { result });
+  console.log("getNextUrl: Using goToSignedInPage result:", result);
   return result;
 }
