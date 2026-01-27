@@ -35,8 +35,8 @@ func TestGetOrganizationMetadata(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -186,8 +186,8 @@ func TestListOrganizationMetadata(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -364,8 +364,8 @@ func TestSetOrganizationMetadata_UpdatedAt(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	err := instanceRepo.Create(t.Context(), pool, &instance)
@@ -438,8 +438,8 @@ func TestSetOrganizationMetadata(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)
@@ -828,8 +828,8 @@ func TestRemoveOrganizationMetadata(t *testing.T) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	err = instanceRepo.Create(t.Context(), tx, &instance)

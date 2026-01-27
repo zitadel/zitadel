@@ -51,10 +51,10 @@ type instanceColumns interface {
 	DefaultOrgIDColumn() database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
 	IAMProjectIDColumn() database.Column
-	// ConsoleClientIDColumn returns the column for the default IAM org id field
-	ConsoleClientIDColumn() database.Column
-	// ConsoleAppIDColumn returns the column for the console client id field
-	ConsoleAppIDColumn() database.Column
+	// ManagementConsoleClientIDColumn returns the column for the default management console client id field
+	ManagementConsoleClientIDColumn() database.Column
+	// ManagementConsoleAppIDColumn returns the column for the management console client id field
+	ManagementConsoleAppIDColumn() database.Column
 	// DefaultLanguageColumn returns the column for the default language field
 	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
@@ -87,10 +87,10 @@ type instanceChanges interface {
 	SetDefaultOrg(id string) database.Change
 	// SetDefaultLanguage sets the default language column.
 	SetDefaultLanguage(language language.Tag) database.Change
-	// SetConsoleClientID sets the console client id column.
-	SetConsoleClientID(id string) database.Change
-	// SetConsoleAppID sets the console app id column.
-	SetConsoleAppID(id string) database.Change
+	// SetManagementConsoleClientID sets the management console client id column.
+	SetManagementConsoleClientID(id string) database.Change
+	// SetManagementConsoleAppID sets the management console app id column.
+	SetManagementConsoleAppID(id string) database.Change
 }
 
 // InstanceRepository is the interface for the instance repository.

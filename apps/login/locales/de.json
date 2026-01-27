@@ -315,7 +315,7 @@
       "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
     },
     "title": "Registrieren",
-    "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "description": "Erstellen Sie Ihr Zitadel-Konto.",
     "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",

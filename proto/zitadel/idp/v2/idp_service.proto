@@ -16,7 +16,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Identity Provider Service";
     version: "2.0";
-    description: "This API is intended to manage identity providers (IdPs) in a ZITADEL instance.";
+    description: "This API is intended to manage identity providers (IdPs) in a Zitadel instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"

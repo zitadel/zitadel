@@ -18,7 +18,7 @@ Prerequisites:
 - existing Gitlab SaaS Setup in the premium tier
 
 > We have to switch between ZITADEL and Gitlab. If the headings begin with "ZITADEL" switch to the ZITADEL
-> Console and
+> Management Console and
 > if the headings start with "Gitlab" please switch to the Gitlab GUI.
 
 ## **Gitlab**: Create a new external identity provider
