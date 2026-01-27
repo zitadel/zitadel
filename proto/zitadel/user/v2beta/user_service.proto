@@ -24,7 +24,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
     version: "2.0-beta";
-    description: "This API is intended to manage users in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage users in a Zitadel instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -1836,7 +1836,7 @@ message RetrieveIdentityProviderIntentResponse{
   IDPInformation idp_information = 2;
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the user in ZITADEL if external user is linked"
+      description: "ID of the user in Zitadel if external user is linked"
       example: "\"163840776835432345\"";
     }
   ];

@@ -18,7 +18,7 @@ Prerequisites:
 - existing Pingidentity environment [here](https://docs.pingidentity.com/bundle/pingone/page/wqe1564020490538.html)
 
 > We have to switch between ZITADEL and Ping Identity. If the headings begin with "ZITADEL" switch to the ZITADEL
-> Console and
+> Management Console and
 > if the headings start with "Ping" please switch to the PingIdentity GUI.
 
 ## **Ping**: Create a new external identity provider

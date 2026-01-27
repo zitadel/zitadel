@@ -105,7 +105,7 @@ func TestServer_Limits_Block(t *testing.T) {
 					nil,
 				)
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
-					// the console is not blocked so we can render a link to an instance management portal.
+					// the management console is not blocked so we can render a link to an instance management portal.
 					// A CDN can cache these assets easily
 					// We also don't care about a cookie because the environment.json already takes care of that.
 					assertLimitResponse(ttt, response, false)

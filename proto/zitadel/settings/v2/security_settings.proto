@@ -20,6 +20,6 @@ message EmbeddedIframeSettings{
   // Enabled states if iframe embedding is enabled or disabled.
   bool enabled = 1;
 
-  // AllowedOrigins defines which origins are allowed to embed ZITADEL in an iframe.
+  // AllowedOrigins defines which origins are allowed to embed Zitadel in an iframe.
   repeated string allowed_origins = 2;
 }

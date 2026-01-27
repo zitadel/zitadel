@@ -25,7 +25,7 @@ Zitadel is an open-source identity and access management platform built with a m
 5. Generate code `pnpm nx run-many --target generate`
 6. Optionally, install the following VSCode plugins:
    - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
-   - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
+   - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Management Console development
    - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
    - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
    - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner tooling
@@ -34,7 +34,7 @@ Jump to the dedicated sections for developing a specific project:
 
 - [Contributing to the API](#contribute-to-api)
 - [Contributing to the Login](#contribute-to-login)
-- [Contributing to the Console](#contribute-to-console)
+- [Contributing to the Management Console](#contribute-to-management-console)
 - [Contributing to the Docs](#contribute-to-docs)
 - [Contributing translations](#contribute-translations)
 
@@ -52,7 +52,7 @@ You can build and start any project with Nx commands.
 | **Test - Unit**               | `pnpm nx run PROJECT:test-unit`             | Run unit tests               |                                                                                                                                                                                                  |
 | **Test - Integration**        | `pnpm nx run PROJECT:test-integration`      | Run integration tests        | Learn mnore about how to [debug API integration tests](#run-api-integration-tests)                                                                                                               |
 | **Test - Integration Stop**   | `pnpm nx run PROJECT:test-integration-stop` | Stop integration containers  |                                                                                                                                                                                                  |
-| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Console and opening the interactive Test Suite](#pass-console-quality-checks)                                                                               |
+| **Test - Functional UI**      | `pnpm nx run @zitadel/functional-ui:test`   | Run functional UI tests      | Learn more about how to [develop the Management Console and opening the interactive Test Suite](#pass-management-console-quality-checks)                                                                               |
 | **Test - Functional UI Stop** | `pnpm nx run @zitadel/functional-ui:stop`   | Run functional UI containers |                                                                                                                                                                                                  |
 | **Test**                      | `pnpm nx run PROJECT:test`                  | Run all tests                |                                                                                                                                                                                                  |
 | **Lint**                      | `pnpm nx run PROJECT:lint`                  | Check code style             |                                                                                                                                                                                                  |
@@ -127,7 +127,7 @@ The code consists of the following parts:
 | ------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | API implementation | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#contribute-to-api)             |
 | API definitions    | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#contribute-to-api)             |
-| Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
+| Management Console            | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-to-frontend)   |
 | Login              | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-to-frontend)   |
 | Docs               | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-to-frontend)   |
 | translations       | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
@@ -229,7 +229,7 @@ To start developing, make sure you followed the [quick start](#quick-start) step
 
 ### Develop the API
 
-Optionally build the Console
+Optionally build the Management Console
 
 ```bash
 pnpm nx run @zitadel/api:build-console
@@ -272,7 +272,7 @@ For example, in VSCode, you can use a `launch.json` configuration like this.
    }
 ```
 
-If you have built the Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+If you have built the Management Console and started the Login, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 Call the API using the generated [](./admin.pat) with [grpcurl](https://github.com/fullstorydev/grpcurl) or [grpcui](https://github.com/fullstorydev/grpcui), for example:
 
@@ -348,7 +348,7 @@ pnpm nx run @zitadel/devcontainer:compose down db-api-integration cache-api-inte
 
 ### Run Functional UI Tests
 
-To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
+To test the whole system, including the Management Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
@@ -461,13 +461,13 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 - Build and deploy with Docker: `pnpm nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
 - Build and deploy with NodeJS: `pnpm nx run @zitadel/login:prod`
 
-### Contribute to Console
+### Contribute to the Management Console
 
-To learn more about the Console, go to the Consoles [README.md](./console/README.md).
+To learn more about the Management Console, go to the Management Consoles [README.md](./console/README.md).
 
 To start developing, make sure you followed the [quick start](#quick-start) steps.
 
-#### Develop the Console against a local API
+#### Develop the Management Console against a local API
 
 Run the local development database.
 
@@ -489,7 +489,7 @@ pnpm nx run @zitadel/login:prod
 
 Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 
-In another terminal, start the Console development server
+In another terminal, start the Management Console development server
 
 ```bash
 pnpm nx run @zitadel/console:dev
@@ -501,7 +501,7 @@ Make some changes to the source code and see how the browser is automatically up
 
 #### Develop against a Cloud instance
 
-If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
+If you don't want to build and run a local API, you can just run the management console development server and point it to a cloud instance.
 
 Save the following file to console/.env.local
 
@@ -519,9 +519,9 @@ Allow the API [to redirect to your dev server](#configure-console-dev-server-red
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
-#### Configure Console Dev Server Redirects
+#### Configure the Management Console Dev Server Redirects
 
-To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
+To allow the Management Console access via http://localhost:4200, you have to configure the Zitadel API.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
 2. Select the _ZITADEL_ project.
@@ -531,16 +531,16 @@ To allow Console access via http://localhost:4200, you have to configure the Zit
 6. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
 7. Select the _Save_ button
 
-#### Pass Console Quality Checks
+#### Pass the Management Console Quality Checks
 
 Run the quality checks for the code you changed.
 
 ```bash
-# Run console-related linting builds and unit tests
+# Run the management console-related linting builds and unit tests
 pnpm nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test
 ```
 
-Run functional UI tests against a locally built API and a dev server Console.
+Run functional UI tests against a locally built API and a dev server Management Console.
 
 Allow the API [to redirect to your dev server](#configure-console-dev-server-redirects).
 Alternatively, create the file `tests/functional-ui/.env.open.local` with the following content:
@@ -550,7 +550,7 @@ CYPRESS_BASE_URL=http://localhost:8080/ui/console
 ```
 
 ```bash
-# Run the API and the Console dev server
+# Run the API and the Management Console dev server
 # Beware this doesn't work from within a dev container.
 pnpm nx run @zitadel/functional-ui:open
 ```
@@ -738,7 +738,7 @@ The category shows which part of Zitadel is affected.
 - **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the Login (gohtml)
+- **category: frontend**: The frontend concerns on the one hand the Zitadel Management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 
