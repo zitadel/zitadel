@@ -2,16 +2,16 @@ package mirror
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"errors"
 	"fmt"
-	"log/slog"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 )
 
@@ -37,32 +37,41 @@ Order of execution:
 3. mirror event store tables
 4. recompute projections
 5. verify`,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
-			logging.OnError(err).Fatal("unable to read default config")
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror (sub)command failed")
+			}()
 
+			err = viper.MergeConfig(bytes.NewBuffer(defaultConfig))
+			if err != nil {
+				return fmt.Errorf("unable to read default config: %w", err)
+			}
 			for _, file := range *configFiles {
 				viper.SetConfigFile(file)
 				err := viper.MergeInConfig()
-				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "unable to read config file")
 			}
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				if err != nil {
-					slog.Error("zitadel mirror command failed", "err", err)
-				}
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror command failed")
 			}()
 
-			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return fmt.Errorf("unable to create migration config: %w", err)
 			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
 
-			projectionConfig := mustNewProjectionsConfig(viper.GetViper())
+			projectionConfig, _, err := newProjectionsConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return fmt.Errorf("unable to create projections config: %w", err)
+			}
 
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
@@ -73,6 +82,11 @@ Order of execution:
 			copyAuth(cmd.Context(), config)
 			copyEventstore(cmd.Context(), config)
 
+			defer func() {
+				if recErr, ok := recover().(error); ok {
+					err = recErr
+				}
+			}()
 			projections(cmd.Context(), projectionConfig, masterKey)
 			return nil
 		},
@@ -115,4 +129,11 @@ func instanceClause() string {
 
 	// COPY does not allow parameters so we need to set them directly
 	return "WHERE instance_id IN (" + strings.Join(instanceIDs, ", ") + ")"
+}
+
+func panicOnError(ctx context.Context, err error, logMsg string) {
+	logging.OnError(ctx, err).ErrorContext(ctx, logMsg)
+	if err != nil {
+		panic(err)
+	}
 }

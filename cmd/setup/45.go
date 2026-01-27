@@ -6,8 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -42,7 +41,7 @@ func (mig *CorrectProjectOwners) Execute(ctx context.Context, _ eventstore.Event
 	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: "SETUP"})
 	for i, instance := range instances {
 		ctx = authz.WithInstanceID(ctx, instance)
-		logging.WithFields("instance_id", instance, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(instances))).Info("correct owners of projects")
+		logging.Info(ctx, "correct owners of projects", "instance", instance, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(instances)))
 		didCorrect, err := mig.correctInstanceProjects(ctx, instance)
 		if err != nil {
 			return err
@@ -51,7 +50,7 @@ func (mig *CorrectProjectOwners) Execute(ctx context.Context, _ eventstore.Event
 			continue
 		}
 		_, err = projection.ProjectGrantProjection.Trigger(ctx)
-		logging.OnError(err).Debug("failed triggering project grant projection to update owners")
+		logging.OnError(ctx, err).DebugContext(ctx, "failed triggering project grant projection to update owners")
 	}
 	return nil
 }

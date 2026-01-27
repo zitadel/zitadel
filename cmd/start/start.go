@@ -6,7 +6,6 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"log/slog"
 	"math"
 	"net/http"
 	"os"
@@ -21,7 +20,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
@@ -29,6 +27,7 @@ import (
 	"golang.org/x/text/language"
 
 	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -131,9 +130,7 @@ Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				if err != nil {
-					slog.Error("zitadel start command failed", "err", err)
-				}
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel start command failed")
 			}()
 
 			err = cmd_tls.ModeFromFlag(cmd)
@@ -144,6 +141,8 @@ Requirements:
 			if err != nil {
 				return err
 			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
@@ -750,7 +749,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	errCh := make(chan error)
 
 	go func() {
-		logging.Infof("server is listening on %s", lis.Addr().String())
+		logging.Info(ctx, "server is listening on", "address", lis.Addr().String())
 		if tlsConfig != nil {
 			// we don't need to pass the files here, because we already initialized the TLS config on the server
 			errCh <- http1Server.ServeTLS(lis, "", "")
@@ -776,7 +775,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	if err != nil {
 		return fmt.Errorf("could not shutdown gracefully: %w", err)
 	}
-	logging.New().Info("server shutdown gracefully")
+	logging.Info(ctx, "server shutdown gracefully")
 	return nil
 }
 

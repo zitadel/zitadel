@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
@@ -28,9 +28,7 @@ Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				if err != nil {
-					slog.Error("zitadel start-from-init command failed", "err", err)
-				}
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel start-from-init command failed")
 			}()
 
 			err = tls.ModeFromFlag(cmd)
@@ -44,27 +42,40 @@ Requirements:
 			}
 
 			initCtx, cancel := context.WithCancel(cmd.Context())
-			initialise.InitAll(initCtx, initialise.MustNewConfig(viper.GetViper()))
-			cancel()
+			defer cancel()
+			initConfig, shutdown, err := initialise.NewConfig(initCtx, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
+			defer func() {
+				err = errors.Join(err, shutdown(initCtx))
+			}()
+
+			initialise.InitAll(initCtx, initConfig)
 
 			err = setup.BindInitProjections(cmd)
 			if err != nil {
 				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
 			}
 
-			setupConfig, shutdown, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			setupConfig, _, err := setup.NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
-			defer func() {
-				err = errors.Join(err, shutdown(cmd.Context()))
-			}()
 
-			setupSteps := setup.MustNewSteps(viper.New())
+			setupSteps, err := setup.NewSteps(cmd.Context(), viper.New())
+			if err != nil {
+				return err
+			}
 
 			setupCtx, cancel := context.WithCancel(cmd.Context())
-			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
-			cancel()
+			defer cancel()
+			err = setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
+			if err != nil {
+				return err
+			}
 
 			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {

@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
@@ -23,10 +24,20 @@ func newZitadel() *cobra.Command {
 Prerequisites:
 - postgreSQL with user and database
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.GetViper())
-			err := verifyZitadel(cmd.Context(), config.Database)
-			logging.OnError(err).Fatal("unable to init zitadel")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel verify zitadel command failed")
+			}()
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+			return verifyZitadel(cmd.Context(), config.Database)
 		},
 	}
 }
@@ -43,32 +54,32 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 	}
 	defer conn.Close()
 
-	logging.WithFields().Info("verify system")
+	logging.Info(ctx, "verify system")
 	if err := exec(ctx, conn, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
-	logging.WithFields().Info("verify encryption keys")
+	logging.Info(ctx, "verify encryption keys")
 	if err := createEncryptionKeys(ctx, conn); err != nil {
 		return err
 	}
 
-	logging.WithFields().Info("verify projections")
+	logging.Info(ctx, "verify projections")
 	if err := exec(ctx, conn, fmt.Sprintf(createProjectionsStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
-	logging.WithFields().Info("verify eventstore")
+	logging.Info(ctx, "verify eventstore")
 	if err := exec(ctx, conn, fmt.Sprintf(createEventstoreStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
-	logging.WithFields().Info("verify events tables")
+	logging.Info(ctx, "verify events tables")
 	if err := createEvents(ctx, conn); err != nil {
 		return err
 	}
 
-	logging.WithFields().Info("verify unique constraints")
+	logging.Info(ctx, "verify unique constraints")
 	if err := exec(ctx, conn, createUniqueConstraints, nil); err != nil {
 		return err
 	}
@@ -77,7 +88,7 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 }
 
 func verifyZitadel(ctx context.Context, config database.Config) error {
-	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
+	logging.Info(ctx, "verify zitadel", "database", config.DatabaseName())
 
 	db, err := database.Connect(config, false)
 	if err != nil {
@@ -98,7 +109,7 @@ func createEncryptionKeys(ctx context.Context, db database.Beginner) error {
 	}
 	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
 		rollbackErr := tx.Rollback()
-		logging.OnError(rollbackErr).Error("rollback failed")
+		logging.WithError(ctx, rollbackErr).ErrorContext(ctx, "rollback failed")
 		return err
 	}
 
@@ -113,7 +124,7 @@ func createEvents(ctx context.Context, conn *sql.Conn) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Error("rollback failed")
+			logging.WithError(ctx, rollbackErr).ErrorContext(ctx, "rollback failed")
 			return
 		}
 		err = tx.Commit()

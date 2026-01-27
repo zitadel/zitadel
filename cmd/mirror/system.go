@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -23,12 +23,22 @@ func systemCmd() *cobra.Command {
 ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror system command failed")
+			}()
+			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+			defer func() {
+				if recErr, ok := recover().(error); ok {
+					err = recErr
+				}
 			}()
 			copySystem(cmd.Context(), config)
 			return nil
@@ -42,11 +52,11 @@ Only keys and assets are mirrored`,
 
 func copySystem(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	panicOnError(ctx, err, "unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	panicOnError(ctx, err, "unable to connect to destination database")
 	defer destClient.Close()
 
 	copyAssets(ctx, sourceClient, destClient)
@@ -54,11 +64,11 @@ func copySystem(ctx context.Context, config *Migration) {
 }
 
 func copyAssets(ctx context.Context, source, dest *database.DB) {
-	logging.Info("starting to copy assets")
+	logging.Info(ctx, "starting to copy assets")
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
+	panicOnError(ctx, err, "unable to acquire source connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -76,7 +86,7 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	panicOnError(ctx, err, "unable to acquire dest connection")
 	defer destConn.Close()
 
 	var assetCount int64
@@ -95,17 +105,17 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy assets to destination")
-	logging.OnError(<-errs).Fatal("unable to copy assets from source")
-	logging.WithFields("took", time.Since(start), "count", assetCount).Info("assets migrated")
+	panicOnError(ctx, err, "unable to copy assets to destination")
+	panicOnError(ctx, <-errs, "unable to copy assets from source")
+	logging.Info(ctx, "assets migrated", "took", time.Since(start), "count", assetCount)
 }
 
 func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
-	logging.Info("starting to copy encryption keys")
+	logging.Info(ctx, "starting to copy encryption keys")
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
+	panicOnError(ctx, err, "unable to acquire source connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -123,7 +133,7 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	panicOnError(ctx, err, "unable to acquire dest connection")
 	defer destConn.Close()
 
 	var keyCount int64
@@ -142,7 +152,7 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
-	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
-	logging.WithFields("took", time.Since(start), "count", keyCount).Info("encryption keys migrated")
+	panicOnError(ctx, err, "unable to copy encryption keys to destination")
+	panicOnError(ctx, <-errs, "unable to copy encryption keys from source")
+	logging.Info(ctx, "encryption keys migrated", "took", time.Since(start), "count", keyCount)
 }

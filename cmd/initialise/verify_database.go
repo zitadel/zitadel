@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -27,11 +28,21 @@ The user provided by flags needs privileges to
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel init verify database command failed")
+			}()
+			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return err
+			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
-			err := initialise(cmd.Context(), config.Database, VerifyDatabase(config.Database.DatabaseName()))
-			logging.OnError(err).Fatal("unable to initialize the database")
+			return initialise(cmd.Context(), config.Database, VerifyDatabase(config.Database.DatabaseName()))
 		},
 	}
 }
@@ -46,10 +57,10 @@ func VerifyDatabase(databaseName string) func(context.Context, *database.DB) err
 			return fmt.Errorf("unable to get current database: %w", err)
 		}
 		if currentDatabase == databaseName {
-			logging.WithFields("database", databaseName).Info("database is same as config.database.postgres.admin.ExistingDatabase, skipping creation")
+			logging.Info(ctx, "database is same as config.database.postgres.admin.ExistingDatabase, skipping creation", "database", databaseName)
 			return nil
 		}
-		logging.WithFields("database", databaseName).Info("verify database")
+		logging.Info(ctx, "verify database", "database", databaseName)
 
 		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}

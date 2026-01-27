@@ -8,7 +8,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/hooks"
@@ -28,7 +28,7 @@ type Migration struct {
 	EventBulkSize     uint32
 	MaxAuthRequestAge time.Duration
 
-	Log             *logging.Config
+	Log             *old_logging.Config
 	Machine         *id.Config
 	Instrumentation instrumentation.Config
 	Metrics         instrumentation.LegacyMetricConfig
@@ -39,39 +39,48 @@ var (
 	defaultConfig []byte
 )
 
-func mustNewMigrationConfig(ctx context.Context, v *viper.Viper) (*Migration, instrumentation.ShutdownFunc, error) {
+func newMigrationConfig(ctx context.Context, v *viper.Viper) (*Migration, instrumentation.ShutdownFunc, error) {
 	config := new(Migration)
-	mustNewConfig(v, config)
-
-	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	err := newConfig(v, config)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
+		return nil, nil, err
 	}
-
-	// Legacy logger
-	err = config.Log.SetLogger()
+	shutdown, err := startInstrumentation(ctx, config.Instrumentation, config.Log)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
+		return nil, nil, err
 	}
-
 	id.Configure(config.Machine)
-
 	return config, shutdown, nil
 }
 
-func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
+func newProjectionsConfig(ctx context.Context, v *viper.Viper) (*ProjectionsConfig, instrumentation.ShutdownFunc, error) {
 	config := new(ProjectionsConfig)
-	mustNewConfig(v, config)
-
-	err := config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
+	err := newConfig(v, config)
+	if err != nil {
+		return nil, nil, err
+	}
+	shutdown, err := startInstrumentation(ctx, config.Instrumentation, config.Log)
+	if err != nil {
+		return nil, nil, err
+	}
 	id.Configure(config.Machine)
-
-	return config
+	return config, shutdown, nil
 }
 
-func mustNewConfig(v *viper.Viper, config any) {
+func startInstrumentation(ctx context.Context, cfg instrumentation.Config, logConfig *old_logging.Config) (instrumentation.ShutdownFunc, error) {
+	shutdown, err := instrumentation.Start(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("unable to start instrumentation: %w", err)
+	}
+	// Legacy logger
+	err = logConfig.SetLogger()
+	if err != nil {
+		return nil, fmt.Errorf("unable to set logger: %w", err)
+	}
+	return shutdown, nil
+}
+
+func newConfig(v *viper.Viper, config any) error {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
@@ -91,5 +100,8 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read default config")
+	if err != nil {
+		return fmt.Errorf("unable to decode config: %w", err)
+	}
+	return nil
 }

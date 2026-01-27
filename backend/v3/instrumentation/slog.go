@@ -90,6 +90,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		stdErrHandler,
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
+				instanceExtractor,
 				domainExtractor,
 				requestExtractor,
 				slogotel.ExtractTraceSpanID,
@@ -117,7 +118,7 @@ const (
 // SetHttpRequestDetails adds static details to each context aware log entry.
 func SetHttpRequestDetails(ctx context.Context, service string, request *http.Request) context.Context {
 	now := time.Now()
-	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
 		protocol:    ProtocolHttp,
 		service:     service,
 		http_method: request.Method,
@@ -127,11 +128,21 @@ func SetHttpRequestDetails(ctx context.Context, service string, request *http.Re
 	})
 }
 
+// Instance is a minimal interface for logging the instance ID.
+type Instance interface {
+	InstanceID() string
+}
+
+// SetInstance adds the instance to the context for logging.
+func SetInstance(ctx context.Context, instance Instance) context.Context {
+	return context.WithValue(ctx, ctxKeyInstance, instance)
+}
+
 // SetConnectRequestDetails adds static details to each context aware log entry.
 func SetConnectRequestDetails(ctx context.Context, request connect.AnyRequest) context.Context {
 	now := time.Now()
 	spec := request.Spec()
-	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
 		protocol:    ProtocolConnect,
 		service:     serviceFromRPCMethod(spec.Procedure),
 		http_method: request.HTTPMethod(),
@@ -143,7 +154,7 @@ func SetConnectRequestDetails(ctx context.Context, request connect.AnyRequest) c
 
 func SetGrpcRequestDetails(ctx context.Context, info *grpc.UnaryServerInfo) context.Context {
 	now := time.Now()
-	return context.WithValue(ctx, ctxKey{}, &requestDetails{
+	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
 		protocol:    ProtocolGrpc,
 		service:     serviceFromRPCMethod(info.FullMethod),
 		http_method: http.MethodPost, // gRPC always uses POST
@@ -153,7 +164,12 @@ func SetGrpcRequestDetails(ctx context.Context, info *grpc.UnaryServerInfo) cont
 	})
 }
 
-type ctxKey struct{}
+type ctxKeyType int
+
+const (
+	ctxKeyRequestDetails ctxKeyType = iota
+	ctxKeyInstance
+)
 
 type requestDetails struct {
 	protocol    string
@@ -195,6 +211,16 @@ func serviceFromRPCMethod(fullMethod string) string {
 	return "unknown"
 }
 
+// instanceExtractor sets the instance ID from [Instance] to a log entry.
+func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
+	if instance, ok := ctx.Value(ctxKeyInstance).(Instance); ok {
+		return []slog.Attr{
+			slog.String("instance", instance.InstanceID()),
+		}
+	}
+	return nil
+}
+
 // domainExtractor sets the sanitized request hosts from [http_util.DomainCtx] to a log entry.
 func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
 	return []slog.Attr{
@@ -204,7 +230,7 @@ func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) [
 
 // requestExtractor sets the request details from [requestDetails] to a log entry.
 func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := ctx.Value(ctxKey{}).(*requestDetails); ok {
+	if r, ok := ctx.Value(ctxKeyRequestDetails).(*requestDetails); ok {
 		return r.attrs()
 	}
 	return nil
