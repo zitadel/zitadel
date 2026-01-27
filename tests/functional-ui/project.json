@@ -7,7 +7,7 @@
       "command": "nx run @zitadel/devcontainer:compose up --force-recreate --renew-anon-volumes db-functional-ui"
     },
     "run-api": {
-      "description": "Sets up and runs the Zitadel API with the embedded Console against which the functional UI tests are run.",
+      "description": "Sets up and runs the Zitadel API with the embedded Management Console against which the functional UI tests are run.",
       "continuous": true,
       "dependsOn": [
         "@zitadel/api:build"
