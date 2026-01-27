@@ -11,7 +11,7 @@
     "lint-check-next": "next lint",
     "lint-check-prettier": "prettier --check .",
     "lint-fix": "prettier --write .",
-    "test-unit": "vitest --run",
+    "test-unit": "vitest --run --exclude='**/otel.integration.test.ts'",
     "test-otel": "vitest --run tests/otel/",
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress"
