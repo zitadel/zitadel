@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Fonctionnalité de clé Web désactivée
     NoActive: Aucune clé Web active trouvée
     NotFound: Clé Web introuvable
-
 AggregateTypes:
   action: Action
   instance: Instance
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Clé Web
   saml_request: Requête SAML
   saml_session: Session SAML
-
 EventTypes:
   execution:
     set: Ensemble d'exécution
@@ -1319,7 +1317,6 @@ EventTypes:
         changed: Politique de confidentialité modifiée
       security:
         set: Ensemble de règles de sécurité
-
     removed: Instance removed
     secret:
       generator:
@@ -1355,7 +1352,7 @@ EventTypes:
       updated: Utilisateur mis à jour
       deleted: Utilisateur supprimé
       email:
-        updated:  Adresse e-mail modifiée
+        updated: Adresse e-mail modifiée
         verified: Adresse e-mail vérifiée
         verification:
           failed: Échec de la vérification de l'adresse e-mail
@@ -1375,7 +1372,6 @@ EventTypes:
     activated: Clé Web activée
     deactivated: Clé Web désactivée
     removed: Clé Web supprimée
-
 Application:
   OIDC:
     UnsupportedVersion: Votre version de l'OIDC n'est pas prise en charge
@@ -1403,7 +1399,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Le jeton de rafraîchissement n'est autorisé qu'en combinaison avec le code d'autorisation.
-
 Action:
   Flow:
     Type:

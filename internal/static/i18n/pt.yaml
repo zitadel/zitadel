@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Usuário não pôde ser encontrado na organização escolhida
     NotAllowedOrg: O usuário não é membro da organização requerida
     UserIDMissing: ID do usuário ausente
-    UserIDWrong: "Usuário da solicitação não é igual ao usuário autenticado"
+    UserIDWrong: Usuário da solicitação não é igual ao usuário autenticado
     DomainPolicyNil: Política da organização está vazia
     EmailAsUsernameNotAllowed: O email não é permitido como nome de usuário
     Invalid: Dados do usuário são inválidos
@@ -620,7 +620,6 @@ Errors:
     FeatureDisabled: Recurso chave da Web desativado
     NoActive: Nenhuma chave web ativa encontrada
     NotFound: Chave Web não encontrada
-
 AggregateTypes:
   action: Ação
   instance: Instância
@@ -646,7 +645,6 @@ AggregateTypes:
   web_key: Chave da Web
   saml_request: Solicitação SAML
   saml_session: Sessão SAML
-
 EventTypes:
   execution:
     set: Conjunto de execução
@@ -1320,7 +1318,6 @@ EventTypes:
         changed: Política de privacidade alterada
       security:
         set: Política de segurança definida
-
     removed: Instância removida
     secret:
       generator:
@@ -1376,7 +1373,6 @@ EventTypes:
     activated: Chave Web ativada
     deactivated: Chave Web desativada
     removed: Chave Web removida
-
 Application:
   OIDC:
     UnsupportedVersion: Sua versão do OIDC não é suportada
@@ -1404,7 +1400,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: O token de atualização só é permitido em combinação com o Código de Autorização.
-
 Action:
   Flow:
     Type:

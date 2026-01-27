@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
     NotAllowedOrg: ユーザーが必要な組織のメンバーでありません
     UserIDMissing: ユーザーIDがありません
-    UserIDWrong: "リクエストユーザーが認証されたユーザーと等しくない"
+    UserIDWrong: リクエストユーザーが認証されたユーザーと等しくない
     DomainPolicyNil: 組織ポリシーが空です
     EmailAsUsernameNotAllowed: メールアドレスはユーザー名として使用できません
     Invalid: 無効なユーザーデータです
@@ -622,7 +622,6 @@ Errors:
     FeatureDisabled: Web キー機能が無効です
     NoActive: アクティブな Web キーが見つかりません
     NotFound: Web キーが見つかりません
-
 AggregateTypes:
   action: アクション
   instance: インスタンス
@@ -648,7 +647,6 @@ AggregateTypes:
   web_key: Web キー
   saml_request: SAML リクエスト
   saml_session: SAMLセッション
-
 EventTypes:
   execution:
     set: 実行セット
@@ -853,7 +851,6 @@ EventTypes:
       code:
         added: 電話番号コードの生成
         sent: 電話番号コードの送信
-
     profile:
       changed: ユーザープロファイルの変更
     address:
@@ -1325,7 +1322,6 @@ EventTypes:
         changed: プライバシーポリシーの変更
       security:
         set: セキュリティポリシーのセット
-
     removed: インスタンスの削除
     secret:
       generator:
@@ -1376,13 +1372,11 @@ EventTypes:
         code:
           added: 電話番号の確認コードが生成されました
           sent: 電話番号の確認コードが送信されました
-
   web_key:
     added: Web キーが追加されました
     activated: Web キーが有効化されました
     deactivated: Web キーが無効化されました
     removed: Web キーが削除されました
-
 Application:
   OIDC:
     UnsupportedVersion: OIDCバージョンはサポートされていません
@@ -1410,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: リフレッシュトークンはAuthorization Codeと組み合わせてのみ使用可能です。
-
 Action:
   Flow:
     Type:

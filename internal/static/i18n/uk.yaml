@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: Користувач не знайдений в обраній організації
     NotAllowedOrg: Користувач не є членом необхідної організації
     UserIDMissing: Відсутній ідентифікатор користувача
-    UserIDWrong: "Користувач запиту не дорівнює аутентифікованому користувачу"
+    UserIDWrong: Користувач запиту не дорівнює аутентифікованому користувачу
     DomainPolicyNil: Політика організації порожня
     EmailAsUsernameNotAllowed: Електронна пошта не дозволена як ім'я користувача
     Invalid: Дані користувача недійсні
@@ -616,7 +616,6 @@ Errors:
     FeatureDisabled: Функція веб-ключа вимкнена
     NoActive: Активний веб-ключ не знайдено
     NotFound: Веб-ключ не знайдено
-
 AggregateTypes:
   action: Дія
   instance: Інстанс
@@ -642,7 +641,6 @@ AggregateTypes:
   web_key: Веб-ключ
   saml_request: SAML запит
   saml_session: SAML сесія
-
 EventTypes:
   execution:
     set: Виконання встановлено
@@ -847,7 +845,6 @@ EventTypes:
       code:
         added: Код номера телефону згенеровано
         sent: Код номера телефону відправлено
-
     profile:
       changed: Профіль користувача змінено
     address:
@@ -1319,7 +1316,6 @@ EventTypes:
         changed: Політика конфіденційності змінена
       security:
         set: Політика безпеки встановлена
-
     removed: Інстанс видалений
     secret:
       generator:
@@ -1375,7 +1371,6 @@ EventTypes:
     activated: Веб-ключ активований
     deactivated: Веб-ключ деактивований
     removed: Веб-ключ видалений
-
 Application:
   OIDC:
     UnsupportedVersion: Ваша версія OIDC не підтримується
@@ -1403,7 +1398,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token дозволений лише в комбінації з Authorization Code.
-
 Action:
   Flow:
     Type:

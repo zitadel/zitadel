@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Webnyckelfunktion inaktiverad
     NoActive: Ingen aktiv webbnyckel hittades
     NotFound: Webnyckel hittades inte
-
 AggregateTypes:
   action: Åtgärd
   instance: Instans
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Webbnyckel
   saml_request: SAML-förfrågan
   saml_session: SAML-session
-
 EventTypes:
   execution:
     set: Exekvering satt
@@ -852,7 +850,6 @@ EventTypes:
       code:
         added: Mobilnummerkod genererad
         sent: Mobilnummerkod skickad
-
     profile:
       changed: Användarprofil ändrad
     address:
@@ -1324,7 +1321,6 @@ EventTypes:
         changed: Integritetspolicy ändrad
       security:
         set: Säkerhetspolicy inställd
-
     removed: Instans borttagen
     secret:
       generator:
@@ -1380,7 +1376,6 @@ EventTypes:
     activated: Webbnyckel aktiverad
     deactivated: Webnyckel avaktiverad
     removed: Webbnyckeln har tagits bort
-
 Application:
   OIDC:
     UnsupportedVersion: Din OIDC-version stöds inte
@@ -1408,7 +1403,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Uppdateringstoken tillåts endast i kombination med auktoriseringskod.
-
 Action:
   Flow:
     Type:

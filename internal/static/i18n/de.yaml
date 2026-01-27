@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
-    UserIDWrong: "Der Anforderungsbenutzer ist nicht gleich dem authentifizierten Benutzer"
+    UserIDWrong: Der Anforderungsbenutzer ist nicht gleich dem authentifizierten Benutzer
     DomainPolicyNil: Organisation Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig
@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Webschlüsselfunktion deaktiviert
     NoActive: Kein aktiver Webschlüssel gefunden
     NotFound: Webschlüssel nicht gefunden
-
 AggregateTypes:
   action: Action
   instance: Instanz
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Webschlüssel
   saml_request: SAML Request
   saml_session: SAML Session
-
 EventTypes:
   execution:
     set: Ausführung gesetzt
@@ -1324,7 +1322,6 @@ EventTypes:
         changed: Datenschutzrichtlinie geändert
       security:
         set: Sicherheitsrichtlinie gesetzt
-
     removed: Instanz gelöscht
     secret:
       generator:
@@ -1380,7 +1377,6 @@ EventTypes:
     activated: Web Key aktiviert
     deactivated: Web Key deaktiviert
     removed: Web Key entfernen
-
 Application:
   OIDC:
     UnsupportedVersion: Deine OIDC Version wird nicht unterstützt
@@ -1408,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token nur in Kombination mit Authorization Code erlaubt.
-
 Action:
   Flow:
     Type:

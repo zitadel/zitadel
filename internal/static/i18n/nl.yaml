@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
     NotAllowedOrg: Gebruiker is geen lid van de vereiste organisatie
     UserIDMissing: UserID is leeg
-    UserIDWrong: "Verzoekgebruiker niet gelijk aan geverifieerde gebruiker"
+    UserIDWrong: Verzoekgebruiker niet gelijk aan geverifieerde gebruiker
     DomainPolicyNil: Organisatiebeleid is leeg
     EmailAsUsernameNotAllowed: Email is niet toegestaan als gebruikersnaam
     Invalid: Gebruikersdata is ongeldig
@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Websleutelfunctie uitgeschakeld
     NoActive: Geen actieve websleutel gevonden
     NotFound: Websleutel niet gevonden
-
 AggregateTypes:
   action: Actie
   instance: Instantie
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Websleutel
   saml_request: SAML-aanvraag
   saml_session: SAML-sessie
-
 EventTypes:
   execution:
     set: Uitvoering ingesteld
@@ -1321,7 +1319,6 @@ EventTypes:
         changed: Privacy beleid gewijzigd
       security:
         set: Beveiligingsbeleid ingesteld
-
     removed: Instantie verwijderd
     secret:
       generator:
@@ -1375,7 +1372,6 @@ EventTypes:
     activated: Web Key geactiveerd
     deactivated: Web Key gedeactiveerd
     removed: Web Key verwijderd
-
 Application:
   OIDC:
     UnsupportedVersion: Uw OIDC-versie wordt niet ondersteund
@@ -1403,7 +1399,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token is alleen toegestaan in combinatie met Authorization Code.
-
 Action:
   Flow:
     Type:

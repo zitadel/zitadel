@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Корисникот не е пронајден во избраната организација
     NotAllowedOrg: Корисникот не е член на бараната организација
     UserIDMissing: ID на корисник е празно
-    UserIDWrong: "Корисникот во барањето не се совпаѓа со автентицираниот корисник"
+    UserIDWrong: Корисникот во барањето не се совпаѓа со автентицираниот корисник
     DomainPolicyNil: Политиката на организацијата е празна
     EmailAsUsernameNotAllowed: Е-поштата не е дозволена како корисничко име
     Invalid: Податоците на корисникот се невалидни
@@ -620,7 +620,6 @@ Errors:
     FeatureDisabled: Функцијата за веб-клуч е оневозможена
     NoActive: Не е пронајден активен веб-клуч
     NotFound: Веб-клучот не е пронајден
-
 AggregateTypes:
   action: Акција
   instance: Инстанца
@@ -646,7 +645,6 @@ AggregateTypes:
   web_key: Веб клуч
   saml_request: Барање SAML
   saml_session: SAML сесија
-
 EventTypes:
   execution:
     set: Комплет за извршување
@@ -1378,7 +1376,6 @@ EventTypes:
     activated: Веб-клучот е активиран
     deactivated: Веб-клучот е деактивиран
     removed: Веб-клучот е отстранет
-
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC верзија не е поддржана
@@ -1406,7 +1403,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token е дозволен само во комбинација со Authorization Code.
-
 Action:
   Flow:
     Type:

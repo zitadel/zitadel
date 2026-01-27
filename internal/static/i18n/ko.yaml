@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: 선택한 조직에서 사용자를 찾을 수 없습니다
     NotAllowedOrg: 사용자가 필수 조직의 구성원이 아닙니다
     UserIDMissing: 사용자 ID가 누락되었습니다
-    UserIDWrong: "요청한 사용자와 인증된 사용자가 일치하지 않습니다"
+    UserIDWrong: 요청한 사용자와 인증된 사용자가 일치하지 않습니다
     DomainPolicyNil: 조직 정책이 비어 있습니다
     EmailAsUsernameNotAllowed: 이메일을 사용자 이름으로 사용할 수 없습니다
     Invalid: 사용자 데이터가 잘못되었습니다
@@ -489,7 +489,7 @@ Errors:
     NotActive: 작업이 활성화되지 않았습니다
     NotInactive: 작업이 비활성화되지 않았습니다
     MaxAllowed: 추가 활성 작업이 허용되지 않습니다
-    NotEnabled: "\"작업\" 기능이 활성화되지 않았습니다"
+    NotEnabled: "작업" 기능이 활성화되지 않았습니다
   Flow:
     FlowTypeMissing: FlowType이 누락되었습니다
     Empty: 플로우가 이미 비어 있습니다
@@ -590,7 +590,7 @@ Errors:
     ResponseIsNotValidJSON: 응답이 유효한 JSON이 아닙니다
     MissingEncryptionKey: 암호화 키가 누락되었습니다
   UserSchema:
-    NotEnabled: "\"사용자 스키마\" 기능이 활성화되지 않았습니다"
+    NotEnabled: "사용자 스키마" 기능이 활성화되지 않았습니다
     Type:
       Missing: 사용자 스키마 유형이 누락되었습니다
       AlreadyExists: 사용자 스키마 유형이 이미 존재합니다
@@ -622,7 +622,6 @@ Errors:
     FeatureDisabled: 웹 키 기능이 비활성화되었습니다
     NoActive: 활성 웹 키가 없습니다
     NotFound: 웹 키를 찾을 수 없습니다
-
 AggregateTypes:
   action: 작업
   instance: 인스턴스
@@ -648,7 +647,6 @@ AggregateTypes:
   web_key: 웹 키
   saml_request: SAML 요청
   saml_session: SAML 세션
-
 EventTypes:
   execution:
     set: 실행 설정됨
@@ -853,7 +851,6 @@ EventTypes:
       code:
         added: 전화번호 코드 생성됨
         sent: 전화번호 코드 전송됨
-
     profile:
       changed: 사용자 프로필 변경됨
     address:
@@ -1325,7 +1322,6 @@ EventTypes:
         changed: 개인정보 보호 정책 변경됨
       security:
         set: 보안 정책 설정됨
-
     removed: 인스턴스 삭제됨
     secret:
       generator:
@@ -1376,14 +1372,11 @@ EventTypes:
         code:
           added: 전화번호 인증 코드 생성됨
           sent: 전화번호 인증 코드 전송됨
-
-
   web_key:
     added: 웹 키 추가됨
     activated: 웹 키 활성화됨
     deactivated: 웹 키 비활성화됨
     removed: 웹 키 삭제됨
-
 Application:
   OIDC:
     UnsupportedVersion: 지원되지 않는 OIDC 버전입니다
@@ -1411,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: 리프레시 토큰은 인증 코드와 함께 사용할 때만 허용됩니다.
-
 Action:
   Flow:
     Type:

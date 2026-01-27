@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organization
     NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
-    UserIDWrong: "Request user not equal to authenticated user"
+    UserIDWrong: Request user not equal to authenticated user
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
@@ -549,21 +549,21 @@ Errors:
   AuthRequest:
     AlreadyExists: Auth Request already exists
     NotExisting: Auth Request does not exist
-    WrongLoginClient: Auth Request created by other login client
+    WrongLoginClient: Auth Request created by other login application
     AlreadyHandled: Auth Request has already been handled
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is invalid
     Token:
       Invalid: Token is invalid
       Expired: Token is expired
-    InvalidClient: Token was not issued for this client
+    InvalidClient: Token was not issued for this application
   SAMLRequest:
     AlreadyExists: SAMLRequest already exists
     NotExisting: SAMLRequest does not exist
-    WrongLoginClient: SAMLRequest created by other login client
+    WrongLoginClient: SAMLRequest created by other login application
     AlreadyHandled: SAMLRequest has already been handled
   SAMLSession:
-    InvalidClient: SAMLResponse was not issued for this client
+    InvalidClient: SAMLResponse was not issued for this application
   DeviceAuth:
     NotFound: Device Authorization Request does not exist
     AlreadyHandled: Device Authorization Request has already been handled
@@ -622,7 +622,6 @@ Errors:
     FeatureDisabled: Web key feature disabled
     NoActive: No active web key found
     NotFound: Web key not found
-
 AggregateTypes:
   action: Action
   instance: Instance
@@ -648,7 +647,6 @@ AggregateTypes:
   web_key: Web Key
   saml_request: SAML Request
   saml_session: SAML Session
-
 EventTypes:
   execution:
     set: Execution set
@@ -853,7 +851,6 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-
     profile:
       changed: User profile changed
     address:
@@ -1077,8 +1074,8 @@ EventTypes:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
         key:
-          added: OIDC App Key added
-          removed: OIDC App Key removed
+          added: OIDC Application Key added
+          removed: OIDC Application Key removed
       api:
         secret:
           check:
@@ -1325,7 +1322,6 @@ EventTypes:
         changed: Privacy policy changed
       security:
         set: Security policy set
-
     removed: Instance removed
     secret:
       generator:
@@ -1381,7 +1377,6 @@ EventTypes:
     activated: Web Key activated
     deactivated: Web Key deactivated
     removed: Web Key removed
-
 Application:
   OIDC:
     UnsupportedVersion: Your OIDC version is not supported
@@ -1405,11 +1400,10 @@ Application:
           MustBeHttpLocalhost: Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.
       UserAgent:
         AuthMethodType:
-          NotNone: User agent app should have authmethodtype none.
+          NotNone: User agent application should have authmethodtype none.
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token only allowed in combination with Authorization Code.
-
 Action:
   Flow:
     Type:

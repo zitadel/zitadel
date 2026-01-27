@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: Kullanıcı seçilen organizasyonda bulunamadı
     NotAllowedOrg: Kullanıcı gerekli organizasyonun üyesi değil
     UserIDMissing: Kullanıcı ID eksik
-    UserIDWrong: "İstek kullanıcısı, kimlik doğrulaması yapılan kullanıcıya eşit değil"
+    UserIDWrong: İstek kullanıcısı, kimlik doğrulaması yapılan kullanıcıya eşit değil
     DomainPolicyNil: Organizasyon Politikası boş
     EmailAsUsernameNotAllowed: E-posta kullanıcı adı olarak izin verilmiyor
     Invalid: Kullanıcı verisi geçersiz
@@ -489,7 +489,7 @@ Errors:
     NotActive: Eylem aktif değil
     NotInactive: Eylem pasif değil
     MaxAllowed: Ek aktif Eylem izin verilmiyor
-    NotEnabled: '"Action" özelliği etkin değil'
+    NotEnabled: "Action" özelliği etkin değil
   Flow:
     FlowTypeMissing: FlowType eksik
     Empty: Akış zaten boş
@@ -590,7 +590,7 @@ Errors:
     ResponseIsNotValidJSON: Yanıt geçerli JSON değil
     MissingEncryptionKey: Şifreleme anahtarı eksik
   UserSchema:
-    NotEnabled: '"User Schema" özelliği etkin değil'
+    NotEnabled: "User Schema" özelliği etkin değil
     Type:
       Missing: Kullanıcı Şema Türü eksik
       AlreadyExists: Kullanıcı Şema Türü zaten mevcut
@@ -622,7 +622,6 @@ Errors:
     FeatureDisabled: Web anahtarı özelliği devre dışı
     NoActive: Aktif web anahtarı bulunamadı
     NotFound: Web anahtarı bulunamadı
-
 AggregateTypes:
   action: Eylem
   instance: Instance
@@ -648,7 +647,6 @@ AggregateTypes:
   web_key: Web Anahtarı
   saml_request: SAML İsteği
   saml_session: SAML Oturumu
-
 EventTypes:
   execution:
     set: Yürütme ayarlandı
@@ -853,7 +851,6 @@ EventTypes:
       code:
         added: Telefon numarası kodu oluşturuldu
         sent: Telefon numarası kodu gönderildi
-
     profile:
       changed: Kullanıcı profili değiştirildi
     address:
@@ -1325,7 +1322,6 @@ EventTypes:
         changed: Gizlilik politikası değiştirildi
       security:
         set: Güvenlik politikası ayarlandı
-
     removed: Örnek kaldırıldı
     secret:
       generator:
@@ -1376,14 +1372,11 @@ EventTypes:
         code:
           added: Telefon numarası doğrulama kodu oluşturuldu
           sent: Telefon numarası doğrulama kodu gönderildi
-
-
   web_key:
     added: Web Anahtarı eklendi
     activated: Web Anahtarı etkinleştirildi
     deactivated: Web Anahtarı devre dışı bırakıldı
     removed: Web Anahtarı kaldırıldı
-
 Application:
   OIDC:
     UnsupportedVersion: OIDC sürümünüz desteklenmiyor
@@ -1411,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Yenileme Token'ı sadece Yetkilendirme Kodu ile birlikte izin verilir.
-
 Action:
   Flow:
     Type:

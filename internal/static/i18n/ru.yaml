@@ -610,7 +610,6 @@ Errors:
     FeatureDisabled: Функция веб-ключа отключена
     NoActive: Активный веб-ключ не найден
     NotFound: Веб-ключ не найден
-
 AggregateTypes:
   action: Действие
   instance: Экземпляр
@@ -636,7 +635,6 @@ AggregateTypes:
   web_key: Веб-ключ
   saml_request: SAML-запрос
   saml_session: Сессия SAML
-
 EventTypes:
   execution:
     set: Набор исполнения
@@ -1310,7 +1308,6 @@ EventTypes:
         changed: Политика конфиденциальности изменена
       security:
         set: Политика безопасности установлена
-
     removed: Экземпляр удалён
     secret:
       generator:
@@ -1366,7 +1363,6 @@ EventTypes:
     activated: Веб-ключ активирован
     deactivated: Веб-ключ деактивирован
     removed: Веб-ключ удален
-
 Application:
   OIDC:
     UnsupportedVersion: Ваша версия OIDC не поддерживается
@@ -1394,7 +1390,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Токен обновления разрешён только в сочетании с кодом авторизации
-
 Action:
   Flow:
     Type:

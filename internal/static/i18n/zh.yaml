@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
     UserIDMissing: 缺少用户 ID
-    UserIDWrong: "请求用户不等于经过身份验证的用户"
+    UserIDWrong: 请求用户不等于经过身份验证的用户
     DomainPolicyNil: 组织策略为空
     EmailAsUsernameNotAllowed: 电子邮件不允许作为用户名
     Invalid: 用户数据无效
@@ -622,7 +622,6 @@ Errors:
     FeatureDisabled: Web 密钥功能已禁用
     NoActive: 未找到活动 Web 密钥
     NotFound: 未找到 Web 密钥
-
 AggregateTypes:
   action: 动作
   instance: 实例
@@ -648,7 +647,6 @@ AggregateTypes:
   web_key: Web 密钥
   saml_request: SAML 请求
   saml_session: SAML 会话
-
 EventTypes:
   execution:
     set: 执行集
@@ -1325,7 +1323,6 @@ EventTypes:
         changed: 隐私政策已更改
       security:
         set: 安全策略集
-
     removed: 实例已删除
     secret:
       generator:
@@ -1381,7 +1378,6 @@ EventTypes:
     activated: 已激活 Web Key
     deactivated: 已停用 Web Key
     removed: 已删除 Web Key
-
 Application:
   OIDC:
     UnsupportedVersion: 不支持您的 OIDC 版本
@@ -1409,7 +1405,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token 仅允许与授权码（Authorization Code）模式一起使用。
-
 Action:
   Flow:
     Type:

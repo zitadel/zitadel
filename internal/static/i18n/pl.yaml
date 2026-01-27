@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
     UserIDMissing: Brakuje ID użytkownika
-    UserIDWrong: "Żądanie użytkownika nie jest równe uwierzytelnionemu użytkownikowi"
+    UserIDWrong: Żądanie użytkownika nie jest równe uwierzytelnionemu użytkownikowi
     DomainPolicyNil: Polityka organizacji jest pusta
     EmailAsUsernameNotAllowed: Adres e-mail nie jest dozwolony jako nazwa użytkownika
     Invalid: Dane użytkownika są nieprawidłowe
@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Funkcja klucza internetowego jest wyłączona
     NoActive: Nie znaleziono aktywnego klucza internetowego
     NotFound: Nie znaleziono klucza internetowego
-
 AggregateTypes:
   action: Działanie
   instance: Instancja
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Klucz internetowy
   saml_request: Żądanie SAML
   saml_session: Sesja SAML
-
 EventTypes:
   execution:
     set: Zestaw wykonawczy
@@ -1324,7 +1322,6 @@ EventTypes:
         changed: Policy prywatności zmieniona
       security:
         set: Policy bezpieczeństwa ustawiona
-
     removed: Usunięto instancję
     secret:
       generator:
@@ -1380,7 +1377,6 @@ EventTypes:
     activated: Klucz internetowy aktywowano
     deactivated: Klucz internetowy dezaktywowano
     removed: Klucz internetowy usunięto
-
 Application:
   OIDC:
     UnsupportedVersion: Twoja wersja OIDC nie jest obsługiwana
@@ -1408,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Token odświeżania jest dozwolony tylko w połączeniu z Authorization Code.
-
 Action:
   Flow:
     Type:

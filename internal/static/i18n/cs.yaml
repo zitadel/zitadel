@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: Uživatel v dané organizaci nenalezen
     NotAllowedOrg: Uživatel není členem požadované organizace
     UserIDMissing: Chybí ID uživatele
-    UserIDWrong: "Požadovaný uživatel se neshoduje s ověřeným uživatelem"
+    UserIDWrong: Požadovaný uživatel se neshoduje s ověřeným uživatelem
     DomainPolicyNil: Politika organizace je prázdná
     EmailAsUsernameNotAllowed: E-mail není povolen jako uživatelské jméno
     Invalid: Data uživatele jsou neplatná
@@ -619,7 +619,6 @@ Errors:
     FeatureDisabled: Funkce webového klíče je zakázána
     NoActive: Nebyl nalezen žádný aktivní webový klíč
     NotFound: Webový klíč nebyl nalezen
-
 AggregateTypes:
   action: Akce
   instance: Instance
@@ -645,7 +644,6 @@ AggregateTypes:
   web_key: Webový klíč
   saml_request: Žádost SAML
   saml_session: Relace SAML
-
 EventTypes:
   execution:
     set: Prováděcí sada
@@ -1322,7 +1320,6 @@ EventTypes:
         changed: Politika ochrany soukromí změněna
       security:
         set: Bezpečnostní politika nastavena
-
     removed: Instance odstraněna
     secret:
       generator:
@@ -1378,7 +1375,6 @@ EventTypes:
     activated: Web Key aktivován
     deactivated: Web Key deaktivován
     removed: Odstraňte webový klíč
-
 Application:
   OIDC:
     UnsupportedVersion: Vaše verze OIDC není podporována
@@ -1406,7 +1402,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token je povolen pouze v kombinaci s Authorization Code.
-
 Action:
   Flow:
     Type:

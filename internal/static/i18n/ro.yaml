@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: Utilizatorul nu a putut fi găsit în organizația aleasă
     NotAllowedOrg: Utilizatorul nu este membru al organizației cerute
     UserIDMissing: ID-ul utilizatorului lipsește
-    UserIDWrong: "Utilizatorul din cerere nu este egal cu utilizatorul autentificat"
+    UserIDWrong: Utilizatorul din cerere nu este egal cu utilizatorul autentificat
     DomainPolicyNil: Politica organizației este goală
     EmailAsUsernameNotAllowed: E-mailul nu este permis ca nume de utilizator
     Invalid: Datele utilizatorului sunt invalide
@@ -617,7 +617,6 @@ Errors:
         FeatureDisabled: Caracteristica cheie web este dezactivată
         NoActive: Nu a fost găsită nicio cheie web activă
         NotFound: Cheia web nu a fost găsită
-
     AggregateTypes:
       action: Acțiune
       instance: Instanță
@@ -643,7 +642,6 @@ Errors:
       web_key: Cheie web
       saml_request: Cerere SAML
       saml_session: Sesiune SAML
-
     EventTypes:
       execution:
         set: Execuție setată
@@ -848,7 +846,6 @@ Errors:
           code:
             added: Cod de număr de telefon generat
             sent: Cod de număr de telefon trimis
-
         profile:
           changed: Profil de utilizator schimbat
         address:
@@ -1320,7 +1317,6 @@ Errors:
                 changed: Politică de confidențialitate schimbată
               security:
                 set: Politică de securitate setată
-
             removed: Instanță ștearsă
             secret:
               generator:
@@ -1371,13 +1367,11 @@ Errors:
                 code:
                   added: Cod de număr de telefon generat
                   sent: Cod de număr de telefon trimis
-
           web_key:
             added: Cheie Web adăugată
             activated: Cheie Web activată
             deactivated: Cheie Web dezactivată
             removed: Cheie Web ștearsă
-
         Application:
           OIDC:
             UnsupportedVersion: Versiunea dvs. OIDC nu este suportată
@@ -1405,7 +1399,6 @@ Errors:
               GrantType:
                 Refresh:
                   NoAuthCode: Token-ul de reîmprospătare este permis doar în combinație cu codul de autorizare.
-
         Action:
           Flow:
             Type:

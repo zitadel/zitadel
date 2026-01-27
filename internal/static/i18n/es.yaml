@@ -79,7 +79,7 @@ Errors:
     NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
     NotAllowedOrg: El usuario no es miembro de la organización requerida
     UserIDMissing: Falta el ID de usuario
-    UserIDWrong: "Solicitud de usuario no igual al usuario autenticado"
+    UserIDWrong: Solicitud de usuario no igual al usuario autenticado
     DomainPolicyNil: Falta la política de la organización
     EmailAsUsernameNotAllowed: La dirección de Email no se permite como nombre de usuario
     Invalid: Los datos de usuario no son válidos
@@ -621,7 +621,6 @@ Errors:
     FeatureDisabled: Función de clave web deshabilitada
     NoActive: No se encontró ninguna clave web activa
     NotFound: Clave web no encontrada
-
 AggregateTypes:
   action: Acción
   instance: Instancia
@@ -647,7 +646,6 @@ AggregateTypes:
   web_key: Clave web
   saml_request: Solicitud SAML
   saml_session: Sesión SAML
-
 EventTypes:
   execution:
     set: Conjunto de ejecución
@@ -1324,7 +1322,6 @@ EventTypes:
         changed: Política de privacidad modificada
       security:
         set: Política de seguridad establecida
-
     removed: Instancia eliminada
     secret:
       generator:
@@ -1360,7 +1357,7 @@ EventTypes:
       updated: Usuario actualizado
       deleted: Usuario eliminado
       email:
-        updated:  Dirección de correo electrónico modificada
+        updated: Dirección de correo electrónico modificada
         verified: Dirección de correo electrónico verificada
         verification:
           failed: Error en la verificación de la dirección de correo electrónico
@@ -1380,7 +1377,6 @@ EventTypes:
     activated: Clave web activada
     deactivated: Clave web desactivada
     removed: Clave web eliminada
-
 Application:
   OIDC:
     UnsupportedVersion: Tu versión de OIDC no está soportada
@@ -1408,7 +1404,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: El token de refresco sólo se permite en combinación con el código de autorización.
-
 Action:
   Flow:
     Type:

@@ -80,7 +80,7 @@ Errors:
     NotFoundOnOrg: تعذر العثور على المستخدم في المنظمة المختارة
     NotAllowedOrg: المستخدم ليس عضواً في المنظمة المطلوبة
     UserIDMissing: معرف المستخدم مفقود
-    UserIDWrong: "المستخدم الطالب لا يساوي المستخدم الموثق"
+    UserIDWrong: المستخدم الطالب لا يساوي المستخدم الموثق
     DomainPolicyNil: سياسة المنظمة فارغة
     EmailAsUsernameNotAllowed: البريد الإلكتروني غير مسموح به كاسم مستخدم
     Invalid: بيانات المستخدم غير صالحة
@@ -617,7 +617,6 @@ Errors:
     FeatureDisabled: ميزة مفتاح الويب معطلة
     NoActive: لم يتم العثور على مفتاح ويب نشط
     NotFound: مفتاح الويب غير موجود
-
 AggregateTypes:
   action: إجراء
   instance: مثيل
@@ -643,7 +642,6 @@ AggregateTypes:
   web_key: مفتاح ويب
   saml_request: طلب SAML
   saml_session: جلسة SAML
-
 EventTypes:
   execution:
     set: تم تعيين التنفيذ
@@ -848,7 +846,6 @@ EventTypes:
       code:
         added: تم إنشاء رمز رقم الهاتف
         sent: تم إرسال رمز رقم الهاتف
-
     profile:
       changed: تم تغيير ملف تعريف المستخدم
     address:
@@ -1320,7 +1317,6 @@ EventTypes:
         changed: تم تغيير سياسة الخصوصية
       security:
         set: تم تعيين سياسة الأمان
-
     removed: تمت إزالة المثيل
     secret:
       generator:
@@ -1376,7 +1372,6 @@ EventTypes:
     activated: تم تفعيل مفتاح الويب
     deactivated: تم تعطيل مفتاح الويب
     removed: تمت إزالة مفتاح الويب
-
 Application:
   OIDC:
     UnsupportedVersion: إصدار OIDC الخاص بك غير مدعوم
@@ -1404,7 +1399,6 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: رمز التحديث مسموح به فقط بالاشتراك مع رمز التفويض.
-
 Action:
   Flow:
     Type:
