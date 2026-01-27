@@ -78,6 +78,7 @@ const CREATE_USER: ShortcutItem = {
   selector: 'cnsl-shortcuts',
   templateUrl: './shortcuts.component.html',
   styleUrls: ['./shortcuts.component.scss'],
+  standalone: false,
 })
 export class ShortcutsComponent implements OnDestroy {
   public org!: Org.AsObject;

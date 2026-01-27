@@ -5,6 +5,7 @@ import { NavigationService } from 'src/app/services/navigation.service';
 
 @Directive({
   selector: '[cnslBack]',
+  standalone: false,
 })
 export class BackDirective {
   new: Boolean = false;

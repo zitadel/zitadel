@@ -21,6 +21,7 @@ import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { TableActionsModule } from '../table-actions/table-actions.module';
 import { OrgTableComponent } from './org-table.component';
+import { TypeSafeCellDefModule } from '../../directives/type-safe-cell-def/type-safe-cell-def.module';
 
 @NgModule({
   declarations: [OrgTableComponent],
@@ -45,6 +46,7 @@ import { OrgTableComponent } from './org-table.component';
     MatRadioModule,
     InputModule,
     FormsModule,
+    TypeSafeCellDefModule,
   ],
   exports: [OrgTableComponent],
 })

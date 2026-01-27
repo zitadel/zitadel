@@ -419,6 +419,7 @@ const REQUESTMAP = {
   selector: 'cnsl-message-texts',
   templateUrl: './message-texts.component.html',
   styleUrls: ['./message-texts.component.scss'],
+  standalone: false,
 })
 export class MessageTextsComponent implements OnInit, OnDestroy {
   public loading: boolean = false;

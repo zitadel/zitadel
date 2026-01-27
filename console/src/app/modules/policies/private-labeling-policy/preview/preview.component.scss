@@ -1,11 +1,11 @@
-@import '../../../../../styles/input.scss';
-@import '../../../label/label.component.scss';
+@use '../../../../../styles/input.scss' as input;
+@use '../../../label/label.component.scss' as label;
 
 @mixin preview-theme($show-dark) {
   $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
 
-  @include input-theme($theme);
-  @include cnsl-label-theme($theme);
+  @include input.input-theme($theme);
+  @include label.cnsl-label-theme($theme);
   //   @include mat.all-component-themes($theme);
 
   $primary: map-get($theme, primary);

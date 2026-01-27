@@ -48,6 +48,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
+  standalone: false,
 })
 export class AppCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();

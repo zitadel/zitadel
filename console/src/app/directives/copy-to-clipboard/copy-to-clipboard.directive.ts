@@ -2,6 +2,7 @@ import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/c
 
 @Directive({
   selector: '[cnslCopyToClipboard]',
+  standalone: false,
 })
 export class CopyToClipboardDirective {
   @Input() valueToCopy: string = '';

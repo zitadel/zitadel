@@ -7,6 +7,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   templateUrl: './org-list.component.html',
   styleUrls: ['./org-list.component.scss'],
   animations: [enterAnimations],
+  standalone: false,
 })
 export class OrgListComponent {
   constructor(breadcrumbService: BreadcrumbService) {

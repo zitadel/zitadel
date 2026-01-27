@@ -23,6 +23,7 @@ import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2/query_pb';
   templateUrl: './actions-two-actions.component.html',
   styleUrls: ['./actions-two-actions.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsComponent {
   protected readonly refresh$ = new Subject<true>();
@@ -72,7 +73,7 @@ export class ActionsTwoActionsComponent {
       .open<ActionTwoAddActionDialogComponent, ActionTwoAddActionDialogData, ActionTwoAddActionDialogResult>(
         ActionTwoAddActionDialogComponent,
         {
-          width: '400px',
+          width: '500px',
           data: execution
             ? {
                 execution,

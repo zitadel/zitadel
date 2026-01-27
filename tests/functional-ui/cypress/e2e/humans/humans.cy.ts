@@ -30,9 +30,9 @@ describe('humans', () => {
         cy.url().should('contain', 'users/create');
         cy.get('[formcontrolname="email"]').should('be.enabled').type('dummy@dummy.com');
         //force needed due to the prefilled username prefix
-        cy.get('[formcontrolname="username"]').should('be.enabled').type(user.addName);
-        cy.get('[formcontrolname="givenName"]').should('be.enabled').type('e2ehumanfirstname');
-        cy.get('[formcontrolname="familyName"]').should('be.enabled').type('e2ehumanlastname');
+        cy.get('[formcontrolname="userName"]').should('be.enabled').type(user.addName);
+        cy.get('[formcontrolname="firstName"]').should('be.enabled').type('e2ehumanfirstname');
+        cy.get('[formcontrolname="lastName"]').should('be.enabled').type('e2ehumanlastname');
         cy.get('[data-e2e="create-button"]').click({ force: true });
         cy.shouldConfirmSuccess();
         let loginName = user.addName;
