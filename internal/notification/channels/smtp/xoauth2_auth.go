@@ -14,6 +14,14 @@ import (
 
 var tokenSourceCache *lru.TwoQueueCache[string, oauth2.TokenSource]
 
+func init() {
+	var err error
+	tokenSourceCache, err = lru.New2Q[string, oauth2.TokenSource](100)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type XOAuth2AuthConfig struct {
 	User                  string
 	TokenEndpoint         string
