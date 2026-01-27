@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -30,6 +31,11 @@ type testLogError struct {
 	Parent  string
 	Message string
 	ID      string
+}
+
+func init() {
+	// Only enable StreamRuntime for tests
+	instrumentation.EnableStreams(StreamRuntime)
 }
 
 // prepareDefaultLogger sets the global default logger to a JSON logger writing to a buffer.
@@ -55,6 +61,39 @@ func prepareDefaultLogger() (done func() (*testLogEntry, error)) {
 			return nil, err
 		}
 		return entry, nil
+	}
+}
+
+func TestNew(t *testing.T) {
+	tests := []struct {
+		name   string
+		stream Stream
+		want   *testLogEntry
+	}{
+		{
+			name:   "enabled stream",
+			stream: StreamRuntime,
+			want: &testLogEntry{
+				Level: "INFO",
+				Msg:   "test message",
+				Foo:   "bar",
+			},
+		},
+		{
+			name:   "disabled stream",
+			stream: StreamEventPusher,
+			want:   nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			done := prepareDefaultLogger()
+			logger := New(tt.stream, slog.String("foo", "bar"))
+			logger.Info("test message")
+			got, err := done()
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }
 

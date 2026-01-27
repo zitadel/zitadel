@@ -38,6 +38,7 @@ const (
 
 type LogConfig struct {
 	Level     slog.Level
+	Streams   []Stream
 	Format    LogFormat
 	AddSource bool
 	Errors    ErrorConfig

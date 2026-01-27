@@ -28,24 +28,36 @@ import (
 	"log/slog"
 
 	slogctx "github.com/veqryn/slog-context"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type Stream int
+// Stream represents a logging stream for categorizing log entries.
+// This is a type alias for [instrumentation.Stream] to expose it in this package.
+type Stream = instrumentation.Stream
 
-//go:generate enumer -type=Stream -trimprefix=Stream -transform=snake
 const (
-	StreamRuntime      Stream = iota // Top-level commands, such as starting the application or running migrations.
-	StreamRequest                    // API request handling.
-	StreamEventPusher                // Event pushing to the database (not implemented yet).
-	StreamEventHandler               // Event handling and processing.
-	StreamAction                     // Execution target workers (actions v2).
-	StreamNotification               // Notification sending workers.
+	StreamRuntime      = instrumentation.StreamRuntime      // Application runtime logs.
+	StreamRequest      = instrumentation.StreamRequest      // API request handling.
+	StreamEventPusher  = instrumentation.StreamEventPusher  // Event pushing to the database (not implemented yet).
+	StreamEventHandler = instrumentation.StreamEventHandler // Event handling and processing.
+	StreamAction       = instrumentation.StreamAction       // Execution target workers (actions v2).
+	StreamNotification = instrumentation.StreamNotification // Notification sending workers.
 )
+
+var noop = slog.New(slog.DiscardHandler)
 
 // New creates a new logger with the given stream and additional arguments.
 func New(stream Stream, args ...any) *slog.Logger {
-	args = append(args, slog.String("stream", stream.String()))
+	if !instrumentation.IsStreamEnabled(stream) {
+		return noop
+	}
+	args = append(args,
+		slog.String("stream", stream.String()),
+		slog.String("version", build.Version()),
+	)
 	return slog.Default().With(args...)
 }
 
@@ -104,8 +116,6 @@ func Warn(ctx context.Context, msg string, args ...any) {
 func Error(ctx context.Context, msg string, args ...any) {
 	slogctx.Error(ctx, msg, args...)
 }
-
-var noop = slog.New(slog.DiscardHandler)
 
 // WithError adds an error attribute to the logger from the context and returns the new logger.
 // If the error is not a [zerrors.ZitadelError], it is wrapped in a generic ZitadelError with kind [zerrors.KindUnknown].

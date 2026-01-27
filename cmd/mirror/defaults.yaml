@@ -43,13 +43,21 @@ Instrumentation:
   Log:
     # Log lines lower than this level are not emitted.
     Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Streams enable logging for specific parts of the application.
+    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+      - runtime # General runtime logs, such as startup and shutdown messages.
+      - request # Logs for incoming API and HTTP requests.
+      # - event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
+      - event_handler # Logs for event handling in projections.
+      - action # Logs for execution target workers (actions v2).
+      - notification # Logs for notification sending workers.
     # Enable printing structured logs to standard error in the specified format.
     # The following formats are supported:
     #   - "disabled": Disables logging
     #   - "text": Logs are printed on StdErr as human-readable text
     #   - "json": Logs are printed on StdErr as JSON objects
-    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
-    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
+    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
     Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
