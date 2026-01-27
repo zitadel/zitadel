@@ -21,7 +21,7 @@ const (
 	KeyEnableBackChannelLogout        Key = 12
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
-	KeyConsoleUseV2UserApi            Key = 15
+	KeyManagementConsoleUseV2UserApi  Key = 15
 	KeyEnableRelationalTables         Key = 16
 )
 

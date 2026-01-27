@@ -175,7 +175,7 @@ Milestones are used to track the administrator's progress in setting up their in
 Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, ZITADEL must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
 
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
-For single instance setups which fulfilled all milestone (*your next steps* in console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
+For single instance setups which fulfilled all milestone (*your next steps* in the management console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
 
 ### Organization
 
