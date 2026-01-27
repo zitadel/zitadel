@@ -35,7 +35,7 @@ Select Web application type and continue.
 We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our NextJS application.
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
 
-![Create app in console](/img/nextjs/app-create.png)
+![Create app in management console](/img/nextjs/app-create.png)
 
 ### Redirect URIs
 

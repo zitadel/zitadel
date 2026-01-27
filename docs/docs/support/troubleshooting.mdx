@@ -62,7 +62,7 @@ End-users authenticate to the application in the frontend project, but when call
 You must add the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to the auth request that is send from the front end.
 
 When accessing your ZITADEL instance's APIs they act as a resource server.
-You can check the Console or via API and see that when you open your default organization there exists a project "ZITADEL" that contains different applications for each API and the Console.
+You can check the Management Console or via API and see that when you open your default organization there exists a project "ZITADEL" that contains different applications for each API and the Console.
 Like in the scenario above the access token requires to have an `aud` claim that includes the "ZITADEL" project.
 Instead of `urn:zitadel:iam:org:project:id:zitadel:aud` you could also use `urn:zitadel:iam:org:project:id:{projectId}:aud`, where  `projectId` is the projectId of the Project "ZITADEL".
 

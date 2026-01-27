@@ -103,7 +103,7 @@ Once in the settings:
 Access the settings page of your instance or the specific organization and select **Identity Providers**.
 
 
-The ZITADEL Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
+The ZITADEL Management Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
 
 ![Identity Provider Overview](/img/guides/zitadel_identity_provider_overview.png)
 
