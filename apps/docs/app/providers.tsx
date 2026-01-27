@@ -6,7 +6,7 @@ import MixpanelProvider from '@/components/mixpanel-provider';
 
 export function Providers({ children }: any) {
   return (
-    <RootProvider>
+    <RootProvider search={{ enabled: false }}>
       <MixpanelProvider>
         <AuthRequestProvider>{children}</AuthRequestProvider>
       </MixpanelProvider>
