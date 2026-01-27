@@ -135,9 +135,12 @@ export async function register(): Promise<void> {
   const { OTLPLogExporter } = await import("@opentelemetry/exporter-logs-otlp-http");
   const { Resource } = await import("@opentelemetry/resources");
   const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } = await import("@opentelemetry/semantic-conventions");
-  const { metrics, diag, DiagConsoleLogger, DiagLogLevel } = await import("@opentelemetry/api");
+  const { metrics, diag, DiagConsoleLogger, DiagLogLevel, propagation } = await import("@opentelemetry/api");
   const { logs } = await import("@opentelemetry/api-logs");
   const { registerInstrumentations } = await import("@opentelemetry/instrumentation");
+  const { CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator } = await import(
+    "@opentelemetry/core"
+  );
   const { HttpInstrumentation } = await import("@opentelemetry/instrumentation-http");
   const { WinstonInstrumentation } = await import("@opentelemetry/instrumentation-winston");
   const { RuntimeNodeInstrumentation } = await import("@opentelemetry/instrumentation-runtime-node");
@@ -183,6 +186,15 @@ export async function register(): Promise<void> {
 
   tracerProvider.register();
   console.log("OTEL: Trace provider registered");
+
+  // ============ PROPAGATION ============
+  // Set up W3C trace context and baggage propagation for cross-service tracing
+  propagation.setGlobalPropagator(
+    new CompositePropagator({
+      propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
+    }),
+  );
+  console.log("OTEL: W3C trace context and baggage propagation enabled");
 
   // ============ METRICS ============
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
