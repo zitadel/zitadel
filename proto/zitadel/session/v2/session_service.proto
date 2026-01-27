@@ -153,7 +153,7 @@ service SessionService {
   // the factors that were verified, the metadata, user agent information and possible expiration date.
   // The session token is required unless either of the following conditions is met:
   //   - the caller created the session
-  //   - the authenticated user requests their own session (checked user)
+  //   - the authenticated User (Human) requests their own session (checked User (Human))
   //   - the security token provided in the authorization header has the same user agent as the session
   //   - the caller is granted the permission session.read permission on either the instance or on the checked user's organization
   //
@@ -317,7 +317,7 @@ message GetSessionRequest{
   // The current token of the session, previously returned on the create / update request.
   // The token is required unless either of the following conditions is met:
   // - the caller created the session
-  // - the authenticated user requests their own session (checked user)
+  // - the authenticated User (Human) requests their own session (checked User (Human))
   // - the security token provided in the authorization header has the same user agent as the session
   // - the caller is granted the permission session.read permission on either the instance or on the checked user's organization
   optional string session_token = 2 [
@@ -337,9 +337,9 @@ message GetSessionResponse{
 message CreateSessionRequest{
   // The checks to be performed during session creation.
   // Note that a user check can only be performed once per session and cannot be changed afterwards.
-  // Some checks require that the user is already checked, either in the previous or the same
-  // request. For example, a password check requires that the user is already checked.
-  // Other checks, like WebAuthN or IDP intent, require that the user is already checked and a challenge
+  // Some checks require that the User (Human) is already checked, either in the previous or the same
+  // request. For example, a password check requires that the User (Human) is already checked.
+  // Other checks, like WebAuthN or IDP intent, require that the User (Human) is already checked and a challenge
   // was requested in any previous request.
   // On successful checks, the session's `factors` field will be updated.
   Checks checks = 1;
@@ -413,9 +413,9 @@ message SetSessionRequest{
   // Re-executing a check that was already successful will overwrite the previous check time.
   // For example, if a password check was already successful, it can be re-checked to update the check time.
   // Note that a user check can only be performed once per session and cannot be changed afterwards.
-  // Some checks require that the user is already checked, either in the previous or the same request.
-  // For example, a password check requires that the user is already checked.
-  // Other checks, like WebAuthN or IDP intent, require that the user is already checked and a challenge
+  // Some checks require that the User (Human) is already checked, either in the previous or the same request.
+  // For example, a password check requires that the User (Human) is already checked.
+  // Other checks, like WebAuthN or IDP intent, require that the User (Human) is already checked and a challenge
   // was requested in any previous request.
   // On successful checks, the session's `factors` field will be updated.
   Checks checks = 3;
@@ -474,7 +474,7 @@ message DeleteSessionRequest{
   // The current token of the session, previously returned on the create / update request.
   // The token is required unless either of the following conditions is met:
   // - the caller created the session
-  // - the authenticated user requests their own session (checked user)
+  // - the authenticated User (Human) requests their own session (checked User (Human))
   // - the security token provided in the authorization header has the same user agent as the session
   // - the caller is granted the permission session.delete permission on either the instance or on the checked user's organization
   optional string session_token = 2;
@@ -485,16 +485,16 @@ message DeleteSessionResponse{
 }
 
 message Checks {
-  // Check the user by its user ID or login name.
+  // Check the User (Human) by its user ID or login name.
   // A user check can only be performed once per session and cannot be changed afterwards.
   // On successful user check, the session's `factors` field will be updated with a `user` factor
-  // containing the checked user's ID, login name, display name, organization ID and verification time.
-  // Note that some other checks require that the user is already checked, either in the previous
-  // or the same request. For example, a password check requires that the user is already checked.
+  // containing the checked User (Human) ID, login name, display name, organization ID and verification time.
+  // Note that some other checks require that the User (Human) is already checked, either in the previous
+  // or the same request. For example, a password check requires that the User (Human) is already checked.
   optional CheckUser user = 1;
 
   // Check the password and update the session on success.
-  // Requires that the user is already checked, either in the previous or the same request.
+  // Requires that the User (Human) is already checked, either in the previous or the same request.
   // On successful password check, the session's `factors` field will be updated with a `password` factor,
   // containing the verification time.
   // On failed password check id: "COMMAND-3M0fs" wll be returned.
@@ -502,14 +502,14 @@ message Checks {
   optional CheckPassword password = 2;
 
   // Check the public key credential issued by the WebAuthN client.
-  // Requires that the user is already checked and a WebAuthN challenge to be requested,
+  // Requires that the User (Human) is already checked and a WebAuthN challenge to be requested,
   // in any previous request.
   // On successful WebAuthN check, the session's `factors` field will be updated with a `webauthn` factor,
   // containing the verification time and if the user presence was verified.
   optional CheckWebAuthN web_auth_n = 3;
 
   // Check the IDP intent and update the session on success.
-  // Requires that the user is already checked and an IDP intent succeeded and has not expired yet.
+  // Requires that the User (Human) is already checked and an IDP intent succeeded and has not expired yet.
   // Note that the IDP intent must be either matching the same user as checked in the session,
   // or there must not be an external IDP linked to the intent's user.
   // On successful IDP intent check, the session's `factors` field will be updated with an `intent` factor,
@@ -517,38 +517,38 @@ message Checks {
   optional CheckIDPIntent idp_intent = 4;
 
   // Check the Time-based One-Time Password and update the session on success.
-  // Requires that the user is already checked, either in the previous or the same request.
+  // Requires that the User (Human) is already checked, either in the previous or the same request.
   // On successful TOTP check, the session's `factors` field will be updated with a `totp` factor,
   // containing the verification time.
   optional CheckTOTP totp = 5;
 
   // Check the One-Time Password sent over SMS and update the session on success.
-  // Requires that the user is already checked, either in the previous or the same request.
+  // Requires that the User (Human) is already checked, either in the previous or the same request.
   // On successful OTP SMS check, the session's `factors` field will be updated with an `otp` factor,
   // containing the verification time.
   // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
   optional CheckOTP otp_sms = 6;
 
   // Check the One-Time Password sent over Email and update the session on success.
-  // Requires that the user is already checked, either in the previous or the same request.
+  // Requires that the User (Human) is already checked, either in the previous or the same request.
   // On successful OTP Email check, the session's `factors` field will be updated with an `otp` factor,
   // containing the verification time.
   // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
   optional CheckOTP otp_email = 7;
 
   // Check the Recovery Code and update the session on success.
-  // Requires that the user is already checked, either in the previous or the same request.
+  // Requires that the User (Human) is already checked, either in the previous or the same request.
   // On successful Recovery Code check, the session's `factors` field will be updated with a `recovery_code` factor,
   // containing the verification time.
   optional CheckRecoveryCode recovery_code = 8;
 }
 
 message CheckUser {
-  // Search the user either by its user ID or login name.
+  // Search the User (Human) either by its user ID or login name.
   oneof search {
     option (validate.required) = true;
 
-    // The unique identifier of the user to be checked.
+    // The unique identifier of the User (Human) to be checked.
     string user_id = 1 [
       (validate.rules).string = {min_len: 1, max_len: 200},
       (google.api.field_behavior) = REQUIRED,
@@ -559,10 +559,10 @@ message CheckUser {
       }
     ];
 
-    // The login name of the user to be checked. It will search case insensitive.
+    // The login name of the User (Human) to be checked. It will search case insensitive.
     // Note this only checks for the computed login name and not for any organization scoped usernames.
     // Also note that it will not check for emails or phone numbers, even if the corresponding
-    // setting is enabled. Use the user service ListUsers method to find a user by email or phone number first
+    // setting is enabled. Use the user service ListUsers method to find a User (Human) by email or phone number first
     // to obtain the user ID or login name.
     string login_name = 2 [
       (validate.rules).string = {min_len: 1, max_len: 200},
@@ -577,7 +577,7 @@ message CheckUser {
 }
 
 message CheckPassword {
-  // The password of the user to be checked.
+  // The password of the User (Human) to be checked.
   string password = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -639,7 +639,7 @@ message CheckTOTP {
 }
 
 message CheckOTP {
-  // The One-Time Password sent over SMS or Email of the user to be checked.
+  // The One-Time Password sent over SMS or Email of the User (Human) to be checked.
   string code = 1 [
     (validate.rules).string = {min_len: 1},
     (google.api.field_behavior) = REQUIRED,
@@ -651,7 +651,7 @@ message CheckOTP {
 }
 
 message CheckRecoveryCode {
-  // The Recovery Code of the user to be checked.
+  // The Recovery Code of the User (Human) to be checked.
   // The code must match the exact code previously generated for the user, including dashes if any.
   // On successful check, the recovery code will be invalidated and cannot be used again.
   string code = 1 [

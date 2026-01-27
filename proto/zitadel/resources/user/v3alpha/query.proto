@@ -119,7 +119,7 @@ message UsernameFilter {
 }
 
 message EmailFilter {
-  // Defines the email of the user to query for.
+  // Defines the email of the User (Human) to query for.
   string address = 1 [
     (validate.rules).string = {max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -136,7 +136,7 @@ message EmailFilter {
 }
 
 message PhoneFilter {
-  // Defines the phone of the user to query for.
+  // Defines the phone of the User (Human) to query for.
   string number = 1 [
     (validate.rules).string = {min_len: 1, max_len: 20},
     (google.api.field_behavior) = REQUIRED,

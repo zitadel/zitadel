@@ -369,7 +369,7 @@ service ZITADELUsers {
   //
   // Add or update the contact email address of a user.
   // If the email is not passed as verified, a verification code will be generated,
-  // which can be either returned or will be sent to the user by email.
+  // which can be either returned or will be sent to the User (Human) by email.
   rpc SetContactEmail (SetContactEmailRequest) returns (SetContactEmailResponse) {
     option (google.api.http) = {
       put: "/resources/v3alpha/users/{id}/email"
@@ -446,7 +446,7 @@ service ZITADELUsers {
   //
   // Add or update the contact phone number of a user.
   // If the phone is not passed as verified, a verification code will be generated,
-  // which can be either returned or will be sent to the user by SMS.
+  // which can be either returned or will be sent to the User (Human) by SMS.
   rpc SetContactPhone (SetContactPhoneRequest) returns (SetContactPhoneResponse) {
     option (google.api.http) = {
       put: "/resources/v3alpha/users/{id}/phone"
@@ -792,7 +792,7 @@ service ZITADELUsers {
   //
   // Add a new one-time password (OTP) SMS authenticator to a user.
   // If the phone is not passed as verified, a verification code will be generated,
-  // which can be either returned or will be sent to the user by SMS.
+  // which can be either returned or will be sent to the User (Human) by SMS.
   rpc AddOTPSMSAuthenticator (AddOTPSMSAuthenticatorRequest) returns (AddOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/otp_sms"
@@ -866,7 +866,7 @@ service ZITADELUsers {
   //
   // Add a new one-time password (OTP) Email authenticator to a user.
   // If the email is not passed as verified, a verification code will be generated,
-  // which can be either returned or will be sent to the user by email.
+  // which can be either returned or will be sent to the User (Human) by email.
   rpc AddOTPEmailAuthenticator (AddOTPEmailAuthenticatorRequest) returns (AddOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/otp_email"
@@ -1354,9 +1354,9 @@ message ResendContactEmailCodeRequest {
   ];
   // if no verification is specified, an email is sent
   oneof verification {
-    // Let Zitadel send the link to the user via email.
+    // Let Zitadel send the link to the User (Human) via email.
     SendEmailVerificationCode send_code = 4;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnEmailVerificationCode return_code = 5;
   }
 }
@@ -1453,9 +1453,9 @@ message ResendContactPhoneCodeRequest {
   ];
   // if no verification is specified, a SMS is sent
   oneof verification {
-    // Let Zitadel send the link to the user via SMS.
+    // Let Zitadel send the link to the User (Human) via SMS.
     SendPhoneVerificationCode send_code = 4;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnPhoneVerificationCode return_code = 5;
   }
 }
@@ -1578,11 +1578,11 @@ message RequestPasswordResetRequest {
   ];
   // If no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let Zitadel send the link to the user via email.
+    // Let Zitadel send the link to the User (Human) via email.
     SendPasswordResetEmail send_email = 4;
-    // Let Zitadel send the link to the user via SMS.
+    // Let Zitadel send the link to the User (Human) via SMS.
     SendPasswordResetSMS send_sms = 5;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnPasswordResetCode return_code = 6;
   }
 }
@@ -1691,9 +1691,9 @@ message CreateWebAuthNRegistrationLinkRequest {
   ];
   // if no medium is specified, an email is sent with the default url.
   oneof medium {
-    // Let Zitadel send the link to the user via email.
+    // Let Zitadel send the link to the User (Human) via email.
     SendWebAuthNRegistrationLink send_link = 4;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnWebAuthNRegistrationCode return_code = 5;
   }
 }

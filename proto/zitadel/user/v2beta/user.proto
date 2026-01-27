@@ -175,9 +175,9 @@ message HumanUser {
   HumanEmail email = 7;
   // Phone of the user, if defined.
   HumanPhone phone = 8;
-  // User is required to change the used password on the next login.
+  // User (Human) is required to change the used password on the next login.
   bool password_change_required = 9;
-  // The time the user last changed their password.
+  // The time the User (Human) last changed their password.
   google.protobuf.Timestamp password_changed = 10;
 }
 

@@ -7922,9 +7922,9 @@ message GetPasswordAgePolicyResponse {
 }
 
 message UpdatePasswordAgePolicyRequest {
-    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    // Amount of days after which a password will expire. The User (Human) will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
+    // Amount of days after which the User (Human) should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -7940,7 +7940,7 @@ message GetLockoutPolicyResponse {
 }
 
 message UpdateLockoutPolicyRequest {
-    // failed attempts until a user gets locked
+    // failed attempts until a User (Human) gets locked
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset."

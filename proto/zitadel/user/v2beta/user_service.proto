@@ -111,7 +111,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // Deprecated: use user service v2 instead. This service will be removed in the next major version of ZITADEL.
 service UserService {
 
-  // Create a new human user
+  // Create a new User (Human)
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   //
@@ -145,7 +145,7 @@ service UserService {
 
   // User by ID
   //
-  // Returns the full user object (human or machine) including the profile, email, etc.
+  // Returns the full user object (User (Human) or machine) including the profile, email, etc.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
@@ -215,9 +215,9 @@ service UserService {
     };
   }
 
-  // Change the user email
+  // Change the User (Human) email
   //
-  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email.
+  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the User (Human) by email.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
@@ -243,9 +243,9 @@ service UserService {
     };
   }
 
-  // Resend code to verify user email
+  // Resend code to verify User (Human) email
   //
-  // Resend code to verify user email
+  // Resend code to verify User (Human) email
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
@@ -299,9 +299,9 @@ service UserService {
     };
   }
 
-  // Set the user phone
+  // Set the User (Human) phone
   //
-  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms.
+  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the User (Human) by sms.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
@@ -327,9 +327,9 @@ service UserService {
     };
   }
 
-  // Remove the user phone
+  // Remove the User (Human) phone
   //
-  // Remove the user phone
+  // Remove the User (Human) phone
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
@@ -357,9 +357,9 @@ service UserService {
     };
   }
 
-  // Resend code to verify user phone
+  // Resend code to verify User (Human) phone
   //
-  // Resend code to verify user phone
+  // Resend code to verify User (Human) phone
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
@@ -770,7 +770,7 @@ service UserService {
 
   // Remove TOTP generator from a user
   //
-  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second factor afterward.
+  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the User (Human) will not have TOTP as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
@@ -796,7 +796,7 @@ service UserService {
 
   // Add OTP SMS for a user
   //
-  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
+  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the User (Human) to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
@@ -823,7 +823,7 @@ service UserService {
 
   // Remove One-Time Password (OTP) SMS from a user
   //
-  // Remove the configured One-Time Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+  // Remove the configured One-Time Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the User (Human) will not have OTP SMS as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
@@ -849,7 +849,7 @@ service UserService {
 
   // Add OTP Email for a user
   //
-  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor.
+  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the User (Human) to verify a OTP with the latest verified email. The email has to be verified to add the second factor.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
@@ -876,7 +876,7 @@ service UserService {
 
   // Remove One-Time Password (OTP) Email from a user
   //
-  // Remove the configured One-Time Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+  // Remove the configured One-Time Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the User (Human) will not have OTP Email as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
@@ -1014,7 +1014,7 @@ service UserService {
 
   // Change password
   //
-  // Change the password of a user with either a verification code or the current password.
+  // Change the password of a User (Human) with either a verification code or the current password.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
@@ -1895,7 +1895,7 @@ message SetPasswordRequest{
   ];
   Password new_password = 2;
   // if neither, the current password must be provided nor a verification code generated by the PasswordReset is provided,
-  // the user must be granted permission to set a password
+  // the User (Human) must be granted permission to set a password
   oneof verification {
     string current_password = 3 [
       (validate.rules).string = {min_len: 1, max_len: 200},

@@ -16,7 +16,7 @@ message SAMLConfiguration {
   // In case the metadata was provided as raw XML, this field is empty.
   string metadata_url = 2;
 
-  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // LoginVersion specifies the login UI, where the User (Human) is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.

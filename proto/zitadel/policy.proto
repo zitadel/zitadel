@@ -311,13 +311,13 @@ message PasswordComplexityPolicy {
 
 message PasswordAgePolicy {
     zitadel.v1.ObjectDetails details = 1;
-    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    // Amount of days after which a password will expire. The User (Human) will be forced to change the password on the following authentication.
     uint64 max_age_days = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"365\""
         }
     ];
-    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
+    // Amount of days after which the User (Human) should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint64 expire_warn_days = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"10\""

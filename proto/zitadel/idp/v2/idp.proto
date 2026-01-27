@@ -329,7 +329,7 @@ message AzureADConfig {
   // Organizational, All).
   AzureADTenant tenant = 2;
   // Azure AD doesn't send if the email has been verified. Enable this if the
-  // user email should always be added verified in Zitadel (no verification
+  // User (Human) email should always be added verified in Zitadel (no verification
   // emails will be sent).
   bool email_verified = 3;
   // The scopes requested by Zitadel during the request to Azure AD.
@@ -365,7 +365,7 @@ enum AutoLinkingOption {
   // check for a corresponding Zitadel user.
   AUTO_LINKING_OPTION_USERNAME = 1;
   // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check
-  // for a corresponding Zitadel user with the same verified email Note that in
+  // for a corresponding Zitadel User (Human) with the same verified email Note that in
   // case multiple users match, no prompt will be shown.
   AUTO_LINKING_OPTION_EMAIL = 2;
 }

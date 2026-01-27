@@ -37,14 +37,14 @@ message AuthRequest{
   // Prompts that must be displayed to the user.
   repeated Prompt prompt = 6;
 
-  // End-User's preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646]
+  // End-User's (Human) preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646]
   // language tag values, ordered by preference.
   // For instance, the value [fr-CA, fr, en] represents a preference for French as spoken in Canada,
   // then French (without a region designation), followed by English (without a region designation).
   // An error SHOULD NOT result if some or all of the requested locales are not supported.
   repeated string ui_locales = 7;
 
-  // Login hint can be set by the application with a user identifier such as an email or phone number.
+  // Login hint can be set by the application with a User (Human) identifier such as an email or phone number.
   optional string login_hint = 8;
 
   // Specifies the allowable elapsed time in seconds since the last time the End-User was actively authenticated.

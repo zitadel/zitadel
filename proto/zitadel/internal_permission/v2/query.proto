@@ -157,7 +157,7 @@ message UserDisplayNameFilter {
   ];
 
   // Specify the method to search for the display name. Default is EQUAL.
-  // For example, to search for all administrator roles of a user with a display name
+  // For example, to search for all administrator roles of a User (Human) with a display name
   // containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
   zitadel.filter.v2.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
 }

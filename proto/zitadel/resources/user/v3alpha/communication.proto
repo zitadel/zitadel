@@ -55,9 +55,9 @@ message SetEmail {
   ];
   // if no verification is specified, an email is sent with the default url
   oneof verification {
-    // Let Zitadel send the link to the user via email.
+    // Let Zitadel send the link to the User (Human) via email.
     SendEmailVerificationCode send_code = 2;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnEmailVerificationCode return_code = 3;
     // Set the email as already verified.
     bool is_verified = 4 [(validate.rules).bool.const = true];
@@ -66,7 +66,7 @@ message SetEmail {
 
 message SendEmailVerificationCode {
   // Optionally set a url_template, which will be used in the verification mail sent by Zitadel
-  // to guide the user to your verification page.
+  // to guide the User (Human) to your verification page.
   // If no template is set, the default Zitadel url will be used.
   optional string url_template = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -93,9 +93,9 @@ message SetPhone {
   ];
   // if no verification is specified, a SMS is sent
   oneof verification {
-    // Let Zitadel send the link to the user via SMS.
+    // Let Zitadel send the link to the User (Human) via SMS.
     SendPhoneVerificationCode send_code = 2;
-    // Get the code back to provide it to the user in your preferred mechanism.
+    // Get the code back to provide it to the User (Human) in your preferred mechanism.
     ReturnPhoneVerificationCode return_code = 3;
     // Set the phone as already verified.
     bool is_verified = 4 [(validate.rules).bool.const = true];

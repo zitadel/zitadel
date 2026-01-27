@@ -59,19 +59,19 @@ message UserFactor {
   reserved 5;
   reserved "organisation_id";
 
-  // The timestamp when the user was last verified.
+  // The timestamp when the User (Human) was last verified.
   google.protobuf.Timestamp verified_at = 1;
 
-  // The unique identifier of the user that was verified.
+  // The unique identifier of the User (Human) that was verified.
   string id = 2;
 
-  // The login name of the user that was verified.
+  // The login name of the User (Human) that was verified.
   string login_name = 3;
 
-  // The display name of the user that was verified.
+  // The display name of the User (Human) that was verified.
   string display_name = 4;
 
-  // The id of the organization the user belongs to.
+  // The id of the organization the User (Human) belongs to.
   string organization_id = 6;
 }
 
@@ -89,7 +89,7 @@ message WebAuthNFactor {
   // The timestamp when the passkey challenge was last verified.
   google.protobuf.Timestamp verified_at = 1;
 
-  // Indicates if the user presence was verified during the last challenge.
+  // Indicates if the User (Human) presence was verified during the last challenge.
   // This can be used to determine if the factor can be considered as multi-factor authentication.
   bool user_verified = 2;
 }
@@ -128,7 +128,7 @@ message SearchQuery {
 
     // Search for sessions based on the user agent used to create the session.
     // It can be used to find sessions created from a specific device or browser.
-    // This is typically done for providing a list of active sessions to the user
+    // This is typically done for providing a list of active sessions to the User (Human)
     // in a user interface.
     UserAgentQuery user_agent_query = 5;
 
@@ -145,7 +145,7 @@ message IDsQuery {
 }
 
 message UserIDQuery {
-  // ID of the user whose sessions are being searched for.
+  // ID of the User (Human) whose sessions are being searched for.
   string id = 1;
 }
 
@@ -161,7 +161,7 @@ message CreationDateQuery {
 }
 
 message CreatorQuery {
-  // ID of the user who created the session. If empty, the calling user's ID is used.
+  // ID of the User (Human) who created the session. If empty, the calling user's ID is used.
   optional string id = 1 [
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

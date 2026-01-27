@@ -336,7 +336,7 @@ message CreateOIDCApplicationRequest {
   // to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html).
   string back_channel_logout_uri = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://example.com/auth/backchannel\"]"}];
 
-  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // LoginVersion specifies the login UI, where the User (Human) is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
@@ -376,7 +376,7 @@ message CreateSAMLApplicationRequest {
     }];
   }
 
-  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // LoginVersion specifies the login UI, where the User (Human) is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
@@ -456,7 +456,7 @@ message UpdateSAMLApplicationConfigurationRequest {
     string metadata_url = 2 [(validate.rules).string.max_len = 200];
   }
 
-  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // LoginVersion specifies the login UI, where the User (Human) is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
@@ -525,7 +525,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   // If not set, the access token role assertion will not be changed.
   optional bool access_token_role_assertion = 10;
 
-  // If IDTokenRoleAssertion is enabled, the roles of the user are added to the id token.
+  // If IDTokenRoleAssertion is enabled, the roles of the User (Human) are added to the id token.
   // Ensure that either the roles are requested by scope or enable the user role assertion on the
   // project.
   // If not set, the id token role assertion will not be changed.
@@ -534,7 +534,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   // If IDTokenUserinfoAssertion is enabled, the claims of profile, email, address and phone scopes
   // are added to the id token even if an access token is issued. This can be required by some applications
   // that do not call the userinfo endpoint after authentication or directly use the id_token for retrieving
-  // user information.
+  // User (Human) information.
   // Attention: this violates the OIDC specification, which states that these claims must only be
   // requested from the userinfo endpoint if an access token is issued. This is to prevent
   // leaking of personal information in the id token, which is often stored in the browser and
@@ -573,7 +573,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   // If not set, the back channel logout URI will not be changed.
   optional string back_channel_logout_uri = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "[\"https://example.com/auth/backchannel\"]"}];
 
-  // LoginVersion specifies the login UI, where the user is redirected to for authentication.
+  // LoginVersion specifies the login UI, where the User (Human) is redirected to for authentication.
   // It can be used to select a specific login UI, e.g. for embedded UIs or for custom login pages
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.

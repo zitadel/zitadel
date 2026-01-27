@@ -61,7 +61,7 @@ message LoginSettings {
   ];
 
   // The duration a password check is valid.
-  // After this time has passed, the user will be required to re-validate their
+  // After this time has passed, the User (Human) will be required to re-validate their
   // password on the next action that requires authentication.
   // Note that this does not enforce a logout or session expiration.
   google.protobuf.Duration password_check_lifetime = 9 [
@@ -71,7 +71,7 @@ message LoginSettings {
   ];
 
   // The duration a login through an external identity provider is valid.
-  // After this time has passed, the user will be required to re-authenticate with the
+  // After this time has passed, the User (Human) will be required to re-authenticate with the
   // external identity provider on the next action that requires authentication.
   // Note that this does not enforce a logout or session expiration.
   google.protobuf.Duration external_login_check_lifetime = 10 [
@@ -88,7 +88,7 @@ message LoginSettings {
   ];
 
   // The duration a second factor check is valid.
-  // After this time has passed, the user will be required to re-validate their
+  // After this time has passed, the User (Human) will be required to re-validate their
   // second factor on the next action that requires authentication.
   // Note that this does not enforce a logout or session expiration.
   google.protobuf.Duration second_factor_check_lifetime = 12 [
@@ -98,7 +98,7 @@ message LoginSettings {
   ];
 
   // The duration a multi-factor check is valid.
-  // After this time has passed, the user will be required to re-validate their
+  // After this time has passed, the User (Human) will be required to re-validate their
   // multi-factor on the next action that requires authentication.
   // Note that this does not enforce a logout or session expiration.
   google.protobuf.Duration multi_factor_check_lifetime = 13 [
@@ -117,7 +117,7 @@ message LoginSettings {
   // If set to true, the suffix (@domain.com) of an unknown username input on the login screen
   // will be matched against the organization domains and will redirect to the registration of that organization on success.
   // The registration can either be locally (requires allow_register to be true) or through an external identity provider.
-  // In case only one identity provider is configured for the organization, the user will be redirected directly to the identity provider.
+  // In case only one identity provider is configured for the organization, the User (Human) will be redirected directly to the identity provider.
   bool allow_domain_discovery = 16;
 
   // By default, users can login with their verified email address additionally to their login name.

@@ -39,7 +39,7 @@ message HumanEmail {
 }
 
 message SendEmailVerificationCode {
-  // Optionally set a url_template, which will be used in the verification mail sent by Zitadel to guide the user to your verification page.
+  // Optionally set a url_template, which will be used in the verification mail sent by Zitadel to guide the User (Human) to your verification page.
   // If no template is set, the default Zitadel url will be used.
   //
   // The following placeholders can be used: UserID, OrgID, Code

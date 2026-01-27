@@ -549,9 +549,9 @@ message Options {
 enum AutoLinkingOption {
     // AUTO_LINKING_OPTION_UNSPECIFIED disables the auto linking prompt.
     AUTO_LINKING_OPTION_UNSPECIFIED = 0;
-    // AUTO_LINKING_OPTION_USERNAME will use the username of the external user to check for a corresponding Zitadel user.
+    // AUTO_LINKING_OPTION_USERNAME will use the username of the external User (Human) to check for a corresponding Zitadel user.
     AUTO_LINKING_OPTION_USERNAME = 1;
-    // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check for a corresponding Zitadel user with the same verified email
+    // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check for a corresponding Zitadel User (Human) with the same verified email
     // Note that in case multiple users match, no prompt will be shown.
     AUTO_LINKING_OPTION_EMAIL = 2;
 }

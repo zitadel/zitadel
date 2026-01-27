@@ -284,7 +284,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 ListUsers with InUserIDQuery](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
     //
-    // Returns the full user object (human or machine) including the profile, email, etc.
+    // Returns the full user object (User (Human) or machine) including the profile, email, etc.
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -444,7 +444,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
     //
-    // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create a new User (Human). The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -473,7 +473,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
     //
-    // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
+    // Create/import a new User (Human). The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -719,7 +719,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
     //
-    // Change the username of the user. Be aware that the user has to log in with the newly added username afterward.
+    // Change the username of the user. Be aware that the User (Human) has to log in with the newly added username afterward.
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -928,7 +928,7 @@ service ManagementService {
         };
     }
 
-    // Get User Profile (Human)
+    // Get User (Human) Profile
     //
     // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
     //
@@ -963,7 +963,7 @@ service ManagementService {
         };
     }
 
-    // Update User Profile (Human)
+    // Update User (Human) Profile
     //
     // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
     //
@@ -999,7 +999,7 @@ service ManagementService {
         };
     }
 
-    // Get User Email (Human)
+    // Get User (Human) email (Human)
     //
     // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
     //
@@ -1034,11 +1034,11 @@ service ManagementService {
         };
     }
 
-    // Update User Email (Human)
+    // Update User (Human) email (Human)
     //
     // Deprecated: use [user service v2 SetEmail](apis/resources/user_service_v2/user-service-set-email.api.mdx) instead.
     //
-    // Change the email address of a user. If the state is set to not verified, the user will get a verification email.
+    // Change the email address of a user. If the state is set to not verified, the User (Human) will get a verification email.
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -1071,11 +1071,11 @@ service ManagementService {
     }
 
 
-    // Resend User Initialization Email
+    // Resend User (Human) Initialization Email
     //
     // Deprecated: not used anymore in user state so will be removed.
     //
-    // A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.
+    // A newly created User (Human) will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -1107,7 +1107,7 @@ service ManagementService {
         };
     }
 
-    // Resend User Email Verification
+    // Resend User (Human) email Verification
     //
     // Deprecated: use [user service v2 ResendEmailCode](apis/resources/user_service_v2/user-service-resend-email-code.api.mdx) instead.
     //
@@ -1143,7 +1143,7 @@ service ManagementService {
         };
     }
 
-    // Get User Phone (Human)
+    // Get User (Human) Phone
     //
     // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
     //
@@ -1178,11 +1178,11 @@ service ManagementService {
         };
     }
 
-    // Update User Phone (Human)
+    // Update User (Human) Phone
     //
     // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
     //
-    // Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
+    // Change the phone number of a user. If the state is set to not verified, the User (Human) will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -1214,7 +1214,7 @@ service ManagementService {
         };
     }
 
-    // Remove User Phone (Human)
+    // Remove User (Human) Phone
     //
     // Deprecated: use user service v2 [user service v2 SetPhone](apis/resources/user_service_v2/user-service-set-phone.api.mdx) instead.
     //
@@ -1249,7 +1249,7 @@ service ManagementService {
         };
     }
 
-    // Resend User Phone Verification
+    // Resend User (Human) Phone Verification
     //
     // Deprecated: use user service v2 [user service v2 ResendPhoneCode](apis/resources/user_service_v2/user-service-resend-phone-code.api.mdx) instead.
     //
@@ -1285,7 +1285,7 @@ service ManagementService {
         };
     }
 
-    // Delete User Avatar (Human)
+    // Delete User (Human) Avatar
     //
     // Removes the avatar that is currently set on the user.
     rpc RemoveHumanAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
@@ -1317,7 +1317,7 @@ service ManagementService {
         };
     }
 
-    // Set Human Initial Password
+    // Set User (Human) Initial Password
     //
     // Deprecated: use [user service v2 SetPassword](apis/resources/user_service_v2/user-service-set-password.api.mdx) instead.
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
@@ -1345,7 +1345,7 @@ service ManagementService {
         };
     }
 
-    // Set User Password
+    // Set User (Human) Password
     //
     // Deprecated: use [user service v2 SetPassword](apis/resources/user_service_v2/user-service-set-password.api.mdx) instead.
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
@@ -1383,7 +1383,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 PasswordReset](apis/resources/user_service_v2/user-service-password-reset.api.mdx) instead.
     //
-    // The user will receive an email with a link to change the password.
+    // The User (Human) will receive an email with a link to change the password.
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -1415,11 +1415,11 @@ service ManagementService {
         };
     }
 
-    // Get User Authentication Factors (2FA/MFA)
+    // Get User (Human) Authentication Factors (2FA/MFA)
     //
     // Deprecated: use [user service v2 ListAuthenticationMethodTypes](apis/resources/user_service_v2/user-service-list-authentication-method-types.api.mdx) instead.
     //
-    // Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).
+    // Get a list of authentication factors the User (Human) has set. Including Second Factors (2FA) and Multi-Factors (MFA).
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -1524,7 +1524,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otpsms.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+    // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per User (Human) is allowed, the User (Human) will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1559,7 +1559,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveOTPEmail](apis/resources/user_service_v2/user-service-remove-otp-email.api.mdx) instead.
     //
-    // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+    // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per User (Human) is allowed, the User (Human) will not have OTP Email as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -1629,7 +1629,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the User (Human) and returns it in the response. The link enables the User (Human) to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1663,7 +1663,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
     //
-    // Adds a new passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
+    // Adds a new passkey authenticator link to the User (Human) and sends it to the User (Human) per email. The link enables the User (Human) to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -2159,7 +2159,7 @@ service ManagementService {
     //
     // Deprecated: use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx) instead.
     //
-    // Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.
+    // Remove a configured social logins/identity providers of the User (Human) (e.g. Google, Microsoft, AzureAD, etc.). The User (Human) will not be able to log in with the given provider afterward. Make sure the User (Human) does have other possibilities to authenticate.
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -11306,9 +11306,9 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
-    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    // Amount of days after which a password will expire. The User (Human) will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
+    // Amount of days after which the User (Human) should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -11317,9 +11317,9 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
-    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    // Amount of days after which a password will expire. The User (Human) will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
-    // Amount of days after which the user should be notified of the upcoming expiry. Zitadel will not notify the user.
+    // Amount of days after which the User (Human) should be notified of the upcoming expiry. Zitadel will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
