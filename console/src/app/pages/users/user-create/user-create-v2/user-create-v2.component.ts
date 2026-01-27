@@ -188,10 +188,10 @@ export class UserCreateV2Component implements OnInit {
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
       organization: { org: { case: 'orgId', value: activeOrg.id } },
-      username: userValues.username,
+      username: userValues.userName,
       profile: {
-        givenName: userValues.givenName,
-        familyName: userValues.familyName,
+        givenName: userValues.firstName,
+        familyName: userValues.lastName,
       },
       email: {
         email: userValues.email,
