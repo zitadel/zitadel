@@ -1406,6 +1406,8 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 				),
 			)
 			require.NoError(collect, err)
+			require.NotNil(collect, setting)
+
 			// ClientSecret
 			assert.Equal(collect, uint(64), *setting.ClientSecret.Length)
 			assert.Equal(collect, true, *setting.ClientSecret.IncludeLowerLetters)
