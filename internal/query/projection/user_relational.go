@@ -2268,14 +2268,14 @@ func mapHumanGender(gender old_domain.Gender) domain.HumanGender {
 	}
 }
 
-func mapMachineAccessTokenType(tokenType old_domain.OIDCTokenType) domain.PersonalAccessTokenType {
+func mapMachineAccessTokenType(tokenType old_domain.OIDCTokenType) domain.AccessTokenType {
 	switch tokenType {
 	case old_domain.OIDCTokenTypeBearer:
-		return domain.PersonalAccessTokenTypeBearer
+		return domain.AccessTokenTypeBearer
 	case old_domain.OIDCTokenTypeJWT:
-		return domain.PersonalAccessTokenTypeJWT
+		return domain.AccessTokenTypeJWT
 	default:
-		return domain.PersonalAccessTokenTypeUnspecified
+		return domain.AccessTokenTypeUnspecified
 	}
 }
 

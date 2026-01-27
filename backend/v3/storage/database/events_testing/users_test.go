@@ -21,9 +21,9 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
-	v2beta_user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	v2_user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_TestHumanUserReduces(t *testing.T) {
@@ -61,13 +61,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -76,33 +76,27 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			// event user.human.added
 			// domain.User
 			assert.Equal(t, instanceID, user.InstanceID)
-			assert.Equal(t, orgID, user.OrgID)
+			assert.Equal(t, orgID, user.OrganizationID)
 			assert.Equal(t, resp.UserId, user.ID)
 			assert.Equal(t, humanUserRequest.UserName, user.Username)
 			assert.Equal(t, domain.UserStateActive, user.State)
-			// TODO
-			// assert.Equal(t, true, user.UsernameOrgUnique)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 			assert.WithinRange(t, user.CreatedAt, before, after)
 			// Email
-			assert.Equal(t, domain.ContactTypeEmail, *user.HumanEmailContact.Type)
-			assert.Equal(t, humanUserRequest.Email.Email, *user.HumanEmailContact.Value)
-			// TODO
-			// assert.Equal(t, true, *user.HumanEmailContact.IsVerified)
-			assert.Nil(t, user.HumanEmailContact.UnverifiedValue)
+			assert.Equal(t, humanUserRequest.Email.Email, user.Human.Email.Address)
+			assert.NotZero(t, user.Human.Email.VerifiedAt)
+			assert.Nil(t, user.Human.Email.Unverified)
 			// Phone
-			assert.Equal(t, domain.ContactTypePhone, *user.HumanPhoneContact.Type)
-			assert.Equal(t, humanUserRequest.Phone.Phone, *user.HumanPhoneContact.Value)
-			// TODO
-			// assert.Equal(t, true, *user.HumanPhoneContact.IsVerified)
-			assert.Nil(t, user.HumanPhoneContact.UnverifiedValue)
+			assert.Equal(t, humanUserRequest.Phone.Phone, user.Human.Phone.Number)
+			assert.NotZero(t, user.Human.Phone.VerifiedAt)
+			assert.Nil(t, user.Human.Phone.Unverified)
 			// Human
-			assert.Equal(t, humanUserRequest.Profile.FirstName, user.FirstName)
-			assert.Equal(t, humanUserRequest.Profile.LastName, user.LastName)
-			assert.Equal(t, humanUserRequest.Profile.NickName, user.NickName)
-			assert.Equal(t, humanUserRequest.Profile.DisplayName, user.DisplayName)
-			assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.PreferredLanguage)
-			assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Gender)
+			assert.Equal(t, humanUserRequest.Profile.FirstName, user.Human.FirstName)
+			assert.Equal(t, humanUserRequest.Profile.LastName, user.Human.LastName)
+			assert.Equal(t, humanUserRequest.Profile.NickName, user.Human.Nickname)
+			assert.Equal(t, humanUserRequest.Profile.DisplayName, user.Human.DisplayName)
+			assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.Human.PreferredLanguage)
+			assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Human.Gender)
 		}, retryDuration, tick)
 	})
 
@@ -148,44 +142,33 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
+					userRepo.InstanceIDCondition(instanceID),
 					userRepo.Human().FirstNameCondition(database.TextOperationEqual, firstName),
 					userRepo.Human().LastNameCondition(database.TextOperationEqual, lastName),
 				)),
 			)
 			require.NoError(t, err)
 
-			// // domain.User
+			// domain.User
 			assert.Equal(t, instanceID, user.InstanceID)
 			assert.Equal(t, email, user.Username)
 			assert.Equal(t, domain.UserStateActive, user.State)
-			// // TODO
-			// // assert.Equal(t, true, user.UsernameOrgUnique)
-			assert.WithinRange(t, user.UpdatedAt, before, after)
 			assert.WithinRange(t, user.CreatedAt, before, after)
-			// // Email
-			// assert.Equal(t, domain.ContactTypeEmail, *user.HumanEmailContact.Type)
-			// assert.Equal(t, humanUserRequest.Email.Email, *user.HumanEmailContact.Value)
-			// // TODO
-			// // assert.Equal(t, true, *user.HumanEmailContact.IsVerified)
-			// assert.Nil(t, user.HumanEmailContact.UnverifiedValue)
-			// // Phone
-			// assert.Equal(t, domain.ContactTypePhone, *user.HumanPhoneContact.Type)
-			// assert.Equal(t, humanUserRequest.Phone.Phone, *user.HumanPhoneContact.Value)
-			// // TODO
-			// // assert.Equal(t, true, *user.HumanPhoneContact.IsVerified)
-			// assert.Nil(t, user.HumanPhoneContact.UnverifiedValue)
-			// // Human
-			assert.Equal(t, firstName, user.FirstName)
-			assert.Equal(t, lastName, user.LastName)
-			// assert.Equal(t, humanUserRequest.Profile.NickName, user.NickName)
-			// assert.Equal(t, humanUserRequest.Profile.DisplayName, user.DisplayName)
-			// assert.Equal(t, humanUserRequest.Profile.PreferredLanguage, user.PreferredLanguage)
-			// assert.Equal(t, uint8(humanUserRequest.Profile.Gender), user.Gender)
+			// Email
+			assert.Equal(t, email, user.Human.Email.Address)
+			assert.NotZero(t, user.Human.Email.VerifiedAt)
+			assert.Nil(t, user.Human.Email.Unverified)
+			// Phone
+			assert.Equal(t, email, user.Human.Phone.Number)
+			assert.NotZero(t, user.Human.Phone.VerifiedAt)
+			assert.Nil(t, user.Human.Phone.Unverified)
+			// Human
+			assert.Equal(t, firstName, user.Human.FirstName)
+			assert.Equal(t, lastName, user.Human.LastName)
 		}, retryDuration, tick)
 	})
 
@@ -217,13 +200,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.GetHuman(
+	// 		user, err := userRepo.Get(
 	// 			CTX,
 	// 			pool,
 	// 			database.WithCondition(database.And(
-	// 				userRepo.Human().InstanceIDCondition(instanceID),
-	// 				userRepo.Human().OrgIDCondition(orgID),
-	// 				userRepo.Human().IDCondition(resp.UserId),
+	// 				userRepo.InstanceIDCondition(instanceID),
+	// 				userRepo.OrganizationIDCondition(orgID),
+	// 				userRepo.IDCondition(resp.UserId),
 	// 			)),
 	// 		)
 	// 		require.NoError(t, err)
@@ -260,13 +243,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.GetHuman(
+	// 		user, err := userRepo.Get(
 	// 			CTX,
 	// 			pool,
 	// 			database.WithCondition(database.And(
-	// 				userRepo.Human().InstanceIDCondition(instanceID),
-	// 				userRepo.Human().OrgIDCondition(orgID),
-	// 				userRepo.Human().IDCondition(resp.UserId),
+	// 				userRepo.InstanceIDCondition(instanceID),
+	// 				userRepo.OrganizationIDCondition(orgID),
+	// 				userRepo.IDCondition(resp.UserId),
 	// 			)),
 	// 		)
 	// 		require.NoError(t, err)
@@ -302,13 +285,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -325,13 +308,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -369,13 +352,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -390,13 +373,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -413,13 +396,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -457,13 +440,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -480,13 +463,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -524,13 +507,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -545,13 +528,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -568,13 +551,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -612,13 +595,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -626,20 +609,20 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.NotNil(t, user)
 		}, retryDuration, tick)
 
-		_, err = UserClient.DeleteUser(IAMCTX, &v2beta_user.DeleteUserRequest{
+		_, err = UserClient.DeleteUser(IAMCTX, &v2_user.DeleteUserRequest{
 			UserId: resp.UserId,
 		})
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := userRepo.GetHuman(
+			_, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 
@@ -675,13 +658,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -690,7 +673,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		username := gofakeit.Username()
-		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2beta_user.UpdateHumanUserRequest{
+		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2_user.UpdateHumanUserRequest{
 			UserId:   resp.UserId,
 			Username: &username,
 		})
@@ -698,13 +681,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -792,13 +775,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	// check user exists
 	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.GetHuman(
+	// 		user, err := userRepo.Get(
 	// 			CTX,
 	// 			pool,
 	// 			database.WithCondition(database.And(
-	// 				userRepo.Human().InstanceIDCondition(instanceID),
-	// 				userRepo.Human().OrgIDCondition(orgID),
-	// 				userRepo.Human().IDCondition(userID),
+	// 				userRepo.InstanceIDCondition(instanceID),
+	// 				userRepo.OrganizationIDCondition(orgID),
+	// 				userRepo.IDCondition(userID),
 	// 			)),
 	// 		)
 	// 		require.NoError(t, err)
@@ -859,13 +842,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 	// 	// check usernme now includes the domain
 	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		user, err := userRepo.GetHuman(
+	// 		user, err := userRepo.Get(
 	// 			CTX,
 	// 			pool,
 	// 			database.WithCondition(database.And(
-	// 				userRepo.Human().InstanceIDCondition(instanceID),
-	// 				userRepo.Human().OrgIDCondition(orgID),
-	// 				userRepo.Human().IDCondition(userID),
+	// 				userRepo.InstanceIDCondition(instanceID),
+	// 				userRepo.OrganizationIDCondition(orgID),
+	// 				userRepo.IDCondition(userID),
 	// 			)),
 	// 		)
 	// 		require.NoError(t, err)
@@ -902,13 +885,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -916,15 +899,15 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 			assert.NotNil(t, user)
 		}, retryDuration, tick)
 
-		profile := &v2beta_user.SetHumanProfile{
+		profile := &v2_user.SetHumanProfile{
 			GivenName:         gofakeit.FirstName(),
 			FamilyName:        gofakeit.LastName(),
 			NickName:          gu.Ptr(gofakeit.Color()),
 			DisplayName:       gu.Ptr(gofakeit.Name()),
 			PreferredLanguage: gu.Ptr("fr"),
-			Gender:            gu.Ptr(v2beta_user.Gender_GENDER_FEMALE),
+			Gender:            gu.Ptr(v2_user.Gender_GENDER_FEMALE),
 		}
-		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2beta_user.UpdateHumanUserRequest{
+		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2_user.UpdateHumanUserRequest{
 			UserId:  resp.UserId,
 			Profile: profile,
 		})
@@ -932,24 +915,24 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
 
 			// event user.human.profile.changed
-			assert.Equal(t, profile.GivenName, user.FirstName)
-			assert.Equal(t, profile.FamilyName, user.LastName)
-			assert.Equal(t, *profile.NickName, user.NickName)
-			assert.Equal(t, *profile.DisplayName, user.DisplayName)
-			assert.Equal(t, *profile.PreferredLanguage, user.PreferredLanguage)
-			assert.Equal(t, uint8(*profile.Gender), user.Gender)
+			assert.Equal(t, profile.GivenName, user.Human.FirstName)
+			assert.Equal(t, profile.FamilyName, user.Human.LastName)
+			assert.Equal(t, *profile.NickName, user.Human.Nickname)
+			assert.Equal(t, *profile.DisplayName, user.Human.DisplayName)
+			assert.Equal(t, *profile.PreferredLanguage, user.Human.PreferredLanguage)
+			assert.Equal(t, uint8(*profile.Gender), user.Human.Gender)
 		}, retryDuration, tick)
 	})
 
@@ -970,7 +953,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		orgID := org_.ID
 
 		// delete user tester
-		deleteUserReq := v2beta_user.DeleteUserRequest{
+		deleteUserReq := v2_user.DeleteUserRequest{
 			UserId: "tester",
 		}
 		deleteUserReqJSON, err := json.Marshal(&deleteUserReq)
@@ -985,33 +968,33 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		// require.NoError(t, err)
 
 		// create user tester
-		createUserReq := &v2beta_user.AddHumanUserRequest{
+		createUserReq := &v2_user.AddHumanUserRequest{
 			UserId: gu.Ptr("tester"), // YOLO
 			Organization: &object.Organization{
 				Org: &object.Organization_OrgId{
 					OrgId: orgID,
 				},
 			},
-			Profile: &v2beta_user.SetHumanProfile{
+			Profile: &v2_user.SetHumanProfile{
 				GivenName:         "Donald",
 				FamilyName:        "Duck",
 				NickName:          gu.Ptr("Dukkie"),
 				DisplayName:       gu.Ptr("Donald Duck"),
 				PreferredLanguage: gu.Ptr("en"),
-				Gender:            v2beta_user.Gender_GENDER_DIVERSE.Enum(),
+				Gender:            v2_user.Gender_GENDER_DIVERSE.Enum(),
 			},
-			Email: &v2beta_user.SetHumanEmail{
+			Email: &v2_user.SetHumanEmail{
 				Email: gofakeit.Email(),
 			},
-			Phone: &v2beta_user.SetHumanPhone{},
-			Metadata: []*v2beta_user.SetMetadataEntry{
+			Phone: &v2_user.SetHumanPhone{},
+			Metadata: []*v2_user.SetMetadataEntry{
 				{
 					Key:   "somekey",
 					Value: []byte("somevalue"),
 				},
 			},
-			PasswordType: &v2beta_user.AddHumanUserRequest_Password{
-				Password: &v2beta_user.Password{
+			PasswordType: &v2_user.AddHumanUserRequest_Password{
+				Password: &v2_user.Password{
 					Password:       "DifficultPW666!",
 					ChangeRequired: true,
 				},
@@ -1042,21 +1025,20 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition("tester"),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition("tester"),
 				)),
 			)
 			require.NoError(t, err)
 
 			// event user.human.avatar.added
 			avatarUrl := "users/tester/avatar?"
-			// assert.Equal(t, avatarUrl, string(user.AvatarKey)[:len(avatarUrl)])
-			assert.Equal(t, avatarUrl, (*user.AvatarKey)[:len(avatarUrl)])
+			assert.Contains(t, user.Human.AvatarKey, avatarUrl)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1078,7 +1060,7 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		orgID := org_.ID
 
 		// delete user tester
-		deleteUserReq := v2beta_user.DeleteUserRequest{
+		deleteUserReq := v2_user.DeleteUserRequest{
 			UserId: "tester",
 		}
 		deleteUserReqJSON, err := json.Marshal(&deleteUserReq)
@@ -1093,33 +1075,33 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		// require.NoError(t, err)
 
 		// create user tester
-		createUserReq := &v2beta_user.AddHumanUserRequest{
+		createUserReq := &v2_user.AddHumanUserRequest{
 			UserId: gu.Ptr("tester"), // YOLO
 			Organization: &object.Organization{
 				Org: &object.Organization_OrgId{
 					OrgId: orgID,
 				},
 			},
-			Profile: &v2beta_user.SetHumanProfile{
+			Profile: &v2_user.SetHumanProfile{
 				GivenName:         "Donald",
 				FamilyName:        "Duck",
 				NickName:          gu.Ptr("Dukkie"),
 				DisplayName:       gu.Ptr("Donald Duck"),
 				PreferredLanguage: gu.Ptr("en"),
-				Gender:            v2beta_user.Gender_GENDER_DIVERSE.Enum(),
+				Gender:            v2_user.Gender_GENDER_DIVERSE.Enum(),
 			},
-			Email: &v2beta_user.SetHumanEmail{
+			Email: &v2_user.SetHumanEmail{
 				Email: gofakeit.Email(),
 			},
-			Phone: &v2beta_user.SetHumanPhone{},
-			Metadata: []*v2beta_user.SetMetadataEntry{
+			Phone: &v2_user.SetHumanPhone{},
+			Metadata: []*v2_user.SetMetadataEntry{
 				{
 					Key:   "somekey",
 					Value: []byte("somevalue"),
 				},
 			},
-			PasswordType: &v2beta_user.AddHumanUserRequest_Password{
-				Password: &v2beta_user.Password{
+			PasswordType: &v2_user.AddHumanUserRequest_Password{
+				Password: &v2_user.Password{
 					Password:       "DifficultPW666!",
 					ChangeRequired: true,
 				},
@@ -1147,21 +1129,21 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition("tester"),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition("tester"),
 				)),
 			)
 			require.NoError(t, err)
 
-			require.NotNil(t, user.Avatar)
+			require.NotEmpty(t, user.Human.AvatarKey)
 
 			avatarUrl := "users/tester/avatar?"
-			assert.Equal(t, avatarUrl, string(user.Avatar)[:len(avatarUrl)])
+			assert.Equal(t, avatarUrl, string(user.Human.AvatarKey)[:len(avatarUrl)])
 		}, retryDuration, tick)
 
 		// delete avatar
@@ -1175,51 +1157,51 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition("tester"),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition("tester"),
 				)),
 			)
 			require.NoError(t, err)
 
-			assert.Nil(t, user.AvatarKey)
+			assert.Nil(t, user.Human.AvatarKey)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
 	password := gofakeit.Password(true, true, true, true, true, 10)
 	t.Run("test human user password change reduced", func(t *testing.T) {
-		createUserReq := &v2beta_user.AddHumanUserRequest{
+		createUserReq := &v2_user.AddHumanUserRequest{
 			// UserId: gu.Ptr("tester"),
 			Organization: &object.Organization{
 				Org: &object.Organization_OrgId{
 					OrgId: orgID,
 				},
 			},
-			Profile: &v2beta_user.SetHumanProfile{
+			Profile: &v2_user.SetHumanProfile{
 				GivenName:         "Donald",
 				FamilyName:        "Duck",
 				NickName:          gu.Ptr("Dukkie"),
 				DisplayName:       gu.Ptr("Donald Duck"),
 				PreferredLanguage: gu.Ptr("en"),
-				Gender:            v2beta_user.Gender_GENDER_DIVERSE.Enum(),
+				Gender:            v2_user.Gender_GENDER_DIVERSE.Enum(),
 			},
-			Email: &v2beta_user.SetHumanEmail{
+			Email: &v2_user.SetHumanEmail{
 				Email: gofakeit.Email(),
 			},
-			Phone: &v2beta_user.SetHumanPhone{},
-			Metadata: []*v2beta_user.SetMetadataEntry{
+			Phone: &v2_user.SetHumanPhone{},
+			Metadata: []*v2_user.SetMetadataEntry{
 				{
 					Key:   "somekey",
 					Value: []byte("somevalue"),
 				},
 			},
-			PasswordType: &v2beta_user.AddHumanUserRequest_Password{
-				Password: &v2beta_user.Password{
+			PasswordType: &v2_user.AddHumanUserRequest_Password{
+				Password: &v2_user.Password{
 					Password:       password,
 					ChangeRequired: true,
 				},
@@ -1233,13 +1215,13 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		// make sure user exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetHuman(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(userID),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(userID),
 				)),
 			)
 			require.NoError(t, err)
@@ -1249,16 +1231,16 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 
 		// change user password
 		before := time.Now()
-		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2beta_user.UpdateHumanUserRequest{
+		_, err = UserClient.UpdateHumanUser(IAMCTX, &v2_user.UpdateHumanUserRequest{
 			UserId: userID,
-			Password: &v2beta_user.SetPassword{
-				PasswordType: &v2beta_user.SetPassword_Password{
-					Password: &v2beta_user.Password{
+			Password: &v2_user.SetPassword{
+				PasswordType: &v2_user.SetPassword_Password{
+					Password: &v2_user.Password{
 						Password:       gofakeit.Password(true, true, true, true, true, 10),
 						ChangeRequired: true,
 					},
 				},
-				Verification: &v2beta_user.SetPassword_CurrentPassword{
+				Verification: &v2_user.SetPassword_CurrentPassword{
 					CurrentPassword: password,
 				},
 			},
@@ -1267,21 +1249,21 @@ func TestServer_TestHumanUserReduces(t *testing.T) {
 		after := time.Now()
 
 		// check password updated
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			security, err := userRepo.Human().Security().Get(
+			humanUser, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Human().InstanceIDCondition(instanceID),
-					userRepo.Human().OrgIDCondition(orgID),
-					userRepo.Human().IDCondition(userID),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(userID),
 				)),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, true, security.PasswordChangeRequired)
-			assert.WithinRange(t, *security.PasswordChange, before, after)
+			assert.Equal(t, true, humanUser.Human.Password.IsChangeRequired)
+			assert.WithinRange(t, humanUser.Human.Password.ChangedAt, before, after)
 		}, retryDuration, tick)
 	})
 }
@@ -1308,13 +1290,13 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetMachine(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Machine().InstanceIDCondition(instanceID),
-					userRepo.Machine().OrgIDCondition(orgID),
-					userRepo.Machine().IDCondition(resp.UserId),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(resp.UserId),
 				)),
 			)
 			require.NoError(t, err)
@@ -1322,18 +1304,16 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 			// event user.machine.added
 			// user
 			assert.Equal(t, instanceID, user.InstanceID)
-			assert.Equal(t, orgID, user.OrgID)
+			assert.Equal(t, orgID, user.OrganizationID)
 			assert.Equal(t, *machineUserRequest.UserId, user.ID)
 			assert.Equal(t, machineUserRequest.UserName, user.Username)
 			assert.Equal(t, domain.UserStateActive, user.State)
-			// TODO
-			// assert.Equal(t, true, user.UsernameOrgUnique)
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 			assert.WithinRange(t, user.CreatedAt, before, after)
 			// machine
-			assert.Equal(t, machineUserRequest.Name, user.Name)
-			assert.Equal(t, machineUserRequest.Description, *user.Description)
-			assert.Equal(t, domain.AccessTokenTypeBearer, user.AccessTokenType)
+			assert.Equal(t, machineUserRequest.Name, user.Machine.Name)
+			assert.Equal(t, machineUserRequest.Description, user.Machine.Description)
+			assert.Equal(t, domain.AccessTokenTypeBearer, user.Machine.AccessTokenType)
 		}, retryDuration, tick)
 	})
 
@@ -1364,13 +1344,13 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			user, err := userRepo.GetMachine(
+			user, err := userRepo.Get(
 				CTX,
 				pool,
 				database.WithCondition(database.And(
-					userRepo.Machine().InstanceIDCondition(instanceID),
-					userRepo.Machine().OrgIDCondition(orgID),
-					userRepo.Machine().IDCondition(userID),
+					userRepo.InstanceIDCondition(instanceID),
+					userRepo.OrganizationIDCondition(orgID),
+					userRepo.IDCondition(userID),
 				)),
 			)
 			require.NoError(t, err)
@@ -1379,9 +1359,9 @@ func TestServer_TesMachinetUserReduces(t *testing.T) {
 			// user
 			assert.WithinRange(t, user.UpdatedAt, before, after)
 			// machine
-			assert.Equal(t, updateMachineUserReq.Name, user.Name)
-			assert.Equal(t, machineUserRequest.Description, *user.Description)
-			assert.Equal(t, domain.AccessTokenTypeJWT, user.AccessTokenType)
+			assert.Equal(t, updateMachineUserReq.Name, user.Machine.Name)
+			assert.Equal(t, machineUserRequest.Description, user.Machine.Description)
+			assert.Equal(t, domain.AccessTokenTypeJWT, user.Machine.AccessTokenType)
 		}, retryDuration, tick)
 	})
 }

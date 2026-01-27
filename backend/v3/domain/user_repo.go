@@ -269,7 +269,7 @@ type machineChanges interface {
 	// nil will set the secret to NULL in the database
 	SetSecret(secret *string) database.Change
 	// SetAccessTokenType sets the personal access token type field
-	SetAccessTokenType(tokenType PersonalAccessTokenType) database.Change
+	SetAccessTokenType(tokenType AccessTokenType) database.Change
 
 	// AddKey adds a key for the machine user
 	AddKey(key *MachineKey) database.Change

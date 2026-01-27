@@ -694,7 +694,7 @@ func (c *MockMachineUserRepositoryRemovePersonalAccessTokenCall) DoAndReturn(f f
 }
 
 // SetAccessTokenType mocks base method.
-func (m *MockMachineUserRepository) SetAccessTokenType(tokenType domain.PersonalAccessTokenType) database.Change {
+func (m *MockMachineUserRepository) SetAccessTokenType(tokenType domain.AccessTokenType) database.Change {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetAccessTokenType", tokenType)
 	ret0, _ := ret[0].(database.Change)
@@ -720,13 +720,13 @@ func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Return(arg0 database.C
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Do(f func(domain.PersonalAccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
+func (c *MockMachineUserRepositorySetAccessTokenTypeCall) Do(f func(domain.AccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockMachineUserRepositorySetAccessTokenTypeCall) DoAndReturn(f func(domain.PersonalAccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
+func (c *MockMachineUserRepositorySetAccessTokenTypeCall) DoAndReturn(f func(domain.AccessTokenType) database.Change) *MockMachineUserRepositorySetAccessTokenTypeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

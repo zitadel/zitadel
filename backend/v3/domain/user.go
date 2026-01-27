@@ -23,10 +23,10 @@ type User struct {
 }
 
 type MachineUser struct {
-	Name            string                  `json:"name,omitempty" db:"name"`
-	Description     string                  `json:"description,omitempty" db:"description"`
-	Secret          []byte                  `json:"secret,omitempty" db:"secret"`
-	AccessTokenType PersonalAccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
+	Name            string          `json:"name,omitempty" db:"name"`
+	Description     string          `json:"description,omitempty" db:"description"`
+	Secret          []byte          `json:"secret,omitempty" db:"secret"`
+	AccessTokenType AccessTokenType `json:"accessTokenType,omitempty" db:"access_token_type"`
 
 	PATs []*PersonalAccessToken `json:"pats,omitempty" db:"pats"`
 	Keys []*MachineKey          `json:"keys,omitempty" db:"keys"`
@@ -145,14 +145,13 @@ type PersonalAccessToken struct {
 	Scopes    []string  `json:"scopes" db:"scopes"`
 }
 
-//go:generate enumer -type PersonalAccessTokenType -transform lower -trimprefix PersonalAccessTokenType
-
-type PersonalAccessTokenType uint8
+//go:generate enumer -type AccessTokenType -transform lower -trimprefix AccessTokenType
+type AccessTokenType uint8
 
 const (
-	PersonalAccessTokenTypeUnspecified PersonalAccessTokenType = iota
-	PersonalAccessTokenTypeBearer
-	PersonalAccessTokenTypeJWT
+	AccessTokenTypeUnspecified AccessTokenType = iota
+	AccessTokenTypeBearer
+	AccessTokenTypeJWT
 )
 
 type MachineKey struct {

@@ -57,7 +57,7 @@ func (u userMachine) Update(ctx context.Context, client database.QueryExecutor, 
 }
 
 // SetAccessTokenType implements [domain.MachineUserRepository].
-func (u userMachine) SetAccessTokenType(tokenType domain.PersonalAccessTokenType) database.Change {
+func (u userMachine) SetAccessTokenType(tokenType domain.AccessTokenType) database.Change {
 	return database.NewChange(u.accessTokenTypeColumn(), tokenType)
 }
 
