@@ -1,12 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTheme } from 'next-themes';
+
+// Type definitions to keep TypeScript happy without @ts-ignore
+declare global {
+  interface Window {
+    __INKEEP_INSTANCE__?: any;
+    __INKEEP_UPDATE__?: (props: any) => void;
+    __INKEEP_ANCHOR_ELEMENT__?: HTMLElement;
+  }
+}
 
 export function InkeepSearch() {
   const { resolvedTheme } = useTheme();
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   const config = {
     apiKey: process.env.NEXT_PUBLIC_INKEEP_API_KEY,
     integrationId: process.env.NEXT_PUBLIC_INKEEP_INTEGRATION_ID,
@@ -16,53 +25,49 @@ export function InkeepSearch() {
     botName: 'Zitadel AI',
   };
 
-  const handleOpen = () => {
-    console.log("Inkeep: Setting isOpen = true");
-    // Instead of calling .open(), we update the widget properties directly
-    // @ts-ignore
+  const handleOpen = useCallback(() => {
     if (window.__INKEEP_UPDATE__) {
-      // @ts-ignore
       window.__INKEEP_UPDATE__({ isOpen: true });
-    } else {
-      console.warn("Inkeep: Update function not ready.");
     }
-  };
+  }, []);
 
   useEffect(() => {
-    // 1. Create Anchor
+    // 1. Create the anchor element if it doesn't exist
     let anchor = document.getElementById('inkeep-anchor');
     if (!anchor) {
       anchor = document.createElement('div');
       anchor.id = 'inkeep-anchor';
+      anchor.style.position = 'absolute';
+      anchor.style.top = '0';
+      anchor.style.left = '0';
+      anchor.style.width = '0';
+      anchor.style.height = '0';
+      anchor.style.overflow = 'hidden';
       document.body.appendChild(anchor);
     }
-    // @ts-ignore
     window.__INKEEP_ANCHOR_ELEMENT__ = anchor;
 
-    // 2. CSS Fix
-    const style = document.createElement('style');
-    style.innerHTML = `
-      :root, body { --ikp-z-index-modal: 2147483647 !important; }
-      .ikp-modal-container { z-index: 2147483647 !important; }
-    `;
-    document.head.appendChild(style);
+    // 2. Force high Z-Index for the modal
+    if (!document.getElementById('inkeep-style-fix')) {
+      const style = document.createElement('style');
+      style.id = 'inkeep-style-fix';
+      style.innerHTML = `
+        :root, body { --ikp-z-index-modal: 2147483647 !important; }
+        .ikp-modal-container { z-index: 2147483647 !important; }
+      `;
+      document.head.appendChild(style);
+    }
 
-    // 3. Inject Script
+    // 3. Check if script is already injected
     if (document.getElementById('inkeep-script-injection')) {
-      // @ts-ignore
       if (window.__INKEEP_INSTANCE__) setIsLoaded(true);
       return;
     }
 
-    const script = document.createElement('script');
-    script.id = 'inkeep-script-injection';
-    script.type = 'module';
-    script.crossOrigin = "anonymous";
-    
-    // Initial Config (Closed by default)
+    // 4. Prepare Configuration
     const baseConfig = JSON.stringify({
-      componentType: 'CustomTrigger', // Works best for manual control
-      isOpen: false, // Start closed
+      componentType: 'CustomTrigger',
+      isOpen: false,
       properties: {
         baseSettings: {
           apiKey: config.apiKey,
@@ -79,6 +84,12 @@ export function InkeepSearch() {
       },
     });
 
+    // 5. Inject Script
+    const script = document.createElement('script');
+    script.id = 'inkeep-script-injection';
+    script.type = 'module';
+    script.crossOrigin = "anonymous";
+    
     script.textContent = `
       import { Inkeep } from 'https://unpkg.com/@inkeep/widgets-embed@0.2.292/dist/embed.js';
       
@@ -88,10 +99,8 @@ export function InkeepSearch() {
       if (anchorElement) {
         initialConfig.targetElement = anchorElement; 
         
-        // Define the onClose callback to update state
+        // Callback to handle closing via the 'X' button or overlay click
         initialConfig.properties.onClose = () => {
-           console.log("Inkeep: Closing...");
-           // Re-render with isOpen: false
            if (window.__INKEEP_UPDATE__) window.__INKEEP_UPDATE__({ isOpen: false });
         };
 
@@ -101,46 +110,35 @@ export function InkeepSearch() {
           
           window.__INKEEP_INSTANCE__ = instance;
           
-          // CRITICAL: We create a global update function.
-          // This allows React to "push" new props (like isOpen: true) into the widget.
+          // Global update function for React to communicate with the widget
           window.__INKEEP_UPDATE__ = (newProps) => {
-             // Merge new props into existing config
-             const updatedConfig = { 
-               ...initialConfig, 
-               ...newProps 
-             };
-             // Re-render the widget with new props
+             const updatedConfig = { ...initialConfig, ...newProps };
              instance.render(updatedConfig);
           };
 
           window.dispatchEvent(new Event('inkeep-ready'));
-          
         } catch(e) {
-          console.error("Inkeep: CRASHED.", e);
+          console.error("Inkeep: Initialization failed", e);
         }
       }
     `;
     document.body.appendChild(script);
 
-    // 4. Ready Listener
+    // 6. Listener for readiness
     const checkReady = () => {
-       // @ts-ignore
        if (window.__INKEEP_INSTANCE__) setIsLoaded(true);
     };
     window.addEventListener('inkeep-ready', checkReady);
-    const interval = setInterval(checkReady, 500);
-
+    
+    // Cleanup
     return () => {
       window.removeEventListener('inkeep-ready', checkReady);
-      clearInterval(interval);
     };
-  }, []);
+  }, []); // Run once on mount
 
-  // Sync Theme
+  // Sync Theme changes
   useEffect(() => {
-    // @ts-ignore
     if (window.__INKEEP_UPDATE__) {
-       // @ts-ignore
        window.__INKEEP_UPDATE__({
          properties: {
            baseSettings: { colorMode: { forcedColorMode: resolvedTheme } }
@@ -149,7 +147,7 @@ export function InkeepSearch() {
     }
   }, [resolvedTheme]);
 
-  // Keyboard Shortcut
+  // Keyboard Shortcut (Cmd+K)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -159,7 +157,7 @@ export function InkeepSearch() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [handleOpen]);
 
   return (
     <button
