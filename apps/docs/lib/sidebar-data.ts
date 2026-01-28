@@ -30,7 +30,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
     label: "Get Started",
     collapsed: false,
     items: [
-      "guides/overview",
       "guides/start/quickstart",
       {
         type: "category",

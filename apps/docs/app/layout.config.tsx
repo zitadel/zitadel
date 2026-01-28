@@ -8,7 +8,7 @@ export const baseOptions: BaseLayoutProps = {
   links: [
     {
       text: 'Guides',
-      url: '/guides/overview',
+      url: '/',
       active: 'nested-url',
       icon: <BookOpen />,
     },
