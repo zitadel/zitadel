@@ -46,7 +46,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: SAML2  
 :white_check_mark: LDAP  
 :white_check_mark: Passkeys / FIDO2  
-:white_check_mark: OTP  
+:white_check_mark: OTP
 :white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
@@ -117,7 +117,7 @@ Authentication
 - Single Sign On (SSO)
 - [Passkeys support (FIDO2 / WebAuthN)](https://zitadel.com/docs/concepts/features/passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
+- Multifactor authentication with OTP, U2F, OTP Email, OTP SMS
 - [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap)
 - [External enterprise identity providers and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
 - [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)

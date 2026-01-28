@@ -27,9 +27,9 @@ VerifyPhone:
   Text: Er is een nieuw telefoonnummer toegevoegd. Gebruik de volgende code om het te verifiëren {{.Code}}
   ButtonText: Verifieer telefoon
 VerifyEmailOTP:
-  Title: Verifieer One-Time Wachtwoord
-  PreHeader: Verifieer One-Time Wachtwoord
-  Subject: Verifieer One-Time Wachtwoord
+  Title: Verifieer OTP
+  PreHeader: Verifieer OTP
+  Subject: Verifieer OTP
   Greeting: Hallo {{.DisplayName}},
   Text: Gebruik het eenmalige wachtwoord {{.OTP}} om binnen de volgende vijf minuten te authenticeren of klik op de "Authenticeer" knop.
   ButtonText: Authenticeer

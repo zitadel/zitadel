@@ -1851,8 +1851,8 @@
         "INIT": "Inicializálás",
         "VE": "Email ellenőrzése",
         "VP": "Telefon igazolása",
-        "VSO": "SMS OTP igazolása",
-        "VEO": "Email OTP igazolása",
+        "VSO": "OTP SMS igazolása",
+        "VEO": "OTP Email igazolása",
         "PR": "Jelszó visszaállítása",
         "DC": "Domain igénylés",
         "PL": "Passkey",
@@ -2432,8 +2432,8 @@
       "0": "Ismeretlen",
       "1": "Egyszeri Jelszó az Authenticator App-al (TOTP)",
       "2": "Passkey",
-      "3": "Egyszeri Jelszó Emailben (Email OTP)",
-      "4": "Egyszeri jelszó SMS-ben (SMS OTP)",
+      "3": "Egyszeri Jelszó Emailben (OTP Email)",
+      "4": "Egyszeri jelszó SMS-ben (OTP SMS)",
       "5": "Helyreállítási kódok"
     }
   },

@@ -156,12 +156,12 @@ type humanEmailChanges interface {
 	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
-	// CheckEmailOTP sets the email OTP based on the check
+	// CheckEmailOTP sets the OTP email based on the check
 	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
 	//  * [CheckTypeFailed] increments failed attempts
 	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckEmailOTP(check CheckType) database.Change
-	// EnableEmailOTPAt enables the email OTP
+	// EnableEmailOTPAt enables the OTP email
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
 	// EnableEmailOTP sets the enabled at time to NOW()
@@ -179,12 +179,12 @@ type humanPhoneChanges interface {
 	SetPhone(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
-	// CheckSMSOTP sets the SMS OTP based on the check
+	// CheckSMSOTP sets the OTP SMS based on the check
 	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
 	//  * [CheckTypeFailed] increments failed attempts
 	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckSMSOTP(check CheckType) database.Change
-	// EnableSMSOTPAt enables the SMS OTP
+	// EnableSMSOTPAt enables the OTP SMS
 	// If enabledAt is zero, it will be set to NOW()
 	EnableSMSOTPAt(enabledAt time.Time) database.Change
 	// EnableSMSOTP sets the enabled at time to NOW()
