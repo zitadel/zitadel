@@ -73,7 +73,7 @@ Read more about [Service Users](/guides/integrate/service-users/authenticate-ser
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client can also implement this by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
+A application can also implement this by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Profile
 

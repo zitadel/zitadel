@@ -71,7 +71,7 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 ## Setup new Symfony application
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Symfony client.
+Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Symfony application.
 The example is build on a [generated Symfony web app](https://symfony.com/doc/current/setup.html#creating-symfony-applications), using the following command:
 
 :::info

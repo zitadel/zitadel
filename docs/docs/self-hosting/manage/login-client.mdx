@@ -4,11 +4,11 @@ sidebar_label: Create a Login Client
 ---
 
 To enable your self-hosted Login UI to connect to the Zitadel API, it needs a token for a user with the IAM_LOGIN_CLIENT role.
-On new installations, the Zitadel setup job can be configured to automatically write a Personal Access Token (PAT) for the login client.
+On new installations, the Zitadel setup job can be configured to automatically write a Personal Access Token (PAT) for the login application.
 Check out [one of the deployment examples](https://zitadel.com/docs/self-hosting/deploy/overview) to learn how to do this.
 
 However, if you want to replace the v1 login of an existing installation by a self-hosted v2 login, the setup job won't execute these steps.
-In that case, you can create a new PAT for the login client manually.
+In that case, you can create a new PAT for the login application manually.
 
 ## Create a Login Client User{#create-login-client}
 
@@ -34,7 +34,7 @@ docker run -p 3000:3000 -v /path/on/your/host/login-client.pat:/path/in/containe
 :::caution
 Before doing this, make sure you have a working PAT for an Iam Owner user.
 In case something goes wrong and you lock yourself out from the login screen, you can revert the changes.
-Create a machine user PAT like you created the [login client PAT above](#create-login-client), but give the user the Iam Owner role (internally called `IAM_OWNER`).
+Create a machine user PAT like you created the [login application PAT above](#create-login-client), but give the user the Iam Owner role (internally called `IAM_OWNER`).
 :::
 
 Enable the `Login V2` feature flag, for example at the bottom of http://localhost:8080/ui/console/instance?id=features.

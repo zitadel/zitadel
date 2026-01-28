@@ -186,7 +186,7 @@ export default function LoginPage() {
       <div className="w-full">
         <LoginForm />
       </div>
-    </DynamicTheme>
+    </DynamicTheme-
   );
 }
 ```

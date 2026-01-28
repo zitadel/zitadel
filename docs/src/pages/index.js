@@ -45,7 +45,7 @@ const features = [
             <ListElement
               link="/docs/examples/introduction"
               type={ICONTYPE.APIS}
-              title="Example Apps"
+              title="Example Applications"
               description=""
             />
             <ListElement
@@ -147,7 +147,7 @@ const features = [
     lightImageUrl: "/docs/img/index/APIs-light.svg",
     link: "/apis/introduction",
     description: (
-      <>Learn more about our APIs and how to integrate them in your apps.</>
+      <>Learn more about our APIs and how to integrate them in your applications.</>
     ),
     content: (
       <div className={styles.apilinks}>
@@ -162,7 +162,7 @@ const features = [
             link="/docs/apis/resources/mgmt/management-api"
             type={ICONTYPE.APIS}
             title="Organization Objects"
-            description="Mutate IAM objects like organizations, projects, clients, users etc."
+            description="Mutate IAM objects like organizations, projects, applications, users etc."
           />
           <ListElement
             link="/docs/apis/resources/admin/administration-api-aka-admin"

@@ -52,7 +52,7 @@ And make sure to download it, as you won't be able to retrieve it again.
 
 ![Key download](/img/go/api-download_key.png)
 
-Now we need to create a *Personal Access Token* to authenticate the client requests.
+Now we need to create a *Personal Access Token* to authenticate the application requests.
 
 On the user view, switch to *Service Users* and create a new one.
 

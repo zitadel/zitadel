@@ -19,7 +19,7 @@ FirstInstance:
     LoginClient:
       Machine:
         Username: login-client-sa
-        Name: Login Client
+        Name: Login Application
       Pat.ExpirationDate: 2099-01-01T00:00:00Z
 
 DefaultInstance:
