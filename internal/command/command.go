@@ -103,6 +103,7 @@ type Commands struct {
 
 	defaultEmailCodeURLTemplate   func(ctx context.Context) string
 	defaultPasswordSetURLTemplate func(ctx context.Context) string
+	defaultPasskeySetURLTemplate  func(ctx context.Context) string
 }
 
 func StartCommands(
@@ -124,8 +125,9 @@ func StartCommands(
 	defaultRefreshTokenLifetime,
 	defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
-	defaultEmailCodeURLTemplate func(ctx context.Context) string,
-	defaultPasswordSetURLTemplate func(ctx context.Context) string,
+	defaultEmailCodeURLTemplate,
+	defaultPasswordSetURLTemplate,
+	defaultPasskeySetURLTemplate func(ctx context.Context) string,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -215,6 +217,7 @@ func StartCommands(
 		caches:                        caches,
 		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
 		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
+		defaultPasskeySetURLTemplate:  defaultPasskeySetURLTemplate,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
