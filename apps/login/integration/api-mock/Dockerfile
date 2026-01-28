@@ -1,4 +1,4 @@
-FROM bufbuild/buf:1.62.1 AS dependencies
+FROM bufbuild/buf:1.64.0 AS dependencies
 RUN buf export https://github.com/envoyproxy/protoc-gen-validate.git --path validate --output /proto && \
     buf export https://github.com/grpc-ecosystem/grpc-gateway.git --path protoc-gen-openapiv2 --output /proto && \
     buf export https://github.com/googleapis/googleapis.git --path google/api/annotations.proto --path google/api/http.proto --path google/api/field_behavior.proto --output /proto
