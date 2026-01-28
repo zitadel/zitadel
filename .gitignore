@@ -49,6 +49,7 @@ cmd/zitadel/zitadel
 # buildfolders and generated files
 console/dist
 console/src/app/proto/generated
+console/.angular
 **.pb.go
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go

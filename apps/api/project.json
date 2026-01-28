@@ -10,8 +10,7 @@
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go",
-            "{workspaceRoot}/internal/**/*.yaml",
-            "{workspaceRoot}/internal/api/ui/console/static/**/*"
+            "{workspaceRoot}/internal/**/*.yaml"
         ],
         "runtime": [
             "sources",
@@ -64,11 +63,12 @@
                 "generate",
                 "build-console"
             ],
-            "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
+            "command": "bash -c 'CGO_ENABLED=0 GOCACHE=$(pwd)/.cache go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                "runtime"
+                "runtime",
+                {"dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"}
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
@@ -212,10 +212,10 @@
             "dependsOn": [
                 "@zitadel/console:build"
             ],
-            "command": "find internal/api/ui/console/static -mindepth 1 ! -name 'gitkeep' -delete && cp -r console/dist/console/* internal/api/ui/console/static",
+            "command": "find internal/api/ui/console/static -mindepth 1 ! -name 'gitkeep' -delete -print && cp -r -v console/dist/console/* internal/api/ui/console/static",
             "cache": true,
             "inputs": [
-                "{workspaceRoot}/console/dist/console/**/*"
+                {"dependentTasksOutputFiles": "console/dist/console/**/*"}
             ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
