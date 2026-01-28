@@ -2654,7 +2654,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) e in generale tutti i framework JS eseguiti nei browser"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
