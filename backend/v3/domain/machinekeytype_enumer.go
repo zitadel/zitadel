@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _MachineKeyTypeName = "unspecifiedjsonnone"
+const _MachineKeyTypeName = "nonejson"
 
-var _MachineKeyTypeIndex = [...]uint8{0, 11, 15, 19}
+var _MachineKeyTypeIndex = [...]uint8{0, 4, 8}
 
-const _MachineKeyTypeLowerName = "unspecifiedjsonnone"
+const _MachineKeyTypeLowerName = "nonejson"
 
 func (i MachineKeyType) String() string {
 	if i >= MachineKeyType(len(_MachineKeyTypeIndex)-1) {
@@ -24,26 +24,22 @@ func (i MachineKeyType) String() string {
 // Re-run the stringer command to generate them again.
 func _MachineKeyTypeNoOp() {
 	var x [1]struct{}
-	_ = x[MachineKeyTypeUnspecified-(0)]
+	_ = x[MachineKeyTypeNone-(0)]
 	_ = x[MachineKeyTypeJSON-(1)]
-	_ = x[MachineKeyTypeNone-(2)]
 }
 
-var _MachineKeyTypeValues = []MachineKeyType{MachineKeyTypeUnspecified, MachineKeyTypeJSON, MachineKeyTypeNone}
+var _MachineKeyTypeValues = []MachineKeyType{MachineKeyTypeNone, MachineKeyTypeJSON}
 
 var _MachineKeyTypeNameToValueMap = map[string]MachineKeyType{
-	_MachineKeyTypeName[0:11]:       MachineKeyTypeUnspecified,
-	_MachineKeyTypeLowerName[0:11]:  MachineKeyTypeUnspecified,
-	_MachineKeyTypeName[11:15]:      MachineKeyTypeJSON,
-	_MachineKeyTypeLowerName[11:15]: MachineKeyTypeJSON,
-	_MachineKeyTypeName[15:19]:      MachineKeyTypeNone,
-	_MachineKeyTypeLowerName[15:19]: MachineKeyTypeNone,
+	_MachineKeyTypeName[0:4]:      MachineKeyTypeNone,
+	_MachineKeyTypeLowerName[0:4]: MachineKeyTypeNone,
+	_MachineKeyTypeName[4:8]:      MachineKeyTypeJSON,
+	_MachineKeyTypeLowerName[4:8]: MachineKeyTypeJSON,
 }
 
 var _MachineKeyTypeNames = []string{
-	_MachineKeyTypeName[0:11],
-	_MachineKeyTypeName[11:15],
-	_MachineKeyTypeName[15:19],
+	_MachineKeyTypeName[0:4],
+	_MachineKeyTypeName[4:8],
 }
 
 // MachineKeyTypeString retrieves an enum value from the enum constants string name.

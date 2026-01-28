@@ -1,0 +1,542 @@
+package repository
+
+import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+// -------------------------------------------------------------
+// repository
+// -------------------------------------------------------------
+
+func UserRepository() domain.UserRepository {
+	return new(user)
+}
+
+func MachineUserRepository() domain.MachineUserRepository {
+	return &userMachine{user: user{}}
+}
+
+type user struct {
+	verification          verification
+	tableName             string
+	shouldLoadMachineKeys bool
+	machineKeyRepo
+	shouldLoadPATs bool
+	personalAccessTokenRepo
+	shouldLoadMetadata bool
+	userMetadataRepo
+	// userVerificationRepo
+	userPasskeyRepo
+}
+
+func (u user) HumanRepository() domain.HumanUserRepository {
+	return userHuman{user: u}
+}
+
+// existingUser is used to get the columns and conditions for the CTE that selects the existing user in update and delete operations.
+var existingUser = user{tableName: "existing_user"}
+
+// Create implements [domain.UserRepository.Create].
+func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
+
+	var create func(context.Context, *database.StatementBuilder, database.QueryExecutor, *domain.User) error
+	switch {
+	case user.Human != nil:
+		create = userHuman{user: u}.create
+	case user.Machine != nil:
+		create = userMachine{user: u}.create
+	default:
+		return zerrors.ThrowInvalidArgument(nil, "REPOS-KxMnG", "no user type defined")
+	}
+	// we need to cheat a bit here to be able to use CTEChanges
+	// we pretend we have an existing user to be able to use the existing change mechanisms
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT $1 AS instance_id, $2 AS organization_id, $3 AS id)", user.InstanceID, user.OrganizationID, user.ID)
+	return create(ctx, builder, client, user)
+}
+
+// Delete implements [domain.UserRepository.Delete].
+func (u user) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+	if err := checkPKCondition(u, condition); err != nil {
+		return 0, err
+	}
+
+	builder := database.NewStatementBuilder("DELETE FROM zitadel.users")
+	writeCondition(builder, condition)
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+var queryUserStmt = "SELECT users.instance_id, users.organization_id, users.id, users.username" +
+	", users.state, users.created_at, users.updated_at" +
+	// metadata
+	`, jsonb_agg(DISTINCT jsonb_build_object('instanceId', user_metadata.instance_id, 'userId', user_metadata.user_id, 'key', user_metadata.key, 'value', encode(user_metadata.value, 'base64'), 'createdAt', user_metadata.created_at, 'updatedAt', user_metadata.updated_at)) FILTER (WHERE user_metadata.user_id IS NOT NULL) AS metadata` +
+	// machine
+	`, CASE WHEN users.type = 'machine' THEN jsonb_build_object('name', users.name` +
+	`, 'description', users.description, 'secret', encode(users.secret, 'base64')` +
+	`, 'accessTokenType', users.access_token_type` +
+	`, 'keys', jsonb_agg(DISTINCT jsonb_build_object('id', machine_keys.id, 'publicKey', encode(machine_keys.public_key, 'base64'), 'createdAt', machine_keys.created_at, 'expiresAt', machine_keys.expires_at, 'type', machine_keys.type)) FILTER (WHERE machine_keys.user_id IS NOT NULL)` +
+	`, 'pats', jsonb_agg(DISTINCT jsonb_build_object('id', user_personal_access_tokens.id, 'createdAt', user_personal_access_tokens.created_at, 'expiresAt', user_personal_access_tokens.expires_at, 'scopes', user_personal_access_tokens.scopes)) FILTER (WHERE user_personal_access_tokens.user_id IS NOT NULL)` +
+	`) END AS machine` +
+	// human
+	`, CASE WHEN users.type = 'human' THEN jsonb_build_object('firstName', users.first_name, 'lastName', users.last_name` +
+	`, 'nickname', users.nickname, 'displayName', users.display_name` +
+	`, 'preferredLanguage', users.preferred_language, 'gender', users.gender` +
+	`, 'avatarKey', users.avatar_key` +
+	`, 'multifactorInitializationSkippedAt', users.multifactor_initialization_skipped_at` +
+	`, 'password', jsonb_build_object('password', encode(users.password, 'escape')::JSONB, 'isChangeRequired', users.password_change_required, 'changedAt', users.password_verified_at, 'failedAttempts', users.password_failed_attempts, 'lastSuccessfullyCheckedAt', users.password_last_successful_check, 'pendingVerification', ` + verificationQuery(userHuman{}.passwordVerificationIDColumn()) + `)` +
+	`, 'email', jsonb_build_object('address', users.email, 'verifiedAt', users.email_verified_at, 'otp', jsonb_build_object('enabledAt', users.email_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.email_otp_last_successful_check, 'failedAttempts', users.email_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.emailVerificationIDColumn()) + `)` +
+	`, 'phone', CASE WHEN users.phone IS NOT NULL OR users.phone_verification_id IS NOT NULL THEN jsonb_build_object('number', users.phone, 'verifiedAt', users.phone_verified_at, 'otp', jsonb_build_object('enabledAt', users.sms_otp_enabled_at, 'lastSuccessfullyCheckedAt', users.sms_otp_last_successful_check, 'failedAttempts', users.sms_otp_failed_attempts), 'pendingVerification', ` + verificationQuery(userHuman{}.phoneVerificationIDColumn()) + `) ELSE NULL END` +
+	`, 'totp', CASE WHEN users.totp_secret IS NOT NULL THEN jsonb_build_object('secret', encode(users.totp_secret, 'base64'), 'verifiedAt', users.totp_verified_at, 'lastSuccessfullyCheckedAt', users.totp_last_successful_check) ELSE NULL END` +
+	`, 'passkeys', jsonb_agg(DISTINCT jsonb_build_object('id', human_passkeys.token_id, 'keyId', encode(human_passkeys.key_id::BYTEA, 'base64'), 'type', human_passkeys.type, 'name', human_passkeys.name, 'signCount', human_passkeys.sign_count, 'challenge', encode(human_passkeys.challenge, 'base64'), 'publicKey', encode(human_passkeys.public_key, 'base64'), 'attestationType', human_passkeys.attestation_type, 'aaGuid', encode(human_passkeys.authenticator_attestation_guid, 'base64'), 'rpId', human_passkeys.relying_party_id, 'createdAt', human_passkeys.created_at, 'updatedAt', human_passkeys.updated_at, 'verifiedAt', human_passkeys.verified_at)) FILTER (WHERE human_passkeys.user_id IS NOT NULL)` +
+	`, 'verifications', (SELECT jsonb_agg(jsonb_build_object('id', verifications.id, 'value', verifications.value, 'code', encode(verifications.code, 'escape')::JSONB, 'createdAt', verifications.created_at, 'updatedAt', verifications.updated_at, 'expiresAt', verifications.created_at+verifications.expiry, 'failedAttempts', verifications.failed_attempts)) FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.user_id = users.id AND verifications.id NOT IN (COALESCE(users.password_verification_id, ''), COALESCE(users.email_verification_id, ''), COALESCE(users.phone_verification_id, '')))` +
+	`) END AS human FROM zitadel.users`
+
+func verificationQuery(column database.Column) string {
+	var builder database.StatementBuilder
+	builder.WriteString("CASE WHEN ")
+	column.WriteQualified(&builder)
+	builder.WriteString(` IS NOT NULL THEN (SELECT row_to_json(res.*) FROM (SELECT value, encode(code, 'escape')::JSONB AS code, created_at+expiry AS "expiresAt", failed_attempts as "failedAttempts" FROM zitadel.verifications WHERE verifications.instance_id = users.instance_id AND verifications.id = `)
+	column.WriteQualified(&builder)
+	builder.WriteString(`) AS res) ELSE NULL END`)
+	return builder.String()
+}
+
+// Get implements [domain.UserRepository.Get].
+func (u user) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.User, error) {
+	opts = append(opts,
+		u.joinMachineKeys(),
+		u.joinPATs(),
+		u.joinMetadata(),
+		u.joinVerifications(),
+		u.joinPasskeys(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.InstanceIDColumn())
+	}
+
+	builder := database.NewStatementBuilder(queryUserStmt)
+	options.Write(builder)
+
+	return scanUser(ctx, client, builder)
+}
+
+// List implements [domain.UserRepository.List].
+func (u user) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.User, error) {
+	opts = append(opts,
+		u.joinMachineKeys(),
+		u.joinPATs(),
+		u.joinMetadata(),
+		u.joinVerifications(),
+		u.joinPasskeys(),
+		database.WithGroupBy(u.PrimaryKeyColumns()...),
+	)
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if !options.Condition.IsRestrictingColumn(u.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(u.InstanceIDColumn())
+	}
+
+	builder := database.NewStatementBuilder(queryUserStmt)
+	options.Write(builder)
+
+	return scanUsers(ctx, client, builder)
+}
+
+// Update implements [domain.UserRepository.Update].
+func (u user) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	if err := checkPKCondition(u, condition); err != nil {
+		return 0, err
+	}
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
+	}
+	if !database.Changes(changes).IsOnColumn(u.updatedAtColumn()) {
+		changes = append(changes, u.clearUpdatedAt())
+	}
+
+	builder := database.NewStatementBuilder("WITH existing_user AS (SELECT id, instance_id FROM zitadel.users")
+	writeCondition(builder, condition)
+	builder.WriteString(") ")
+	for i, change := range changes {
+		sessionCTE(change, i, 0, builder)
+	}
+
+	builder.WriteString(" UPDATE zitadel.users SET ")
+	if err := database.Changes(changes).Write(builder); err != nil {
+		return 0, err
+	}
+	builder.WriteString(" FROM existing_user")
+	writeCondition(builder, database.And(
+		database.NewColumnCondition(u.IDColumn(), existingUser.IDColumn()),
+		database.NewColumnCondition(u.InstanceIDColumn(), existingUser.InstanceIDColumn()),
+	))
+
+	return client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (u user) unqualifiedTableName() string {
+	if u.tableName != "" {
+		return u.tableName
+	}
+	return "users"
+}
+
+// -------------------------------------------------------------
+// changes
+// -------------------------------------------------------------
+
+// SetState implements [domain.UserRepository.SetState].
+func (u user) SetState(state domain.UserState) database.Change {
+	return database.NewChange(u.StateColumn(), state)
+}
+
+// SetUpdatedAt implements [domain.UserRepository.SetUpdatedAt].
+func (u user) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(u.updatedAtColumn(), updatedAt)
+}
+
+// SetUsername implements [domain.UserRepository.SetUsername].
+func (u user) SetUsername(username string) database.Change {
+	return database.NewChange(u.UsernameColumn(), username)
+}
+
+func (u user) clearUpdatedAt() database.Change {
+	return database.NewChange(u.updatedAtColumn(), database.NullInstruction)
+}
+
+// -------------------------------------------------------------
+// conditions
+// -------------------------------------------------------------
+
+// ExistsMetadata implements [domain.UserRepository.ExistsMetadata].
+func (u user) ExistsMetadata(condition database.Condition) database.Condition {
+	return database.Exists(
+		u.userMetadataRepo.qualifiedTableName(),
+		database.And(
+			database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
+			database.NewColumnCondition(u.IDColumn(), u.userMetadataRepo.userIDColumn()),
+			condition,
+		),
+	)
+}
+
+// IDCondition implements [domain.UserRepository.IDCondition].
+func (u user) IDCondition(userID string) database.Condition {
+	return database.NewTextCondition(u.IDColumn(), database.TextOperationEqual, userID)
+}
+
+// InstanceIDCondition implements [domain.UserRepository.InstanceIDCondition].
+func (u user) InstanceIDCondition(instanceID string) database.Condition {
+	return database.NewTextCondition(u.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+}
+
+// LoginNameCondition implements [domain.UserRepository.LoginNameCondition].
+func (u user) LoginNameCondition(op database.TextOperation, loginName string) database.Condition {
+	panic("unimplemented")
+}
+
+func (u user) MetadataConditions() domain.UserMetadataConditions {
+	return userMetadataConditions{userMetadataRepo: u.userMetadataRepo}
+}
+
+// OrganizationIDCondition implements [domain.UserRepository.OrganizationIDCondition].
+func (u user) OrganizationIDCondition(orgID string) database.Condition {
+	return database.NewTextCondition(u.organizationIDColumn(), database.TextOperationEqual, orgID)
+}
+
+// PrimaryKeyCondition implements [domain.UserRepository.PrimaryKeyCondition].
+func (u user) PrimaryKeyCondition(instanceID string, userID string) database.Condition {
+	return database.And(
+		u.InstanceIDCondition(instanceID),
+		u.IDCondition(userID),
+	)
+}
+
+// StateCondition implements [domain.UserRepository.StateCondition].
+func (u user) StateCondition(state domain.UserState) database.Condition {
+	return database.NewNumberCondition(u.StateColumn(), database.NumberOperationEqual, state)
+}
+
+// TypeCondition implements [domain.UserRepository.TypeCondition].
+func (u user) TypeCondition(userType domain.UserType) database.Condition {
+	return database.NewNumberCondition(u.TypeColumn(), database.NumberOperationEqual, userType)
+}
+
+// UsernameCondition implements [domain.UserRepository.UsernameCondition].
+func (u user) UsernameCondition(op database.TextOperation, username string) database.Condition {
+	return database.NewTextCondition(u.UsernameColumn(), op, username)
+}
+
+// -------------------------------------------------------------
+// columns
+// -------------------------------------------------------------
+
+// PrimaryKeyColumns implements [domain.UserRepository.PrimaryKeyColumns].
+func (u user) PrimaryKeyColumns() []database.Column {
+	return database.Columns{
+		u.InstanceIDColumn(),
+		u.IDColumn(),
+	}
+}
+
+// CreatedAtColumn implements [domain.UserRepository.CreatedAtColumn].
+func (u user) CreatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "created_at")
+}
+
+// StateColumn implements [domain.UserRepository.StateColumn].
+func (u user) StateColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "state")
+}
+
+// TypeColumn implements [domain.UserRepository.TypeColumn].
+func (u user) TypeColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "type")
+}
+
+// UsernameColumn implements [domain.UserRepository.UsernameColumn].
+func (u user) UsernameColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "username")
+}
+
+// IDColumn implements [domain.UserRepository.IDColumn].
+func (u user) IDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "id")
+}
+
+func (u user) InstanceIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "instance_id")
+}
+
+func (u user) updatedAtColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "updated_at")
+}
+
+func (u user) organizationIDColumn() database.Column {
+	return database.NewColumn(u.unqualifiedTableName(), "organization_id")
+}
+
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
+type rawUser struct {
+	domain.User
+	Machine *json.RawMessage `json:"machine,omitempty" db:"machine"`
+	Human   *json.RawMessage `json:"human,omitempty" db:"human"`
+}
+
+func (u *rawUser) toDomain() (*domain.User, error) {
+	if u.Machine != nil {
+		err := json.Unmarshal(*u.Machine, &u.User.Machine)
+		if err != nil {
+			return nil, err
+		}
+	} else if u.Human != nil {
+		err := json.Unmarshal(*u.Human, &u.User.Human)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &u.User, nil
+}
+
+func scanUser(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var user rawUser
+	if err = rows.(database.CollectableRows).CollectExactlyOneRow(&user); err != nil {
+		return nil, err
+	}
+	return user.toDomain()
+}
+
+func scanUsers(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.User, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []rawUser
+	if err = rows.(database.CollectableRows).Collect(&users); err != nil {
+		return nil, err
+	}
+	result := make([]*domain.User, len(users))
+	for i, user := range users {
+		domainUser, err := user.toDomain()
+		if err != nil {
+			return nil, err
+		}
+		result[i] = domainUser
+	}
+	return result, nil
+}
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+// Human implements [domain.UserRepository.Human].
+func (u user) Human() domain.HumanUserRepository {
+	return userHuman{user: u}
+}
+
+// LoadIdentityProviderLinks implements [domain.UserRepository.LoadIdentityProviderLinks].
+func (u user) LoadIdentityProviderLinks() domain.UserRepository {
+	panic("unimplemented")
+}
+
+// LoadKeys implements [domain.UserRepository.LoadKeys].
+func (u user) LoadKeys() domain.UserRepository {
+	return &user{
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          u.shouldLoadPATs,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
+		shouldLoadMachineKeys: true,
+		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: u.shouldLoadMetadata,
+		userMetadataRepo:   u.userMetadataRepo,
+	}
+}
+
+func (u user) joinMachineKeys() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.machineKeyRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.machineKeyRepo.userIDColumn()),
+	)
+	if !u.shouldLoadMachineKeys {
+		conditions = append(conditions, database.IsNull(u.machineKeyRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.machineKeyRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+func (u user) LoadPATs() domain.UserRepository {
+	return &user{
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          true,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
+		shouldLoadMachineKeys: u.shouldLoadMachineKeys,
+		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: u.shouldLoadMetadata,
+		userMetadataRepo:   u.userMetadataRepo,
+	}
+}
+
+func (u user) joinPATs() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.personalAccessTokenRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.personalAccessTokenRepo.userIDColumn()),
+	)
+	if !u.shouldLoadPATs {
+		conditions = append(conditions, database.IsNull(u.personalAccessTokenRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.personalAccessTokenRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+// LoadMetadata implements [domain.UserRepository.LoadMetadata].
+func (u user) LoadMetadata() domain.UserRepository {
+	return &user{
+		tableName:    u.tableName,
+		verification: u.verification,
+
+		shouldLoadPATs:          u.shouldLoadPATs,
+		personalAccessTokenRepo: u.personalAccessTokenRepo,
+
+		shouldLoadMachineKeys: u.shouldLoadMachineKeys,
+		machineKeyRepo:        u.machineKeyRepo,
+
+		shouldLoadMetadata: true,
+		userMetadataRepo:   u.userMetadataRepo,
+	}
+}
+
+func (u user) joinMetadata() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.userMetadataRepo.userIDColumn()),
+	)
+	if !u.shouldLoadMetadata {
+		conditions = append(conditions, database.IsNull(u.userMetadataRepo.userIDColumn()))
+	}
+	return database.WithLeftJoin(
+		u.userMetadataRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+// LoadPasskeys implements [domain.UserRepository.LoadPasskeys].
+func (u user) LoadPasskeys() domain.UserRepository {
+	panic("unimplemented")
+}
+
+func (u user) joinPasskeys() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.userPasskeyRepo.instanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.userPasskeyRepo.userIDColumn()),
+	)
+	// if !u.shouldLoadPasskeys {
+	// 	conditions = append(conditions, database.IsNull(u.userPasskeyRepo.userIDColumn()))
+	// }
+	return database.WithLeftJoin(
+		u.userPasskeyRepo.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+// LoadVerifications implements [domain.UserRepository.LoadVerifications].
+func (u user) LoadVerifications() domain.UserRepository {
+	panic("unimplemented")
+}
+
+func (u user) joinVerifications() database.QueryOption {
+	conditions := make([]database.Condition, 0, 3)
+	conditions = append(conditions,
+		database.NewColumnCondition(u.InstanceIDColumn(), u.verification.instanceIDColumn()),
+		database.NewColumnCondition(u.IDColumn(), u.verification.userIDColumn()),
+	)
+	return database.WithLeftJoin(
+		u.verification.qualifiedTableName(),
+		database.And(conditions...),
+	)
+}
+
+// Machine implements [domain.UserRepository.Machine].
+func (u user) Machine() domain.MachineUserRepository {
+	return userMachine{user: u}
+}
