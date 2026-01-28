@@ -9,7 +9,12 @@ const SearchDialog = dynamic(() => import("@/components/inkeep-search"));
 
 export function Providers({ children }: any) {
   return (
-    <RootProvider search={{ enabled: true, SearchDialog }}>
+    <RootProvider
+      search={{
+        enabled: true,
+        SearchDialog: SearchDialog as any,
+      }}
+    >
       <MixpanelProvider>
         <AuthRequestProvider>{children}</AuthRequestProvider>
       </MixpanelProvider>
