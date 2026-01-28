@@ -18,7 +18,8 @@
       "inputs": [
         "default",
         "^production"
-      ]
+      ],
+      "cache": true
     },
     "dev": {
       "executor": "nx:run-commands",
@@ -55,7 +56,7 @@
       "inputs": [
         "default",
         {
-          "runtime": "git ls-remote --tags https://github.com/zitadel/zitadel.git | grep -v '\\^{}' | head -n 20"
+          "runtime": "git ls-remote --tags --sort=-v:refname https://github.com/zitadel/zitadel.git | grep 'refs/tags/v[0-9]' | grep -v '\\^{}' | head -n 5"
         }
       ]
     },
@@ -169,7 +170,12 @@
       "options": {
         "command": "eslint .",
         "cwd": "apps/docs"
-      }
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ]
     }
   }
 }

@@ -4,6 +4,9 @@
   "workspaceLayout": {
     "libsDir": "packages"
   },
+  "tui": {
+    "enabled": false
+  },
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*"
