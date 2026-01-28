@@ -29,18 +29,20 @@ services:
       retries: 10
 
   login-app:
-    build:
-      context: ../..
-      dockerfile: Dockerfile
+    image: node:20-alpine
+    working_dir: /app
+    command: ["node", "apps/login/server.js"]
+    volumes:
+      - ../../.next/standalone:/app:ro
     environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
       - OTEL_SERVICE_NAME=zitadel-login-test
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_LOG_LEVEL=info
       - OTEL_METRICS_EXPORT_INTERVAL_MS=5000
-      # Point to mock Zitadel server for testing trace propagation
       - ZITADEL_API_URL=http://mock-zitadel:8080
-      # Simulate GCP Cloud Run environment
       - GOOGLE_CLOUD_PROJECT=test-project-123
       - K_SERVICE=zitadel-login
       - K_REVISION=zitadel-login-00001-abc
@@ -48,7 +50,7 @@ services:
       - GOOGLE_CLOUD_REGION=us-central1
     ports:
       - "3000:3000"
-      - "9464:9464"  # Prometheus metrics scraping
+      - "9464:9464"
     depends_on:
       otel-collector:
         condition: service_started
