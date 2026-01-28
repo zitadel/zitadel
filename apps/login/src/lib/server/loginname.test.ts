@@ -239,7 +239,7 @@ describe("sendLoginname", () => {
         mockListIDPLinks.mockResolvedValue({
           result: [{ idpId: "idp123" }],
         });
-        mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
@@ -279,7 +279,7 @@ describe("sendLoginname", () => {
           identityProviders: [{ id: "org-idp-123", type: 0 }],
         });
         mockIdpTypeToSlug.mockReturnValue("google");
-        mockStartIdentityProviderFlow.mockResolvedValue("https://org-idp.example.com/auth");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
@@ -331,7 +331,7 @@ describe("sendLoginname", () => {
         mockListIDPLinks.mockResolvedValue({
           result: [{ idpId: "idp123" }],
         });
-        mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
@@ -399,7 +399,7 @@ describe("sendLoginname", () => {
         mockListIDPLinks.mockResolvedValue({
           result: [{ idpId: "idp123" }],
         });
-        mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
         const result = await sendLoginname({
           loginName: "user@example.com",
@@ -453,7 +453,7 @@ describe("sendLoginname", () => {
       mockGetActiveIdentityProviders.mockResolvedValue({
         identityProviders: [{ id: "idp123", type: "OIDC" }],
       });
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -576,7 +576,7 @@ describe("sendLoginname", () => {
       mockGetActiveIdentityProviders.mockResolvedValue({
         identityProviders: [{ id: "idp123", type: "OIDC" }],
       });
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth?org=discovered-org-456");
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth?org=discovered-org-456" });
 
       const result = await sendLoginname({
         loginName: "user@company.com",

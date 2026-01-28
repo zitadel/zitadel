@@ -9,11 +9,13 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { handleServerActionResponse } from "@/lib/client";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { AutoSubmitForm } from "./auto-submit-form";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -28,6 +30,7 @@ type Props = {
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
   const router = useRouter();
@@ -106,37 +109,30 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   async function submitLogin(data: JsonObject) {
     setLoading(true);
-    const response = await sendPasskey({
-      loginName,
-      sessionId,
-      organization,
-      checks: {
-        webAuthN: { credentialAssertionData: data },
-      } as Checks,
-      requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotVerifyPasskey"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await sendPasskey({
+        loginName,
+        sessionId,
+        organization,
+        checks: {
+          webAuthN: { credentialAssertionData: data },
+        } as Checks,
+        requestId,
       });
 
-    if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
-    }
+      const handled = handleServerActionResponse(response, router, setSamlData, setError);
 
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
-    }
-
-    // If we got here, something went wrong - no redirect or error was returned
-    if (!response) {
-      setError(t("verify.errors.noResponseReceived"));
-    } else {
-      setError(t("verify.errors.noRedirectProvided"));
+      if (!handled) {
+        if (!response) {
+          setError(t("verify.errors.noResponseReceived"));
+        } else {
+          setError(t("verify.errors.noRedirectProvided"));
+        }
+      }
+    } catch {
+      setError(t("verify.errors.couldNotVerifyPasskey"));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -191,6 +187,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   return (
     <div className="w-full">
+      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>

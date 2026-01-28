@@ -326,11 +326,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   // Check if we got a valid redirect result
-  if (redirectResult && typeof redirectResult === "object" && "redirect" in redirectResult && redirectResult.redirect) {
-    return redirectResult;
-  }
-
-  if (redirectResult && typeof redirectResult === "object" && "error" in redirectResult) {
+  if (redirectResult && typeof redirectResult === "object") {
     return redirectResult;
   }
 

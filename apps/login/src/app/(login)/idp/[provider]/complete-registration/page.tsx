@@ -18,10 +18,9 @@ export default async function CompleteRegistrationPage(props: {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  if (!id || !token || !idpId || !organization || !idpUserId || !idpUserName) {
+  if (!id || !token || !idpId || !organization || !idpUserId) {
     throw new Error("Missing required parameters");
   }
 

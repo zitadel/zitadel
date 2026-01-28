@@ -21,6 +21,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
+import escapeHtml from "escape-html";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
@@ -131,7 +132,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           params.set("organization", organization);
         }
 
-        let url: string | null = await startIdentityProviderFlow({
+        const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId,
           urls: {
@@ -140,10 +141,35 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           },
         });
 
-        if (!url) {
+        if (!response || !response.url) {
           return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
         }
 
+        if (response.fields) {
+          const hiddenInputs = Object.entries(response.fields)
+            .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+            .join("\n");
+
+          const html = `
+            <html>
+              <body onload="document.forms[0].submit()">
+                <form action="${escapeHtml(response.url)}" method="post">
+                  ${hiddenInputs}
+                  <noscript>
+                    <button type="submit">Continue</button>
+                  </noscript>
+                </form>
+              </body>
+            </html>
+          `;
+
+
+          return new NextResponse(html, {
+            headers: { "Content-Type": "text/html" },
+          });
+        }
+
+        let url = response.url;
         if (url.startsWith("/")) {
           url = constructUrl(request, url).toString();
         }
@@ -404,9 +430,9 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       const html = `
         <html>
           <body onload="document.forms[0].submit()">
-            <form action="${url}" method="post">
-              <input type="hidden" name="RelayState" value="${binding.value.relayState}" />
-              <input type="hidden" name="SAMLResponse" value="${binding.value.samlResponse}" />
+            <form action="${escapeHtml(url)}" method="post">
+              <input type="hidden" name="RelayState" value="${escapeHtml(binding.value.relayState)}" />
+              <input type="hidden" name="SAMLResponse" value="${escapeHtml(binding.value.samlResponse)}" />
               <noscript>
                 <button type="submit">Continue</button>
               </noscript>
