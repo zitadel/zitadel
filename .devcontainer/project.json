@@ -7,7 +7,8 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "./compose.sh"
+        "command": "./compose.sh",
+        "continuous": true
       }
     }
   }
