@@ -13,7 +13,7 @@ export function PiiTable() {
       subjects: "All users as uploaded by Customer."
     },
     {
-      type: "Login data",
+      type: "Login details",
       examples: [
         'Randomly generated ID',
         'Passwords',
