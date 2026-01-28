@@ -21,9 +21,10 @@ services:
       - PORT=8080
       - OUTPUT_DIR=/tmp/otel
     ports:
-      - "8080:8080"
+      - "8080:8080"   # HTTP/2 for gRPC
+      - "7432:7432"   # HTTP/1.1 for health checks
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8080/health"]
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:7432/health"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -43,6 +44,10 @@ services:
       - OTEL_LOG_LEVEL=info
       - OTEL_METRICS_EXPORT_INTERVAL_MS=5000
       - ZITADEL_API_URL=http://mock-zitadel:8080
+      # Required for gRPC authentication - any non-empty token works with mock server
+      - ZITADEL_SERVICE_USER_TOKEN=test-token-for-otel-integration-tests
+      # Disable caching to ensure gRPC calls are made on each request
+      - DEBUG=true
       - GOOGLE_CLOUD_PROJECT=test-project-123
       - K_SERVICE=zitadel-login
       - K_REVISION=zitadel-login-00001-abc

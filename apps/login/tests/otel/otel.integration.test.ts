@@ -9,7 +9,10 @@ const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
 const APP_URL = "http://localhost:3000";
 const PROMETHEUS_URL = "http://localhost:9464/metrics";
 const COLLECTOR_HEALTH_URL = "http://localhost:13133";
-const MOCK_ZITADEL_URL = "http://localhost:8080";
+// HTTP/2 port for gRPC (not used directly by tests)
+const MOCK_ZITADEL_GRPC_URL = "http://localhost:8080";
+// HTTP/1.1 port for health checks and captured headers endpoint
+const MOCK_ZITADEL_URL = "http://localhost:7432";
 const CAPTURED_HEADERS_FILE = path.join(OUTPUT_DIR, "captured-headers.json");
 
 // Timeout for Docker operations
@@ -473,59 +476,48 @@ describe("OpenTelemetry Integration", () => {
   );
 
   describe("Trace Propagation", () => {
-    // TODO: Investigate why traceparent headers aren't being propagated
-    it.skip(
+    it(
       "should propagate traceparent headers to backend gRPC calls",
       async () => {
-        // Clear any existing captured headers
-        try {
-          fs.unlinkSync(CAPTURED_HEADERS_FILE);
-        } catch {
-          // File may not exist
-        }
-
         // Load a page that triggers gRPC calls to the Zitadel backend
-        // The login page will attempt to fetch settings from Zitadel
-        const response = await fetch(`${APP_URL}/ui/v2/login/login`, {
+        // The loginname page fetches settings from Zitadel (getDefaultOrg,
+        // getLoginSettings, getActiveIdentityProviders, getBrandingSettings)
+        const response = await fetch(`${APP_URL}/ui/v2/login/loginname`, {
           redirect: "manual",
         });
 
-        // The response may be a redirect or error (no valid session),
-        // but gRPC calls should still have been made
-        console.log(`Login page response status: ${response.status}`);
+        console.log(`Loginname page response status: ${response.status}`);
 
-        // Wait for the mock server to write captured headers
-        const hasCapturedHeaders = await waitForFile(
-          CAPTURED_HEADERS_FILE,
-          30,
-          1000,
-        );
+        // Wait a moment for the mock server to write captured headers
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        if (!hasCapturedHeaders) {
-          // If no headers were captured, check the mock server endpoint directly
-          const capturedResponse = await fetch(
-            `${MOCK_ZITADEL_URL}/captured-headers`,
-          );
-          const captured = await capturedResponse.json();
-          console.log("Captured via endpoint:", JSON.stringify(captured, null, 2));
-
-          if (captured.length === 0) {
-            console.warn("No gRPC calls were made to mock server");
-            return;
-          }
+        // Read captured headers from the file (written by mock server)
+        let capturedRequests: Array<{ traceparent: string | null; url: string; method: string }> = [];
+        try {
+          const capturedContent = fs.readFileSync(CAPTURED_HEADERS_FILE, "utf-8");
+          capturedRequests = JSON.parse(capturedContent);
+        } catch (err) {
+          // If file doesn't exist, try the endpoint
+          console.log("File not found, trying endpoint...");
+          const capturedResponse = await fetch(`${MOCK_ZITADEL_URL}/captured-headers`);
+          capturedRequests = await capturedResponse.json();
         }
-
-        // Read captured headers
-        const capturedContent = fs.readFileSync(CAPTURED_HEADERS_FILE, "utf-8");
-        const capturedRequests = JSON.parse(capturedContent);
 
         console.log(`Captured ${capturedRequests.length} requests to mock Zitadel`);
 
-        // Verify at least one request has traceparent header
-        const requestsWithTrace = capturedRequests.filter(
-          (req: { traceparent: string | null }) => req.traceparent !== null,
+        // Filter for gRPC calls only (POST requests, not health checks)
+        const grpcRequests = capturedRequests.filter(
+          (req) => req.method === "POST"
+        );
+        console.log(`Found ${grpcRequests.length} gRPC calls`);
+
+        // Verify gRPC calls have traceparent headers
+        const requestsWithTrace = grpcRequests.filter(
+          (req) => req.traceparent !== null,
         );
 
+        // Should have at least one gRPC call with traceparent
+        expect(grpcRequests.length).toBeGreaterThan(0);
         expect(requestsWithTrace.length).toBeGreaterThan(0);
 
         // Verify traceparent format: version-traceid-parentid-flags
@@ -535,71 +527,28 @@ describe("OpenTelemetry Integration", () => {
           console.log(`Request ${req.url}: traceparent=${req.traceparent}`);
         }
 
+        // Verify trace ID consistency - gRPC calls from the same page load share a trace ID
+        // Group calls by trace ID and verify each group has at least 2 calls
+        if (requestsWithTrace.length >= 2) {
+          const traceIds = requestsWithTrace.map((req) => req.traceparent!.split("-")[1]);
+          const traceIdCounts = new Map<string, number>();
+          for (const id of traceIds) {
+            traceIdCounts.set(id, (traceIdCounts.get(id) || 0) + 1);
+          }
+          // Each trace ID should have at least 2 gRPC calls (loginname makes 2+ calls)
+          const validGroups = Array.from(traceIdCounts.values()).filter((count) => count >= 2);
+          expect(validGroups.length).toBeGreaterThan(0);
+          console.log(`Trace ID consistency verified: ${validGroups.length} page loads with 2+ gRPC calls each`);
+        }
+
         console.log(
           `Trace propagation verified: ${requestsWithTrace.length}/${capturedRequests.length} requests have traceparent`,
         );
       },
-      60000,
+      30000,
     );
 
-    it(
-      "should include consistent trace IDs across related gRPC calls",
-      async () => {
-        // Clear any existing captured headers
-        try {
-          fs.unlinkSync(CAPTURED_HEADERS_FILE);
-        } catch {
-          // File may not exist
-        }
-
-        // Load a page that triggers multiple gRPC calls
-        await fetch(`${APP_URL}/ui/v2/login/login`, { redirect: "manual" });
-
-        // Wait for headers to be captured
-        await waitForFile(CAPTURED_HEADERS_FILE, 30, 1000);
-
-        // Read captured headers
-        let capturedRequests: Array<{ traceparent: string | null; url: string }> = [];
-        try {
-          const capturedContent = fs.readFileSync(CAPTURED_HEADERS_FILE, "utf-8");
-          capturedRequests = JSON.parse(capturedContent);
-        } catch {
-          // Try endpoint if file read fails
-          const capturedResponse = await fetch(
-            `${MOCK_ZITADEL_URL}/captured-headers`,
-          );
-          capturedRequests = await capturedResponse.json();
-        }
-
-        const requestsWithTrace = capturedRequests.filter(
-          (req) => req.traceparent !== null,
-        );
-
-        if (requestsWithTrace.length < 2) {
-          console.warn("Not enough requests to verify trace consistency");
-          return;
-        }
-
-        // Extract trace IDs from traceparent headers
-        const traceIds = requestsWithTrace.map((req) => {
-          const parts = req.traceparent!.split("-");
-          return parts[1]; // trace-id is the second part
-        });
-
-        // All requests from the same page load should share the same trace ID
-        // (assuming they're part of the same incoming request context)
-        const uniqueTraceIds = Array.from(new Set(traceIds));
-        console.log(`Found ${uniqueTraceIds.length} unique trace IDs across ${traceIds.length} requests`);
-
-        // Each unique trace ID represents a distinct request context
-        // Verify all trace IDs are valid 32-char hex strings
-        for (const traceId of uniqueTraceIds) {
-          expect(traceId).toMatch(/^[0-9a-f]{32}$/);
-        }
-
-        console.log("Trace ID consistency verified");
-      },
-      60000,
-    );
+    // Note: Trace ID consistency is already verified in the test above
+    // (all gRPC calls from a single page load share the same trace ID)
   });
 });

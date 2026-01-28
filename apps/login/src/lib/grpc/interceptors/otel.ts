@@ -67,7 +67,10 @@ export const otelGrpcInterceptor: Interceptor = (next) => async (req) => {
       },
     },
     async (span) => {
-      propagation.inject(context.active(), req.header, {
+      // Explicitly set the span in context before injection to ensure
+      // traceparent headers are propagated even if async context is lost
+      const ctx = trace.setSpan(context.active(), span);
+      propagation.inject(ctx, req.header, {
         set: (carrier, key, value) => carrier.set(key, value),
       });
 

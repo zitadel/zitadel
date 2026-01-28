@@ -1,7 +1,10 @@
 /**
  * Mock Zitadel Connect/gRPC server for testing trace propagation.
  * Captures incoming headers and writes them to a file for test assertions.
+ *
+ * Uses HTTP/2 with cleartext (h2c) to support gRPC protocol.
  */
+const http2 = require("http2");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -13,17 +16,21 @@ const HEADERS_FILE = path.join(OUTPUT_DIR, "captured-headers.json");
 // Store captured requests
 const capturedRequests = [];
 
-const server = http.createServer((req, res) => {
+// Handle HTTP/2 request
+function handleRequest(stream, headers, isHttp2 = true) {
+  const method = isHttp2 ? headers[":method"] : headers.method;
+  const url = isHttp2 ? headers[":path"] : headers.url;
+
   // Capture trace headers
   const traceHeaders = {
     timestamp: new Date().toISOString(),
-    method: req.method,
-    url: req.url,
-    traceparent: req.headers["traceparent"] || null,
-    tracestate: req.headers["tracestate"] || null,
-    baggage: req.headers["baggage"] || null,
-    grpcAcceptEncoding: req.headers["grpc-accept-encoding"] || null,
-    contentType: req.headers["content-type"] || null,
+    method: method,
+    url: url,
+    traceparent: headers["traceparent"] || null,
+    tracestate: headers["tracestate"] || null,
+    baggage: headers["baggage"] || null,
+    grpcAcceptEncoding: headers["grpc-accept-encoding"] || null,
+    contentType: headers["content-type"] || null,
   };
 
   capturedRequests.push(traceHeaders);
@@ -32,59 +39,99 @@ const server = http.createServer((req, res) => {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   fs.writeFileSync(HEADERS_FILE, JSON.stringify(capturedRequests, null, 2));
 
-  console.log(`[${traceHeaders.timestamp}] ${req.method} ${req.url}`);
+  console.log(`[${traceHeaders.timestamp}] ${method} ${url}`);
   console.log(`  traceparent: ${traceHeaders.traceparent || "(none)"}`);
 
-  // Return mock Connect/gRPC responses
-  // The actual response doesn't matter much - we just need to not error
-  const url = req.url || "";
+  // Helper to send response
+  const sendResponse = (statusCode, contentType, body) => {
+    if (isHttp2) {
+      stream.respond({
+        ":status": statusCode,
+        "content-type": contentType,
+        "grpc-status": "0",
+        "grpc-message": "OK",
+      });
+      stream.end(body);
+    } else {
+      stream.writeHead(statusCode, {
+        "Content-Type": contentType,
+        "grpc-status": "0",
+        "grpc-message": "OK",
+      });
+      stream.end(body);
+    }
+  };
 
   // Health check
   if (url.includes("/health") || url === "/") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok" }));
+    sendResponse(200, "application/json", JSON.stringify({ status: "ok" }));
     return;
   }
 
   // Return captured headers (for debugging)
   if (url === "/captured-headers") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(capturedRequests, null, 2));
+    sendResponse(200, "application/json", JSON.stringify(capturedRequests, null, 2));
     return;
   }
 
   // Mock Connect/gRPC responses
   // These are minimal responses to prevent the login app from crashing
-  res.writeHead(200, {
-    "Content-Type": "application/json",
-    "grpc-status": "0",
-    "grpc-message": "OK",
-  });
-
-  // Return empty but valid protobuf-like responses
   if (url.includes("GetLoginSettings") || url.includes("SettingsService")) {
-    res.end(JSON.stringify({ settings: {} }));
+    sendResponse(200, "application/json", JSON.stringify({ settings: {} }));
   } else if (url.includes("GetBrandingSettings")) {
-    res.end(JSON.stringify({ settings: {} }));
+    sendResponse(200, "application/json", JSON.stringify({ settings: {} }));
   } else if (url.includes("SessionService") || url.includes("Session")) {
-    res.end(JSON.stringify({ session: {} }));
+    sendResponse(200, "application/json", JSON.stringify({ session: {} }));
   } else if (url.includes("UserService") || url.includes("User")) {
-    res.end(JSON.stringify({ user: {} }));
+    sendResponse(200, "application/json", JSON.stringify({ user: {} }));
+  } else if (url.includes("OrganizationService") || url.includes("Organization")) {
+    sendResponse(200, "application/json", JSON.stringify({ result: [] }));
+  } else if (url.includes("IdentityProviderService") || url.includes("IdentityProvider")) {
+    sendResponse(200, "application/json", JSON.stringify({ identityProviders: [] }));
   } else {
-    res.end(JSON.stringify({}));
+    sendResponse(200, "application/json", JSON.stringify({}));
   }
+}
+
+// Create HTTP/2 server (cleartext for testing)
+const http2Server = http2.createServer();
+
+http2Server.on("stream", (stream, headers) => {
+  handleRequest(stream, headers, true);
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Mock Zitadel server listening on port ${PORT}`);
+http2Server.on("error", (err) => console.error("HTTP/2 error:", err));
+
+// Also create HTTP/1.1 server for health checks from wget
+const httpServer = http.createServer((req, res) => {
+  // Create a headers object compatible with handleRequest
+  const headers = {
+    method: req.method,
+    url: req.url,
+    ...req.headers,
+  };
+  handleRequest(res, headers, false);
+});
+
+// Start HTTP/2 server on main port
+http2Server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Mock Zitadel HTTP/2 server listening on port ${PORT}`);
   console.log(`Captured headers will be written to: ${HEADERS_FILE}`);
+});
+
+// Start HTTP/1.1 server on a different port for health checks
+const HEALTH_PORT = 7432;
+httpServer.listen(HEALTH_PORT, "0.0.0.0", () => {
+  console.log(`Mock Zitadel HTTP/1.1 health server listening on port ${HEALTH_PORT}`);
 });
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("Shutting down mock server...");
-  server.close(() => {
-    console.log("Mock server stopped");
-    process.exit(0);
+  console.log("Shutting down mock servers...");
+  http2Server.close(() => {
+    httpServer.close(() => {
+      console.log("Mock servers stopped");
+      process.exit(0);
+    });
   });
 });
