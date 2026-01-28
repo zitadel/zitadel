@@ -3,21 +3,21 @@ package query
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Key interface {
 	ID() string
 	Algorithm() string
-	Use() crypto.KeyUsage
+	Use() zcrypto.KeyUsage
 	Sequence() uint64
 }
 
 type PrivateKey interface {
 	Key
 	Expiry() time.Time
-	Key() *crypto.CryptoValue
+	Key() *zcrypto.CryptoValue
 }
 
 type PublicKey interface {
@@ -38,7 +38,7 @@ type key struct {
 	sequence      uint64
 	resourceOwner string
 	algorithm     string
-	use           crypto.KeyUsage
+	use           zcrypto.KeyUsage
 }
 
 func (k *key) ID() string {
@@ -49,7 +49,7 @@ func (k *key) Algorithm() string {
 	return k.algorithm
 }
 
-func (k *key) Use() crypto.KeyUsage {
+func (k *key) Use() zcrypto.KeyUsage {
 	return k.use
 }
 
