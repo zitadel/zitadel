@@ -702,7 +702,7 @@
     "USERNAME": "사용자 이름",
     "ORGNAME": "조직 이름",
     "ORGID": "조직 ID",
-    "PRIMARYDOMAIN": "기본 도메인",
+    "PRIMARYDOMAIN": "조직 도메인",
     "PROJECTNAME": "프로젝트 이름",
     "RESOURCEOWNER": "리소스 소유자",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "파일 다운로드",
       "SELECTORGTOOLTIP": "이 조직을 선택하세요.",
-      "PRIMARYDOMAIN": "기본 도메인",
+      "PRIMARYDOMAIN": "조직 도메인",
       "STATE": "상태",
       "USEPASSWORD": "초기 비밀번호 설정",
       "USEPASSWORDDESC": "초기화 중에 사용자가 비밀번호를 설정할 필요가 없습니다."

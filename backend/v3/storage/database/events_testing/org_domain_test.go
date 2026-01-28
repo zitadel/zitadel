@@ -46,7 +46,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 	}, retryDuration, tick)
 
 	// The API call also sets the domain as primary, so we don't do a separate test for that.
-	t.Run("test organization domain add reduces", func(t *testing.T) {
+	t.Run("test Organization Domain add reduces", func(t *testing.T) {
 		// Add a domain to the organization
 		domainName := gofakeit.DomainName()
 		beforeAdd := time.Now()
@@ -90,7 +90,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test org domain remove reduces", func(t *testing.T) {
+	t.Run("test Organization Domain remove reduces", func(t *testing.T) {
 		// Add a domain to the organization
 		domainName := gofakeit.DomainName()
 		_, err := OrgClient.AddOrganizationDomain(CTX, &v2beta.AddOrganizationDomainRequest{

@@ -80,7 +80,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
-			name: "default verification (org domain ctx)",
+			name: "default verification (Organization Domain ctx)",
 			args: args{
 				OrgCTX,
 				&user.AddHumanUserRequest{

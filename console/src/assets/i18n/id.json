@@ -702,7 +702,7 @@
     "USERNAME": "Nama belakang",
     "ORGNAME": "Nama Organisasi",
     "ORGID": "ID Organisasi",
-    "PRIMARYDOMAIN": "Domain Utama",
+    "PRIMARYDOMAIN": "Domain Organisasi",
     "PROJECTNAME": "Nama Proyek",
     "RESOURCEOWNER": "Pemilik Sumber Daya",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Unduh Berkas",
       "SELECTORGTOOLTIP": "Pilih organisasi ini.",
-      "PRIMARYDOMAIN": "Domain Utama",
+      "PRIMARYDOMAIN": "Domain Organisasi",
       "STATE": "Negara",
       "USEPASSWORD": "Tetapkan Kata Sandi Awal",
       "USEPASSWORDDESC": "Pengguna tidak perlu mengatur kata sandi selama inisialisasi."

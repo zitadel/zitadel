@@ -826,7 +826,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return nil
 	}
 	// the user was either not found or not active
-	// so check if the loginname suffix matches a verified org domain
+	// so check if the loginname suffix matches an organization domain
 	// but only if no org was requested (by id or domain)
 	if request.RequestedOrgID == "" {
 		ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
@@ -871,7 +871,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	if index < 0 {
 		return false, nil
 	}
-	// check if the suffix matches a verified domain
+	// check if the suffix matches an organization domain
 	org, err := repo.Query.OrgByVerifiedDomain(ctx, loginName[index+1:])
 	if err != nil {
 		return false, nil

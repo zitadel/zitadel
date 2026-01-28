@@ -146,7 +146,7 @@ func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequeste
 // projectRoles contains the roles of a project of multiple organisations
 //
 // key of the first map is the role key,
-// key of the second map is the org id, value the org domain
+// key of the second map is the org id, value the organization domain
 type projectRoles map[string]map[string]string
 
 func (p projectRoles) Add(roleKey, orgID, domain string) {

@@ -701,7 +701,7 @@
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
     "ORGID": "ID Organizacji",
-    "PRIMARYDOMAIN": "Domena podstawowa",
+    "PRIMARYDOMAIN": "Domena organizacji",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
@@ -1419,7 +1419,7 @@
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
-      "PRIMARYDOMAIN": "Domena główna",
+      "PRIMARYDOMAIN": "Domena organizacji",
       "STATE": "Stan",
       "USEPASSWORD": "Ustaw hasło początkowe",
       "USEPASSWORDDESC": "Użytkownik nie musi ustawiać hasła podczas inicjalizacji."

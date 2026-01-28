@@ -609,7 +609,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		err      error
 	}{
 		{
-			name:   "add org domain, happy path",
+			name:   "add Organization Domain, happy path",
 			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
@@ -630,7 +630,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 			err: errors.New("membership not found"),
 		},
 		{
-			name:   "add org domain, twice",
+			name:   "add Organization Domain, twice",
 			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
@@ -671,7 +671,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name:   "add org domain to non existent org",
+			name:   "add Organization Domain to non existent org",
 			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
@@ -777,7 +777,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		err      error
 	}{
 		{
-			name:   "delete org domain, happy path",
+			name:   "delete Organization Domain, happy path",
 			ctx:    CTX,
 			domain: domain,
 			testFunc: func() string {
@@ -812,7 +812,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 			},
 		},
 		{
-			name:   "delete org domain, twice",
+			name:   "delete Organization Domain, twice",
 			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
@@ -859,7 +859,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 			err: errors.New("Domain doesn't exist on organization"),
 		},
 		{
-			name:   "delete org domain to non existent org",
+			name:   "delete Organization Domain to non existent org",
 			ctx:    CTX,
 			domain: integration.DomainName(),
 			testFunc: func() string {
@@ -868,7 +868,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 			err: errors.New("Domain doesn't exist on organization"),
 		},
 		{
-			name:   "delete org domain no permission",
+			name:   "delete Organization Domain no permission",
 			ctx:    Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			domain: domain,
 			testFunc: func() string {

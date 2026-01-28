@@ -58,7 +58,7 @@ message Domain {
     ];
     bool is_primary = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the domain is the primary domain"
+            description: "defines if the domain is the Organization Domain"
         }
     ];
     DomainValidationType validation_type = 6 [

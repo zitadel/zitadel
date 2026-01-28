@@ -215,7 +215,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			},
 		},
 		{
-			name: "domain verified, wrong org",
+			name: "Organization Domain, wrong org",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -376,7 +376,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			},
 		},
 		{
-			name: "email as username, verified domain, ok",
+			name: "email as username, Organization Domain, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(

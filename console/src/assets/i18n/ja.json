@@ -702,7 +702,7 @@
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
     "ORGID": "組織ID",
-    "PRIMARYDOMAIN": "プライマリドメイン",
+    "PRIMARYDOMAIN": "組織ドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "ファイルをダウンロード",
       "SELECTORGTOOLTIP": "この組織を選択",
-      "PRIMARYDOMAIN": "プライマリドメイン",
+      "PRIMARYDOMAIN": "組織ドメイン",
       "STATE": "ステート",
       "USEPASSWORD": "初期パスワードを設定する",
       "USEPASSWORDDESC": "ユーザーは、初期セットアップ中にパスワードを設定する必要はありません。"

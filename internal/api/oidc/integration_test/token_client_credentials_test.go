@@ -133,7 +133,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			},
 		},
 		{
-			name:         "invalid org domain filtered",
+			name:         "invalid Organization Domain filtered",
 			clientID:     clientID,
 			clientSecret: clientSecret,
 			scope: []string{

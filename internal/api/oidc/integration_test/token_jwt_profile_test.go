@@ -83,7 +83,7 @@ func TestServer_JWTProfile(t *testing.T) {
 			},
 		},
 		{
-			name:    "invalid org domain filtered",
+			name:    "invalid Organization Domain filtered",
 			keyData: keyData,
 			scope: []string{
 				oidc.ScopeOpenID,

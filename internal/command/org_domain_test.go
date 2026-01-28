@@ -1744,7 +1744,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "remove verified domain, ok",
+			name: "remove Organization Domain, cannot remove current",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1830,7 +1830,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "remove verified domain, ok",
+			name: "remove Organization Domain, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1877,7 +1877,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "remove verified domain (with permission check), ok",
+			name: "remove Organization Domain (with permission check), ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1925,7 +1925,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "remove verified domain (no permission), error",
+			name: "remove Organization Domain (no permission), error",
 			fields: fields{
 				eventstore: expectEventstore(),
 			},

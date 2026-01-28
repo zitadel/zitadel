@@ -427,7 +427,7 @@ service OrganizationService {
 
   // Generate Organization Domain Validation
   //
-  // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
+  // Generate a new file to be able to verify your Organization Domain with DNS or HTTP challenge.
   //
   // Required permission:
   //  - `org.write`

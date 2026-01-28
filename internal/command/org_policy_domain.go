@@ -131,7 +131,7 @@ func prepareAddOrgDomainPolicy(
 			}
 
 			// the UserLoginMustBeDomain setting will be different from the instance
-			// therefore get all usernames and the current primary domain
+			// therefore get all usernames and the current organization domain
 			usersWriteModel, err := domainPolicyUsernames(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -178,7 +178,7 @@ func prepareChangeOrgDomainPolicy(
 			if err != nil {
 				return nil, err
 			}
-			// get all usernames and the primary domain
+			// get all usernames and the organization domain
 			usersWriteModel, err := domainPolicyUsernames(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -225,7 +225,7 @@ func prepareRemoveOrgDomainPolicy(
 			if writeModel.UserLoginMustBeDomain == instancePolicy.UserLoginMustBeDomain {
 				return cmds, nil
 			}
-			// get all usernames and the primary domain
+			// get all usernames and the organization domain
 			usersWriteModel, err := domainPolicyUsernames(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err

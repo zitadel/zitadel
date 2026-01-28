@@ -84,7 +84,7 @@ var (
 		"resource_owner", // project_grant resource owner
 		"id",             // granted org id
 		"name",           // granted org name
-		"primary_domain", // granted org domain
+		"primary_domain", // granted organization domain
 	}
 	userGrantsStmt = regexp.QuoteMeta(
 		"SELECT projections.user_grants5.id" +

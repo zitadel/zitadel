@@ -699,7 +699,7 @@
     "ORGNAME": "Organizasyon Adı",
     "ORGID": "Organizasyon ID",
     "STATE": "Durum",
-    "PRIMARYDOMAIN": "Birincil Alan Adı",
+    "PRIMARYDOMAIN": "Organizasyon Alan Adı",
     "DISPLAYNAME": "Kullanıcı Görünen Adı",
     "EMAIL": "E-posta",
     "USERNAME": "Kullanıcı Adı",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Dosyayı İndir",
       "SELECTORGTOOLTIP": "Bu organizasyonu seç.",
-      "PRIMARYDOMAIN": "Birincil Domain",
+      "PRIMARYDOMAIN": "Organizasyon Alan Adı",
       "STATE": "Durum",
       "USEPASSWORD": "İlk Şifreyi Ayarla",
       "USEPASSWORDDESC": "Kullanıcının başlatma sırasında şifre ayarlaması gerekmez."
