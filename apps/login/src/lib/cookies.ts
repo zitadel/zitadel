@@ -3,6 +3,9 @@
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
+import { createLogger } from "./logger";
+
+const logger = createLogger("cookies");
 
 // TODO: improve this to handle overflow
 const MAX_COOKIE_SIZE = 2048;
@@ -77,7 +80,7 @@ export async function addSessionToCookie<T>({
     const temp = [...currentSessions, session];
 
     if (JSON.stringify(temp).length >= MAX_COOKIE_SIZE) {
-      console.log("WARNING COOKIE OVERFLOW");
+      logger.warn("WARNING COOKIE OVERFLOW");
       // TODO: improve cookie handling
       // this replaces the first session (oldest) with the new one
       currentSessions = [session].concat(currentSessions.slice(1));
@@ -257,7 +260,7 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (!stringifiedCookie?.value) {
-    console.log("getAllSessions: No session cookie found, returning empty array");
+    logger.info("getAllSessions: No session cookie found, returning empty array");
     return [];
   }
 
