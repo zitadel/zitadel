@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { glob } from 'glob';
 import { join, dirname, resolve } from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -84,15 +85,74 @@ async function run() {
       
     console.log(`Using input for ${label}: ${bufInput}`);
 
+
     // Use spawn (async) instead of spawnSync to avoid blocking the event loop
-    await new Promise((resolvePromise, rejectPromise) => {
+    await new Promise(async (resolvePromise, rejectPromise) => {
+        // Dynamic discovery of excluded paths
+        const getExcludedPaths = async () => {
+             const patterns = ['**/v3alpha'];
+             const excluded = new Set();
+             
+             if (v.refType === 'local') {
+                 // For local, use glob against PROTO_DIR
+                 // patterns are relative to PROTO_DIR, but glob needs to search inside PROTO_DIR
+                 // The result of glob will be paths relative to PROTO_DIR if cwd is PROTO_DIR
+                 try {
+                    const files = await glob(patterns, { cwd: PROTO_DIR, nodir: false });
+                    // We only want directories that contain v3alpha, or files?
+                    // buf --exclude-path expects directories or files.
+                    // If we found directories ending in v3alpha, usage is fine.
+                    // glob '**/v3alpha' matches directories or files ending in v3alpha.
+                    // Ensure we pass absolute paths for local input to avoid CWD resolution issues
+                    files.forEach(f => excluded.add(resolve(PROTO_DIR, f)));
+                 } catch (e) {
+                     console.warn('Failed to glob excluded paths locally', e);
+                 }
+             } else {
+                 // For remote (tag/branch), use git ls-tree
+                 // We need to run git ls-tree -r <ref> --name-only
+                 // and filter for lines matching /v3alpha/
+                 // We run this in ROOT_DIR (where .git presumably is available via parent)
+                 // The paths returned by git ls-tree are relative to repo root.
+                 // buf input is relative to 'proto' subdir.
+                 // So we need to strip 'proto/' prefix.
+                 try {
+                     const ref = v.ref;
+                     const gitCmd = spawnSync('git', ['ls-tree', '-r', '--name-only', ref], { cwd: ROOT_DIR, encoding: 'utf-8' });
+                     if (gitCmd.error) throw gitCmd.error;
+                     const files = gitCmd.stdout.split('\n');
+                     files.forEach(f => {
+                         if (f.includes('v3alpha') && f.startsWith('proto/')) {
+                             // strip 'proto/' (6 chars)
+                             excluded.add(f.substring(6));
+                         }
+                     });
+                 } catch (e) {
+                     console.warn(`Failed to list tree for ${v.param}`, e);
+                 }
+             }
+             return Array.from(excluded);
+        };
+
+        const excludedPaths = await getExcludedPaths();
+        if (excludedPaths.length > 0) {
+            console.log(`Excluding ${excludedPaths.length} paths matching v3alpha`);
+        }
+
         import('child_process').then(({ spawn }) => {
-            const child = spawn('npx', [
+            const args = [
               '@bufbuild/buf', 'generate',
               bufInput,
               '--template', templatePath,
               '--output', outputPath
-            ], {
+            ];
+
+            // Add excluded paths
+            for (const excludedPath of excludedPaths) {
+                args.push('--exclude-path', excludedPath);
+            }
+
+            const child = spawn('npx', args, {
               cwd: taskTempDir, 
               stdio: 'inherit',
               env: {
