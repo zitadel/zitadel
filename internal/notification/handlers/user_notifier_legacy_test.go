@@ -1506,7 +1506,7 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 }
 
 func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
-	expectMailSubject := "Verify OTP "
+	expectMailSubject := "Verify OTP"
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)

@@ -8402,7 +8402,7 @@ message SetDefaultVerifySMSOTPMessageTextRequest {
     string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please visit {{ .VerifyURL }} or copy the OTP  {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -8447,21 +8447,21 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - OTP \""
+            example: "\"ZITADEL - OTP\""
             max_length: 500;
         }
     ];
     string pre_header = 3 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify OTP  \""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
     string subject = 4 [
         (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify OTP \""
+            example: "\"Verify OTP\""
             max_length: 500;
         }
     ];
@@ -8475,7 +8475,7 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP  {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the OTP {{.OTP}} and paste it to to the authentication screen in order to authenticate at Zitadel within the next five minutes.\""
             max_length: 10000;
         }
     ];
