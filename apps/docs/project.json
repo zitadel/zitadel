@@ -96,9 +96,26 @@
       ],
       "cache": true,
       "inputs": [
-        "default",
+        "{projectRoot}/scripts/generate-docs.mts",
         {
           "dependentTasksOutputFiles": "apps/docs/openapi/**"
+        }
+      ]
+    },
+    "fix-links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm fix:links",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate-api"
+      ],
+      "cache": false,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "apps/docs/content/reference/api/**"
         }
       ]
     },
@@ -111,9 +128,13 @@
       "outputs": [
         "{projectRoot}/content/**/index.mdx"
       ],
+      "dependsOn": [
+        "fetch-remote"
+      ],
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "{projectRoot}/content/versions.json"
       ]
     },
     "generate-source": {
@@ -126,7 +147,7 @@
         "{projectRoot}/.source"
       ],
       "dependsOn": [
-        "generate-api",
+        "fix-links",
         "generate-indices"
       ],
       "cache": true,
