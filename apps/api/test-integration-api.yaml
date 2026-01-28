@@ -1,6 +1,5 @@
 Database:
   Postgres:
-    Port: 5433
     AwaitInitialConn: 5m
     MaxOpenConns: 20
     MaxIdleConns: 20
@@ -28,8 +27,6 @@ Log:
 
 ExternalSecure: false
 
-Port: 8082
-ExternalPort: 8082
 TLS:
   Enabled: false
 
