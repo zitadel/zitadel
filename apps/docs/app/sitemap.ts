@@ -26,7 +26,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 1,
         },
         ...docsPages,
-        ...versionPages,
     ].filter((item, index, self) =>
         index === self.findIndex((t) => t.url === item.url)
     );

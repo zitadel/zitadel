@@ -82,7 +82,9 @@ API Reference for ${title}
   // Generate meta.json
   const meta = {
     title: "APIs",
-    pages: services.sort()
+    pages: services
+      .filter(s => !s.includes('beta') && !s.includes('alpha'))
+      .sort()
   };
 
   writeFileSync(
@@ -103,7 +105,7 @@ async function fixAllGeneratedLinks() {
   };
 
   const getUrl = (filePath: string) => {
-    return '/docs/' + filePath.replace(/\.(md|mdx)$/, '').split(path.sep).join('/');
+    return '/' + filePath.replace(/\.(md|mdx)$/, '').split(path.sep).join('/');
   };
 
   // Build index
@@ -173,10 +175,33 @@ async function fixAllGeneratedLinks() {
       return match;
     });
 
-    if (newContent.includes('/docs/docs')) {
-      newContent = newContent.replace(/\/docs\/docs/g, '/docs');
-      modified = true;
-    }
+    // Fix v2beta links that were likely in the source proto comments
+    // and also remove potential double /docs prefixing from source comments
+    const internalLinkRegex = /\[([^\]]+)\]\(([\/]?docs\/)?reference\/api\/([^\/]+)\/([^\s)]+)\)/g;
+    newContent = newContent.replace(internalLinkRegex, (match, text, docsPrefix, service, fileSlug) => {
+      let targetFileSlug = fileSlug;
+      let isV2Beta = fileSlug.includes('.v2beta.');
+
+      if (isV2Beta) {
+        const v2Target = fileSlug.replace('.v2beta.', '.v2.');
+        // Only rename to v2 if the v2 target actually exists in our index
+        if (versionMap?.has(v2Target.toLowerCase())) {
+          targetFileSlug = v2Target;
+        } else {
+          // If no v2 target, and we excluded v2beta, this link is dead.
+          // Return plain text instead of a broken link to satisfy the link checker.
+          modified = true;
+          return text;
+        }
+      }
+
+      const targetUrl = `/reference/api/${service}/${targetFileSlug}`;
+      if (docsPrefix || isV2Beta) {
+        modified = true;
+        return `[${text}](${targetUrl})`;
+      }
+      return match;
+    });
 
     if (modified) {
       writeFileSync(fullPath, newContent);

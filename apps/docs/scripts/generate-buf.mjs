@@ -90,7 +90,7 @@ async function run() {
     await new Promise(async (resolvePromise, rejectPromise) => {
         // Dynamic discovery of excluded paths
         const getExcludedPaths = async () => {
-             const patterns = ['**/v3alpha'];
+             const patterns = ['**/v3alpha', '**/v2beta'];
              const excluded = new Set();
              
              if (v.refType === 'local') {
@@ -122,9 +122,15 @@ async function run() {
                      if (gitCmd.error) throw gitCmd.error;
                      const files = gitCmd.stdout.split('\n');
                      files.forEach(f => {
-                         if (f.includes('v3alpha') && f.startsWith('proto/')) {
-                             // strip 'proto/' (6 chars)
-                             excluded.add(f.substring(6));
+                         if ((f.includes('v3alpha') || f.includes('v2beta')) && f.startsWith('proto/')) {
+                             // strip 'proto/' (6 chars) and take the directory
+                             const relPath = f.substring(6);
+                             const dirPath = dirname(relPath);
+                             if (dirPath.includes('v3alpha') || dirPath.includes('v2beta')) {
+                                excluded.add(dirPath);
+                             } else {
+                                excluded.add(relPath);
+                             }
                          }
                      });
                  } catch (e) {
@@ -136,7 +142,7 @@ async function run() {
 
         const excludedPaths = await getExcludedPaths();
         if (excludedPaths.length > 0) {
-            console.log(`Excluding ${excludedPaths.length} paths matching v3alpha`);
+            console.log(`Excluding ${excludedPaths.length} paths matching v3alpha or v2beta`);
         }
 
         import('child_process').then(({ spawn }) => {
@@ -166,6 +172,19 @@ async function run() {
                     rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (exit code ${code})`));
                 } else {
                     console.log(`Successfully generated OpenAPI for ${label}`);
+                    
+                    // Post-generation cleanup: delete any missed v2beta/v3alpha files
+                    try {
+                        const generatedFiles = glob.sync('**/*', { cwd: outputPath, absolute: true, nodir: false });
+                        generatedFiles.forEach(f => {
+                            if (f.includes('v2beta') || f.includes('v3alpha')) {
+                                fs.rmSync(f, { recursive: true, force: true });
+                            }
+                        });
+                    } catch (e) {
+                        console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
+                    }
+                    
                     resolvePromise();
                 }
             });

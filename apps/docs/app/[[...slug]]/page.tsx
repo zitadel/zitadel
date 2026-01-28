@@ -53,10 +53,25 @@ export async function generateMetadata(
   const params = await props.params;
   const { page } = getPage(params.slug);
   if (!page) notFound();
+  const baseUrl = 'https://zitadel.com/docs';
+  const url = params.slug ? `${baseUrl}/${params.slug.join('/')}` : baseUrl;
+
+  let canonicalUrl = url;
+
+  if (params.slug?.[0]?.startsWith('v')) {
+    const unversionedSlug = params.slug.slice(1);
+    const unversionedPage = source.getPage(unversionedSlug);
+    if (unversionedPage) {
+      canonicalUrl = `${baseUrl}${unversionedPage.url === '/' ? '' : unversionedPage.url}`;
+    }
+  }
 
   return {
     title: page.data.title,
     description: page.data.description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       images: getPageImage(page).url,
     },
