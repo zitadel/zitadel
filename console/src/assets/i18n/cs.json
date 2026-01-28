@@ -1594,7 +1594,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
         "VERIFYSERVICESID": "ID služby ověření",
-        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a OTP SMS.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",
@@ -1853,7 +1853,7 @@
         "INIT": "Inicializace",
         "VE": "Ověření e-mailu",
         "VP": "Ověření telefonu",
-        "VSO": "Ověření SMS OTP",
+        "VSO": "Ověření OTP SMS",
         "VEO": "Ověření e-mailu OTP",
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
@@ -2421,8 +2421,8 @@
       "0": "Neznámý",
       "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
       "2": "Passkey",
-      "3": "Jednorázové heslo e-mailem (Email OTP)",
-      "4": "Jednorázové heslo SMS (SMS OTP)",
+      "3": "Jednorázové heslo e-mailem (OTP Email)",
+      "4": "Jednorázové heslo SMS (OTP SMS)",
       "5": "Obnovovací kódy"
     }
   },

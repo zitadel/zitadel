@@ -772,7 +772,7 @@ EventTypes:
             succeeded: Controllo OTP riuscito
             failed: Controllo OTP fallito
           sms:
-            added: Aggiunto SMS OTP
+            added: Aggiunto OTP SMS
             removed: OTP SMS rimosso
             code:
               added: Aggiunto codice OTP SMS

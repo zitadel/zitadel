@@ -86,12 +86,12 @@ test("username, password and email otp login, wrong code", async ({ user, page }
 
 test("username, password and email otp login, multiple mfa options", async ({ page }) => {
   base.skip();
-  // Given email otp and sms otp is enabled on the organization of the user
-  // Given the user has email and sms otp configured as second factor
+  // Given email otp and OTP SMS is enabled on the organization of the user
+  // Given the user has email and OTP SMS configured as second factor
   // User enters username
   // User enters password
   // User receives an email with a verification code
-  // User clicks button to use sms otp as second factor
+  // User clicks button to use OTP SMS as second factor
   // User receives a sms with a verification code
   // User enters code in ui
   // User is redirected to the app (default redirect url)

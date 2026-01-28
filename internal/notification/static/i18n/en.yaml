@@ -27,15 +27,15 @@ VerifyPhone:
   Text: A new phone number has been added. Please use the following code to verify it {{.Code}}
   ButtonText: Verify phone
 VerifyEmailOTP:
-  Title: Verify One-Time Password
-  PreHeader: Verify One-Time Password
-  Subject: Verify One-Time Password
+  Title: Verify OTP
+  PreHeader: Verify OTP
+  Subject: Verify OTP
   Greeting: Hello {{.DisplayName}},
-  Text: Please use the one-time password {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
+  Text: Please use the OTP  {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
   ButtonText: Authenticate
 VerifySMSOTP:
   Text: >-
-    {{.OTP}} is your one-time password for {{ .Domain }}. Use it within the next {{.Expiry}}.
+    {{.OTP}} is your OTP for {{ .Domain }}. Use it within the next {{.Expiry}}.
     
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:

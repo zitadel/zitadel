@@ -1856,7 +1856,7 @@
         "INIT": "Başlatma",
         "VE": "E-postayı Doğrula",
         "VP": "Telefonu Doğrula",
-        "VSO": "SMS OTP Doğrula",
+        "VSO": "OTP SMS Doğrula",
         "VEO": "E-posta OTP Doğrula",
         "PR": "Şifre Sıfırlama",
         "DC": "Domain Talebi",
@@ -2437,8 +2437,8 @@
       "0": "Bilinmeyen",
       "1": "Kimlik Doğrulayıcı Uygulama ile Tek Kullanımlık Şifre (TOTP)",
       "2": "Passkey",
-      "3": "E-posta ile Tek Kullanımlık Şifre (Email OTP)",
-      "4": "SMS ile Tek Kullanımlık Şifre (SMS OTP)",
+      "3": "E-posta ile Tek Kullanımlık Şifre (OTP Email)",
+      "4": "SMS ile Tek Kullanımlık Şifre (OTP SMS)",
       "5": "Kurtarma Kodları"
     }
   },

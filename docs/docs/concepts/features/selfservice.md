@@ -91,9 +91,9 @@ The current password must be entered first.
 Users can set up and delete a second factor and FIDO Passkeys (Passwordless).
 Available authenticators are:
 
-- Time-based one-time password (TOTP) (Which are Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.)
-- One-time password sent as E-Mail
-- One-time password sent as SMS
+- TOTP (Which are Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.)
+- OTP  sent as E-Mail
+- OTP  sent as SMS
 - FIDO Universal Second Factor (U2F) (Security Keys, Device, etc.)
 - FIDO2 WebAuthN (Passkeys)
 
@@ -113,12 +113,12 @@ Users can change their profile information. This includes
 ### Email Verification
 
 Users can change their email address.
-The user receives a one-time password and can verify control over the given email address.
+The user receives a OTP  and can verify control over the given email address.
 
 ### Phone Verification
 
 Users can change their phone number.
-The user receives a one-time password and can verify control over the given phone number.
+The user receives a OTP  and can verify control over the given phone number.
 
 ### Identity providers
 

@@ -1857,7 +1857,7 @@
         "INIT": "Initialisering",
         "VE": "Verifiera E-post",
         "VP": "Verifiera Telefon",
-        "VSO": "Verifiera SMS OTP",
+        "VSO": "Verifiera OTP SMS",
         "VEO": "Verifiera E-post OTP",
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
@@ -2438,7 +2438,7 @@
       "1": "Engångslösenord via autentiseringsapp (TOTP)",
       "2": "Passkey",
       "3": "Engångslösenord via e-post (E-post OTP)",
-      "4": "Engångslösenord via SMS (SMS OTP)",
+      "4": "Engångslösenord via SMS (OTP SMS)",
       "5": "Återställningskoder"
     }
   },

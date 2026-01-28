@@ -116,7 +116,7 @@ message WebAuthNFactor {
 message TOTPFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"time when the Time-based One-Time Password was last checked\"";
+      description: "\"time when the TOTP was last checked\"";
     }
   ];
 }
@@ -124,7 +124,7 @@ message TOTPFactor {
 message OTPFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"time when the One-Time Password was last checked\"";
+      description: "\"time when the OTP  was last checked\"";
     }
   ];
 }

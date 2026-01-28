@@ -95,12 +95,12 @@ message WebAuthNFactor {
 }
 
 message TOTPFactor {
-  // The timestamp when the Time-based One-Time Password was last verified.
+  // The timestamp when the TOTP was last verified.
   google.protobuf.Timestamp verified_at = 1;
 }
 
 message OTPFactor {
-  // The timestamp when the One-Time Password was last verified either by SMS or Email.
+  // The timestamp when the OTP  was last verified either by SMS or Email.
   google.protobuf.Timestamp verified_at = 1;
 }
 
