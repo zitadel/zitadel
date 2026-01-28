@@ -4944,6 +4944,7 @@ message AddEmailProviderSMTPRequest {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
         }
     ];
+    // Deprecated: use [Auth] oneof instead.
     string password = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"this-is-my-password\"";
@@ -4965,6 +4966,78 @@ message AddEmailProviderSMTPRequest {
             max_length: 200;
         }
     ];
+    oneof Auth {
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
+}
+
+// SMTPNoAuth can be used when no authentication is required for the SMTP connection.
+message SMTPNoAuth {}
+
+// SMTPPlainAuth adds plain authentication to the smtp connection. The username of the parent configuration is used in
+// combination with the password in this message.
+message SMTPPlainAuth {
+    string password = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-client-secret\"";
+        }
+    ];
+}
+
+// SMTPXOAuth2Auth adds XOAut2 authentication to the smtp connection. The username of the parent configuration is used
+// in combination with the other parameters of this message.
+message SMTPXOAuth2Auth {
+    // token_endpoint is the endpoint from which a token will be requested according to the oauth2 specification.
+    string token_endpoint = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://auth.example.com/token\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    // scopes is a list of scopes which should be requested from the authorization service. To authorize a token to
+    // use the smtp functionality, the server requires a specific scope. These scopes can be found in the documentation
+    // of the provider.
+    repeated string scopes = 2 [
+        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://mail.example.com\"]";
+        }
+    ];
+    // OAuth2Type is a oneof used to switch between the different types of oauth2 authorization flows.
+    oneof OAuth2Type {
+        ClientCredentials client_credentials = 3;
+    }
+
+    // ClientCredentials authenticates the SMTP client using Oauth 2.0 Client Credentials grant.
+    // https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+    message ClientCredentials {
+        string client_id = 1 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+        string client_secret = 2 [
+            (validate.rules).string = {min_len: 0, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"this-is-my-client-secret\"";
+                min_length: 0;
+                max_length: 200;
+            }
+        ];
+    }
 }
 
 message AddEmailProviderSMTPResponse {
@@ -5029,6 +5102,11 @@ message UpdateEmailProviderSMTPRequest {
         }
     ];
     string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    oneof Auth {
+        SMTPNoAuth none = 10;
+        SMTPPlainAuth plain = 11;
+        SMTPXOAuth2Auth xoauth2 = 12;
+    }
 }
 
 message UpdateEmailProviderSMTPResponse {
@@ -5221,6 +5299,12 @@ message TestEmailProviderSMTPRequest {
             example: "\"267191369515139464\"";
         }
     ];
+    oneof Auth {
+        option (validate.required) = true;
+        SMTPNoAuth none = 9;
+        SMTPPlainAuth plain = 10;
+        SMTPXOAuth2Auth xoauth2 = 11;
+    }
 }
 
 // This is an empty response
