@@ -16,7 +16,7 @@ export async function initMixpanel() {
     debug: process.env.NODE_ENV === 'development',
     track_pageview: 'url-with-path',
     persistence: 'localStorage',
-    api_host: 'https://api-eu.mixpanel.com',
+    api_host: '/docs/mp',
     record_sessions_percent: 50,
   });
 }
