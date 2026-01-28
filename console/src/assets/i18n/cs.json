@@ -2662,7 +2662,8 @@
             "DESCRIPTION": "Single Page Aplikace (SPA) a obecně všechny JS frameworky spouštěné v prohlížečích"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {

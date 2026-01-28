@@ -2679,7 +2679,8 @@
             "DESCRIPTION": "단일 페이지 애플리케이션(SPA) 및 브라우저에서 실행되는 모든 JS 프레임워크"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGUTURI": "백채널 로그아웃 URI"
     },
     "API": {
       "INFO": {

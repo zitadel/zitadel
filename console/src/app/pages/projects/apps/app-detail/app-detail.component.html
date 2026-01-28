@@ -143,6 +143,11 @@
                     {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
                   </mat-checkbox>
 
+                  <cnsl-form-field class="app-formfield">
+                    <cnsl-label>{{ 'APP.OIDC.BACKCHANNELLOOGUTURI' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="backChannelLogoutURI" />
+                  </cnsl-form-field>
+
                   <mat-checkbox
                     *ngIf="oidcLoginV2"
                     color="primary"

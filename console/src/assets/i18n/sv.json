@@ -2682,7 +2682,8 @@
             "DESCRIPTION": "Single Page Applications (SPA) och i allmänhet alla JS-ramverk som körs i webbläsare"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
