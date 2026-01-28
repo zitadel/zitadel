@@ -148,14 +148,22 @@ func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, err
 }
 
 func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
-	if !smtpConfig.HasAuth() {
+	if smtpConfig.XOAuth2Auth != nil {
+		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, host))
+		if err != nil {
+			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotXOAuth2")
+		}
 		return nil
 	}
-	// Auth
-	err := client.Auth(PlainOrLoginAuth(smtpConfig.User, smtpConfig.Password, host))
-	if err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s9kfs", "Errors.SMTP.CouldNotAuth")
+
+	if smtpConfig.PlainAuth != nil {
+		err := client.Auth(PlainOrLoginAuth(*smtpConfig.PlainAuth, host))
+		if err != nil {
+			return zerrors.ThrowInternal(err, "EMAIL-s9kfs", "Errors.SMTP.CouldNotAuth")
+		}
+		return nil
 	}
+
 	return nil
 }
 
@@ -176,11 +184,11 @@ func TestConfiguration(cfg *Config, testEmail string) error {
 	}
 
 	if err := client.Mail(cfg.From); err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s3is3", "Errors.SMTP.CouldNotSetSender")
+		return zerrors.ThrowInternal(err, "EMAIL-s5is5", "Errors.SMTP.CouldNotSetSender")
 	}
 
 	if err := client.Rcpt(testEmail); err != nil {
-		return zerrors.ThrowInternal(err, "EMAIL-s4is4", "Errors.SMTP.CouldNotSetRecipient")
+		return zerrors.ThrowInternal(err, "EMAIL-s6is6", "Errors.SMTP.CouldNotSetRecipient")
 	}
 
 	// Open data connection
