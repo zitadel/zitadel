@@ -445,15 +445,15 @@ func newBackChannelLogoutWorker(queries Queries, commands Commands, es *eventsto
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),
 		},
-		config: BackChannelLogoutWorkerConfig{
+		config: &BackChannelLogoutWorkerConfig{
 			Workers:             1,
 			TransactionDuration: 5 * time.Second,
 			MaxTtl:              5 * time.Minute,
 			MaxAttempts:         1,
+			TokenLifetime:       time.Hour,
 		},
-		tokenLifetime: time.Hour,
-		now:           testNow,
-		idGenerator:   idGenerator,
+		now:         testNow,
+		idGenerator: idGenerator,
 	}
 }
 

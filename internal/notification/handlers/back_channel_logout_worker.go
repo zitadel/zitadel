@@ -22,15 +22,14 @@ import (
 type BackChannelLogoutWorker struct {
 	river.WorkerDefaults[*backchannel.LogoutRequest]
 
-	commands      Commands
-	queries       *NotificationQueries
-	eventstore    *eventstore.Eventstore
-	queue         Queue
-	channels      types.ChannelChains
-	config        *BackChannelLogoutWorkerConfig
-	tokenLifetime time.Duration
-	now           nowFunc
-	idGenerator   id.Generator
+	commands    Commands
+	queries     *NotificationQueries
+	eventstore  *eventstore.Eventstore
+	queue       Queue
+	channels    types.ChannelChains
+	config      *BackChannelLogoutWorkerConfig
+	now         nowFunc
+	idGenerator id.Generator
 }
 
 // Timeout implements the Timeout-function of [river.Worker].
@@ -109,7 +108,7 @@ func (w *BackChannelLogoutWorker) logoutToken(ctx context.Context, request *back
 		request.TriggeredAtOrigin,
 		request.UserID,
 		oidc.Audience{request.ClientID},
-		w.now().Add(w.tokenLifetime),
+		w.now().Add(w.config.TokenLifetime),
 		request.TokenID,
 		request.SessionID,
 		time.Second,
