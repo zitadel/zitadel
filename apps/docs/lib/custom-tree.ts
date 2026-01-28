@@ -8,7 +8,7 @@ import {
 
 // --- Logic ---
 
-export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPrefix?: string, suppressWarnings?: boolean }): PageTree.Root {
+export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPrefix?: string, suppressWarnings?: boolean, labels?: Map<string, string> }): PageTree.Root {
     const start = performance.now();
     const pageLookup = new Map<string, PageTree.Item>();
     const folderLookup = new Map<string, PageTree.Folder>();
@@ -44,6 +44,8 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      */
     function collect(node: PageTree.Node, path: string = '') {
         if (node.type === 'page') {
+            const label = options?.labels?.get(node.url);
+            if (label) node.name = label;
             pageLookup.set(node.url, node);
             pageLookup.set(normalize(node.url), node);
         }

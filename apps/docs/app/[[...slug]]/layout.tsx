@@ -15,6 +15,14 @@ export default async function Layout(props: { children: React.ReactNode; params:
   const versionParam = slug[0] && versions.find(v => v.param === slug[0]) ? slug[0] : undefined;
   const currentVersion = versionParam || 'latest';
 
+  const allPages = [...source.getPages(), ...versionSource.getPages()];
+  const labelsMap = new Map<string, string>();
+  allPages.forEach(p => {
+    if (p.data.sidebar_label) {
+      labelsMap.set(p.url, p.data.sidebar_label);
+    }
+  });
+
   let tree = source.pageTree;
   if (currentVersion !== 'latest') {
     // Hoist the version folder to root to flatten sidebar
@@ -43,13 +51,14 @@ export default async function Layout(props: { children: React.ReactNode; params:
       // The logs showed the URLs start with /[version] not /docs/[version]
       const prefix = currentVersion === 'latest' ? '/docs' : `/${currentVersion}`;
       tree = buildCustomTree(hoistedTree, {
-        stripPrefix: prefix
+        stripPrefix: prefix,
+        labels: labelsMap
       });
     } else {
-      tree = versionSource.pageTree;
+      tree = buildCustomTree(versionSource.pageTree, { labels: labelsMap });
     }
   } else {
-    tree = buildCustomTree(source.pageTree);
+    tree = buildCustomTree(source.pageTree, { labels: labelsMap });
   }
 
   return (
@@ -58,7 +67,7 @@ export default async function Layout(props: { children: React.ReactNode; params:
       {...baseOptions()}
       sidebar={{
         banner: (
-            <VersionSelector />
+          <VersionSelector />
         ),
       }}
     >

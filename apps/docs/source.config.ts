@@ -9,6 +9,7 @@ import {
   frontmatterSchema,
   metaSchema,
 } from 'fumadocs-mdx/config';
+import { z } from 'zod';
 // @ts-ignore
 import remarkHeadingId from 'remark-heading-id';
 
@@ -17,7 +18,9 @@ import remarkHeadingId from 'remark-heading-id';
 export const docs = defineDocs({
   dir: 'content',
   docs: {
-    schema: frontmatterSchema,
+    schema: frontmatterSchema.extend({
+      sidebar_label: z.string().optional(),
+    }),
     files: ['**/*.md', '**/*.mdx', '!v*/**/*', '!**/_*'], // Exclude versioned folders at root and partials
     postprocess: {
       includeProcessedMarkdown: true,
@@ -32,7 +35,9 @@ export const docs = defineDocs({
 export const versions = defineDocs({
   dir: 'content',
   docs: {
-    schema: frontmatterSchema,
+    schema: frontmatterSchema.extend({
+      sidebar_label: z.string().optional(),
+    }),
     files: ['v*/**/*.md', 'v*/**/*.mdx', '!**/_*'], // Include only versioned folders from content
     postprocess: {
       includeProcessedMarkdown: true,

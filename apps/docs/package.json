@@ -40,7 +40,8 @@
     "react-google-charts": "^5.2.1",
     "shiki": "^3.19.0",
     "tailwind-merge": "^2.6.0",
-    "vanilla-cookieconsent": "3.0.0"
+    "vanilla-cookieconsent": "3.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.61.0",
