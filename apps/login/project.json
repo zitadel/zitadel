@@ -93,6 +93,19 @@
         "^build"
       ]
     },
+    "test-otel": {
+      "description": "Runs OpenTelemetry integration tests with Docker Compose (run separately, not part of main test target)",
+      "dependsOn": [
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "pnpm vitest --run --config vitest.config.otel.mts"
+        ]
+      }
+    },
     "test-integration-run-login": {
       "description": "Runs the Login application under test. It has its own target, separate from test-integration, because it's a continuous task.",
       "dependsOn": [

@@ -12,6 +12,7 @@
     "lint-check-prettier": "prettier --check .",
     "lint-fix": "prettier --write .",
     "test-unit": "vitest --run",
+    "test-otel": "vitest --run --config vitest.config.otel.mts",
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress"
   },
