@@ -26,7 +26,7 @@ func (u userMetadataRepo) AddMetadata(metadata ...*domain.Metadata) database.Cha
 				placeholders := make([]string, 4)
 				placeholders[0] = builder.AppendArg(md.Key)
 				placeholders[1] = builder.AppendArg(md.Value) + "::BYTEA"
-				var createdAt, updatedAt any = database.DefaultInstruction, database.NullInstruction
+				var createdAt, updatedAt any = database.NowInstruction, database.NullInstruction
 				if !md.CreatedAt.IsZero() {
 					createdAt = md.CreatedAt
 				}

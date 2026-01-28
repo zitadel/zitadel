@@ -490,7 +490,7 @@ func (u user) joinMetadata() database.QueryOption {
 		database.NewColumnCondition(u.InstanceIDColumn(), u.userMetadataRepo.instanceIDColumn()),
 		database.NewColumnCondition(u.IDColumn(), u.userMetadataRepo.userIDColumn()),
 	)
-	if !u.shouldLoadPATs {
+	if !u.shouldLoadMetadata {
 		conditions = append(conditions, database.IsNull(u.userMetadataRepo.userIDColumn()))
 	}
 	return database.WithLeftJoin(

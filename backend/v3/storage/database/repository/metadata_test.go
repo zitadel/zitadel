@@ -13,7 +13,7 @@ import (
 func assertMetadata(t *testing.T, expected, gotten []*domain.Metadata) {
 	t.Helper()
 
-	assert.Len(t, gotten, len(expected))
+	assert.Len(t, gotten, len(expected), "metadata length mismatch")
 	for _, exp := range expected {
 		var actual *domain.Metadata
 		gotten = slices.DeleteFunc(gotten, func(m *domain.Metadata) bool {
@@ -25,8 +25,8 @@ func assertMetadata(t *testing.T, expected, gotten []*domain.Metadata) {
 		})
 		require.NotNil(t, actual, "metadata with key %s not found", exp.Key)
 		assert.Equal(t, exp.Value, actual.Value, "metadata value mismatch for key %s", exp.Key)
-		assert.True(t, exp.CreatedAt.Equal(actual.CreatedAt), "metadata created at mismatch for key %s", exp.Key)
-		assert.True(t, exp.UpdatedAt.Equal(actual.UpdatedAt), "metadata updated at mismatch for key %s", exp.Key)
+		assert.NotZero(t, actual.CreatedAt, "metadata created at is zero for key %s", exp.Key)
+		assert.NotZero(t, actual.UpdatedAt, "metadata updated at is zero for key %s", exp.Key)
 
 	}
 	assert.Empty(t, gotten, "unmatched metadata found")

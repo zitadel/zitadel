@@ -218,6 +218,10 @@ func Test_user_Update(t *testing.T) {
 		},
 		{
 			name: "add metadata",
+			setup: func(_ *testing.T, _ database.Transaction) error {
+				userRepo = userRepo.LoadMetadata()
+				return nil
+			},
 			args: args{
 				condition: machineCondition,
 				changes: []database.Change{
