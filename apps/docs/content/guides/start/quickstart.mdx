@@ -8,6 +8,9 @@ stack: Node.js
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+//import { FrameworkSelector } from '@/component/framework-selector';
+import AppConfig from './_app_config.mdx';
+import AppValues from './_app_values.mdx';
 
 This sample app implements the [OIDC PKCE](/guides/integrate/login/oidc/login-users) flow for secure authentication.
 - Login: Exchanges a code challenge for an access token via ZITADEL.
@@ -73,19 +76,24 @@ Log in using the Admin credentials you just created.
 #### Step 2: Review Default Configuration
 ZITADEL automatically configures the best security settings for your selected framework.
 
-
-<Tabs items={['React', 'Angular']} groupId="framework-select">
-    <Tab value="React">
-        - **Auth Strategy**: [Authorization Code Flow](/apis/openidoauth/grant-types#authorization-code) with [PKCE](/apis/openidoauth/grant-types#authorization-code). This modern standard ensures tokens are exchanged securely without needing a client secret in your frontend.
-        - **Redirect URIs**: These define where users return after authentication:
-          - Redirect URI: http://localhost:3000/callback (Landing page after login)
-          - Post Logout URI: http://localhost:3000/ (Landing page after logout)
-    </Tab>
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
-        - **Auth Strategy**: [Authorization Code Flow](/apis/openidoauth/grant-types#authorization-code) with [PKCE](/apis/openidoauth/grant-types#authorization-code). This modern standard ensures tokens are exchanged securely without needing a client secret in your frontend.
-        - **Redirect URIs**: These define where users return after authentication:
-          - Redirect URI: http://localhost:3000/auth/callback (Landing page after login)
-          - Post Logout URI: http://localhost:3000/signedout (Landing page after logout)
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRegirectUrl="http://localhost:3000/signedout">
+        </AppConfig>
+    </Tab>
+    <Tab value="React">
+        <AppConfig
+            redirectUrl="http://localhost:3000/callback"
+            postLogoutRegirectUrl="http://localhost:3000/">
+        </AppConfig>
+    </Tab>
+    <Tab value="Vue">
+        <AppConfig
+            redirectUrl="http://localhost:5173/auth/signinwin/zitadel"
+            postLogoutRegirectUrl="http://localhost:5173/">
+        </AppConfig>
     </Tab>
 </Tabs>
 
@@ -93,16 +101,20 @@ ZITADEL automatically configures the best security settings for your selected fr
 
 ### 5. Collect your Integration Keys
 
-To connect your React application to ZITADEL, you need two primary configuration values.
-These are typically stored as environment variables in your project.
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
+    <Tab value="Angular">
+        <AppValues valueCount="two" projectID={false}></AppValues>
+    </Tab>
+    <Tab value="React">
+        <AppValues valueCount="two" projectID={true}></AppValues>
+    </Tab>
+    <Tab value="Vue">
+        <AppValues valueCount="two" projectID={false}></AppValues>
+    </Tab>
+</Tabs>
 
-1. **Client ID** Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
-![Get Client ID](/img/guides/quickstart/project_client_id.png)
-2. **Issuer URL** Click on URLs in the left sidebar to find your **Discovery Endpoint**.
-- The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).
-- Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
 
-![Get URLs](../../../public/img/guides/quickstart/project_urls.png)
+
 
 ## Integrate ZITADEL into your App
 
@@ -117,15 +129,20 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 ### 1. Prerequisites
 
-<Tabs items={['React', 'Angular']} groupId="framework-select">
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
+    <Tab value="Angular">
+        - [Node.js](https://nodejs.org/): v16 or later.
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
     <Tab value="React">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
         - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
     </Tab>
-    <Tab value="Angular">
+    <Tab value="Vue">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
     </Tab>
 </Tabs>
 
@@ -133,25 +150,35 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 Clone the repository and move into the project directory:
 
-<Tabs items={['React', 'Angular']} groupId="framework-select">
-    <Tab value="React">
-        ```bash
-        git clone https://github.com/zitadel/zitadel-react.git
-        cd zitadel-react
-        ```
-    </Tab>
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         git clone https://github.com/zitadel/zitadel-angular.git
         cd zitadel-angular
         ```
     </Tab>
+    <Tab value="React">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-react.git
+        cd zitadel-react
+        ```
+    </Tab>
+    <Tab value="Vue">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-vue.git
+        cd zitadel-vue
+        ```
+    </Tab>
 </Tabs>
 
 ### 3. Build and Install
 
-
-<Tabs items={['React', 'Angular']} groupId="framework-select">
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
+    <Tab value="Angular">
+        ```bash
+        npm install
+        ```
+    </Tab>
     <Tab value="React">
         Since this repo contains the SDK source, you need to build the library before running the example:
 
@@ -163,9 +190,9 @@ Clone the repository and move into the project directory:
         cd .. && yarn install
         ```
     </Tab>
-    <Tab value="Angular">
+    <Tab value="Vue">
         ```bash
-        npm install
+        yarn install
         ```
     </Tab>
 </Tabs>
@@ -173,10 +200,26 @@ Clone the repository and move into the project directory:
 
 ### 4. Configure your Credentials
 
-<Tabs items={['React', 'Angular']} groupId="framework-select">
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
+    <Tab value="Angular">
+        Open src/app/app.module.ts and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
+
+        ```typescript
+        const authConfig: AuthConfig = {
+            scope: 'openid profile email offline_access',
+            responseType: 'code',
+            oidc: true,
+            clientId: "YOUR_CLIENT_ID",                       // Your Client ID
+            issuer: "https://your-instance.zitadel.cloud",    // Your Issuer URL
+            redirectUri: 'http://localhost:4200/auth/callback',
+            postLogoutRedirectUri: 'http://localhost:4200/signedout',
+            requireHttps: false, // required for running locally
+        };
+        ```
+    </Tab>
     <Tab value="React">
 
-        Open src/app/app.module.ts and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
+        Open src/App.tsx and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
 
         ```typescript
         const config: ZitadelConfig = {
@@ -189,18 +232,13 @@ Clone the repository and move into the project directory:
         };
         ```
     </Tab>
-    <Tab value="Angular">
-        ```typescript
-        const authConfig: AuthConfig = {
-            scope: 'openid profile email offline_access',
-            responseType: 'code',
-            oidc: true,
-            clientId: "YOUR_CLIENT_ID",                       // Your Client ID
-            issuer: "https://your-instance.zitadel.cloud",   // Your Issuer URL
-            redirectUri: 'http://localhost:4200/auth/callback',
-            postLogoutRedirectUri: 'http://localhost:4200/signedout',
-            requireHttps: false, // required for running locally
-        };
+    <Tab value="Vue">
+        Open .env and update the config object with the **Issuer**, **Client ID** and **PROJECT_ID** you collected in Step 5.
+
+        ```bash
+        VITE_ZITADEL_PROJECT_RESOURCE_ID=
+        VITE_ZITADEL_CLIENT_ID=YOUR_CLIENT_ID
+        VITE_ZITADEL_ISSUER=https://your-instance.zitadel.cloud/
         ```
     </Tab>
 </Tabs>
@@ -211,17 +249,7 @@ Clone the repository and move into the project directory:
 Start your development server:
 
 
-<Tabs items={['React', 'Angular']} groupId="framework-select">
-    <Tab value="React">
-        ```bash
-        yarn start
-        ```
-
-        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
-
-        ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
-
-    </Tab>
+<Tabs items={['Angular', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         ng serve
@@ -232,14 +260,33 @@ Start your development server:
         ![React Example App](../../../public/img/guides/quickstart/angular_example_app.png)
 
     </Tab>
+    <Tab value="React">
+        ```bash
+        yarn start
+        ```
+
+        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+
+        ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+
+    </Tab>
+    <Tab value="Vue">
+        ```bash
+        yarn dev
+        ```
+
+        Your app will be live at `http://localhost:5173`. Click Login to test the full PKCE flow!
+
+        ![React Example App](../../../public/img/guides/quickstart/vue_example_app.png)
+
+    </Tab>
 </Tabs>
-
-
 
 ## Success! 🚀
 You’ve successfully integrated ZITADEL into a React application.
 
 ### What’s next?
+- [**Example Applications**](/examples/introduction): Find more comprehensive guides and examples for the different frameworks
 - [**SSO**](/guides/integrate/services): Learn how to add SSO to your services
 - [**Customize the UI**](/guides/manage/customize/branding): Make the login page your own with Branding.
 - [**Explore the API**](/apis/introduction): Check out the ZITADEL API Reference for advanced integrations.

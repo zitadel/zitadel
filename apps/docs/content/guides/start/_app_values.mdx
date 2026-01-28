@@ -1,0 +1,37 @@
+
+export default function AppValue({ valueCount, projectID }) {
+    return (
+        <div>
+            <p>
+            To connect your application to ZITADEL, you need {valueCount} primary configuration values.
+            These are typically stored as environment variables in your project.
+            </p>
+
+            <ol>
+                <li>
+                    <b>Client ID</b> Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
+                    <img
+                        src="../../../img/guides/quickstart/project_client_id.png"
+                        alt="Get Client ID"
+                    />
+                    ![Get Client ID](/img/guides/quickstart/project_client_id.png)
+                </li>
+                <li>
+                    <b>Issuer URL</b> Click on URLs in the left sidebar to find your <b>Discovery Endpoint</b>.
+                    - The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).
+                    - Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
+                    ![Get URLs](../../../public/img/guides/quickstart/project_urls.png)
+                </li>
+                <li >
+                    <b>Project ID</b> Your currently in the application configuration which is a sub resource of the Project. Navigate to the Project with the back arrow and copy the Project ID.
+
+                    ![Get Project ID](/img/guides/quickstart/project_client_id.png)
+                </li>
+            </ol>
+
+
+
+        </div>
+
+    );
+}
