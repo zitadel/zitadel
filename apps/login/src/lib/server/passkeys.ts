@@ -21,11 +21,11 @@ import { userAgent } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
-import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { checkEmailVerification, checkPhoneVerification, checkUserVerification } from "../verify-helper";
+import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
 import { completeFlowOrGetUrl } from "../client";
-import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -303,6 +303,13 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
+  }
+
+  // check to see if user phone was verified (if user has a phone)
+  const phoneVerificationCheck = checkPhoneVerification(session, humanUser, organization, requestId);
+
+  if (phoneVerificationCheck?.redirect) {
+    return phoneVerificationCheck;
   }
 
   let redirectResult;

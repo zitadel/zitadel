@@ -69,19 +69,19 @@ export function SetPasswordForm({
       organization,
       defaultOrganization,
       requestId,
-    })
-      .catch(() => {
-        setError(t("set.errors.couldNotResetPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("set.errors.couldNotResetPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
+      setLoading(false);
       return;
     }
+
+    setLoading(false);
   }
 
   async function submitPassword(values: Inputs) {
@@ -98,22 +98,21 @@ export function SetPasswordForm({
       payload = { ...payload, code: values.code };
     }
 
-    const changeResponse = await changePassword(payload)
-      .catch(() => {
-        setError(t("set.errors.couldNotSetPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const changeResponse = await changePassword(payload).catch(() => {
+      setError(t("set.errors.couldNotSetPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (changeResponse && "error" in changeResponse) {
       setError(changeResponse.error);
+      setLoading(false);
       return;
     }
 
     if (!changeResponse) {
       setError(t("set.errors.couldNotSetPassword"));
+      setLoading(false);
       return;
     }
 
@@ -135,17 +134,15 @@ export function SetPasswordForm({
         password: { password: values.password },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("set.errors.couldNotVerifyPassword"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("set.errors.couldNotVerifyPassword"));
+      setLoading(false);
+      return;
+    });
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
       setError(passwordResponse.error);
+      setLoading(false);
       return;
     }
 
@@ -153,6 +150,7 @@ export function SetPasswordForm({
       return router.push(passwordResponse.redirect);
     }
 
+    setLoading(false);
     return;
   }
 
