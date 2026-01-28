@@ -100,7 +100,7 @@ message TOTPFactor {
 }
 
 message OTPFactor {
-  // The timestamp when the OTP  was last verified either by SMS or Email.
+  // The timestamp when the OTP was last verified either by SMS or Email.
   google.protobuf.Timestamp verified_at = 1;
 }
 

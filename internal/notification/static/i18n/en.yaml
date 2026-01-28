@@ -31,7 +31,7 @@ VerifyEmailOTP:
   PreHeader: Verify OTP
   Subject: Verify OTP
   Greeting: Hello {{.DisplayName}},
-  Text: Please use the OTP  {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
+  Text: Please use the OTP {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
   ButtonText: Authenticate
 VerifySMSOTP:
   Text: >-

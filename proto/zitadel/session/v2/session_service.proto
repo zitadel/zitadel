@@ -522,14 +522,14 @@ message Checks {
   // containing the verification time.
   optional CheckTOTP totp = 5;
 
-  // Check the OTP  sent over SMS and update the session on success.
+  // Check the OTP sent over SMS and update the session on success.
   // Requires that the user is already checked, either in the previous or the same request.
   // On successful OTP SMS check, the session's `factors` field will be updated with an `otp` factor,
   // containing the verification time.
   // Note that the OTP code is valid for a single use only and will be invalidated after a successful check.
   optional CheckOTP otp_sms = 6;
 
-  // Check the OTP  sent over Email and update the session on success.
+  // Check the OTP sent over Email and update the session on success.
   // Requires that the user is already checked, either in the previous or the same request.
   // On successful OTP Email check, the session's `factors` field will be updated with an `otp` factor,
   // containing the verification time.
@@ -639,7 +639,7 @@ message CheckTOTP {
 }
 
 message CheckOTP {
-  // The OTP  sent over SMS or Email of the user to be checked.
+  // The OTP sent over SMS or Email of the user to be checked.
   string code = 1 [
     (validate.rules).string = {min_len: 1},
     (google.api.field_behavior) = REQUIRED,
