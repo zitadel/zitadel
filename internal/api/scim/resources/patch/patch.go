@@ -2,10 +2,9 @@ package patch
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strings"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/scim/resources/filter"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
@@ -139,7 +138,6 @@ func flattenPatchOperations(op *Operation) ([]*Operation, error) {
 
 	patches := map[string]json.RawMessage{}
 	if err := json.Unmarshal(op.Value, &patches); err != nil {
-		logging.WithError(err).Error("SCIM: Invalid patch value while flattening")
 		return nil, zerrors.ThrowInvalidArgument(err, "SCIM-ioyl1", "Invalid patch value")
 	}
 
@@ -163,8 +161,7 @@ func flattenPatchOperations(op *Operation) ([]*Operation, error) {
 // unmarshalPatchValuesSlice unmarshal the raw json value (a scalar value, object or array) into a new slice
 func unmarshalPatchValuesSlice(elementTypePtr reflect.Type, value json.RawMessage, valueIsArray bool) (reflect.Value, error) {
 	if elementTypePtr.Kind() != reflect.Ptr {
-		logging.Panicf("elementType must be a pointer to a struct, but is %s", elementTypePtr.Name())
-		return reflect.Value{}, nil
+		panic(fmt.Sprintf("elementType must be a pointer to a struct, but is %s", elementTypePtr.Name()))
 	}
 
 	if !valueIsArray {
@@ -181,7 +178,6 @@ func unmarshalPatchValuesSlice(elementTypePtr reflect.Type, value json.RawMessag
 	newSlicePtr := reflect.New(reflect.SliceOf(elementTypePtr))
 	newSlice := newSlicePtr.Elem()
 	if err := json.Unmarshal(value, newSlicePtr.Interface()); err != nil {
-		logging.WithError(err).Error("SCIM: Invalid patch values")
 		return reflect.Value{}, zerrors.ThrowInvalidArgument(err, "SCIM-opxx8", "Invalid patch values")
 	}
 	return newSlice, nil
@@ -197,7 +193,6 @@ func unmarshalPatchValue(newValue json.RawMessage, targetElement reflect.Value) 
 	}
 
 	if err := json.Unmarshal(newValue, targetElement.Interface()); err != nil {
-		logging.WithError(err).Error("SCIM: Invalid patch value")
 		return zerrors.ThrowInvalidArgument(err, "SCIM-opty9", "Invalid patch value")
 	}
 

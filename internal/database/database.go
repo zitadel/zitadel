@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"reflect"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mitchellh/mapstructure"
-	"github.com/zitadel/logging"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -54,14 +54,11 @@ var (
 
 func CloseTransaction(tx Tx, err error) error {
 	if err != nil {
-		rollbackErr := tx.Rollback()
-		logging.OnError(rollbackErr).Error("failed to rollback transaction")
+		_ = tx.Rollback()
 		return err
 	}
 
-	commitErr := tx.Commit()
-	logging.OnError(commitErr).Error("failed to commit transaction")
-	return commitErr
+	return tx.Commit()
 }
 
 const (
@@ -93,8 +90,7 @@ func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error,
 		return err
 	}
 	defer func() {
-		closeErr := rows.Close()
-		logging.OnError(closeErr).Info("rows.Close failed")
+		_ = rows.Close()
 	}()
 
 	if err = scan(rows); err != nil {
@@ -109,7 +105,6 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
 	row := db.DB.QueryRowContext(ctx, query, args...)
-	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
 	if err != nil {
@@ -176,7 +171,7 @@ func DecodeHook(allowCockroach bool) func(from, to reflect.Value) (_ interface{}
 		}
 
 		if !allowCockroach && configuredDialect.Matcher.Type() == dialect.DatabaseTypeCockroach {
-			logging.Info("Cockroach support was removed with Zitadel v3, please refer to https://zitadel.com/docs/self-hosting/manage/cli/mirror to migrate your data to postgres")
+			slog.Info("Cockroach support was removed with Zitadel v3, please refer to https://zitadel.com/docs/self-hosting/manage/cli/mirror to migrate your data to postgres")
 			return nil, zerrors.ThrowPreconditionFailed(nil, "DATAB-0pIWD", "Cockroach support was removed with Zitadel v3")
 		}
 

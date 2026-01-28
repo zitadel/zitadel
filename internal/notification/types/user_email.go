@@ -3,9 +3,8 @@ package types
 import (
 	"context"
 	"html"
+	"log/slog"
 	"strings"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
@@ -26,7 +25,9 @@ func generateEmail(
 	triggeringEventType eventstore.EventType,
 ) error {
 	emailChannels, config, err := channels.Email(ctx)
-	logging.OnError(err).Error("could not create email channel")
+	if err != nil {
+		slog.ErrorContext(ctx, "could not create email channel", "error", err)
+	}
 	if emailChannels == nil || emailChannels.Len() == 0 {
 		return zchannels.NewCancelError(
 			zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
