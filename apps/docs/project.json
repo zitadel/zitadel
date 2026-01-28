@@ -24,27 +24,27 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next dev",
+        "command": "pnpm dev",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate-all"
+        "generate"
       ]
     },
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next start",
+        "command": "pnpm start",
         "cwd": "apps/docs"
       },
       "dependsOn": [
         "build"
       ]
     },
-    "fetch-remote": {
+    "generate-fetch": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm fetch:remote",
+        "command": "pnpm generate:fetch",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -67,7 +67,7 @@
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "fetch-remote"
+        "generate-fetch"
       ],
       "outputs": [
         "{projectRoot}/openapi"
@@ -102,10 +102,10 @@
         }
       ]
     },
-    "fix-links": {
+    "generate-fix-links": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm fix:links",
+        "command": "pnpm generate:fix-links",
         "cwd": "apps/docs"
       },
       "dependsOn": [
@@ -129,7 +129,7 @@
         "{projectRoot}/content/**/index.mdx"
       ],
       "dependsOn": [
-        "fetch-remote"
+        "generate-fetch"
       ],
       "cache": true,
       "inputs": [
@@ -140,14 +140,14 @@
     "generate-source": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm exec fumadocs-mdx",
+        "command": "pnpm generate:source",
         "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/.source"
       ],
       "dependsOn": [
-        "fix-links",
+        "generate-fix-links",
         "generate-indices"
       ],
       "cache": true,
@@ -158,7 +158,7 @@
         }
       ]
     },
-    "generate-all": {
+    "generate": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'Generation complete'",
@@ -175,7 +175,7 @@
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate-all"
+        "generate"
       ],
       "cache": true,
       "inputs": [
@@ -189,7 +189,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint .",
+        "command": "pnpm lint",
         "cwd": "apps/docs"
       },
       "cache": true,

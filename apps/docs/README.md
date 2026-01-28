@@ -24,15 +24,15 @@ Key scripts for documentation workflows:
 | :--- | :--- |
 | `dev` | Starts the development server. |
 | `build` | Builds the production application. |
-| `fetch:remote` | Fetches remote tags and referenced content. |
-| `generate:all` | Runs all generation steps (`fetch:remote`, `generate:grpc`, `generate:api`, `generate:indices`). |
+| `generate:fetch` | Fetches remote tags and referenced content. |
+| `generate` | Runs all generation steps (`generate:fetch`, `generate:grpc`, `generate:api`, `generate:indices`). |
 | `check:links` | Checks for broken links. |
 
 ## Contributing
 
 ### Build Process
 
-The docs build process automatically handling the following steps via `generate:all`:
+The docs build process automatically handling the following steps via `generate`:
 1.  Downloads required protoc plugins.
 2.  Generates gRPC documentation from proto files.
 3.  Generates API documentation from OpenAPI specs.
