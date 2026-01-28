@@ -589,7 +589,7 @@ func startCommandsQueries(
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
-		config.BackChannelLogout,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -602,7 +602,6 @@ func startCommandsQueries(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		q,
 	)
 

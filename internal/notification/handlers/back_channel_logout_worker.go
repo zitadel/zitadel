@@ -27,7 +27,7 @@ type BackChannelLogoutWorker struct {
 	eventstore    *eventstore.Eventstore
 	queue         Queue
 	channels      types.ChannelChains
-	config        BackChannelLogoutWorkerConfig
+	config        *BackChannelLogoutWorkerConfig
 	tokenLifetime time.Duration
 	now           nowFunc
 	idGenerator   id.Generator
@@ -127,20 +127,19 @@ func NewBackChannelLogoutWorker(
 	eventstore *eventstore.Eventstore,
 	queue Queue,
 	channels types.ChannelChains,
-	config BackChannelLogoutWorkerConfig,
-	tokenLifetime time.Duration,
+	config *BackChannelLogoutWorkerConfig,
+
 	idGenerator id.Generator,
 ) *BackChannelLogoutWorker {
 	return &BackChannelLogoutWorker{
-		commands:      commands,
-		queries:       queries,
-		eventstore:    eventstore,
-		queue:         queue,
-		channels:      channels,
-		config:        config,
-		tokenLifetime: tokenLifetime,
-		now:           time.Now,
-		idGenerator:   idGenerator,
+		commands:    commands,
+		queries:     queries,
+		eventstore:  eventstore,
+		queue:       queue,
+		channels:    channels,
+		config:      config,
+		now:         time.Now,
+		idGenerator: idGenerator,
 	}
 }
 
@@ -158,4 +157,5 @@ type BackChannelLogoutWorkerConfig struct {
 	TransactionDuration time.Duration
 	MaxAttempts         uint8
 	MaxTtl              time.Duration
+	TokenLifetime       time.Duration
 }

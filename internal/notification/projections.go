@@ -3,7 +3,6 @@ package notification
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -28,7 +27,7 @@ func Register(
 	ctx context.Context,
 	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	notificationWorkerConfig handlers.WorkerConfig,
-	backChannelLogoutWorkerConfig handlers.BackChannelLogoutWorkerConfig,
+	backChannelLogoutWorkerConfig *handlers.BackChannelLogoutWorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -38,7 +37,6 @@ func Register(
 	es *eventstore.Eventstore,
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
-	tokenLifetime time.Duration,
 	queue *queue.Queue,
 ) {
 	if !notificationWorkerConfig.LegacyEnabled {
@@ -47,13 +45,6 @@ func Register(
 
 	// make sure the slice does not contain old values
 	projections = nil
-
-	backChannelLogoutWorkerConfig = handlers.BackChannelLogoutWorkerConfig{
-		Workers:             notificationWorkerConfig.Workers,
-		TransactionDuration: notificationWorkerConfig.TransactionDuration,
-		MaxAttempts:         notificationWorkerConfig.MaxAttempts,
-		MaxTtl:              notificationWorkerConfig.MaxTtl,
-	}
 
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
@@ -66,7 +57,7 @@ func Register(
 		queue,
 		backChannelLogoutWorkerConfig.MaxAttempts,
 	))
-	queue.AddWorkers(handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, tokenLifetime, id.SonyFlakeGenerator()))
+	queue.AddWorkers(handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}

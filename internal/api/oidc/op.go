@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -42,6 +43,16 @@ type Config struct {
 	DefaultLogoutURLV2                string
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
+	BackChannelLogout                 *handlers.BackChannelLogoutWorkerConfig
+}
+
+// BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
+func (c *Config) BackChannelLogoutConfig() *handlers.BackChannelLogoutWorkerConfig {
+	if c.DefaultBackChannelLogoutLifetime == 0 {
+		return c.BackChannelLogout
+	}
+	c.BackChannelLogout.TokenLifetime = c.DefaultBackChannelLogoutLifetime
+	return c.BackChannelLogout
 }
 
 type EndpointConfig struct {

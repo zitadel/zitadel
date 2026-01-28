@@ -67,14 +67,13 @@ func projectionsCmd() *cobra.Command {
 }
 
 type ProjectionsConfig struct {
-	Destination       database.Config
-	Projections       projection.Config
-	Notifications     handlers.WorkerConfig
-	BackChannelLogout handlers.BackChannelLogoutWorkerConfig
-	EncryptionKeys    *encryption.EncryptionKeyConfig
-	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
-	Eventstore        *eventstore.Config
-	Caches            *connector.CachesConfig
+	Destination    database.Config
+	Projections    projection.Config
+	Notifications  handlers.WorkerConfig
+	EncryptionKeys *encryption.EncryptionKeyConfig
+	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
+	Eventstore     *eventstore.Config
+	Caches         *connector.CachesConfig
 
 	Admin admin_es.Config
 	Auth  auth_es.Config
@@ -217,7 +216,7 @@ func projections(
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
-		config.BackChannelLogout,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -230,7 +229,6 @@ func projections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		nil,
 	)
 
