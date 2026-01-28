@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
-    "nx": "22.4.2",
+    "nx": "21.6.9",
     "sass": "^1.97.1",
     "wait-on": "^9.0.3"
   }
