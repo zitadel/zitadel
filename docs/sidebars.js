@@ -742,7 +742,32 @@ module.exports = {
             "self-hosting/deploy/macos",
             "self-hosting/deploy/devcontainer",
             "self-hosting/deploy/compose",
-            "self-hosting/deploy/kubernetes",
+            {
+              type: "category",
+              label: "Kubernetes",
+              link: {
+                type: "doc",
+                id: "self-hosting/deploy/kubernetes/index",
+              },
+              items: [
+                "self-hosting/deploy/kubernetes/installation",
+                {
+                  type: "category",
+                  label: "Configuration",
+                  link: {
+                    type: "doc",
+                    id: "self-hosting/deploy/kubernetes/configuration",
+                  },
+                  items: [
+                    "self-hosting/deploy/kubernetes/ingress",
+                    "self-hosting/deploy/kubernetes/database",
+                    "self-hosting/deploy/kubernetes/observability",
+                  ],
+                },
+                "self-hosting/deploy/kubernetes/operations",
+                "self-hosting/deploy/kubernetes/uninstalling",
+              ],
+            },
             {
               type: "category",
               label: "Manage",
