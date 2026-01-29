@@ -15,12 +15,11 @@ export function FrameworkSelector({ children }: { children: ReactNode }) {
     const activeIndex = frameworkParam && FRAMEWORKS.includes(frameworkParam)
         ? FRAMEWORKS.indexOf(frameworkParam)
         : 0;
-
+ //console.log("HEEELLOO", searchParams.size, frameworkParam, activeIndex);
     return (
         <Tabs
             items={DISPLAY_NAMES}
-            defaultIndex={activeIndex}
-            persist // Keeps selection if they navigate away and come back
+            defaultValue="React"
             groupId="framework-select"
         >
             {children}

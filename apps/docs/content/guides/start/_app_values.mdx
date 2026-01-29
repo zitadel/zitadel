@@ -22,11 +22,11 @@ export default function AppValue({ valueCount, projectID }) {
                     - Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
                     ![Get URLs](../../../public/img/guides/quickstart/project_urls.png)
                 </li>
-                <li >
+                {!!projectID && (<li >
                     <b>Project ID</b> Your currently in the application configuration which is a sub resource of the Project. Navigate to the Project with the back arrow and copy the Project ID.
 
                     ![Get Project ID](/img/guides/quickstart/project_client_id.png)
-                </li>
+                </li>)}
             </ol>
 
 
