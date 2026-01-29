@@ -74,6 +74,7 @@ function filterVersions(tags) {
 }
 
 // Helper to identify the currently checked-out reference
+// Caches result to avoid redundant git/env checks. Use force=true to bypass cache (e.g. for testing).
 let cachedRef = null;
 function getCurrentRef(force = false) {
   if (cachedRef && !force) return cachedRef;
@@ -132,7 +133,13 @@ async function downloadVersion(tag, sourceRef) {
       const localPublic = join(ROOT_DIR, 'public');
       const tempPublic = join(tempDir, 'apps/docs/public');
       fs.mkdirSync(tempPublic, { recursive: true });
-      fs.cpSync(localPublic, tempPublic, { recursive: true });
+      
+      const publicItems = fs.readdirSync(localPublic);
+      for (const item of publicItems) {
+        // Avoid copying versioned folders (e.g., v4.10, v4.10.0) to prevent nested version directories
+        if (versionDirPattern.test(item) && fs.statSync(join(localPublic, item)).isDirectory()) continue;
+        fs.cpSync(join(localPublic, item), join(tempPublic, item), { recursive: true });
+      }
 
       // Copy external files from repo root
       const repoRoot = resolve(ROOT_DIR, '../..');
@@ -296,7 +303,7 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     // Ensure the resolved path stays within the repository root using a robust, cross-platform check
     const relativePath = path.relative(repoRoot, localPath);
     
-    if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    if (!relativePath || relativePath.startsWith('..')) {
       console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
       return null;
     }
