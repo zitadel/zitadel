@@ -19,19 +19,19 @@ describe('fetch-remote-content', () => {
     test('returns VERCEL_GIT_COMMIT_REF if set', () => {
       process.env.VERCEL_GIT_COMMIT_REF = 'vercel-branch';
       delete process.env.GITHUB_REF_NAME;
-      assert.strictEqual(getCurrentRef(), 'vercel-branch');
+      assert.strictEqual(getCurrentRef(true), 'vercel-branch');
     });
 
     test('returns GITHUB_REF_NAME if set', () => {
       delete process.env.VERCEL_GIT_COMMIT_REF;
       process.env.GITHUB_REF_NAME = 'github-branch';
-      assert.strictEqual(getCurrentRef(), 'github-branch');
+      assert.strictEqual(getCurrentRef(true), 'github-branch');
     });
 
     test('prefers VERCEL over GITHUB', () => {
       process.env.VERCEL_GIT_COMMIT_REF = 'vercel-branch';
       process.env.GITHUB_REF_NAME = 'github-branch';
-      assert.strictEqual(getCurrentRef(), 'vercel-branch');
+      assert.strictEqual(getCurrentRef(true), 'vercel-branch');
     });
 
     // Note: Testing the git fallback would require mocking child_process which is complex via ES modules mocking 

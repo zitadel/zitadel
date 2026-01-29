@@ -74,23 +74,32 @@ function filterVersions(tags) {
 }
 
 // Helper to identify the currently checked-out reference
-function getCurrentRef() {
+let cachedRef = null;
+function getCurrentRef(force = false) {
+  if (cachedRef && !force) return cachedRef;
+
   if (process.env.VERCEL_GIT_COMMIT_REF) {
     console.log(`[ref] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
-    return process.env.VERCEL_GIT_COMMIT_REF;
+    cachedRef = process.env.VERCEL_GIT_COMMIT_REF;
+    return cachedRef;
   }
   if (process.env.GITHUB_REF_NAME) {
     console.log(`[ref] Detected GitHub Action Branch: ${process.env.GITHUB_REF_NAME}`);
-    return process.env.GITHUB_REF_NAME;
+    cachedRef = process.env.GITHUB_REF_NAME;
+    return cachedRef;
   }
   try {
     const branch = execSync('git branch --show-current').toString().trim();
-    if (branch) return branch;
+    if (branch) {
+      cachedRef = branch;
+      return cachedRef;
+    }
   } catch (e) {
     // Ignore git errors
   }
   console.log(`[ref] Defaulting to ${FALLBACK_BRANCH}`);
-  return FALLBACK_BRANCH;
+  cachedRef = FALLBACK_BRANCH;
+  return cachedRef;
 }
 
 // sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
@@ -142,6 +151,8 @@ async function downloadVersion(tag, sourceRef) {
       }
     } catch (err) {
       console.error(`[local] Failed to copy local files: ${err.message}`);
+      // Clean up the temporary directory to avoid leaving partial content
+      fs.rmSync(tempDir, { recursive: true, force: true });
       throw err;
     }
   } else {
@@ -282,10 +293,10 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     const normalizedRepoPath = repoPath.replace(/\\/g, '/');
     const localPath = resolve(repoRoot, normalizedRepoPath);
     
-    // Ensure the resolved path stays within the repository root
-    const repoRootWithSep = repoRoot.endsWith(path.sep) ? repoRoot : repoRoot + path.sep;
+    // Ensure the resolved path stays within the repository root using a robust, cross-platform check
+    const relativePath = path.relative(repoRoot, localPath);
     
-    if (!localPath.startsWith(repoRootWithSep) && localPath !== repoRoot) {
+    if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
       console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
       return null;
     }
