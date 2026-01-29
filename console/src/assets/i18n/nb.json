@@ -1,0 +1,2873 @@
+{
+  "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Kom i gang med ZITADEL",
+      "NEXT": {
+        "TITLE": "Dine neste steg",
+        "DESCRIPTION": "Fullfør følgende steg for å sikre applikasjonen din.",
+        "CREATE_PROJECT": {
+          "TITLE": "Opprett et prosjekt",
+          "DESCRIPTION": "Legg til et prosjekt og definer roller og tillatelser."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Kom i gang",
+          "DESCRIPTION": "Følg hurtigstart-guiden steg for steg og begynn å bygge umiddelbart."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentasjon",
+          "DESCRIPTION": "Utforsk ZITADELs kunnskapsbase for å bli kjent med kjernekonsepter og ideer. Lær hvordan ZITADEL fungerer og hvordan du bruker det."
+        },
+        "EXAMPLES": {
+          "TITLE": "Eksempler og programvareutviklingssett",
+          "DESCRIPTION": "Se gjennom eksemplene og SDK-ene våre for å bruke ZITADEL sammen med dine favoritt programmeringsspråk og verktøy."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisasjon",
+      "DESCRIPTION": "En organisasjon inneholder brukere, prosjekter med apper, identitetsleverandører og innstillinger som merkevarebygging. Vil du dele innstillinger på tvers av flere organisasjoner? Konfigurer standardinnstillinger.",
+      "METADATA": "Legg til egendefinerte attributter til organisasjonen som plassering eller en identifikator i et annet system. Du kan bruke denne informasjonen i handlingene dine."
+    },
+    "PROJECTS": {
+      "TITLE": "Prosjekter",
+      "DESCRIPTION": "Et prosjekt inneholder én eller flere applikasjoner som du kan bruke til å autentisere brukerne dine. Du kan for eksempel ha ett enkelt prosjekt med 3 applikasjoner: én hver for webfrontenden, mobilappen og backend-tjenestene dine. Du kan også autorisere brukerne dine med prosjekter. For å la brukere fra andre organisasjoner logge inn på applikasjonene dine, gi dem tilgang til prosjektet ditt.<br/><br/>Hvis du ikke finner et prosjekt, kontakt prosjektets eier eller noen med tilsvarende rettigheter for å få tilgang.",
+      "OWNED": {
+        "TITLE": "Egne prosjekter",
+        "DESCRIPTION": "Dette er prosjektene du eier. Du kan administrere disse prosjektenes innstillinger, autorisasjoner og applikasjoner."
+      },
+      "GRANTED": {
+        "TITLE": "Tildelte prosjekter",
+        "DESCRIPTION": "Dette er prosjektene som andre organisasjoner har tildelt deg. Med tildelte prosjekter kan du gi brukerne dine tilgang til andre organisasjoners applikasjoner."
+      }
+    },
+    "USERS": {
+      "TITLE": "Brukere",
+      "DESCRIPTION": "En bruker er et menneske eller en maskin som kan få tilgang til applikasjonen din.",
+      "HUMANS": {
+        "TITLE": "Brukere",
+        "DESCRIPTION": "Brukere autentiserer seg interaktivt i en nettleserøkt med en påloggingsforespørsel.",
+        "METADATA": "Legg til egendefinerte attributter til brukeren som avdeling. Du kan bruke denne informasjonen i handlingene dine."
+      },
+      "MACHINES": {
+        "TITLE": "Tjenestebrukere",
+        "DESCRIPTION": "Tjenestebrukere autentiserer seg ikke-interaktivt ved hjelp av JWT-bærertoken signert med en privat nøkkel. De kan også bruke et personlig tilgangstoken.",
+        "METADATA": "Legg til egendefinerte attributter til brukeren som autentiseringssystemet. Du kan bruke denne informasjonen i handlingene dine."
+      },
+      "SELF": {
+        "METADATA": "Legg til egendefinerte attributter til brukeren din som avdeling. Du kan bruke denne informasjonen i organisasjonens handlinger."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorisasjoner",
+      "DESCRIPTION": "Autorisasjoner definerer tilgangsrettighetene til en bruker for et prosjekt. Du kan gi en bruker tilgang til et prosjekt og definere brukerens roller i det prosjektet."
+    },
+    "ACTIONS": {
+      "TITLE": "Handlinger",
+      "DESCRIPTION": "Kjør egendefinert kode på hendelser som skjer når brukerne autentiserer seg hos ZITADEL. Automatiser prosessene dine, berik brukernes metadata og tokens, eller varsle eksterne systemer.",
+      "SCRIPTS": {
+        "TITLE": "Skript",
+        "DESCRIPTION": "Skriv JavaScript-koden din én gang og utløs den i flere flyter."
+      },
+      "FLOWS": {
+        "TITLE": "Flyter",
+        "DESCRIPTION": "Velg en autentiseringsflyt og utløs handlingen din på en spesifikk hendelse i denne flyten."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, en ny og forbedret versjon av handlinger, er nå tilgjengelig. Den gjeldende versjonen er fortsatt tilgjengelig, men vår fremtidige utvikling vil fokusere på den nye, som til slutt vil erstatte den gjeldende versjonen."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instansinnstillinger",
+        "DESCRIPTION": "Standardinnstillinger for alle organisasjoner. Med de riktige tillatelsene kan noen av dem overstyres i organisasjonsinnstillingene."
+      },
+      "ORG": {
+        "TITLE": "Organisasjonsinnstillinger",
+        "DESCRIPTION": "Tilpass innstillingene for organisasjonen din."
+      },
+      "FEATURES": {
+        "TITLE": "Funksjonsinnstillinger",
+        "DESCRIPTION": "Lås opp funksjoner for instansen din."
+      },
+      "IDPS": {
+        "TITLE": "Identitetsleverandører",
+        "DESCRIPTION": "Opprett og aktiver eksterne identitetsleverandører. Velg en velkjent leverandør eller konfigurer enhver annen OIDC-, OAuth- eller SAML-kompatibel leverandør du ønsker. Du kan til og med bruke eksisterende JWT-tokens som fødererte identiteter ved å konfigurere en JWT-identitetsleverandør.",
+        "NEXT": "Hva nå?",
+        "SAML": {
+          "TITLE": "Konfigurer SAML-identitetsleverandøren din",
+          "DESCRIPTION": "ZITADEL er konfigurert. Nå må SAML-identitetsleverandøren din konfigureres. De fleste leverandører lar deg bare laste opp hele ZITADEL-metadata-XML-en. Andre leverandører ber deg bare oppgi noen distinkte URL-er, som for eksempel entity ID (metadata-URL), Assertion Consumer Service (ACS) URL eller Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfigurer {{ provider }}-identitetsleverandøren din",
+          "DESCRIPTION": "Før du kan konfigurere ZITADEL, må du sende denne URL-en til identitetsleverandøren din for å aktivere nettleseromdirigering tilbake til ZITADEL etter autentisering."
+        },
+        "JWT": {
+          "TITLE": "Bruk JWT-er som fødererte identiteter",
+          "DESCRIPTION": "JWT-identitetsleverandøren lar deg bruke eksisterende JWT-tokens som fødererte identiteter. Denne funksjonen er nyttig hvis du allerede har en utsteder for JWT-er. Med en JWT-IdP kan du bruke disse JWT-ene til å opprette og oppdatere brukere i ZITADEL fortløpende."
+        },
+        "LDAP": {
+          "TITLE": "Konfigurer ZITADEL til å koble til LDAP-identitetsleverandøren din",
+          "DESCRIPTION": "Oppgi tilkoblingsdetaljene til LDAP-serveren din og konfigurer tilordningen av LDAP-attributtene dine til ZITADEL-attributter."
+        },
+        "AUTOFILL": {
+          "TITLE": "Autofyll brukerdata",
+          "DESCRIPTION": "Bruk en handling for å forbedre brukeropplevelsen. Du kan forhåndsutfylle ZITADELs registreringsskjema med verdier fra identitetsleverandøren."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktiver IdP-en",
+          "DESCRIPTION": "IdP-en din er ikke aktiv ennå. Aktiver den for å la brukerne dine logge inn."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Passordkompleksitet",
+        "DESCRIPTION": "Sørg for at brukerne dine bruker sterke passord ved å definere kompleksitetsregler."
+      },
+      "BRANDING": {
+        "TITLE": "Merkevarebygging",
+        "DESCRIPTION": "Tilpass utseendet på påloggingsskjemaet ditt. Husk å bruke konfigurasjonen din når du er ferdig."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Eksterne lenker",
+        "DESCRIPTION": "Led brukerne dine til egendefinerte eksterne ressurser som vises på påloggingssiden. Brukere må godta vilkårene og personvernreglene før de kan registrere seg. Endre lenken til dokumentasjonen din eller sett en tom streng for å skjule dokumentasjonsknappen fra konsollen. Legg til en egendefinert ekstern lenke og en egendefinert tekst for den lenken i konsollen, eller sett dem tomme for å skjule den knappen."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-innstillinger",
+        "DESCRIPTION": "Konfigurer SMTP-serveren din til å bruke et domene for avsenderadressen som brukerne dine kjenner og stoler på."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-innstillinger",
+        "DESCRIPTION": "For å låse opp alle ZITADEL-funksjoner, konfigurer Twilio til å sende SMS-meldinger til brukerne dine."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Hendelser",
+        "DESCRIPTION": "Denne siden viser alle tilstandsendringer i instansen din så langt tilbake som instansens revisjonslogggrense. Filtrer listen etter tidsrom for feilsøking eller filtrer etter et aggregat for revisjonsformål."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Mislykkede hendelser",
+        "DESCRIPTION": "Denne siden viser alle mislykkede hendelser i instansen din. Hvis ZITADEL ikke oppfører seg som forventet, sjekk alltid denne listen først."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Visninger",
+        "DESCRIPTION": "Denne siden viser alle databasevisningene dine og når de behandlet sin siste hendelse. Hvis du mangler noen data, sjekk om visningen er oppdatert."
+      },
+      "LANGUAGES": {
+        "TITLE": "Språk",
+        "DESCRIPTION": "Begrens språkene som påloggingsskjemaet og varslene oversettes til. Hvis du vil deaktivere noen av språkene, dra dem til seksjonen Ikke tillatte språk. Du kan spesifisere et tillatt språk som standardspråk. Hvis en brukers foretrukne språk ikke er tillatt, brukes standardspråket."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Hemmelighetsgenereringer",
+        "DESCRIPTION": "Definer kompleksitet og levetid for hemmelighetene dine. En høyere kompleksitet og levetid forbedrer sikkerheten, en lavere kompleksitet og levetid forbedrer dekrypteringsytelsen."
+      },
+      "SECURITY": {
+        "TITLE": "Sikkerhetsinnstillinger",
+        "DESCRIPTION": "Aktiver ZITADEL-funksjoner som kan ha sikkerhetskonsekvenser. Du bør virkelig vite hva du gjør før du endrer disse innstillingene."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect-innstillinger",
+        "DESCRIPTION": "Konfigurer levetiden for OIDC-tokenene dine. Bruk kortere levetider for å øke brukernes sikkerhet, bruk lengre levetider for å øke brukernes bekvemmelighet.",
+        "LABEL_HOURS": "Maksimal levetid i timer",
+        "LABEL_DAYS": "Maksimal levetid i dager",
+        "ACCESS_TOKEN": {
+          "TITLE": "Tilgangstoken",
+          "DESCRIPTION": "Tilgangstokenet brukes til å autentisere en bruker. Det er et kortvarig token som brukes til å få tilgang til brukerens data. Bruk kort levetid for å minimere risikoen for uautorisert tilgang. Tilgangstokener kan automatisk oppdateres ved hjelp av et oppdateringstoken."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-token",
+          "DESCRIPTION": "ID-tokenet er en JSON Web Token (JWT) som inneholder påstander om brukeren. ID-tokenets levetid bør ikke overskride tilgangstokenets levetid."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Oppdateringstoken",
+          "DESCRIPTION": "Oppdateringstokenet brukes til å få et nytt tilgangstoken. Det er et langvarig token som brukes til å oppdatere tilgangstokenet. En bruker må manuelt autentisere seg på nytt når oppdateringstokenet utløper."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inaktivt oppdateringstoken",
+          "DESCRIPTION": "Levetiden for inaktivt oppdateringstoken er maksimal tid et oppdateringstoken kan være ubrukt."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Administrer OIDC-webnøklene dine for å signere og validere tokener sikkert for ZITADEL-instansen din.",
+        "TABLE": {
+          "TITLE": "Aktive og fremtidige webnøkler",
+          "DESCRIPTION": "Dine aktive og kommende webnøkler. Aktivering av en ny nøkkel vil deaktivere den gjeldende.",
+          "NOTE": "Merk: JWKs OIDC-endepunktet returnerer et bufferbart svar (standard 5 min). Unngå å aktivere en nøkkel for tidlig, da den kanskje ikke er tilgjengelig for hurtigbuffere og klienter ennå.",
+          "ACTIVATE": "Aktiver neste webnøkkel",
+          "ACTIVE": "Nå aktiv",
+          "NEXT": "Neste i køen",
+          "FUTURE": "Fremtidig",
+          "WARNING": "Webnøkkelen er mindre enn 5 min gammel"
+        },
+        "CREATE": {
+          "TITLE": "Opprett ny webnøkkel",
+          "DESCRIPTION": "Oppretting av en ny webnøkkel legger den til i listen din. ZITADEL bruker RSA2048-nøkler med en SHA256-hasher som standard.",
+          "KEY_TYPE": "Nøkkeltype",
+          "BITS": "Biter",
+          "HASHER": "Hasher",
+          "CURVE": "Kurve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Tidligere webnøkler",
+          "DESCRIPTION": "Dette er dine tidligere webnøkler som ikke lenger er aktive.",
+          "DEACTIVATED_ON": "Deaktivert den"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Meldingstekster",
+        "DESCRIPTION": "Tilpass tekstene i e-postvarsler eller SMS-meldinger. Hvis du vil deaktivere noen av språkene, begrens dem i instansens språkinnstillinger.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Når du krever et domene for organisasjonen din, vil brukere som ikke bruker dette domenet i påloggingsnavnet sitt bli bedt om å endre påloggingsnavnet til å samsvare med det krevde domenet.",
+          "INIT": "Når en bruker opprettes, vil de motta en e-post med en lenke for å sette passordet sitt.",
+          "PC": "Når en bruker endrer passordet sitt, vil de motta et varsel om endringen hvis du har aktivert dette i varslingsinnstillingene.",
+          "PL": "Når en bruker legger til en passnøkkel som autentiseringsmetode, må de aktivere den ved å klikke på en lenke i en e-post.",
+          "PR": "Når en bruker tilbakestiller passordet sitt, vil de motta en e-post med en lenke for å sette et nytt passord.",
+          "VE": "Når en bruker endrer e-postadressen sin, vil de motta en e-post med en lenke for å verifisere den nye adressen.",
+          "VP": "Når en bruker endrer telefonnummeret sitt, vil de motta en SMS med en kode for å verifisere det nye nummeret.",
+          "VEO": "Når en bruker legger til engangspassord via e-post, må de aktivere det ved å skrive inn en kode sendt til e-postadressen deres.",
+          "VSO": "Når en bruker legger til engangspassord via SMS, må de aktivere det ved å skrive inn en kode sendt til telefonnummeret deres.",
+          "IU": "Når en brukerinvitasjonskode opprettes, vil de motta en e-post med en lenke for å sette opp autentiseringsmetoden sin."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Tekster for påloggingsgrensesnitt",
+        "DESCRIPTION": "Tilpass tekstene i påloggingsskjemaet. Hvis en tekst er tom, viser plassholderen standardverdien. Hvis du vil deaktivere noen av språkene, begrens dem i instansens språkinnstillinger."
+      },
+      "DOMAINS": {
+        "TITLE": "Domeneinnstillinger",
+        "DESCRIPTION": "Definer begrensninger på domenene dine og konfigurer påloggingsnavnmønstrene dine.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Krev at egendefinerte domener må verifiseres",
+          "DESCRIPTION": "Hvis dette er aktivert, må organisasjonsdomener verifiseres før de kan brukes til domeneoppdagelse eller brukernavn-suffiks."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Mønster for påloggingsnavn",
+          "DESCRIPTION": "Kontroller mønsteret for brukernes påloggingsnavn. ZITADEL velger brukerens organisasjon så snart de skriver inn påloggingsnavnet. Derfor må påloggingsnavnene være unike på tvers av alle organisasjoner. Hvis du har brukere som har en konto i flere domener, kan du sikre unikhet ved å legge til organisasjonsdomenet som suffiks til påloggingsnavnene."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domeneverifisering",
+          "DESCRIPTION": "Tillat bare organisasjonen din å bruke domenene de faktisk kontrollerer. Hvis aktivert, verifiseres organisasjonsdomener periodisk med DNS- eller HTTP-utfordring før de kan brukes. Dette er en sikkerhetsfunksjon for å forhindre domenekapring."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-avsenderadresse",
+          "DESCRIPTION": "Tillat bare en SMTP-avsenderadresse hvis den samsvarer med et av dine instansdomener."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Påloggingslevetider",
+          "DESCRIPTION": "Styrk sikkerheten ved å redusere noen påloggingsrelaterte maksimale levetider.",
+          "LABEL": "Maksimal levetid i timer",
+          "PW_CHECK": {
+            "TITLE": "Passordsjekk",
+            "DESCRIPTION": "Brukere må autentisere seg på nytt med passordet sitt etter denne perioden."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Ekstern påloggingssjekk",
+            "DESCRIPTION": "Brukerne dine blir omdirigert til sin eksterne identitetsleverandør etter disse periodene."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Flerfaktor-initialiseringssjekk",
+            "DESCRIPTION": "Brukerne dine blir bedt om å sette opp en andre faktor eller en flerfaktor etter disse periodene hvis de ikke allerede har gjort det. En levetid på 0 deaktiverer denne oppfordringen."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Andrefaktor-sjekk",
+            "DESCRIPTION": "Brukerne dine må validere sin andre faktor på nytt i disse periodene."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Flerfaktor-sjekk",
+            "DESCRIPTION": "Brukerne dine må validere flerfaktoren sin på nytt i disse periodene."
+          }
+        },
+        "FORM": {
+          "TITLE": "Påloggingsskjema",
+          "DESCRIPTION": "Tilpass påloggingsskjemaet.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Brukernavn og passord tillatt",
+            "DESCRIPTION": "Tillat brukerne dine å logge inn med brukernavn og passord. Hvis dette er deaktivert, kan brukerne dine bare logge inn med passnøkkelautentisering eller med en ekstern identitetsleverandør."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Brukerregistrering tillatt",
+            "DESCRIPTION": "Tillat anonyme brukere å opprette en konto."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisasjonsregistrering tillatt",
+            "DESCRIPTION": "Tillat anonyme brukere å opprette en organisasjon."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Ekstern pålogging tillatt",
+            "DESCRIPTION": "Tillat brukerne dine å logge inn med en ekstern identitetsleverandør i stedet for å bruke ZITADEL-brukeren til å logge inn."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Passordtilbakestilling skjult",
+            "DESCRIPTION": "Ikke tillat brukerne dine å tilbakestille passordet sitt."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domeneoppdagelse tillatt",
+            "DESCRIPTION": "Finn brukernes organisasjoner basert på påloggingsnavnene deres."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorer ukjente brukernavn",
+            "DESCRIPTION": "Hvis dette er aktivert, vil påloggingsskjemaet ikke vise en feil når et ukjent brukernavn skrives inn."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Deaktiver e-postpålogging",
+            "DESCRIPTION": "Hvis dette er aktivert, kan ikke brukerne dine bruke e-postadressen sin som påloggingsnavn."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Deaktiver telefonpålogging",
+            "DESCRIPTION": "Hvis dette er aktivert, kan ikke brukerne dine bruke telefonnummeret sitt som påloggingsnavn."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Forrige",
+    "NEXT": "Neste",
+    "COUNT": "Totalt antall resultater",
+    "MORE": "Mer"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Vilkår for bruk",
+      "PP": "Personvernerklæring"
+    },
+    "THEME": {
+      "DARK": "Mørk",
+      "LIGHT": "Lys"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Kom i gang med ZITADEL",
+    "DISCLAIMER": "ZITADEL behandler dataene dine konfidensielt og sikkert.",
+    "DISCLAIMERLINK": "Mer informasjon",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Kom raskt i gang med ZITADEL."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Kom raskt i gang med ZITADEL."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Første steg",
+      "DESCRIPTION": "Kom raskt i gang med ZITADEL."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Snarveier",
+      "SETTINGS": "Tilgjengelige snarveier",
+      "PROJECTS": "Prosjekter",
+      "REORDER": "Hold og dra flisen for å flytte den",
+      "ADD": "Hold og dra en flis for å legge til"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Dine neste steg",
+    "MOREDESCRIPTION": "flere snarveier",
+    "COMPLETED": "fullført",
+    "DISMISS": "Nei takk, jeg er en proff.",
+    "CARD": {
+      "TITLE": "Få ZITADEL i gang",
+      "DESCRIPTION": "Denne sjekklisten hjelper deg med å sette opp instansen din og veileder deg gjennom de viktigste trinnene."
+    },
+    "MILESTONES": {
+      "PROJECT_CREATED": {
+        "title": "Opprett et prosjekt",
+        "description": "Legg til et prosjekt og definer roller og tillatelser.",
+        "action": "Opprett prosjekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registrer appen din",
+        "description": "Registrer web-, native-, API- eller SAML-applikasjonen din og sett opp innstillingene.",
+        "action": "Registrer app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Logg inn på appen din",
+        "description": "Integrer applikasjonen din med ZITADEL for autentisering og autorisasjon.",
+        "action": "Logg inn"
+      },
+      "instance.policy.label.added": {
+        "title": "Sett opp merkevaren din",
+        "description": "Definer farger og form på påloggingen din og last opp logoen og ikonene dine.",
+        "action": "Sett opp merkevarebygging"
+      },
+      "instance.smtp.config.added": {
+        "title": "Sett opp SMTP-innstillingene dine",
+        "description": "Sett opp dine egne e-postserverinnstillinger.",
+        "action": "Sett opp SMTP"
+      },
+      "user.human.added": {
+        "title": "Legg til brukere",
+        "description": "Legg til applikasjonsbrukerne dine",
+        "action": "Legg til bruker"
+      },
+      "user.grant.added": {
+        "title": "Gi brukere tilgang",
+        "description": "Gi brukere tilgang til applikasjonen din og sett opp rollene deres.",
+        "action": "Gi bruker tilgang"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Standardinnstillinger",
+    "DASHBOARD": "Hjem",
+    "PERSONAL_INFO": "Personlig informasjon",
+    "DOCUMENTATION": "Dokumentasjon",
+    "INSTANCEOVERVIEW": "Instans",
+    "ORGS": "Organisasjoner",
+    "VIEWS": "Visninger",
+    "EVENTS": "Hendelser",
+    "FAILEDEVENTS": "Mislykkede hendelser",
+    "ORGANIZATION": "Organisasjon",
+    "PROJECT": "Prosjekter",
+    "PROJECTOVERVIEW": "Oversikt",
+    "PROJECTGRANTS": "Tildelinger",
+    "ROLES": "Roller",
+    "GRANTEDPROJECT": "Tildelte prosjekter",
+    "HUMANUSERS": "Brukere",
+    "MACHINEUSERS": "Tjenestebrukere",
+    "LOGOUT": "Logg ut alle brukere",
+    "NEWORG": "Ny organisasjon",
+    "IAMADMIN": "Du er en IAM-administrator. Merk at du har utvidede tillatelser.",
+    "SHOWORGS": "Vis alle organisasjoner",
+    "GRANTS": "Autorisasjoner",
+    "ACTIONS": "Handlinger",
+    "TARGETS": "Mål",
+    "PRIVACY": "Personvern",
+    "TOS": "Vilkår for bruk",
+    "OPENSHORTCUTSTOOLTIP": "Skriv ? for å vise hurtigtaster",
+    "SETTINGS": "Innstillinger",
+    "CUSTOMERPORTAL": "Kundeportal"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrer ZITADEL i applikasjonen din",
+    "DESCRIPTION": "Integrer ZITADEL i applikasjonen din eller bruk et av våre eksempler.",
+    "BTN_START": "Opprett applikasjon",
+    "BTN_LEARNMORE": "Lær mer",
+    "CREATEPROJECTFORAPP": "Opprett prosjekt {{value}}",
+    "SELECT_FRAMEWORK": "Velg rammeverk",
+    "FRAMEWORK": "Rammeverk",
+    "FRAMEWORK_OTHER": "Annet (OIDC, SAML, API)",
+    "ALMOSTDONE": "Du er nesten ferdig.",
+    "REVIEWCONFIGURATION": "Gjennomgå konfigurasjon",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Vi har opprettet en grunnleggende konfigurasjon for {{value}}-applikasjonen. Gjennomgå og tilpass den etter behov.",
+    "REDIRECTS": "Konfigurer omdirigeringer",
+    "DEVMODEWARN": "Utviklingsmodus er aktivert som standard. Du kan oppdatere verdier for produksjon senere.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Se gjennom eksempler og SDK-er",
+    "DUPLICATEAPPRENAME": "En app med samme navn finnes allerede. Vennligst velg et annet navn.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Endre rammeverk",
+        "DESCRIPTION": "Velg et av de tilgjengelige rammeverkene for rask oppsett av applikasjonen din."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Handlinger",
+    "FILTER": "Filter",
+    "RENAME": "Gi nytt navn",
+    "SET": "Sett",
+    "COPY": "Kopier til utklippstavle",
+    "COPIED": "Kopiert til utklippstavle.",
+    "RESET": "Tilbakestill",
+    "RESETDEFAULT": "Tilbakestill til standard",
+    "RESETTO": "Tilbakestill til: ",
+    "RESETCURRENT": "Tilbakestill til gjeldende",
+    "SHOW": "Vis",
+    "HIDE": "Skjul",
+    "SAVE": "Lagre",
+    "SAVENOW": "Lagre nå",
+    "NEW": "Ny",
+    "ADD": "Legg til",
+    "CREATE": "Opprett",
+    "CONTINUE": "Fortsett",
+    "CONTINUEWITH": "Fortsett med {{value}}",
+    "BACK": "Tilbake",
+    "CLOSE": "Lukk",
+    "CLEAR": "Tøm",
+    "CANCEL": "Avbryt",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Velg",
+    "VIEW": "Vis",
+    "SELECTIONDELETE": "Slett utvalg",
+    "DELETE": "Slett",
+    "REMOVE": "Fjern",
+    "VERIFY": "Verifiser",
+    "FINISH": "Fullfør",
+    "FINISHED": "Lukk",
+    "CHANGE": "Endre",
+    "REACTIVATE": "Reaktiver",
+    "ACTIVATE": "Aktiver",
+    "DEACTIVATE": "Deaktiver",
+    "REFRESH": "Oppdater",
+    "LOGIN": "Logg inn",
+    "EDIT": "Rediger",
+    "PIN": "Fest / Løsne",
+    "CONFIGURE": "Konfigurer",
+    "SEND": "Send",
+    "NEWVALUE": "Ny verdi",
+    "RESTORE": "Gjenopprett",
+    "CONTINUEWITHOUTSAVE": "Fortsett uten å lagre",
+    "OF": "av",
+    "PREVIOUS": "Forrige",
+    "NEXT": "Neste",
+    "MORE": "mer",
+    "STEP": "Steg",
+    "SETUP": "Oppsett",
+    "TEST": "Test",
+    "UNSAVEDCHANGES": "Ulagrede endringer",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Er du sikker på at du vil forkaste denne nye handlingen? Handlingen din vil gå tapt.",
+        "CANCEL": "Avbryt",
+        "DISCARD": "Forkast"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Vis bruker {{value}}"
+    },
+    "DOWNLOAD": "Last ned",
+    "APPLY": "Bruk"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Du bruker nå den nye Actions V2, som er i beta. Gi oss gjerne tilbakemelding!",
+    "EXECUTION": {
+      "TITLE": "Handlinger",
+      "DESCRIPTION": "Handlinger lar deg kjøre egendefinert kode som svar på API-forespørsler, hendelser og funksjoner.",
+      "TYPES": {
+        "request": "Forespørsel",
+        "response": "Svar",
+        "event": "Hendelser",
+        "function": "Funksjon"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Opprett en handling",
+        "UPDATE_TITLE": "Oppdater en handling",
+        "TYPE": {
+          "DESCRIPTION": "Velg når du vil at denne handlingen skal kjøre",
+          "REQUEST": {
+            "TITLE": "Forespørsel",
+            "DESCRIPTION": "Forespørsler som skjer innenfor Zitadel. Dette kan være alt fra brukeroppretting til tokenutstedelse."
+          },
+          "RESPONSE": {
+            "TITLE": "Svar",
+            "DESCRIPTION": "Et svar fra en forespørsel innenfor Zitadel. Tenk på svaret som resultatet av en operasjon."
+          },
+          "EVENTS": {
+            "TITLE": "Hendelser",
+            "DESCRIPTION": "Hendelser som skjer innenfor Zitadel. Dette kan være alt fra brukeroppretting til endringer i organisasjonsinnstillinger."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funksjoner",
+            "DESCRIPTION": "Funksjoner du kan kalle innenfor Zitadel. Dette kan være en intern funksjon eller en ekstern tjeneste."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Velg om denne handlingen gjelder for alle forespørsler, en spesifikk tjeneste eller en spesifikk metode.",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Velg dette hvis du vil kjøre handlingen på hver forespørsel"
+          },
+          "ALL_EVENTS": "Velg dette hvis du vil kjøre handlingen på hver hendelse",
+          "SELECT_SERVICE": {
+            "TITLE": "Velg tjeneste",
+            "DESCRIPTION": "Velg en Zitadel-tjeneste for handlingen din."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Velg metode",
+            "DESCRIPTION": "Hvis du bare vil utføre på en spesifikk forespørsel, velg metoden her.",
+            "NOTE": "Hvis du ikke velger en metode, vil handlingen din kjøre på hver forespørsel i den valgte tjenesten."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funksjonsnavn",
+            "DESCRIPTION": "Velg funksjonen du vil utføre"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Angi gruppe",
+            "DESCRIPTION": "Hvis du bare vil utføre på en gruppe hendelser, angi gruppen her."
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Velg hendelse",
+            "DESCRIPTION": "Hvis du bare vil utføre på en spesifikk hendelse, spesifiser den her."
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Du kan velge å utføre et mål, eller kjøre det på samme tid som andre handlinger.",
+          "TARGET": {
+            "DESCRIPTION": "Målet du vil utføre for denne handlingen"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Utførelsesbetingelser"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Betingelse",
+        "TYPE": "Type",
+        "TARGET": "Mål",
+        "CREATIONDATE": "Opprettelsesdato"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Mål",
+      "DESCRIPTION": "Et mål er destinasjonen for koden du vil utføre. Opprett dine egne mål utenfor Zitadel.",
+      "CREATE": {
+        "TITLE": "Opprett målet ditt",
+        "DESCRIPTION": "Opprett ditt eget mål utenfor Zitadel",
+        "NAME": "Navn",
+        "NAME_DESCRIPTION": "Gi målet ditt et klart, beskrivende navn for å gjøre det enkelt å identifisere.",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST-kall",
+          "restAsync": "REST asynkron"
+        },
+        "TYPES_DESCRIPTION": "Webhook: kallet håndterer statuskoden men svaret er irrelevant. REST-kall: svaret brukes som input til neste handling. REST asynkron: kallet skjer i bakgrunnen.",
+        "PAYLOAD_TYPE": "Nyttelasttype",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Uspesifisert",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Kryptert JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON-nyttelast med en signaturhode for verifisering.",
+        "ENDPOINT": "Endepunkt",
+        "ENDPOINT_DESCRIPTION": "Skriv inn endepunktet der koden din er vert. Sørg for at det er tilgjengelig.",
+        "TIMEOUT": "Tidsavbrudd",
+        "TIMEOUT_DESCRIPTION": "Angi maksimal tid målet ditt har til å svare. Hvis det tar for lang tid, vil forespørselen mislykkes.",
+        "INTERRUPT_ON_ERROR": "Avbryt ved feil",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stopp alle utførelser når målet returnerer med en feil",
+        "INTERRUPT_ON_ERROR_WARNING": "Forsiktig: «Avbryt ved feil» stopper operasjoner ved feil, noe som krever manuell håndtering.",
+        "AWAIT_RESPONSE": "Vent på svar",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vi venter på et svar før vi gjør noe annet. Nyttig når rekkefølgen er viktig."
+      },
+      "TABLE": {
+        "NAME": "Navn",
+        "ENDPOINT": "Endepunkt",
+        "CREATIONDATE": "Opprettelsesdato",
+        "REORDER": "Endre rekkefølge"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Har kontroll over hele instansen, inkludert alle organisasjoner og deres ressurser.",
+    "IAM_OWNER_VIEWER": "Har tillatelse til å gjennomgå hele instansen, inkludert alle organisasjoner og deres ressurser.",
+    "IAM_ORG_MANAGER": "Har tillatelse til å opprette og administrere organisasjoner",
+    "IAM_USER_MANAGER": "Har tillatelse til å opprette og administrere brukere",
+    "IAM_ADMIN_IMPERSONATOR": "Har tillatelse til å etterligne administrator- og sluttbrukere fra alle organisasjoner",
+    "IAM_END_USER_IMPERSONATOR": "Har tillatelse til å etterligne sluttbrukere fra alle organisasjoner",
+    "IAM_LOGIN_CLIENT": "Har tillatelse til å administrere innloggingsklienter",
+    "ORG_OWNER": "Har tillatelse over hele organisasjonen",
+    "ORG_USER_MANAGER": "Har tillatelse til å opprette og administrere brukere i organisasjonen",
+    "ORG_OWNER_VIEWER": "Har tillatelse til å gjennomgå hele organisasjonen",
+    "ORG_SETTINGS_MANAGER": "Har tillatelse til å administrere organisasjonsinnstillinger",
+    "ORG_USER_PERMISSION_EDITOR": "Har tillatelse til å administrere brukertildelinger",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Har tillatelse til å administrere prosjekttildelinger",
+    "ORG_PROJECT_CREATOR": "Har tillatelse til å opprette egne prosjekter og underliggende innstillinger",
+    "ORG_ADMIN_IMPERSONATOR": "Har tillatelse til å etterligne administrator- og sluttbrukere fra organisasjonen",
+    "ORG_END_USER_IMPERSONATOR": "Har tillatelse til å etterligne sluttbrukere fra organisasjonen",
+    "ORG_USER_SELF_MANAGER": "Har tillatelse til å administrere sin egen bruker",
+    "PROJECT_OWNER": "Har tillatelse over hele prosjektet",
+    "PROJECT_OWNER_VIEWER": "Har tillatelse til å gjennomgå hele prosjektet",
+    "PROJECT_OWNER_GLOBAL": "Har tillatelse over hele prosjektet",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Har tillatelse til å gjennomgå hele prosjektet",
+    "PROJECT_GRANT_OWNER": "Har tillatelse til å administrere prosjekttildelingen",
+    "PROJECT_GRANT_OWNER_VIEWER": "Har tillatelse til å gjennomgå prosjekttildelingen"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Alle organisasjonsinnstillinger og tabeller i konsollen er basert på den valgte organisasjonen."
+    },
+    "INSTANCE": {
+      "TEXT": "Klikk her for å komme til standardinnstillingene. Merk at du har tilgang til instansen."
+    },
+    "PROFILE": {
+      "TEXT": "Her kan du bytte mellom brukerkontoene dine og administrere profilen din."
+    },
+    "NAV": {
+      "TEXT": "Denne navigasjonen endres basert på den valgte organisasjonen."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Organisasjonskonteksten har endret seg."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Visningen byttet nettopp til instans!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "ORGNAME": "Organisasjonsnavn",
+    "ORGID": "Organisasjons-ID",
+    "STATE": "Status",
+    "PRIMARYDOMAIN": "Primærdomene",
+    "DISPLAYNAME": "Brukerens visningsnavn",
+    "EMAIL": "E-post",
+    "USERNAME": "Brukernavn",
+    "PROJECTNAME": "Prosjektnavn",
+    "RESOURCEOWNER": "Ressurseier",
+    "METHODS": {
+      "1": "er lik",
+      "5": "inneholder",
+      "7": "slutter med"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tastatursnarveier",
+    "UNDERORGCONTEXT": "Innenfor organisasjonssider",
+    "SIDEWIDE": "Snarveier for hele nettstedet",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>å til <strong>H</strong>jem",
+      "INSTANCE": "<strong>G</strong>å til <strong>I</strong>nstans",
+      "ORG": "<strong>G</strong>å til <strong>O</strong>rganisasjon",
+      "ORGSETTINGS": "<strong>G</strong>å til Organisasjon<strong>s</strong>innstillinger",
+      "ORGSWITCHER": "Bytt organisasjon",
+      "ME": "Gå til egen profil",
+      "PROJECTS": "<strong>G</strong>å til <strong>P</strong>rosjekter",
+      "USERS": "<strong>G</strong>å til <strong>B</strong>rukere",
+      "USERGRANTS": "<strong>G</strong>å til <strong>A</strong>utoriseringer",
+      "ACTIONS": "<strong>G</strong>å til Handlinger og <strong>F</strong>lyter",
+      "DOMAINS": "<strong>G</strong>å til <strong>D</strong>omener"
+    }
+  },
+  "RESOURCEID": "Ressurs-ID",
+  "NAME": "Navn",
+  "VERSION": "Versjon",
+  "TABLE": {
+    "NOROWS": "Ingen data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Vennligst fyll ut dette feltet.",
+    "ATLEASTONE": "Oppgi minst én verdi.",
+    "TOKENINVALID": {
+      "TITLE": "Autorisasjonstokenet ditt har utløpt.",
+      "DESCRIPTION": "Klikk på knappen nedenfor for å logge inn igjen."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Instansen din er blokkert.",
+      "DESCRIPTION": "Be ZITADEL-instansadministratoren om å oppdatere abonnementet."
+    },
+    "INVALID_FORMAT": "Formateringen er ugyldig.",
+    "NOTANEMAIL": "Den oppgitte verdien er ikke en e-postadresse.",
+    "MINLENGTH": "Må være minst {{requiredLength}} tegn langt.",
+    "MAXLENGTH": "Må være mindre enn {{requiredLength}} tegn.",
+    "UPPERCASEMISSING": "Må inneholde en stor bokstav.",
+    "LOWERCASEMISSING": "Må inneholde en liten bokstav.",
+    "SYMBOLERROR": "Må inneholde et symbol eller tegnsettingstegn.",
+    "NUMBERERROR": "Må inneholde et siffer.",
+    "PWNOTEQUAL": "Passordene som ble oppgitt samsvarer ikke.",
+    "PHONE": "Telefonnummeret må starte med +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Innstillinger",
+      "GENERAL": "Generelt",
+      "IDP": "Identitetsleverandører",
+      "SECURITY": "Passord og sikkerhet",
+      "KEYS": "Nøkler",
+      "PAT": "Personlige tilgangstokener",
+      "USERGRANTS": "Autoriseringer",
+      "MEMBERSHIPS": "Medlemskap",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Personlig informasjon",
+    "DESCRIPTION": "Administrer informasjonen og sikkerhetsinnstillingene dine.",
+    "PAGES": {
+      "TITLE": "Bruker",
+      "DETAIL": "Detaljer",
+      "CREATE": "Opprett",
+      "MY": "Min informasjon",
+      "LOGINNAMES": "Brukernavn",
+      "LOGINMETHODS": "Innloggingsmetoder",
+      "LOGINNAMESDESC": "Dette er brukernavnene dine:",
+      "NOUSER": "Ingen tilknyttet bruker.",
+      "REACTIVATE": "Reaktiver",
+      "DEACTIVATE": "Deaktiver",
+      "FILTER": "Filter",
+      "STATE": "Status",
+      "DELETE": "Slett bruker",
+      "UNLOCK": "Lås opp bruker",
+      "GENERATESECRET": "Generer klienthemmelighet",
+      "REMOVESECRET": "Fjern klienthemmelighet",
+      "LOCKEDDESCRIPTION": "Denne brukeren har blitt låst ute på grunn av for mange mislykkede innloggingsforsøk.",
+      "DELETEACCOUNT": "Slett konto",
+      "DELETEACCOUNT_DESC": "Hvis du utfører denne handlingen, blir du logget ut og vil ikke kunne logge inn igjen.",
+      "DELETEACCOUNT_BTN": "Slett konto",
+      "DELETEACCOUNT_SUCCESS": "Kontoen ble slettet!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Opprettet",
+      "DATECHANGED": "Endret"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Slett bruker",
+      "DELETE_SELF_TITLE": "Slett konto",
+      "DELETE_DESCRIPTION": "Du er i ferd med å permanent slette en bruker. Er du sikker?",
+      "DELETE_SELF_DESCRIPTION": "Du er i ferd med å permanent slette din personlige konto. Dette kan ikke angres.",
+      "DELETE_AUTH_DESCRIPTION": "Du er i ferd med å permanent slette din personlige konto. Alle data vil bli slettet.",
+      "TYPEUSERNAME": "Skriv '{{value}}' for å bekrefte og slette brukeren.",
+      "USERNAME": "Brukernavn",
+      "DELETE_BTN": "Slett permanent"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Send e-postvarsling",
+      "DESCRIPTION": "Klikk på knappen nedenfor for å sende et varsel til den gjeldende e-postadressen.",
+      "NEWEMAIL": "Ny e-postadresse"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Klienthemmelighet",
+      "CLIENTSECRET_DESCRIPTION": "Oppbevar klienthemmeligheten på et trygt sted, da den forsvinner etter at du lukker denne dialogen."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deaktiver",
+      "ACTIVATE": "Aktiver",
+      "CHANGEDATE": "Sist endret",
+      "CREATIONDATE": "Opprettet",
+      "FILTER": {
+        "0": "Filtrer etter visningsnavn",
+        "1": "Filtrer etter brukernavn",
+        "2": "filtrer etter visningsnavn",
+        "3": "filtrer etter brukernavn",
+        "4": "filtrer etter e-post",
+        "5": "filtrer etter visningsnavn",
+        "10": "filtrer etter organisasjonsnavn",
+        "12": "filtrer etter prosjektnavn"
+      },
+      "EMPTY": "Ingen oppføringer"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Send registreringslenke",
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Navn",
+      "EMPTY": "Ingen enhet angitt",
+      "TITLE": "Passnøkkelautentisering",
+      "DESCRIPTION": "Legg til WebAuthn-baserte autentiseringsmetoder for å logge på ZITADEL.",
+      "MANAGE_DESCRIPTION": "Administrer andrefaktormetodene til brukerne dine.",
+      "U2F": "Legg til metode",
+      "U2F_DIALOG_TITLE": "Verifiser autentisator",
+      "U2F_DIALOG_DESCRIPTION": "Skriv inn et navn for passnøkkelinnloggingen din",
+      "U2F_SUCCESS": "Passnøkkelautentisering opprettet!",
+      "U2F_ERROR": "En feil oppstod under oppsett!",
+      "U2F_NAME": "Autentisatornavn",
+      "TYPE": {
+        "0": "Ingen MFA definert",
+        "1": "Engangspassord (OTP)",
+        "2": "Passnøkkel"
+      },
+      "STATE": {
+        "0": "Ingen status",
+        "1": "Ikke klar",
+        "2": "Klar",
+        "3": "Slettet"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Fjern passnøkkel",
+        "DELETE_DESCRIPTION": "Du er i ferd med å slette en passnøkkel. Er du sikker?",
+        "ADD_TITLE": "Passnøkkelautentisering",
+        "ADD_DESCRIPTION": "Velg et av de tilgjengelige alternativene for å opprette en passnøkkel.",
+        "SEND_DESCRIPTION": "Send deg selv en registreringslenke til e-postadressen din.",
+        "SEND": "Send registreringslenke",
+        "SENT": "E-posten ble sendt. Sjekk innboksen din for å fullføre oppsettet.",
+        "QRCODE_DESCRIPTION": "Generer QR-kode for skanning med en annen enhet.",
+        "QRCODE": "Generer QR-kode",
+        "QRCODE_SCAN": "Skann denne QR-koden for å fortsette oppsettet på enheten din.",
+        "NEW_DESCRIPTION": "Bruk denne enheten til å sette opp passnøkkel.",
+        "NEW": "Legg til ny"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Navn",
+      "EMPTY": "Ingen ekstra faktorer",
+      "TITLE": "Flerfaktorautentisering",
+      "DESCRIPTION": "Legg til en andrefaktor for å sikre optimal sikkerhet for kontoen din.",
+      "MANAGE_DESCRIPTION": "Administrer andrefaktormetodene til brukerne dine.",
+      "ADD": "Legg til faktor",
+      "OTP": "Autentiseringsapp for TOTP (tidsbasert engangspassord)",
+      "OTP_DIALOG_TITLE": "Legg til OTP",
+      "OTP_DIALOG_DESCRIPTION": "Skann QR-koden med en autentiseringsapp og skriv inn koden.",
+      "U2F": "Passnøkkel",
+      "U2F_DIALOG_TITLE": "Verifiser faktor",
+      "U2F_DIALOG_DESCRIPTION": "Skriv inn et navn for den universelle flerfaktoren din.",
+      "U2F_SUCCESS": "Faktor lagt til!",
+      "U2F_ERROR": "En feil oppstod under oppsett!",
+      "U2F_NAME": "Autentisatornavn",
+      "OTPSMS": "OTP (engangspassord) med SMS",
+      "OTPEMAIL": "OTP (engangspassord) med e-post",
+      "SETUPOTPSMSDESCRIPTION": "Vil du sette opp dette telefonnummeret som OTP (engangspassord)?",
+      "OTPSMSSUCCESS": "OTP-faktor satt opp.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Telefonen din må være verifisert for å bruke denne metoden.",
+      "OTPEMAILSUCCESS": "OTP-faktor satt opp.",
+      "TYPE": {
+        "0": "Ingen MFA definert",
+        "1": "Engangspassord (OTP)",
+        "2": "Passnøkkel"
+      },
+      "STATE": {
+        "0": "Ingen status",
+        "1": "Ikke klar",
+        "2": "Klar",
+        "3": "Slettet"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Fjern andrefaktor",
+        "MFA_DELETE_DESCRIPTION": "Du er i ferd med å slette en andrefaktor. Er du sikker?",
+        "ADD_MFA_TITLE": "Legg til andrefaktor",
+        "ADD_MFA_DESCRIPTION": "Velg et av følgende alternativer."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Eksterne identitetsleverandører",
+      "DESC": "",
+      "IDPCONFIGID": "IDP-konfigurasjons-ID",
+      "IDPNAME": "IDP-navn",
+      "USERDISPLAYNAME": "Eksternt navn",
+      "EXTERNALUSERID": "Ekstern bruker-ID",
+      "EMPTY": "Ingen ekstern IdP funnet",
+      "DIALOG": {
+        "DELETE_TITLE": "Fjern IdP",
+        "DELETE_DESCRIPTION": "Du er i ferd med å slette en identitetsleverandør fra en bruker. Vil du fortsette?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Opprett en ny bruker",
+      "DESCRIPTION": "Vennligst oppgi nødvendig informasjon.",
+      "NAMEANDEMAILSECTION": "Navn og e-post",
+      "GENDERLANGSECTION": "Kjønn og språk",
+      "PHONESECTION": "Telefonnumre",
+      "PASSWORDSECTION": "Opprinnelig passord",
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Hvis begge alternativene er valgt, vil ingen e-post for initialisering bli sendt.",
+      "SETUPAUTHENTICATIONLATER": "Sett opp autentisering senere for denne brukeren.",
+      "INVITATION": "Send en invitasjons-e-post for oppsett av autentisering og e-postverifisering.",
+      "INITIALPASSWORD": "Angi et opprinnelig passord for brukeren."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verifiser telefonnummer",
+      "DESCRIPTION": "Skriv inn koden du mottok på SMS for å verifisere telefonnummeret ditt.",
+      "CODE": "Kode"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Ukjent",
+      "STATE1": "Aktiv",
+      "STATE2": "Inaktiv",
+      "STATE3": "Slettet",
+      "STATE4": "Låst",
+      "STATE5": "Suspendert",
+      "STATE6": "Innledende"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-post",
+      "PHONE": "Telefonnummer",
+      "PHONE_HINT": "Bruk +-symbolet etterfulgt av landets retningsnummer, eller velg et land fra listen.",
+      "PHONE_VERIFIED": "Telefonnummer verifisert",
+      "SEND_SMS": "Send verifiserings-SMS",
+      "SEND_EMAIL": "Send e-post",
+      "USERNAME": "Brukernavn",
+      "CHANGEUSERNAME": "endre",
+      "CHANGEUSERNAME_TITLE": "Endre brukernavn",
+      "CHANGEUSERNAME_DESC": "Skriv inn det nye navnet i feltet nedenfor.",
+      "FIRSTNAME": "Fornavn",
+      "LASTNAME": "Etternavn",
+      "NICKNAME": "Kallenavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "PREFERREDLOGINNAME": "Foretrukket påloggingsnavn",
+      "PREFERRED_LANGUAGE": "Språk",
+      "GENDER": "Kjønn",
+      "PASSWORD": "Passord",
+      "AVATAR": {
+        "UPLOADTITLE": "Last opp profilbildet ditt",
+        "UPLOADBTN": "Velg fil",
+        "UPLOAD": "Last opp",
+        "CURRENT": "Nåværende bilde",
+        "PREVIEW": "Forhåndsvisning",
+        "DELETESUCCESS": "Slettet!",
+        "CROPPERERROR": "Det oppstod en feil under opplasting av filen. Prøv en annen fil."
+      },
+      "COUNTRY": "Land"
+    },
+    "MACHINE": {
+      "TITLE": "Tjenestebrukerdetaljer",
+      "USERNAME": "Brukernavn",
+      "NAME": "Navn",
+      "DESCRIPTION": "Beskrivelse",
+      "KEYSTITLE": "Nøkler",
+      "KEYSDESC": "Definer nøklene dine og legg til en valgfri utløpsdato.",
+      "TOKENSTITLE": "Personlige tilgangstokener",
+      "TOKENSDESC": "Personlige tilgangstokener fungerer som vanlige OAuth-tilgangstokener.",
+      "ID": "Nøkkel-ID",
+      "TYPE": "Type",
+      "EXPIRATIONDATE": "Utløpsdato",
+      "CHOOSEDATEAFTER": "Angi en gyldig utløpsdato etter",
+      "CHOOSEEXPIRY": "Velg en utløpsdato",
+      "CREATIONDATE": "Opprettelsesdato",
+      "KEYDETAILS": "Nøkkeldetaljer",
+      "ACCESSTOKENTYPE": "Tilgangstokentype",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Legg til nøkkel",
+        "DESCRIPTION": "Velg nøkkeltype og en valgfri utløpsdato."
+      },
+      "ADDED": {
+        "TITLE": "Nøkkelen ble opprettet",
+        "DESCRIPTION": "Last ned nøkkelen da den ikke vil være synlig etter at du lukker denne dialogen."
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Slett nøkkel",
+          "DESCRIPTION": "Vil du slette den valgte nøkkelen? Dette kan ikke angres."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Passord",
+      "LABEL": "Et sikkert passord bidrar til å beskytte kontoen",
+      "DESCRIPTION": "Skriv inn det nye passordet i henhold til retningslinjene nedenfor.",
+      "OLD": "Nåværende passord",
+      "NEW": "Nytt passord",
+      "CONFIRM": "Bekreft nytt passord",
+      "NEWINITIAL": "Passord",
+      "CONFIRMINITIAL": "Bekreft passord",
+      "RESET": "Tilbakestill nåværende passord",
+      "SET": "Angi nytt passord",
+      "RESENDNOTIFICATION": "Send lenke for tilbakestilling av passord",
+      "REQUIRED": "Noen obligatoriske felt mangler.",
+      "MINLENGTHERROR": "Må være minst {{value}} tegn.",
+      "MAXLENGTHERROR": "Må være mindre enn {{value}} tegn."
+    },
+    "ID": "ID",
+    "EMAIL": "E-post",
+    "PHONE": "Telefonnummer",
+    "PHONEEMPTY": "Ingen telefonnummer definert",
+    "PHONEVERIFIED": "Telefonnummer verifisert.",
+    "EMAILVERIFIED": "E-post verifisert",
+    "NOTVERIFIED": "ikke verifisert",
+    "PREFERRED_LOGINNAME": "Foretrukket påloggingsnavn",
+    "ISINITIAL": "Brukeren er ikke aktiv ennå.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktinformasjon",
+      "DESCRIPTION": "Den oppgitte informasjonen brukes til å sende viktig informasjon til brukeren.",
+      "EMAIL": {
+        "TITLE": "E-post",
+        "VALID": "verifisert",
+        "ISVERIFIED": "E-post verifisert",
+        "ISVERIFIEDDESC": "Hvis e-posten er angitt som verifisert, sendes ingen e-postverifisering.",
+        "RESEND": "Send verifiserings-e-post på nytt",
+        "EDITTITLE": "Endre e-post",
+        "EDITDESC": "Skriv inn den nye e-postadressen i feltet nedenfor."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "verifisert",
+        "RESEND": "Send verifiserings-SMS på nytt",
+        "EDITTITLE": "Endre nummer",
+        "EDITVALUE": "Telefonnummer",
+        "EDITDESC": "Skriv inn det nye telefonnummeret i feltet nedenfor.",
+        "DELETETITLE": "Slett telefonnummer",
+        "DELETEDESC": "Vil du virkelig slette telefonnummeret",
+        "OTPSMSREMOVALWARNING": "Denne kontoen bruker dette telefonnummeret som andre faktor. Du vil ikke kunne bruke SMS som andre faktor lenger."
+      },
+      "RESENDCODE": "Send kode på nytt",
+      "ENTERCODE": "Verifiser",
+      "ENTERCODE_DESC": "Bekreft kode"
+    },
+    "GRANTS": {
+      "TITLE": "Brukerrettigheter",
+      "DESCRIPTION": "Gi denne brukeren tilgang til visse prosjekter",
+      "CREATE": {
+        "TITLE": "Opprett brukerrettighet",
+        "DESCRIPTION": "Søk etter organisasjonen, prosjektet og de tilhørende rollene."
+      },
+      "PROJECTNAME": "Prosjektnavn",
+      "PROJECT-OWNED": "Prosjekt",
+      "PROJECT-GRANTED": "Tildelt prosjekt",
+      "FILTER": {
+        "0": "filtrer for bruker",
+        "1": "filtrer for domene",
+        "2": "filtrer for prosjektnavn",
+        "3": "filtrer for rollenavn"
+      }
+    },
+    "STATE": {
+      "0": "Ukjent",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Slettet",
+      "4": "Låst",
+      "5": "Suspendert",
+      "6": "Innledende"
+    },
+    "STATEV2": {
+      "0": "Ukjent",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Slettet",
+      "4": "Låst",
+      "5": "Innledende"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Påloggingsnavn (nåværende organisasjon)",
+      "ADDITIONAL-EXTERNAL": "Påloggingsnavn (ekstern organisasjon)"
+    },
+    "TARGET": {
+      "SELF": "Hvis du vil gi en bruker fra en annen organisasjon tilgang",
+      "EXTERNAL": "For å gi en bruker i din organisasjon tilgang",
+      "CLICKHERE": "klikk her"
+    },
+    "SIGNEDOUT": "Du er logget ut. Klikk på knappen «Logg inn» for å logge inn igjen.",
+    "SIGNEDOUT_BTN": "Logg inn",
+    "EDITACCOUNT": "Rediger konto",
+    "ADDACCOUNT": "Logg inn med en annen konto",
+    "RESENDINITIALEMAIL": "Send aktiverings-e-post på nytt",
+    "RESENDEMAILNOTIFICATION": "Send e-postvarsel på nytt",
+    "TOAST": {
+      "CREATED": "Bruker opprettet.",
+      "SAVED": "Profil lagret.",
+      "USERNAMECHANGED": "Brukernavn endret.",
+      "EMAILSAVED": "E-post lagret.",
+      "INITEMAILSENT": "Initialiseringse-post sendt.",
+      "PHONESAVED": "Telefon lagret.",
+      "PHONEREMOVED": "Telefon er fjernet.",
+      "PHONEVERIFIED": "Telefon verifisert.",
+      "PHONEVERIFICATIONSENT": "Verifiseringskode sendt til telefon.",
+      "EMAILVERIFICATIONSENT": "Verifiseringskode sendt til e-post.",
+      "OTPREMOVED": "OTP fjernet.",
+      "U2FREMOVED": "Faktor fjernet.",
+      "PASSWORDLESSREMOVED": "Passnøkkel fjernet.",
+      "INITIALPASSWORDSET": "Opprinnelig passord angitt.",
+      "PASSWORDNOTIFICATIONSENT": "Varsel om passordendring sendt.",
+      "PASSWORDCHANGED": "Passord endret.",
+      "REACTIVATED": "Bruker reaktivert.",
+      "DEACTIVATED": "Bruker deaktivert.",
+      "SELECTEDREACTIVATED": "Valgte brukere reaktivert.",
+      "SELECTEDDEACTIVATED": "Valgte brukere deaktivert.",
+      "SELECTEDKEYSDELETED": "Valgte nøkler slettet.",
+      "KEYADDED": "Nøkkel lagt til!",
+      "MACHINEADDED": "Tjenestebruker opprettet!",
+      "DELETED": "Bruker slettet!",
+      "UNLOCKED": "Bruker låst opp!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registreringslenke sendt.",
+      "SECRETGENERATED": "Hemmelighet generert!",
+      "SECRETREMOVED": "Hemmelighet fjernet!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL-administratorroller",
+      "DESCRIPTION": "Dette er alle medlemstildelinger for brukeren. Du kan endre dem her.",
+      "ORGCONTEXT": "Du ser alle organisasjoner og prosjekter som er relatert til denne brukeren.",
+      "USERCONTEXT": "Du ser alle organisasjoner og prosjekter du er autorisert for.",
+      "CREATIONDATE": "Opprettelsesdato",
+      "CHANGEDATE": "Sist endret",
+      "DISPLAYNAME": "Visningsnavn",
+      "REMOVE": "Fjern",
+      "TYPE": "Type",
+      "ORGID": "Organisasjons-ID",
+      "UPDATED": "Medlemskapet ble oppdatert.",
+      "NOPERMISSIONTOEDIT": "Du mangler nødvendige tillatelser for å redigere roller!",
+      "TYPES": {
+        "UNKNOWN": "Ukjent",
+        "ORG": "Organisasjon",
+        "PROJECT": "Prosjekt",
+        "GRANTEDPROJECT": "Tildelt prosjekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generer nytt personlig tilgangstoken",
+        "DESCRIPTION": "Definer en egendefinert utløpsdato for tokenet.",
+        "CHOOSEEXPIRY": "Velg en utløpsdato",
+        "CHOOSEDATEAFTER": "Angi en gyldig utløpsdato etter"
+      },
+      "ADDED": {
+        "TITLE": "Personlig tilgangstoken",
+        "DESCRIPTION": "Sørg for å kopiere ditt personlige tilgangstoken. Du vil ikke kunne se det igjen."
+      },
+      "DELETE": {
+        "TITLE": "Slett token",
+        "DESCRIPTION": "Du er i ferd med å slette det personlige tilgangstokenet. Er du sikker?"
+      },
+      "DELETED": "Token slettet."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Nøkkel",
+    "VALUE": "Verdi",
+    "ADD": "Ny oppføring",
+    "SAVE": "Lagre",
+    "EMPTY": "Ingen metadata",
+    "SETSUCCESS": "Element lagret",
+    "REMOVESUCCESS": "Element slettet"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Navn",
+    "STATE": "Status",
+    "STATES": {
+      "0": "ingen status",
+      "1": "inaktiv",
+      "2": "aktiv"
+    },
+    "ADDTRIGGER": "Legg til utløser",
+    "FLOWCHANGED": "Flyten ble endret",
+    "FLOWCLEARED": "Flyten ble tilbakestilt",
+    "TIMEOUT": "Tidsavbrudd",
+    "TIMEOUTINSEC": "Tidsavbrudd i sekunder",
+    "ALLOWEDTOFAIL": "Tillatt å feile",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Advarsel",
+      "DESCRIPTION": "Hvis du deaktiverer denne innstillingen, kan det føre til at brukere i organisasjonen din ikke kan logge inn."
+    },
+    "SCRIPT": "Skript",
+    "FLOWTYPE": "Flyttype",
+    "TRIGGERTYPE": "Utløsertype",
+    "ACTIONS": "Handlinger",
+    "ACTIONSMAX": "Basert på ditt abonnement har du et begrenset antall handlinger tilgjengelig.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Opprett en handling"
+      },
+      "UPDATE": {
+        "TITLE": "Oppdater handling"
+      },
+      "DELETEACTION": {
+        "TITLE": "Slette handling?",
+        "DESCRIPTION": "Du er i ferd med å slette en handling. Dette kan ikke angres.",
+        "DELETE_SUCCESS": "Handling slettet."
+      },
+      "CLEAR": {
+        "TITLE": "Tilbakestille flyt?",
+        "DESCRIPTION": "Du er i ferd med å tilbakestille flyten sammen med utløserne og handlingene. Vil du fortsette?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Slette valgte handlinger?",
+        "DESCRIPTION": "Er du sikker på at du vil slette de valgte handlingene fra listen?"
+      },
+      "ABOUTNAME": "Navnet på handlingen og navnet på funksjonen i JavaScript-koden må være identiske."
+    },
+    "TOAST": {
+      "ACTIONSSET": "Handlinger angitt",
+      "ACTIONREACTIVATED": "Handlinger reaktivert",
+      "ACTIONDEACTIVATED": "Handlinger deaktivert"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Systempolicyer og tilgangsinnstillinger",
+      "DESCRIPTION": "Administrer dine globale policyer og administrasjonstilgangsinnstillinger."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM-lagringsadministrasjon",
+      "DESCRIPTION": "Administrer dine ZITADEL-visninger og feilede hendelser."
+    },
+    "MEMBER": {
+      "TITLE": "Administratorer",
+      "DESCRIPTION": "Disse administratorene har tillatelse til å gjøre endringer i instansen din."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Egendefinerte domener"
+    },
+    "STATE": {
+      "0": "Uspesifisert",
+      "1": "Opprettes",
+      "2": "Kjører",
+      "3": "Stopper",
+      "4": "Stoppet"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Navn",
+      "DATABASE": "Database",
+      "SEQUENCE": "Sekvens",
+      "EVENTTIMESTAMP": "Tidsstempel",
+      "LASTSPOOL": "Vellykket spoling",
+      "ACTIONS": "Handlinger",
+      "CLEAR": "Tøm",
+      "CLEARED": "Visning ble tømt!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Tøm visning",
+        "VIEW_CLEAR_DESCRIPTION": "Du er i ferd med å tømme en visning. Å tømme en visning oppretter en prosess som kan ta litt tid."
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Navn",
+      "DATABASE": "Database",
+      "FAILEDSEQUENCE": "Mislykket sekvens",
+      "FAILURECOUNT": "Antall feil",
+      "LASTFAILED": "Sist mislykket",
+      "ERRORMESSAGE": "Feilmelding",
+      "ACTIONS": "Handlinger",
+      "DELETE": "Fjern",
+      "DELETESUCCESS": "Mislykkede hendelser fjernet."
+    },
+    "EVENTS": {
+      "EDITOR": "Redaktør",
+      "EDITORID": "Redaktør-ID",
+      "AGGREGATE": "Aggregat",
+      "AGGREGATEID": "Aggregat-ID",
+      "AGGREGATETYPE": "Aggregattype",
+      "RESOURCEOWNER": "Ressurseier",
+      "SEQUENCE": "Sekvens",
+      "CREATIONDATE": "Opprettet",
+      "TYPE": "Type",
+      "PAYLOAD": "Nyttelast",
+      "FILTERS": {
+        "BTN": "Filtrer",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer etter redaktør"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregattype",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer etter aggregat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrer etter type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrer etter ressurseier"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekvens",
+          "CHECKBOX": "Filtrer etter sekvens"
+        },
+        "SORT": "Sorter",
+        "ASC": "Stigende",
+        "DESC": "Synkende",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Fra",
+          "RADIO_RANGE": "Område",
+          "LABEL_SINCE": "Siden",
+          "LABEL_UNTIL": "Til"
+        },
+        "OTHER": "annen",
+        "OTHERS": "andre"
+      },
+      "DIALOG": {
+        "TITLE": "Hendelsesdetaljer"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERSADDED": "Administratorer lagt til.",
+      "MEMBERADDED": "Administrator lagt til.",
+      "MEMBERCHANGED": "Administrator endret.",
+      "ROLEREMOVED": "Rolle fjernet.",
+      "ROLECHANGED": "Rolle endret.",
+      "REACTIVATED": "Reaktivert",
+      "DEACTIVATED": "Deaktivert"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Navn",
+      "ID": "ID",
+      "CREATIONDATE": "Opprettelsesdato",
+      "DATECHANGED": "Endret",
+      "FILTER": "Filter",
+      "FILTERPLACEHOLDER": "Filtrer etter navn",
+      "LIST": "Organisasjoner",
+      "LISTDESCRIPTION": "Velg en organisasjon.",
+      "ACTIVE": "Aktiv",
+      "CREATE": "Opprett organisasjon",
+      "DEACTIVATE": "Deaktiver organisasjon",
+      "REACTIVATE": "Reaktiver organisasjon",
+      "NOPERMISSION": "Du har ikke tillatelse til å få tilgang til organisasjonsinnstillinger.",
+      "USERSELFACCOUNT": "Bruk din personlige konto som organisasjonseier",
+      "ORGDETAIL_TITLE": "Skriv inn navnet og domenet for din nye organisasjon.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Skriv inn navnet på din nye organisasjon.",
+      "ORGDETAILUSER_TITLE": "Konfigurer organisasjonseier",
+      "DELETE": "Slett organisasjon",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Angi som standardorganisasjon",
+      "DEFAULTORGSET": "Standardorganisasjon endret",
+      "RENAME": {
+        "ACTION": "Gi nytt navn",
+        "TITLE": "Gi organisasjon nytt navn",
+        "DESCRIPTION": "Skriv inn det nye navnet for organisasjonen din",
+        "BTN": "Gi nytt navn"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verifiser eierskap av {{value}}",
+        "VERIFICATION": "Vi tilbyr deg to metoder for å manuelt validere domenet ditt:",
+        "VERIFICATION_HTML": "- HTTP. Vert en midlertidig verifiseringsfil på nettstedet ditt",
+        "VERIFICATION_DNS": "- DNS. Opprett en TXT-post DNS-oppføring",
+        "VERIFICATION_DNS_DESC": "Hvis du administrerer {{ value }} og har tilgang til DNS-oppføringene dine",
+        "VERIFICATION_DNS_HOST_LABEL": "Vert:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Bruk denne koden som verdi for TXT-posten:",
+        "VERIFICATION_HTTP_DESC": "Hvis du har tilgang til webhotellet ditt, last ned filen og plasser den på nettstedet.",
+        "VERIFICATION_HTTP_URL_LABEL": "Forventet URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verifiseringsfil:",
+        "VERIFICATION_SKIP": "Du kan hoppe over verifisering for nå og fortsette å opprette organisasjonen din.",
+        "VERIFICATION_VALIDATION_DESC": "Ikke slett verifiseringskoden, da ZITADEL vil sjekke den på nytt.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Be om nytt token",
+        "VERIFICATION_VALIDATION_ONGOING": "{{ value }}-metoden er valgt for å verifisere domenet ditt.",
+        "VERIFICATION_SUCCESSFUL": "Domene verifisert!",
+        "RESETMETHOD": "Tilbakestill verifiseringsmetode"
+      },
+      "DOWNLOAD_FILE": "Last ned fil",
+      "SELECTORGTOOLTIP": "Velg denne organisasjonen.",
+      "PRIMARYDOMAIN": "Primærdomene",
+      "STATE": "Status",
+      "USEPASSWORD": "Angi opprinnelig passord",
+      "USEPASSWORDDESC": "Brukeren trenger ikke å sette passord under initialisering."
+    },
+    "LIST": {
+      "TITLE": "Organisasjoner",
+      "DESCRIPTION": "Dette er organisasjonene i instansen din"
+    },
+    "DOMAINS": {
+      "NEW": "Legg til domene",
+      "TITLE": "Verifiserte domener",
+      "DESCRIPTION": "Konfigurer organisasjonsdomenene dine. Dette domenet kan brukes til pålogging.",
+      "SETPRIMARY": "Angi som primær",
+      "DELETE": {
+        "TITLE": "Slett domene",
+        "DESCRIPTION": "Du er i ferd med å slette et av domenene dine."
+      },
+      "ADD": {
+        "TITLE": "Legg til domene",
+        "DESCRIPTION": "Du er i ferd med å legge til et domene for organisasjonen din. Etter at du har lagt det til, må du verifisere det."
+      }
+    },
+    "STATE": {
+      "0": "Ikke definert",
+      "1": "Aktiv",
+      "2": "Deaktivert"
+    },
+    "MEMBER": {
+      "TITLE": "Organisasjonsadministratorer",
+      "DESCRIPTION": "Definer brukerne som kan endre organisasjonens innstillinger."
+    },
+    "TOAST": {
+      "UPDATED": "Organisasjon oppdatert.",
+      "DEACTIVATED": "Organisasjon deaktivert.",
+      "REACTIVATED": "Organisasjon reaktivert.",
+      "DOMAINADDED": "Domene lagt til.",
+      "DOMAINREMOVED": "Domene fjernet.",
+      "MEMBERADDED": "Administrator lagt til.",
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERCHANGED": "Administrator endret.",
+      "SETPRIMARY": "Primærdomene angitt.",
+      "DELETED": "Organisasjon slettet",
+      "DEFAULTORGNOTFOUND": "Standardorganisasjonen ble ikke funnet",
+      "ORG_WAS_DELETED": "Organisasjonen har blitt slettet."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deaktiver organisasjon",
+        "DESCRIPTION": "Du er i ferd med å deaktivere organisasjonen din. Brukere vil ikke kunne logge inn."
+      },
+      "REACTIVATE": {
+        "TITLE": "Reaktiver organisasjon",
+        "DESCRIPTION": "Du er i ferd med å reaktivere organisasjonen din. Brukere vil kunne logge inn igjen."
+      },
+      "DELETE": {
+        "TITLE": "Slett organisasjon",
+        "DESCRIPTION": "Du er i ferd med å slette organisasjonen din. Dette starter en slettingsprosess.",
+        "TYPENAME": "Skriv '{{value}}' for å slette organisasjonen.",
+        "ORGNAME": "Navn",
+        "BTN": "Slett"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organisasjoner",
+      "FEATURESETTINGS": "Funksjoner",
+      "LANGUAGES": "Språk",
+      "LOGIN": "Innloggingsatferd og sikkerhet",
+      "LOCKOUT": "Utestengelse",
+      "AGE": "Passordutløp",
+      "COMPLEXITY": "Passordkompleksitet",
+      "NOTIFICATIONS": "Varsler",
+      "SMTP_PROVIDER": "SMTP-leverandør",
+      "SMS_PROVIDER": "SMS/telefon-leverandør",
+      "NOTIFICATIONS_DESC": "SMTP- og SMS-innstillinger",
+      "MESSAGETEXTS": "Meldingstekster",
+      "IDP": "Identitetsleverandører",
+      "VERIFIED_DOMAINS": "Verifiserte domener",
+      "DOMAIN": "Domeneinnstillinger",
+      "LOGINTEXTS": "Tekster for innloggingsgrensesnitt",
+      "BRANDING": "Merkevarebygging",
+      "PRIVACYPOLICY": "Eksterne lenker",
+      "OIDC": "OIDC-token levetid og utløp",
+      "WEB_KEYS": "OIDC-webnøkler",
+      "SECRETS": "Hemmelighetsgenerator",
+      "SECURITY": "Sikkerhetsinnstillinger",
+      "EVENTS": "Hendelser",
+      "FAILEDEVENTS": "Mislykkede hendelser",
+      "VIEWS": "Visninger",
+      "ACTIONS": "Handlinger",
+      "TARGETS": "Mål"
+    },
+    "GROUPS": {
+      "GENERAL": "Generell informasjon",
+      "NOTIFICATIONS": "Varsler",
+      "LOGIN": "Innlogging og tilgang",
+      "DOMAIN": "Domene",
+      "TEXTS": "Tekster og språk",
+      "APPEARANCE": "Utseende",
+      "OTHER": "Annet",
+      "STORAGE": "Lagring",
+      "ACTIONS": "Handlinger"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Standardspråk",
+      "ALLOWED": "Tillatte språk",
+      "NOT_ALLOWED": "Ikke tillatte språk",
+      "ALLOW_ALL": "Tillat alle",
+      "DISALLOW_ALL": "Ikke tillat noen",
+      "SETASDEFAULT": "Angi som standardspråk",
+      "DEFAULT_SAVED": "Standardspråk lagret",
+      "ALLOWED_SAVED": "Tillatte språk lagret",
+      "OPTIONS": {
+        "de": "Tysk",
+        "en": "Engelsk",
+        "es": "Spansk",
+        "fr": "Fransk",
+        "it": "Italiensk",
+        "ja": "Japansk",
+        "pl": "Polsk",
+        "zh": "Kinesisk (forenklet)",
+        "bg": "Bulgarsk",
+        "pt": "Portugisisk",
+        "mk": "Makedonsk",
+        "cs": "Tsjekkisk",
+        "ru": "Russisk",
+        "nl": "Nederlandsk",
+        "sv": "Svensk",
+        "id": "Indonesisk",
+        "hu": "Ungarsk",
+        "ko": "Koreansk",
+        "ro": "Rumensk",
+        "tr": "Tyrkisk",
+        "uk": "Ukrainsk",
+        "nb": "Norsk bokmål"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP-leverandør",
+      "DESCRIPTION": "Beskrivelse",
+      "SENDERADDRESS": "Avsenders e-postadresse",
+      "SENDERNAME": "Avsendernavn",
+      "REPLYTOADDRESS": "Svar-til-adresse",
+      "HOSTANDPORT": "Vert og port",
+      "USER": "Bruker",
+      "PASSWORD": "Passord",
+      "SETPASSWORD": "Angi SMTP-passord",
+      "PASSWORDSET": "SMTP-passord ble angitt.",
+      "TLS": "Transportlagssikkerhet (TLS)",
+      "SAVED": "Lagret!",
+      "NOCHANGES": "Ingen endringer!",
+      "REQUIREDWARN": "For å sende varsler fra ditt domene, må du oppgi din SMTP-konfigurasjon."
+    },
+    "SMS": {
+      "PROVIDERS": "Leverandører",
+      "PROVIDER": "SMS-leverandør",
+      "ADDPROVIDER": "Legg til SMS-leverandør",
+      "ADDPROVIDERDESCRIPTION": "Velg en av de tilgjengelige leverandørene og oppgi nødvendig informasjon.",
+      "REMOVEPROVIDER": "Fjern leverandør",
+      "REMOVEPROVIDER_DESC": "Du er i ferd med å slette en leverandørkonfigurasjon. Vil du fortsette?",
+      "SMSPROVIDERSTATE": {
+        "0": "Uspesifisert",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ACTIVATED": "Leverandør aktivert.",
+      "DEACTIVATED": "Leverandør deaktivert.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Avsendernummer",
+        "VERIFYSERVICESID": "Verifikasjon Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Ved å angi en Verifikasjon Service Sid, kan du bruke Twilio Verify til SMS-verifisering.",
+        "ADDED": "Twilio lagt til.",
+        "UPDATED": "Twilio oppdatert.",
+        "REMOVED": "Twilio fjernet",
+        "CHANGETOKEN": "Endre token",
+        "SETTOKEN": "Angi token",
+        "TOKENSET": "Token angitt."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Hemmelighetstyper",
+      "TYPE": {
+        "1": "Initialiseringspost",
+        "2": "E-postverifisering",
+        "3": "Telefonverifisering",
+        "4": "Tilbakestilling av passord",
+        "5": "Passordnøkkel-initialisering",
+        "6": "App-hemmelighet",
+        "7": "Engangspassord (OTP) - SMS",
+        "8": "Engangspassord (OTP) - E-post"
+      },
+      "EXPIRY": "Utløp (i minutter)",
+      "INCLUDEDIGITS": "Inkluder tall",
+      "INCLUDESYMBOLS": "Inkluder symboler",
+      "INCLUDELOWERLETTERS": "Inkluder små bokstaver",
+      "INCLUDEUPPERLETTERS": "Inkluder store bokstaver",
+      "LENGTH": "Lengde",
+      "UPDATED": "Innstillinger oppdatert."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Denne innstillingen setter CSP til å tillate innramming fra et sett med tillatte opprinnelser.",
+      "IFRAMEENABLED": "Tillat iFrame",
+      "ALLOWEDORIGINS": "Tillatte URL-er",
+      "IMPERSONATIONTITLE": "Etterligning",
+      "IMPERSONATIONENABLED": "Tillat etterligning",
+      "IMPERSONATIONDESCRIPTION": "Denne innstillingen tillater bruk av etterligning. Merk at brukere fortsatt trenger de nødvendige tillatelsene."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Standard org for pålogging",
+      "LOGINDEFAULTORG_DESCRIPTION": "Påloggingsgrensesnittet vil bruke innstillingene til standardorganisasjonen (og ikke instansen).",
+      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktiver den eksperimentelle urn:ietf:params:oauth:grant-type:token-exchange grant-typen.",
+      "USERSCHEMA": "Brukerskjema",
+      "USERSCHEMA_DESCRIPTION": "Brukerskjemaer lar deg administrere dataskjemaer for brukere. Hvis flagget er aktivert, vil brukerskjema-funksjonen være tilgjengelig.",
+      "ACTIONS": "Handlinger",
+      "ACTIONS_DESCRIPTION": "Handlinger v2 lar deg administrere datakjøringer og mål. Hvis flagget er aktivert, vil handlinger v2-funksjonen være tilgjengelig.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Enkelt V1 Sesjonsavslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Hvis flagget er aktivert, kan du avslutte en enkelt v1-sesjon ved utlogging.",
+      "DEBUGOIDCPARENTERROR": "Feilsøk OIDC overordnet feil",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Hvis flagget er aktivert, vil OIDC overordnet feil bli logget.",
+      "ENABLEBACKCHANNELLOGOUT": "Aktiver Backchannel-utlogging",
+      "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Backchannel-utlogging implementerer OpenID Connect Back-Channel Logout spesifikasjonen.",
+      "PERMISSIONCHECKV2": "Tillatelseskontroll V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Hvis flagget er aktivert, kan du bruke det nye API-et og tillatelseskontrollsystemet.",
+      "STATES": {
+        "INHERITED": "Arv",
+        "ENABLED": "Aktivert",
+        "DISABLED": "Deaktivert"
+      },
+      "INHERITED_DESCRIPTION": "Dette setter verdien til systemets standardverdi.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "«Aktivert» er arvet",
+        "DISABLED": "«Deaktivert» er arvet"
+      },
+      "RESET": "Sett alle til arv",
+      "CONSOLEUSEV2USERAPI": "Bruk V2 API i konsollen for brukeroppretting",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Når dette flagget er aktivert, bruker konsollen V2 User API for brukeroppretting.",
+      "LOGINV2": "Pålogging V2",
+      "LOGINV2_DESCRIPTION": "Aktivering av dette aktiverer det nye TypeScript-baserte påloggingsgrensesnittet med forbedrede funksjoner.",
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relasjonstabeller",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktiver dette for å bruke relasjonstabeller i stedet for projeksjoner for bedre ytelse."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Tilbakestill innstilling",
+        "DEFAULTDESCRIPTION": "Du er i ferd med å tilbakestille innstillingene til standardkonfigurasjonen. Vil du fortsette?",
+        "LOGINPOLICY_DESCRIPTION": "Advarsel: Hvis du fortsetter, vil innstillinger for identitetsleverandør bli tilbakestilt."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Brukt på",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Passordkompleksitet",
+      "DESCRIPTION": "Sikrer at alle angitte passord samsvarer med et bestemt mønster.",
+      "SYMBOLANDNUMBERERROR": "Må inneholde et tall og et symbol/tegnsettingstegn.",
+      "SYMBOLERROR": "Må inneholde et symbol/tegnsettingstegn.",
+      "NUMBERERROR": "Må inneholde et tall.",
+      "PATTERNERROR": "Passordet oppfyller ikke det påkrevde mønsteret."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Varsling",
+      "DESCRIPTION": "Bestemmer ved hvilke endringer varsler vil bli sendt.",
+      "PASSWORDCHANGE": "Passord endret"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Gi påloggingen din personlige stil og endre dens oppførsel.",
+      "PREVIEW_DESCRIPTION": "Endringer i policyen vil automatisk bli distribuert til forhåndsvisning.",
+      "BTN": "Velg fil",
+      "ACTIVATEPREVIEW": "Bruk konfigurasjon",
+      "DARK": "Mørk modus",
+      "LIGHT": "Lys modus",
+      "CHANGEVIEW": "Endre visning",
+      "ACTIVATED": "Policyendringer er nå AKTIVE",
+      "THEME": "Tema",
+      "COLORS": "Farger",
+      "FONT": "Skrift",
+      "ADVANCEDBEHAVIOR": "Avansert oppførsel",
+      "DROP": "Slipp bilde her eller",
+      "RELEASE": "Slipp",
+      "DROPFONT": "Slipp skriftfil her",
+      "RELEASEFONT": "Slipp",
+      "USEOFLOGO": "Logoen din vil bli brukt i pålogging samt e-poster.",
+      "MAXSIZE": "Maksimal størrelse er begrenset til 524kB",
+      "EMAILNOSVG": "SVG-filformatet støttes ikke i e-poster. Last derfor opp en PNG- eller JPG-fil.",
+      "MAXSIZEEXCEEDED": "Maksimal størrelse på 524kB overskredet.",
+      "NOSVGSUPPORTED": "SVG støttes ikke!",
+      "FONTINLOGINONLY": "Skriften vises for øyeblikket kun i påloggingsgrensesnittet.",
+      "BACKGROUNDCOLOR": "Bakgrunnsfarge",
+      "PRIMARYCOLOR": "Primærfarge",
+      "WARNCOLOR": "Advarselsfarge",
+      "FONTCOLOR": "Skriftfarge",
+      "VIEWS": {
+        "PREVIEW": "Forhåndsvisning",
+        "CURRENT": "Gjeldende konfigurasjon"
+      },
+      "PREVIEW": {
+        "TITLE": "Pålogging",
+        "SECOND": "logg inn med din ZITADEL-konto.",
+        "ERROR": "Bruker ble ikke funnet!",
+        "PRIMARYBUTTON": "neste",
+        "SECONDARYBUTTON": "registrer"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatisk modus",
+        "THEME_MODE_LIGHT": "Kun lys modus",
+        "THEME_MODE_DARK": "Kun mørk modus"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Passordutløp",
+      "DESCRIPTION": "Du kan sette en policy for utløp av passord. Denne policyen bestemmer hvor lenge et passord er gyldig."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Utestengingspolicy",
+      "DESCRIPTION": "Angi et maksimalt antall passordforsøk, hvoretter kontoer blir utestengt."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Merkevarebygging",
+      "BTN": "Velg fil",
+      "DESCRIPTION": "Tilpass utseendet til påloggingen",
+      "ACTIVATEPREVIEW": "Aktiver konfigurasjon"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Påloggingsinnstillinger",
+      "DESCRIPTION": "Definer hvordan brukere kan autentiseres og konfigurer identitetsleverandører.",
+      "DESCRIPTIONCREATEADMIN": "Brukere kan velge blant de tilgjengelige identitetsleverandørene nedenfor.",
+      "DESCRIPTIONCREATEMGMT": "Brukere kan velge blant de tilgjengelige identitetsleverandørene nedenfor.",
+      "LIFETIME_INVALID": "Skjemaet inneholder ugyldige verdier.",
+      "SAVED": "Lagret!",
+      "PROVIDER_ADDED": "Identitetsleverandør aktivert."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Angi lenker til personvern og vilkår for bruk",
+      "TOSLINK": "Lenke til vilkår for bruk",
+      "POLICYLINK": "Lenke til personvernerklæring",
+      "HELPLINK": "Lenke til hjelp",
+      "SUPPORTEMAIL": "Support-e-post",
+      "DOCSLINK": "Dokumentasjonslenke (konsoll)",
+      "CUSTOMLINK": "Egendefinert lenke (konsoll)",
+      "CUSTOMLINKTEXT": "Egendefinert lenketekst (konsoll)",
+      "SAVED": "Lagret!",
+      "RESET_TITLE": "Gjenopprett standardverdier",
+      "RESET_DESCRIPTION": "Du er i ferd med å gjenopprette standardlenker for vilkår og personvern."
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Tekster for påloggingsgrensesnitt",
+      "DESCRIPTION": "Definer tekstene dine for påloggingsgrensesnittene. Hvis tekstene er tomme, brukes standardtekster.",
+      "DESCRIPTION_SHORT": "Definer tekstene dine for påloggingsgrensesnittene.",
+      "NEWERVERSIONEXISTS": "Nyere versjon finnes",
+      "CURRENTDATE": "Gjeldende konfigurasjon",
+      "CHANGEDATE": "Nyere versjon fra",
+      "KEYNAME": "Påloggingsskjerm / Grensesnitt",
+      "RESET_TITLE": "Gjenopprett standardverdier",
+      "RESET_DESCRIPTION": "Du er i ferd med å gjenopprette alle standardverdier. Alle endringer du har gjort vil gå tapt.",
+      "UNSAVED_TITLE": "Fortsett uten å lagre?",
+      "UNSAVED_DESCRIPTION": "Du har gjort endringer uten å lagre. Vil du lagre nå?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Du har valgt et språk som ikke er tillatt. Du kan fortsette å redigere, men endringer vil ikke tre i kraft.",
+      "LANGUAGES_NOT_ALLOWED": "Ikke tillatt:",
+      "LANGUAGE": "Språk",
+      "LANGUAGES": {
+        "de": "Tysk",
+        "en": "Engelsk",
+        "es": "Spansk",
+        "fr": "Fransk",
+        "it": "Italiensk",
+        "ja": "Japansk",
+        "pl": "Polsk",
+        "zh": "Kinesisk (forenklet)",
+        "bg": "Bulgarsk",
+        "pt": "Portugisisk",
+        "mk": "Makedonsk",
+        "cs": "Tsjekkisk",
+        "ru": "Russisk",
+        "nl": "Nederlandsk",
+        "sv": "Svensk",
+        "id": "Indonesisk",
+        "hu": "Ungarsk",
+        "ko": "Koreansk",
+        "ro": "Rumensk",
+        "tr": "Tyrkisk",
+        "uk": "Ukrainsk",
+        "nb": "Norsk bokmål"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "E-postverifisering fullført",
+        "emailVerificationText": "E-postverifisering",
+        "externalUserNotFoundText": "Ekstern bruker ikke funnet",
+        "footerText": "Bunntekst",
+        "initMfaDoneText": "MFA-initialisering fullført",
+        "initMfaOtpText": "Initialiser MFA",
+        "initMfaPromptText": "MFA-initialisering forespørsel",
+        "initMfaU2fText": "Initialiser universell andrefaktor",
+        "initPasswordDoneText": "Passordinitialisering fullført",
+        "initPasswordText": "Initialiser passord",
+        "initializeDoneText": "Brukerinitialisering fullført",
+        "initializeUserText": "Initialiser bruker",
+        "linkingUserDoneText": "Brukerkobling fullført",
+        "loginText": "Pålogging",
+        "logoutText": "Utlogging",
+        "mfaProvidersText": "MFA-leverandører",
+        "passwordChangeDoneText": "Passordendring fullført",
+        "passwordChangeText": "Passordendring",
+        "passwordResetDoneText": "Tilbakestilling av passord fullført",
+        "passwordText": "Passord",
+        "registrationOptionText": "Registreringsalternativer",
+        "registrationOrgText": "Registrer organisasjon",
+        "registrationUserText": "Registrer bruker",
+        "selectAccountText": "Velg konto",
+        "successLoginText": "Vellykket pålogging",
+        "usernameChangeDoneText": "Brukernavn endret",
+        "usernameChangeText": "Endre brukernavn",
+        "verifyMfaOtpText": "Verifiser OTP",
+        "verifyMfaU2fText": "Verifiser universell andrefaktor",
+        "passwordlessPromptText": "Passordnøkkel-forespørsel",
+        "passwordlessRegistrationDoneText": "Passordnøkkel-registrering fullført",
+        "passwordlessRegistrationText": "Passordnøkkel-registrering",
+        "passwordlessText": "Passordnøkkel",
+        "externalRegistrationUserOverviewText": "Ekstern registrering bruker oversikt"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Varsling",
+      "TYPES": {
+        "INIT": "Initialisering",
+        "VE": "Verifiser e-post",
+        "VP": "Verifiser telefon",
+        "VSO": "Verifiser SMS OTP",
+        "VEO": "Verifiser e-post OTP",
+        "PR": "Tilbakestill passord",
+        "DC": "Domenekrav",
+        "PL": "Passordnøkkel",
+        "PC": "Passordendring",
+        "IU": "Inviter bruker"
+      },
+      "CHIPS": {
+        "firstname": "Fornavn",
+        "lastname": "Etternavn",
+        "code": "Kode",
+        "preferredLoginName": "Foretrukket påloggingsnavn",
+        "displayName": "Visningsnavn",
+        "nickName": "Kallenavn",
+        "loginnames": "Påloggingsnavn",
+        "domain": "Domene",
+        "lastEmail": "Siste e-post",
+        "lastPhone": "Siste telefon",
+        "verifiedEmail": "Verifisert e-post",
+        "verifiedPhone": "Verifisert telefon",
+        "changedate": "Endringsdato",
+        "username": "Brukernavn",
+        "tempUsername": "Midlertidig brukernavn",
+        "otp": "Engangspassord",
+        "verifyUrl": "Verifiser engangspassord URL",
+        "expiry": "Utløp",
+        "applicationName": "Applikasjonsnavn"
+      },
+      "TOAST": {
+        "UPDATED": "Egendefinerte tekster lagret."
+      }
+    },
+    "DEFAULTLABEL": "Gjeldende innstillinger tilsvarer standarden for din instans.",
+    "BTN_INSTALL": "Sett opp",
+    "BTN_EDIT": "Endre",
+    "DATA": {
+      "DESCRIPTION": "Beskrivelse",
+      "MINLENGTH": "må ha minimum lengde",
+      "HASNUMBER": "må inneholde et tall",
+      "HASSYMBOL": "må inneholde et symbol",
+      "HASLOWERCASE": "må inneholde en liten bokstav",
+      "HASUPPERCASE": "må inneholde en stor bokstav",
+      "SHOWLOCKOUTFAILURES": "vis utestengelsesfeil",
+      "MAXPASSWORDATTEMPTS": "Maksimalt antall passordforsøk",
+      "MAXOTPATTEMPTS": "Maksimalt antall OTP-forsøk",
+      "EXPIREWARNDAYS": "Utløpsvarsel etter dager",
+      "MAXAGEDAYS": "Maksimal gyldighet i dager",
+      "USERLOGINMUSTBEDOMAIN": "Legg til organisasjonsdomene som suffiks til påloggingsnavn",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Hvis du aktiverer denne innstillingen, vil alle påloggingsnavn få suffikset av organisasjonsdomenet.",
+      "VALIDATEORGDOMAINS": "Verifisering av organisasjonsdomene påkrevd (DNS- eller HTTP-utfordring)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP-avsenderadresse samsvarer med instansdomene",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Konvensjonell pålogging med brukernavn og passord er tillatt.",
+      "ALLOWEXTERNALIDP_DESC": "Pålogging er tillatt for de underliggende identitetsleverandørene",
+      "ALLOWREGISTER_DESC": "Hvis alternativet er valgt, vises et ekstra steg for registrering av nye brukere.",
+      "FORCEMFA": "Krev MFA for alle brukere",
+      "FORCEMFALOCALONLY": "Krev MFA kun for lokalt autentiserte brukere",
+      "FORCEMFALOCALONLY_DESC": "Hvis alternativet er valgt, må lokalt autentiserte brukere sette opp MFA.",
+      "HIDEPASSWORDRESET_DESC": "Hvis alternativet er valgt, kan ikke brukeren tilbakestille passordet sitt i påloggingen.",
+      "HIDELOGINNAMESUFFIX": "Skjul påloggingsnavnsuffiks",
+      "HIDELOGINNAMESUFFIX_DESC": "Skjuler påloggingsnavnsuffikset i påloggingsgrensesnittet",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Hvis alternativet er valgt, vil passordskjermen vises selv om brukeren ikke finnes.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Hvis alternativet er valgt, vil suffikset (@domene.com) til en ukjent bruker brukes til domeneoppdagelse.",
+      "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
+      "DEFAULTREDIRECTURI_DESC": "Definerer hvor brukeren vil bli omdirigert til hvis påloggingen ikke har en omdirigerings-URI.",
+      "ERRORMSGPOPUP": "Vis feil i dialog",
+      "DISABLEWATERMARK": "Skjul vannmerke",
+      "DISABLEWATERMARK_DESC": "Skjul Powered by ZITADEL vannmerke i påloggingsgrensesnittet"
+    },
+    "RESET": "Tilbakestill til instansstandard",
+    "CREATECUSTOM": "Opprett egendefinert policy",
+    "TOAST": {
+      "SET": "Policy satt!",
+      "RESETSUCCESS": "Policy tilbakestilt!",
+      "UPLOADSUCCESS": "Lastet opp!",
+      "DELETESUCCESS": "Slettet!",
+      "UPLOADFAILED": "Opplasting mislyktes!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisasjon",
+    "DESCRIPTION": "Her kan du redigere konfigurasjonen av din organisasjon.",
+    "DETAIL": {
+      "TITLE": "Detaljer",
+      "NAME": "Navn",
+      "DOMAIN": "Domene",
+      "STATE": {
+        "0": "Ikke definert",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Medlemmer",
+      "USERNAME": "Brukernavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "LOGINNAME": "Påloggingsnavn",
+      "EMAIL": "E-post",
+      "ROLES": "Roller",
+      "ADD": "Legg til medlem",
+      "ADDDESCRIPTION": "Skriv inn navnene på brukerne som skal legges til."
+    },
+    "TABLE": {
+      "TOTAL": "Totalt antall",
+      "SELECTION": "Valgte elementer",
+      "DEACTIVATE": "Deaktiver bruker",
+      "ACTIVATE": "Aktiver bruker",
+      "DELETE": "Slett bruker",
+      "CLEAR": "Fjern valg"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Prosjekt",
+      "DESCRIPTION": "Her kan du definere applikasjoner, administrere roller og gi tilgang til andre organisasjoner.",
+      "DELETE": "Slett prosjekt",
+      "DETAIL": "Detaljer",
+      "CREATE": "Opprett prosjekt",
+      "CREATE_DESC": "Skriv inn prosjektets navn.",
+      "ROLE": "Rolle",
+      "NOITEMS": "Ingen prosjekter",
+      "ZITADELPROJECT": "Dette tilhører ZITADEL-prosjektet. Vær forsiktig: Hvis du gjør endringer, kan det påvirke systemet.",
+      "TYPE": {
+        "OWNED": "Egne prosjekter",
+        "OWNED_SINGULAR": "Eget prosjekt",
+        "GRANTED_SINGULAR": "Tildelt prosjekt av {{name}}"
+      },
+      "PRIVATELABEL": {
+        "0": {
+          "TITLE": "Uspesifisert",
+          "DESC": "Så snart brukeren er identifisert, vil merkevarebyggingen til organisasjonen brukes."
+        },
+        "1": {
+          "TITLE": "Bruk prosjektinnstilling",
+          "DESC": "Merkevarebyggingen til organisasjonen som eier prosjektet vil bli brukt."
+        },
+        "2": {
+          "TITLE": "Bruk brukerorganisasjonens innstilling",
+          "DESC": "Merkevarebyggingen til brukerens organisasjon vil bli vist."
+        },
+        "TITLE": "Merkevareinnstilling",
+        "DIALOG": {
+          "TITLE": "Merkevareinnstilling",
+          "DESCRIPTION": "Velg oppførselen til påloggingen ved bruk av prosjektet."
+        }
+      },
+      "PINNED": "Festet",
+      "ALL": "Alle",
+      "CREATEDON": "Opprettet",
+      "LASTMODIFIED": "Sist endret",
+      "ADDNEW": "Opprett nytt prosjekt",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reaktiver prosjekt",
+          "DESCRIPTION": "Vil du virkelig reaktivere prosjektet ditt?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktiver prosjekt",
+          "DESCRIPTION": "Vil du virkelig deaktivere prosjektet ditt?"
+        },
+        "DELETE": {
+          "TITLE": "Slett prosjekt",
+          "DESCRIPTION": "Vil du virkelig slette prosjektet ditt?",
+          "TYPENAME": "Skriv inn prosjektets navn for å slette det permanent."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Innstillinger",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "0": "Ikke definert",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "TITLE": "Status"
+    },
+    "TYPE": {
+      "0": "Ukjent type",
+      "1": "Eget",
+      "2": "Tildelt",
+      "TITLE": "Type"
+    },
+    "NAME": "Navn",
+    "NAMEDIALOG": {
+      "TITLE": "Gi nytt navn til prosjekt",
+      "DESCRIPTION": "Skriv inn det nye navnet for prosjektet ditt",
+      "NAME": "Nytt navn"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorer",
+      "TITLEDESC": "Administratorer kan gjøre endringer i dette prosjektet basert på sine roller.",
+      "DESCRIPTION": "Disse administratorene kan kanskje redigere prosjektet ditt.",
+      "USERNAME": "Brukernavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "LOGINNAME": "Brukernavn",
+      "EMAIL": "E-post",
+      "ROLES": "Roller",
+      "USERID": "Bruker-ID"
+    },
+    "GRANT": {
+      "EMPTY": "Ingen tildelt organisasjon.",
+      "TITLE": "Prosjekttildelinger",
+      "DESCRIPTION": "Tillat en annen organisasjon å bruke prosjektet ditt.",
+      "EDITTITLE": "Rediger roller",
+      "CREATE": {
+        "TITLE": "Opprett organisasjonstildeling",
+        "SEL_USERS": "Velg brukerne du ønsker å gi tilgang",
+        "SEL_PROJECT": "Søk etter et prosjekt",
+        "SEL_ROLES": "Velg rollene du vil legge til i tildelingen",
+        "SEL_USER": "Velg brukere",
+        "SEL_ORG": "Søk etter en organisasjon",
+        "SEL_ORG_DESC": "Søk etter organisasjonen som skal tildeles.",
+        "ORG_DESCRIPTION": "Du er i ferd med å tildele en bruker for organisasjonen {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Bytt kontekst i overskriften ovenfor for å tildele en bruker for en annen organisasjon.",
+        "SEL_ORG_FORMFIELD": "Organisasjon",
+        "FOR_ORG": "Tildelingen er opprettet for:"
+      },
+      "DETAIL": {
+        "TITLE": "Prosjekttildeling",
+        "DESC": "Du kan velge hvilke roller som kan brukes av den angitte organisasjonen.",
+        "MEMBERTITLE": "Administratorer",
+        "MEMBERDESC": "Dette er administratorene for den tildelte organisasjonen. Legg til brukere for å administrere tildelingen.",
+        "PROJECTNAME": "Prosjektnavn",
+        "GRANTEDORG": "Tildelt organisasjon",
+        "RESOURCEOWNER": "Ressurseier"
+      },
+      "STATE": "Status",
+      "STATES": {
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ALL": "Alle",
+      "SHOWDETAIL": "Vis detaljer",
+      "USER": "Bruker",
+      "MEMBERS": "Administratorer",
+      "ORG": "Organisasjon",
+      "PROJECTNAME": "Prosjektnavn",
+      "GRANTEDORG": "Tildelt organisasjon",
+      "GRANTEDORGDOMAIN": "Domene",
+      "RESOURCEOWNER": "Ressurseier",
+      "GRANTEDORGNAME": "Organisasjonsnavn",
+      "GRANTID": "Tildelings-ID",
+      "CREATIONDATE": "Opprettelsesdato",
+      "CHANGEDATE": "Sist endret",
+      "DATES": "Datoer",
+      "ROLENAMESLIST": "Roller",
+      "NOROLES": "Ingen roller",
+      "TYPE": "Type",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Prosjekttildeling opprettet.",
+        "PROJECTGRANTADDED": "Prosjekttildeling opprettet.",
+        "PROJECTGRANTCHANGED": "Prosjekttildeling endret.",
+        "PROJECTGRANTMEMBERADDED": "Tildelingsadministrator lagt til.",
+        "PROJECTGRANTMEMBERCHANGED": "Tildelingsadministrator endret.",
+        "PROJECTGRANTMEMBERREMOVED": "Tildelingsadministrator fjernet.",
+        "PROJECTGRANTUPDATED": "Prosjekttildeling oppdatert"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Slett prosjekttildeling",
+        "DELETE_DESCRIPTION": "Du er i ferd med å slette en prosjekttildeling. Er du sikker?"
+      },
+      "ROLES": "Prosjektroller"
+    },
+    "APP": {
+      "TITLE": "Applikasjoner",
+      "NAME": "Navn",
+      "NAMEREQUIRED": "Et navn er påkrevd."
+    },
+    "ROLE": {
+      "EMPTY": "Ingen rolle har blitt opprettet ennå.",
+      "ADDNEWLINE": "Legg til en rolle",
+      "KEY": "Nøkkel",
+      "TITLE": "Roller",
+      "DESCRIPTION": "Definer roller som kan brukes til å opprette prosjekttildelinger og brukertildelinger.",
+      "NAME": "Navn",
+      "DISPLAY_NAME": "Visningsnavn",
+      "GROUP": "Gruppe",
+      "ACTIONS": "Handlinger",
+      "ADDTITLE": "Opprett rolle",
+      "ADDDESCRIPTION": "Skriv inn dataene for den nye rollen.",
+      "EDITTITLE": "Rediger rolle",
+      "EDITDESCRIPTION": "Skriv inn nye data for rollen.",
+      "DELETE": "Slett rolle",
+      "CREATIONDATE": "Opprettet",
+      "CHANGEDATE": "Sist endret",
+      "SELECTGROUPTOOLTIP": "Velg alle roller i gruppen {{group}}.",
+      "OPTIONS": "Alternativer",
+      "ASSERTION": "Returner brukerroller under autentisering",
+      "ASSERTION_DESCRIPTION": "Når en bruker autentiseres, blir rolleinformasjonen gitt i tokenet.",
+      "CHECK": "Kun autoriserte brukere kan autentisere",
+      "CHECK_DESCRIPTION": "Nekt autentisering hvis brukeren ikke har en tilordnet autorisasjon.",
+      "DIALOG": {
+        "DELETE_TITLE": "Slett rolle",
+        "DELETE_DESCRIPTION": "Du er i ferd med å slette en prosjektrolle. Er du sikker?"
+      }
+    },
+    "HAS_PROJECT": "Autentisering er begrenset til brukere fra organisasjoner som har et prosjekt.",
+    "HAS_PROJECT_DESCRIPTION": "Før en bruker kan autentiseres, verifiseres det at organisasjonen har et prosjekt.",
+    "TABLE": {
+      "TOTAL": "Totalt antall oppføringer:",
+      "SELECTION": "Valgte elementer",
+      "DEACTIVATE": "Deaktiver prosjekt",
+      "ACTIVATE": "Aktiver prosjekt",
+      "DELETE": "Slett prosjekt",
+      "ORGNAME": "Organisasjonsnavn",
+      "ORGID": "Organisasjons-ID",
+      "ORGDOMAIN": "Organisasjonsdomene",
+      "STATE": "Status",
+      "TYPE": "Type",
+      "CREATIONDATE": "Opprettet",
+      "CHANGEDATE": "Sist endret",
+      "RESOURCEOWNER": "Eier",
+      "SHOWTABLE": "Vis tabell",
+      "SHOWGRID": "Vis rutenett",
+      "EMPTY": "Ingen prosjekter funnet"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERSADDED": "Administratorer lagt til.",
+      "MEMBERADDED": "Administrator lagt til.",
+      "MEMBERCHANGED": "Administrator endret.",
+      "ROLESCREATED": "Roller opprettet.",
+      "ROLEREMOVED": "Rolle fjernet.",
+      "ROLECHANGED": "Rolle endret.",
+      "REACTIVATED": "Reaktivert.",
+      "DEACTIVATED": "Deaktivert.",
+      "CREATED": "Prosjekt opprettet.",
+      "UPDATED": "Prosjekt endret.",
+      "GRANTUPDATED": "Tildeling endret.",
+      "DELETED": "Prosjekt slettet."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Slett rolle",
+      "DELETE_DESCRIPTION": "Du er i ferd med å slette en rolle. Er du sikker?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Neste steg"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktive identitetsleverandører"
+    },
+    "CREATE": {
+      "TITLE": "Legg til leverandør",
+      "DESCRIPTION": "Velg en eller flere av følgende leverandører.",
+      "STEPPERTITLE": "Opprett leverandør",
+      "OIDC": {
+        "TITLE": "OIDC-leverandør",
+        "DESCRIPTION": "Skriv inn de nødvendige dataene for OIDC-leverandøren din."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth-leverandør",
+        "DESCRIPTION": "Skriv inn de nødvendige dataene for OAuth-leverandøren din."
+      },
+      "JWT": {
+        "TITLE": "JWT-leverandør",
+        "DESCRIPTION": "Skriv inn de nødvendige dataene for JWT-leverandøren din."
+      },
+      "GOOGLE": {
+        "TITLE": "Google-leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for Google-identitetsleverandøren din"
+      },
+      "GITLAB": {
+        "TITLE": "GitLab-leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for GitLab-identitetsleverandøren din"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "GitLab selvhostet leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for den selvhostede GitLab-identitetsleverandøren din"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server-leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for GitHub Enterprise Server-identitetsleverandøren din"
+      },
+      "GITHUB": {
+        "TITLE": "GitHub-leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for GitHub-identitetsleverandøren din"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft-leverandør",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for Microsoft-identitetsleverandøren din"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for LDAP-leverandøren din"
+      },
+      "APPLE": {
+        "TITLE": "Logg inn med Apple",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for Apple-leverandøren din"
+      },
+      "SAML": {
+        "TITLE": "Logg inn med SAML",
+        "DESCRIPTION": "Skriv inn påloggingsinformasjonen for SAML-leverandøren din"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Identitetsleverandør",
+      "DESCRIPTION": "Oppdater leverandørkonfigurasjonen din",
+      "DATECREATED": "Opprettet",
+      "DATECHANGED": "Endret"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatisk opprettelse",
+      "ISAUTOCREATION_DESC": "Hvis valgt, vil en konto bli opprettet hvis den ikke eksisterer.",
+      "ISAUTOUPDATE": "Automatisk oppdatering",
+      "ISAUTOUPDATE_DESC": "Hvis valgt, oppdateres kontoer ved ny autentisering.",
+      "ISCREATIONALLOWED": "Kontoopprettelse tillatt (manuelt)",
+      "ISCREATIONALLOWED_DESC": "Bestemmer om kontoer kan opprettes ved hjelp av en ekstern leverandør.",
+      "ISLINKINGALLOWED": "Kontokobling tillatt (manuelt)",
+      "ISLINKINGALLOWED_DESC": "Bestemmer om en identitet kan kobles manuelt til en eksisterende konto.",
+      "AUTOLINKING_DESC": "Bestemmer om en identitet automatisk blir koblet til en eksisterende konto.",
+      "AUTOLINKINGTYPE": {
+        "0": "Deaktivert",
+        "1": "Sjekk om brukernavn eksisterer",
+        "2": "Sjekk om e-post eksisterer"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "ukjent",
+      "1": "Instans",
+      "2": "Organisasjon"
+    },
+    "STATES": {
+      "1": "aktiv",
+      "2": "inaktiv"
+    },
+    "AZUREADTENANTTYPES": {
+      "0": "Felles",
+      "1": "Organisasjoner",
+      "2": "Forbrukere",
+      "3": "Leietaker-ID"
+    },
+    "AZUREADTENANTTYPE": "Leietakertype",
+    "AZUREADTENANTID": "Leietaker-ID",
+    "EMAILVERIFIED": "E-post verifisert",
+    "NAMEHINT": "Hvis angitt, vil det vises i innloggingsgrensesnittet.",
+    "OPTIONAL": "valgfritt",
+    "LDAPATTRIBUTES": "LDAP-attributter",
+    "UPDATEBINDPASSWORD": "oppdater Bind-passord",
+    "UPDATECLIENTSECRET": "oppdater klienthemmelighet",
+    "ADD": "Legg til identitetsleverandør",
+    "TYPE": "Type",
+    "OWNER": "Eier",
+    "ID": "ID",
+    "NAME": "Navn",
+    "AUTHORIZATIONENDPOINT": "Autorisasjonsendepunkt",
+    "TOKENENDPOINT": "Token-endepunkt",
+    "USERENDPOINT": "Brukerendepunkt",
+    "IDATTRIBUTE": "ID-attributt",
+    "AVAILABILITY": "Tilgjengelighet",
+    "AVAILABLE": "tilgjengelig",
+    "AVAILABLEBUTINACTIVE": "tilgjengelig men inaktiv",
+    "SETAVAILABLE": "angi som tilgjengelig",
+    "SETUNAVAILABLE": "angi som ikke tilgjengelig",
+    "CONFIG": "Konfigurasjon",
+    "STATE": "Status",
+    "ISSUER": "Utsteder",
+    "SCOPESLIST": "Scope-liste",
+    "CLIENTID": "Klient-ID",
+    "CLIENTSECRET": "Klienthemmelighet",
+    "LDAPCONNECTION": "Tilkobling",
+    "LDAPUSERBINDING": "Brukerbinding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind-passord",
+    "SERVERS": "Servere",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Tidsavbrudd i sekunder",
+    "USERBASE": "Brukerbase",
+    "USERFILTERS": "Brukerfiltre",
+    "USEROBJECTCLASSES": "Brukerobjektklasser",
+    "REQUIRED": "påkrevd",
+    "LDAPIDATTRIBUTE": "ID-attributt",
+    "AVATARURLATTRIBUTE": "Avatar-URL-attributt",
+    "DISPLAYNAMEATTRIBUTE": "Visningsnavn-attributt",
+    "EMAILATTRIBUTEATTRIBUTE": "E-post-attributt",
+    "EMAILVERIFIEDATTRIBUTE": "E-post-verifisert-attributt",
+    "FIRSTNAMEATTRIBUTE": "Fornavn-attributt",
+    "LASTNAMEATTRIBUTE": "Etternavn-attributt",
+    "NICKNAMEATTRIBUTE": "Kallenavn-attributt",
+    "PHONEATTRIBUTE": "Telefon-attributt",
+    "PHONEVERIFIEDATTRIBUTE": "Telefon-verifisert-attributt",
+    "PREFERREDLANGUAGEATTRIBUTE": "Foretrukket-språk-attributt",
+    "PREFERREDUSERNAMEATTRIBUTE": "Foretrukket-brukernavn-attributt",
+    "PROFILEATTRIBUTE": "Profil-attributt",
+    "IDPDISPLAYNAMMAPPING": "IdP visningsnavnkartlegging",
+    "USERNAMEMAPPING": "Brukernavnkartlegging",
+    "DATES": "Datoer",
+    "CREATIONDATE": "Opprettet",
+    "CHANGEDATE": "Sist endret",
+    "DEACTIVATE": "Deaktiver",
+    "ACTIVATE": "Aktiver",
+    "DELETE": "Slett",
+    "DELETE_TITLE": "Slett IdP",
+    "DELETE_DESCRIPTION": "Du er i ferd med å slette en identitetsleverandør. Den resulterende handlingen kan ikke angres. Er du sikker?",
+    "REMOVE_WARN_TITLE": "Fjern IdP",
+    "REMOVE_WARN_DESCRIPTION": "Du er i ferd med å fjerne en identitetsleverandør. Dette vil fjerne den fra påloggingssiden.",
+    "DELETE_SELECTION_TITLE": "Slett IdP",
+    "DELETE_SELECTION_DESCRIPTION": "Du er i ferd med å slette en identitetsleverandør. Den resulterende handlingen kan ikke angres. Er du sikker?",
+    "FEDERATEDLOGOUTENABLED": "Federert utlogging aktivert",
+    "FEDERATEDLOGOUTENABLED_DESC": "Hvis aktivert, vil brukeren også bli logget ut fra IdP.",
+    "EMPTY": "Ingen IdP tilgjengelig",
+    "OIDC": {
+      "GENERAL": "Generell informasjon",
+      "TITLE": "OIDC-konfigurasjon",
+      "DESCRIPTION": "Skriv inn dataene for OIDC-identitetsleverandøren."
+    },
+    "JWT": {
+      "TITLE": "JWT-konfigurasjon",
+      "DESCRIPTION": "Skriv inn dataene for JWT-identitetsleverandøren.",
+      "HEADERNAME": "Header-navn",
+      "JWTENDPOINT": "JWT-endepunkt",
+      "JWTKEYSENDPOINT": "JWT-nøkkel-endepunkt"
+    },
+    "APPLE": {
+      "TEAMID": "Team-ID",
+      "KEYID": "Nøkkel-ID",
+      "PRIVATEKEY": "Privat nøkkel",
+      "UPDATEPRIVATEKEY": "Oppdater privat nøkkel",
+      "UPLOADPRIVATEKEY": "Last opp privat nøkkel",
+      "KEYMAXSIZEEXCEEDED": "Maksimal størrelse på 5kB er overskredet."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata-XML",
+      "METADATAURL": "Metadata-URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signert forespørsel",
+      "SIGNATUREALGORITHM": "Signaturalgoritme",
+      "NAMEIDFORMAT": "NameID-format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Egendefinert kartleggingsattributtnavn",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributtnavn for å kartlegge brukeren hvis `nameID`-formatet er satt til transient."
+    },
+    "TOAST": {
+      "SAVED": "Lagret.",
+      "REACTIVATED": "IdP reaktivert.",
+      "DEACTIVATED": "IdP deaktivert.",
+      "SELECTEDREACTIVATED": "Valgte IdP-er reaktivert.",
+      "SELECTEDDEACTIVATED": "Valgte IdP-er deaktivert.",
+      "SELECTEDKEYSDELETED": "Valgte IdP-er slettet.",
+      "DELETED": "IdP fjernet!",
+      "ADDED": "Lagt til.",
+      "REMOVED": "Fjernet."
+    },
+    "ISIDTOKENMAPPING": "Kartlegg fra ID-token",
+    "ISIDTOKENMAPPING_DESC": "Hvis valgt, kartlegges leverandørinformasjon fra ID-tokenet.",
+    "USEPKCE": "Bruk PKCE",
+    "USEPKCE_DESC": "Bestemmer om code_challenge og code_challenge_method brukes i autorisasjonsforespørselen."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Definer multifaktorene dine for Passkey her.",
+      "SECONDFACTORTITLE": "Multifaktorautentisering",
+      "SECONDFACTORDESCRIPTION": "Definer ytterligere mulige faktorer du kan sikre påloggingen med."
+    },
+    "CREATE": {
+      "TITLE": "Ny faktor",
+      "DESCRIPTION": "Velg din nye faktortype."
+    },
+    "DELETE": {
+      "TITLE": "Slett faktor",
+      "DESCRIPTION": "Du er i ferd med å slette en faktor fra påloggingsinnstillingene. Er du sikker?"
+    },
+    "TOAST": {
+      "ADDED": "Lagt til.",
+      "SAVED": "Lagret.",
+      "DELETED": "Fjernet"
+    },
+    "TYPE": "Type",
+    "MULTIFACTORTYPES": {
+      "0": "Ukjent",
+      "1": "Passkey"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Ukjent",
+      "1": "Engangspassord via autentiseringsapp (TOTP)",
+      "2": "Passkey",
+      "3": "Engangspassord via e-post (E-post-OTP)",
+      "4": "Engangspassord via SMS (SMS-OTP)",
+      "5": "Gjenopprettingskoder"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Påloggingsinnstillinger",
+      "DESCRIPTION": "Definer hvordan brukerne dine kan autentiseres i organisasjonen din."
+    },
+    "IDPS": "Identitetsleverandører",
+    "ADDIDP": {
+      "TITLE": "Legg til identitetsleverandør",
+      "DESCRIPTION": "Du kan velge forhåndsdefinerte eller egendefinerte leverandører for autentisering.",
+      "SELECTIDPS": "Identitetsleverandører"
+    },
+    "PASSWORDLESS": "Passkey-pålogging",
+    "PASSWORDLESSTYPE": {
+      "0": "Ikke tillatt",
+      "1": "Tillatt"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP-leverandør",
+      "DESCRIPTION": "Dette er SMTP-leverandørene for ZITADEL-instansen din. Aktiver den du vil bruke.",
+      "EMPTY": "Ingen SMTP-leverandør tilgjengelig",
+      "ACTIVATED": "Aktivert",
+      "ACTIVATE": "Aktiver leverandør",
+      "DEACTIVATE": "Deaktiver leverandør",
+      "TEST": "Test leverandøren din",
+      "TYPE": "Type",
+      "DIALOG": {
+        "ACTIVATED": "SMTP-konfigurasjon er aktivert",
+        "ACTIVATE_WARN_TITLE": "Aktiver SMTP-konfigurasjon",
+        "ACTIVATE_WARN_DESCRIPTION": "Du er i ferd med å aktivere en SMTP-konfigurasjon. Først tester vi konfigurasjonen.",
+        "DEACTIVATE_WARN_TITLE": "Deaktiver SMTP-konfigurasjon",
+        "DEACTIVATE_WARN_DESCRIPTION": "Du er i ferd med å deaktivere en SMTP-konfigurasjon. Er du sikker?",
+        "DEACTIVATED": "SMTP-konfigurasjon er deaktivert",
+        "DELETE_TITLE": "Slett SMTP-konfigurasjon",
+        "DELETE_DESCRIPTION": "Du er i ferd med å slette en konfigurasjon. Bekreft handlingen.",
+        "DELETED": "SMTP-konfigurasjon er slettet",
+        "SENDER": "Skriv {{value}} for å slette denne SMTP-konfigurasjonen.",
+        "TEST_TITLE": "Test SMTP-konfigurasjonen din",
+        "TEST_DESCRIPTION": "Angi en e-postadresse for å teste SMTP-konfigurasjonen.",
+        "TEST_EMAIL": "E-postadresse",
+        "TEST_RESULT": "Testresultat"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Legg til SMTP-leverandør",
+      "DESCRIPTION": "Velg en eller flere av følgende leverandører.",
+      "STEPS": {
+        "TITLE": "Legg til {{ value }} SMTP-leverandør",
+        "CREATE_DESC_TITLE": "Skriv inn {{ value }} SMTP-innstillingene steg for steg",
+        "CURRENT_DESC_TITLE": "Dette er SMTP-innstillingene dine",
+        "PROVIDER_SETTINGS": "SMTP-leverandørinnstillinger",
+        "SENDER_SETTINGS": "Avsenderinnstillinger",
+        "NEXT_STEPS": "Neste steg",
+        "ACTIVATE": {
+          "TITLE": "Aktiver SMTP-leverandøren din",
+          "DESCRIPTION": "ZITADEL kan ikke bruke denne SMTP-leverandøren til å sende varsler før du aktiverer den."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktiver SMTP-leverandøren din",
+          "DESCRIPTION": "Hvis du deaktiverer denne SMTP-leverandøren, kan ikke ZITADEL bruke den til å sende varsler."
+        },
+        "SAVE_SETTINGS": "Lagre innstillingene dine",
+        "TEST": {
+          "TITLE": "Test innstillingene dine",
+          "DESCRIPTION": "Du kan teste SMTP-leverandørinnstillingene dine og sjekke testresultatet.",
+          "RESULT": "E-posten din ble sendt"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP-leverandørinnstillinger"
+    },
+    "EMPTY": "Ingen SMTP-leverandør tilgjengelig"
+  },
+  "APP": {
+    "LIST": "Applikasjoner",
+    "COMPLIANCE": "OIDC-samsvar",
+    "URLS": "URL-er",
+    "CONFIGURATION": "Konfigurasjon",
+    "TOKEN": "Token-innstillinger",
+    "PAGES": {
+      "TITLE": "Applikasjon",
+      "ID": "ID",
+      "DESCRIPTION": "Her kan du redigere applikasjonsdata og konfigurasjon.",
+      "CREATE": "Opprett applikasjon",
+      "CREATE_SELECT_PROJECT": "Velg prosjektet ditt først",
+      "CREATE_NEW_PROJECT": "eller skriv inn navnet på det nye prosjektet",
+      "CREATE_DESC_TITLE": "Skriv inn applikasjonsdetaljene steg for steg",
+      "CREATE_DESC_SUB": "En anbefalt konfigurasjon vil bli automatisk generert.",
+      "STATE": "Status",
+      "DATECREATED": "Opprettet",
+      "DATECHANGED": "Endret",
+      "URLS": "URL-er",
+      "DELETE": "Slett app",
+      "JUMPTOPROJECT": "For å konfigurere roller, autorisasjoner og mer, naviger til prosjektet.",
+      "DETAIL": {
+        "TITLE": "Detaljer",
+        "STATE": {
+          "0": "Ikke definert",
+          "1": "Aktiv",
+          "2": "Inaktiv"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Endre OIDC-konfigurasjon"
+        },
+        "DELETE": {
+          "TITLE": "Slett app",
+          "DESCRIPTION": "Vil du virkelig slette denne applikasjonen?"
+        }
+      },
+      "NEXTSTEPS": {
+        "0": {
+          "TITLE": "Legg til roller",
+          "DESC": "Skriv inn prosjektrollene dine"
+        },
+        "1": {
+          "TITLE": "Legg til brukere",
+          "DESC": "Legg til nye brukere i organisasjonen din"
+        },
+        "2": {
+          "TITLE": "Hjelp og støtte",
+          "DESC": "Les dokumentasjonen vår om å opprette applikasjoner eller kontakt oss."
+        },
+        "TITLE": "Neste steg"
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Gi app nytt navn",
+      "DESCRIPTION": "Skriv inn det nye navnet for appen din",
+      "NAME": "Nytt navn"
+    },
+    "NAME": "Navn",
+    "TYPE": "Applikasjonstype",
+    "AUTHMETHOD": "Autentiseringsmetode",
+    "AUTHMETHODSECTION": "Autentiseringsmetode",
+    "GRANT": "Tildelingstyper",
+    "ADDITIONALORIGINS": "Ekstra opprinnelser",
+    "ADDITIONALORIGINSDESC": "Hvis du vil legge til ekstra opprinnelser til appen din.",
+    "ORIGINS": "Opprinnelser",
+    "NOTANORIGIN": "Den angitte verdien er ikke en opprinnelse",
+    "PROSWITCH": "Jeg er en proff. Hopp over denne veiviseren.",
+    "NAMEANDTYPESECTION": "Navn og type",
+    "TITLEFIRST": "Navn på applikasjonen",
+    "TYPETITLE": "Type applikasjon",
+    "OIDC": {
+      "WELLKNOWN": "Flere lenker kan hentes fra <a href='{{url}}' title='OIDC Discovery Endpoint'>Well-Known-endepunktet</a>.",
+      "INFO": {
+        "ISSUER": "Utsteder",
+        "CLIENTID": "Klient-ID"
+      },
+      "CURRENT": "Gjeldende konfigurasjon",
+      "TOKENSECTIONTITLE": "AuthToken-alternativer",
+      "REDIRECTSECTIONTITLE": "Omdirigeringsinnstillinger",
+      "REDIRECTTITLE": "Angi URI-ene hvor innloggingen skal omdirigere til.",
+      "POSTREDIRECTTITLE": "Dette er omdirigerings-URI-en etter utlogging.",
+      "REDIRECTDESCRIPTIONWEB": "Omdirigerings-URI-er må begynne med https://. http:// er kun gyldig for localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Omdirigerings-URI-er må begynne med din egen protokoll, http://127.0.0.1 eller http://localhost.",
+      "REDIRECTNOTVALID": "Denne omdirigerings-URI-en er ikke gyldig.",
+      "COMMAORENTERSEPERATION": "separer med ↵",
+      "TYPEREQUIRED": "Typen er påkrevd.",
+      "TITLE": "OIDC-konfigurasjon",
+      "CLIENTID": "Klient-ID",
+      "CLIENTSECRET": "Klienthemmelighet",
+      "CLIENTSECRET_NOSECRET": "Med din valgte autentiseringsflyt kreves ingen hemmelighet.",
+      "CLIENTSECRET_DESCRIPTION": "Oppbevar klienthemmeligheten din på et trygt sted da den forsvinner etter lukking av vinduet.",
+      "REGENERATESECRET": "Regenerer klienthemmelighet",
+      "DEVMODE": "Utviklingsmodus",
+      "DEVMODE_ENABLED": "Aktivert",
+      "DEVMODE_DISABLED": "Deaktivert",
+      "DEVMODEDESC": "Advarsel: Med utviklingsmodus aktivert vil ikke omdirigerings-URI-er bli validert.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Hopp over påloggingssuksessiden",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hopp over suksessiden etter pålogging for denne native appen.",
+      "REDIRECT": "Omdirigerings-URI-er",
+      "REDIRECTSECTION": "Omdirigerings-URI-er",
+      "POSTLOGOUTREDIRECT": "URI-er etter utlogging",
+      "RESPONSESECTION": "Responstyper",
+      "GRANTSECTION": "Tildelingstyper",
+      "GRANTTITLE": "Velg tildelingstypene dine. Merk: Implicit er kun tilgjengelig for kompatibilitetsformål.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "Brukeragent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Responstyper",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Oppdateringstoken",
+      "GRANTTYPE": "Tildelingstyper",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code",
+        "4": "Token Exchange"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "Ingen",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Auth-tokentype",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Jeg håper virkelig du vet hva du gjør.",
+      "OVERVIEWSECTION": "Oversikt",
+      "OVERVIEWTITLE": "Du er nå ferdig. Gjennomgå konfigurasjonen din.",
+      "ACCESSTOKENROLEASSERTION": "Legg til brukerroller i tilgangstokenet",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Hvis valgt, legges de forespurte rollene til den autentiserte brukeren til i tilgangstokenet.",
+      "IDTOKENROLEASSERTION": "Brukerroller i ID-token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Når dette alternativet er aktivert, legges den autentiserte brukerens tildelte roller til i ID-tokenet.",
+      "IDTOKENUSERINFOASSERTION": "Inkluder brukerens profilinformasjon i ID-tokenet",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Gjør det mulig for klienter å hente profil-, e-post-, telefon- og adresseinformasjon fra ID-tokenet.",
+      "CLOCKSKEW": "Gjør det mulig for klienter å håndtere klokkeavvik mellom OP og klient. Standardverdien er 0.",
+      "RECOMMENDED": "anbefalt",
+      "NOTRECOMMENDED": "ikke anbefalt",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Vanlige webapplikasjoner som .NET, PHP, Node.js, Java, osv."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Mobilapper, skrivebordsapper, smartenheter, osv."
+          },
+          "USERAGENT": {
+            "TITLE": "Brukeragent",
+            "DESCRIPTION": "Single Page Applications (SPA) og generelt alle JS-rammeverk som Angular, React, Vue, osv."
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Klient-ID"
+      },
+      "REGENERATESECRET": "Regenerer klienthemmelighet",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API-er generelt"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML-applikasjoner"
+      },
+      "CONFIGSECTION": "SAML-konfigurasjon",
+      "CHOOSEMETADATASOURCE": "Oppgi SAML-konfigurasjonen din ved å bruke ett av følgende alternativer.",
+      "METADATAOPT1": "Alternativ 1. Angi URL-en der metadatafilen er plassert",
+      "METADATAOPT2": "Alternativ 2. Last opp en fil som inneholder metadata-XML",
+      "METADATAOPT3": "Alternativ 3. Opprett en minimal metadatafil ved å oppgi Entity ID og ACS URL-er",
+      "UPLOAD": "Last opp XML-fil",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata fra fil",
+      "CERTIFICATE": "SAML-sertifikat",
+      "DOWNLOADCERT": "Last ned SAML-sertifikat",
+      "CREATEMETADATA": "Opprett metadata",
+      "ENTITYID": "Entity-ID",
+      "ACSURL": "ACS-endepunkt-URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Bytt ut autorisasjonskoden mot tokens"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Bruk en tilfeldig hash i stedet for en statisk klienthemmelighet for mer sikkerhet"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Send client_id og client_secret som en del av skjemaet"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Bruk en privat nøkkel for å autorisere applikasjonen din"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Autentisering med brukernavn og passord"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Få tokens direkte fra autorisasjonsendepunktet"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriser enheten på en datamaskin eller smarttelefon."
+      },
+      "CUSTOM": {
+        "TITLE": "Egendefinert",
+        "DESCRIPTION": "Innstillingen din samsvarer ikke med noe annet alternativ."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Applikasjon reaktivert.",
+      "DEACTIVATED": "Applikasjon deaktivert.",
+      "OIDCUPDATED": "App oppdatert.",
+      "APIUPDATED": "App oppdatert",
+      "UPDATED": "App oppdatert.",
+      "CREATED": "App opprettet.",
+      "CLIENTSECRETREGENERATED": "Klienthemmelighet generert.",
+      "DELETED": "App slettet.",
+      "CONFIGCHANGED": "Endringer oppdaget!"
+    },
+    "LOGINV2": {
+      "USEV2": "Bruk nytt innloggingsgrensesnitt",
+      "BASEURL": "Egendefinert basis-URL for det nye innloggingsgrensesnittet"
+    }
+  },
+  "GENDERS": {
+    "0": "Ukjent",
+    "1": "Kvinne",
+    "2": "Mann",
+    "3": "Annet"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Português",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "nb": "Norsk bokmål"
+  },
+  "MEMBER": {
+    "ADD": "Legg til en administrator",
+    "CREATIONTYPE": "Opprettelsestype",
+    "CREATIONTYPES": {
+      "0": "Eiet prosjekt",
+      "1": "Tildelt prosjekt",
+      "2": "Organisasjon",
+      "3": "IAM",
+      "4": "Prosjekt"
+    },
+    "EDITROLE": "Rediger roller",
+    "EDITFOR": "Rediger rollene for brukeren: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Fjern administrator",
+      "DELETE_DESCRIPTION": "Du er i ferd med å fjerne en administrator. Er du sikker?"
+    },
+    "SHOWDETAILS": "Klikk for å vise detaljer."
+  },
+  "ROLESLABEL": "Roller",
+  "GRANTS": {
+    "TITLE": "Autorisasjoner",
+    "DESC": "Dette er alle autorisasjonene i organisasjonen din.",
+    "DELETE": "Slett autorisasjon",
+    "EMPTY": "Ingen autorisasjon funnet",
+    "ADD": "Opprett autorisasjon",
+    "ADD_BTN": "Ny",
+    "PROJECT": {
+      "TITLE": "Autorisasjon",
+      "DESCRIPTION": "Definer autorisasjoner for det angitte prosjektet. Merk at du må ha de nødvendige rettighetene."
+    },
+    "USER": {
+      "TITLE": "Autorisasjon",
+      "DESCRIPTION": "Definer autorisasjoner for den angitte brukeren. Merk at du må ha de nødvendige rettighetene."
+    },
+    "CREATE": {
+      "TITLE": "Opprett autorisasjon",
+      "DESCRIPTION": "Søk etter organisasjonen, prosjektet og de tilsvarende rollene."
+    },
+    "EDIT": {
+      "TITLE": "Endre autorisasjon"
+    },
+    "DETAIL": {
+      "TITLE": "Autorisasjonsdetaljer",
+      "DESCRIPTION": "Her kan du se alle detaljene for autorisasjonen."
+    },
+    "TOAST": {
+      "UPDATED": "Autorisasjon oppdatert.",
+      "REMOVED": "Autorisasjon fjernet",
+      "BULKREMOVED": "Autorisasjoner fjernet.",
+      "CANTSHOWINFO": "Du kan ikke besøke denne brukerens profil fordi du ikke er medlem av deres organisasjon."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Slett autorisasjon",
+      "DELETE_DESCRIPTION": "Du er i ferd med å slette en autorisasjon. Vil du fortsette?",
+      "BULK_DELETE_TITLE": "Slett autorisasjoner",
+      "BULK_DELETE_DESCRIPTION": "Du er i ferd med å slette flere autorisasjoner. Vil du fortsette?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Siste endringer",
+    "BOTTOM": "Du har nådd slutten av listen.",
+    "LOADMORE": "Last inn flere",
+    "ORG": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de siste hendelsene som har generert en organisasjonsendring."
+    },
+    "PROJECT": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de siste hendelsene som har generert en prosjektendring."
+    },
+    "USER": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de siste hendelsene som har generert en brukerendring."
+    }
+  }
+}

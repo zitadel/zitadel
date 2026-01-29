@@ -1,0 +1,457 @@
+{
+  "common": {
+    "back": "Tilbake",
+    "title": "Logg inn med Zitadel"
+  },
+  "accounts": {
+    "title": "Kontoer",
+    "description": "Velg kontoen du vil bruke.",
+    "addAnother": "Legg til en annen konto",
+    "noResults": "Ingen kontoer funnet",
+    "verified": "verifisert",
+    "expired": "utløpt"
+  },
+  "logout": {
+    "title": "Logg ut",
+    "description": "Klikk på en konto for å avslutte økten",
+    "noResults": "Ingen kontoer funnet",
+    "clear": "Avslutt økt",
+    "verifiedAt": "Sist aktiv: {time}",
+    "success": {
+      "title": "Utlogging vellykket",
+      "description": "Du har logget ut."
+    }
+  },
+  "loginname": {
+    "title": "Velkommen tilbake!",
+    "description": "Skriv inn påloggingsinformasjonen din.",
+    "register": "Registrer ny bruker",
+    "submit": "Fortsett",
+    "labels": {
+      "loginname": "Brukernavn",
+      "username": "Brukernavn",
+      "usernameOrPhoneNumber": "Brukernavn eller telefonnummer",
+      "usernameOrEmail": "Brukernavn eller e-post"
+    },
+    "required": {
+      "loginName": "Dette feltet er påkrevd"
+    },
+    "errors": {
+      "internalError": "En intern feil oppstod",
+      "couldNotGetLoginSettings": "Kunne ikke hente innloggingsinnstillinger",
+      "couldNotSearchUsers": "Kunne ikke søke etter brukere",
+      "couldNotGetDomain": "Kunne ikke hente domene",
+      "couldNotGetHost": "Kunne ikke hente vert",
+      "couldNotStartIDPFlow": "Kunne ikke starte IDP-flyt",
+      "moreThanOneUserFound": "Mer enn én bruker funnet. Oppgi en unik identifikator.",
+      "userNotFound": "Bruker ikke funnet i systemet",
+      "couldNotCreateSession": "Kunne ikke opprette økt for bruker",
+      "initialUserNotSupported": "Opprinnelig bruker støttes ikke",
+      "usernamePasswordNotAllowed": "Brukernavn og passord er ikke tillatt! Kontakt administratoren din for mer informasjon.",
+      "passkeysNotAllowed": "Passnøkler er ikke tillatt! Kontakt administratoren din for mer informasjon.",
+      "couldNotFindIdentityProvider": "Kunne ikke finne identitetsleverandør.",
+      "userNotActive": "Brukeren er ikke aktiv. Kontakt administratoren din for mer informasjon."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Det oppstod en feil",
+      "multipleUsersFound": "Flere brukere funnet",
+      "userNotFound": "Bruker ikke funnet i systemet"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Passord",
+      "description": "Skriv inn passordet ditt.",
+      "resetPassword": "Tilbakestill passord",
+      "submit": "Fortsett",
+      "labels": {
+        "password": "Passord"
+      },
+      "required": {
+        "password": "Dette feltet er påkrevd"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Kunne ikke verifisere passord",
+        "couldNotResetPassword": "Kunne ikke tilbakestille passord"
+      },
+      "info": {
+        "passwordResetSent": "Passord ble tilbakestilt. Vennligst sjekk e-posten din"
+      }
+    },
+    "set": {
+      "title": "Angi passord",
+      "description": "Angi passordet for kontoen din",
+      "codeSent": "En kode er sendt til e-postadressen din.",
+      "noCodeReceived": "Mottok du ikke en kode?",
+      "resend": "Send kode på nytt",
+      "submit": "Fortsett",
+      "labels": {
+        "code": "Kode",
+        "newPassword": "Nytt passord",
+        "confirmPassword": "Bekreft passord"
+      },
+      "required": {
+        "code": "Dette feltet er påkrevd",
+        "newPassword": "Du må oppgi et passord!",
+        "confirmPassword": "Dette feltet er påkrevd"
+      },
+      "errors": {
+        "couldNotSetPassword": "Kunne ikke angi passord",
+        "couldNotResetPassword": "Kunne ikke tilbakestille passord",
+        "couldNotVerifyPassword": "Kunne ikke verifisere passord"
+      }
+    },
+    "change": {
+      "title": "Endre passord",
+      "description": "Angi passordet for kontoen din",
+      "submit": "Fortsett",
+      "labels": {
+        "newPassword": "Nytt passord",
+        "confirmPassword": "Bekreft passord"
+      },
+      "required": {
+        "newPassword": "Du må oppgi et nytt passord!",
+        "confirmPassword": "Dette feltet er påkrevd"
+      },
+      "errors": {
+        "couldNotChangePassword": "Kunne ikke endre passord",
+        "couldNotVerifyPassword": "Kunne ikke verifisere passord",
+        "unknownError": "Ukjent feil"
+      }
+    },
+    "complexity": {
+      "length": "Må være minst {minLength} tegn langt.",
+      "hasSymbol": "Må inneholde et symbol.",
+      "hasNumber": "Må inneholde et tall.",
+      "hasUppercase": "Må inneholde en stor bokstav.",
+      "hasLowercase": "Må inneholde en liten bokstav.",
+      "equals": "Passordbekreftelsen samsvarte.",
+      "matches": "Samsvarer",
+      "doesNotMatch": "Samsvarer ikke"
+    },
+    "errors": {
+      "noHostFound": "Ingen vert funnet",
+      "couldNotSendResetLink": "Kunne ikke sende lenke for tilbakestilling av passord",
+      "couldNotCreateSessionForUser": "Kunne ikke opprette økt for bruker",
+      "couldNotVerifyPassword": "Kunne ikke verifisere passord",
+      "failedToAuthenticate": "Autentisering mislyktes. Du har hatt {failedAttempts} av {maxPasswordAttempts} mislykkede forsøk.",
+      "failedToAuthenticateNoLimit": "Autentisering mislyktes.",
+      "accountLockedContactAdmin": " Kontakt administratoren din for å låse opp kontoen din",
+      "userNotFound": "Bruker ikke funnet i systemet",
+      "initialUserNotSupported": "Opprinnelig bruker støttes ikke",
+      "userInitialStateNotSupported": "Brukerens opprinnelige tilstand støttes ikke",
+      "codeOrVerificationRequired": "Du må oppgi en kode eller ha en gyldig brukerverifisering.",
+      "verificationRequired": "Brukerverifiseringssjekk må utføres",
+      "couldNotLoadSession": "Kunne ikke laste økt",
+      "couldNotLoadAuthMethods": "Kunne ikke laste autentiseringsmetoder",
+      "failedPrecondition": "Forutsetning mislyktes",
+      "sessionNotValid": "Økten er ikke gyldig",
+      "passwordVerificationMissing": "Passordverifisering mangler.",
+      "passwordVerificationTooOld": "Passordverifiseringen er for gammel. Vennligst verifiser passordet ditt på nytt."
+    }
+  },
+  "idp": {
+    "title": "Logg inn med SSO",
+    "description": "Velg en av følgende leverandører for å logge inn",
+    "orSignInWith": "eller logg inn med",
+    "signInWithApple": "Logg inn med Apple",
+    "signInWithGoogle": "Logg inn med Google",
+    "signInWithAzureAD": "Logg inn med AzureAD",
+    "signInWithGithub": "Logg inn med GitHub",
+    "signInWithGitlab": "Logg inn med GitLab",
+    "loginError": {
+      "title": "Innlogging mislyktes",
+      "description": "Det oppstod en feil under innlogging."
+    },
+    "linkingError": {
+      "title": "Kontokobling mislyktes",
+      "description": "Det oppstod en feil under kobling av kontoen din."
+    },
+    "completeRegister": {
+      "title": "Fullfør dataene dine",
+      "description": "Du må fullføre registreringen ved å oppgi e-postadressen din."
+    },
+    "accountNotFound": {
+      "title": "Konto ikke funnet",
+      "description": "Vi kunne ikke finne en konto knyttet til identitetsleverandøren din.",
+      "info": "Ingen eksisterende konto ble funnet. Vennligst logg inn med en eksisterende konto.",
+      "backToLogin": "Tilbake til innlogging"
+    },
+    "registrationFailed": {
+      "title": "Registrering ikke tilgjengelig",
+      "description": "Vi kunne ikke fullføre registreringsprosessen.",
+      "info": "Kunne ikke bestemme organisasjonen for registrering. Vennligst kontakt administratoren.",
+      "backToLogin": "Tilbake til innlogging"
+    },
+    "processing": {
+      "message": "Behandler autentisering...",
+      "noRedirect": "Ingen omdirigering eller feil returnert fra serveren",
+      "unexpectedError": "Det oppstod en uventet feil"
+    },
+    "errors": {
+      "missingParameters": "Manglende påkrevde parametere",
+      "missingIdpInfo": "IDP-informasjon mangler",
+      "idpNotFound": "Identitetsleverandør ikke funnet",
+      "linkingNotAllowed": "Kobling er ikke tillatt for denne identitetsleverandøren",
+      "linkingFailed": "Kunne ikke koble identitetsleverandør til konto",
+      "autoLinkingFailed": "Kunne ikke automatisk koble konto",
+      "userCreationFailed": "Kunne ikke opprette brukerkonto",
+      "orgResolutionFailed": "Kunne ikke bestemme organisasjon for registrering",
+      "sessionCreationFailed": "Kunne ikke opprette økt eller bestemme omdirigering",
+      "unknownError": "Det oppstod en ukjent feil"
+    }
+  },
+  "ldap": {
+    "title": "LDAP-innlogging",
+    "description": "Skriv inn LDAP-legitimasjonen din.",
+    "submit": "Fortsett",
+    "labels": {
+      "username": "Brukernavn",
+      "password": "Passord"
+    },
+    "required": {
+      "username": "Dette feltet er påkrevd",
+      "password": "Dette feltet er påkrevd"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Bekreft identiteten din",
+      "description": "Velg en av følgende faktorer.",
+      "noResults": "Ingen andrefaktorer tilgjengelig for oppsett."
+    },
+    "set": {
+      "title": "Sett opp 2-faktor",
+      "description": "Velg en av følgende andrefaktorer.",
+      "skip": "Hopp over"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Bekreft 2-faktor",
+      "totpDescription": "Skriv inn koden fra autentiseringsappen din.",
+      "smsDescription": "Skriv inn koden du mottok via SMS.",
+      "emailDescription": "Skriv inn koden du mottok via e-post.",
+      "noCodeReceived": "Mottok du ikke en kode?",
+      "resendCode": "Send kode på nytt",
+      "submit": "Fortsett",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Dette feltet er påkrevd"
+      }
+    },
+    "set": {
+      "title": "Sett opp 2-faktor",
+      "totpDescription": "Skann QR-koden med autentiseringsappen din.",
+      "smsDescription": "Skriv inn telefonnummeret ditt for å motta en kode via SMS.",
+      "emailDescription": "Skriv inn e-postadressen din for å motta en kode via e-post.",
+      "totpRegisterDescription": "Skann QR-koden eller naviger til URL-en manuelt.",
+      "submit": "Fortsett",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Dette feltet er påkrevd"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Autentiser med en passnøkkel",
+      "description": "Enheten din vil be om fingeravtrykk, ansikt eller skjermlås.",
+      "usePassword": "Bruk passord",
+      "submit": "Fortsett",
+      "errors": {
+        "couldNotRequestChallenge": "Kunne ikke be om passnøkkelutfordring",
+        "couldNotVerifyPasskey": "Kunne ikke verifisere passnøkkel",
+        "noResponseReceived": "Passnøkkelverifisering mislyktes - ingen respons mottatt",
+        "noRedirectProvided": "Passnøkkelverifisering fullført, men ingen omdirigering ble gitt",
+        "couldNotRetrievePasskey": "Det oppstod en feil under henting av passnøkkel",
+        "verificationCancelled": "Passnøkkelverifisering ble avbrutt",
+        "verificationFailed": "Det oppstod en feil under passnøkkelverifisering",
+        "couldNotFindSession": "Kunne ikke finne økt",
+        "couldNotUpdateSession": "Kunne ikke oppdatere økt",
+        "userNotFound": "Bruker ikke funnet i systemet",
+        "couldNotDetermineRedirect": "Kunne ikke bestemme omdirigerings-URL etter passnøkkelverifisering"
+      }
+    },
+    "set": {
+      "title": "Sett opp en passnøkkel",
+      "description": "Enheten din vil be om fingeravtrykk, ansikt eller skjermlås.",
+      "info": {
+        "description": "En passnøkkel er en autentiseringsmetode på en enhet som telefonen din eller datamaskinen din.",
+        "link": "Passnøkkelautentisering"
+      },
+      "skip": "Hopp over",
+      "submit": "Fortsett"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Bekreft 2-faktor",
+      "description": "Bekreft kontoen din med enheten din."
+    },
+    "set": {
+      "title": "Sett opp 2-faktor",
+      "description": "Sett opp en enhet som andrefaktor.",
+      "submit": "Fortsett"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passnøkkel",
+      "password": "Passord"
+    },
+    "disabled": {
+      "title": "Registrering deaktivert",
+      "description": "Registrering er deaktivert. Vennligst kontakt administratoren din."
+    },
+    "missingdata": {
+      "title": "Manglende data",
+      "description": "Oppgi e-post, fornavn og etternavn for å registrere deg."
+    },
+    "title": "Registrer",
+    "description": "Opprett din ZITADEL-konto.",
+    "noMethodAvailableWarning": "Ingen autentiseringsmetode tilgjengelig. Vennligst kontakt administratoren din.",
+    "selectMethod": "Velg metoden du vil autentisere med",
+    "agreeTo": "For å registrere deg må du godta vilkårene og betingelsene",
+    "termsOfService": "Tjenestevilkår",
+    "privacyPolicy": "Personvernerklæring",
+    "submit": "Fortsett",
+    "password": {
+      "title": "Angi passord",
+      "description": "Angi passordet for kontoen din",
+      "submit": "Fortsett",
+      "labels": {
+        "password": "Passord",
+        "confirmPassword": "Bekreft passord"
+      },
+      "required": {
+        "password": "Du må oppgi et passord!",
+        "confirmPassword": "Dette feltet er påkrevd"
+      }
+    },
+    "labels": {
+      "firstname": "Fornavn",
+      "lastname": "Etternavn",
+      "email": "E-post"
+    },
+    "required": {
+      "firstname": "Dette feltet er påkrevd",
+      "lastname": "Dette feltet er påkrevd",
+      "email": "Dette feltet er påkrevd"
+    },
+    "errors": {
+      "couldNotCreateUser": "Kunne ikke opprette bruker",
+      "couldNotCreateSession": "Kunne ikke opprette økt",
+      "userNotFound": "Bruker ikke funnet i systemet",
+      "couldNotLinkIDP": "Kunne ikke koble IDP til bruker",
+      "couldNotRegisterUser": "Kunne ikke registrere bruker"
+    }
+  },
+  "invite": {
+    "title": "Inviter bruker",
+    "description": "Oppgi e-postadressen og navnet på brukeren du ønsker å invitere.",
+    "info": "Brukeren vil motta en e-post med videre instruksjoner.",
+    "notAllowed": "Innstillingene dine tillater ikke at du inviterer brukere.",
+    "submit": "Fortsett",
+    "success": {
+      "title": "Bruker invitert",
+      "description": "E-posten har blitt sendt.",
+      "verified": "Brukeren har blitt invitert og har allerede verifisert e-postadressen sin.",
+      "notVerifiedYet": "Brukeren har blitt invitert. De vil motta en e-post med videre instruksjoner.",
+      "submit": "Inviter en annen bruker"
+    }
+  },
+  "signedin": {
+    "title": "Velkommen {user}!",
+    "description": "Du er logget inn.",
+    "continue": "Fortsett",
+    "error": {
+      "title": "Feil",
+      "description": "Det oppstod en feil under innlogging."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Ingen bruker-ID oppgitt!",
+    "successTitle": "Bruker verifisert",
+    "successDescription": "Brukeren har blitt verifisert.",
+    "setupAuthenticator": "Sett opp autentisering",
+    "verify": {
+      "title": "Verifiser bruker",
+      "description": "Skriv inn koden du mottok i verifiserings-e-posten.",
+      "noCodeReceived": "Mottok du ikke en kode?",
+      "resendCode": "Send kode på nytt",
+      "codeSent": "En kode har nettopp blitt sendt til din e-postadresse.",
+      "submit": "Fortsett",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Dette feltet er obligatorisk"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Kunne ikke sende e-post på nytt",
+      "couldNotVerifyUser": "Kunne ikke verifisere bruker",
+      "couldNotVerifyInvite": "Kunne ikke verifisere invitasjon",
+      "couldNotVerifyEmail": "Kunne ikke verifisere e-post",
+      "couldNotVerify": "Kunne ikke verifisere",
+      "couldNotLoadUser": "Kunne ikke laste bruker",
+      "couldNotLoadAuthenticators": "Kunne ikke laste mulige autentiseringsmetoder",
+      "couldNotCreateSession": "Kunne ikke opprette økt",
+      "noHostFound": "Ingen vert funnet",
+      "userAlreadyVerified": "Bruker er allerede verifisert!",
+      "couldNotResendInvite": "Kunne ikke sende invitasjon på nytt",
+      "inviteSendFailed": "Kunne ikke sende invitasjons-e-post",
+      "emailSendFailed": "Kunne ikke sende verifiserings-e-post",
+      "contextMissing": "Det oppstod en feil. Vennligst prøv igjen."
+    }
+  },
+  "authenticator": {
+    "title": "Velg autentiseringsmetode",
+    "description": "Velg metoden du ønsker å autentisere med",
+    "noMethodsAvailable": "Ingen autentiseringsmetoder tilgjengelig",
+    "allSetup": "Du har allerede satt opp en autentisering!",
+    "linkWithIDP": "eller koble til en identitetsleverandør"
+  },
+  "device": {
+    "usercode": {
+      "title": "Enhetskode",
+      "description": "Skriv inn koden som vises på appen eller enheten din.",
+      "submit": "Fortsett",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Dette feltet er påkrevd"
+      }
+    },
+    "request": {
+      "title": "{appName} ønsker å koble til",
+      "description": "{appName} vil ha tilgang til:",
+      "disclaimer": "Ved å klikke Tillat, gir du {appName} og Zitadel tillatelse til å bruke informasjonen din i henhold til deres vilkår og personvernregler.",
+      "submit": "Tillat",
+      "deny": "Avslå"
+    },
+    "scope": {
+      "openid": "Bekreft identiteten din.",
+      "email": "Se e-postadressen din.",
+      "profile": "Se hele profilinformasjonen din.",
+      "offline_access": "Tillat frakoblet tilgang til kontoen din."
+    }
+  },
+  "error": {
+    "noUserCode": "Ingen brukerkode oppgitt!",
+    "noDeviceRequest": "Ingen enhetsforespørsel funnet.",
+    "unknownContext": "Kunne ikke hente brukerens kontekst. Sørg for å skrive inn riktig URL.",
+    "sessionExpired": "Den nåværende økten har utløpt. Vennligst logg inn på nytt.",
+    "failedLoading": "Kunne ikke laste inn data. Vennligst prøv igjen.",
+    "tryagain": "Prøv igjen",
+    "couldNotContinueSession": "Kunne ikke fortsette med økten - manglende brukerinformasjon"
+  }
+}
