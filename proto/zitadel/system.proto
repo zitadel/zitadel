@@ -59,7 +59,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
@@ -92,8 +92,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service SystemService {
-  //Indicates if ZITADEL is running.
-  // It respondes as soon as ZITADEL started
+  //Indicates if Zitadel is running.
+  // It respondes as soon as Zitadel started
   rpc Healthz(HealthzRequest) returns (HealthzResponse) {
     option (google.api.http) = {
       get: "/healthz";
@@ -116,9 +116,9 @@ service SystemService {
     };
   }
 
-  // Returns a list of ZITADEL instances
+  // Returns a list of Zitadel instances
   //
-  // Deprecated: Use [ListInstances](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListInstances) instead to list instances
+  // Deprecated: Use [ListInstances](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-instances.api.mdx) instead to list instances
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (google.api.http) = {
       post: "/instances/_search"
@@ -136,7 +136,7 @@ service SystemService {
 
   // Returns the detail of an instance
   //
-  // Deprecated: Use [GetInstance](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.GetInstance) instead to get the details of the instance in context
+  // Deprecated: Use [GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-get-instance.api.mdx) instead to get the details of the instance in context
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (google.api.http) = {
       get: "/instances/{instance_id}";
@@ -171,7 +171,7 @@ service SystemService {
 
   // Updates name of an existing instance
   //
-  // Deprecated: Use [UpdateInstance](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.UpdateInstance) instead to update the name of the instance in context
+  // Deprecated: Use [UpdateInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-update-instance.api.mdx) instead to update the name of the instance in context
   rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
     option (google.api.http) = {
       put: "/instances/{instance_id}"
@@ -203,7 +203,7 @@ service SystemService {
   // Removes an instance
   // This might take some time
   //
-  // Deprecated: Use [DeleteInstance](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.DeleteInstance) instead to delete an instance
+  // Deprecated: Use [DeleteInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-delete-instance.api.mdx) instead to delete an instance
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}"
@@ -234,7 +234,7 @@ service SystemService {
 
   // Checks if a domain exists
   //
-  // Deprecated: Use [ListCustomDomains](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListCustomDomains) instead to check existence of an instance
+  // Deprecated: Use [ListCustomDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-custom-domains.api.mdx) instead to check existence of an instance
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
       post: "/domains/{domain}/_exists";
@@ -252,9 +252,9 @@ service SystemService {
 
   // List Domains
   //
-  // Deprecated: use [instance service v2 ListCustomDomains](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.ListCustomDomains) instead.
+  // Deprecated: use [instance service v2 ListCustomDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-list-custom-domains.api.mdx) instead.
   //
-  // Returns the custom domains of an instance.
+  // Returns the Custom Domains of an instance.
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_search";
@@ -272,7 +272,7 @@ service SystemService {
 
   // Adds a domain to an instance
   //
-  // Deprecated: Use [AddCustomDomain](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.AddCustomDomain) instead to add a custom domain to the instance in context
+  // Deprecated: Use [AddCustomDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-add-custom-domain.api.mdx) instead to add a Custom Domain to the instance in context
   rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains";
@@ -290,7 +290,7 @@ service SystemService {
 
   // Removes the domain of an instance
   //
-  // Deprecated: Use [RemoveDomain](/docs/reference/api/instance/zitadel.instance.v2.InstanceService.RemoveCustomDomain) instead to remove a custom domain from the instance in context
+  // Deprecated: Use [RemoveDomain](apis/resources/instance_service_v2/zitadel-instance-v-2-instance-service-remove-custom-domain.api.mdx) instead to remove a Custom Domain from the instance in context
   rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/domains/{domain}";
@@ -317,7 +317,7 @@ service SystemService {
     };
   }
 
-  //Returns all stored read models of ZITADEL
+  //Returns all stored read models of Zitadel
   // views are used for search optimisation and optimise request latencies
   // they represent the delta of the event happend on the objects
   rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
@@ -342,7 +342,7 @@ service SystemService {
   }
 
   //Truncates the delta of the change stream
-  // be carefull with this function because ZITADEL has to
+  // be carefull with this function because Zitadel has to
   // recompute the deltas after they got cleared.
   // Search requests will return wrong results until all deltas are recomputed
   rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
@@ -784,16 +784,16 @@ message AddQuotaRequest {
           description: "the quota amount of units";
     }
   ];
-  // whether ZITADEL should block further usage when the configured amount is used
+  // whether Zitadel should block further usage when the configured amount is used
   bool limit = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "whether ZITADEL should block further usage when the configured amount is used";
+          description: "whether Zitadel should block further usage when the configured amount is used";
     }
   ];
-  // the handlers, ZITADEL executes when certain quota percentages are reached
+  // the handlers, Zitadel executes when certain quota percentages are reached
   repeated zitadel.quota.v1.Notification notifications = 7 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+          description: "the handlers, Zitadel executes when certain quota percentages are reached";
     }
   ];
 }
@@ -832,16 +832,16 @@ message SetQuotaRequest {
       description: "the quota amount of units";
     }
   ];
-  // whether ZITADEL should block further usage when the configured amount is used
+  // whether Zitadel should block further usage when the configured amount is used
   bool limit = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "whether ZITADEL should block further usage when the configured amount is used";
+      description: "whether Zitadel should block further usage when the configured amount is used";
     }
   ];
-  // the handlers, ZITADEL executes when certain quota percentages are reached
+  // the handlers, Zitadel executes when certain quota percentages are reached
   repeated zitadel.quota.v1.Notification notifications = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+      description: "the handlers, Zitadel executes when certain quota percentages are reached";
     }
   ];
 }

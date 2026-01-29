@@ -33,17 +33,17 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
-  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=client_credentials \
   --data scope='openid profile' \
   --user "$CLIENT_ID:$CLIENT_SECRET"
 ```
 
-* `CUSTOM_DOMAIN` should be set to your [custom domain](/concepts/features/custom-domain)
+* `CUSTOM_DOMAIN` should be set to your [Custom Domain](/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
-* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/apis/openidoauth/authn-methods)
+* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Management Console when generating a new secret to enable [basic authentication](/apis/openidoauth/authn-methods) main:docs/docs/guides/integrate/service-users/client-credentials.md
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
@@ -101,8 +101,8 @@ By following these steps and adhering to security best practices, you can effect
 
 ## Notes
 
-* Read about the [different authentication methods for service users](./authenticate-service-users)
-* [Service User API reference](/reference/api/management/zitadel.management.v1.ManagementService.AddMachineUser)
-* [OIDC client secret basic](/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
+* Read about the [different methods to authenticate service users](./authenticate-service-users)
+* [Service User API reference](/category/apis/resources/mgmt/user-machine)
+* [OIDC client secret basic](/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference main:docs/docs/guides/integrate/service-users/client-credentials.md
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

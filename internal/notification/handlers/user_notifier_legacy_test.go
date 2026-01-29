@@ -1091,7 +1091,7 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 }
 
 func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
-	expectMailSubject := "Add Passwordless Login"
+	expectMailSubject := "Add Passkey Login"
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
@@ -1982,9 +1982,11 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 				},
 				SMTPConfig: &smtp.Config{
 					SMTP: smtp.SMTP{
-						Host:     "host",
-						User:     "user",
-						Password: "password",
+						Host: "host",
+						PlainAuth: &smtp.PlainAuthConfig{
+							User:     "user",
+							Password: "password",
+						},
 					},
 					Tls:            true,
 					From:           "from",

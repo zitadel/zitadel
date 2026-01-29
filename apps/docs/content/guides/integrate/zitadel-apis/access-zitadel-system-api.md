@@ -89,7 +89,7 @@ The JWT payload will need to contain the following claims:
 {
   "iss": "<userid>",
   "sub": "<userid>",
-  "aud": "<https://$CUSTOM-DOMAIN>",
+  "aud": "<https://${CUSTOM_DOMAIN}>",
   "exp": <now+1h>,
   "iat": <now>
 }
@@ -125,7 +125,7 @@ Now that you configured ZITADEL and created a JWT, you can call the System API a
 
 ```bash
 curl --request POST \
-  --url $CUSTOM-DOMAIN/system/v1/instances/_search \
+  --url ${CUSTOM_DOMAIN}/system/v1/instances/_search \
   --header 'Authorization: Bearer {token}' \
   --header 'Content-Type: application/json'
 ```

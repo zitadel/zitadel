@@ -54,7 +54,7 @@ What does the Web Application Example include:
 - Authenticating user with OIDC PKCE Flow
 - Public Page: Accessible without authentication
 - Private Page: Shows user information of authenticated user, only accessible after login
-- Task Page: Only accessible after login and uses the API example. Requires the admin role for the application for some interaction.
+- Task Page: Only accessible after login and uses the API example. Requires the administrator role for the application for some interaction.
 - Logout
 
 [Example Web App with Spring Security](https://github.com/zitadel/zitadel-java/web)
@@ -65,7 +65,7 @@ What does the API Application Example include:
 - REST API Application secured with Spring Security and OAuth2
 - Public Endpoint: Accessible without authentication
 - Private Endpoint: Accessible with a token
-- Administrator Endpoint: Accessible with a token of a user with admin role
+- Administrator Endpoint: Accessible with a token of a user with an administrator role
 
 [Example API App with Spring Security](https://github.com/zitadel/zitadel-java/api)
 
@@ -77,12 +77,12 @@ The guides lead you through the whole process from configuring the right applica
 
 #### Web Application Guide
 
-After completing the Step-By-Step Guide you will have:
+After completing the Step-By-Step Guide, you will have:
 1. Example Web Application with integrated ZITADEL Login
 2. Example page accessible by authenticated user showing retrieved user information
-3. Example page accessible by authenticated user showing task list
-   - Task list can be read by authenticated user
-   - New tasks can be created by user with admin role
+3. Example page accessible by an authenticated user showing a task list
+   - Task list can be read by an authenticated user
+   - New tasks can be created by a user with an administrator role
 4. Logout
 5. Correct setup for your application in ZITADEL
 
@@ -91,11 +91,11 @@ After completing the Step-By-Step Guide you will have:
 
 #### API Application Guide
 
-After completing the Step-By-Step Guide you will have:
+After completing the Step-By-Step Guide, you will have:
 1. Example REST API checking tokens against ZITADEL with OAuth2
 2. Public Endpoint accessible by any user
 3. Private Endpoint accessible by authenticated user
-4. Private Endpoint accessible by user with role 'admin'
+4. Private Endpoint accessible by the user with the role 'admin'
 5. Correct setup for your application in ZITADEL
 
 [API APP Step-By-Step Guide](/examples/secure-api/java-spring)

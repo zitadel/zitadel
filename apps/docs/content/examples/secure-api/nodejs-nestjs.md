@@ -25,7 +25,7 @@ Make sure you have Node.js and npm installed on your machine.
 
 ### ZITADEL Configuration for the API
 
-1. Create a ZITADEL instance and a project by following the steps [here](/guides/start/quickstart#3-create-your-first-instance).
+1. Create a ZITADEL instance and a project by following the steps [here](/guides/start/quickstart#3-create-your-zitadel-instance). main:docs/docs/examples/secure-api/nodejs-nestjs.md
 
 2. Set up an API application within your project:
    - Create a new application of type "API" with authentication method "Private Key".

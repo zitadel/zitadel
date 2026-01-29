@@ -28,7 +28,7 @@ Learn how to [use service users](/guides/integrate/service-users/authenticate-se
 ### Managers
 
 Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
-Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
+A user with an administrator role is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ### Federated users
 
@@ -76,6 +76,6 @@ You can use organization metadata or your own business logic to describe a hiera
 
 ## References
 
-- [Manage users in the Console](../../guides/manage/console/users-overview)
-- [ZITADEL APIs: Users](/reference/api/management)
-- [User onboarding and registration](/guides/integrate/onboarding)
+- [Manage users in the Management Console](../../guides/manage/console/users-overview)
+- [ZITADEL APIs: Users](/category/apis/resources/mgmt/users)
+- [User onboarding and registration](/guides/integrate/onboarding) main:docs/docs/concepts/structure/users.md

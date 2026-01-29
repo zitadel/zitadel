@@ -20,7 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Session Service";
     version: "2.0";
-    description: "This API is intended to manage sessions in a ZITADEL instance. Follow the guides on how to [build your own Login UI](/docs/build-and-integrate/login/login-users) and learn how to use the Session API.";
+    description: "This API is intended to manage sessions in a Zitadel instance. Follow the guides on how to [build your own Login UI](/docs/guides/integrate/login-ui) and learn how to use the Session API.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -43,7 +43,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -56,8 +56,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -187,7 +187,7 @@ service SessionService {
   // A token will be returned, which is required for using the session as authentication, e.g.
   // when authenticating an OIDC auth request or SAML request.
   // Additionally, the session token can be used as OAuth2 access token to authenticate against
-  // the ZITADEL APIs.
+  // the Zitadel APIs.
   //
   // Required permissions:
   //   - `session.write`
@@ -250,7 +250,7 @@ service SessionService {
   //
   // Terminate an existing session. This invalidates the session and its token.
   // The session can no longer be used for the authentication of other resources
-  // or to authenticate against the ZITADEL APIs.
+  // or to authenticate against the Zitadel APIs.
   //
   // You can only terminate your own session, unless you are granted the `session.delete` permission.
   //
@@ -382,7 +382,7 @@ message CreateSessionResponse{
   // The current token of the session, which is required for using the session as authentication,
   // e.g.when authenticating an OIDC auth request or SAML request.
   // Additionally, the session token can be used as OAuth2 access token to authenticate against
-  // the ZITADEL APIs.
+  // the Zitadel APIs.
   string session_token = 3;
 
   // The challenges that were requested for the session.
@@ -450,7 +450,7 @@ message SetSessionResponse{
   // The current token of the session, which is required for using the session as authentication,
   // e.g.when authenticating an OIDC auth request or SAML request.
   // Additionally, the session token can be used as OAuth2 access token to authenticate against
-  // the ZITADEL APIs.
+  // the Zitadel APIs.
   // The previous token was invalidated and can no longer be used.
   string session_token = 2;
 

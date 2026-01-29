@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: No se pudo contactar con el servidor SMTP usando TLS, verifique el puerto, problemas con el firewall...
     CouldNotCreateClient: no se pudo crear el cliente smtp
     CouldNotStartTLS: no se pudo iniciar TLS
-    CouldNotAuth: no se pudo agregar la autenticación smtp, verifique si tanto su usuario como su contraseña son correctos, si son correctos tal vez su proveedor requiera un método de autenticación no admitido por ZITADEL
+    CouldNotAuth: no se pudo agregar la autenticación smtp, verifique si tanto su usuario como su contraseña son correctos, si son correctos tal vez su proveedor requiera un método de autenticación no admitido por Zitadel
     CouldNotSetSender: no se pudo configurar el remitente
     CouldNotSetRecipient: No se pudo establecer el destinatario
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organización no encontrada
     NotChanged: La organización no ha cambiado
     DefaultOrgNotDeletable: La organización por defecto no debe borrarse
-    ZitadelOrgNotDeletable: La organización que contiene el proyecto ZITADEL no debe borrarse
+    ZitadelOrgNotDeletable: La organización que contiene el proyecto Zitadel no debe borrarse
     InvalidDomain: Dominio no válido
     DomainMissing: Falta el dominio
     DomainNotOnOrg: El dominio no existe en la organización
@@ -575,6 +575,10 @@ Errors:
     NoTimeout: El objetivo no tiene tiempo de espera
     InvalidURL: El objetivo tiene una URL no válida
     NotFound: El objetivo no encontrado
+    InvalidExpirationDate: La fecha de expiración de la clave debe estar en el futuro
+    PublicKeyExpired: La clave pública del destino ha expirado
+    PublicKeyActive: No se puede eliminar una clave pública activa del destino
+    InvalidPublicKey: La clave pública no es válida. Debe ser una clave pública RSA o ECDSA codificada en PEM en formato PKCS#8
   Execution:
     ConditionInvalid: La condición de ejecución no es válida
     Invalid: La ejecución no es válida
@@ -583,6 +587,7 @@ Errors:
     NoTargets: No hay objetivos definidos
     Failed: Ejecución fallida
     ResponseIsNotValidJSON: La respuesta no es un JSON válido
+    MissingEncryptionKey: Falta la clave de cifrado para la ejecución
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
     Type:
@@ -1110,20 +1115,20 @@ EventTypes:
         changed: Política de bloqueo de contraseña modificada
   iam:
     setup:
-      started: Conficuración de ZITADEL iniciada
-      done: Configuración de ZITADEL finalizada
+      started: Conficuración de Zitadel iniciada
+      done: Configuración de Zitadel finalizada
     global:
       org:
         set: Organización global configurada
     project:
       iam:
-        set: Proyecto ZITADEL configurado
+        set: Proyecto Zitadel configurado
     member:
-      added: Miembro de ZITADEL añadido
-      changed: Miembro de ZITADEL modificado
-      removed: Miembro de ZITADEL eliminado
+      added: Miembro de Zitadel añadido
+      changed: Miembro de Zitadel modificado
+      removed: Miembro de Zitadel eliminado
       cascade:
-        removed: Miembro de ZITADEL eliminado en cascada
+        removed: Miembro de Zitadel eliminado en cascada
     idp:
       config:
         added: Configuración IDP añadida
@@ -1236,9 +1241,9 @@ EventTypes:
       removed: Dominio eliminado
     iam:
       console:
-        set: Aplicación de consola ZITADEL configurada
+        set: Aplicación de consola de administración Zitadel configurada
       project:
-        set: Proyecto ZITADEL configurado
+        set: Proyecto Zitadel configurado
     mail:
       template:
         added: Plantilla de email añadida

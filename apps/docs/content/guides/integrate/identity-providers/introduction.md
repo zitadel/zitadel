@@ -102,7 +102,7 @@ Once in the settings:
 Access the settings page of your instance or the specific organization and select **Identity Providers**.
 
 
-The ZITADEL Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
+The ZITADEL Management Console will display a list of all the IdPs you've configured, along with available provider templates. Selecting any listed IdP will guide you through the process of configuring that specific Identity Provider.
 
 ![](../../../../public/img/guides/zitadel_identity_provider_overview.png)
 
@@ -178,5 +178,5 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 ## References
 
 - [Identity brokering in ZITADEL](/concepts/features/identity-brokering)
-- [The ZITADEL API reference for managing external IdPs](/reference/api/admin)
-- [Handle external logins in a custom login UI](/guides/integrate/login-ui/external-login)
+- [The ZITADEL API reference for managing external IdPs](/category/apis/resources/admin/identity-providers)
+- [Handle external logins in a custom login UI](/guides/integrate/login-ui/external-login) main:docs/docs/guides/integrate/identity-providers/introduction.md

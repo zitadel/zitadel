@@ -11,7 +11,7 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro components={props.components}  provider="PingFederate"/>
+<Intro provider="PingFederate"/> main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx
 
 ## PingFederate SAML configuration
 
@@ -65,7 +65,7 @@ ready for the ZITADEL configuration steps.
 
 ### Go to the IdP providers overview
 
-<IDPsOverview components={props.components}  templates="SAML"/>
+<IDPsOverview templates="SAML"/> main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx
 
 ### Create a new SAML Service Provider
 
@@ -73,9 +73,9 @@ The SAML provider template has everything you need preconfigured.
 Add the metadata.xml or the URL to the metadata which are accessible by your ZITADEL instance.  
 All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
-<GeneralConfigDescription components={props.components}  provider_account="PingFederate" />
+<GeneralConfigDescription provider_account="PingFederate" />
 
-![](../../../../public/img/guides/zitadel_saml_create_provider.png)
+![SAML Provider](../../../../public/img/guides/zitadel_saml_create_provider.png) main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx
 
 After saving, open the newly created PingFederate SAML provider in ZITADEL.  
 In the details view you will find the **ZITADEL Service Provider** URLs, such as:
@@ -155,13 +155,13 @@ If needed, you can still override specific settings manually, but using the meta
 
 ### Activate IdP
 
-<Activate components={props.components} />
+<Activate/>
 
-![](../../../../public/img/guides/zitadel_activate_pingfederate_saml.png)
+![Activate PingFederate SAML provider in ZITADEL](../../../../public/img/guides/zitadel-activate-pingfederate-saml.png)
 
 ### Ensure your Login Policy allows External IdPs
 
-<CustomLoginPolicy components={props.components} />
+<CustomLoginPolicy/> main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx
 
 ## Configure an action to autofill user data
 
@@ -169,7 +169,7 @@ If needed, you can still override specific settings manually, but using the meta
 The creation of users in ZITADEL will fail if the required fields to create a user are not set.
 
 **Actions V2** can be used to map the SAML attributes returned by the IdP to the required fields in ZITADEL.
-See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
+See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation.md) main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx
 guide for more information on setting up a Target and an Execution. In short,
 * Create an Actions V2 Target of type `REST Call`
 * Create an Execution of type `Response` on the method `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`
@@ -340,6 +340,6 @@ func main() {
 
 ## Test the setup
 
-<TestSetup components={props.components}  loginscreen="your PingFederate login"/>
+<TestSetup loginscreen="your PingFederate login"/>
 
-![](../../../../public/img/guides/zitadel_login_pingfederate_button.png)
+![Image: PingFederate button on ZITADEL login](../../../../public/img/guides/zitadel-login-pingfederate-button.png) main:docs/docs/guides/integrate/identity-providers/pingfederate-saml.mdx

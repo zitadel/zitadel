@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "戻る",
-    "title": "ZITADELでログイン"
+    "title": "Zitadelでログイン"
   },
   "accounts": {
     "title": "アカウント",
@@ -35,6 +35,22 @@
     },
     "required": {
       "loginName": "必須項目です"
+    },
+    "errors": {
+      "internalError": "内部エラーが発生しました",
+      "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+      "couldNotSearchUsers": "ユーザーを検索できませんでした",
+      "couldNotGetDomain": "ドメインを取得できませんでした",
+      "couldNotGetHost": "ホストを取得できませんでした",
+      "couldNotStartIDPFlow": "IDPフローを開始できませんでした",
+      "moreThanOneUserFound": "複数のユーザーが見つかりました。一意の識別子を指定してください。",
+      "userNotFound": "ユーザーがシステムに見つかりません",
+      "couldNotCreateSession": "ユーザーのセッションを作成できませんでした",
+      "initialUserNotSupported": "初期ユーザーはサポートされていません",
+      "usernamePasswordNotAllowed": "ユーザー名とパスワードは許可されていません！詳細については管理者にお問い合わせください。",
+      "passkeysNotAllowed": "パスキーは許可されていません！詳細については管理者にお問い合わせください。",
+      "couldNotFindIdentityProvider": "IDプロバイダーが見つかりませんでした。",
+      "userNotActive": "ユーザーはアクティブではありません。詳細については管理者にお問い合わせください。"
     }
   },
   "password": {
@@ -48,6 +64,13 @@
       },
       "required": {
         "password": "必須項目です"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "パスワードを確認できませんでした",
+        "couldNotResetPassword": "パスワードをリセットできませんでした"
+      },
+      "info": {
+        "passwordResetSent": "パスワードがリセットされました。メールを確認してください"
       }
     },
     "set": {
@@ -66,6 +89,11 @@
         "code": "必須項目です",
         "newPassword": "パスワードを入力してください！",
         "confirmPassword": "必須項目です"
+      },
+      "errors": {
+        "couldNotSetPassword": "パスワードを設定できませんでした",
+        "couldNotResetPassword": "パスワードをリセットできませんでした",
+        "couldNotVerifyPassword": "パスワードを確認できませんでした"
       }
     },
     "change": {
@@ -79,7 +107,42 @@
       "required": {
         "newPassword": "新しいパスワードを入力してください！",
         "confirmPassword": "必須項目です"
+      },
+      "errors": {
+        "couldNotChangePassword": "パスワードを変更できませんでした",
+        "couldNotVerifyPassword": "パスワードを確認できませんでした",
+        "unknownError": "不明なエラー"
       }
+    },
+    "errors": {
+      "passwordVerificationMissing": "パスワード確認がありません。",
+      "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。",
+      "noHostFound": "ホストが見つかりません",
+      "couldNotSendResetLink": "パスワードリセットリンクを送信できませんでした",
+      "couldNotCreateSessionForUser": "ユーザーのセッションを作成できませんでした",
+      "couldNotVerifyPassword": "パスワードを確認できませんでした",
+      "failedToAuthenticate": "認証に失敗しました。パスワード試行回数 {maxPasswordAttempts} 回中 {failedAttempts} 回失敗しました。{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "認証に失敗しました。",
+      "accountLockedContactAdmin": " アカウントのロックを解除するには管理者に連絡してください",
+      "userNotFound": "ユーザーがシステムに見つかりません",
+      "initialUserNotSupported": "初期ユーザーはサポートされていません",
+      "userInitialStateNotSupported": "ユーザーの初期状態はサポートされていません",
+      "codeOrVerificationRequired": "コードを提供するか、有効なユーザー確認チェックを行う必要があります",
+      "verificationRequired": "ユーザー確認チェックを行う必要があります",
+      "couldNotLoadSession": "セッションを読み込めませんでした",
+      "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
+      "failedPrecondition": "前提条件に失敗しました",
+      "sessionNotValid": "セッションが無効です"
+    },
+    "complexity": {
+      "length": "{minLength} 文字以上である必要があります。",
+      "hasSymbol": "記号を含める必要があります。",
+      "hasNumber": "数字を含める必要があります。",
+      "hasUppercase": "大文字を含める必要があります。",
+      "hasLowercase": "小文字を含める必要があります。",
+      "equals": "パスワード確認が一致しました。",
+      "matches": "一致します",
+      "doesNotMatch": "一致しません"
     }
   },
   "idp": {
@@ -194,14 +257,27 @@
       "title": "パスキーで認証",
       "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
       "usePassword": "パスワードを使用",
-      "submit": "続行"
+      "submit": "続行",
+      "errors": {
+        "couldNotRequestChallenge": "パスキーチャレンジを要求できませんでした",
+        "couldNotVerifyPasskey": "パスキーを確認できませんでした",
+        "noResponseReceived": "パスキー確認に失敗しました - 応答がありません",
+        "noRedirectProvided": "パスキー確認は完了しましたが、リダイレクトが提供されませんでした",
+        "couldNotRetrievePasskey": "パスキーの取得中にエラーが発生しました",
+        "verificationCancelled": "パスキー確認がキャンセルされました",
+        "verificationFailed": "パスキー確認中にエラーが発生しました",
+        "couldNotFindSession": "セッションが見つかりませんでした",
+        "couldNotUpdateSession": "セッションを更新できませんでした",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+      }
     },
     "set": {
       "title": "パスキーの設定",
       "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
       "info": {
         "description": "パスキーは、指紋やApple FaceIDなどのデバイス上の認証方法です。",
-        "link": "パスワードレス認証"
+        "link": "パスキー認証"
       },
       "skip": "スキップ",
       "submit": "続行"
@@ -232,7 +308,7 @@
       "description": "登録するにはメールアドレス、姓、名を入力してください。"
     },
     "title": "登録",
-    "description": "ZITADELアカウントを作成します。",
+    "description": "Zitadelアカウントを作成します。",
     "noMethodAvailableWarning": "使用可能な認証方法がありません。管理者にお問い合わせください。",
     "selectMethod": "認証に使用する方法を選択してください",
     "agreeTo": "登録するには利用規約に同意する必要があります",
@@ -261,6 +337,13 @@
       "firstname": "必須項目です",
       "lastname": "必須項目です",
       "email": "必須項目です"
+    },
+    "errors": {
+      "couldNotCreateUser": "ユーザーを作成できませんでした",
+      "couldNotCreateSession": "セッションを作成できませんでした",
+      "userNotFound": "ユーザーがシステムに見つかりません",
+      "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
+      "couldNotRegisterUser": "ユーザーを登録できませんでした"
     }
   },
   "invite": {
@@ -318,7 +401,8 @@
       "userAlreadyVerified": "ユーザーは既に確認済みです！",
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
-      "emailSendFailed": "確認メールの送信に失敗しました"
+      "emailSendFailed": "確認メールの送信に失敗しました",
+      "contextMissing": "エラーが発生しました。もう一度お試しください。"
     }
   },
   "authenticator": {
@@ -360,6 +444,14 @@
     "unknownContext": "ユーザーのコンテキストを取得できませんでした。最初にユーザー名を入力するか、検索パラメータとしてloginNameを指定してください。",
     "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
     "failedLoading": "データの読み込みに失敗しました。再試行してください。",
-    "tryagain": "再試行"
+    "tryagain": "再試行",
+    "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています"
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "エラーが発生しました",
+      "multipleUsersFound": "複数のユーザーが見つかりました",
+      "userNotFound": "ユーザーがシステムに見つかりません"
+    }
   }
 }

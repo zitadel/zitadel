@@ -80,7 +80,7 @@ As shown in the example above, the target is created with HTTP and port '8090'. 
 See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information. Notice that the `endpoint` is your Webhook.site URL.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -117,7 +117,7 @@ See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.Set
 Here, `<TargetID returned>` is the `id` from the previous step.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -137,12 +137,12 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 
 ## 7. Example Call
 
-Now that you have set up the target and execution, you can test it by creating a user through the Console UI or by calling the ZITADEL API to create a human user.
+Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or by calling the ZITADEL API to create a human user.
 
 Here, we are creating a user via the API:
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/users/human' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

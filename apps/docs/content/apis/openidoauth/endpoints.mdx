@@ -55,7 +55,7 @@ Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`.
 
 Send the access_token to the [userinfo_endpoint](#userinfo-endpoint) or [introspection_endpoint](#introspection-endpoint) the retrieve these claims
-or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
+or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Management Console) to true.
 </Callout>
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -106,6 +106,7 @@ no additional parameters required
 
 #### Response modes
 
+ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is chosen based on the configured Response Type of the application.
 ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is chosen based on the configured Response Type of the application.
 As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest):
 
@@ -161,7 +162,7 @@ the error will be display directly to the user on the auth server
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                                                                                                                                                  |
 | invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                                                                                                                                                  |
-| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration.                                                                                                                       |
+| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Management Console that the requested `response_type` is allowed in your application configuration.                                                                                                                       |
 | unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                                                                                                                                             |
 | server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                                                                                                                                        |
 | interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction. |

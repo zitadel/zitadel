@@ -17,7 +17,7 @@ Prerequisites:
 - existing ZITADEL project, if not present follow the first 3 steps [here](/guides/manage/console/projects-overview)
 - existing Auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
-> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Console and
+> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Management Console and
 > if the headings start with "Auth0" please switch to the Auth0 GUI.
 
 ## **Auth0**: Create a new connection

@@ -4,8 +4,8 @@ with features as (
 		coalesce(i.value, s.value)
 	) features
 	from (select $1::text instance_id) x
-	cross join projections.system_features s
-	full outer join projections.instance_features2 i using (key, instance_id)
+	cross join projections.system_features2 s
+	full outer join projections.instance_features3 i using (key, instance_id)
 	group by instance_id
 ), external_domains as (
 	select instance_id, array_agg(domain) as domains
@@ -26,7 +26,10 @@ with features as (
 			'endpoint', t.endpoint,
 			'timeout', t.timeout,
 			'interrupt_on_error', t.interrupt_on_error,
-			'signing_key', t.signing_key
+			'signing_key', t.signing_key,
+            'payload_type', t.payload_type,
+            'encryption_key', encode(k.public_key, 'base64'),
+            'encryption_key_id', k.id
 		) as execution_targets
 		from projections.executions1 e
 		join projections.executions1_targets et
@@ -35,6 +38,11 @@ with features as (
 		join projections.targets2 t
 			on et.instance_id = t.instance_id
 			and et.target_id = t.id
+        left join projections.authn_keys2 k
+            on k.instance_id = et.instance_id
+            and k.object_id = t.id
+            and k.enabled = true
+            and (k.expiration IS NULL or k.expiration > now())
 		where e.instance_id = $1
 		order by et.position asc
 	) as x

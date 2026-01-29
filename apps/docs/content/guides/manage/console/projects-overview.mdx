@@ -1,12 +1,14 @@
 ---
-title: Projects
+title: Organize applications, services, and roles with projects
 sidebar_label: Projects
+sidebar_position: 4
 ---
+ main:docs/docs/guides/manage/console/projects-overview.mdx
 import ProjectDescription from "../../../concepts/structure/_project_description.mdx";
 
 ## What is a project?
 
-<ProjectDescription components={props.components}  name="ProjectDescription" />
+<ProjectDescription name="ProjectDescription" /> main:docs/docs/guides/manage/console/projects-overview.mdx
 
 A Project is the vessel that holds your Applications and Roles. It defines the security context for a specific software solution.
 
@@ -16,7 +18,7 @@ Imagine you are building a **Point of Sales (POS)** platform. In ZITADEL, you wo
 * **Roles:** You would create **Roles** (e.g., `admin`, `cashier`, `viewer`) inside this Project.
 * **Authorization:** All applications in this project share these roles, allowing you to create unified authorizations for your users across all platforms.
 
-![](../../../../public/img/guides/console/posproject.png)
+![POS Project](../../../../public/img/guides/console/posproject.png) main:docs/docs/guides/manage/console/projects-overview.mdx
 
 ## Core Components
 
@@ -29,7 +31,7 @@ Go to [Applications](./applications-overview) for more details.
 A role consists of different attributes, but only the **Key** is relevant to the authorization and must be unique within the project.
 * **Key:** The identifier used in code (e.g., `role.admin`).
 * **Display Name:** A human-readable name for the UI.
-* **Group:** Enables better handling in the ZITADEL console (e.g., giving a user all roles of a specific group).
+* **Group:** Enables better handling in the ZITADEL Management Console (e.g., giving a user all roles of a specific group). main:docs/docs/guides/manage/console/projects-overview.mdx
 
 Read more about managing roles [here](./roles).
 
@@ -37,11 +39,11 @@ Read more about managing roles [here](./roles).
 When creating a new ZITADEL instance, you will find an automatically created project in the first organization.
 This **Default Project** (named "ZITADEL") protects the ZITADEL Management Console and APIs.
 
-<Callout type="warn">
+:::caution
 We do not recommend changing any settings in the Default Project or using it for your own applications, as this could influence the behavior of ZITADEL itself.
-</Callout>
+:::
 
-![](../../../../public/img/guides/solution-scenarios/console-default-project.png)
+![Default Project](../../../../public/img/guides/solution-scenarios/console-default-project.png) main:docs/docs/guides/manage/console/projects-overview.mdx
 
 ## Create a Project
 

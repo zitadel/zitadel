@@ -23,7 +23,7 @@ This example uses **[Authlib](https://authlib.org)**, the standard authenticatio
 
 This example shows a complete authentication implementation using [Django](https://www.djangoproject.com) with [Zitadel](https://zitadel.com/docs). Users start on a public landing page, click a login button to authenticate with Zitadel using the secure [PKCE flow](https://oauth.net/2/pkce/), and are redirected to a protected profile page displaying their [user information](https://zitadel.com/docs/apis/openidoauth/claims) after successful authentication.
 
-The application implements server-side session management with Django's built-in session framework, storing authentication state securely in signed cookies. Protected routes use the `@require_auth` decorator to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/apis/openidoauth/endpoints#token-endpoint).
+The application implements server-side session management with Django's built-in session framework, storing authentication state securely in signed cookies. Protected routes use the `@require_auth` decorator to automatically redirect unauthenticated users to the sign-in flow, ensuring only authenticated users can access sensitive areas. The profile page displays comprehensive user information including [OIDC claims](https://zitadel.com/docs/apis/openidoauth/claims) and [session metadata](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint). main:docs/docs/sdk-examples/django.mdx
 
 The application demonstrates proper **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by terminating sessions both locally and with Zitadel's [end-session endpoint](https://zitadel.com/docs/guides/integrate/login/oidc/logout), complete with CSRF protection using state parameters. Additionally, it includes automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/endpoints) using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) to maintain long-lived sessions without requiring users to re-authenticate. The example uses [Zitadel-specific scopes](https://zitadel.com/docs/apis/openidoauth/scopes) like `urn:zitadel:iam:user:metadata` and `urn:zitadel:iam:org:projects:roles` to access extended user attributes and role information for implementing [role-based access control (RBAC)](https://zitadel.com/docs/guides/manage/console/roles).
 
@@ -33,7 +33,7 @@ The application demonstrates proper **[federated logout](https://zitadel.com/doc
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to: main:docs/docs/sdk-examples/django.mdx
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
@@ -42,7 +42,7 @@ Before running this example, you need to create and configure a PKCE application
 5. Copy your **Client ID** for use in the next steps
 6. Optionally enable [refresh tokens](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) in Token Settings for long-lived sessions
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode. main:docs/docs/sdk-examples/django.mdx
 
 ### Run the example
 

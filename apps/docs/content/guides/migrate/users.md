@@ -238,8 +238,8 @@ Use metadata to store additional attributes of the users, such as organizational
 
 <Callout>
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata)
-</Callout>
+[API reference: User Metadata](/category/apis/resources/mgmt/user-metadata)
+::: main:docs/docs/guides/migrate/users.md
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/apis/openidoauth/scopes#reserved-scopes) in your auth request.
 With the [complement token flow](/apis/actions/complement-token), you can also transform metadata (or roles) to custom claims.
@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 <Callout>
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyUserGrants)
-</Callout>
+[API reference: User Authorization / Grants](/category/apis/resources/auth/user-authorizations-grants)
+::: main:docs/docs/guides/migrate/users.md

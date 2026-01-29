@@ -9,7 +9,7 @@ import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_respon
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
 
-<Callout>
+:::info main:docs/docs/guides/integrate/token-exchange.mdx
 Token Exchange is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
 
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1333448892083208262)!
@@ -190,7 +190,7 @@ These preparation steps are needed for all Token Exchange interaction, including
 As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
 
 ```bash
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/features/instance' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/features/instance' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \
@@ -218,7 +218,7 @@ For this example we have the following projects in our organization:
 - **portal** contains the end user interfaces. In this case a web-app that initiated user login and performs operations on other APIs. The web-app has the token exchange grant type enabled;
 - **aggregates** a project that contains APIs of low privilege which aggregate public data to return to the user;
 - **settings** a project that contains APIs for settings and other privileged operations;
-- **ZITADEL** the build-in project used for the zitadel console and APIs;
+- **ZITADEL** the build-in project used for the zitadel management console and APIs;
 
 #### Authenticated user tokens
 
@@ -423,9 +423,9 @@ Doing similar request you can:
 
 In the following example we exchange the initial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
 
-<Callout>
+:::info
 You can also obtain an ID token in the `id_token` response field by requesting an access token and the `openid` scope.
-</Callout>
+::: main:docs/docs/guides/integrate/token-exchange.mdx
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
@@ -829,7 +829,7 @@ And the `subject_token`:
 }
 ```
 
-In both cases the issuer is the web application, the audience must be the zitadel domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
+In both cases the issuer is the web application, the audience must be the Custom Domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
 
 Response:
 
@@ -880,7 +880,7 @@ Above we gave some of the most straightforward use cases. Of course, you can com
 
 ## Audit trail
 
-In the user view of the console we can see whenever a new access token is created for a user.
+In the user view of the management console we can see whenever a new access token is created for a user.
 The existing `Access Token created` event is also used in the case of a token exchange.
 When there was an `actor_token` present during token exchange, we also log a `User impersonated` event.
 

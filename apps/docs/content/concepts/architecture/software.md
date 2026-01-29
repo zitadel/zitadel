@@ -30,7 +30,7 @@ The service layer includes all components who are potentially exposed to consume
 
 The http server is responsible for the following functions:
 
-- serving the management GUI called Zitadel Console
+- serving the management GUI called Zitadel Management Console
 - serving the static assets
 - rendering server side html (login, password-reset, verification, ...)
 

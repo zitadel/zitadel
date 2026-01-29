@@ -21,11 +21,11 @@ Before we begin developing our application, we need to perform a few configurati
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
-![](../../../public/img/go/app-create.png)
+![Create app in management console](../../../public/img/go/app-create.png)
 
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all applications.
 
-![](../../../public/img/go/app-create-auth.png)
+![Create app in management console - set auth method](../../../public/img/go/app-create-auth.png) main:docs/docs/examples/login/go.md
 
 ### Redirect URIs
 
@@ -34,7 +34,7 @@ The Post-logout redirect send the users back to a route on your application afte
 
 > If you are following along with the [example](https://github.com/zitadel/zitadel-go), set the dev mode to `true`, the Redirect URIs to `http://localhost:8089/auth/callback` and Post-logout redirect URI to [http://localhost:8089/](http://localhost:8089/)>.
 
-![](../../../public/img/go/app-create-redirect.png)
+![Create app in management console - set redirectURI](../../../public/img/go/app-create-redirect.png) main:docs/docs/examples/login/go.md
 
 Continue and create the application.
 
@@ -42,7 +42,7 @@ Continue and create the application.
 
 After successful creation of the app, a pop-up will appear displaying the app's client ID. Copy the client ID, as you will need it to configure your Go client.
 
-![](../../../public/img/go/app-create-clientid.png)
+![Create app in management console - copy client_id](../../../public/img/go/app-create-clientid.png) main:docs/docs/examples/login/go.md
 
 ## Go setup
 
@@ -122,14 +122,14 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 ### Start your application
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL custom domain, e.g. my-domain.zitadel.cloud
+- `domain`: Your ZITADEL Custom Domain, e.g. my-domain.zitadel.cloud main:docs/docs/examples/login/go.md
 - `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PKCE.
 - `clientID`: The clientID provided by ZITADEL
 - `redirectURI`: The redirectURI registered at ZITADEL
 - `port`: The port on which the API will be accessible, default it 8089
 
 ```bash
-go run main.go --domain <your domain> --key <key> -- clientID <clientID> --redirectURI <redirectURI>
+go run main.go --domain <custom domain> --key <key> -- clientID <clientID> --redirectURI <redirectURI>
 ```
 
 This could look like:

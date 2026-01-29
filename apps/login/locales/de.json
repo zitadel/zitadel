@@ -147,7 +147,9 @@
       "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
       "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
       "failedPrecondition": "Vorbedingung fehlgeschlagen",
-      "sessionNotValid": "Sitzung ist nicht gültig"
+      "sessionNotValid": "Sitzung ist nicht gültig",
+      "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
+      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
     }
   },
   "idp": {
@@ -274,10 +276,7 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
-        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
-        "couldNotSetSession": "Sitzung konnte nicht gesetzt werden",
-        "couldNotGetUser": "Benutzerdaten konnten nicht abgerufen werden",
-        "couldNotRetrieveSessionCookie": "Sitzungs-Cookie konnte nicht abgerufen werden"
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
       }
     },
     "set": {
@@ -285,7 +284,7 @@
       "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
       "info": {
         "description": "Ein Passkey ist eine Authentifizierungsmethode auf einem Gerät wie Ihr Fingerabdruck, Apple FaceID oder ähnliches.",
-        "link": "Passwortlose Authentifizierung"
+        "link": "Passkey-Authentifizierung"
       },
       "skip": "Überspringen",
       "submit": "Weiter"
@@ -316,7 +315,7 @@
       "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
     },
     "title": "Registrieren",
-    "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "description": "Erstellen Sie Ihr Zitadel-Konto.",
     "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
@@ -409,7 +408,8 @@
       "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
-      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden"
+      "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     }
   },
   "authenticator": {

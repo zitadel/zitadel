@@ -49,7 +49,7 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url ${CUSTOM_DOMAIN}/management/v1/orgs/me \
   --header 'Authorization: Bearer {PAT}' 
 ```
 

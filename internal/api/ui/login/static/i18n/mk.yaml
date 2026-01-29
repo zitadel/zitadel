@@ -2,7 +2,7 @@ Login:
   Title: Добредојдовте назад!
   Description: Внесете ги вашите податоци за најава.
   TitleLinking: Најава за поврзување на корисник
-  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на ZITADEL.
+  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на Zitadel.
   LoginNameLabel: Корисничко име за најава
   UsernamePlaceHolder: корисничко име
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Изберете корисничка сметка
-  Description: Користете ја вашата ZITADEL корисничка сметка
+  Description: Користете ја вашата Zitadel корисничка сметка
   TitleLinking: Изберете корисничка сметка за поврзување на корисник
   DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
   OtherUser: Друг корисник
@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: следно
   CancelButtonText: откажи
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Потврда на 2-факторска автентикација
   DescriptionPhone: Направете двофакторна автентикација. Внесете го вашиот телефонски број за да го потврдите.
   DescriptionCode: Направете двофакторна автентикација. Внесете го примениот код за да го потврдите вашиот телефонски број.
+  CountryCodeLabel: Земја
   PhoneLabel: Телефонски број
   CodeLabel: Код
   EditButtonText: Уредување
@@ -267,6 +268,8 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -312,6 +315,8 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -391,6 +396,8 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Овластување преку уред
@@ -443,8 +450,8 @@ Errors:
       NotFound: Профилот не е пронајден
       NotChanged: Профилот не е променет
       Empty: Профилот е празен
-      FirstNameEmpty: Името во профилот е празно
-      LastNameEmpty: Презимето во профилот е празно
+      FirstNameEmpty: Полето за име на профилот е празно
+      LastNameEmpty: Полето за презиме на профилот е празно
       IDMissing: ID на профил е празно
     Email:
       NotFound: Е-поштата не е пронајдена

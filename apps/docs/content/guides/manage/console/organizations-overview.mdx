@@ -15,7 +15,7 @@ Key characteristics of Organizations in ZITADEL include:
 
 In a B2B use case, an organization typically represents a business partner who requires their own branding, specific access settings, or distinct federated login providers.
 
-![](../../../../public/img/concepts/objects/organization.png)
+![Overview ZITADEL Organizations](../../../../public/img/concepts/objects/organization.png) main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ## Structure and Delegation
 
@@ -27,13 +27,13 @@ ZITADEL allows you to give *other* organizations permission to manage certain as
 
 For example, you could set up a project with roles that define access to your software, but allow a partner organization to allocate those roles to their own users independently. As a service provider, this allows you to establish a self-service culture for your business customers.
 
-![](../../../../public/img/concepts/objects/organization_grants.png)
+![Organization Grant](../../../../public/img/concepts/objects/organization_grants.png) main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ## Managing Organizations
 
 ### Create a new organization
 
-To create a new organization, click on the organizations dropdown in the Console and select **New organization**.
+To create a new organization, click on the organizations dropdown in the Management Console and select **New organization**. main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 You have two options regarding the initial administrator:
 1.  **Current User:** Create the organization with your currently logged-in user as the organization manager. A membership for the new organization will be added to your account.
@@ -62,7 +62,7 @@ On the **Default settings** page (`${CUSTOM_DOMAIN}`/ui/console/orgs), you can d
 * Click the **...** on the right-hand side of the table and select **Set as default organization**.
 * The current default is marked by a "Default" label.
 
-When no specific organization is selected (e.g., during an auth request or via [Domain Discovery](/guides/solution-scenarios/domain-discovery)), users are directed to this default organization for login and self-registration.
+When no specific organization is selected (e.g., during an auth request or via [Domain Discovery](/guides/solution-scenarios/domain-discovery)), users are directed to this default organization for login and self-registration. main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ## Usernames and Domains
 
@@ -84,27 +84,27 @@ You can verify your own domain names (e.g., `acme.ch`) to simplify the user expe
 1.  ZITADEL generates additional login names for users.
 2.  The user `john.doe` can log in via `john.doe@acme.ch` OR `john.doe@acme.zitadel.cloud`.
 
-<Callout>
+:::info
 Only one user with the username `john.doe` can exist within the organization `ACME`, regardless of which domain suffix they use to log in.
-</Callout>
+::: main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ### Primary Domain
 An organization can have multiple domain names, but only one is **Primary**. The primary domain determines:
 * Which login name is displayed to the user in the UI.
 * What information is asserted in `access_tokens` (specifically the `preferred_username` claim).
 
-<Callout type="warn">
+:::caution
 Setting a Primary Domain affects users.
 If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
-</Callout>
+::: main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ## Domain Verification Guide
 
 If the **validate org domains** setting in [Domain Settings](./default-settings#domain-settings) is set to `true`, you must prove ownership of your domain via DNS or HTTP challenge.
 
-<Callout>
+:::info
 You can disable domain verification requirements in the [default settings](/guides/manage/console/default-settings#domain-settings) if you are running a self-hosted instance and do not require strict validation.
-</Callout>
+::: main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 1.  Navigate to your **Organization Settings**.
 2.  Select the menu entry **Verified domains**.
@@ -125,9 +125,9 @@ You can disable domain verification requirements in the [default settings](/guid
 5.  Once verified, click **Verify**.
 6.  (Optional) Click **Set as primary** to make this the default domain for user login names.
 
-<Callout type="warn">
+:::caution
 Do not delete the DNS verification record after success. ZITADEL re-checks domain ownership periodically.
-</Callout>
+::: main:docs/docs/guides/manage/console/organizations-overview.mdx
 
 ## Organization Settings
 
@@ -157,4 +157,4 @@ By default, the ZITADEL Login uses the instance default settings. To trigger the
 urn:zitadel:iam:org:id:{id}
 ```
 
-This value is a [reserved scope](/apis/openidoauth/scopes#reserved-scopes) within ZITADEL.
+This value is a [reserved scope](/apis/openidoauth/scopes#reserved-scopes) within ZITADEL. main:docs/docs/guides/manage/console/organizations-overview.mdx

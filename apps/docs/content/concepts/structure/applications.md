@@ -18,10 +18,10 @@ ZITADEL supports the following client types:
 
 Ensure the configuration of application settings is limited to authorized users only.
 
-- Use [Manager roles](./managers) to limit permissions for your users to make changes to your applications
-- When [granting projects](./granted_projects) to other organizations, the receiving organization can't see or change application configuration
+- Use [Administrator roles](managers.mdx) to limit permissions for your users to make changes to your applications
+- When [granting projects](granted_projects.md) to other organizations, the receiving organization can't see or change application configuration
 
 ## References
 
-- [Configure Applications in the Console](../../guides/manage/console/applications-overview)
-- [ZITADEL API: Applications](/reference/api/management)
+- [Configure Applications in the Management Console](../../guides/manage/console/applications-overview)
+- [ZITADEL API: Applications](/category/apis/resources/mgmt/applications) main:docs/docs/concepts/structure/applications.md

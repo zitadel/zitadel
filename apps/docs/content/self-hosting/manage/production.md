@@ -32,7 +32,7 @@ Also, not all configuration options are available as environment variables.
 - To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/self-hosting/manage/tls_modes).
 - If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/self-hosting/manage/http2)**.
 - You can also refer to some **[example reverse proxy configurations](/self-hosting/manage/reverseproxy/reverse_proxy)**.
-- The ZITADEL Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
+- The ZITADEL Management Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](/self-hosting/manage/custom-domain) or [Brotli](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli). main:docs/docs/self-hosting/manage/production.md
 - Serving and caching the assets using a content delivery network could improve network latencies and shield your ZITADEL runtime.
 
 ## Monitoring
@@ -226,7 +226,7 @@ DefaultInstance:
     ReplyToAddress:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure/configure#database-initialization-file), you can provide a FirstInstance YAML section using the --steps argument.
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument. main:docs/docs/self-hosting/manage/production.md
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/console-overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform-provider).

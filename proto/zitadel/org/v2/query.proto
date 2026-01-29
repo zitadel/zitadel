@@ -16,10 +16,19 @@ message SearchQuery {
   oneof query {
     option (validate.required) = true;
 
+    // Filter organizations by their name.
     OrganizationNameQuery name_query = 1;
+
+    // Filter organizations by their domain.
     OrganizationDomainQuery domain_query = 2;
+
+    // Filter organizations by their state.
     OrganizationStateQuery state_query = 3;
+
+    // Filter organizations by their id.
     OrganizationIDQuery id_query = 4;
+
+    // Filter for the default organization.
     DefaultOrganizationQuery default_query = 5;
   }
 }
@@ -35,6 +44,7 @@ message OrganizationNameQuery {
       example: "\"gigi-giraffe\"";
     }
   ];
+
   // Defines which text equality method is used.
   zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
@@ -52,6 +62,7 @@ message OrganizationDomainQuery {
       example: "\"citadel.cloud\"";
     }
   ];
+
   // Defines which text equality method is used.
   zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
@@ -81,6 +92,22 @@ message OrganizationIDQuery {
 enum OrganizationFieldName {
   ORGANIZATION_FIELD_NAME_UNSPECIFIED = 0;
   ORGANIZATION_FIELD_NAME_NAME = 1;
+  ORGANIZATION_FIELD_NAME_CREATION_DATE = 2;
 }
 
 message DefaultOrganizationQuery {}
+
+message DomainSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Filter organization domains by their domain name.
+    OrganizationDomainQuery domain_filter = 1;
+  }
+}
+
+enum DomainFieldName {
+  DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+  DOMAIN_FIELD_NAME_NAME = 1;
+  DOMAIN_FIELD_NAME_CREATION_DATE = 2;
+}

@@ -11,7 +11,7 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro components={props.components}  provider="OneLogin"/>
+<Intro provider="OneLogin"/> main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 ## OneLogin SAML configuration
 
@@ -33,7 +33,7 @@ After the ZITADEL SAML provider exists, we’ll return to OneLogin and finish th
    - Any optional icon or description you like.
 6. Click **Save** to create the application.
 
-![](../../../../public/img/guides/onelogin-add-apps.png)
+![Image: OneLogin Add Apps screen showing SAML connector selection](../../../../public/img/guides/onelogin-add-apps.png) main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 ### Export OneLogin IdP metadata
 
@@ -57,7 +57,7 @@ ready for the ZITADEL configuration steps.
 
 ### Go to the IdP providers overview
 
-<IDPsOverview components={props.components}  templates="SAML"/>
+<IDPsOverview templates="SAML"/> main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 ### Create a new SAML Service Provider
 
@@ -65,9 +65,9 @@ The SAML provider template has everything you need preconfigured.
 Add the metadata XML or the URL to the metadata which is accessible by your ZITADEL instance.  
 All the necessary configuration is contained in the metadata which has to be exchanged between the Service Provider and the Identity Provider.
 
-<GeneralConfigDescription components={props.components}  provider_account="OneLogin" />
+<GeneralConfigDescription provider_account="OneLogin" />
 
-![](../../../../public/img/guides/zitadel_saml_create_provider.png)
+![SAML Provider](../../../../public/img/guides/zitadel_saml_create_provider.png) main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 After saving, open the newly created **OneLogin SAML provider** in ZITADEL.  
 In the details view you will find the **ZITADEL Service Provider** URLs, such as:
@@ -107,7 +107,7 @@ Now that ZITADEL is configured, return to OneLogin and finish the SAML configura
    - **ACS (Consumer) URL Validator** (if present)  
      For testing, you can use a permissive value like `.*`, then tighten it later to match the exact ACS URL.
 
-![](../../../../public/img/guides/onelogin-configuration.png)
+![Image: OneLogin SAML configuration with ZITADEL URLs](../../../../public/img/guides/onelogin-configuration.png) main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 4. Save your changes.
 
@@ -139,13 +139,13 @@ These attributes are later available in ZITADEL’s **IdP information** and can 
 
 ### Activate IdP
 
-<Activate components={props.components} />
+<Activate/>
 
-![](../../../../public/img/guides/zitadel_activate_onelogin_saml.png)
+![Activate OneLogin SAML provider in ZITADEL](../../../../public/img/guides/zitadel-activate-onelogin-saml.png)
 
 ### Ensure your Login Policy allows External IdPs
 
-<CustomLoginPolicy components={props.components} />
+<CustomLoginPolicy/> main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 
 ## Configure an action to autofill user data
 
@@ -154,7 +154,7 @@ These attributes are later available in ZITADEL’s **IdP information** and can 
 The creation of users in ZITADEL will fail if the required fields to create a user are not set.
 
 **Actions V2** can be used to map the SAML attributes returned by the IdP to the required fields in ZITADEL.  
-See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
+See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation.md) main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx
 guide for more information on setting up a Target and an Execution. In short,
 
 * Create an Actions V2 Target of type `REST Call`.
@@ -325,6 +325,6 @@ func main() {
 
 ## Test the setup
 
-<TestSetup components={props.components}  loginscreen="your OneLogin login"/>
+<TestSetup loginscreen="your OneLogin login"/>
 
-![](../../../../public/img/guides/zitadel_login_onelogin_button.png)
+![Image: OneLogin button on ZITADEL login](../../../../public/img/guides/zitadel-login-onelogin-button.png) main:docs/docs/guides/integrate/identity-providers/onelogin-saml.mdx

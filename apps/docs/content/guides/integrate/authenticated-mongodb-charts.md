@@ -20,7 +20,7 @@ You will need to provide some information about your app. We recommend creating 
 
 Your application configuration should now look similar to this:
 
-![](../../../public/img/integrations/mongodb-charts-app-create-light.png)
+![Create app in management console](../../../public/img/integrations/mongodb-charts-app-create-light.png) main:docs/docs/guides/integrate/authenticated-mongodb-charts.md
 
 ## Setup Custom JWT Provider for MongoDB Charts
 
@@ -29,7 +29,7 @@ Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](htt
 Configure the following values:
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
-- JWKS: https://$CUSTOM-DOMAIN/oauth/v2/keys
+- JWKS: https://$CUSTOM_DOMAIN/oauth/v2/keys
 - Audience: Your app's client ID which you copied when you created the ZITADEL app
 
 Your configuration should look similar to this:

@@ -23,7 +23,7 @@ This example uses **[@auth/express](https://www.npmjs.com/package/@auth/express)
 
 This Express.js example provides a complete authentication implementation using [Zitadel](https://zitadel.com/docs) as the identity provider. The application starts with a public landing page featuring a login button that initiates the [PKCE authentication flow](https://oauth.net/2/pkce/). When users click login, [@auth/express](https://www.npmjs.com/package/@auth/express) generates a cryptographic code verifier and challenge, then redirects to Zitadel's authorization endpoint. After successful authentication at Zitadel, users return to the application's [callback URL](https://zitadel.com/docs/guides/integrate/login/oidc/login-users) where the authorization code is exchanged for [access tokens](https://zitadel.com/docs/apis/openidoauth/endpoints) and an [ID token](https://zitadel.com/docs/apis/openidoauth/claims).
 
-The example includes protected routes using [Express middleware](https://expressjs.com/en/guide/using-middleware.html) that automatically verify session state and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://zitadel.com/docs/apis/openidoauth/claims) from Zitadel. The application maintains long-lived sessions through automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token-endpoint), ensuring users remain authenticated without repeated logins.
+The example includes protected routes using [Express middleware](https://expressjs.com/en/guide/using-middleware.html) that automatically verify session state and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://expressjs.com/en/guide/using-middleware.html) that automatically verify session state and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://zitadel.com/docs/apis/openidoauth/claims) from Zitadel. The application maintains long-lived sessions through automatic [token refresh](https://expressjs.com/en/guide/using-middleware.html) that automatically verify session state and redirect unauthenticated users to the sign-in page. Authenticated users can access their profile page displaying user information including email, name, and custom [metadata claims](https://zitadel.com/docs/apis/openidoauth/claims) from Zitadel. The application maintains long-lived sessions through automatic [token refresh](https://zitadel.com/docs/apis/openidoauth/grant-types#refresh-token) using [refresh tokens](https://zitadel.com/docs/apis/openidoauth/endpoints#token_endpoint), ensuring users remain authenticated without repeated logins. main:docs/docs/sdk-examples/expressjs.mdx
 
 Sign-out functionality implements **[federated logout](https://zitadel.com/docs/guides/integrate/login/oidc/logout)** by redirecting to Zitadel's end-session endpoint with the ID token hint, terminating both the local session and the Zitadel session. The logout flow includes [CSRF protection](https://authjs.dev/guides/basics/securing-pages-and-api-routes) through state parameter validation, and users are redirected to a success page after logout completion. All authentication flows use secure HTTP-only cookies for [session storage](https://authjs.dev/concepts/session-strategies) and implement proper security headers.
 
@@ -33,7 +33,7 @@ Sign-out functionality implements **[federated logout](https://zitadel.com/docs/
 
 ### Prerequisites
 
-Before running this example, you need to create and configure a PKCE application in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to:
+Before running this example, you need to create and configure a PKCE application in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview). Follow the PKCE application setup guide to: main:docs/docs/sdk-examples/expressjs.mdx
 
 1. Create a new Web application in your [Zitadel project](https://zitadel.com/docs/guides/manage/console/projects)
 2. Configure it to use the PKCE authentication method
@@ -41,7 +41,7 @@ Before running this example, you need to create and configure a PKCE application
 4. Configure post-logout redirect URIs (e.g., `http://localhost:3000/auth/logout/callback`)
 5. Copy your **Client ID** for use in the next steps
 
-> **Note:** Make sure to enable **Dev Mode** in the [Zitadel Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
+> **Note:** Make sure to enable **Dev Mode** in the [ZITADEL Management Console](https://zitadel.com/docs/guides/manage/console/overview) if you're using HTTP URLs during local development. For production, always use HTTPS URLs and disable Dev Mode.
 
 ### Run the example
 

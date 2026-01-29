@@ -83,8 +83,8 @@ func createInstance(t *testing.T, tx database.Transaction) (instanceID string) {
 		Name:            gofakeit.Name(),
 		DefaultOrgID:    "defaultOrgId",
 		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleClient",
-		ConsoleAppID:    "consoleApp",
+		ConsoleClientID: "managementConsoleClient",
+		ConsoleAppID:    "managementConsoleApp",
 		DefaultLanguage: "defaultLanguage",
 	}
 	instanceRepo := repository.InstanceRepository()
@@ -142,4 +142,22 @@ func createProjectRole(t *testing.T, tx database.Transaction, instanceID, orgID,
 	require.NoError(t, err)
 
 	return projectRole.Key
+}
+
+func createProjectGrant(t *testing.T, tx database.Transaction, instanceID, grantingOrgID, grantedOrgID, projectID string, roleKeys []string) string {
+	t.Helper()
+	projectGrant := domain.ProjectGrant{
+		InstanceID:             instanceID,
+		ID:                     gofakeit.UUID(),
+		ProjectID:              projectID,
+		GrantingOrganizationID: grantingOrgID,
+		GrantedOrganizationID:  grantedOrgID,
+		State:                  domain.ProjectGrantStateActive,
+		RoleKeys:               roleKeys,
+	}
+	projectGrantRepo := repository.ProjectGrantRepository()
+	err := projectGrantRepo.Create(t.Context(), tx, &projectGrant)
+	require.NoError(t, err)
+
+	return projectGrant.ID
 }

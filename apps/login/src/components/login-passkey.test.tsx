@@ -17,7 +17,7 @@ vi.mock("@/lib/server/passkeys", () => ({
 }));
 
 vi.mock("@/lib/server/session", () => ({
-  updateSession: vi.fn(),
+  updateOrCreateSession: vi.fn(),
 }));
 
 // Mock navigator.credentials
@@ -67,10 +67,10 @@ describe("LoginPasskey Component", () => {
     mockCredentialsGet.mockClear();
 
     const { sendPasskey } = await import("@/lib/server/passkeys");
-    const { updateSession } = await import("@/lib/server/session");
+    const { updateOrCreateSession } = await import("@/lib/server/session");
 
     mockSendPasskey = vi.mocked(sendPasskey);
-    mockUpdateSession = vi.mocked(updateSession);
+    mockUpdateSession = vi.mocked(updateOrCreateSession);
   });
 
   describe("Initialization and Challenge Request", () => {

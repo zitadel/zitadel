@@ -48,7 +48,7 @@ Request the user information by calling the [userinfo endpoint](/apis/openidoaut
 
 ```bash
 curl --request GET \
-  --url "https://$CUSTOM-DOMAIN/oidc/v1/userinfo" \
+  --url "https://${CUSTOM_DOMAIN}/oidc/v1/userinfo" \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -159,10 +159,10 @@ If you get the error "invalid audience (APP-Zxfako)", then you need to add the r
 You can request the user's metadata with the [List My Metadata](/reference/api/auth/zitadel.auth.v1.AuthService.ListMyMetadata) method:
 
 ```bash
-curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
+curl -L -X POST "https://${CUSTOM_DOMAIN}/auth/v1/users/me/metadata/_search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
--H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 --data-raw '{
   "query": {
     "offset": "0",
@@ -172,7 +172,7 @@ curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
   "queries": [
     {
       "keyQuery": {
-        "key": "$METADATA_KEY",
+        "key": "${METADATA_KEY}",
         "method": "TEXT_QUERY_METHOD_EQUALS"
       }
     }
@@ -180,9 +180,9 @@ curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
 }'
 ```
 
-Replace `$ACCESS_TOKEN` with your user's access token.  
-Replace `$CUSTOM-DOMAIN` with your ZITADEL instance's url.  
-Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
+Replace `${ACCESS_TOKEN}` with your user's access token.  
+Replace `${CUSTOM_DOMAIN}` with your ZITADEL instance's url.  
+Replace `${METADATA_KEY}` with they key you want to search for (f.e. "ContractNumber")
 
 <Callout title="Get all metadata">
 You can omit the queries array to retrieve all metadata key-value pairs.
@@ -224,5 +224,5 @@ In case you want to get the metadata for another user, you need to use the manag
 The user that calls the management service must have [manager permissions](/guides/manage/console/managers).
 A user can be either a human user or a service user.
 
-You can get [metadata of a user filtered by your query](/reference/api/management/zitadel.management.v1.ManagementService.ListUserMetadata) or [get a metadata object from a user by a specific key](/reference/api/management/zitadel.management.v1.ManagementService.GetUserMetadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/reference/api/management).
+You can get [metadata of a user filtered by your query](/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/apis/resources/mgmt/management-service-get-user-metadata).
+The management service allows you to set and delete metadata, see the [API documentation for users](/category/apis/resources/mgmt/users). main:docs/docs/guides/manage/customize/user-metadata.md

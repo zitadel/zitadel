@@ -35,8 +35,7 @@ Select Web application type and continue.
 We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our NextJS application.
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
 
-![](../../../public/img/nextjs/app-create.png)
-
+![Create app in management console](../../../public/img/nextjs/app-create.png)
 ### Redirect URIs
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.

@@ -2,7 +2,7 @@ Login:
   Title: Добро пожаловать!
   Description: Введите свои данные для входа.
   TitleLinking: Вход для привязки пользователей
-  DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к учётной записи ZITADEL.
+  DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к учётной записи Zitadel.
   LoginNameLabel: Логин
   UsernamePlaceHolder: логин
   LoginnamePlaceHolder: username@domain
@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Настройка двухфакторной аутентификации
   DescriptionPhone: Введите номер телефона для его подтверждения.
   DescriptionCode: Введите код из СМС для подтверждения номера телефона.
+  CountryCodeLabel: Страна
   PhoneLabel: Номер телефона
   CodeLabel: Код из СМС
   EditButtonText: Изменить
@@ -267,6 +268,8 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -312,6 +315,8 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -391,6 +396,8 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Авторизация устройства
@@ -443,8 +450,8 @@ Errors:
       NotFound: Профиль не найден
       NotChanged: Профиль не изменен
       Empty: Профиль пуст
-      FirstNameEmpty: Поле имени пусто
-      LastNameEmpty: Поле фамилии пусто
+      FirstNameEmpty: Имя в профиле пустое
+      LastNameEmpty: Фамилия в профиле пустая
       IDMissing: Отсутствует идентификатор профиля
       Email:
         NotFound: Электронная почта не найдена

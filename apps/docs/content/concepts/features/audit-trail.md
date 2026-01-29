@@ -35,14 +35,14 @@ The same view is available on several other objects such as organization or proj
 
 ### Event View
 
-Administrators can see all events across an instance and filter them directly in [Console](/guides/manage/console/console-overview).
-Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events
+Administrators can see all events across an instance and filter them directly in [Console](/guides/manage/console/console-console-overview).
+Go to your default settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM_DOMAIN/ui/console/events
 
 ![](../../../public/img/concepts/audit-trail/event-viewer.png)
 
 ### Event API
 
-Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
+Since everything that is available in Management Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
 - [Event API Guide](/guides/integrate/zitadel-apis/event-api)
 - [API Documentation](/reference/api/admin)

@@ -129,7 +129,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -152,7 +152,7 @@ To call the target just created before, with the intention to manipulate the req
 See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -170,11 +170,11 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 
 ## Example call
 
-Now that you have set up the target and execution, you can test it by creating a user through the Console UI or
+Now that you have set up the target and execution, you can test it by creating a user through the Management Console UI or
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -203,7 +203,7 @@ Your server should now manipulate the request to something like the following. C
 the [Sent information Request](./usage#sent-information-request) payload description.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/new' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

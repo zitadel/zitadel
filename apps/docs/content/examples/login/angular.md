@@ -8,7 +8,7 @@ It explains how to enable user login in your application and how to fetch data f
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
 
-> This documentation references our [example](https://github.com/zitadel/zitadel-angular) on GitHub. Please note that we wrote the ZITADEL Console in Angular, so you can also use that as a reference.
+> This documentation references our [example](https://github.com/zitadel/zitadel-angular) on GitHub. Please note that we wrote the ZITADEL Management Console in Angular, so you can also use that as a reference.
 
 ## Set up application and obtain keys
 
@@ -17,7 +17,7 @@ You'll need to provide some information about your app. We recommend creating a 
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
-![](../../../public/img/angular/app-create.png)
+![Create app in management console](../../../public/img/angular/app-create.png) main:docs/docs/examples/login/angular.md
 
 
 ### Redirect URIs
@@ -147,7 +147,7 @@ https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/use
 
 ### Refresh token
 
-If you want to add a refresh token to your application, navigate to the console application and check the box in the configuration section.
+If you want to add a refresh token to your application, navigate to the management console application and check the box in the configuration section.
 Then add `offline_access` to the scopes and add the following line:
 
 ```
@@ -163,10 +163,10 @@ Congratulations! You have successfully integrated your Angular application with 
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
-![](../../../public/img/angular/app-screen.png)
+![App in management console](../../../public/img/angular/app-screen.png) main:docs/docs/examples/login/angular.md
 
 ### What's next?
 
-Now that you have enabled authentication, it's time for you to add authorization to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
+Now that you have enabled authentication, it's time for you to add authorization to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Management Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
 For more information on how to create an Angular application, you can refer to [Angular](https://angular.io/start). If you want to learn more about the OAuth/OIDC library used above, consider reading the docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

@@ -27,7 +27,7 @@ ZITADEL does have multiple possibilities to achieve that process.
 
 Each ZITADEL instance does automatically bring a management console with it. The [console](/guides/manage/console/console-overview) can be used to manage all your resources through a UI.
 You can access it by calling the following URL: `${CUSTOM-DOMAIN}/ui/`
-Make sure that your admins have a [Manager role](/guides/manage/console/managers) with permissions on an instance level such as "INSTANCE_OWNER"
+Make sure that your admins have a [Administrator role](/guides/manage/console/managers) with permissions on an instance level such as "INSTANCE_OWNER" main:docs/docs/guides/integrate/onboarding/b2b.mdx
 
 ### Create a customer
 
@@ -58,10 +58,10 @@ import CreateUser from "../../../guides/manage/console/_create-user.mdx";
 
 <CreateUser components={props.components} />
 
-#### Add Manager Role to User
+#### Add Administrator Role to User
 
-Now you need to give the right manager role to your user. In this case we want to give "ORG_OWNER".
-If you do want to know more about the roles check out the [ZITADEL Managers Guide with the Role List](/guides/manage/console/managers)
+Now you need to assign the right administrator role to your user. In this case we want to give "ORG_OWNER".
+If you do want to know more about the roles check out the [ZITADEL Managers Guide with the Role List](/guides/manage/console/managers) main:docs/docs/guides/integrate/onboarding/b2b.mdx
 
 Go to the detail page of the organization and select the "+" button in the top right corner, where you already see a list of existing managers.
 <img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
@@ -85,7 +85,7 @@ To show how you can use the self-management possibilities it is shown from the c
 The Administrator user received an initialization e-mail after the user was created.
 With the link in the email the admin will be able to setup a password and optionally some multi-factors.
 
-As the administrator only has permission for its own organization the ZITADEL Console UI does look slightly different.
+As the administrator only has permission for its own organization the ZITADEL Management Console UI does look slightly different.
 
 To invite a team member the admin has to repeat the steps you did before.
 1. [Create User](./b2b#create-user)
@@ -169,7 +169,7 @@ Per default the user will automatically get "ORG_OWNER".
 #### Example Request
 
 ```bash
-curl -L -X POST 'https://$CUSTOM-DOMAIN/admin/v1/orgs/_setup' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/admin/v1/orgs/_setup' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

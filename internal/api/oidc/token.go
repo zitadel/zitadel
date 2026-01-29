@@ -4,18 +4,16 @@ import (
 	"context"
 	"encoding/base64"
 	"slices"
-	"sync"
 	"time"
 
-	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 /*
@@ -59,53 +57,8 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	return resp, err
 }
 
-// SignerFunc is a getter function that allows add-hoc retrieval of the instance's signer.
-type SignerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
-
-func (s *Server) getSignerOnce() SignerFunc {
-	return GetSignerOnce(s.query.GetActiveSigningWebKey)
-}
-
-// GetSignerOnce returns a function which retrieves the instance's signer from the database once.
-// Repeated calls of the returned function return the same results.
-func GetSignerOnce(
-	getActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error),
-) SignerFunc {
-	var (
-		once    sync.Once
-		signer  jose.Signer
-		signAlg jose.SignatureAlgorithm
-		err     error
-	)
-	return func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error) {
-		once.Do(func() {
-			ctx, span := tracing.NewSpan(ctx)
-			defer func() { span.EndWithError(err) }()
-
-			var webKey *jose.JSONWebKey
-			webKey, err = getActiveSigningWebKey(ctx)
-			if err != nil {
-				return
-			}
-			signer, signAlg, err = signerFromWebKey(webKey)
-		})
-		return signer, signAlg, err
-	}
-}
-
-func signerFromWebKey(signingKey *jose.JSONWebKey) (jose.Signer, jose.SignatureAlgorithm, error) {
-	signAlg := jose.SignatureAlgorithm(signingKey.Algorithm)
-	signer, err := jose.NewSigner(
-		jose.SigningKey{
-			Algorithm: signAlg,
-			Key:       signingKey,
-		},
-		(&jose.SignerOptions{}).WithType("JWT"),
-	)
-	if err != nil {
-		return nil, "", zerrors.ThrowInternal(err, "OIDC-oaF0s", "Errors.Internal")
-	}
-	return signer, signAlg, nil
+func (s *Server) getSignerOnce() sign.SignerFunc {
+	return sign.GetSignerOnce(s.query.GetActiveSigningWebKey)
 }
 
 // userInfoFunc is a getter function that allows add-hoc retrieval of a user.
@@ -120,7 +73,7 @@ func (s *Server) getUserInfo(userID, projectID, clientID string, projectRoleAsse
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey SignerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey sign.SignerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -164,7 +117,7 @@ func timeToOIDCExpiresIn(exp time.Time) uint64 {
 	return uint64(time.Until(exp) / time.Second)
 }
 
-func (s *Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, assertRoles bool, getSigner SignerFunc) (_ string, err error) {
+func (s *Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, assertRoles bool, getSigner sign.SignerFunc) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

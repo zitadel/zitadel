@@ -78,7 +78,7 @@ As you see in the example above the target is created with HTTP and port '8090' 
 See [Create a target](/reference/api/action/zitadel.action.v2.ActionService.CreateTarget) for more detailed information.
 
 ```shell
-curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/actions/targets' \
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -102,7 +102,7 @@ condition.
 See [Set an execution](/reference/api/action/zitadel.action.v2.ActionService.SetExecution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -120,7 +120,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/actions/executions' \
 
 ## Example call
 
-Now that you have set up the target and execution, you can test it by logging into Console UI or
+Now that you have set up the target and execution, you can test it by logging into Management Console UI or
 by using any OIDC flow.
 
 Your server should now print out something like the following. Check out the [Sent information Function](./usage#sent-information-function) payload description.

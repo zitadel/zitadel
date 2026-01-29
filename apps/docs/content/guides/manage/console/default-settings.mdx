@@ -44,7 +44,7 @@ If a feature is set to `Inherit`, it becomes available once its enabled per defa
   width="700px"
 />
 
-Features can range from UI changes in the console, to new APIs or performance improvements.
+Features can range from UI changes in the management console, to new APIs or performance improvements.
 
 <Callout type="warn">
 Be careful on which features you enable as they can be in an experimental state.
@@ -61,14 +61,14 @@ In the Branding settings, you can upload you Logo for the login interface, set y
 | Setting           | Description                                                                                                                                                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Logo              | Upload your logo for the light and the dark design. This is used mainly in the login interface.                                                                                                                            |
-| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in console on the top left as the home button.                                                                      |
+| Icon              | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in management console on the top left as the home button.                                                                      |
 | Colors            | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color)                                                                                                       |
 | Font              | Upload your custom font                                                                                                                                                                                                    |
 | Advanced Behavior | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
-Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [branding](/guides/manage/customize/branding).
+Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization take a look at our guide under [organization setting](./organizations#branding). main:docs/docs/guides/manage/console/default-settings.mdx
 
 ## Notification settings
 
@@ -87,7 +87,7 @@ You can configure on which changes the users will be notified. The text of the m
 
 ### SMTP
 
-On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a custom domain on your instance.
+On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own, you need to add a Custom Domain on your instance.
 
 You can configure many SMTP providers using templates for popular providers. The templates will add known settings like host, port or default user and will suggest values for user and/or password.
 
@@ -102,7 +102,7 @@ Email delivery through this service may be **delayed or temporarily unstable**.
 For any **production setup**, you must configure your own SMTP provider to ensure reliable and consistent email delivery.
 </Callout>
 
-Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
+Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a Custom Domain.
 
 To configure your custom SMTP please fill the following fields:
 
@@ -163,7 +163,7 @@ Reasons why ZITADEL doesn't have a redirect URI:
 - The login has not been called with an OIDC authorize request
 - The user landed on the login through an email link, e.g. Password Reset, Initialize User
 
-We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
+We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL Management Console.
 
 Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/instance?id=login`
 
@@ -258,7 +258,7 @@ The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 - Maximum OTP Attempts: When the user has reached the maximum (T)OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 
-If an account is locked, the administrator has to unlock it in the ZITADEL console
+If an account is locked, the administrator has to unlock it in the ZITADEL Management Console
 
 <img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
@@ -277,7 +277,7 @@ If it is set to false, all registered domain will automatically be created as ve
 
 ### SMTP Sender Address matches Custom Domain
 
-If enabled, the SMTP server address must match the instance's primary custom domain.
+If enabled, the SMTP server address must match the instance's primary Custom Domain.
 With that you can ensure that users receive notifications from the same domain that is used for login.
 
 ### Use email as username
@@ -309,7 +309,7 @@ Example:
   width="600px"
 />
 
-Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
+Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the management console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
 
 <img
   src="/docs/img/guides/console/external_links_2.png"

@@ -28,13 +28,13 @@ For further details and in-depth exploration, you can refer to the [ZITADEL API 
 Accessing ZITADEL APIs, except for the Auth API and the System API, requires these basic steps:
 
 1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-users/authenticate-service-users).
-2. **Give permission to access ZITADEL APIs**: Assign a Manager role to the service user, giving it permission to make changes to certain resources in ZITADEL.
+2. **Give permission to access ZITADEL APIs**: Assign a Administrator role to the service user, giving it permission to make changes to certain resources in ZITADEL.
 3. **Authenticate the service user**: Like human users, service users must authenticate and request an OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs. [Service users can be authenticated](../service-users/authenticate-service-users) using private key JWT, client credentials, or personal access tokens.
 4. **Access ZITADEL APIs with the token**: The OAuth token must be included in the Authorization Header of calls to ZITADEL APIs.
 
 ### Accessing Auth API
 
-The Auth API can be used for all operations on the requesting user, meaning the user id in the sub claim of the used token.
+The Auth API can be used for all operations on the requesting user, meaning the user id in the `sub` claim of the used token.
 Using this API doesn't require a service user to be authenticated.
 Instead, you call the Auth API with the token of the user.
 
@@ -49,9 +49,9 @@ The System API can't be accessed by service users and requires a special configu
 
 ## 1. Create a service user
 
-First, you need to create a new service user through the console or ZITADEL APIs.
+First, you need to create a new service user through the management console or ZITADEL APIs.
 
-Via Console:
+Via Management Console:
 
 1. In an organization, navigate to Users > Service Users
 2. Click on **New**
@@ -60,17 +60,17 @@ Via Console:
 
 Via APIs23: * [Create User (Machine)](/reference/api/management/zitadel.management.v1.ManagementService.AddMachineUser)
 
-## 2. Grant a Manager role to the service user
+## 2. Grant an Administrator Role to the Service User
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself.
 There are some different levels for managers.
 
-- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole instance.
+- **IAM Managers**: This is the highest level. Users with IAM Administrator roles are able to manage the whole instance.
 - **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
 - **Project Managers**: At this level, the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
-On each level, we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
+There are different roles on each level. You can find more about the different roles here: [ZITADEL Administrator Roles](/guides/manage/console/managers#roles)
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
@@ -107,7 +107,7 @@ A sample request will look like this
 
 ```bash {5}
 curl --request POST \
-  --url $CUSTOM-DOMAIN/oauth/v2/token \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile urn:zitadel:iam:org:project:id:zitadel:aud' \
@@ -138,7 +138,7 @@ In the following example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url ${CUSTOM_DOMAIN}/management/v1/orgs/me \
   --header 'Authorization: Bearer ${TOKEN}' 
 ```
 
@@ -179,7 +179,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash {6}
 curl --request POST \
-  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -210,7 +210,7 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url ${CUSTOM_DOMAIN}/management/v1/orgs/me \
   --header 'Authorization: Bearer ${TOKEN}' 
 ```
 
@@ -223,7 +223,7 @@ In this example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --url ${CUSTOM_DOMAIN}/management/v1/orgs/me \
   --header 'Authorization: Bearer {PAT}' 
 ```
 

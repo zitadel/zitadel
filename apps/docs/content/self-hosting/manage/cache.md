@@ -5,7 +5,7 @@ sidebar_label: Caches [Beta]
 
 ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/concepts/structure/instance) information in middleware.
 
-<Callout>
+:::info main:docs/docs/self-hosting/manage/cache.md
 Caches is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature.
 
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1332343909900222506)!
@@ -158,12 +158,12 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/category/apis/resources/system/system-service), the instance can be resolved by its ID. An instance object contains many of the [default settings](/reference/api/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/guides/manage/console/default-settings):
 
 - Instance [features](/guides/manage/console/default-settings#features)
-- Custom domains: generated and [custom](/guides/manage/cloud/instances#add-custom-domain)
-- [Trusted domains](/reference/api/admin/zitadel.admin.v1.AdminService.AddInstanceTrustedDomain)
-- Security settings ([IFrame policy](/guides/solution-scenarios/configurations#embedding-zitadel-in-an-i-frame))
+- Custom Domains: generated and [custom](/guides/manage/cloud/instances#add-custom-domain)
+- [Trusted domains](/apis/resources/admin/admin-service-add-instance-trusted-domain)
+- Security settings ([IFrame policy](/guides/solution-scenarios/configurations#embedding-zitadel-in-an-iframe)) main:docs/docs/self-hosting/manage/cache.md
 - Limits[^2]
 - [Allowed languages](/guides/manage/console/default-settings#languages)
 
@@ -171,15 +171,15 @@ These settings typically change infrequently in production. ***Every*** request 
 
 ### Milestones
 
-Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/guides/manage/console/console-overview) landing page.
+Milestones are used to track the administrator's progress in setting up their instance. Milestones are used to render *your next steps* in the [console](/guides/manage/console/console-overview) landing page. main:docs/docs/self-hosting/manage/cache.md
 Milestones are reached upon the first time a certain action is performed. For example the first application created or the first human login. In order to push a "reached" event only once, ZITADEL must keep track of the current state of milestones by an eventstore query every time an eligible action is performed. This can cause an unwanted overhead on production servers, therefore they are cached.
 
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
-For single instance setups which fulfilled all milestone (*your next steps* in console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
+For single instance setups which fulfilled all milestone (*your next steps* in the management console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
 
 ### Organization
 
-Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Most resources like users, project and applications are part of an [organization](/guides/manage/console/organizations-overview). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain. main:docs/docs/self-hosting/manage/cache.md
 Organization objects are quite small and receive infrequent updates after they are created:
 
 - Change of organization name

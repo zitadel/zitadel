@@ -43,7 +43,7 @@ provider = "oidc"
 user_id_claim = "sub" #uses the subject as ID instead of the email
 provider_display_name = "ZITADEL"
 redirect_url = "http://127.0.0.1:4180/oauth2/callback"
-oidc_issuer_url = "https://$CUSTOM-DOMAIN"
+oidc_issuer_url = "https://$CUSTOM_DOMAIN"
 upstreams = [
     "https://example.corp.com"
 ]
@@ -63,7 +63,7 @@ http_address = "127.0.0.1:4180" #localdev only
 
 ### Check for groups
 
-If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config:
+If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](/guides/manage/console/actions-overview) in ZITADEL to [complement the token](/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config: main:docs/docs/examples/identity-proxy/oauth2-proxy.md
 
 ```toml
 oidc_groups_claim = "{your_actions_group_key}"
