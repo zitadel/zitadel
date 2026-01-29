@@ -67,7 +67,7 @@ jobs:
 #          NX_NATIVE_LOGGING: "nx::native::cache,nx::native::db"
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs --verbose
+        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:
