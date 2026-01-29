@@ -96,9 +96,9 @@ export class UserCreateV2Component implements OnInit {
 
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
-      username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
-      givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-      familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
+      firstName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      lastName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       emailVerified: new FormControl(false, { nonNullable: true }),
       authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
         nonNullable: true,
@@ -188,10 +188,10 @@ export class UserCreateV2Component implements OnInit {
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
       organization: { org: { case: 'orgId', value: org.id } },
-      username: userValues.username,
+      username: userValues.userName,
       profile: {
-        givenName: userValues.givenName,
-        familyName: userValues.familyName,
+        givenName: userValues.firstName,
+        familyName: userValues.lastName,
       },
       email: {
         email: userValues.email,

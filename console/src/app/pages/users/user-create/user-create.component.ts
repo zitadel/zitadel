@@ -141,7 +141,7 @@ export class UserCreateComponent implements OnInit {
   private getUseV2Api() {
     return defer(() => this.featureService.getInstanceFeatures()).pipe(
       map((features) => features.consoleUseV2UserApi?.enabled ?? false),
-      timeout(1000),
+      timeout(5000),
       catchError((err) => {
         if (!(err instanceof TimeoutError)) {
           this.toast.showError(err);

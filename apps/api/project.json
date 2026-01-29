@@ -65,7 +65,8 @@
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
-                "runtime"
+                "runtime",
+                {"dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"}
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
@@ -209,10 +210,10 @@
             "dependsOn": [
                 "@zitadel/console:build"
             ],
-            "command": "cp -r console/dist/console/* internal/api/ui/console/static",
+            "command": "find internal/api/ui/console/static -mindepth 1 ! -name 'gitkeep' -delete -print && cp -r -v console/dist/console/* internal/api/ui/console/static",
             "cache": true,
             "inputs": [
-                "{workspaceRoot}/console/dist/console/**/*"
+                {"dependentTasksOutputFiles": "console/dist/console/**/*"}
             ],
             "outputs": [
                 "{workspaceRoot}/internal/api/ui/console/static"
