@@ -3,10 +3,8 @@ import {
     guidesSidebar,
     apisSidebar,
     legalSidebar,
-    type SidebarItem, // Import the shared type
+    type SidebarItem,
 } from './sidebar-data';
-
-// --- Logic ---
 
 export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPrefix?: string, suppressWarnings?: boolean, labels?: Map<string, string> }): PageTree.Root {
     const start = performance.now();
@@ -18,7 +16,6 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      */
     function normalize(path: string): string {
         let p = path.toLowerCase();
-        // Ensure leading slash for consistent prefix checking
         if (!p.startsWith('/')) p = '/' + p;
 
         const prefix = options?.stripPrefix ?
@@ -54,7 +51,6 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
             const nodeName = typeof node.name === 'string' ? node.name : '';
             const currentPath = path ? `${path}/${nodeName}` : nodeName;
 
-            // Use URL of index or children to infer the real disk-like path
             const sampleUrl = node.index?.url || node.children.find(c => c.type === 'page')?.url;
             if (sampleUrl) {
                 const folderUrl = node.index ? sampleUrl : sampleUrl.split('/').slice(0, -1).join('/');
@@ -77,22 +73,18 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      */
     function findPage(path: string): PageTree.Item | undefined {
         if (!path) return undefined;
-
         const key = normalize(path);
         if (pageLookup.has(key)) return pageLookup.get(key);
 
-        // Deduped Match
         const segments = key.split('/');
         if (segments.length >= 2 && segments[segments.length - 1] === segments[segments.length - 2]) {
             const dedupedKey = segments.slice(0, -1).join('/');
             if (pageLookup.has(dedupedKey)) return pageLookup.get(dedupedKey);
         }
 
-        // Suffix Scan Fallback
         for (const [lookupKey, node] of pageLookup.entries()) {
             if (lookupKey.endsWith('/' + key)) return node;
         }
-
         return undefined;
     }
 
@@ -101,7 +93,6 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      */
     function findFolder(dirName: string): PageTree.Folder | undefined {
         if (!dirName) return undefined;
-
         if (folderLookup.has(dirName)) return folderLookup.get(dirName);
         const normKey = normalize(dirName);
         if (folderLookup.has(normKey)) return folderLookup.get(normKey);
@@ -116,39 +107,27 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
      * 5. Recursive Builder
      */
     function buildNode(item: SidebarItem): PageTree.Node | PageTree.Node[] | null {
-        // String Shorthand
         if (typeof item === 'string') {
             const folder = findFolder(item);
             if (folder) {
-                const nodes: PageTree.Node[] = [];
-                const seenUrls = new Set<string>();
+                const indexPage = folder.index;
+                const indexUrl = indexPage?.url;
 
-                // Add index first
-                if (folder.index && folder.index.url) {
-                    nodes.push(folder.index);
-                    seenUrls.add(folder.index.url);
-                }
-
-                // Add children that are not already present
-                folder.children.forEach(child => {
-                    if (child.type === 'page' && child.url) {
-                        if (!seenUrls.has(child.url)) {
-                            nodes.push(child);
-                            seenUrls.add(child.url);
-                        }
-                    } else {
-                        // For folders, we rely on their distinct identity or recursive structure.
-                        // Assuming folder children don't duplicate the parent index URL.
-                        nodes.push(child);
-                    }
+                const filteredChildren = folder.children.filter(child => {
+                    if (child.type === 'page' && indexUrl && child.url === indexUrl) return false;
+                    return true;
                 });
 
-                // Sort unique nodes by name
-                return nodes.sort((a, b) => {
-                    const nameA = typeof a.name === 'string' ? a.name : '';
-                    const nameB = typeof b.name === 'string' ? b.name : '';
-                    return nameA.localeCompare(nameB);
-                });
+                return {
+                    type: 'folder',
+                    name: typeof folder.name === 'string' ? folder.name : item,
+                    index: indexPage,
+                    children: [...filteredChildren].sort((a, b) => {
+                        const nameA = typeof a.name === 'string' ? a.name : '';
+                        const nameB = typeof b.name === 'string' ? b.name : '';
+                        return nameA.localeCompare(nameB);
+                    }),
+                } as PageTree.Folder;
             }
 
             const page = findPage(item);
@@ -160,7 +139,6 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
             return null;
         }
 
-        // Links
         if (item.type === 'link') {
             const isExternal = item.href && (item.href.startsWith('http') || item.href.startsWith('//'));
             if (isExternal) {
@@ -179,19 +157,16 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
             return null;
         }
 
-        // Docs
         if (item.type === 'doc') {
             const node = findPage(item.id || '');
             if (!node) return null;
             return { ...node, name: item.label || node.name, icon: item.icon };
         }
 
-        // Autogenerated
         if (item.type === 'autogenerated') {
             if (item.dirName) {
                 const folder = findFolder(item.dirName);
                 if (folder) {
-                    // Safe sort for strict TS
                     return [...folder.children].sort((a, b) => {
                         const nameA = typeof a.name === 'string' ? a.name : '';
                         const nameB = typeof b.name === 'string' ? b.name : '';
@@ -202,24 +177,24 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
             return null;
         }
 
-        // Categories
         if (item.type === 'category' || !item.type) {
-            const children: PageTree.Node[] = [];
+            let children: PageTree.Node[] = [];
+            let promotedIndex: PageTree.Item | undefined;
+
             if (item.items) {
                 for (const child of item.items) {
                     const built = buildNode(child);
                     if (built) {
-                        if (Array.isArray(built)) children.push(...built);
-                        else children.push(built);
+                        if (!Array.isArray(built) && built.type === 'folder' && item.items.length === 1) {
+                            promotedIndex = built.index;
+                            children = built.children;
+                        } else if (Array.isArray(built)) {
+                            children.push(...built);
+                        } else {
+                            children.push(built);
+                        }
                     }
                 }
-            }
-
-            let indexPage: PageTree.Item | undefined;
-            if (item.link?.type === 'generated-index' && item.link.slug) {
-                indexPage = findPage(item.link.slug);
-            } else if (item.link?.type === 'doc' && item.link.id) {
-                indexPage = findPage(item.link.id);
             }
 
             return {
@@ -227,7 +202,8 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
                 name: item.label || 'Category',
                 children: children,
                 defaultOpen: item.collapsed === false,
-                index: indexPage,
+                // TS FIX: Check for link.id existence before calling findPage
+                index: promotedIndex || (item.link?.type === 'doc' && item.link.id ? findPage(item.link.id) : undefined),
                 icon: item.icon
             } as PageTree.Folder;
         }
@@ -235,7 +211,6 @@ export function buildCustomTree(originalTree: PageTree.Root, options?: { stripPr
         return null;
     }
 
-    // 6. Construction
     const newChildren: PageTree.Node[] = [];
 
     const indexNode = findPage('index');
