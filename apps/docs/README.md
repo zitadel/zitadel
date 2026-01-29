@@ -27,7 +27,10 @@ Key scripts for documentation workflows:
 | `fetch:remote-content` | Fetches remote tags and referenced content. |
 | `generate` | Runs all generation steps (`fetch:remote-content`, `generate:proto-docs`, `generate:api-reference`, `generate:index-pages`). |
 | `check:links` | Validates content integrity (broken links, missing frontmatter, schema errors). |
+| `check-types` | Validates typescript types. |
+| `test` | Runs all validation steps (`check-types`, `check:links`). |
 | `lint` | checks for code style and syntax errors (ESLint). |
+| `clean` | Cleans the build output and generated files. |
 
 ### Validation
 

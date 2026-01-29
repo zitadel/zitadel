@@ -186,12 +186,50 @@
         "{projectRoot}/public/**/*"
       ]
     },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm clean",
+        "cwd": "apps/docs"
+      }
+    },
+    "check-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm check:types",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{projectRoot}/tsconfig.json",
+        "{projectRoot}/**/*.{ts,tsx}",
+        "{projectRoot}/.next/types/**/*.ts"
+      ]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Test complete'",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "check-types",
+        "check-links"
+      ]
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm lint",
         "cwd": "apps/docs"
       },
+      "dependsOn": [
+        "generate"
+      ],
       "cache": true,
       "inputs": [
         "default",
