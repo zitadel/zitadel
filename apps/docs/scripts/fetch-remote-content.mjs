@@ -6,7 +6,7 @@ import semver from 'semver';
 import { Readable } from 'stream';
 
 const FALLBACK_VERSION = 'v4.10.0'; // Temporary fallback until > 4.10.0 exists
-const FALLBACK_BRANCH = 'fuma-docs'; // Primary branch to check for 4.10.0 content
+const FALLBACK_BRANCH = 'main'; // Primary branch to check for 4.10.0 content
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -99,7 +99,7 @@ function getFallbackSource() {
 
 // sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
 async function downloadVersion(tag, sourceRef) {
-  const isBranch = sourceRef === 'main' || sourceRef === 'fuma-docs' || !sourceRef.startsWith('v');
+  const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
   const typeSegment = isBranch ? 'heads' : 'tags';
   const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
   
@@ -452,8 +452,12 @@ function getLocalVersion() {
         } catch (e) {}
     }
 
-    if (branch && branch !== 'main') {
+    if (branch && branch !== 'main' && branch !== 'master') {
         return { label: branch, isUnreleased: true };
+    }
+
+    if (branch === 'main' || branch === 'master') {
+        return { label: 'ZITADEL Docs', isUnreleased: false };
     }
 
     try {
