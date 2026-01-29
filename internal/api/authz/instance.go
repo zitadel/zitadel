@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
@@ -107,11 +108,12 @@ func GetFeatures(ctx context.Context) feature.Features {
 }
 
 func WithInstance(ctx context.Context, instance Instance) context.Context {
+	ctx = instrumentation.SetInstance(ctx, instance)
 	return context.WithValue(ctx, instanceKey, instance)
 }
 
 func WithInstanceID(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, instanceKey, &instance{id: id})
+	return WithInstance(ctx, &instance{id: id})
 }
 
 func WithDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) context.Context {

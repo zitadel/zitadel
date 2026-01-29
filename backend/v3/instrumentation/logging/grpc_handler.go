@@ -5,7 +5,6 @@ import (
 	"slices"
 	"strings"
 
-	slogctx "github.com/veqryn/slog-context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,16 +20,15 @@ func NewGrpcInterceptor(ignoredMethodSuffixes ...string) grpc.UnaryServerInterce
 			return next(ctx, req)
 		}
 
-		logger := instrumentation.Logger()
+		ctx = NewCtx(ctx, StreamRequest)
 		ctx = instrumentation.SetGrpcRequestDetails(ctx, info)
-		ctx = slogctx.NewCtx(ctx, logger)
 
 		resp, err := next(ctx, req)
 		var code codes.Code
 		if err != nil {
 			code = status.Code(err)
 		}
-		logger.InfoContext(ctx, "gRPC request", "code", code)
+		Info(ctx, "gRPC request", "code", code)
 		return resp, err
 	}
 }

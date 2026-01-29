@@ -1,24 +1,28 @@
 package ready
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 )
 
 type Config struct {
-	Log  *logging.Config
-	Port uint16
-	TLS  network.TLS
+	Instrumentation instrumentation.Config
+	Log             *old_logging.Config
+	Port            uint16
+	TLS             network.TLS
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func newConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -30,10 +34,22 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	logging.OnError(err).Fatal("unable to read default config")
-
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to read default config: %w", err)
+	}
+	// Force-disable metrics and tracing for ready command
+	config.Instrumentation.Metric.Exporter.Type = instrumentation.ExporterTypeNone
+	config.Instrumentation.Trace.Exporter.Type = instrumentation.ExporterTypeNone
+	// Legacy logger
 	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
+	}
 
-	return config
+	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
+	}
+
+	return config, shutdown, nil
 }

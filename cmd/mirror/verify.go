@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	cryptoDatabase "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -22,12 +22,22 @@ func verifyCmd() *cobra.Command {
 		Use:   "verify",
 		Short: "counts if source and dest have the same amount of entries",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			config, shutdown, err := mustNewMigrationConfig(cmd.Context(), viper.GetViper())
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror verify command failed")
+			}()
+			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
 				return err
 			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+			defer func() {
+				if recErr, ok := recover().(error); ok {
+					err = recErr
+				}
 			}()
 			verifyMigration(cmd.Context(), config)
 			return nil
@@ -45,11 +55,11 @@ var schemas = []string{
 
 func verifyMigration(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	panicOnError(ctx, err, "unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	panicOnError(ctx, err, "unable to connect to destination database")
 	defer destClient.Close()
 
 	for _, schema := range schemas {
@@ -57,12 +67,12 @@ func verifyMigration(ctx context.Context, config *Migration) {
 			sourceCount := countEntries(ctx, sourceClient, table)
 			destCount := countEntries(ctx, destClient, table)
 
-			entry := logging.WithFields("table", table, "dest", destCount, "source", sourceCount)
+			logger := logging.FromCtx(ctx).With("table", table, "dest", destCount, "source", sourceCount)
 			if sourceCount == destCount {
-				entry.Debug("equal count")
+				logger.DebugContext(ctx, "equal count")
 				continue
 			}
-			entry.WithField("diff", destCount-sourceCount).Info("unequal count")
+			logger.InfoContext(ctx, "unequal count", "diff", destCount-sourceCount)
 		}
 	}
 }
@@ -83,7 +93,7 @@ func getTables(ctx context.Context, dest *database.DB, schema string) (tables []
 		"SELECT CONCAT(schemaname, '.', tablename) FROM pg_tables WHERE schemaname = $1",
 		schema,
 	)
-	logging.WithFields("schema", schema).OnError(err).Fatal("unable to query tables")
+	panicOnError(ctx, err, "unable to query tables")
 	return tables
 }
 
@@ -103,7 +113,7 @@ func getViews(ctx context.Context, dest *database.DB, schema string) (tables []s
 		"SELECT CONCAT(schemaname, '.', viewname) FROM pg_views WHERE schemaname = $1",
 		schema,
 	)
-	logging.WithFields("schema", schema).OnError(err).Fatal("unable to query views")
+	panicOnError(ctx, err, "unable to query views")
 	return tables
 }
 
@@ -125,7 +135,7 @@ func countEntries(ctx context.Context, client *database.DB, table string) (count
 		},
 		fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, instanceClause),
 	)
-	logging.WithFields("table", table, "db", client.DatabaseName()).OnError(err).Error("unable to count")
+	panicOnError(ctx, err, "unable to count")
 
 	return count
 }

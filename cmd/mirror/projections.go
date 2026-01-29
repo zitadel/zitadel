@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -10,8 +11,10 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -51,13 +54,32 @@ func projectionsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "projections",
 		Short: "calls the projections synchronously",
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewProjectionsConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror projections command failed")
+			}()
+			config, shutdown, err := newProjectionsConfig(cmd.Context(), viper.GetViper())
+			if err != nil {
+				return fmt.Errorf("unable to create projections config: %w", err)
+			}
+			// Set logger again to include changes from config
+			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Fatal("unable to read master key")
+			if err != nil {
+				return fmt.Errorf("unable to read master key: %w", err)
+			}
 
+			defer func() {
+				if recErr, ok := recover().(error); ok {
+					err = recErr
+				}
+			}()
 			projections(cmd.Context(), config, masterKey)
+			return nil
 		},
 	}
 
@@ -67,18 +89,19 @@ func projectionsCmd() *cobra.Command {
 }
 
 type ProjectionsConfig struct {
-	Destination    database.Config
-	Projections    projection.Config
-	Notifications  handlers.WorkerConfig
-	EncryptionKeys *encryption.EncryptionKeyConfig
-	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
-	Eventstore     *eventstore.Config
-	Caches         *connector.CachesConfig
+	Instrumentation instrumentation.Config
+	Destination     database.Config
+	Projections     projection.Config
+	Notifications   handlers.WorkerConfig
+	EncryptionKeys  *encryption.EncryptionKeyConfig
+	SystemAPIUsers  map[string]*internal_authz.SystemAPIUser
+	Eventstore      *eventstore.Config
+	Caches          *connector.CachesConfig
 
 	Admin admin_es.Config
 	Auth  auth_es.Config
 
-	Log     *logging.Config
+	Log     *old_logging.Config
 	Machine *id.Config
 
 	ExternalPort    uint16
@@ -104,21 +127,21 @@ func projections(
 	ctx context.Context,
 	config *ProjectionsConfig,
 	masterKey string,
-) {
-	logging.Info("starting to fill projections")
+) error {
+	logging.Info(ctx, "starting to fill projections")
 	start := time.Now()
 
 	client, err := database.Connect(config.Destination, false)
-	logging.OnError(err).Fatal("unable to connect to database")
+	panicOnError(ctx, err, "unable to connect to database")
 
 	keyStorage, err := crypto_db.NewKeyStorage(client, masterKey)
-	logging.OnError(err).Fatal("cannot start key storage")
+	panicOnError(ctx, err, "cannot start key storage")
 
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
-	logging.OnError(err).Fatal("unable to read encryption keys")
+	panicOnError(ctx, err, "unable to read encryption keys")
 
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
-	logging.OnError(err).Fatal("unable create static storage")
+	panicOnError(ctx, err, "unable create static storage")
 
 	newEventstore := new_es.NewEventstore(client)
 	config.Eventstore.Querier = old_es.NewPostgres(client)
@@ -133,7 +156,7 @@ func projections(
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	cacheConnectors, err := connector.StartConnectors(config.Caches, client)
-	logging.OnError(err).Fatal("unable to start caches")
+	panicOnError(ctx, err, "unable to start caches")
 
 	queries, err := query.StartQueries(
 		ctx,
@@ -162,10 +185,10 @@ func projections(
 		config.SystemAPIUsers,
 		false,
 	)
-	logging.OnError(err).Fatal("unable to start queries")
+	panicOnError(ctx, err, "unable to start queries")
 
 	authZRepo, err := authz.Start(queries, es, client, keys.OIDC, config.ExternalSecure)
-	logging.OnError(err).Fatal("unable to start authz repo")
+	panicOnError(ctx, err, "unable to start authz repo")
 
 	webAuthNConfig := &webauthn.Config{
 		DisplayName:    config.WebAuthNName,
@@ -202,10 +225,10 @@ func projections(
 		nil,
 		nil,
 	)
-	logging.OnError(err).Fatal("unable to start commands")
+	panicOnError(ctx, err, "unable to start commands")
 
 	err = projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
-	logging.OnError(err).Fatal("unable to start projections")
+	panicOnError(ctx, err, "unable to start projections")
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -236,13 +259,13 @@ func projections(
 	config.Auth.Spooler.Client = client
 	config.Auth.Spooler.Eventstore = es
 	authView, err := auth_view.StartView(config.Auth.Spooler.Client, keys.OIDC, queries, config.Auth.Spooler.Eventstore)
-	logging.OnError(err).Fatal("unable to start auth view")
+	panicOnError(ctx, err, "unable to start auth view")
 	auth_handler.Register(ctx, config.Auth.Spooler, authView, queries)
 
 	config.Admin.Spooler.Client = client
 	config.Admin.Spooler.Eventstore = es
 	adminView, err := admin_view.StartView(config.Admin.Spooler.Client)
-	logging.OnError(err).Fatal("unable to start admin view")
+	panicOnError(ctx, err, "unable to start admin view")
 
 	admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
 
@@ -253,7 +276,7 @@ func projections(
 
 	go func() {
 		for instance := range failedInstances {
-			logging.WithFields("instance", instance).Error("projection failed")
+			logging.WithError(ctx, errors.New("projection failed for instance")).ErrorContext(ctx, "projection failed", "instance", instance)
 		}
 	}()
 
@@ -264,64 +287,65 @@ func projections(
 	existingInstances := queryInstanceIDs(ctx, client)
 	for i, instance := range existingInstances {
 		instances <- instance
-		logging.WithFields("id", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances))).Info("instance queued for projection")
+		logging.Info(ctx, "instance queued for projection", "instance", instance, "index", fmt.Sprintf("%d/%d", i, len(existingInstances)))
 	}
 	close(instances)
 	wg.Wait()
 
 	close(failedInstances)
 
-	logging.WithFields("took", time.Since(start)).Info("projections executed")
+	logging.Info(ctx, "projections executed", "took", time.Since(start))
+	return nil
 }
 
 func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
 	for instance := range instances {
-		logging.WithFields("instance", instance).Info("starting projections")
 		ctx = internal_authz.WithInstanceID(ctx, instance)
+		logging.Info(ctx, "starting projections")
 
 		err := projection.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = projection.ProjectInstanceFields(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger fields failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = admin_handler.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger admin handler failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger admin handler failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = projection.ProjectInstanceFields(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger fields failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger fields failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = auth_handler.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger auth handler failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger auth handler failed")
 			failedInstances <- instance
 			continue
 		}
 
 		err = notification.ProjectInstance(ctx)
 		if err != nil {
-			logging.WithFields("instance", instance).WithError(err).Info("trigger notification failed")
+			logging.WithError(ctx, err).ErrorContext(ctx, "trigger notification failed")
 			failedInstances <- instance
 			continue
 		}
 
-		logging.WithFields("instance", instance).Info("projections done")
+		logging.Info(ctx, "projections done")
 	}
 	wg.Done()
 }
@@ -349,7 +373,6 @@ func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
 		},
 		"SELECT DISTINCT instance_id FROM eventstore.events2 WHERE instance_id <> '' AND aggregate_type = 'instance' AND event_type = 'instance.added' AND instance_id NOT IN (SELECT instance_id FROM eventstore.events2 WHERE instance_id <> '' AND aggregate_type = 'instance' AND event_type = 'instance.removed')",
 	)
-	logging.OnError(err).Fatal("unable to query instances")
-
+	panicOnError(ctx, err, "unable to query instances")
 	return instances
 }
