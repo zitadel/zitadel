@@ -2,7 +2,7 @@
 
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import dynamic from "next/dynamic";
-import AuthRequestProvider from '@/utils/authrequest';
+
 import MixpanelProvider from '@/components/mixpanel-provider';
 import PlausibleProvider from '@/components/plausible-provider';
 
@@ -18,7 +18,7 @@ export function Providers({ children }: any) {
     >
       <PlausibleProvider />
       <MixpanelProvider>
-        <AuthRequestProvider>{children}</AuthRequestProvider>
+        {children}
       </MixpanelProvider>
     </RootProvider>
   );

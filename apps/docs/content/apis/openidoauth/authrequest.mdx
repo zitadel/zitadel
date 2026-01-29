@@ -3,13 +3,15 @@ title: ZITADEL OIDC Authentication Request Playground
 sidebar_label: OIDC Playground
 ---
 
-import { SetAuthRequest } from "@/components/authrequest";
+import { ExternalLink } from "lucide-react";
 
 The OIDC Playground is for testing OpenID Authentication Requests, giving you more insight how OpenID Connect works and how you can customize ZITADEL behavior with different parameters.
 
 An OpenID Connect (OIDC) [authentication request](https://openid.net/specs/openid-connect-core-1_0.html) is an OAuth 2.0 Authorization Request using additional parameters and scopes to request that the end-user be authenticated by ZITADEL.
 
-<SetAuthRequest  />
+<a href="https://zitadel.com/playgrounds/oidc" target="_blank" className="flex items-center gap-2 text-primary hover:underline">
+  Go to the OIDC Playground <ExternalLink className="h-4 w-4" />
+</a>
 
 ## Why this OIDC playground?
 
