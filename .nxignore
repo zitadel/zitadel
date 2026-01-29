@@ -1,0 +1,3 @@
+!console/dist
+!console/src/app/proto/generated
+!internal/api/ui/console/static
