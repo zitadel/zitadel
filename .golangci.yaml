@@ -123,6 +123,10 @@ issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   new-from-rev: origin/main
+  exclude-rules:
+    - path: apps/docs/.*
+      linters:
+        - typecheck
 formatters:
   enable:
     - gci

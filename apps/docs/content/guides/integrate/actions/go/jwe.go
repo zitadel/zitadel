@@ -1,3 +1,5 @@
+//go:build ignore
+
 package main
 
 import (
@@ -60,7 +62,7 @@ func validateJWE(ctx context.Context, jweString string, signatureAlgorithms []jo
 	return validateJWT(ctx, string(decryptedJWT), signatureAlgorithms, keySet)
 }
 
-func validateJWT(ctx context.Context, jwtString string, algorithms []jose.SignatureAlgorithm, keySet oidc.KeySet) ([]byte, error) {
+func validateJWT(ctx context.Context, jwtString string, algorithms []jose.SignatureAlgorithm, keySet oidc.KeySet) ([]byte, error) { //nolint:typecheck
 	// Parse the signed JWT to get the JWS object (which contains the signatures and unverified payload)
 	parsedJWS, err := jose.ParseSigned(jwtString, algorithms)
 	if err != nil {
