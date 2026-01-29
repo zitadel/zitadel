@@ -223,8 +223,8 @@
           "PR": "När en användare återställer sitt lösenord, kommer de att få ett mail med en länk för att ställa in ett nytt lösenord.",
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
-          "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "VEO": "När en användare lägger till en OTP via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
+          "VSO": "När en användare lägger till en OTP via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
           "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Autentiserarens namn",
       "TYPE": {
         "0": "Ingen MFA definierad",
-        "1": "Engångslösenord (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Lägg till en andra faktor för att säkerställa optimal säkerhet för ditt konto.",
       "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
       "ADD": "Lägg till faktor",
-      "OTP": "Autentiseringsapp för TOTP (Tidsbaserat engångslösenord)",
+      "OTP": "Autentiseringsapp för TOTP",
       "OTP_DIALOG_TITLE": "Lägg till OTP",
       "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
       "U2F": "Passkey",
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Faktor tillagd framgångsrikt!",
       "U2F_ERROR": "Ett fel inträffade under inställningen!",
       "U2F_NAME": "Autentiserarens namn",
-      "OTPSMS": "OTP (Engångslösenord) med SMS",
-      "OTPEMAIL": "OTP (Engångslösenord) med e-post",
-      "SETUPOTPSMSDESCRIPTION": "Vill du ställa in detta telefonnummer som OTP (Engångslösenord) andra faktor?",
+      "OTPSMS": "OTP med SMS",
+      "OTPEMAIL": "OTP med e-post",
+      "SETUPOTPSMSDESCRIPTION": "Vill du ställa in detta telefonnummer som OTP andra faktor?",
       "OTPSMSSUCCESS": "OTP-faktor inställd med framgång.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Din telefon måste verifieras för att använda denna metod.",
       "OTPEMAILSUCCESS": "OTP-faktor inställd med framgång.",
       "TYPE": {
         "0": "Ingen MFA definierad",
-        "1": "Engångslösenord (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1616,8 +1616,8 @@
         "4": "Återställning av lösenord",
         "5": "Passkey-initiering",
         "6": "App-hemlighet",
-        "7": "Engångslösenord (OTP) - SMS",
-        "8": "Engångslösenord (OTP) - E-post"
+        "7": "OTP - SMS",
+        "8": "OTP - E-post"
       },
       "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
@@ -1881,8 +1881,8 @@
         "changedate": "Ändringsdatum",
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
-        "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL",
+        "otp": "OTP",
+        "verifyUrl": "Verifiera OTP URL",
         "expiry": "Utgångsdatum",
         "applicationName": "Applikationsnamn"
       },
@@ -2435,10 +2435,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Okänd",
-      "1": "Engångslösenord via autentiseringsapp (TOTP)",
+      "1": "OTP via autentiseringsapp (TOTP)",
       "2": "Passkey",
-      "3": "Engångslösenord via e-post (E-post OTP)",
-      "4": "Engångslösenord via SMS (OTP SMS)",
+      "3": "E-post OTP",
+      "4": "OTP SMS",
       "5": "Återställningskoder"
     }
   },

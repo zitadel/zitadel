@@ -223,8 +223,8 @@
           "PR": "Gdy użytkownik zresetuje swoje hasło, otrzyma e-mail z linkiem do ustawienia nowego hasła.",
           "VE": "Gdy użytkownik zmieni swój adres e-mail, otrzyma e-mail z linkiem do weryfikacji nowego adresu.",
           "VP": "Gdy użytkownik zmieni swój numer telefonu, otrzyma SMS z kodem do weryfikacji nowego numeru.",
-          "VEO": "Gdy użytkownik doda metodę jednorazowego hasła przez e-mail, musi ją aktywować, wprowadzając kod wysłany na jego adres e-mail.",
-          "VSO": "Gdy użytkownik doda metodę jednorazowego hasła przez SMS, musi ją aktywować, wprowadzając kod wysłany na jego numer telefonu.",
+          "VEO": "Gdy użytkownik doda metodę OTP przez e-mail, musi ją aktywować, wprowadzając kod wysłany na jego adres e-mail.",
+          "VSO": "Gdy użytkownik doda metodę OTP przez SMS, musi ją aktywować, wprowadzając kod wysłany na jego numer telefonu.",
           "IU": "Kiedy zostanie utworzony kod zaproszenia użytkownika, otrzyma on e-mail z linkiem do ustawienia swojej metody uwierzytelniania."
         }
       },
@@ -850,7 +850,7 @@
       "U2F_NAME": "Nazwa urządzenia uwierzytelniającego",
       "TYPE": {
         "0": "Brak MFA zdefiniowanego",
-        "1": "Hasło jednorazowe (OTP)",
+        "1": "OTP",
         "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne"
       },
       "STATE": {
@@ -883,7 +883,7 @@
       "DESCRIPTION": "Dodaj drugi czynnik, aby zapewnić optymalne bezpieczeństwo twojego konta.",
       "MANAGE_DESCRIPTION": "Zarządzaj metodami drugiego czynnika swoich użytkowników.",
       "ADD": "Dodaj czynnik",
-      "OTP": "Aplikacja uwierzytelniająca TOTP (jednorazowe hasło)",
+      "OTP": "Aplikacja uwierzytelniająca TOTP",
       "OTP_DIALOG_TITLE": "Dodaj TOTP",
       "OTP_DIALOG_DESCRIPTION": "Zeskanuj kod QR za pomocą aplikacji uwierzytelniającej i wprowadź poniższy kod, aby zweryfikować i aktywować metodę OTP.",
       "U2F": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne",
@@ -892,15 +892,15 @@
       "U2F_SUCCESS": "Czynnik został pomyślnie dodany!",
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
-      "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
-      "OTPEMAIL": "OTP (hasło jednorazowe) z e-mailem",
-      "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP (hasło jednorazowe)?",
+      "OTPSMS": "OTP z SMS-em",
+      "OTPEMAIL": "OTP z e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP?",
       "OTPSMSSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Aby skorzystać z tej metody, Twój telefon musi zostać zweryfikowany.",
       "OTPEMAILSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
-        "1": "Jednorazowe hasło (OTP)",
+        "1": "OTP",
         "2": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne"
       },
       "STATE": {
@@ -1611,8 +1611,8 @@
         "4": "Resetowanie hasła",
         "5": "Inicjalizacja passkey",
         "6": "Sekret aplikacji",
-        "7": "Hasło jednorazowe (OTP) - SMS",
-        "8": "Hasło jednorazowe (OTP) — e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP — e-mail"
       },
       "EXPIRY": "Wygaśnięcie (w minutach)",
       "INCLUDEDIGITS": "Dołącz cyfry",
@@ -1876,8 +1876,8 @@
         "changedate": "Data zmiany",
         "username": "Nazwa użytkownika",
         "tempUsername": "Tymczasowa nazwa użytkownika",
-        "otp": "Hasło jednorazowe",
-        "verifyUrl": "URL do weryfikacji hasła jednorazowego",
+        "otp": "OTP",
+        "verifyUrl": "URL do weryfikacji OTP",
         "expiry": "Wygaśnięcie",
         "applicationName": "Nazwa aplikacji"
       },
@@ -2410,10 +2410,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "1": "TOTP",
       "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
-      "3": "Hasło jednorazowe dla wiadomości e-mail (OTP Email)",
-      "4": "Hasło jednorazowe dla wiadomości SMS (OTP SMS)",
+      "3": "OTP Email",
+      "4": "OTP SMS",
       "5": "Kody odzyskiwania"
     }
   },

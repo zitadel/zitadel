@@ -223,8 +223,8 @@
           "PR": "Quando um usuário reseta sua senha, ele receberá um e-mail com um link para definir uma nova senha.",
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
-          "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "VEO": "Quando um usuário adiciona um método OTP via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
+          "VSO": "Quando um usuário adiciona um método OTP via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
           "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nome do Autenticador",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
-      "OTPSMS": "OTP (senha de uso único) com SMS",
-      "OTPEMAIL": "OTP (senha de uso único) com e-mail",
-      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMS": "OTP com SMS",
+      "OTPEMAIL": "OTP com e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP?",
       "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
       "OTPEMAILSUCCESS": "Fator OTP configurado com sucesso.",
       "TYPE": {
         "0": "Nenhum MFA definido",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Impressão digital, Chaves de Segurança, Face ID e outros"
       },
       "STATE": {
@@ -1613,8 +1613,8 @@
         "4": "Redefinição de senha",
         "5": "Inicialização passkey",
         "6": "Segredo do aplicativo",
-        "7": "Senha única (OTP) - SMS",
-        "8": "Senha única (OTP) - e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP - e-mail"
       },
       "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
@@ -1878,8 +1878,8 @@
         "changedate": "Data de alteração",
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
-        "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único",
+        "otp": "OTP",
+        "verifyUrl": "URL para verificar o OTP",
         "expiry": "Data de expiração",
         "applicationName": "Nome do aplicativo"
       },
@@ -2406,10 +2406,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Desconhecido",
-      "1": "Senha de uso único para o aplicativo autenticador (TOTP)",
+      "1": "OTP para o aplicativo autenticador",
       "2": "Impressão digital, Chaves de Segurança, Face ID e outros",
-      "3": "Senha de uso único para e-mail (OTP Email)",
-      "4": "Senha de uso único para SMS (OTP SMS)",
+      "3": "OTP Email",
+      "4": "OTP SMS",
       "5": "Códigos de recuperação"
     }
   },
