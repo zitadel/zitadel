@@ -75,17 +75,26 @@ function filterVersions(tags) {
 
 // Helper to determine the best branch for v4.10.0 content
 function getFallbackSource() {
-  try {
-    const res = execSync(`git ls-remote --heads origin ${FALLBACK_BRANCH}`).toString().trim();
-    if (res) {
-      console.log(`[fallback] Found active branch: ${FALLBACK_BRANCH}`);
-      return FALLBACK_BRANCH;
-    }
-  } catch (e) {
-    console.warn(`[fallback] Failed to check ref ${FALLBACK_BRANCH}:`, e.message);
+  // Prioritize CI/CD Environment Variables
+  if (process.env.VERCEL_GIT_COMMIT_REF) {
+    console.log(`[fallback] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
+    return process.env.VERCEL_GIT_COMMIT_REF;
   }
-  console.log(`[fallback] Defaulting to main branch`);
-  return 'main';
+  if (process.env.GITHUB_REF_NAME) {
+    console.log(`[fallback] Detected GitHub Action Branch: ${process.env.GITHUB_REF_NAME}`);
+    return process.env.GITHUB_REF_NAME;
+  }
+
+  // Fallback for local dev if git is available
+  try {
+    const branch = execSync('git branch --show-current').toString().trim();
+    if (branch) return branch;
+  } catch (e) {
+    // Ignore git errors
+  }
+
+  console.log(`[fallback] Defaulting to ${FALLBACK_BRANCH}`);
+  return FALLBACK_BRANCH;
 }
 
 // sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
