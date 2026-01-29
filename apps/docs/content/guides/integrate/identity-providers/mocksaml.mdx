@@ -1,0 +1,274 @@
+---
+title: Configure MockSAML as an Identity Provider in ZITADEL
+sidebar_label: MockSAML
+id: mocksaml
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+import PrefillAction from './_prefill_action.mdx';
+
+<Intro components={props.components}  provider="MockSAML"/>
+
+<Callout type="warn">
+MockSAML is not intended for any production environment, only for test purposes
+</Callout>
+
+## MockSAML
+
+### Download metadata
+
+You can either download the metadata under [https://mocksaml.com/api/saml/metadata?download=true](https://mocksaml.com/api/saml/metadata?download=true) or skip this step and
+fill in the URL when creating the SAML Provider in ZITADEL.
+
+## ZITADEL configuration
+
+### Go to the IdP providers overview
+
+<IDPsOverview components={props.components}  templates="SAML"/>
+
+### Create a new SAML ServiceProvider
+
+The SAML provider template has everything you need preconfigured.
+Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
+All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
+
+<GeneralConfigDescription components={props.components}  provider_account="SAML account" />
+
+![](../../../../public/img/guides/zitadel_saml_create_provider.png)
+
+### Download metadata
+
+Normally, you would need to download the ServiceProvider metadata from ZITADEL to upload to the IdentityProvider.
+They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in ZITADEL}/saml/metadata`, but this step can be skipped due to the fact that MockSAML is only for testing purposes.
+
+### Activate IdP
+
+<Activate components={props.components} />
+
+![](../../../../public/img/guides/zitadel_activate_saml.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy components={props.components} />
+
+## Configure an action to autofill user data
+
+### Required for Login V2
+The creation of users in ZITADEL will fail if the required fields to create a user are not set.
+
+**Actions V2** can be used to map the SAML attributes returned by the IDP to the required fields in ZITADEL.
+See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
+guide for more information on setting up a Target and an Execution. In short,
+* Create an Actions V2 Target of type `REST Call`
+* Create an Execution of type `Response` on the method `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`
+
+The following minimal example modifies the response of `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` to set the required fields
+for user creation. This example is specific to MockSAML, please adjust the attributes according to your IDP.
+
+``` go
+package main
+
+import (
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+
+	"github.com/muhlemmer/gu"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+type contextResponse struct {
+	Request  *retrieveIdentityProviderIntentRequestWrapper  `json:"request"`
+	Response *retrieveIdentityProviderIntentResponseWrapper `json:"response"`
+}
+
+// RetrieveIdentityProviderIntentRequestWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type retrieveIdentityProviderIntentRequestWrapper struct {
+	user.RetrieveIdentityProviderIntentRequest
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
+}
+
+// RetrieveIdentityProviderIntentResponseWrapper necessary to marshal and unmarshal the JSON into the proto message correctly
+type retrieveIdentityProviderIntentResponseWrapper struct {
+	user.RetrieveIdentityProviderIntentResponse
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
+}
+
+// call HandleFunc to read the response body, manipulate the content and return the response
+func call(w http.ResponseWriter, req *http.Request) {
+	// read the body content
+	sentBody, err := io.ReadAll(req.Body)
+	if err != nil {
+		// if there was an error while reading the body return an error
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+	defer req.Body.Close()
+
+	// read the response into the expected structure
+	request := new(contextResponse)
+	if err := json.Unmarshal(sentBody, request); err != nil {
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+
+	// build the response from the received response
+	resp := request.Response
+	// manipulate the received response to send back as response
+	if err = manipulateResponse(resp); err != nil {
+		http.Error(w, "error modifying response", http.StatusInternalServerError)
+		return
+	}
+
+	// marshal the response into json
+	data, err := json.Marshal(resp)
+	if err != nil {
+		// if there was an error while marshalling the json
+		http.Error(w, "error marshaling response", http.StatusInternalServerError)
+		return
+	}
+
+	// return the manipulated response
+	w.Write(data)
+}
+
+type rawInformation struct {
+	Attributes struct {
+		Email     []string `json:"email"`
+		FirstName []string `json:"firstName"`
+		Id        []string `json:"id"`
+		LastName  []string `json:"lastName"`
+	} `json:"attributes"`
+	Id string `json:"id"`
+}
+
+func manipulateResponse(resp *retrieveIdentityProviderIntentResponseWrapper) error {
+	if resp == nil || resp.IdpInformation == nil || resp.IdpInformation.RawInformation == nil {
+		log.Println("missing IDP/User information in the IDP response")
+		return nil
+	}
+	// retrieve raw information from the IDP
+	var rawInfoBytes []byte
+	var err error
+	if rawInfoBytes, err = resp.IdpInformation.RawInformation.MarshalJSON(); err != nil {
+		return err
+	}
+
+	// NOTE: the raw information struct used here is specific to MockSAML.
+	// Please adapt this to your IDP.
+	var rawInfo rawInformation
+	if err = json.Unmarshal(rawInfoBytes, &rawInfo); err != nil {
+		return err
+	}
+
+	if len(rawInfo.Attributes.Email) == 0 ||
+		len(rawInfo.Attributes.FirstName) == 0 ||
+		len(rawInfo.Attributes.LastName) == 0 {
+		log.Println("missing required attributes in the IDP response")
+		return nil
+	}
+
+	// to create a new user.
+	if resp.AddHumanUser != nil {
+		// set the required fields to create a new user in Zitadel based on the information returned by the IDP
+		username := rawInfo.Attributes.Email[0]
+		resp.IdpInformation.UserName = username
+
+		resp.AddHumanUser.Profile = &user.SetHumanProfile{
+			GivenName:  rawInfo.Attributes.FirstName[0],
+			FamilyName: rawInfo.Attributes.LastName[0],
+		}
+		resp.AddHumanUser.Email = &user.SetHumanEmail{
+			Email:        rawInfo.Attributes.Email[0],
+			Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+		}
+		resp.AddHumanUser.Username = gu.Ptr(username)
+		resp.AddHumanUser.IdpLinks = []*user.IDPLink{
+			{
+				UserName: username,
+				UserId:   resp.GetIdpInformation().GetUserId(),
+				IdpId:    resp.GetIdpInformation().GetIdpId(),
+			},
+		}
+	}
+	return nil
+}
+
+func main() {
+	// handle the HTTP call under "/call"
+	http.HandleFunc("/call", call)
+
+	// start an HTTP server with the before defined function to handle the endpoint under "http://localhost:8090"
+	http.ListenAndServe(":8090", nil)
+}
+
+```
+
+### Optional for Login V1 (using Actions V1)
+
+<PrefillAction components={props.components}  fields="firstname, lastname, email, display name and username" provider="mockSaml"/>
+
+NOTE: The name of the action should be the same as the function name. In this example, the action should be named `mapSAMLIDPAttrs`
+
+```js
+function mapSAMLIDPAttrs(ctx, api) {
+    if (ctx.v1.externalUser.externalIdpId != "external-idp-id") {
+        return
+    }
+    // the attribute names below represent the ones used by MockSAML, please adjust accordingly for your IDP.
+    let firstname = ctx.v1.providerInfo.attributes["firstName"];
+    let lastname = ctx.v1.providerInfo.attributes["lastName"];
+    let email = ctx.v1.providerInfo.attributes["email"];
+    let username = ctx.v1.providerInfo.attributes["email"];
+    if (firstname != undefined) {
+        api.setFirstName(firstname[0]);
+    }
+    if (lastname != undefined) {
+        api.setLastName(lastname[0]);
+    }
+    if (email != undefined) {
+        api.setEmail(email[0]);
+        api.setEmailVerified(true);
+    }
+    if (username != undefined) {
+        api.setPreferredUsername(username[0]);
+    }
+}
+```
+
+## Test the setup
+
+<TestSetup components={props.components}  loginscreen="your SAML login"/>
+
+![](../../../../public/img/guides/zitadel_login_saml.png)
+
+![](../../../../public/img/guides/mocksaml_login.png)

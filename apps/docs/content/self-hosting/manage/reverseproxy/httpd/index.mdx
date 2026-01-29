@@ -1,0 +1,28 @@
+---
+title: Configure Zitadel with Apache httpd
+sidebar_label: Apache httpd
+---
+
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
+import ProxyGuideMore from '../_proxy_guide_more.mdx';
+import Compose from "./docker-compose.yaml";
+import ConfigDisabled from "./httpd-disabled-tls.conf";
+import ConfigExternal from "./httpd-external-tls.conf";
+import ConfigEnabled from "./httpd-enabled-tls.conf";
+
+export const providername = "Apache httpd";
+export const lower = "httpd";
+export const link = <a href="https://httpd.apache.org//">{providername}</a>
+
+<ProxyGuideOverview components={props.components}  name={providername} link={link} compose={Compose}></ProxyGuideOverview>
+
+You can either setup your environment for <a href={'#tls-mode-disabled'}>TLS mode disabled</a>, <a href={'#tls-mode-external'}>TLS mode external</a> or <a href={'#tls-mode-enabled'}>TLS mode enabled</a>.
+
+## TLS mode external
+
+<ProxyGuideTLSMode components={props.components}  mode="external" configfilename="httpd-external-tls.conf" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## More Information
+
+<ProxyGuideMore components={props.components} ></ProxyGuideMore>

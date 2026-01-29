@@ -1,0 +1,73 @@
+---
+title: Install Zitadel on Linux
+sidebar_label: Linux
+---
+
+import Disclaimer from "./_disclaimer.mdx";
+import DefaultUser from "./_defaultuser.mdx";
+import Next from "./_next.mdx";
+import NoteInstanceNotFound from "./troubleshooting/_note_instance_not_found.mdx";
+
+<Callout type="warn">
+
+Be aware! This guide does not work for the newly updated version of Zitadel 4! [Learn more](https://github.com/zitadel/zitadel/issues/10526)
+
+Please use Docker version if you want to use Zitadel 4.
+
+</Callout>
+
+## Install PostgreSQL
+
+Download a `postgresql` binary as described [in the PostgreSQL docs](https://www.postgresql.org/download/linux/).
+Zitadel is tested against PostgreSQL latest stable tag and latest Ubuntu LTS.
+
+## Run PostgreSQL
+
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+## Install Zitadel
+
+Download the Zitadel release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest), unpack the archive and copy zitadel binary to /usr/local/bin
+
+```bash
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac; wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz && sudo mv zitadel-linux-$ARCH/zitadel /usr/local/bin
+```
+
+## Run Zitadel
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+<DefaultUser components={props.components} />
+
+<NoteInstanceNotFound components={props.components} />
+
+## VideoGuide
+
+<iframe
+  width="100%"
+  height="315"
+  src="https://www.youtube.com/embed/YVLua-q7dbs"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+### Setup Zitadel with a service account
+
+```bash
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+
+# then you can move your machine key
+mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
+```
+
+This key can be used to provision resources with for example [Terraform](/guides/manage/terraform-provider).
+
+<Next components={props.components} />
+<Disclaimer components={props.components} />

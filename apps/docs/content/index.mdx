@@ -1,0 +1,127 @@
+---
+title: ZITADEL Documentation
+description: ZITADEL is the "Identity Infrastructure for developers". We provide a hardened and extensible turnkey solution to address all your authentication and authorization needs.
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Rocket, Laptop, BookOpen, Book, Server, ShieldCheck, Terminal, MessageCircle, Calendar, Heart } from 'lucide-react';
+
+**ZITADEL is the Identity Infrastructure for Developers.**
+
+We provide a hardened, extensible turnkey solution for all your authentication and authorization needs. Instead of building your own login system, use ZITADEL to accelerate your project with features that work out of the box:
+
+*   **Secure Login**: Multi-factor authentication (OTP, U2F, Passkeys) and single sign-on (OIDC, SAML, OAuth2).
+*   **B2B Ready**: First-class multi-tenancy with branding customization and self-service.
+*   **Auditable**: Exhaustive audit trail of all events.
+*   **Extensible**: Execute custom code on events (Actions) to fit your unique workflows.
+
+## Get Started
+
+Explore our guides to get up and running with ZITADEL quickly.
+
+<Cards>
+  <Card
+    title="Quick Start Guide"
+    href="/guides/start/quickstart"
+    icon={<Rocket />}
+    description="Learn how to set up ZITADEL in minutes."
+  />
+  <Card
+    title="SDKs"
+    href="/sdk-examples/introduction"
+    icon={<Terminal />}
+    description="Explore our libraries for your favorite languages."
+  />
+  <Card
+    title="Example Apps"
+    href="/examples/introduction"
+    icon={<Laptop />}
+    description="Sample applications to help you get started."
+  />
+</Cards>
+
+## Deployment Options
+
+You can use ZITADEL in two ways:
+
+- **ZITADEL Cloud**: This is our public cloud service. Use the free tier to start in minutes.
+- **Self-hosted ZITADEL**: For full control, deploy ZITADEL wherever you prefer.
+
+If you're unsure, consider the generous free tier of [ZITADEL Cloud](/guides/manage/cloud/start).
+
+<Cards>
+  <Card title="ZITADEL Cloud" href="/guides/manage/cloud/start" icon={<Server />}>
+    Choose if you want:
+    - A turnkey solution that's ready to go
+    - Global scalability without the hassle
+    - Data-residency compliance
+  </Card>
+  <Card title="Self-hosted" href="/self-hosting/deploy/overview" icon={<Server />}>
+    Choose if you want:
+    - Total control over all components
+    - Air-gapped or regulated environments
+    - Flexibility when deploying updates
+  </Card>
+</Cards>
+
+## Explore Components
+
+Deep dive into the architecture and capabilities of ZITADEL.
+
+<Cards>
+  <Card
+    title="Concepts"
+    href="/concepts"
+    icon={<BookOpen />}
+    description="Understand the core principles of ZITADEL."
+  />
+  <Card
+    title="APIs"
+    href="/apis/introduction"
+    icon={<Laptop />}
+    description="Reference documentation for our REST and gRPC APIs."
+  />
+  <Card
+    title="Self-hosting"
+    href="/self-hosting/deploy/overview"
+    icon={<Server />}
+    description="Learn how to deploy and manage ZITADEL yourself."
+  />
+  <Card
+    title="Legal"
+    href="/legal"
+    icon={<ShieldCheck />}
+    description="Terms of service, privacy policy, and more."
+  />
+</Cards>
+
+## Community & Support
+
+Join the community and get help.
+
+<Cards>
+  <Card
+    title="Discord"
+    href="https://zitadel.com/chat"
+    icon={<MessageCircle />}
+    description="Join our Discord chat to get help from the community and the ZITADEL team."
+  />
+  <Card
+    title="Github Discussions"
+    href="https://github.com/zitadel/zitadel/discussions"
+    icon={<MessageCircle />}
+    description="Open a discussion on Github."
+  />
+  <Card
+    title="Office Hours"
+    href="https://zitadel.com/office-hours"
+    icon={<Calendar />}
+    description="Join our bi-weekly community calls."
+  />
+  <Card
+    title="Contribute"
+    href="https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.mdx"
+    icon={<Heart />}
+    description="Help us improve ZITADEL and its documentation."
+  />
+</Cards>

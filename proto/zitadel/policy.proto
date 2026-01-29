@@ -352,18 +352,18 @@ message PrivacyPolicy {
     zitadel.v1.ObjectDetails details = 1;
     string tos_link = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+            example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
         }
     ];
     string privacy_link = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+            example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
         }
     ];
     bool is_default = 4;
     string help_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+            example: "\"https://zitadel.com/docs/manage/console-overview\"";
         }
     ];
     string support_email = 6 [

@@ -5,13 +5,13 @@ on:
     branches:
     -  'main'
     paths-ignore:
-    - 'docs/**'
+    - 'apps/docs/content/**'
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
     -  'main'
     paths-ignore:
-    - 'docs/**'
+    - 'apps/docs/content/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

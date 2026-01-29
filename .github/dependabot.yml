@@ -86,3 +86,21 @@ updates:
   commit-message:
     prefix: chore
     include: scope
+- package-ecosystem: npm
+  directory: '/apps/docs'
+  open-pull-requests-limit: 10
+  schedule:
+    interval: weekly
+    time: "02:00"
+  groups:
+    prod:
+      dependency-type: production
+    dev:
+      dependency-type: development
+  commit-message:
+    prefix: chore
+    include: scope
+  labels:
+    - "npm"
+    - "dependencies"
+    - "documentation"
