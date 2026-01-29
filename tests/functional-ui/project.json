@@ -36,7 +36,7 @@
         ]
       },
       "cache": true,
-      "inputs": ["default", { "dependentTasksOutputFiles": ".artifacts/bin/*/*/zitadel.local" }]
+      "inputs": ["default", { "dependentTasksOutputFiles": ".artifacts/bin/*/*/zitadel.local", "transitive": true }]
     },
     "stop": {
       "description": "Stops the local Postgres database used for functional UI (Console) tests.",
