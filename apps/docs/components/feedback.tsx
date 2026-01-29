@@ -12,7 +12,7 @@ export function Feedback() {
 
   const handleVote = (useful: boolean) => {
     setVoted(useful);
-    mixpanelClient.track('docs_feedback', {
+    mixpanelClient.track('helpfulness_vote', {
       path: pathname,
       useful: useful,
     });

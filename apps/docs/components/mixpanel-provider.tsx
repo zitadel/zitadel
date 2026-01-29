@@ -1,11 +1,9 @@
 'use client';
 
 import { initMixpanel, mixpanelClient, optInTracking, optOutTracking } from '@/utils/mixpanel';
-import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 
 export default function MixpanelProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   useEffect(() => {
     const setup = async () => {
       await initMixpanel();
@@ -48,12 +46,6 @@ export default function MixpanelProvider({ children }: { children: React.ReactNo
       window.removeEventListener('cc:onChange:mixpanel', handleConsentChange);
     };
   }, []);
-
-  useEffect(() => {
-    if (pathname) {
-      mixpanelClient.track('page_viewed', { path: pathname });
-    }
-  }, [pathname]);
 
   return <>{children}</>;
 }
