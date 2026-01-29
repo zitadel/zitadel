@@ -81,7 +81,6 @@ my-pylon/
 Here's an example of a basic Pylon service:
 
 ```ts
-import { app } from "@getcronit/pylon";
 
 export const graphql = {
   Query: {
@@ -261,7 +260,7 @@ export default app;
 ### Call the API
 
 To call the API you need an access token, which is then verified by ZITADEL.
-Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount. main:docs/docs/examples/secure-api/pylon.mdx
+Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 <Callout>
 You can also create a PAT for the serviceuser and use it to test the API. For this, follow [this guide](/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat).

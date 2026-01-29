@@ -56,7 +56,7 @@ You need to add the redirect URL and configure token settings after creating the
 
 ![](../../../../public/img/guides/integrate/services/google-cloud-redirect-url.png)
 
-After creating, go to the application settings "Redirect settings" and add the redirect url from Googles configuration guide. 
+After creating, go to the application settings "Redirect settings" and add the redirect url from Googles configuration guide.
 It looks something like `https://auth.cloud.google/signin-callback/locations/global/workforcePools/WORKFORCE_POOL_ID/providers/WORKFORCE_PROVIDER_ID`.
 
 Save the settings.
@@ -101,7 +101,7 @@ function googleGroups(ctx, api) {
   let grants = [];
   ctx.v1.user.grants.grants.forEach(claim => {
     claim.roles.forEach(role => {
-        grants.push(claim.projectId+':'+role)  
+        grants.push(claim.projectId+':'+role)
     })
   })
 
@@ -112,8 +112,6 @@ function googleGroups(ctx, api) {
 ```
 
 ![](../../../../public/img/guides/integrate/services/google-cloud-action-code.png)
-
-
 
 <Callout type="warn">
 Make sure that the name of the action matches the name of the function.

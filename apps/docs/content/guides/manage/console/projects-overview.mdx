@@ -3,12 +3,12 @@ title: Organize applications, services, and roles with projects
 sidebar_label: Projects
 sidebar_position: 4
 ---
- main:docs/docs/guides/manage/console/projects-overview.mdx
+
 import ProjectDescription from "../../../concepts/structure/_project_description.mdx";
 
 ## What is a project?
 
-<ProjectDescription name="ProjectDescription" /> main:docs/docs/guides/manage/console/projects-overview.mdx
+<ProjectDescription components={props.components} name="ProjectDescription" />
 
 A Project is the vessel that holds your Applications and Roles. It defines the security context for a specific software solution.
 
@@ -18,7 +18,7 @@ Imagine you are building a **Point of Sales (POS)** platform. In ZITADEL, you wo
 * **Roles:** You would create **Roles** (e.g., `admin`, `cashier`, `viewer`) inside this Project.
 * **Authorization:** All applications in this project share these roles, allowing you to create unified authorizations for your users across all platforms.
 
-![POS Project](../../../../public/img/guides/console/posproject.png) main:docs/docs/guides/manage/console/projects-overview.mdx
+![POS Project](../../../../public/img/guides/console/posproject.png)
 
 ## Core Components
 
@@ -31,7 +31,7 @@ Go to [Applications](./applications-overview) for more details.
 A role consists of different attributes, but only the **Key** is relevant to the authorization and must be unique within the project.
 * **Key:** The identifier used in code (e.g., `role.admin`).
 * **Display Name:** A human-readable name for the UI.
-* **Group:** Enables better handling in the ZITADEL Management Console (e.g., giving a user all roles of a specific group). main:docs/docs/guides/manage/console/projects-overview.mdx
+* **Group:** Enables better handling in the ZITADEL Management Console (e.g., giving a user all roles of a specific group).
 
 Read more about managing roles [here](./roles).
 
@@ -39,11 +39,11 @@ Read more about managing roles [here](./roles).
 When creating a new ZITADEL instance, you will find an automatically created project in the first organization.
 This **Default Project** (named "ZITADEL") protects the ZITADEL Management Console and APIs.
 
-:::caution
+<Callout type="caution">
 We do not recommend changing any settings in the Default Project or using it for your own applications, as this could influence the behavior of ZITADEL itself.
-:::
+</Callout>
 
-![Default Project](../../../../public/img/guides/solution-scenarios/console-default-project.png) main:docs/docs/guides/manage/console/projects-overview.mdx
+![Default Project](../../../../public/img/guides/solution-scenarios/console-default-project.png)
 
 ## Create a Project
 
@@ -54,7 +54,7 @@ To create a project:
 
 <img
   alt="Empty Project"
-  src="/docs/img/console_projects_empty.png"
+  src="/img/console_projects_empty.png"
   width="270px"
 />
 
@@ -72,7 +72,7 @@ Using the POS example above: You could grant the `POS` project to a partner orga
 
 <img
   alt="Granted project"
-  src="/docs/img/guides/console/grantedprojectgrid.png"
+  src="/img/guides/console/grantedprojectgrid.png"
   width="320px"
 />
 
@@ -96,7 +96,7 @@ You can customize the behavior of your project, particularly regarding how login
 If you have different designs for your organizations (Private Labeling), you can define the login behavior on the project detail page.
 
 <img
-  src="/docs/img/guides/console/projectbranding.png"
+  src="/img/guides/console/projectbranding.png"
   alt="Project branding"
   width="400px"
 />
@@ -113,7 +113,7 @@ In a B2B use case, you would typically use **Allow login user policy**. If you w
 You can configure strict security checks regarding roles during authentication.
 
 <img
-  src="/docs/img/guides/console/rolesettings.png"
+  src="/img/guides/console/rolesettings.png"
   width="700px"
   alt="Role settings"
 />
@@ -130,7 +130,7 @@ If you want roles to appear directly inside your Access or ID Tokens (to avoid c
 3.  Check **Assert Roles on Authentication**.
 
 <img
-  src="/docs/img/guides/console/tokenroles.png"
+  src="/img/guides/console/tokenroles.png"
   width="700px"
   alt="Roles in token"
 />

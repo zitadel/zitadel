@@ -3,6 +3,8 @@ title: Data Processing Agreement
 custom_edit_url: null
 ---
 
+import { PiiTable } from "@/components/pii_table";
+
 Last updated on May 8, 2025
 
 This Data Protection Agreement and its annexes (“**DPA**”) are part of the [Framework Agreement](./terms-of-service) between Zitadel, Inc. and it's affiliates ("**Zitadel**") and the Customer in respect of the provision of certain services, including any applicable statement of work, booking, purchase order (PO) or any agreed upon instructions (the "**Agreement**") and applies where, and to the extent that, Zitadel processes Personal Data as a Processor on behalf of the Customer under the Framework Agreement (each a “**Party**” and together the “**Parties**”).
@@ -29,7 +31,7 @@ This DPA shall become legally binding upon Customer entering into the Agreement.
 
 “**Personal Data**” shall have the meaning given to it, or to the terms “personally identifiable information” and “personal information” under applicable Data Protection Law, but shall include, at a minimum, any information related to an identified or identifiable natural person.
 
-“**Restricted Transfer**” means: (i) where the GDPR applies, a transfer of Personal Data from the EEA to a country outside of the EEA which is not subject to an adequacy determination by the European Commission;  and (ii) where UK-GDPR applies, a transfer of Personal Data from the United Kingdom to any other country which is not subject to adequacy regulations pursuant to Section 17A of the United Kingdom Data Protection Act 2018, in each case whether such transfer is direct or via onward transfer.  
+“**Restricted Transfer**” means: (i) where the GDPR applies, a transfer of Personal Data from the EEA to a country outside of the EEA which is not subject to an adequacy determination by the European Commission;  and (ii) where UK-GDPR applies, a transfer of Personal Data from the United Kingdom to any other country which is not subject to adequacy regulations pursuant to Section 17A of the United Kingdom Data Protection Act 2018, in each case whether such transfer is direct or via onward transfer.
 
 “**Security Incident**” means any unauthorized or unlawful breach of security leading to, or reasonably believed to have led to, the accidental or unlawful destruction, loss, or alteration of, or unauthorized disclosure or access to, Personal Data transmitted, stored or otherwise processed by Zitadel under or in connection with the Agreement.
 
@@ -50,8 +52,6 @@ This DPA will become effective on the date the Agreement enters into effect and 
 For the avoidance of doubt, the terms of the Framework Agreement will continue in full force and effect; however, to the extent any term in any Agreement regarding either Party’s obligations with respect to Customer Data is less restrictive than or is inconsistent with this DPA, the terms of this DPA shall supersede and control.
 
 The Parties acknowledge that the following Customer Data will be processed as part of the Services:
-
-import { PiiTable } from "@/components/pii_table";
 
 <PiiTable />
 
@@ -159,7 +159,7 @@ Zitadel may: (i) compile aggregated and/or de-identified information in connecti
 
 ### Data Transfers
 
-Where either Party intends to transfer Personal Data cross-border and Applicable Data Protection Law requires certain measures to be implemented prior to such transfer, each Party agrees to implement such measures to ensure compliance with Applicable Data Protection Law.  
+Where either Party intends to transfer Personal Data cross-border and Applicable Data Protection Law requires certain measures to be implemented prior to such transfer, each Party agrees to implement such measures to ensure compliance with Applicable Data Protection Law.
 
 To the extent that the transfer of Personal Data from Customer to Zitadel involves a transfer of Personal Data outside the European Economic Area (EEA), Switzerland, or the United Kingdom to a jurisdiction which is not subject to an adequacy determination by the European Commission, United Kingdom or Swiss authorities (as applicable) that covers such transfer, then the SCCs are hereby incorporated by reference and form an integral part of the DPA.
 
@@ -167,38 +167,38 @@ To the extent that the transfer of Personal Data from Customer to Zitadel involv
 
 To the extent that Customer Personal Data is subject to the GDPR, and the transfer would be a Restricted Transfer, the SCCs apply as follows:
 
-1) the Customer is the ‘data exporter’ and Zitadel is the ‘data importer’;  
-2) the Module Two terms (Transfer controller to processor) apply;  
-3) in Clause 7, the optional docking clause does not apply;  
-4) in Clause 9, Option 2 (General Authorization) applies and the time period for prior notice of sub-processor changes is set out in this DPA;  
-5) in Clause 11, the optional language does not apply;  
-6) in Clause 17, Option 1 applies, and the SCCs are governed by German law;  
-7) in Clause 18(b), disputes will be resolved before the courts of Hamburg in Germany;  
-8) in Annex I, the details of the parties and the transfer are set out in the Agreement;  
-9) in Clause 13(a) and Annex I, the Hamburg data protection authority will act as competent supervisory authority;  
-10) in Annex II, the description of the technical and organizational security measures is set out in Annex 2 of this DPA or, if not set out therein, the applicable statement of work; and  
+1) the Customer is the ‘data exporter’ and Zitadel is the ‘data importer’;
+2) the Module Two terms (Transfer controller to processor) apply;
+3) in Clause 7, the optional docking clause does not apply;
+4) in Clause 9, Option 2 (General Authorization) applies and the time period for prior notice of sub-processor changes is set out in this DPA;
+5) in Clause 11, the optional language does not apply;
+6) in Clause 17, Option 1 applies, and the SCCs are governed by German law;
+7) in Clause 18(b), disputes will be resolved before the courts of Hamburg in Germany;
+8) in Annex I, the details of the parties and the transfer are set out in the Agreement;
+9) in Clause 13(a) and Annex I, the Hamburg data protection authority will act as competent supervisory authority;
+10) in Annex II, the description of the technical and organizational security measures is set out in Annex 2 of this DPA or, if not set out therein, the applicable statement of work; and
 11) in Annex III, the list of sub-processors is set out at the address [https://zitadel.com/trust](https://zitadel.com/trust) or, if not set out therein, applicable statement of work.
 
 #### Swiss Transfers
 
 To the extent that Customer Personal Data is subject to Swiss law, and the transfer would be a Restricted Transfer, the SCCs apply as set out above with the following modifications:
 
-1) references to ‘Regulation (EU) 2016/679’ are interpreted as references to the Swiss FADP or any successor thereof;  
-2) references to specific articles of ‘Regulation (EU) 2016/679’ are replaced with the equivalent article or section of the Swiss FADP,  
-3) references to ‘EU’, ‘Union’ and ‘Member State’ are replaced with ‘Switzerland’,  
-4) Clause 13(a) and Part C of Annex 2 is not used and the ‘competent supervisory authority’ is the Swiss Federal Data Protection Information Commissioner (“**FDPIC**”) or, if the transfer is subject to both the Swiss FADP and the GDPR, the FDPIC (insofar as the transfer is governed by the Swiss FADP) or the DPC (insofar as the transfer is governed by the GDPR),  
-5) references to the ‘competent supervisory authority’ and ‘competent courts’ are replaced with the FDPIC and ‘competent Swiss courts’,  
-6) in Clause 17, the SCCs are governed by the laws of Switzerland,  
-7) in Clause 18(b), disputes will be resolved before the competent Swiss courts, and  
+1) references to ‘Regulation (EU) 2016/679’ are interpreted as references to the Swiss FADP or any successor thereof;
+2) references to specific articles of ‘Regulation (EU) 2016/679’ are replaced with the equivalent article or section of the Swiss FADP,
+3) references to ‘EU’, ‘Union’ and ‘Member State’ are replaced with ‘Switzerland’,
+4) Clause 13(a) and Part C of Annex 2 is not used and the ‘competent supervisory authority’ is the Swiss Federal Data Protection Information Commissioner (“**FDPIC**”) or, if the transfer is subject to both the Swiss FADP and the GDPR, the FDPIC (insofar as the transfer is governed by the Swiss FADP) or the DPC (insofar as the transfer is governed by the GDPR),
+5) references to the ‘competent supervisory authority’ and ‘competent courts’ are replaced with the FDPIC and ‘competent Swiss courts’,
+6) in Clause 17, the SCCs are governed by the laws of Switzerland,
+7) in Clause 18(b), disputes will be resolved before the competent Swiss courts, and
 8) the SCCs also protect the data of legal entities until entry into force of the revised Swiss FADP.
 
 #### UK Transfers
 
 To the extent that Customer Personal Data is subject to Applicable Data Protection Law of the United Kingdom, and the transfer would be a Restricted Transfer, the SCCs as set out above shall apply as amended by Part 2 of the UK Addendum, and Part 1 of the UK Addendum is deemed completed as follows:
 
-1) in Table 1, the details of the parties are set out in the Agreement or, if not set out therein, the applicable statement of work;  
-2) in Table 2, the selected modules and clauses are set out in Section 6.3 of this DPA;  
-3) in Table 3, the appendix information is set out in the annexes to this DPA or, if not set out therein, the applicable statement of work; and  
+1) in Table 1, the details of the parties are set out in the Agreement or, if not set out therein, the applicable statement of work;
+2) in Table 2, the selected modules and clauses are set out in Section 6.3 of this DPA;
+3) in Table 3, the appendix information is set out in the annexes to this DPA or, if not set out therein, the applicable statement of work; and
 4) in Table 4, the ‘Exporter’ is selected.
 
 #### Alternative Transfer Mechanism
@@ -211,8 +211,8 @@ The Parties agree that all Customer Personal Data that is subject to US Data Pro
 
 Zitadel agrees that it will not:
 
-1. sell or share any Customer Personal Data to a third party for any purpose other than than for the Permitted Purpose;  
-2. retain, use, or disclose any Customer Personal Data (i) for any purpose other than for the Permitted Purpose, including for any commercial purpose, or (ii) outside of the direct business relationship between the Parties, except as necessary to perform the Permitted Purpose or as otherwise permitted by US Data Protection Laws; or  
+1. sell or share any Customer Personal Data to a third party for any purpose other than than for the Permitted Purpose;
+2. retain, use, or disclose any Customer Personal Data (i) for any purpose other than for the Permitted Purpose, including for any commercial purpose, or (ii) outside of the direct business relationship between the Parties, except as necessary to perform the Permitted Purpose or as otherwise permitted by US Data Protection Laws; or
 3. combine Customer Personal Data received from or on behalf of Customer with Personal Data received from or on behalf of any third party or collected from Zitadel’s own interaction with individuals or data subjects, except to perform a Permitted Purpose in accordance with the CCPA, the Agreement and this DPA.
 
 The Parties acknowledge that the Customer Personal Data that Customer discloses to Zitadel is provided only for the limited and specified purposes set forth as the Permitted Purpose in the Agreement and this DPA.

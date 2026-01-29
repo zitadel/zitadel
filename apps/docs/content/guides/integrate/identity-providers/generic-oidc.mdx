@@ -12,16 +12,16 @@ import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro provider="your OIDC Provider"/>
+<Intro components={props.components} provider="your OIDC Provider"/>
 
 ## Open the Generic OIDC Provider Template
 
-<IDPsOverview templates="Generic OIDC"/> main:docs/docs/guides/integrate/identity-providers/generic-oidc.mdx
+<IDPsOverview components={props.components} templates="Generic OIDC"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste this URL in your external OIDC provider's application configuration later.
 
-![Generic OIDC Provider](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png) main:docs/docs/guides/integrate/identity-providers/generic-oidc.mdx
+![Generic OIDC Provider](../../../../public/img/guides/zitadel_generic_oidc_create_provider.png)
 
 ## OIDC Provider Configuration
 
@@ -51,18 +51,18 @@ ZITADEL ensures that at least the `openid` scope is always sent.
 
 **Use PKCE**: If enabled, Proof Key for Code Exchange (PKCE) will be used to secure the authorization code flow in addition to the client secret.
 
-<GeneralConfigDescription provider_account="OIDC provider account" />
+<GeneralConfigDescription components={props.components} provider_account="OIDC provider account" />
 
 ### Activate IdP
 
-<Activate/>
+<Activate components={props.components} />
 
 ![Activate the OIDC Provider](../../../../public/img/guides/zitadel_activate_okta.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy/>
+<CustomLoginPolicy components={props.components} />
 
 ## Test the setup
 
-<TestSetup loginscreen="your OIDC provider login"/> main:docs/docs/guides/integrate/identity-providers/generic-oidc.mdx
+<TestSetup components={props.components} loginscreen="your OIDC provider login"/>

@@ -19,7 +19,7 @@ You need an existing source database, most probably the database Zitadel current
 
 To mirror the data, the destination database needs to be initialized and set up without an instance. You can find the commands to start an empty Zitadel deployment in [the example section](#prepare-the-destination-database).
 
-### Start the destination database 
+### Start the destination database
 
 Follow one of the following guides to start the database:
 
@@ -200,7 +200,7 @@ Copies the events since the last migration and unique constraints to the destina
 
 Executes all projections in the destination database.
 
-It is NOOP if the projections are already up-to-date. 
+It is NOOP if the projections are already up-to-date.
 
 ### `zitadel mirror system`
 
@@ -227,4 +227,4 @@ Currently the encryption keys of the source database must be copied to the desti
 
 It is not possible to change the domain of the Zitadel deployment.
 
-Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag 
+Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag

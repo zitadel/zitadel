@@ -4,12 +4,13 @@ sidebar_label: Local OpenLDAP
 ---
 
 import Intro from './_intro.mdx';
-import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 import CustomLoginPolicy from './_custom_login_policy.mdx';
 import IDPsOverview from './_idps_overview.mdx';
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
+
+import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 
 <Callout type="warn">
 This guide shows you how you can configure an LDAP server locally.
@@ -18,7 +19,7 @@ You have to spin up your own local ZITADEL.
 The easiest way to do so is [by following the Docker Compose installation guide](/self-hosting/deploy/compose).
 </Callout>
 
-:::caution main:docs/docs/guides/integrate/identity-providers/openldap.mdx
+<Callout type="caution">
 Beware that this example configuration neither supports LDAPS nor StartTLS.
 We highly recommend to enable LDAPS or StartTLS in your production setup.
 Otherwise, your users passwords are sent in clear text through the wire.
@@ -207,7 +208,6 @@ Fill in the template fields with the exact values listed below. The fields are d
 **StartTLS**: For this example should be left untouched, if this setting is enabled after the initial connection ZITADEL tries to build a TLS connection.
 
 **Timeout**: Can be left empty, if this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
-
 
 <GeneralConfigDescription components={props.components}  provider_account="LDAP user" />
 

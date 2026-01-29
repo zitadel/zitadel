@@ -6,7 +6,6 @@ sidebar_label: Common Configurations
 Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
 In this section we show you the different use-cases we have already experienced, that could interest you.
 
-
 ## Automatically redirect users if the organization has only one identity provider
 
 You have different customers (organizations) in your ZITADEL instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Entra ID, and so on.
@@ -27,8 +26,8 @@ More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
 If you have an application that runs a dedicated domain for each customer you need to instruct ZITADEL to allow redirection for each domain specifically to safeguard against phishing attacks.
 
-Example:  
-MyApplication: `customer-a.app.com`  
+Example:
+MyApplication: `customer-a.app.com`
 ZITADEL Login: `login.app.com`
 
 In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
@@ -94,7 +93,7 @@ You can either set this attribute on your whole ZITADEL instance or just on some
 
 ### Use the phone number field of the user as additional login to the username
 
-No matter how the username of your user looks like, 
+No matter how the username of your user looks like,
 you can additionally allow login with the phone number attribute of the user.
 
 You can enable this feature in the "Login Behavior and Security" Setting of your instance or organizations.
@@ -104,7 +103,7 @@ Go to the "Advanced" section, per default login with phone number should be allo
 
 ## Embedding ZITADEL in an iFrame
 
-To maximize the security during login and in the Management Console UI, ZITADEL follows security best practices by setting a main:docs/docs/guides/solution-scenarios/configurations.mdx
+To maximize the security during login and in the Management Console UI, ZITADEL follows security best practices by setting a
 Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:
 
 ```
@@ -153,4 +152,3 @@ If you do want to disable the prompt for your users, go to the login behavior se
 If the setting is not configured to 0, it means that after that time, the user will be asked again to setup a factor.
 
 ![](../../../public/img/guides/scenarios/login-settings-mfa-init-lifetime.png)
-

@@ -1,12 +1,12 @@
 ---
 title: Configuration Options in ZITADEL
-sidebar_label: Configuration 
+sidebar_label: Configuration
 ---
 
 import LinuxUnix from "./_linuxunix.mdx";
 import Compose from "./_compose.mdx";
 import Helm from "./_helm.mdx";
-import Login from "./_login.md";
+import Login from "./_login.mdx";
 import CodeBlock from "@/components/docusaurus/code-block";
 import DefaultsYamlSource from "../../../../../../cmd/defaults.yaml";
 import StepsYamlSource from "../../../../../../cmd/setup/steps.yaml";
@@ -24,7 +24,6 @@ Also, you can use the environment variables listed in the defaults.yaml.
 <Callout>
 For overwriting the default configuration for the first instance created by zitadel setup, use the FirstInstance section in the [database initialization file](#database-initialization-file).
 </Callout>
-
 
 <details>
   <summary>defaults.yaml</summary>
@@ -102,11 +101,11 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 >
   <Tab value="linuxunix">
     <LinuxUnix components={props.components}  />
-    <Login/>
+    <Login components={props.components} />
   </Tab>
   <Tab value="compose">
     <Compose components={props.components}  />
-    <Login/>
+    <Login components={props.components} />
   </Tab>
   <Tab value="k8s">
     <Helm components={props.components}  />
@@ -121,8 +120,6 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 - Check out all possible [setup step configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml)
 
 <Callout type="warn">
-
-{/* TODO: Better mark the link in the UI */}
 
 The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2)
 </Callout>

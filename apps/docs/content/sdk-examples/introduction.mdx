@@ -2,7 +2,9 @@
 title: Examples and SDKs for Zitadel
 sidebar_label: Introduction
 ---
- main:docs/docs/sdk-examples/introduction.mdx
+
+import { Frameworks } from "@/components/frameworks";
+
 You can integrate Zitadel quickly into your application and be up and running within minutes.
 To achieve your goals as fast as possible, we provide you with SDKs, Example Repositories and Guides.
 
@@ -16,8 +18,6 @@ If you encounter issues with a community-contributed example, please contact the
 We provide this list for informational purposes and to foster community engagement, but we do not assume responsibility for these external implementations.
 </Callout>
 
-import { Frameworks } from "@/components/frameworks";
-
 ## Clients
 
 <Frameworks filter={(framework) => framework.client === true } />
@@ -30,7 +30,7 @@ import { Frameworks } from "@/components/frameworks";
 
 <Frameworks filter={(framework) => framework.client === false || framework.client == null} />
 
-To further streamline your setup, simply visit the management console in Zitadel where you can select one of the languages or frameworks. This will allow you to instantly set up the configuration for that specific sample in Zitadel, ensuring you have everything you need to get started right away. main:docs/docs/sdk-examples/introduction.mdx
+To further streamline your setup, simply visit the management console in Zitadel where you can select one of the languages or frameworks. This will allow you to instantly set up the configuration for that specific sample in Zitadel, ensuring you have everything you need to get started right away.
 
 ![](../../public/img/sdk-examples/console.png)
 

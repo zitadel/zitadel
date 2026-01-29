@@ -3,6 +3,7 @@ title: Download and adjust the example configuration file containing standard co
 ---
 
 import CodeBlock from '@/components/docusaurus/code-block';
+
 import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
 import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
 import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
@@ -53,13 +54,13 @@ zitadel start-from-init \
 
 ```bash
 # Set runtime environment variables
-export ZITADEL_DATABASE_POSTGRES_HOST=my.database 
-export ZITADEL_DATABASE_POSTGRES_PORT=5432 
-export ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel 
-export ZITADEL_DATABASE_POSTGRES_USER_USERNAME=my_zitadel_db_user 
-export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=Secret_DB_User_Password 
-export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable 
-export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root 
+export ZITADEL_DATABASE_POSTGRES_HOST=my.database
+export ZITADEL_DATABASE_POSTGRES_PORT=5432
+export ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
+export ZITADEL_DATABASE_POSTGRES_USER_USERNAME=my_zitadel_db_user
+export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=Secret_DB_User_Password
+export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
+export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
 export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"

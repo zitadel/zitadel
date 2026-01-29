@@ -11,7 +11,7 @@ Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios w
 
 ![](../../../public/img/guides/solution-scenarios/domain-discovery.png)
 
-In the example there is a service provider with a ZITADEL instance running on a [Custom Domain](/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`. main:docs/docs/guides/solution-scenarios/domain-discovery.mdx
+In the example there is a service provider with a ZITADEL instance running on a [Custom Domain](/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`.
 By default all users login on the organization **CIAM** with their preferred social login provider.
 
 Users of the two business customers **Alpha** and **Beta** should login according to their organization login and access policy settings.
@@ -36,7 +36,7 @@ You can also configure these settings on the default organization (see below) an
 
 ### Default Organization
 
-Set **CIAM** as [default organization](/guides/manage/console/organizations-overview#default-organization). main:docs/docs/guides/solution-scenarios/domain-discovery.mdx
+Set **CIAM** as [default organization](/guides/manage/console/organizations-overview#default-organization).
 You will find the overview of all organizations under the "Organizations" tab on the Default Settings.
 
 The default organization will hold all unmatched users, ie. all users that are not specifically in the organizations **Alpha** or **Beta** in the example.
@@ -51,7 +51,7 @@ Follow this [configuration guide](/guides/solution-scenarios/configurations#use-
 
 ### Other considerations
 
-You can also have multiple Custom Domains pointing to the same instance as described in this [configuration guide](/guides/solution-scenarios/configurations#custom-application-domain-per-organization). In our example you could also use `alpha.mycompany.com` to show the login page of your instance. main:docs/docs/guides/solution-scenarios/domain-discovery.mdx
+You can also have multiple Custom Domains pointing to the same instance as described in this [configuration guide](/guides/solution-scenarios/configurations#custom-application-domain-per-organization). In our example you could also use `alpha.mycompany.com` to show the login page of your instance.
 
 The domain of your email notification can be changed by [setting up your SMTP](/guides/manage/console/default-settings#smtp).
 
@@ -70,7 +70,7 @@ In the organization settings under Login Behavior and Access make sure the follo
 Now you can configure an [external identity provider](/guides/manage/console/default-settings#identity-providers).
 
 <Callout>
-Given you have only one external identity provider configured, when a user tries to login on that organization, then the user will be automatically redirected to the external identity provider.  
+Given you have only one external identity provider configured, when a user tries to login on that organization, then the user will be automatically redirected to the external identity provider.
 In case multiple providers are configured, then the user will be prompted to select an identity provider.
 </Callout>
 
@@ -89,7 +89,7 @@ Make sure to [Force MFA](/guides/manage/console/default-settings#multifactor-mfa
 ### Verify domains
 
 Switch to the organization **Alpha** and navigate to the settings and "Verified domains".
-Verify the domain alpha.com following the [organization guide](/guides/manage/console/organizations-overview#usernames-and-domains). main:docs/docs/guides/solution-scenarios/domain-discovery.mdx
+Verify the domain alpha.com following the [organization guide](/guides/manage/console/organizations-overview#usernames-and-domains).
 
 Do the same for the **Beta** organization.
 

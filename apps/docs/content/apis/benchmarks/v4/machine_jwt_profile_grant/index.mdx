@@ -3,6 +3,9 @@ title: machine jwt profile grant benchmark of zitadel v4
 sidebar_label: machine jwt profile grant
 ---
 
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
 Benchmark results of v4 release of Zitadel.
 
 ## Performance test results
@@ -33,15 +36,11 @@ Benchmark results of v4 release of Zitadel.
 
 ## Endpoint latencies
 
-import OutputSource from "./output.json";
-
-import { BenchmarkChart } from '@/components/benchmark_chart';
-
 <BenchmarkChart testResults={OutputSource} />
 
 ## k6 output
 ```bash
-  █ TOTAL RESULTS 
+  █ TOTAL RESULTS
 
     checks_total.......................: 3128039 1702.561961/s
     checks_succeeded...................: 100.00% 3128039 out of 3128039
@@ -67,22 +66,22 @@ import { BenchmarkChart } from '@/components/benchmark_chart';
 
     CUSTOM
     login_ui_enter_login_name_duration......................................: min=185.23ms avg=185.23ms max=185.23ms p(50)=185.23ms p(95)=185.23ms p(99)=185.23ms
-    login_ui_enter_password_duration........................................: min=19.29ms  avg=19.29ms  max=19.29ms  p(50)=19.29ms  p(95)=19.29ms  p(99)=19.29ms 
+    login_ui_enter_password_duration........................................: min=19.29ms  avg=19.29ms  max=19.29ms  p(50)=19.29ms  p(95)=19.29ms  p(99)=19.29ms
     login_ui_init_login_duration............................................: min=103.07ms avg=103.07ms max=103.07ms p(50)=103.07ms p(95)=103.07ms p(99)=103.07ms
-    login_ui_token_duration.................................................: min=147.4ms  avg=147.4ms  max=147.4ms  p(50)=147.4ms  p(95)=147.4ms  p(99)=147.4ms 
-    oidc_token_duration.....................................................: min=58.6ms   avg=688.05ms max=3.95s    p(50)=470.3ms  p(95)=1.16s    p(99)=1.24s   
-    org_create_org_duration.................................................: min=88.83ms  avg=88.83ms  max=88.83ms  p(50)=88.83ms  p(95)=88.83ms  p(99)=88.83ms 
+    login_ui_token_duration.................................................: min=147.4ms  avg=147.4ms  max=147.4ms  p(50)=147.4ms  p(95)=147.4ms  p(99)=147.4ms
+    oidc_token_duration.....................................................: min=58.6ms   avg=688.05ms max=3.95s    p(50)=470.3ms  p(95)=1.16s    p(99)=1.24s
+    org_create_org_duration.................................................: min=88.83ms  avg=88.83ms  max=88.83ms  p(50)=88.83ms  p(95)=88.83ms  p(99)=88.83ms
     user_add_machine_key_duration...........................................: min=29.55ms  avg=481.01ms max=742.31ms p(50)=487.76ms p(95)=728.51ms p(99)=739.94ms
-    user_create_machine_duration............................................: min=88.42ms  avg=748.16ms max=4.46s    p(50)=732.58ms p(95)=1.01s    p(99)=1.03s   
+    user_create_machine_duration............................................: min=88.42ms  avg=748.16ms max=4.46s    p(50)=732.58ms p(95)=1.01s    p(99)=1.03s
 
     HTTP
-    http_req_duration.......................................................: min=19.29ms  avg=687.53ms max=4.46s    p(50)=470.17ms p(95)=1.16s    p(99)=1.24s   
-      { expected_response:true }............................................: min=19.29ms  avg=687.53ms max=4.46s    p(50)=470.17ms p(95)=1.16s    p(99)=1.24s   
+    http_req_duration.......................................................: min=19.29ms  avg=687.53ms max=4.46s    p(50)=470.17ms p(95)=1.16s    p(99)=1.24s
+      { expected_response:true }............................................: min=19.29ms  avg=687.53ms max=4.46s    p(50)=470.17ms p(95)=1.16s    p(99)=1.24s
     http_req_failed.........................................................: 0.00%   0 out of 1565523
     http_reqs...............................................................: 1565523 852.099321/s
 
     EXECUTION
-    iteration_duration......................................................: min=61.7ms   avg=690.96ms max=3.96s    p(50)=473.07ms p(95)=1.16s    p(99)=1.25s   
+    iteration_duration......................................................: min=61.7ms   avg=690.96ms max=3.96s    p(50)=473.07ms p(95)=1.16s    p(99)=1.25s
     iterations..............................................................: 1563113 850.787581/s
     vus.....................................................................: 1       min=0            max=600
     vus_max.................................................................: 600     min=600          max=600
@@ -94,4 +93,3 @@ import { BenchmarkChart } from '@/components/benchmark_chart';
 running (30m37.3s), 000/600 VUs, 1563113 complete and 0 interrupted iterations
 default ✓ [======================================] 600 VUs  30m0s
 ```
-

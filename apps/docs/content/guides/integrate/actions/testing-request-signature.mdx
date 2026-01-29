@@ -2,16 +2,10 @@
 title: Verify Payload Integrity
 ---
 
-import JWT from "./go/jwt.go"
-import JWE from "./go/jwe.go"
-import JSON from "./go/json.go"
-import CodeBlock from '@/components/docusaurus/code-block';
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import CodeBlock from '@theme/CodeBlock';
-import JSON from "!!raw-loader!./go/json"
-import JWT from "!!raw-loader!./go/jwt"
-import JWE from "!!raw-loader!./go/jwe" main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+import JSONCode from "./go/json.go";
+import JWTCode from "./go/jwt.go";
+import JWECode from "./go/jwe.go";
+import CodeBlock from "@/components/docusaurus/code-block";
 
 This guide shows you how to verify the integrity of the received data on your target.
 There are three options available, which will be demonstrated in the following sections.
@@ -23,10 +17,10 @@ Before you start, make sure you have everything set up correctly.
 
 - You need to be at least a ZITADEL [_IAM_OWNER_](/guides/manage/console/managers)
 
-:::info
+<Callout type="info">
 Note that this guide assumes that ZITADEL is running on the same machine as the target and can be reached via `localhost`.
 In case you are using a different setup, you need to adjust the target URL accordingly and will need to make sure that the target is reachable from ZITADEL.
-::: main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+</Callout>
 
 ## Payload and Validation Types
 
@@ -46,19 +40,19 @@ This type is recommended if the payload contains sensitive information that shou
 
 We'll start the endpoint on port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information. main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information.
 
 Specify the `payloadType` according to the implementation you want to test: `PAYLOAD_TYPE_JSON`, `PAYLOAD_TYPE_JWT`, or `PAYLOAD_TYPE_JWE`.
 
 ```shell
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \ main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
   "name": "local webhook",
   "restWebhook": {
-    "interruptOnError": true    
+    "interruptOnError": true
   },
   "endpoint": "http://localhost:8090/webhook",
   "timeout": "10s",
@@ -89,7 +83,7 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 Then upload the public key to ZITADEL using the following command. Replace `<TargetID>` with the ID of the target you created earlier.
 Use the base64 encoded content of the `public_key.pem` file as the value for `publicKey`.
 ```shell
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickeys' \ main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickeys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -100,7 +94,7 @@ curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publicke
 
 Be sure to also activate the public key for the target using the returned `<KeyID>` from the previous request:
 ```shell
-curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickeys/<KeyID>/activate' \ main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/targets/<TargetID>/publickeys/<KeyID>/activate' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
@@ -114,7 +108,7 @@ condition.
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
 
 ```shell
-curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \ main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -138,22 +132,22 @@ For this example, we will use a simple Go HTTP server that will print the receiv
 As mentioned before, this validation can and should be applied to any target implementation.
 
 <Tabs>
-    <TabItem value="JSON">
-        <CodeBlock language="go">{JSON}</CodeBlock>
-    </TabItem>
-    <TabItem value="JWT">
-        <CodeBlock language="go">{JWT}</CodeBlock>
-    </TabItem>
-    <TabItem value="JWE">
-        <CodeBlock language="go">{JWE}</CodeBlock>
-    </TabItem>
+    <Tab value="JSON">
+        <CodeBlock language="go">{JSONCode}</CodeBlock>
+    </Tab>
+    <Tab value="JWT">
+        <CodeBlock language="go">{JWTCode}</CodeBlock>
+    </Tab>
+    <Tab value="JWE">
+        <CodeBlock language="go">{JWECode}</CodeBlock>
+    </Tab>
 </Tabs>
 
-:::info
+<Callout type="info">
 The example above runs only on your local machine (`localhost`).
 To test it with Zitadel, you must make your listener reachable from the internet.
 You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).
-:::
+</Callout>
 
 ## Example call
 
@@ -161,7 +155,7 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \ main:docs/docs/guides/integrate/actions/testing-request-signature.mdx
+curl -L -X POST 'https://${CUSTOM_DOMAIN}/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

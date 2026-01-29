@@ -15,26 +15,25 @@ The results can be found on sub pages.
 
 The primary goal is to assess if ZITADEL can scale to required proportion. The goals might change over time and maturity of ZITADEL. At the moment the goal is to assess how the application’s performance scales. There are some concrete goals we have to meet:
 
-1. [https://github.com/zitadel/zitadel/issues/8352](https://github.com/zitadel/zitadel/issues/8352) defines 1000 JWT profile auth/sec  
+1. [https://github.com/zitadel/zitadel/issues/8352](https://github.com/zitadel/zitadel/issues/8352) defines 1000 JWT profile auth/sec
 2. [https://github.com/zitadel/zitadel/issues/4424](https://github.com/zitadel/zitadel/issues/4424) defines 1200 logins / sec.
 
 ## Procedure
 
-First we determine the “target” of our load-test. The target is expressed as a make recipe in the load-test [Makefile](https://github.com/zitadel/zitadel/blob/main/load-test/Makefile). See also the load-test [readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md) on how to configure and run load-tests.  
+First we determine the “target” of our load-test. The target is expressed as a make recipe in the load-test [Makefile](https://github.com/zitadel/zitadel/blob/main/load-test/Makefile). See also the load-test [readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md) on how to configure and run load-tests.
 A target should be tested for longer periods of time, as it might take time for certain metrics to show up. For example, cloud SQL samples query insights. A runtime of at least **30 minutes** is advised at the moment.
 
 After each iteration of load-test, we should consult the [After test procedure](#after-test-procedure) to conclude an outcome:
 
-1. Scale  
-2. Log potential issuer and scale  
+1. Scale
+2. Log potential issuer and scale
 3. Terminate testing and resolve issues
-
 
 ## Methodology
 
 ### Benchmark definition
 
-Tests are implemented in the ecosystem of [k6](https://k6.io). The tests are publicly available in the [zitadel repository](https://github.com/zitadel/zitadel/tree/main/load-test). Custom extensions of k6 are implemented in the [xk6-modules repository](https://github.com/zitadel/xk6-modules).  
+Tests are implemented in the ecosystem of [k6](https://k6.io). The tests are publicly available in the [zitadel repository](https://github.com/zitadel/zitadel/tree/main/load-test). Custom extensions of k6 are implemented in the [xk6-modules repository](https://github.com/zitadel/xk6-modules).
 The tests must at least measure the request duration for each API call. This gives an indication on how zitadel behaves over the duration of the load test.
 
 ### Metrics
@@ -78,8 +77,8 @@ Details about the tests implemented can be found in [this readme](https://github
 
 After each iteration of load-test, we should consult the [Flowchart](#after-test-procedure) to conclude an outcome:
 
-1. [Scale](#scale)  
-2. [Log potential issue and scale](#potential-issues)  
+1. [Scale](#scale)
+2. [Log potential issue and scale](#potential-issues)
 3. [Terminate testing](#termination) and resolve issues
 
 #### Scale

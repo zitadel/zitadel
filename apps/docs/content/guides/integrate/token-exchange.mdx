@@ -9,7 +9,7 @@ import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_respon
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
 
-:::info main:docs/docs/guides/integrate/token-exchange.mdx
+<Callout type="info">
 Token Exchange is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
 
 Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1333448892083208262)!
@@ -105,7 +105,6 @@ We currently allow all token types, except refresh tokens, to be used as subject
 The actor parameters are optional and enable impersonation and delegation. At ZITADEL we don't make any distinction between the two concepts, so we call both cases impersonation from this point.The `actor_token` and `actor_token_type` come in a pair. If the actor token is provided, the actor token type must also be specified.
 
 Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned.
-
 
 #### Requested token type
 
@@ -423,9 +422,9 @@ Doing similar request you can:
 
 In the following example we exchange the initial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
 
-:::info
+<Callout type="info">
 You can also obtain an ID token in the `id_token` response field by requesting an access token and the `openid` scope.
-::: main:docs/docs/guides/integrate/token-exchange.mdx
+</Callout>
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/token' \

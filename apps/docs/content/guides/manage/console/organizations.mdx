@@ -3,10 +3,10 @@ title: ZITADEL Organizations
 sidebar_label: Organizations
 ---
 
-## What is an organization?
-
 import OrgDescription from "../../../concepts/structure/_org_description.mdx";
 import Column from "@/components/column";
+
+## What is an organization?
 
 An Organization is where your projects and users live. Looking at a B2B use case, an organization represents a business partner who typically has its own branding and has different access settings like additional federated login providers.
 Users from one organization are separated from others.
@@ -19,7 +19,7 @@ If you choose your logged in user as organization manager, a membership for the 
 
 <img
   width="400px"
-  src="/docs/img/console_org_select.png"
+  src="/img/console_org_select.png"
   alt="Select Organization"
 />
 
@@ -28,7 +28,7 @@ The customer needs to fill in the form with the organization name and the contac
 
 <img
   width="400px"
-  src="/docs/img/console_org_register.png"
+  src="/img/console_org_register.png"
   alt="Register new organization"
 />
 
@@ -80,7 +80,7 @@ You can also disable domain verification with DNS challenge in the [default sett
 
 <img
   width="400px"
-  src="/docs/img/console_verify_domain.png"
+  src="/img/console_verify_domain.png"
   alt="Select Organization"
 />
 
@@ -105,13 +105,14 @@ Those settings are the same as your default settings.
 
 > Note: that the following links, redirect to default settings to omit redundancy.
 
-- [**Login Behavior and Access**](./default-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether passkeys are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
+- [**Domain settings**](./default-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
+- [**Branding**](./default-settings#branding): Appearance of the login interface.
+- [**Notification settings**](./default-settings#notification-settings): Setup Notification and Email Server settings for initialization-, verification- and other mails. Setup Twilio as SMS notification provider.
+- [**Login Behavior and Access**](./default-settings#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether passkeys are allowed or not, Set Login Lifetimes and advanced behavior for the login interface.
 - [**Identity Providers**](./default-settings#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](./default-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Lockout**](./default-settings#lockout): Set the maximum attempts a user can try to enter the password or any (T)OTP method. When the number is exceeded, the user gets locked out and has to be unlocked.
-- [**Verified domains**](/guides/manage/console/organizations-overview#usernames-and-domains): This is where you manage your organization specific domains which can be used to build usernames main:docs/docs/guides/manage/console/organizations.mdx
-- [**Domain settings**](./default-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
-- [**Branding**](./default-settings#branding): Appearance of the login interface.
+- [**Verified domains**](/guides/manage/console/organizations-overview#usernames-and-domains): This is where you manage your organization specific domains which can be used to build usernames
 - [**Message Texts**](./default-settings#message-texts): Text and internationalization for emails
 - [**Login Interface Texts**](./default-settings#login-interface-texts): Text and internationalization for the login interface
 - [**External Links**](./default-settings#external-links): Links to your own Terms of Service and Privacy Policy regulations, Help Page, Support email, documentation link...

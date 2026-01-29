@@ -36,7 +36,7 @@ The `init` command is designed to be run **only once**, during the initial setup
 If you must rotate the credentials:
 
 - You can change the password for the existing ZITADEL user, but you must manually update the password wherever ZITADEL needs it.
-- Creating a new database user requires manual reassignment of ownership and privileges for all required database objects (schemas, tables, etc.) to the new user. 
+- Creating a new database user requires manual reassignment of ownership and privileges for all required database objects (schemas, tables, etc.) to the new user.
 - After migration, remove or deprecate the old user using admin access and commands appropriate for your database provider.
 
 Attempting to run `init` a second time with new credentials will fail if the user already exists, and will not change existing permissions or migrate data.

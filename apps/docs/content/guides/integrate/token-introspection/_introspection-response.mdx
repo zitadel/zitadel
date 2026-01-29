@@ -13,9 +13,8 @@ Upon successful introspection, regardless of the token type or introspection met
 | `token_type` | Type of the inspected token. Value is always Bearer |
 | `username` | ZITADEL's login name of the user. Consists of username@primarydomain |
 
-
-Depending on the granted scopes, additional information about the authorized user is provided. 
+Depending on the granted scopes, additional information about the authorized user is provided.
 
 If the authorization fails, an HTTP 401 with invalid_client will be returned.
 
-In summary, the introspection endpoint plays a crucial role in validating access tokens, either opaque or JWT, ensuring that they are not revoked. 
+In summary, the introspection endpoint plays a crucial role in validating access tokens, either opaque or JWT, ensuring that they are not revoked.

@@ -27,13 +27,13 @@ Read more about how to set the default redirect URI: [Settings - Default Redirec
 
 ### Restricting Management Console in default-project
 
-With this workaround, you will limit users from accessing the [default-project](/guides/manage/console/projects-overview#the-default-project) if they are not explicitly granted to use this project. main:docs/docs/guides/solution-scenarios/restrict-console.mdx
+With this workaround, you will limit users from accessing the [default-project](/guides/manage/console/projects-overview#the-default-project) if they are not explicitly granted to use this project.
 When setting the "Check for Project on Authentication" setting on a project, only users of organizations with a grant to that project can access it.
 By default, this setting is disabled, so all users can access the project.
 
 ![](../../../public/img/guides/solution-scenarios/console-check-project-auth.png)
 
-Start by granting the organization of your managers, that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project): main:docs/docs/guides/solution-scenarios/restrict-console.mdx
+Start by granting the organization of your managers, that should be able to access the Management Console, the [default project](/guides/manage/console/projects-overview#the-default-project):
 
 1. Click on the default-project > Grants > New +
    ![](../../../public/img/guides/solution-scenarios/console-zitadel-project-grants.png)
@@ -45,7 +45,7 @@ Start by granting the organization of your managers, that should be able to acce
 4. Make sure the grant is in now in the overview and marked as active.
 
 To avoid accidental lock-out, the [default project](/guides/manage/console/projects-overview#the-default-project) hides the checkbox "Check Project on Authentication" in the Management Console:
-![Default Project](../../../public/img/guides/solution-scenarios/console-default-project.png) main:docs/docs/guides/solution-scenarios/restrict-console.mdx
+![Default Project](../../../public/img/guides/solution-scenarios/console-default-project.png)
 
 You need to use the [update project API call](/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject) to set the configuration on the project.
 
@@ -53,7 +53,7 @@ First, you need a user with manager permissions to change the project settings i
 This means either you add the manager to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.
 After that create a Personal Access Token (PAT) for the manager.
 
-More detailed information about creating a PAT and administrator roles you can find [here](/guides/integrate/service-users/personal-access-token) main:docs/docs/guides/solution-scenarios/restrict-console.mdx
+More detailed information about creating a PAT and administrator roles you can find [here](/guides/integrate/service-users/personal-access-token)
 
 Then you have to send the following request:
 ```bash
@@ -79,4 +79,3 @@ You should now be able to log in with users of the organization that have the gr
 All other users should see the following error message after authentication:
 
 ![](../../../public/img/guides/solution-scenarios/console-access-restricted.png)
-

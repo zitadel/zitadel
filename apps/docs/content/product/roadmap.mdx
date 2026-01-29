@@ -3,13 +3,11 @@ title: Zitadel Release Versions and Roadmap
 sidebar_label: Release Versions and Roadmap
 ---
 
-
 import NewFeature from './_new-feature.mdx';
 import BreakingChanges from './_breaking-changes.mdx';
 import Deprecated from './_deprecated.mdx';
 import BetaToGA from './_beta-ga.mdx';
 import SDKv3 from './_sdk_v3.mdx';
-
 
 ## Timeline and Overview
 
@@ -64,13 +62,13 @@ import SDKv3 from './_sdk_v3.mdx';
             <td colspan={25}>Zitadel Versions</td>
         </tr>
         <tr>
-            <th scope="row">[v2.x](/product/roadmap#v-2-x)</th>
+            <th scope="row">[v2.x](/product/roadmap#v2-x)</th>
             <td colspan={6} class="release-stable">GA / Stable </td>
             <td colSpan={3} class="release-deprecated">Deprecated</td>
             <td colSpan={16}></td>
         </tr>
         <tr>
-            <th scope="row">[v3.x](/product/roadmap#v-3-x)</th>
+            <th scope="row">[v3.x](/product/roadmap#v3-x)</th>
             <td colspan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
             <td colspan={5} class="release-stable">GA / Stable </td>
@@ -78,7 +76,7 @@ import SDKv3 from './_sdk_v3.mdx';
             <td colSpan={12}></td>
         </tr>
         <tr>
-            <th scope="row">[v4.x](/product/roadmap#v-4-x)</th>
+            <th scope="row">[v4.x](/product/roadmap#v4-x)</th>
             <td colSpan={3}></td>
             <td colSpan={3} class="release-impl">Implementation</td>
             <td class="release-rc">RC</td>
@@ -87,16 +85,13 @@ import SDKv3 from './_sdk_v3.mdx';
             <td colSpan={9}></td>
         </tr>
         <tr>
-            <th scope="row">[v5.x](/product/roadmap#v5x)</th> main:docs/docs/product/roadmap.mdx
+            <th scope="row">[v5.x](/product/roadmap#v5-x)</th>
             <td colSpan={24}>TBC</td>
         </tr>
     </tbody>
 </table>
 
 For more detailed description about the different stages and the release cycle check out the following Page: [Release Cycle](/product/release-cycle)
-
-
-
 
 <table id="zitadel-versions">
     <thead>
@@ -113,10 +108,10 @@ For more detailed description about the different stages and the release cycle c
         </tr>
         <tr>
             <td scope="row">
-                [v2.x](/product/roadmap#v-2-x)
+                [v2.x](/product/roadmap#v2-x)
             </td>
             <td scope="row">
-                [v3.x](/product/roadmap#v-3-x)
+                [v3.x](/product/roadmap#v3-x)
                 <ul>
                     <li>
                         Actions V2
@@ -144,7 +139,7 @@ For more detailed description about the different stages and the release cycle c
                 </ul>
             </td>
             <td scope="row">
-                [v4.x](/product/roadmap#v-4-x)
+                [v4.x](/product/roadmap#v4-x)
                 <ul>
                     <li>Resource API</li>
                     <li>
@@ -169,7 +164,7 @@ For more detailed description about the different stages and the release cycle c
 
             </td>
             <td scope="row">
-                [v5.x](/product/roadmap#v5x) main:docs/docs/product/roadmap.mdx
+                [v5.x](/product/roadmap#v5-x)
                 <div>Release: TBC</div>
                 <ul>
                     <li>Analytics</li>
@@ -238,7 +233,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
 **Blog**: [Zitadel v3: AGPL License, Streamlined Releases, and Platform Updates](https://zitadel.com/blog/zitadel-v3-announcement)
 
-
 <details>
     <summary>New Features</summary>
 
@@ -290,7 +284,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 ### v4-x
 
 **Current State**: General Availability / Stable
-
 
 <details>
     <summary>New Features</summary>
@@ -358,7 +351,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
     </details>
 </details>
 
-
 <details>
     <summary>General Availability</summary>
 
@@ -381,7 +373,7 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
         With Actions V2, you gain significantly more flexibility to tailor ZITADEL’s behavior compared to previous versions.
         Actions are now available instance-wide, eliminating the need to configure them for each organization individually.
         ZITADEL no longer restricts the implementation language, tooling, or runtime for action executions.
-        Instead, you define external endpoints that are called by ZITADEL and maintained by you. 
+        Instead, you define external endpoints that are called by ZITADEL and maintained by you.
 
         - [Actions V2](/reference/api/action)
     </details>
@@ -524,7 +516,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
             For users, we will offer filters to retrieve the total count, counts per organization, and counts by user type (human or machine).
             These metrics will provide administrators with valuable insights into the scale and complexity of their Zitadel instance.
 
-
             For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9709).
         </details>
 
@@ -534,7 +525,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
             To empower customers to better manage and optimize their Zitadel instances, we will provide access to detailed operational metrics.
             This data will help customers identify potential issues, optimize performance, and ensure the stability of their deployments.
             The provided data will encompass basic system information, infrastructure details, configuration settings, error reports, and the health status of various Zitadel components, accessible via a user interface or an API.
-
 
             For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9476).
 
@@ -557,7 +547,6 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
         Stay updated on the progress and details on our [GitHub Issue](https://github.com/zitadel/zitadel/issues/9535)
     </details>
-
 
     <details>
         <summary>Remove Required Fields</summary>
@@ -588,12 +577,10 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
         <summary>Hosted Login v1 will be removed</summary>
     </details>
 
-
     <details>
         <summary>Zitadel APIs v1 will be removed</summary>
     </details>
 </details>
-
 
 ### v6-x
 
@@ -722,7 +709,6 @@ Your feedback will directly influence our development and ensure we build a solu
 
 🔗 Join the conversation and share your insights [here](https://discord.com/channels/927474939156643850/1375383775164235806)
 
-
 #### The Role of AI in Zitadel
 
 As we look to the future, we believe Artificial Intelligence will be a critical tool for enhancing both user experience and security within Zitadel.
@@ -752,8 +738,6 @@ Our vision for AI is focused on two key areas: providing intelligent, contextual
     - **Shared Protection**: These constantly improving models would then be distributed to all participating Zitadel instances.
 
     The result is a powerful security network effect. You could receive protection from a threat vector you haven't even experienced yet, simply because the system learned from an attack on another member of the community.
-
-
 
 ## Zitadel Ecosystem
 

@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Python 
+title: ZITADEL with Python
 sidebar_label: Python
 ---
 
@@ -9,7 +9,6 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 ![](../../../public/img/python-flask/1.png)
 
-
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
 The API will validate the access token on the [introspect endpoint](/apis/openidoauth/endpoints#introspection-endpoint) and will receive the user's roles from ZITADEL.
@@ -17,7 +16,6 @@ The API will validate the access token on the [introspect endpoint](/apis/openid
 The API application uses [Client Secret Basic](/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
 In this example we will use a service account with a [personal access token](/guides/integrate/service-users/personal-access-token) which can be used directly to access the example API.
-
 
 ## Running the example
 
@@ -29,15 +27,15 @@ In order to run the example you need to have `python3` and `pip3` installed.
 
 ![](../../../public/img/python-flask/2.png)
 
-You need to setup a couple of things in ZITADEL. 
+You need to setup a couple of things in ZITADEL.
 
 1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/guides/start/quickstart#3-create-your-zitadel-instance). Also, create a new project by following the steps [here](/guides/start/quickstart#4-create-your-project-and-application).
 
-2. You must create an API application in your project. Follow [this guide](/guides/manage/console/applications-overview) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application.  main:docs/docs/examples/secure-api/python-flask.mdx
+2. You must create an API application in your project. Follow [this guide](/guides/manage/console/applications-overview) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application.
 
 ### Create the API
 
-1. Clone or download this [Python project](https://github.com/zitadel/example-api-python3-flask) to your workspace. 
+1. Clone or download this [Python project](https://github.com/zitadel/example-api-python3-flask) to your workspace.
 
 ```
 git clone https://github.com/zitadel/example-api-python3-flask
@@ -45,7 +43,6 @@ git clone https://github.com/zitadel/example-api-python3-flask
 cd example-api-python3-flask
 ```
 2. The [server.py](https://github.com/zitadel/example-api-python3-flask/blob/main/server.py) file contains a Flask-based API that provides authentication for routes using the OpenID Connect protocol as shown below.
- 
 
 ```python
 from flask import Flask, jsonify, Response
@@ -72,7 +69,6 @@ def public():
     )
     return jsonify(message=response)
 
-
 @APP.route("/img/api/private")
 @require_auth(None)
 def private():
@@ -81,7 +77,6 @@ def private():
         "Private route - You need to be authenticated to see this."
     )
     return jsonify(message=response)
-
 
 @APP.route("/img/api/private-scoped")
 @require_auth(["read:messages"])
@@ -123,7 +118,6 @@ ZITADEL_DOMAIN = os.getenv("ZITADEL_DOMAIN")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-
 class ValidatorError(Exception):
 
     def __init__(self, error: Dict[str, str], status_code: int):
@@ -142,9 +136,9 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         resp = requests.post(url, data=data, auth=auth)
         resp.raise_for_status()
         return resp.json()
-    
+
     def match_token_scopes(self, token, or_scopes):
-        if or_scopes is None: 
+        if or_scopes is None:
             return True
         roles = token["urn:zitadel:iam:org:project:roles"].keys()
         for and_scopes in or_scopes:
@@ -159,20 +153,20 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         now = int( time.time() )
         if not token:
             raise ValidatorError({
-                "code": "invalid_token_revoked", 
+                "code": "invalid_token_revoked",
                 "description": "Token was revoked." }, 401)
         """Expired"""
-        if token["exp"] < now: 
+        if token["exp"] < now:
             raise ValidatorError({
-                "code": "invalid_token_expired", 
+                "code": "invalid_token_expired",
                 "description": "Token has expired." }, 401)
         """Revoked"""
-        if not token["active"]: 
+        if not token["active"]:
             raise InvalidTokenError()
         """Insufficient Scope"""
         if not self.match_token_scopes(token, scopes):
             raise ValidatorError({
-                "code": "insufficient_scope", 
+                "code": "insufficient_scope",
                 "description": f"Token has insufficient scope. Route requires: {scopes}" }, 401)
 
     def __call__(self, *args, **kwargs):
@@ -180,7 +174,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         return res
 ```
 
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart#5-collect-your-integration-keys). main:docs/docs/examples/secure-api/python-flask.mdx
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/guides/start/quickstart#5-collect-your-integration-keys).
 
 ```python
 ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"
@@ -192,10 +186,9 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ![](../../../public/img/python-flask/3.png)
 
-1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
-2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project. 
-3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
-
+1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat).
+2. To enable authorization, follow [this guide](/guides/manage/console/roles) to create a role `read:messages` on your project.
+3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/guides/manage/console/roles#authorizations) for more information on creating an authorization.
 
 ### Run the API
 
@@ -207,7 +200,7 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ### Public route
 
-Invoke the public route by running the following command: 
+Invoke the public route by running the following command:
 
 ```
 curl --request GET \
@@ -220,7 +213,7 @@ You should get a response with Status Code 200 and the following message.
 
 ### Private route
 
-Call the private route without authorization headers by running the following command: 
+Call the private route without authorization headers by running the following command:
 
 ```
 curl --request GET \
@@ -229,7 +222,7 @@ curl --request GET \
 
 You should get a response with Status Code 401 and an error message.
 
-Now let's add an authorization header to your request. Save the personal access token for your service user to a variable by running the following command. Replace the value with the PAT you obtained earlier.  
+Now let's add an authorization header to your request. Save the personal access token for your service user to a variable by running the following command. Replace the value with the PAT you obtained earlier.
 
 `PAT=nr9vnUTkQkn4rxWk...`
 
@@ -255,7 +248,7 @@ curl --request GET \
     --header "authorization: Bearer $PAT"
 ```
 
-You should get a response with Status Code 200 and the following message. 
+You should get a response with Status Code 200 and the following message.
 
 `{"message":"Private, scoped route - You need to be authenticated and have the role read:messages to see this."}`
 

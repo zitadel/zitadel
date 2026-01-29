@@ -11,7 +11,7 @@ You can migrate from a generic OIDC provider to the following supported template
 - Google
 
 To migrate, you either use the [Migrate Generic OIDC Identity Provider (Instance)](/reference/api/admin/zitadel.admin.v1.AdminService.MigrateGenericOIDCProvider) or [Migrate Generic OIDC Identity Provider (Organization)](/reference/api/management/zitadel.management.v1.ManagementService.MigrateGenericOIDCProvider) API request.
-These calls change the type of the provider and don't delete any linked users. 
+These calls change the type of the provider and don't delete any linked users.
 
 <Callout title="Linked users will not notice the change and be able to login as usual.">
 </Callout>
@@ -27,7 +27,7 @@ The available configuration is described in [Entra ID Configuration](./azure-ad-
 ## Migrate with Terraform
 
 Please note that you only have to perform this migration if you already have an existing IDP with linked users, that should not loose the connection to the provider.
-If that isn't your case please just add a new provider from scratch. 
+If that isn't your case please just add a new provider from scratch.
 To migrate to a specific provider, you need to follow a few essential steps:
 1. Create a desired IDP as Terraform resource for example [Google](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/idp_google).
 2. Remove the old terraform resource from the state as to not destroy the migrated IDP accidentally.

@@ -1,5 +1,5 @@
 ---
-title: ZITADEL with Django Python 
+title: ZITADEL with Django Python
 sidebar_label: Django
 ---
 
@@ -58,7 +58,6 @@ For this example we need the following dependencies:
 - `python-dotenv`: to use environment variables in the configuration
 - `authlib`: client-side OAuth functionality
 - `requests`: HTTP requests for the introspection
-
 
 For the dependencies we need a requirements.txt-file with the following content:
 
@@ -145,7 +144,7 @@ python manage.py runserver
 ### Call the API
 
 To call the API you need an access token, which is then verified by ZITADEL.
-Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount. main:docs/docs/examples/secure-api/python-django.mdx
+Please follow [this guide here](/guides/integrate/token-introspection/private-key-jwt), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 Optionally set the token as an environment variable:
 ```

@@ -30,7 +30,7 @@ This example expects 3 different roles:
 
 In your project settings make sure the "Assert Roles On Authentication" is enabled.
 
-![Project settings in management console](../../../public/img/django/project-settings.png) main:docs/docs/examples/login/python-django.mdx
+![Project settings in management console](../../../public/img/django/project-settings.png)
 
 In the project Role tab, add 3 special roles:
 
@@ -44,7 +44,7 @@ If none of the roles is provided as a user, the user in Django will not be creat
 
 Finally, we can assign the roles to users in the project's authorizations tab.
 
-![Project authorizations in management console](../../../public/img/django/project-authorizations.png) main:docs/docs/examples/login/python-django.mdx
+![Project authorizations in management console](../../../public/img/django/project-authorizations.png)
 
 ### Set up application and obtain secrets
 
@@ -58,7 +58,7 @@ We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code) fo
 
 Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated secret for later use.
 
-![Configure app authentication method in management console](../../../public/img/django/app-auth-method.png) main:docs/docs/examples/login/python-django.mdx
+![Configure app authentication method in management console](../../../public/img/django/app-auth-method.png)
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
@@ -67,7 +67,7 @@ For the example application we are writing use:
 - `http://localhost:8000/oidc/callback/` as Redirect URI
 - `http://localhost:8000/oidc/logout/` as post-logout URI.
 
-![Configure app redirects management console](../../../public/img/django/app-redirects.png) main:docs/docs/examples/login/python-django.mdx
+![Configure app redirects management console](../../../public/img/django/app-redirects.png)
 
 After the final step you are presented with a client ID and secret.
 Copy and paste them to a safe location for later use by the application.
@@ -175,7 +175,7 @@ Which handles the users differently depending on if there are roles associated t
 - `user` -> user
 - `no role` -> no user gets created
 
-### URLs 
+### URLs
 
 To handle the callback and logout the urls have to be added to the urls.py:
 ```python

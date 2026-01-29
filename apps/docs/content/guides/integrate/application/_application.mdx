@@ -16,7 +16,7 @@ export default function CreateApp(props) {
       </p>
       <img
         alt="Add application"
-        src="/docs/img/guides/console/addapplication.png"
+        src="/img/guides/console/addapplication.png"
         width="120px"
       />
       <p>
@@ -24,7 +24,7 @@ export default function CreateApp(props) {
       </p>
       <img
         alt={"create " + props.appType + " preview"}
-        src={"/docs/img/guides/application/create-" + props.appType + "-app.png"}
+        src={"/img/guides/application/create-" + props.appType + "-app.png"}
       />
       <h3>Select the authentication method</h3>
       <p>
@@ -32,7 +32,7 @@ export default function CreateApp(props) {
       </p>
       <AuthType components={props.components}  appType={props.appType} authType={props.authType} />
       <h3>Redirect URIs</h3>
-      <RedirectURIs components={props.components} 
+      <RedirectURIs components={props.components}
         appType={props.appType}
         redirectURI={props.redirectURI}
         postLogoutURI={props.postLogoutURI}

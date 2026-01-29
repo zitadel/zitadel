@@ -69,7 +69,6 @@ JSON file. This process creates a secure token.
 **Example:**
 
 ```ts
-import Zitadel, { ApiException } from '@zitadel/zitadel-node';
 
 const client = await Zitadel.withPrivateKey(
   "https://example.us1.zitadel.cloud",
@@ -116,7 +115,6 @@ which is then used to authenticate.
 **Example:**
 
 ```ts
-import Zitadel, { ApiException } from '@zitadel/zitadel-node';
 
 const client = await Zitadel.withClientCredentials(
   "https://example.us1.zitadel.cloud",
@@ -164,7 +162,6 @@ authenticate without exchanging credentials every time.
 **Example:**
 
 ```ts
-import Zitadel, { ApiException } from '@zitadel/zitadel-node';
 
 const client = await Zitadel.withAccessToken(
   "https://example.us1.zitadel.cloud",

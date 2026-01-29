@@ -4,15 +4,16 @@ sidebar_label: Managers
 ---
 
 import ManagerDescription from "../../../concepts/structure/_manager_description.mdx";
+import AddManager from "./_add_manager.mdx";
+import PermissionTable from '@/components/PermissionTable';
+import permissionData from "../../../../../../cmd/defaults.yaml";
 
 <ManagerDescription components={props.components}  name="ManagerDescription" />
 
 To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
-In the right part of the management console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one. main:docs/docs/guides/manage/console/managers.mdx
+In the right part of the management console you can find **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
 
 <img alt="Managers" src="/docs/img/guides/console/managers.png" width="200px" />
-
-import AddManager from "./_add_manager.mdx";
 
 <AddManager components={props.components}  name="AddManager" />
 
@@ -56,9 +57,6 @@ InternalAuthZ:
         - "iam.read"
         - "iam.write"
 ```
-
-import PermissionTable from '@/components/PermissionTable';
-import permissionData from "../../../../../../cmd/defaults.yaml";
 
 # Manager Permission Matrix
 
