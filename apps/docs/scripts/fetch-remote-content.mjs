@@ -124,11 +124,12 @@ async function downloadVersion(tag, sourceRef) {
 
       const contentItems = fs.readdirSync(localContent);
       // Strictly match version folders like v1.0, v2.3.4 to avoid skipping other folders starting with 'v'
+      const versionDirPattern = /^v\d+(\.\d+){1,2}$/;
       for (const item of contentItems) {
         // Avoid copying versioned folders to prevent recursion if tag is current
         let isVersionDir = false;
         try {
-          if (semver.valid(item) && fs.statSync(join(localContent, item)).isDirectory()) {
+          if (versionDirPattern.test(item) && fs.statSync(join(localContent, item)).isDirectory()) {
             isVersionDir = true;
           }
         } catch (e) {
@@ -150,7 +151,7 @@ async function downloadVersion(tag, sourceRef) {
         // Avoid copying versioned folders (e.g., v4.10, v4.10.0) to prevent nested version directories
         let isVersionDir = false;
         try {
-          if (semver.valid(item) && fs.statSync(join(localPublic, item)).isDirectory()) {
+          if (versionDirPattern.test(item) && fs.statSync(join(localPublic, item)).isDirectory()) {
             isVersionDir = true;
           }
         } catch (e) {
@@ -323,7 +324,7 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     // Ensure the resolved path stays within the repository root using a robust, cross-platform check
     const relativePath = path.relative(repoRoot, localPath);
     
-    if (relativePath.startsWith('..')) {
+    if (path.isAbsolute(relativePath) || relativePath.startsWith('..')) {
       console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
       return null;
     }
