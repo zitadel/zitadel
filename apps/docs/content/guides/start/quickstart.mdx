@@ -76,7 +76,7 @@ Log in using the Admin credentials you just created.
 ZITADEL automatically configures the best security settings for your selected framework.
 
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -87,6 +87,12 @@ ZITADEL automatically configures the best security settings for your selected fr
         <AppConfig
             redirectUrl="http://localhost:4444/auth.html, com.example.zitadelflutter"
             postLogoutRedirectUrl="http://localhost:4444, com.example.zitadelflutter">
+        </AppConfig>
+    </Tab>
+    <Tab value="Go">
+        <AppConfig
+            redirectUrl="http://localhost:8089/auth/callback"
+            postLogoutRedirectUrl="http://localhost:8089">
         </AppConfig>
     </Tab>
     <Tab value="React">
@@ -108,11 +114,14 @@ ZITADEL automatically configures the best security settings for your selected fr
 
 ### 5. Collect your Integration Keys
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         <AppValues valueCount="two" projectID={false}></AppValues>
     </Tab>
     <Tab value="Flutter">
+        <AppValues valueCount="two" projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Go">
         <AppValues valueCount="two" projectID={false}></AppValues>
     </Tab>
     <Tab value="React">
@@ -136,13 +145,17 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 ### 1. Prerequisites
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="Flutter">
         - [Flutter](https://docs.flutter.dev/install)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Go">
+        - [Go](https://go.dev/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="React">
@@ -161,7 +174,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 Clone the repository and move into the project directory:
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         git clone https://github.com/zitadel/zitadel-angular.git
@@ -172,6 +185,12 @@ Clone the repository and move into the project directory:
         ```bash
         git clone https://github.com/zitadel/zitadel_flutter.git
         cd zitadel_flutter
+        ```
+    </Tab>
+    <Tab value="Go">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-go.git
+        cd zitadel_go
         ```
     </Tab>
     <Tab value="React">
@@ -190,13 +209,16 @@ Clone the repository and move into the project directory:
 
 ### 3. Build and Install
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         npm install
         ```
     </Tab>
     <Tab value="Flutter">
+        No action required for this step.
+    </Tab>
+    <Tab value="Go">
         No action required for this step.
     </Tab>
     <Tab value="React">
@@ -220,7 +242,7 @@ Clone the repository and move into the project directory:
 
 ### 4. Configure your Credentials
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         Open src/app/app.module.ts and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
 
@@ -238,6 +260,10 @@ Clone the repository and move into the project directory:
         ```
     </Tab>
     <Tab value="Flutter">
+        No action required for this step.
+        The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Go">
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
     </Tab>
@@ -272,7 +298,7 @@ Clone the repository and move into the project directory:
 
 Start your development server:
 
-<Tabs items={['Angular', 'Flutter', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         ng serve
@@ -292,6 +318,17 @@ Start your development server:
         Your app will be live at `http://localhost:4444`. Click Login to test the full PKCE flow!
 
         ![Flutter Example App](../../../public/img/guides/quickstart/flutter_example_app.png)
+
+    </Tab>
+    <Tab value="Go">
+        Make sure to replace the [zitadel_domain] (use the domain from the issuer without the https://) and [zitadel_client_id] with your own value before running the command
+        ```bash
+        go run example/app/app.go --domain [zitadel_domain] --key XKv2Lqd7YAq13NUZVUWZEWZeruqyzViM --clientID [zitadel_client_id] --redirectURI http://localhost:8089/auth/callback
+        ```
+
+        Your app will be live at `http://localhost:8089`. Click Login to test the full PKCE flow!
+
+        ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
 
     </Tab>
     <Tab value="React">
