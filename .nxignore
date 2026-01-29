@@ -2,3 +2,5 @@
 !console/src/app/proto/generated
 !internal/api/ui/console/static
 !.artifacts/bin/*/*/zitadel.local
+!apps/docs/content/apis/assets/assets.mdx
+!apps/docs/content/reference/api/

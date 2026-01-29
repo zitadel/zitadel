@@ -64,12 +64,8 @@ openapi/**/*.json
 /internal/api/assets/router.go
 internal/api/ui/console/static
 !internal/api/ui/console/static/gitkeep
-apps/docs/docs/apis/auth
-apps/docs/docs/apis/admin
-apps/docs/docs/apis/mgmt
-apps/docs/docs/apis/system
-apps/docs/docs/apis/proto
-**/.sass-cache
+apps/docs/content/apis/assets/assets.mdx
+apps/docs/content/reference/api/
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
 /zitadel-*-*

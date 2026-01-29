@@ -13,7 +13,7 @@ import (
 
 var (
 	directory   = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
-	assetsDocs  = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	assetsDocs  = flag.String("assets", "../../../../apps/docs/content/apis/assets/assets.mdx", "path where the assets.mdx will be generated")
 	assetPrefix = flag.String("handler-prefix", "/assets/v1", "prefix of the handler paths")
 )
 
