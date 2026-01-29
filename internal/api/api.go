@@ -137,6 +137,7 @@ func New(
 		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
 		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
 		otelconnect.WithoutServerPeerAttributes(),
+		otelconnect.WithTrustRemote(),
 	)
 	if err != nil {
 		return nil, err
