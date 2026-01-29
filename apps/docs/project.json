@@ -96,7 +96,7 @@
       ],
       "cache": true,
       "inputs": [
-        "{projectRoot}/scripts/generate-docs.mts",
+        "{projectRoot}/scripts/generate-api-reference.mts",
         {
           "dependentTasksOutputFiles": "apps/docs/openapi/**"
         }
