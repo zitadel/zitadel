@@ -24,8 +24,8 @@ Key scripts for documentation workflows:
 | :--- | :--- |
 | `dev` | Starts the development server. |
 | `build` | Builds the production application. |
-| `generate:fetch` | Fetches remote tags and referenced content. |
-| `generate` | Runs all generation steps (`generate:fetch`, `generate:grpc`, `generate:api`, `generate:indices`). |
+| `fetch:remote-content` | Fetches remote tags and referenced content. |
+| `generate` | Runs all generation steps (`fetch:remote-content`, `generate:proto-docs`, `generate:api-reference`, `generate:index-pages`). |
 | `check:links` | Checks for broken links. |
 
 ## Contributing
@@ -56,3 +56,7 @@ Pass quality checks before submitting:
 pnpm nx run @zitadel/docs:build
 pnpm nx run @zitadel/docs:check:links
 ```
+
+You can also run specific steps individually:
+*   `pnpm fetch:remote-content`
+*   `pnpm generate:api-reference`

@@ -41,10 +41,10 @@
         "build"
       ]
     },
-    "generate-fetch": {
+    "fetch-remote-content": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:fetch",
+        "command": "pnpm fetch:remote-content",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -60,14 +60,14 @@
         }
       ]
     },
-    "generate-grpc": {
+    "generate-proto-docs": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:grpc",
+        "command": "pnpm generate:proto-docs",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate-fetch"
+        "fetch-remote-content"
       ],
       "outputs": [
         "{projectRoot}/openapi"
@@ -81,10 +81,10 @@
         }
       ]
     },
-    "generate-api": {
+    "generate-api-reference": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:api",
+        "command": "pnpm generate:api-reference",
         "cwd": "apps/docs"
       },
       "outputs": [
@@ -92,7 +92,7 @@
         "{projectRoot}/content/v*/reference/api"
       ],
       "dependsOn": [
-        "generate-grpc"
+        "generate-proto-docs"
       ],
       "cache": true,
       "inputs": [
@@ -102,14 +102,14 @@
         }
       ]
     },
-    "generate-fix-links": {
+    "fix-api-links": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:fix-links",
+        "command": "pnpm fix:api-links",
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate-api"
+        "generate-api-reference"
       ],
       "cache": false,
       "inputs": [
@@ -119,17 +119,17 @@
         }
       ]
     },
-    "generate-indices": {
+    "generate-index-pages": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:indices",
+        "command": "pnpm generate:index-pages",
         "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/content/**/index.mdx"
       ],
       "dependsOn": [
-        "generate-fetch"
+        "fetch-remote-content"
       ],
       "cache": true,
       "inputs": [
@@ -137,18 +137,18 @@
         "{projectRoot}/content/versions.json"
       ]
     },
-    "generate-source": {
+    "build-mdx-source": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm generate:source",
+        "command": "pnpm build:mdx-source",
         "cwd": "apps/docs"
       },
       "outputs": [
         "{projectRoot}/.source"
       ],
       "dependsOn": [
-        "generate-fix-links",
-        "generate-indices"
+        "fix-api-links",
+        "generate-index-pages"
       ],
       "cache": true,
       "inputs": [
@@ -165,7 +165,7 @@
         "cwd": "apps/docs"
       },
       "dependsOn": [
-        "generate-source"
+        "build-mdx-source"
       ]
     },
     "check-links": {
