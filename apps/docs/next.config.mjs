@@ -26,6 +26,12 @@ const nextConfig = {
             basePath: false,
             permanent: false,
           },
+          {
+            source: '/img/:path*',
+            destination: '/docs/img/:path*',
+            basePath: false,
+            permanent: false,
+          },
         ];
     } catch (e) {
         console.warn('Could not load redirects.json', e);
@@ -33,6 +39,12 @@ const nextConfig = {
             {
               source: '/',
               destination: '/docs',
+              basePath: false,
+              permanent: false,
+            },
+            {
+              source: '/img/:path*',
+              destination: '/docs/img/:path*',
               basePath: false,
               permanent: false,
             },
