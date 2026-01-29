@@ -13,17 +13,14 @@ export function defaultAuthTypes(appType, authType) {
     case "user-agent":
       rows = userAgent(authType);
       break;
-      break;
     case "api":
       rows = api(authType);
-      break;
       break;
     case "native":
       rows = native();
       break;
     default:
       return null;
-      break;
   }
   return (
     <table>

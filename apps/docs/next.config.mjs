@@ -1,6 +1,6 @@
 import { createMDX } from 'fumadocs-mdx/next';
 import { rehypeCode } from 'fumadocs-core/mdx-plugins';
-import path from 'path';
+
 
 import { promises as fs } from 'fs';
 import { URL } from 'url';

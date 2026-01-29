@@ -195,7 +195,9 @@
       "cache": true,
       "inputs": [
         "default",
-        "{workspaceRoot}/.eslintrc.json"
+        "{workspaceRoot}/.eslintrc.json",
+        "{projectRoot}/eslint.config.mjs",
+        "{projectRoot}/content/**/*.{md,mdx}"
       ]
     }
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import { initMixpanel, optInTracking, optOutTracking } from '@/utils/mixpanel';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 export default function MixpanelProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function MixpanelProvider({ children }: { children: React.ReactNo
     window.addEventListener('cc:onChange:mixpanel', handleConsentChange);
 
     return () => {
-        window.removeEventListener('cc:onChange:mixpanel', handleConsentChange);
+      window.removeEventListener('cc:onChange:mixpanel', handleConsentChange);
     };
   }, []);
 

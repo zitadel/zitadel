@@ -120,6 +120,14 @@ try {
     const imageErrors = await checkImages(filesToCheck);
     console.timeEnd('checkImages');
 
+    // Check for .md files
+    const mdFiles = filesToCheck.filter(f => f.path.endsWith('.md'));
+    if (mdFiles.length > 0) {
+      console.error('\n❌ Error: Found .md files. All content files must use .mdx extension:');
+      mdFiles.forEach(f => console.error(` - ${f.path}`));
+      process.exit(1);
+    }
+
     if (linkErrors.length === 0 && !imageErrors) {
       console.log('\n✅ All checks passed: No broken links or images found.');
     }
