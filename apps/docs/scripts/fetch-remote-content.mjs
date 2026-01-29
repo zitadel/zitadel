@@ -73,6 +73,16 @@ function filterVersions(tags) {
   return result;
 }
 
+function getCurrentRef() {
+  if (process.env.VERCEL_GIT_COMMIT_REF) return process.env.VERCEL_GIT_COMMIT_REF;
+  if (process.env.GITHUB_REF_NAME) return process.env.GITHUB_REF_NAME;
+  try {
+    return execSync('git branch --show-current').toString().trim();
+  } catch (e) {
+    return FALLBACK_BRANCH;
+  }
+}
+
 // Helper to determine the best branch for v4.10.0 content
 function getFallbackSource() {
   // Prioritize CI/CD Environment Variables
@@ -99,17 +109,54 @@ function getFallbackSource() {
 
 // sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
 async function downloadVersion(tag, sourceRef) {
-  const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
-  const typeSegment = isBranch ? 'heads' : 'tags';
-  const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
-  
-  const tempDir = join(ROOT_DIR, `.temp/${tag}`); // Extract to tag-specific temp to avoid collisions
+  const currentRef = getCurrentRef();
+  const isLocal = sourceRef === currentRef;
+  const tempDir = join(ROOT_DIR, `.temp/${tag}`);
   fs.mkdirSync(tempDir, { recursive: true });
 
-  console.log(`Downloading content for ${tag} (using source: ${sourceRef})...`);
+  if (isLocal) {
+    console.log(`[local] Copying local content for ${tag} (ref: ${sourceRef})...`);
+    // Copy apps/docs/content while avoiding recursion
+    const localContent = join(ROOT_DIR, 'content');
+    const tempContent = join(tempDir, 'apps/docs/content');
+    fs.mkdirSync(tempContent, { recursive: true });
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
+    const contentItems = fs.readdirSync(localContent);
+    for (const item of contentItems) {
+      // Avoid copying versioned folders (starting with v) to prevent recursion if tag is current
+      if (item.startsWith('v') && fs.statSync(join(localContent, item)).isDirectory()) continue;
+      if (item === 'versions.json') continue;
+      fs.cpSync(join(localContent, item), join(tempContent, item), { recursive: true });
+    }
+
+    // Copy public directory
+    const localPublic = join(ROOT_DIR, 'public');
+    const tempPublic = join(tempDir, 'apps/docs/public');
+    fs.mkdirSync(tempPublic, { recursive: true });
+    fs.cpSync(localPublic, tempPublic, { recursive: true });
+
+    // Copy external files from repo root
+    const repoRoot = resolve(ROOT_DIR, '../..');
+    const tempCmd = join(tempDir, 'cmd');
+    fs.mkdirSync(tempCmd, { recursive: true });
+    if (fs.existsSync(join(repoRoot, 'cmd/defaults.yaml'))) {
+      fs.cpSync(join(repoRoot, 'cmd/defaults.yaml'), join(tempCmd, 'defaults.yaml'));
+    }
+    if (fs.existsSync(join(repoRoot, 'cmd/setup/steps.yaml'))) {
+      fs.mkdirSync(join(tempCmd, 'setup'), { recursive: true });
+      fs.cpSync(join(repoRoot, 'cmd/setup/steps.yaml'), join(tempCmd, 'setup/steps.yaml'));
+    }
+  } else {
+    const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
+    const typeSegment = isBranch ? 'heads' : 'tags';
+    const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
+
+    console.log(`Downloading content for ${tag} (using source: ${sourceRef})...`);
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
+
+    // ... rest of tar extraction logic
 
   const tarArgs = [
     '-xz',
@@ -167,15 +214,16 @@ async function downloadVersion(tag, sourceRef) {
     '*/cmd/setup/steps.yaml'
   ];
 
-  await new Promise((resolve, reject) => {
-    const tar = spawn('tar', tarArgsWildcard);
-    Readable.fromWeb(res.body).pipe(tar.stdin);
-    tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
-    tar.stderr.on('data', d => {
-        const msg = d.toString();
-         if (!msg.includes('Not found in archive')) console.error(msg);
+    await new Promise((resolve, reject) => {
+      const tar = spawn('tar', tarArgsWildcard);
+      Readable.fromWeb(res.body).pipe(tar.stdin);
+      tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
+      tar.stderr.on('data', d => {
+          const msg = d.toString();
+           if (!msg.includes('Not found in archive')) console.error(msg);
+      });
     });
-  });
+  }
 
   // Name normalization logic for destination
   // If tag is 'v4.10.0', use only 'v4.10' for folder (matches current logic)
@@ -227,6 +275,17 @@ async function downloadVersion(tag, sourceRef) {
 
 
 async function downloadFileContent(tagOrBranch, repoPath) {
+    const currentRef = getCurrentRef();
+    if (tagOrBranch === currentRef) {
+        console.log(`[local] Reading local file content for: ${repoPath}`);
+        const repoRoot = resolve(ROOT_DIR, '../..');
+        const localPath = join(repoRoot, repoPath);
+        if (fs.existsSync(localPath)) {
+            return fs.readFileSync(localPath, 'utf8');
+        }
+        return null;
+    }
+
     const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
     const res = await fetch(url);
     if (!res.ok) {
