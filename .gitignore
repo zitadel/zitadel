@@ -47,7 +47,9 @@ cmd/zitadel/zitadel
 /zitadel
 
 # buildfolders and generated files
-console/src/app/proto/generated/
+console/dist
+console/src/app/proto/generated
+console/.angular
 **.pb.go
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go
@@ -57,8 +59,8 @@ pkg/**/**.connect.go
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
-/internal/api/ui/console/static/*
-!/internal/api/ui/console/static/gitkeep
+internal/api/ui/console/static
+!internal/api/ui/console/static/gitkeep
 docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
@@ -73,8 +75,10 @@ zitadel-*-*
 # local
 build/local/*.env
 .notifications
-/.artifacts/*
-!/.artifacts/zitadel
+.artifacts/*
+!.artifacts/bin
+.artifacts/bin/*/*/**/*
+!.artifacts/zitadel
 /zitadel
 node_modules/
 .kreya
@@ -87,7 +91,6 @@ go.work.sum
 # Local Netlify folder
 .netlify
 
-dist
 .vercel
 
 # PNPM
