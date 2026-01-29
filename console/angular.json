@@ -37,10 +37,7 @@
               "sass": {
                 "silenceDeprecations": ["import", "mixed-decls"]
               },
-              "includePaths": [
-                "node_modules",
-                "."
-              ]
+              "includePaths": ["node_modules", "."]
             },
             "allowedCommonJsDependencies": [
               "opentype.js",
@@ -150,6 +147,12 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": ["import", "mixed-decls"]
+              },
+              "includePaths": ["node_modules", "."]
+            },
             "scripts": []
           }
         },
