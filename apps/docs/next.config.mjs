@@ -62,6 +62,14 @@ const nextConfig = {
         source: '/mp/:slug*',
         destination: 'https://api-eu.mixpanel.com/:slug*',
       },
+      {
+        source: '/pl/js/script.js',
+        destination: 'https://plausible.io/js/script.js',
+      },
+      {
+        source: '/pl/api/event',
+        destination: 'https://plausible.io/api/event',
+      },
     ];
   },
   async headers() {
