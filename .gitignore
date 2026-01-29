@@ -75,8 +75,10 @@ zitadel-*-*
 # local
 build/local/*.env
 .notifications
-/.artifacts/*
-!/.artifacts/zitadel
+.artifacts/*
+!.artifacts/bin
+.artifacts/bin/*/*/**/*
+!.artifacts/zitadel
 /zitadel
 node_modules/
 .kreya
@@ -104,3 +106,5 @@ CLAUDE.md
 AGENTS.md
 .mcp.json
 .gemini/*
+
+.cache
