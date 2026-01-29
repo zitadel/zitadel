@@ -84,7 +84,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 </div>
 <div className="apicard-right">
 
-#### GRPC
+#### Auth GRPC
 
 Endpoint:
 `${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/`
@@ -92,7 +92,7 @@ Endpoint:
 Definition:
 [Auth Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/auth.proto)
 
-#### REST
+#### Auth REST
 
 Endpoint:
 `${CUSTOM_DOMAIN}/auth/v1/`
@@ -117,7 +117,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 </div>
 <div className="apicard-right">
 
-#### GRPC
+#### Mgmt GRPC
 
 Endpoint:
 `${CUSTOM_DOMAIN}/zitadel.management.v1.ManagementService/`
@@ -125,7 +125,7 @@ Endpoint:
 Definition:
 [Management Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/management.proto)
 
-#### REST
+#### Mgmt REST
 
 Endpoint:
 `${CUSTOM_DOMAIN}/management/v1/`
@@ -148,7 +148,7 @@ This API is intended to configure and manage one ZITADEL instance itself.
 </div>
 <div className="apicard-right">
 
-#### GRPC
+#### Admin GRPC
 
 Endpoint:
 `${CUSTOM_DOMAIN}/zitadel.admin.v1.AdminService/`
@@ -156,7 +156,7 @@ Endpoint:
 Definition:
 [Admin Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/admin.proto)
 
-#### REST
+#### Admin REST
 
 Endpoint:
 `${CUSTOM_DOMAIN}/admin/v1/`
@@ -181,7 +181,7 @@ Checkout the guide how to [access the ZITADEL System API](/guides/integrate/zita
 </div>
 <div className="apicard-right">
 
-#### GRPC
+#### System GRPC
 
 Endpoint:
 `${CUSTOM_DOMAIN}/zitadel.system.v1.SystemService/`
@@ -189,7 +189,7 @@ Endpoint:
 Definition:
 [System Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/system.proto)
 
-#### REST
+#### System REST
 
 Endpoint:
 `${CUSTOM_DOMAIN}/system/v1/`
@@ -212,7 +212,7 @@ The Assets API allows you to up- and download all kinds of assets. This can be f
 </div>
 <div>
 
-#### REST
+#### Assets REST
 
 Endpoint:
 `${CUSTOM_DOMAIN}/assets/v1/`

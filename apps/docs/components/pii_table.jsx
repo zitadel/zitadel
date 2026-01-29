@@ -81,26 +81,34 @@ export function PiiTable() {
       ],
       subjects: "All users"
     },
-    ]
+  ]
 
   return (
     <table className="text-xs">
-      <tr>
-        <th>Type of personal data</th>
-        <th>Examples</th>
-        <th>Affected data subjects</th>
-      </tr>
-      {
-        pii.map((row, rowID) => {
-          return (
-            <tr>
-              <td key={rowID}>{row.type}</td>
-              <td><ul>{row.examples.map((example) => { return ( <li>{example}</li> )})}</ul></td>
+      <thead>
+        <tr>
+          <th>Type of personal data</th>
+          <th>Examples</th>
+          <th>Affected data subjects</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          pii.map((row) => (
+            <tr key={row.type}>
+              <td>{row.type}</td>
+              <td>
+                <ul>
+                  {row.examples.map((example) => (
+                    <li key={example}>{example}</li>
+                  ))}
+                </ul>
+              </td>
               <td>{row.subjects}</td>
             </tr>
-          )
-        })
-      }
+          ))
+        }
+      </tbody>
     </table>
   );
 }
