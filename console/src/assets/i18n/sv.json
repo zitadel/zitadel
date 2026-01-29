@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Inloggningsformulär",
           "DESCRIPTION": "Anpassa inloggningsformuläret.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Användarnamn och lösenord tillåtet",
-            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med Passkey autentisering eller med en extern identitetsleverantör."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokal autentisering tillåten",
+            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord eller nyckelautentisering (passkey). Om detta är inaktiverat kan dina användare endast logga in med en extern identitetsleverantör."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Användarregistrering tillåten",

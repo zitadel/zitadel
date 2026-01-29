@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "로그인 폼",
           "DESCRIPTION": "로그인 폼을 사용자 정의하세요.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "사용자 이름과 비밀번호 허용",
-            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호로 로그인할 수 있도록 허용하세요. 비활성화하면 비밀번호 없는 인증 또는 외부 ID 제공자로만 로그인할 수 있습니다."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "로컬 인증 허용",
+            "DESCRIPTION": "사용자가 사용자 이름과 비밀번호 또는 패스키 인증으로 로그인할 수 있도록 허용합니다. 이 기능이 비활성화되면 사용자는 외부 ID 제공업체를 통해서만 로그인할 수 있습니다."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "사용자 등록 허용",

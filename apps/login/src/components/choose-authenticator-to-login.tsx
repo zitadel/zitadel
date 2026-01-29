@@ -20,16 +20,17 @@ export function ChooseAuthenticatorToLogin({
   return (
     <>
       {authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-        loginSettings?.allowUsernamePassword && (
+        loginSettings?.allowLocalAuthentication && (
           <div className="ztdl-p">
             <Translated i18nKey="chooseAlternativeMethod" namespace="idp" />
           </div>
         )}
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-          loginSettings?.allowUsernamePassword &&
+          loginSettings?.allowLocalAuthentication &&
           PASSWORD(false, "/password?" + params)}
         {authMethods.includes(AuthenticationMethodType.PASSKEY) &&
+        loginSettings?.allowLocalAuthentication &&
           loginSettings?.passkeysType == PasskeysType.ALLOWED &&
           PASSKEYS(false, "/passkey?" + params)}
       </div>

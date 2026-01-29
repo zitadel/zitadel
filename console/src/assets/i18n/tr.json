@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Giriş Formu",
           "DESCRIPTION": "Giriş formunu özelleştirin.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Kullanıcı adı ve Şifreye izin verildi",
-            "DESCRIPTION": "Kullanıcılarınızın kullanıcı adı ve şifreleriyle giriş yapmalarına izin verin. Bu devre dışı bırakılırsa, kullanıcılarınız yalnızca şifresiz kimlik doğrulama veya harici kimlik sağlayıcısı kullanarak giriş yapabilir."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Yerel kimlik doğrulamaya izin verildi",
+            "DESCRIPTION": "Kullanıcılarınızın kullanıcı adı ve şifre veya geçiş anahtarı (passkey) kimlik doğrulaması ile oturum açmasına izin verin. Bu devre dışı bırakılırsa, kullanıcılarınız yalnızca harici bir kimlik sağlayıcı kullanarak oturum açabilir."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Kullanıcı Kaydına izin verildi",
