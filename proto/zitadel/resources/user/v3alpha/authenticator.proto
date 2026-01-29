@@ -277,7 +277,7 @@ message SetPassword {
       }
     ];
     // Encoded hash of a password in Modular Crypt Format:
-    // https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets.
+    // https://zitadel.com/docs/learn/architecture/secrets#hashed-secrets.
     string hash = 2 [
       (validate.rules).string = {min_len: 1, max_len: 200},
       (google.api.field_behavior) = REQUIRED,
