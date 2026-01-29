@@ -14,11 +14,13 @@ export async function initMixpanel() {
   mixpanel.init(token, {
     property_blacklist: ['$referrer', 'referrer', '$current_url_query_params', '$initial_referrer'],
     debug: process.env.NODE_ENV === 'development',
-    track_pageview: 'url-with-path',
+    track_pageview: false,
     persistence: 'localStorage',
     api_host: '/docs/mp',
     record_sessions_percent: 50,
   });
+
+  mixpanel.register({ source: 'docs' });
 }
 
 export function optInTracking() {
@@ -41,7 +43,8 @@ export const mixpanelClient = {
   track: (eventName: string, properties?: Record<string, any>) => {
     if (isMixpanelInitialized()) {
       try {
-        mixpanel?.track(eventName, properties);
+        const prefixedName = eventName.startsWith('docs_') ? eventName : `docs_${eventName}`;
+        mixpanel?.track(prefixedName, properties);
       } catch (e) {
         console.warn('Mixpanel tracking error:', e);
       }
