@@ -59,6 +59,15 @@ The docs build process automatically handling the following steps via `generate`
 
 Refer to the [Google Developer Style Guide](https://developers.google.com/style) for general guidelines.
 
+### Adding Content
+
+All documentation content is located in the `content` directory. Note that the system strictly accepts **only `.mdx` files**.
+
+To add a new page:
+1.  Create a `.mdx` file in the appropriate subdirectory of [`content`](./content).
+2.  Register the new page in the sidebar configuration at [`lib/sidebar-data.ts`](./lib/sidebar-data.ts) to make it accessible in the navigation.
+
+
 ### Pull Requests
 
 Use `docs(<scope>): <short summary>` for PR titles.
