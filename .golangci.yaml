@@ -2,6 +2,8 @@ version: "2"
 run:
   concurrency: 4
   go: "1.24"
+  skip-dirs:
+    - apps/docs
 linters:
   enable:
     - asciicheck
