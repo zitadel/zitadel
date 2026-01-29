@@ -1,8 +1,9 @@
 import ProjectClientIdImg from '@pub/img/guides/quickstart/project_client_id.png'
+import ProjectClientIdSecretImg from '@pub/img/guides/quickstart/project_client_id_secret.png'
 import ProjectUrlsImg from '@pub/img/guides/quickstart/project_urls.png'
 import ProjectProjectIdImg from '@pub/img/guides/quickstart/project_project_id.png'
 
-export default function AppValue({ valueCount, projectID }) {
+export default function AppValue({ valueCount, clientSecret, projectID }) {
     return (
         <div>
             <p>
@@ -10,11 +11,17 @@ export default function AppValue({ valueCount, projectID }) {
             These are typically stored as environment variables in your project.
             </p>
             <ol>
-                <li>
+                {!!clientSecret == false && (<li>
                     <b>Client ID</b> Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
                     <img
                         src={ProjectClientIdImg.src} alt="Get Client ID"/>
-                </li>
+                </li>)}
+                {!!clientSecret && (<li>
+                    <b>Client ID & Client Secret</b> Copy the client id and secret from the modal. The client id is the unique public identifier for your application.
+                    Note: If you missed copy the secret, you can generate a new one in the Actions dropdown.
+                    <img
+                        src={ProjectClientIdSecretImg.src} alt="Get Client ID and Secret"/>
+                </li>)}
                 <li>
                     <b>Issuer URL</b> Click on URLs in the left sidebar to find your <b>Discovery Endpoint</b>.
                     - The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).

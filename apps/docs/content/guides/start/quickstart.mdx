@@ -76,7 +76,7 @@ Log in using the Admin credentials you just created.
 ZITADEL automatically configures the best security settings for your selected framework.
 
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -95,13 +95,19 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:8089">
         </AppConfig>
     </Tab>
+    <Tab value="Next.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
     <Tab value="React">
         <AppConfig
             redirectUrl="http://localhost:3000/callback"
             postLogoutRedirectUrl="http://localhost:3000/">
         </AppConfig>
     </Tab>
-    <Tab value="Vue">
+    <Tab value="Vue.js">
         <AppConfig
             redirectUrl="http://localhost:5173/auth/signinwin/zitadel"
             postLogoutRedirectUrl="http://localhost:5173/">
@@ -114,21 +120,24 @@ ZITADEL automatically configures the best security settings for your selected fr
 
 ### 5. Collect your Integration Keys
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
-        <AppValues valueCount="two" projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
     </Tab>
     <Tab value="Flutter">
-        <AppValues valueCount="two" projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
     </Tab>
     <Tab value="Go">
-        <AppValues valueCount="two" projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Next.js">
+        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
     </Tab>
     <Tab value="React">
-        <AppValues valueCount="two" projectID={false}></AppValues>
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
     </Tab>
-    <Tab value="Vue">
-        <AppValues valueCount="three" projectID={true}></AppValues>
+    <Tab value="Vue.js">
+        <AppValues valueCount="three" clientSecret={false} projectID={true}></AppValues>
     </Tab>
 </Tabs>
 
@@ -145,7 +154,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 ### 1. Prerequisites
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
@@ -158,12 +167,16 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         - [Go](https://go.dev/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
+    <Tab value="Next.js">
+        - [Node.js](https://nodejs.org/): v16 or later.
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
     <Tab value="React">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
         - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
     </Tab>
-    <Tab value="Vue">
+    <Tab value="Vue.js">
         - [Node.js](https://nodejs.org/): v16 or later.
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
         - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
@@ -174,7 +187,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 Clone the repository and move into the project directory:
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         git clone https://github.com/zitadel/zitadel-angular.git
@@ -193,13 +206,19 @@ Clone the repository and move into the project directory:
         cd zitadel_go
         ```
     </Tab>
+    <Tab value="Next.js">
+        ```bash
+        git clone git@github.com:zitadel/example-auth-nextjs.git
+        cd example-auth-nextjs
+        ```
+    </Tab>
     <Tab value="React">
         ```bash
         git clone https://github.com/zitadel/zitadel-react.git
         cd zitadel-react
         ```
     </Tab>
-    <Tab value="Vue">
+    <Tab value="Vue.js">
         ```bash
         git clone https://github.com/zitadel/zitadel-vue.git
         cd zitadel-vue
@@ -209,7 +228,7 @@ Clone the repository and move into the project directory:
 
 ### 3. Build and Install
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         npm install
@@ -220,6 +239,11 @@ Clone the repository and move into the project directory:
     </Tab>
     <Tab value="Go">
         No action required for this step.
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        npm install
+        ```
     </Tab>
     <Tab value="React">
         Since this repo contains the SDK source, you need to build the library before running the example:
@@ -232,7 +256,7 @@ Clone the repository and move into the project directory:
         cd .. && yarn install
         ```
     </Tab>
-    <Tab value="Vue">
+    <Tab value="Vue.js">
         ```bash
         yarn install
         ```
@@ -242,7 +266,7 @@ Clone the repository and move into the project directory:
 
 ### 4. Configure your Credentials
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
     <Tab value="Angular">
         Open src/app/app.module.ts and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
 
@@ -267,6 +291,25 @@ Clone the repository and move into the project directory:
         No action required for this step.
         The issuer and client Id will be passed directly when running the app (next step)
     </Tab>
+    <Tab value="Next.js">
+        1. Copy+past the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-instance.zitadel.cloud/"
+        ZITADEL_CLIENT_ID="zitadel-client-id"
+        ZITADEL_CLIENT_SECRET="zitadel-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
+
+        ```
+    </Tab>
     <Tab value="React">
 
         Open src/App.tsx and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
@@ -282,7 +325,7 @@ Clone the repository and move into the project directory:
         };
         ```
     </Tab>
-    <Tab value="Vue">
+    <Tab value="Vue.js">
         Open .env and update the config object with the **Issuer**, **Client ID** and **PROJECT_ID** you collected in Step 5.
 
         ```bash
@@ -298,7 +341,7 @@ Clone the repository and move into the project directory:
 
 Start your development server:
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'React', 'Vue']} groupId="framework-select">
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue']} groupId="framework-select">
     <Tab value="Angular">
         ```bash
         ng serve
@@ -329,6 +372,16 @@ Start your development server:
         Your app will be live at `http://localhost:8089`. Click Login to test the full PKCE flow!
 
         ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
+
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+
+        ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
 
     </Tab>
     <Tab value="React">
