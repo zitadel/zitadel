@@ -2,26 +2,11 @@
 title: Database
 ---
 
-import Cockroach from './_cockroachdb.mdx'
 import Postgres from './_postgres.mdx'
 
 # Database Configuration
 
-<Tabs
-    groupId="database-vendor"
-    default="postgres"
-    values={[
-        {'label': 'Postgres', 'value': 'pg'},
-        {'label': 'Cockroach (Zitadel v2)', 'value': 'crdb'},
-    ]}
->
-    <Tab value="pg">
-        <Postgres components={props.components} />
-    </Tab>
-    <Tab value="crdb">
-        <Cockroach components={props.components} />
-    </Tab>
-</Tabs>
+<Postgres components={props.components} />
 
 ## Zitadel Credentials
 
