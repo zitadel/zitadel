@@ -40,7 +40,7 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     httpOnly: true,
     path: "/",
     sameSite: resolvedSameSite,
-    secure: process.env.NODE_ENV === "production",
+    secure: await secureSessionCookiesUsed(),
   });
 }
 
@@ -53,6 +53,13 @@ export async function setLanguageCookie(language: string) {
     httpOnly: true,
     path: "/",
   });
+}
+
+export async function secureSessionCookiesUsed(): Promise<boolean> {
+  if (process.env.NODE_ENV === "production") {
+    return !(process.env.NON_SECURE_SESSION_COOKIE === "true");
+  }
+  return false;
 }
 
 export async function addSessionToCookie<T>({
