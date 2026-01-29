@@ -7,7 +7,7 @@
     @if (toggleState.enabled) {
       <cnsl-form-field>
         <cnsl-label>{{ 'SETTING.FEATURES.LOGINV2_BASEURI' | translate }}</cnsl-label>
-        <input cnslInput [formControl]="baseUri"/>
+        <input cnslInput [formControl]="baseUri" />
         <button
           matTooltip="{{ 'ACTIONS.SAVE' | translate }}"
           mat-icon-button
@@ -15,12 +15,12 @@
           color="primary"
           type="submit"
           (click)="
-        toggleChanged.emit({
-          source: toggleState.source,
-          enabled: toggleState.enabled,
-          baseUri: baseUri.value,
-        })
-      "
+            toggleChanged.emit({
+              source: toggleState.source,
+              enabled: toggleState.enabled,
+              baseUri: baseUri.value,
+            })
+          "
         >
           <i class="las la-save"></i>
         </button>
@@ -28,4 +28,3 @@
     }
   </cnsl-feature-toggle>
 }
-
