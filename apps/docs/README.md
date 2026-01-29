@@ -26,7 +26,16 @@ Key scripts for documentation workflows:
 | `build` | Builds the production application. |
 | `fetch:remote-content` | Fetches remote tags and referenced content. |
 | `generate` | Runs all generation steps (`fetch:remote-content`, `generate:proto-docs`, `generate:api-reference`, `generate:index-pages`). |
-| `check:links` | Checks for broken links. |
+| `check:links` | Validates content integrity (broken links, missing frontmatter, schema errors). |
+| `lint` | checks for code style and syntax errors (ESLint). |
+
+### Validation
+
+*   **Code Quality**: Run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
+*   **Content Integrity**: Run `pnpm check:links` to validate content structure, including:
+    *   Broken internal links
+    *   Missing required frontmatter (e.g., `title`)
+    *   Image references
 
 ## Contributing
 
