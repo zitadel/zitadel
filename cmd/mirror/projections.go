@@ -216,6 +216,7 @@ func projections(
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -228,8 +229,6 @@ func projections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		keys.OIDC,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		nil,
 	)
 

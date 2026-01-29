@@ -43,6 +43,20 @@ func (m *MockCommands) EXPECT() *MockCommandsMockRecorder {
 	return m.recorder
 }
 
+// BackChannelLogoutSent mocks base method.
+func (m *MockCommands) BackChannelLogoutSent(arg0 context.Context, arg1, arg2, arg3 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BackChannelLogoutSent", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BackChannelLogoutSent indicates an expected call of BackChannelLogoutSent.
+func (mr *MockCommandsMockRecorder) BackChannelLogoutSent(arg0, arg1, arg2, arg3 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackChannelLogoutSent", reflect.TypeOf((*MockCommands)(nil).BackChannelLogoutSent), arg0, arg1, arg2, arg3)
+}
+
 // HumanEmailVerificationCodeSent mocks base method.
 func (m *MockCommands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error {
 	m.ctrl.T.Helper()
