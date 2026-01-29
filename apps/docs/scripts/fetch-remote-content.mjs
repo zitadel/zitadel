@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import semver from 'semver';
 import { Readable } from 'stream';
 
+const FALLBACK_VERSION = 'v4.10.0'; // Temporary fallback until > 4.10.0 exists
+const FALLBACK_BRANCH = 'fuma-docs'; // Primary branch to check for 4.10.0 content
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const PROTO_DIR = join(ROOT_DIR, '../../proto');
@@ -70,17 +73,31 @@ function filterVersions(tags) {
   return result;
 }
 
-// Downloads content from the 'fuma-docs' branch but puts it in a version-specific folder
-// This is done because older tags do not have valid fumadocs content yet.
-async function downloadVersion(tag) {
-  // MOCK: Use fuma-docs branch content for validity testing
-  const MOCK_REF = 'fuma-docs'; 
-  const url = `https://github.com/${REPO}/archive/refs/heads/${MOCK_REF}.tar.gz`;
+// Helper to determine the best branch for v4.10.0 content
+function getFallbackSource() {
+  try {
+    const res = execSync(`git ls-remote --heads origin ${FALLBACK_BRANCH}`).toString().trim();
+    if (res) {
+      console.log(`[fallback] Found active branch: ${FALLBACK_BRANCH}`);
+      return FALLBACK_BRANCH;
+    }
+  } catch (e) {
+    console.warn(`[fallback] Failed to check ref ${FALLBACK_BRANCH}:`, e.message);
+  }
+  console.log(`[fallback] Defaulting to main branch`);
+  return 'main';
+}
+
+// sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
+async function downloadVersion(tag, sourceRef) {
+  const isBranch = sourceRef === 'main' || sourceRef === 'fuma-docs' || !sourceRef.startsWith('v');
+  const typeSegment = isBranch ? 'heads' : 'tags';
+  const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
   
   const tempDir = join(ROOT_DIR, `.temp/${tag}`); // Extract to tag-specific temp to avoid collisions
   fs.mkdirSync(tempDir, { recursive: true });
 
-  console.log(`Downloading content for ${tag} (using source: ${MOCK_REF})...`);
+  console.log(`Downloading content for ${tag} (using source: ${sourceRef})...`);
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
@@ -89,24 +106,70 @@ async function downloadVersion(tag) {
     '-xz',
     '-C', tempDir,
     `--strip-components=1`,
-    `zitadel-${MOCK_REF}/apps/docs/content`,
-    `zitadel-${MOCK_REF}/apps/docs/public`, 
-    `zitadel-${MOCK_REF}/cmd/defaults.yaml`,
-    `zitadel-${MOCK_REF}/cmd/setup/steps.yaml`
+    `zitadel-${sourceRef.replace(/\//g, '-')}/apps/docs/content`, // GitHub archive naming usually matches ref name with slashes replaced? No, usually zitadel-ref. For tags it might vary.
+    // Actually, GitHub archives top folder is usually `repo-ref`. 
+    // For `v4.10.0` -> `zitadel-4.10.0`. For `fuma-docs` -> `zitadel-fuma-docs`.
+    // We should probably rely on wildcard or just strict assumption.
+    // Let's use a wildcard for the top directory since we strip it anyway?
+    // wait, --strip-components=1 removes the top level folder, whatever it is.
+    // BUT we are explicitly listing paths INSIDE that folder to extract.
+    // `tar` requires separate arguments for paths.
+    // If we don't know the exact top folder name, we can't restrict extraction efficiently without wildcards.
+    // BUT standard `tar` doesn't always support wildcards in extraction list nicely.
+    // Strategy: Extract the whole thing? No, too big.
+    // Solution: The top folder name is predictable.
+    // Branch: `zitadel-<branch-name>`
+    // Tag: `zitadel-<tag-name>` (usually without 'v' if tag has 'v'? No, usually matches tag exactly).
+    // Let's refine the top folder guess.
+  ];
+  
+  // GitHub archive folder name logic:
+  // Refs/heads/fuma-docs -> zitadel-fuma-docs
+  // Refs/tags/v4.10.0 -> zitadel-4.10.0 (often strips 'v'?) OR zitadel-v4.10.0?
+  // It's inconsistent. 
+  // Better approach: Download and list first? Or extract everything and move?
+  // Let's try to extract specific paths but use a wildcard if possible?
+  // Actually, preventing the extract of the whole repo is good.
+  // Let's guess:
+  let topFolder = `zitadel-${sourceRef}`;
+  // Tags often strip 'v' in the folder name if using 'archive/vX.Y.Z.tar.gz' vs 'archive/refs/tags/vX.Y.Z.tar.gz'
+  // using refs/tags/... generally preserves it or uses the tag name.
+  // Let's try to just extract *apps/docs/content* with a wildcard pattern if supported?
+  // `*/apps/docs/content`
+  
+  // Update tarArgs to be safer with wildcards if using GNU tar, but macos bsdtar differs.
+  // Safest: Extract all, then filter? Repository is large.
+  // Let's stick to the previous code's assumption but make it dynamic.
+  // Previous code: `zitadel-${MOCK_REF}/...`
+  // If sourceRef is 'v4.10.0', try `zitadel-4.10.0` or `zitadel-v4.10.0`.
+  // Let's just assume `zitadel-${sourceRef}` or `zitadel-${sourceRef.replace(/^v/, '')}`
+  
+  // Hack: We can peak at the first file entries? No.
+  // Let's just try to extract `*/apps/docs/content` using --wildcards if on linux (which we are).
+  
+   const tarArgsWildcard = [
+    '-xz',
+    '-C', tempDir,
+    '--strip-components=1',
+    '--wildcards',
+    '*/apps/docs/content',
+    '*/apps/docs/public',
+    '*/cmd/defaults.yaml',
+    '*/cmd/setup/steps.yaml'
   ];
 
   await new Promise((resolve, reject) => {
-    const tar = spawn('tar', tarArgs);
+    const tar = spawn('tar', tarArgsWildcard);
     Readable.fromWeb(res.body).pipe(tar.stdin);
     tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
     tar.stderr.on('data', d => {
         const msg = d.toString();
-        // Ignore "not found in archive" warnings if they are expected
-        if (!msg.includes('Not found in archive') && !msg.includes('Not found in the archive')) console.error(msg);
+         if (!msg.includes('Not found in archive')) console.error(msg);
     });
   });
 
-  // Move to final destinations matches the version tag
+  // Name normalization logic for destination
+  // If tag is 'v4.10.0', use only 'v4.10' for folder (matches current logic)
   const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
   
   const contentDest = join(CONTENT_DIR, versionSlug);
@@ -115,18 +178,25 @@ async function downloadVersion(tag) {
   fs.mkdirSync(dirname(contentDest), { recursive: true });
   fs.mkdirSync(dirname(publicDest), { recursive: true });
   
-  // Clean existing destination to avoid staleness
   fs.rmSync(contentDest, { recursive: true, force: true });
   fs.rmSync(publicDest, { recursive: true, force: true });
 
+  // Move content
   if (fs.existsSync(join(tempDir, 'apps/docs/content'))) {
      fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
   } else {
-     console.warn(`[warn] apps/docs/content not found in ${MOCK_REF} archive for ${tag}`);
+     // Fallback: sometimes unzipping structure might differ if wildcards matched differently?
+     // Check if there is only one folder in tempDir?
+     // With strip-components=1 and wildcards, it "should" land in tempDir/apps/docs/content directly 
+     // IF the wildcards matched `topfolder/apps/docs/content`.
+     // If `apps/docs/content` is not there, check for `content` root?
+     // Let's verify commonly used structure.
+     if (!fs.existsSync(join(tempDir, 'apps/docs/content'))) {
+        console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${sourceRef})`);
+     }
   }
 
   // Handle external files (defaults.yaml etc)
-  // We put them in _external folder inside the version content
   const externalDir = join(contentDest, '_external/cmd');
   fs.mkdirSync(externalDir, { recursive: true });
   
@@ -134,14 +204,10 @@ async function downloadVersion(tag) {
       fs.cpSync(join(tempDir, 'cmd/defaults.yaml'), join(externalDir, 'defaults.yaml'));
   }
    if (fs.existsSync(join(tempDir, 'cmd/setup/steps.yaml'))) {
-      // Create setup dir if needed
       fs.mkdirSync(join(externalDir, 'setup'), { recursive: true });
       fs.cpSync(join(tempDir, 'cmd/setup/steps.yaml'), join(externalDir, 'setup/steps.yaml'));
   }
 
-  // Also handling public assets? 
-  // If fuma-docs branch has apps/docs/public, we might want to version them or just copy them.
-  // For now simple rename if exists
   if (fs.existsSync(join(tempDir, 'apps/docs/public'))) {
     fs.renameSync(join(tempDir, 'apps/docs/public'), publicDest);
   }
@@ -400,11 +466,25 @@ async function run() {
   let others = selectedTags; // In our case, if local is latest, all filtered tags are others
 
   console.log(`Latest version (Local): ${localVer.label} (Unreleased: ${localVer.isUnreleased})`);
+  
+  // Conditional Fallback: If no versions found > 4.10.0, inject v4.10.0
+  if (others.length === 0) {
+      console.log(`[fallback] No versions found strictly > ${CUTOFF}. Injecting ${FALLBACK_VERSION} as fallback.`);
+      others.push(FALLBACK_VERSION);
+  }
+
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
   // Download chosen versions
   // Parallelize download and processing
   await Promise.all(others.map(async (tag) => {
+    let sourceRef = tag;
+    
+    // Explicit logic for version 4.10.0 to use active branch
+    if (tag === FALLBACK_VERSION || tag === '4.10.0') {
+         sourceRef = getFallbackSource();
+    }
+    
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
     const contentDest = join(CONTENT_DIR, versionSlug);
     
@@ -413,7 +493,7 @@ async function run() {
     if (fs.existsSync(contentDest)) {
         console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
     } else {
-        await downloadVersion(tag);
+        await downloadVersion(tag, sourceRef);
         // Only fix imports if we just downloaded it (or maybe always run it? Safe to rerun)
         // Rerunning fixRelativeImports is relatively cheap compared to download + tar extraction
         // but let's stick to doing it only if we downloaded or if we force it.
