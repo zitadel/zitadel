@@ -42,6 +42,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/favicon.ico',
+        destination: 'https://zitadel.com/favicon.ico',
+        basePath: false,
+      },
+      {
         source: '/mp/lib.min.js',
         destination: 'https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js',
       },
@@ -56,6 +61,43 @@ const nextConfig = {
       {
         source: '/mp/:slug*',
         destination: 'https://api-eu.mixpanel.com/:slug*',
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://www.gstatic.com/charts/ https://www.youtube.com/; child-src zitadel.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com/charts/ zitadel.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; object-src 'none'; connect-src 'self' https://raw.githubusercontent.com/zitadel/ https://api.inkeep.com https://api.io.inkeep.com https://www.youtube.com; frame-src https://www.youtube.com/ https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; img-src 'self' https://raw.githubusercontent.com/devicons/devicon/master/icons/ https://i.ytimg.com https://yt3.ggpht.com data: `,
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'payment=(self "https://js.stripe.com")',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
       },
     ];
   },
