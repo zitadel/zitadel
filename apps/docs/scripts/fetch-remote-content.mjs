@@ -74,10 +74,10 @@ function filterVersions(tags) {
 }
 
 // Helper to identify the currently checked-out reference
-// Caches result to avoid redundant git/env checks. Use force=true to bypass cache (e.g. for testing).
+// Caches result to avoid redundant git/env checks.
 let cachedRef = null;
-function getCurrentRef(force = false) {
-  if (cachedRef && !force) return cachedRef;
+function getCurrentRef() {
+  if (cachedRef) return cachedRef;
 
   if (process.env.VERCEL_GIT_COMMIT_REF) {
     console.log(`[ref] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
@@ -103,6 +103,10 @@ function getCurrentRef(force = false) {
   return cachedRef;
 }
 
+export function resetCache() {
+  cachedRef = null;
+}
+
 // sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
 async function downloadVersion(tag, sourceRef) {
   const currentRef = getCurrentRef();
@@ -120,11 +124,18 @@ async function downloadVersion(tag, sourceRef) {
 
       const contentItems = fs.readdirSync(localContent);
       // Strictly match version folders like v1.0, v2.3.4 to avoid skipping other folders starting with 'v'
-      const versionDirPattern = /^v\d+\.\d+(\.\d+)?$/;
-
       for (const item of contentItems) {
         // Avoid copying versioned folders to prevent recursion if tag is current
-        if (versionDirPattern.test(item) && fs.statSync(join(localContent, item)).isDirectory()) continue;
+        let isVersionDir = false;
+        try {
+          if (semver.valid(item) && fs.statSync(join(localContent, item)).isDirectory()) {
+            isVersionDir = true;
+          }
+        } catch (e) {
+          // Ignore stat errors
+        }
+
+        if (isVersionDir) continue;
         if (item === 'versions.json') continue;
         fs.cpSync(join(localContent, item), join(tempContent, item), { recursive: true });
       }
@@ -137,7 +148,16 @@ async function downloadVersion(tag, sourceRef) {
       const publicItems = fs.readdirSync(localPublic);
       for (const item of publicItems) {
         // Avoid copying versioned folders (e.g., v4.10, v4.10.0) to prevent nested version directories
-        if (versionDirPattern.test(item) && fs.statSync(join(localPublic, item)).isDirectory()) continue;
+        let isVersionDir = false;
+        try {
+          if (semver.valid(item) && fs.statSync(join(localPublic, item)).isDirectory()) {
+            isVersionDir = true;
+          }
+        } catch (e) {
+          // Ignore stat errors
+        }
+        
+        if (isVersionDir) continue;
         fs.cpSync(join(localPublic, item), join(tempPublic, item), { recursive: true });
       }
 
@@ -303,7 +323,7 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     // Ensure the resolved path stays within the repository root using a robust, cross-platform check
     const relativePath = path.relative(repoRoot, localPath);
     
-    if (!relativePath || relativePath.startsWith('..')) {
+    if (relativePath.startsWith('..')) {
       console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
       return null;
     }
