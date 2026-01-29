@@ -73,37 +73,23 @@ function filterVersions(tags) {
   return result;
 }
 
+// Helper to identify the currently checked-out reference
 function getCurrentRef() {
-  if (process.env.VERCEL_GIT_COMMIT_REF) return process.env.VERCEL_GIT_COMMIT_REF;
-  if (process.env.GITHUB_REF_NAME) return process.env.GITHUB_REF_NAME;
-  try {
-    return execSync('git branch --show-current').toString().trim();
-  } catch (e) {
-    return FALLBACK_BRANCH;
-  }
-}
-
-// Helper to determine the best branch for v4.10.0 content
-function getFallbackSource() {
-  // Prioritize CI/CD Environment Variables
   if (process.env.VERCEL_GIT_COMMIT_REF) {
-    console.log(`[fallback] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
+    console.log(`[ref] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
     return process.env.VERCEL_GIT_COMMIT_REF;
   }
   if (process.env.GITHUB_REF_NAME) {
-    console.log(`[fallback] Detected GitHub Action Branch: ${process.env.GITHUB_REF_NAME}`);
+    console.log(`[ref] Detected GitHub Action Branch: ${process.env.GITHUB_REF_NAME}`);
     return process.env.GITHUB_REF_NAME;
   }
-
-  // Fallback for local dev if git is available
   try {
     const branch = execSync('git branch --show-current').toString().trim();
     if (branch) return branch;
   } catch (e) {
     // Ignore git errors
   }
-
-  console.log(`[fallback] Defaulting to ${FALLBACK_BRANCH}`);
+  console.log(`[ref] Defaulting to ${FALLBACK_BRANCH}`);
   return FALLBACK_BRANCH;
 }
 
@@ -116,35 +102,47 @@ async function downloadVersion(tag, sourceRef) {
 
   if (isLocal) {
     console.log(`[local] Copying local content for ${tag} (ref: ${sourceRef})...`);
-    // Copy apps/docs/content while avoiding recursion
-    const localContent = join(ROOT_DIR, 'content');
-    const tempContent = join(tempDir, 'apps/docs/content');
-    fs.mkdirSync(tempContent, { recursive: true });
+    try {
+      // Copy apps/docs/content while avoiding recursion
+      const localContent = join(ROOT_DIR, 'content');
+      const tempContent = join(tempDir, 'apps/docs/content');
+      fs.mkdirSync(tempContent, { recursive: true });
 
-    const contentItems = fs.readdirSync(localContent);
-    for (const item of contentItems) {
-      // Avoid copying versioned folders (starting with v) to prevent recursion if tag is current
-      if (item.startsWith('v') && fs.statSync(join(localContent, item)).isDirectory()) continue;
-      if (item === 'versions.json') continue;
-      fs.cpSync(join(localContent, item), join(tempContent, item), { recursive: true });
-    }
+      const contentItems = fs.readdirSync(localContent);
+      // Strictly match version folders like v1.0, v2.3.4 to avoid skipping other folders starting with 'v'
+      const versionDirPattern = /^v\d+\.\d+(\.\d+)?$/;
 
-    // Copy public directory
-    const localPublic = join(ROOT_DIR, 'public');
-    const tempPublic = join(tempDir, 'apps/docs/public');
-    fs.mkdirSync(tempPublic, { recursive: true });
-    fs.cpSync(localPublic, tempPublic, { recursive: true });
+      for (const item of contentItems) {
+        // Avoid copying versioned folders to prevent recursion if tag is current
+        if (versionDirPattern.test(item) && fs.statSync(join(localContent, item)).isDirectory()) continue;
+        if (item === 'versions.json') continue;
+        fs.cpSync(join(localContent, item), join(tempContent, item), { recursive: true });
+      }
 
-    // Copy external files from repo root
-    const repoRoot = resolve(ROOT_DIR, '../..');
-    const tempCmd = join(tempDir, 'cmd');
-    fs.mkdirSync(tempCmd, { recursive: true });
-    if (fs.existsSync(join(repoRoot, 'cmd/defaults.yaml'))) {
-      fs.cpSync(join(repoRoot, 'cmd/defaults.yaml'), join(tempCmd, 'defaults.yaml'));
-    }
-    if (fs.existsSync(join(repoRoot, 'cmd/setup/steps.yaml'))) {
-      fs.mkdirSync(join(tempCmd, 'setup'), { recursive: true });
-      fs.cpSync(join(repoRoot, 'cmd/setup/steps.yaml'), join(tempCmd, 'setup/steps.yaml'));
+      // Copy public directory
+      const localPublic = join(ROOT_DIR, 'public');
+      const tempPublic = join(tempDir, 'apps/docs/public');
+      fs.mkdirSync(tempPublic, { recursive: true });
+      fs.cpSync(localPublic, tempPublic, { recursive: true });
+
+      // Copy external files from repo root
+      const repoRoot = resolve(ROOT_DIR, '../..');
+      const tempCmd = join(tempDir, 'cmd');
+      fs.mkdirSync(tempCmd, { recursive: true });
+      
+      const defaultsPath = join(repoRoot, 'cmd/defaults.yaml');
+      if (fs.existsSync(defaultsPath)) {
+        fs.cpSync(defaultsPath, join(tempCmd, 'defaults.yaml'));
+      }
+      
+      const stepsPath = join(repoRoot, 'cmd/setup/steps.yaml');
+      if (fs.existsSync(stepsPath)) {
+        fs.mkdirSync(join(tempCmd, 'setup'), { recursive: true });
+        fs.cpSync(stepsPath, join(tempCmd, 'setup/steps.yaml'));
+      }
+    } catch (err) {
+      console.error(`[local] Failed to copy local files: ${err.message}`);
+      throw err;
     }
   } else {
     const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
@@ -275,24 +273,36 @@ async function downloadVersion(tag, sourceRef) {
 
 
 async function downloadFileContent(tagOrBranch, repoPath) {
-    const currentRef = getCurrentRef();
-    if (tagOrBranch === currentRef) {
-        console.log(`[local] Reading local file content for: ${repoPath}`);
-        const repoRoot = resolve(ROOT_DIR, '../..');
-        const localPath = join(repoRoot, repoPath);
-        if (fs.existsSync(localPath)) {
-            return fs.readFileSync(localPath, 'utf8');
-        }
-        return null;
+  const currentRef = getCurrentRef();
+  if (tagOrBranch === currentRef) {
+    console.log(`[local] Reading local file content for: ${repoPath}`);
+    const repoRoot = resolve(ROOT_DIR, '../..');
+    
+    // Normalize and validate repoPath to prevent path traversal outside repoRoot
+    const normalizedRepoPath = repoPath.replace(/\\/g, '/');
+    const localPath = resolve(repoRoot, normalizedRepoPath);
+    
+    // Ensure the resolved path stays within the repository root
+    const repoRootWithSep = repoRoot.endsWith(path.sep) ? repoRoot : repoRoot + path.sep;
+    
+    if (!localPath.startsWith(repoRootWithSep) && localPath !== repoRoot) {
+      console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
+      return null;
     }
 
-    const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-        // Fallback for some repo structures if needed, or if file doesn't exist in that version
-        return null;
+    if (fs.existsSync(localPath)) {
+      return fs.readFileSync(localPath, 'utf8');
     }
-    return await res.text();
+    return null;
+  }
+
+  const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    // Fallback for some repo structures if needed, or if file doesn't exist in that version
+    return null;
+  }
+  return await res.text();
 }
 
 async function fixRelativeImports(versionDir, tagOrBranch) {
@@ -554,7 +564,7 @@ async function run() {
     
     // Explicit logic for version 4.10.0 to use active branch
     if (tag === FALLBACK_VERSION || tag === '4.10.0') {
-         sourceRef = getFallbackSource();
+         sourceRef = getCurrentRef();
     }
     
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
@@ -604,7 +614,11 @@ async function run() {
   console.log('versions.json generated successfully.');
 }
 
-run().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  run().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+export { getCurrentRef, downloadVersion, downloadFileContent };
