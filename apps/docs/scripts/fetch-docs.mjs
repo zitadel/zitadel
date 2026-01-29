@@ -19,8 +19,7 @@ console.log(`[fetch-docs] PROTO_DIR: ${PROTO_DIR}`);
 console.log(`[fetch-docs] CONTENT_DIR: ${CONTENT_DIR}`);
 
 const REPO = 'zitadel/zitadel';
-const CUTOFF = '2.0.0';
-const ARCHIVE_URL = 'https://archive.zitadel.com';
+const CUTOFF = '4.10.0';
 
 async function fetchTags() {
   const token = process.env.GITHUB_TOKEN;
@@ -448,12 +447,6 @@ async function run() {
         target: targetUrl
     });
   }
-
-  versionsJson.push({
-    label: `Archive (< ${CUTOFF})`,
-    url: ARCHIVE_URL,
-    type: 'external'
-  });
 
   fs.writeFileSync(VERSIONS_FILE, JSON.stringify(versionsJson, null, 2));
   console.log('versions.json generated successfully.');
