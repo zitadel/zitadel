@@ -1,5 +1,5 @@
 import { type BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { BookOpen, Compass, Code2, AppWindow, Server } from 'lucide-react';
+import { BookOpen, Code2, Server } from 'lucide-react';
 
 export const baseOptions: BaseLayoutProps = {
   nav: {

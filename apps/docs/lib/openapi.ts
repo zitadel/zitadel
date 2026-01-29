@@ -1,7 +1,7 @@
 import { createOpenAPI } from 'fumadocs-openapi/server';
 
 import { globSync } from 'glob';
-import { join } from 'path';
+
 
 const isDev = process.env.NODE_ENV === 'development';
 const globPattern = isDev ? 'openapi/latest/**/*.openapi.json' : 'openapi/**/*.openapi.json';

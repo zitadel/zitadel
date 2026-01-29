@@ -4,7 +4,7 @@ import path from 'path';
 import client from './api-page.client';
 
 export function APIPage({ document, operations }: { document: string; operations: any[] }) {
-  const start = Date.now();
+
 
   if (!path.isAbsolute(document) && !document.startsWith('openapi/')) {
     throw new Error(`APIPage document path MUST start with 'openapi/'. Received: ${document}`);

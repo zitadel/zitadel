@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { source, versionSource } from '@/lib/source';
+import { source } from '@/lib/source';
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://zitadel.com/docs';
@@ -11,12 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.8,
     }));
 
-    const versionPages = versionSource.getPages().map((page) => ({
-        url: `${baseUrl}${page.url}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.3,
-    }));
+
 
     return [
         {
