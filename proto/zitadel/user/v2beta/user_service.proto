@@ -1016,6 +1016,8 @@ service UserService {
   //
   // Change the password of a user with either a verification code or the current password.
   //
+  // Organization Admins can change passwords for their users without verification code or current password
+  //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
@@ -1066,7 +1068,6 @@ service UserService {
       };
     };
   }
-
 }
 
 message AddHumanUserRequest{
