@@ -2,7 +2,17 @@
 
 import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import versions from '../content/versions.json';
+interface DocVersion {
+    param: string;
+    label: string;
+    url: string;
+    ref: string;
+    refType: string;
+    type?: 'external';
+}
+
+import rawVersions from '../content/versions.json';
+const versions = rawVersions as DocVersion[];
 
 export function VersionSelector() {
     const pathname = usePathname();
@@ -34,11 +44,6 @@ export function VersionSelector() {
         const version = versions.find((v) => (v.param || v.label) === value);
 
         if (!version) return;
-
-        if (version.type === 'external') {
-            window.open(version.url, '_blank');
-            return;
-        }
 
         if (!version.param) return;
 

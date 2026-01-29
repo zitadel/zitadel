@@ -2,7 +2,8 @@ import { source, versionSource } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import { buildCustomTree } from '@/lib/custom-tree';
-import versions from '@/content/versions.json';
+import rawVersions from '@/content/versions.json';
+const versions = rawVersions as any[];
 import { VersionSelector } from '@/components/version-selector';
 
 export default async function Layout(props: { children: React.ReactNode; params: Promise<{ slug?: string[] }> }) {
