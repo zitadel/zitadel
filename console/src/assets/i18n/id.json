@@ -223,7 +223,7 @@
           "PR": "Saat pengguna menyetel ulang kata sandinya, mereka akan menerima email berisi tautan untuk menyetel kata sandi baru.",
           "VE": "Saat pengguna mengubah alamat emailnya, mereka akan menerima email berisi tautan untuk memverifikasi alamat baru.",
           "VP": "Saat pengguna mengganti nomor teleponnya, mereka akan menerima SMS berisi kode untuk memverifikasi nomor baru.",
-          "VEO": "Ketika pengguna menambahkan Kata Sandi Sekali Pakai melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
+          "VEO": "Ketika pengguna menambahkan OTP melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
           "VSO": "Ketika pengguna menambahkan OTP melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka.",
           "IU": "Ketika kode undangan pengguna dibuat, mereka akan menerima email dengan tautan untuk mengatur metode otentikasi mereka."
         }
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nama Pengautentikasi",
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
-        "1": "Kata Sandi Satu Kali (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -884,7 +884,7 @@
       "DESCRIPTION": "Tambahkan faktor kedua untuk memastikan keamanan optimal untuk akun Anda.",
       "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
       "ADD": "Tambahkan Faktor",
-      "OTP": "Aplikasi Authenticator untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
+      "OTP": "Aplikasi Authenticator untuk TOTP",
       "OTP_DIALOG_TITLE": "Tambahkan OTP",
       "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi autentikator dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
       "U2F": "Passkey",
@@ -901,7 +901,7 @@
       "OTPEMAILSUCCESS": "Faktor OTP diatur dengan sukses.",
       "TYPE": {
         "0": "Tidak ada MFA yang ditentukan",
-        "1": "Kata Sandi Satu Kali (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1612,8 +1612,8 @@
         "4": "Reset Kata Sandi",
         "5": "Inisialisasi Passkey",
         "6": "Rahasia Aplikasi",
-        "7": "Kata Sandi Satu Kali (OTP) - SMS",
-        "8": "Kata Sandi Sekali Pakai (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Kedaluwarsa (dalam menit)",
       "INCLUDEDIGITS": "Sertakan Angka",
@@ -1875,8 +1875,8 @@
         "changedate": "Ubah tanggal",
         "username": "Nama belakang",
         "tempUsername": "Nama pengguna sementara",
-        "otp": "Kata sandi satu kali",
-        "verifyUrl": "Verifikasi URL kata sandi satu kali",
+        "otp": "OTP",
+        "verifyUrl": "Verifikasi URL OTP",
         "expiry": "Kedaluwarsa",
         "applicationName": "Nama aplikasi"
       },
@@ -2430,10 +2430,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Tidak dikenal",
-      "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
+      "1": "OTP oleh Aplikasi Authenticator (TOTP)",
       "2": "Passkey",
-      "3": "Kata Sandi Satu Kali melalui Email (OTP Email)",
-      "4": "Kata Sandi Satu Kali melalui SMS (OTP SMS)",
+      "3": "OTP melalui Email (OTP Email)",
+      "4": "OTP melalui SMS (OTP SMS)",
       "5": "Kode Pemulihan"
     }
   },

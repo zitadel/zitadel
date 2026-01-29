@@ -852,7 +852,7 @@
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -902,7 +902,7 @@
       "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1616,8 +1616,8 @@
         "4": "Password Reset",
         "5": "Passkey Initialization",
         "6": "App Secret",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -2436,10 +2436,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password by Authenticator App (TOTP)",
+      "1": "OTP by Authenticator App (TOTP)",
       "2": "Passkey",
-      "3": "One Time Password by Email (OTP Email)",
-      "4": "One Time Password by SMS (OTP SMS)",
+      "3": "OTP by Email (OTP Email)",
+      "4": "OTP by SMS (OTP SMS)",
       "5": "Recovery Codes"
     }
   },

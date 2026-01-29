@@ -223,8 +223,8 @@
           "PR": "Lorsqu'un utilisateur réinitialise son mot de passe, il recevra un e-mail avec un lien pour définir un nouveau mot de passe.",
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
-          "VEO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
-          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
+          "VEO": "Lorsqu'un utilisateur ajoute une OTP via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
+          "VSO": "Lorsqu'un utilisateur ajoute une OTP via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
           "IU": "Lorsqu'un code d'invitation d'utilisateur est créé, il recevra un e-mail avec un lien pour configurer sa méthode d'authentification."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Nom de l'authentificateur",
       "TYPE": {
         "0": "Pas de MFA défini",
-        "1": "Mot de passe à usage unique (OTP)",
+        "1": "OTP",
         "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
-      "OTPSMS": "OTP  avec SMS",
-      "OTPEMAIL": "OTP (password monouso) cone-mail",
-      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMS": "OTP avec SMS",
+      "OTPEMAIL": "OTP cone-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP ?",
       "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
       "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
-        "1": "Mot de passe à usage unique (OTP)",
+        "1": "OTP",
         "2": "Clé d'accès (Empreinte digitale, clés de sécurité, Face ID et autres)"
       },
       "STATE": {
@@ -1612,8 +1612,8 @@
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
-        "7": "Mot de passe à usage unique (OTP) - SMS",
-        "8": "Mot de passe à usage unique (OTP) -e-mail"
+        "7": "OTP - SMS",
+        "8": "OTP -e-mail"
       },
       "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -1877,8 +1877,8 @@
         "changedate": "Date de changement",
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
-        "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "otp": "OTP",
+        "verifyUrl": "URL pour vérifier le OTP",
         "expiry": "Expiration",
         "applicationName": "Nom de l'application"
       },
@@ -2411,10 +2411,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "One Time Password via une application d'authentification (TOTP)",
+      "1": "OTP par application d'authentification (TOTP)",
       "2": "Clé d'accès",
-      "3": "One Time Password par e-mail (E-mail OTP)",
-      "4": "One Time Password par SMS (OTP SMS)",
+      "3": "OTP par e-mail (OTP Email)",
+      "4": "OTP par SMS (OTP SMS)",
       "5": "Codes de récupération"
     }
   },

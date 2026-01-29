@@ -223,8 +223,8 @@
           "PR": "Wanneer een gebruiker zijn wachtwoord reset, ontvangt hij een e-mail met een link om een nieuw wachtwoord in te stellen.",
           "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
           "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
-          "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
-          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
+          "VEO": "Wanneer een gebruiker een OTP via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
+          "VSO": "Wanneer een gebruiker een OTP via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
           "IU": "Wanneer een uitnodigingscode voor gebruikers wordt gemaakt, ontvangt de gebruiker een e-mail met een link om zijn verificatiemethode in te stellen."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Authenticator Naam",
       "TYPE": {
         "0": "Geen MFA gedefinieerd",
-        "1": "Eenmalig wachtwoord (OTP)",
+        "1": "OTP",
         "2": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere"
       },
       "STATE": {
@@ -893,15 +893,15 @@
       "U2F_SUCCESS": "Factor succesvol toegevoegd!",
       "U2F_ERROR": "Er is een fout opgetreden tijdens de installatie!",
       "U2F_NAME": "Authenticator Naam",
-      "OTPSMS": "OTP (Eenmalig wachtwoord) met SMS",
-      "OTPEMAIL": "OTP (Eenmalig wachtwoord) met Email",
+      "OTPSMS": "OTP met SMS",
+      "OTPEMAIL": "OTP met Email",
       "SETUPOTPSMSDESCRIPTION": "Wilt u dit telefoonnummer instellen als OTP tweede factor?",
       "OTPSMSSUCCESS": "OTP factor succesvol ingesteld.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Uw telefoon moet worden geverifieerd om deze methode te kunnen gebruiken.",
       "OTPEMAILSUCCESS": "OTP factor succesvol ingesteld.",
       "TYPE": {
         "0": "Geen MFA gedefinieerd",
-        "1": "Eenmalig wachtwoord (OTP)",
+        "1": "OTP",
         "2": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere"
       },
       "STATE": {
@@ -1612,8 +1612,8 @@
         "4": "Wachtwoord Reset",
         "5": "Passkey Initialisatie",
         "6": "App Secret",
-        "7": "Eenmalig Wachtwoord (OTP) - SMS",
-        "8": "Eenmalig Wachtwoord (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
@@ -1877,8 +1877,8 @@
         "changedate": "Wijzigingsdatum",
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
-        "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "otp": "OTP",
+        "verifyUrl": "Verifieer OTP URL",
         "expiry": "Vervaldatum",
         "applicationName": "Toepassingsnaam"
       },
@@ -2429,10 +2429,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Onbekend",
-      "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
+      "1": "OTP door Authenticator App",
       "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
-      "3": "Eenmalig wachtwoord per e-mail (OTP Email)",
-      "4": "Eenmalig wachtwoord per SMS (OTP SMS)",
+      "3": "OTP per e-mail",
+      "4": "OTP per SMS",
       "5": "Herstelcodes"
     }
   },

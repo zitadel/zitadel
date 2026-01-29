@@ -223,8 +223,8 @@
           "PR": "Quando un utente reimposta la sua password, riceverà un'email con un link per impostare una nuova password.",
           "VE": "Quando un utente cambia il suo indirizzo email, riceverà un'email con un link per verificare il nuovo indirizzo.",
           "VP": "Quando un utente cambia il suo numero di telefono, riceverà un SMS con un codice per verificare il nuovo numero.",
-          "VEO": "Quando un utente aggiunge una Password Monouso tramite metodo email, deve attivarla inserendo un codice inviato al suo indirizzo email.",
-          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono.",
+          "VEO": "Quando un utente aggiunge una OTP tramite metodo email, deve attivarla inserendo un codice inviato al suo indirizzo email.",
+          "VSO": "Quando un utente aggiunge una OTP tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono.",
           "IU": "Quando viene creato un codice di invito per un utente, riceverà un'e-mail con un collegamento per impostare il suo metodo di autenticazione."
         }
       },
@@ -850,7 +850,7 @@
       "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
         "0": "Nessun MFA definito",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -900,7 +900,7 @@
       "OTPEMAILSUCCESS": "Fattore OTP impostato con successo.",
       "TYPE": {
         "0": "Nessun altro fattore definito",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -1139,7 +1139,7 @@
       "PHONEVERIFIED": "Telefono verificato con successo.",
       "PHONEVERIFICATIONSENT": "Codice di verifica telefonica inviato.",
       "EMAILVERIFICATIONSENT": "Codice di verifica e-mail inviato.",
-      "OTPREMOVED": "One Time Password (OTP) rimosso.",
+      "OTPREMOVED": "OTP rimosso.",
       "U2FREMOVED": "Fattore rimosso.",
       "PASSWORDLESSREMOVED": "Rimosso con passkey.",
       "INITIALPASSWORDSET": "Password iniziale impostata.",
@@ -1612,8 +1612,8 @@
         "4": "Ripristino Password",
         "5": "Inizializzazione passkey",
         "6": "Segreto dell'applicazione",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
@@ -1877,8 +1877,8 @@
         "changedate": "Cambia data",
         "username": "Nome utente",
         "tempUsername": "Nome utente temporaneo",
-        "otp": "Password monouso",
-        "verifyUrl": "URL per verificare la password monouso",
+        "otp": "OTP",
+        "verifyUrl": "URL per verificare la OTP",
         "expiry": "Scadenza",
         "applicationName": "Nome dell'applicazione"
       },
@@ -2411,10 +2411,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password per Authenticator App (TOTP)",
+      "1": "OTP per Authenticator App (TOTP)",
       "2": "Passkey",
-      "3": "One Time Password per Email (OTP Email)",
-      "4": "One Time Password per SMS (OTP SMS)",
+      "3": "OTP per Email (OTP Email)",
+      "4": "OTP per SMS (OTP SMS)",
       "5": "Codici di recupero"
     }
   },

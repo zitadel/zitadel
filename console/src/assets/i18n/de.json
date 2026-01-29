@@ -223,8 +223,8 @@
           "PR": "Wenn ein Benutzer sein Passwort zurücksetzt, erhält er eine E-Mail mit einem Link, um ein neues Passwort festzulegen.",
           "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
           "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
-          "VEO": "Wenn ein Benutzer eine Einmalpasswort-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
-          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
+          "VEO": "Wenn ein Benutzer eine OTP-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
+          "VSO": "Wenn ein Benutzer eine OTP-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
           "IU": "Wenn ein Benutzer-Einladungscode erstellt wird, erhält er eine E-Mail mit einem Link zur Einstellung seiner Authentifizierungsmethode."
         }
       },
@@ -851,7 +851,7 @@
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
-        "1": "One Time Password (OTP)",
+        "1": "OTP",
         "2": "Passkey"
       },
       "STATE": {
@@ -895,7 +895,7 @@
       "U2F_NAME": "Authenticator Name",
       "OTPSMS": "OTP mit SMS",
       "OTPEMAIL": "OTP mit E-Mail",
-      "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor (Einmalpasswort) einrichten?",
+      "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor einrichten?",
       "OTPSMSSUCCESS": "OTP-Faktor erfolgrech hinzugefügt.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Um diese Methode nutzen zu können, muss Ihr Telefon verifiziert werden.",
       "OTPEMAILSUCCESS": "OTP-Faktor erfolgrech hinzugefügt.",
@@ -1612,8 +1612,8 @@
         "4": "Passwort Zurücksetzen Code",
         "5": "Passkey Initialisierungscode",
         "6": "Applicationssecret",
-        "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - Email"
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
       },
       "EXPIRY": "Ablauf (in Minuten)",
       "INCLUDEDIGITS": "Enthält Zahlen",
@@ -1877,8 +1877,8 @@
         "changedate": "Änderungsdatum",
         "username": "Username",
         "tempUsername": "Temp. Username",
-        "otp": "Einmalpasswort",
-        "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
+        "otp": "OTP",
+        "verifyUrl": "URL zur Überprüfung des OTPs",
         "expiry": "Ablauf",
         "applicationName": "Anwendungsname"
       },
@@ -2410,10 +2410,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password per Authenticator App (TOTP)",
+      "1": "OTP per Authenticator App (TOTP)",
       "2": "Passkey",
-      "3": "One Time Password per Email (OTP Email)",
-      "4": "One Time Password per SMS (OTP SMS)",
+      "3": "OTP per Email (OTP Email)",
+      "4": "OTP per SMS (OTP SMS)",
       "5": "Wiederherstellungscodes"
     }
   },
