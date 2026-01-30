@@ -34,6 +34,14 @@
           'USER.STATE.' + session.authState | translate
         }}</span>
       </div>
+      <button
+        matTooltip="{{ 'MENU.LOGOUT' | translate }}"
+        class="logout-button"
+        mat-icon-button
+        (click)="logoutSession($event, session)"
+      >
+        <i class="icon las la-minus-circle"></i>
+      </button>
       <mat-icon>keyboard_arrow_right</mat-icon>
     </a>
     <a class="row" (click)="selectNewAccount()">
@@ -47,5 +55,5 @@
     </a>
   </div>
 
-  <button (click)="logout()" color="warn" mat-stroked-button>{{ 'MENU.LOGOUT' | translate }}</button>
+  <button (click)="logoutAll()" color="warn" mat-stroked-button>{{ 'MENU.LOGOUTALL' | translate }}</button>
 </div>
