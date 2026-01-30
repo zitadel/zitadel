@@ -12,21 +12,21 @@ message LegalAndSupportSettings {
   // Link to the Terms of Service. Can be a relative or absolute URL.
   string tos_link = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+      example: "\"https://zitadel.com/docs/manage/legal/terms-of-service\"";
     }
   ];
 
   // Link to the Privacy Policy. Can be a relative or absolute URL.
   string privacy_policy_link = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+      example: "\"https://zitadel.com/docs/manage/legal/policies/privacy-policy\"";
     }
   ];
 
   // Link to a help page. Can be a relative or absolute URL.
   string help_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://zitadel.com/docs/manuals/introduction\"";
+      example: "\"https://zitadel.com/docs/manage/console-overview\"";
     }
   ];
 

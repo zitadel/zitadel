@@ -16,6 +16,7 @@ The following files and directories, including their subdirectories, are license
 
 ```
 proto/
+apps/docs/
 ```
 
 
