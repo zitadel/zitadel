@@ -1,0 +1,62 @@
+---
+title: Kubernetes
+sidebar_label: Overview
+---
+
+
+
+Deploy Zitadel, the open-source identity and access management platform, on Kubernetes using Helm.
+
+## What's in the Chart
+
+By default, this chart installs a highly available Zitadel deployment. The chart deploys:
+
+- A Zitadel **init job** that prepares the database schema
+- A Zitadel **setup job** that bootstraps the first instance and admin user
+- A Zitadel **deployment** with configurable replicas for high availability
+
+The execution order is orchestrated using Helm hooks on installations and upgrades.
+
+## Architecture Overview
+
+Zitadel is deployed as two separate containers within your Kubernetes cluster. The main Zitadel container handles all API traffic, the console UI, and OIDC endpoints, while the Login container serves the login UI at the `/ui/v2/login` path. Both containers are stateless and can be scaled horizontally to handle increased load.
+
+Traffic enters the cluster through an ingress controller such as Traefik or NGINX. The chart creates two separate Ingress resources, one for each container, both typically sharing the same domain and TLS certificate.
+
+TLS termination happens at the ingress controller, which forwards unencrypted HTTP/2 traffic to the pods. cert-manager or the ingress controller's built-in ACME support can be used to automatically obtain and renew TLS certificates from Let's Encrypt.
+
+Zitadel stores all persistent data in PostgreSQL. The database holds user accounts, organizations, projects, applications, sessions, and all other identity data. Zitadel uses two database connections: an admin connection for schema migrations during startup and an application connection for normal operations. Both connections should use TLS in production environments.
+
+For observability, Zitadel pushes traces to an OpenTelemetry Collector using the OTLP protocol over gRPC. Prometheus scrapes metrics from the `/debug/metrics` endpoint on the Zitadel pods. Both containers write structured logs to stdout, which must be collected by a log collector such as Fluent Bit or Vector. The Login container does not support tracing or metrics, only log collection. All observability data can be forwarded to a unified backend such as Grafana, OpenObserve, or your preferred monitoring stack.
+
+## Prerequisites at a Glance
+
+| Requirement | Minimum Version |
+|-------------|-----------------|
+| Kubernetes | 1.30+ |
+| Helm | 3.x or 4.x |
+| kubectl | 1.30+ |
+| PostgreSQL | 14+ |
+
+You also need:
+- An ingress controller (Traefik, NGINX, or cloud-native)
+- A domain with DNS configured
+- TLS certificates (via cert-manager, ACME, or manual)
+
+## Quick Links
+
+| Resource | Link |
+|----------|------|
+| Helm Chart Repository | [charts.zitadel.com](https://charts.zitadel.com) |
+| Source Code | [github.com/zitadel/zitadel-charts](https://github.com/zitadel/zitadel-charts) |
+| Zitadel Documentation | [zitadel.com/docs](https://zitadel.com/docs) |
+| Artifact Hub | [artifacthub.io/packages/helm/zitadel/zitadel](https://artifacthub.io/packages/helm/zitadel/zitadel) |
+
+## Next Steps
+
+- [Installation](/self-hosting/deploy/kubernetes/installation) — Get Zitadel running
+- [Configuration](/self-hosting/deploy/kubernetes/configuration) — Customize your deployment
+- [Configuring the Ingress](/self-hosting/deploy/kubernetes/ingress) — Set up ingress for Zitadel and Login containers
+- [Configuring the Database](/self-hosting/deploy/kubernetes/database) — Connect to PostgreSQL
+- [Operations](/self-hosting/deploy/kubernetes/operations) — Upgrades and scaling
+- [Uninstalling](/self-hosting/deploy/kubernetes/uninstalling) — Remove Zitadel from your cluster
