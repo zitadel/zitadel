@@ -16,7 +16,6 @@ import (
 	"github.com/drone/envsubst"
 	"github.com/jarcoal/jpath"
 	"github.com/sony/sonyflake"
-	"github.com/zitadel/logging"
 )
 
 type sonyflakeGenerator struct {
@@ -107,7 +106,7 @@ func MachineIdentificationMethod() string {
 
 func machineID() (uint16, error) {
 	if GeneratorConfig == nil {
-		logging.Panic("cannot create a unique id for the machine, generator has not been configured")
+		panic("cannot create a unique id for the machine, generator has not been configured")
 	}
 
 	errors := []string{}
@@ -139,9 +138,7 @@ func machineID() (uint16, error) {
 		errors = append(errors, "No machine identification method enabled.")
 	}
 
-	logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
-	// this return will never happen because of panic one line before
-	return 0, nil
+	panic(fmt.Sprintf("none of the enabled methods for identifying the machine succeeded: %s", strings.Join(errors, ", ")))
 }
 
 func lower16BitPrivateIP() (uint16, error) {
