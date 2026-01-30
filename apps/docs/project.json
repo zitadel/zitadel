@@ -1,0 +1,242 @@
+{
+  "name": "@zitadel/docs",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm build",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/.next"
+      ],
+      "dependsOn": [
+        "^build",
+        "check-links"
+      ],
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm dev",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate"
+      ]
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm start",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "fetch-remote-content": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm fetch:remote-content",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/content/v*",
+        "{projectRoot}/content/versions.json",
+        "{projectRoot}/public/v*"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "runtime": "git ls-remote --tags --sort=-v:refname https://github.com/zitadel/zitadel.git | grep 'refs/tags/v[0-9]' | grep -v '\\^{}' | head -n 5"
+        }
+      ]
+    },
+    "generate-proto-docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:proto-docs",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "fetch-remote-content"
+      ],
+      "outputs": [
+        "{projectRoot}/openapi"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/proto/**/*",
+        {
+          "dependentTasksOutputFiles": "apps/docs/content/versions.json"
+        }
+      ]
+    },
+    "generate-api-reference": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:api-reference",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/content/reference/api",
+        "{projectRoot}/content/v*/reference/api"
+      ],
+      "dependsOn": [
+        "generate-proto-docs"
+      ],
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/scripts/generate-api-reference.mts",
+        {
+          "dependentTasksOutputFiles": "apps/docs/openapi/**"
+        }
+      ]
+    },
+    "fix-api-links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm fix:api-links",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate-api-reference"
+      ],
+      "cache": false,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "apps/docs/content/reference/api/**"
+        }
+      ]
+    },
+    "generate-index-pages": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:index-pages",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/content/**/index.mdx"
+      ],
+      "dependsOn": [
+        "fetch-remote-content"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{projectRoot}/content/versions.json"
+      ]
+    },
+    "build-mdx-source": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm build:mdx-source",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/.source"
+      ],
+      "dependsOn": [
+        "fix-api-links",
+        "generate-index-pages"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        {
+          "dependentTasksOutputFiles": "apps/docs/content/**"
+        }
+      ]
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Generation complete'",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "build-mdx-source"
+      ]
+    },
+    "check-links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm check:links",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/proto/**/*",
+        "{projectRoot}/content/**/*",
+        "{projectRoot}/public/**/*"
+      ]
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm clean",
+        "cwd": "apps/docs"
+      }
+    },
+    "check-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm check:types",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{projectRoot}/tsconfig.json",
+        "{projectRoot}/**/*.{ts,tsx}",
+        "{projectRoot}/.next/types/**/*.ts"
+      ]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Test complete'",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "check-types",
+        "check-links"
+      ]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm lint",
+        "cwd": "apps/docs"
+      },
+      "dependsOn": [
+        "generate"
+      ],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{projectRoot}/eslint.config.mjs",
+        "{projectRoot}/content/**/*.{md,mdx}"
+      ]
+    }
+  }
+}
