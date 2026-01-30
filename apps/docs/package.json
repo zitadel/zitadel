@@ -16,6 +16,7 @@
     "clean": "node scripts/clean.mjs",
     "check:types": "fumadocs-mdx && next typegen && tsc --noEmit",
     "check:links": "tsx scripts/check-links.mts",
+    "test:scripts": "node --test scripts/*.test.mjs",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint ."
   },

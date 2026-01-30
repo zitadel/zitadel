@@ -213,7 +213,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Test complete'",
+        "command": "pnpm test:scripts",
         "cwd": "apps/docs"
       },
       "dependsOn": [
