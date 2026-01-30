@@ -739,7 +739,24 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/deploy/macos",
           "self-hosting/deploy/devcontainer",
           "self-hosting/deploy/compose",
-          "self-hosting/deploy/kubernetes",
+          {
+            type: "category",
+            label: "Kubernetes",
+            collapsed: true,
+            link: {
+              type: "doc",
+              id: "self-hosting/deploy/kubernetes/index",
+            },
+            items: [
+              "self-hosting/deploy/kubernetes/installation",
+              "self-hosting/deploy/kubernetes/configuration",
+              "self-hosting/deploy/kubernetes/ingress",
+              "self-hosting/deploy/kubernetes/database",
+              "self-hosting/deploy/kubernetes/observability",
+              "self-hosting/deploy/kubernetes/operations",
+              "self-hosting/deploy/kubernetes/uninstalling",
+            ],
+          },
           {
             type: "category",
             label: "Manage",
