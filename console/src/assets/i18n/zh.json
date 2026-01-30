@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "登录表单",
           "DESCRIPTION": "自定义登录表单。",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "允许用户名和密码",
-            "DESCRIPTION": "允许用户使用他们的用户名和密码登录。如果此功能被禁用，你的用户只能使用Passkey认证或外部身份提供者登录。"
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "允许本地身份验证",
+            "DESCRIPTION": "允许您的用户使用其用户名和密码或通行密钥身份验证登录。如果停用此选项，您的用户只能使用外部身份提供商登录。"
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "允许用户注册",

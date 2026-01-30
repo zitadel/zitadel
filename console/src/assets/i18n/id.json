@@ -281,9 +281,9 @@
         "FORM": {
           "TITLE": "Formulir Masuk",
           "DESCRIPTION": "Sesuaikan formulir login.",
-          "USERNAME_PASSWORD_ALLOWED": {
-            "TITLE": "Nama Pengguna dan Kata Sandi diperbolehkan",
-            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan nama pengguna dan kata sandi mereka. Jika ini dinonaktifkan, pengguna Anda hanya dapat masuk menggunakan autentikasi tanpa kata sandi atau dengan penyedia identitas eksternal."
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Otentikasi lokal diizinkan",
+            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan nama pengguna dan kata sandi atau autentikasi passkey. Jika ini dinonaktifkan, pengguna Anda hanya dapat masuk menggunakan penyedia identitas eksternal."
           },
           "USER_REGISTRATION_ALLOWED": {
             "TITLE": "Pendaftaran Pengguna diperbolehkan",

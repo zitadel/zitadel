@@ -52,7 +52,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       </div>
       <div className="w-full"></div>
     </DynamicTheme>
-  ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
+  ) : loginSettings?.allowRegister && loginSettings.allowLocalAuthentication ? (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
         <h1>
