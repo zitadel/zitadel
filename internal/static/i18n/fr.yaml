@@ -1018,7 +1018,7 @@ EventTypes:
       cleared: Flux effacé
     mail:
       template:
-        added: Modèle de courrier électronique ajouté
+        added: Modèle de e-mail ajouté
         changed: Modèle d'e-mail modifié
         removed: Modèle d'e-mail supprimé
       text:
@@ -1241,7 +1241,7 @@ EventTypes:
         set: Zitadel project set
     mail:
       template:
-        added: Modèle de courrier électronique ajouté
+        added: Modèle de e-mail ajouté
         changed: Modèle d'e-mail modifié
       text:
         added: Texte de l'e-mail ajouté

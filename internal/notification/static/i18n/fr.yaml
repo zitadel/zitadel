@@ -17,7 +17,7 @@ VerifyEmail:
   PreHeader: "Vérifier l'email"
   Subject: "Vérifier l'email"
   Greeting: "Bonjour {{.DisplayName}},"
-  Text: "Un nouveau courriel a été ajouté. Veuillez utiliser le bouton ci-dessous pour vérifier votre e-mail. (Code {{.Code}}) Si vous n'avez pas ajouté de nouvelle adresse e-mail, veuillez ignorer cet e-mail."
+  Text: "Un nouveau e-mail a été ajouté. Veuillez utiliser le bouton ci-dessous pour vérifier votre e-mail. (Code {{.Code}}) Si vous n'avez pas ajouté de nouvelle adresse e-mail, veuillez ignorer cet e-mail."
   ButtonText: "Vérifier l'email"
 VerifyPhone:
   Title: "Zitadel - Vérifier le téléphone"
