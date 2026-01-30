@@ -1852,40 +1852,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add ldap
 		before := time.Now()
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		after := time.Now()
 		require.NoError(t, err)
 
@@ -1940,40 +1907,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, &management.AddLDAPProviderRequest{
-			Name:              name,
-			Servers:           []string{"servers"},
-			StartTls:          true,
-			BaseDn:            "baseDN",
-			BindDn:            "bindND",
-			BindPassword:      "bindPassword",
-			UserBase:          "userBase",
-			UserObjectClasses: []string{"userOhjectClasses"},
-			UserFilters:       []string{"userFilters"},
-			Timeout:           durationpb.New(time.Minute),
-			Attributes: &idp_grpc.LDAPAttributes{
-				IdAttribute:                "idAttribute",
-				FirstNameAttribute:         "firstNameAttribute",
-				LastNameAttribute:          "lastNameAttribute",
-				DisplayNameAttribute:       "displayNameAttribute",
-				NickNameAttribute:          "nickNameAttribute",
-				PreferredUsernameAttribute: "preferredUsernameAttribute",
-				EmailAttribute:             "emailAttribute",
-				EmailVerifiedAttribute:     "emailVerifiedAttribute",
-				PhoneAttribute:             "phoneAttribute",
-				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
-				PreferredLanguageAttribute: "preferredLanguageAttribute",
-				AvatarUrlAttribute:         "avatarUrlAttribute",
-				ProfileAttribute:           "profileAttribute",
-			},
-			ProviderOptions: &idp_grpc.Options{
-				IsLinkingAllowed:  false,
-				IsCreationAllowed: false,
-				IsAutoCreation:    false,
-				IsAutoUpdate:      false,
-				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
-			},
-		})
+		addLdap, err := MgmtClient.AddLDAPProvider(IAMCTX, defaultOrganizationLDAPRequest(name))
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository()
@@ -2411,4 +2345,41 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
+}
+
+func defaultOrganizationLDAPRequest(providerName string) *management.AddLDAPProviderRequest {
+	return &management.AddLDAPProviderRequest{
+		Name:              providerName,
+		Servers:           []string{"servers"},
+		StartTls:          true,
+		BaseDn:            "baseDN",
+		BindDn:            "bindND",
+		BindPassword:      "bindPassword",
+		UserBase:          "userBase",
+		UserObjectClasses: []string{"userOhjectClasses"},
+		UserFilters:       []string{"userFilters"},
+		Timeout:           durationpb.New(time.Minute),
+		Attributes: &idp_grpc.LDAPAttributes{
+			IdAttribute:                "idAttribute",
+			FirstNameAttribute:         "firstNameAttribute",
+			LastNameAttribute:          "lastNameAttribute",
+			DisplayNameAttribute:       "displayNameAttribute",
+			NickNameAttribute:          "nickNameAttribute",
+			PreferredUsernameAttribute: "preferredUsernameAttribute",
+			EmailAttribute:             "emailAttribute",
+			EmailVerifiedAttribute:     "emailVerifiedAttribute",
+			PhoneAttribute:             "phoneAttribute",
+			PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
+			PreferredLanguageAttribute: "preferredLanguageAttribute",
+			AvatarUrlAttribute:         "avatarUrlAttribute",
+			ProfileAttribute:           "profileAttribute",
+		},
+		ProviderOptions: &idp_grpc.Options{
+			IsLinkingAllowed:  false,
+			IsCreationAllowed: false,
+			IsAutoCreation:    false,
+			IsAutoUpdate:      false,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+		},
+	}
 }
