@@ -893,7 +893,7 @@
       "U2F_ERROR": "Si è verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
       "OTPSMS": "OTP con SMS",
-      "OTPEMAIL": "OTP with Email",
+      "OTPEMAIL": "OTP con Email",
       "SETUPOTPSMSDESCRIPTION": "Vuoi impostare questo numero di telefono come secondo fattore OTP?",
       "OTPSMSSUCCESS": "Fattore OTP impostato con successo.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Il tuo telefono deve essere verificato per utilizzare questo metodo.",
