@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5"
 )
 
 // Pool is a connection pool. e.g. pgxpool
@@ -19,7 +21,7 @@ type Pool interface {
 type PoolTest interface {
 	Pool
 	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
-	MigrateTest(ctx context.Context) error
+	MigrateTest(ctx context.Context, typeRegistration func(ctx context.Context, conn *pgx.Conn) error) error
 }
 
 // Connection is a single database connection which can be released back to the pool.
