@@ -1,0 +1,148 @@
+---
+title: Operations
+sidebar_label: Operations
+---
+
+
+
+This guide covers day-2 operations for Zitadel on Kubernetes.
+
+## Upgrades
+
+### General Upgrade Process
+
+1. Review the release notes for your target version
+2. Back up your database
+3. Update your `values.yaml` with any required changes
+4. Upgrade the Helm release:
+
+```bash
+helm repo update
+helm upgrade my-zitadel zitadel/zitadel --values values.yaml --version <target-version>
+```
+
+5. Monitor the upgrade. Watch the pods:
+
+```bash
+kubectl get pods --watch
+```
+
+Check the Helm release status:
+
+```bash
+helm status my-zitadel
+```
+
+## Scaling
+
+### Manual Scaling
+
+Adjust the replica count in your values:
+
+```yaml
+replicaCount: 3
+```
+
+Or scale directly:
+
+```bash
+kubectl scale deployment my-zitadel --replicas=3
+```
+
+### Horizontal Pod Autoscaler
+
+Enable HPA for automatic scaling based on resource utilization:
+
+```yaml
+zitadel:
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+```
+
+This creates an HPA that:
+- Maintains at least 2 replicas
+- Scales up to 10 replicas
+- Targets 80% CPU and memory utilization
+
+View HPA status:
+
+```bash
+kubectl get hpa
+```
+
+Get detailed HPA information:
+
+```bash
+kubectl describe hpa my-zitadel
+```
+
+### Resource Requests and Limits
+
+Configure appropriate resource allocations:
+
+```yaml
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+```
+
+**Recommendations by deployment size:**
+
+| Size | CPU Request | CPU Limit | Memory Request | Memory Limit |
+|------|-------------|-----------|----------------|--------------|
+| Small (dev) | 100m | 500m | 256Mi | 512Mi |
+| Medium | 250m | 1000m | 512Mi | 1Gi |
+| Large | 500m | 2000m | 1Gi | 2Gi |
+
+### Pod Disruption Budget
+
+Ensure availability during voluntary disruptions by using `minAvailable`:
+
+```yaml
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+```
+
+Alternatively, use `maxUnavailable`:
+
+```yaml
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+```
+
+This ensures at least one pod remains available during node drains, upgrades, or other voluntary disruptions.
+
+### Database Scaling Considerations
+
+When scaling Zitadel horizontally, ensure your PostgreSQL database can handle the increased connection load:
+- Each Zitadel pod opens multiple connections
+- Consider using PgBouncer for connection pooling
+- Monitor database connection usage
+
+Example connection pooling setup with PgBouncer:
+
+```yaml
+zitadel:
+  configmapConfig:
+    Database:
+      Postgres:
+        Host: "pgbouncer.database.svc.cluster.local"
+        Port: 6432
+        MaxOpenConns: 20
+        MaxIdleConns: 10
+```
+
+## Next Steps
+
+- [Configuration](./configuration) — Review all configuration options
+- [Uninstalling](./uninstalling) — Remove Zitadel from your cluster
