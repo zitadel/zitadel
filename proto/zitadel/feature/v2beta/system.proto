@@ -33,7 +33,9 @@ message SetSystemFeaturesRequest{
   // See the security policy to allow impersonation on an instance.
   // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
   // Setting the field will have no effect.
-  optional bool oidc_token_exchange = 5;
+  optional bool oidc_token_exchange = 5 [
+    deprecated = true
+  ];
 
   repeated ImprovedPerformance improved_performance = 7 [
     (validate.rules).repeated.unique = true,
@@ -87,7 +89,9 @@ message GetSystemFeaturesResponse {
   // Token exchange can be used to request tokens with a lesser scope or impersonate other users.
   // See the security policy to allow impersonation on an instance.
   // This field is only kept for backward compatibility and will be removed in the next major version of Zitadel.
-  FeatureFlag oidc_token_exchange = 6;
+  FeatureFlag oidc_token_exchange = 6 [
+    deprecated = true
+  ];
 
   ImprovedPerformanceFeatureFlag improved_performance = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
