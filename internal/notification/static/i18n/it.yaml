@@ -31,11 +31,11 @@ VerifyEmailOTP:
   PreHeader: "Verifica l'OTP"
   Subject: "Verifica l'OTP"
   Greeting: "Ciao {{.DisplayName}},"
-  Text: "Per favore, utilizza il pulsante 'Autentica' o copia l'OTP {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a Zitadel entro i primi cinque minuti."
+  Text: "Per favore, utilizza il pulsante 'Autentica' o copia l'OTP {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a Zitadel entro i prossimi cinque minuti."
   ButtonText: "Autentica"
 VerifySMSOTP:
   Text: |-
-    {{.OTP}} è la tua OTP per {{ .Domain }}. Usalo entro il prossimo {{.Expiry}}.
+    {{.OTP}} è la tua OTP per {{ .Domain }}. Usala entro i prossimi {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: "Zitadel - Il dominio è stato rivendicato"

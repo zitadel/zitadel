@@ -223,8 +223,8 @@
           "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
-          "VEO": "When a user adds a OTP via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a OTP via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "VEO": "When a user adds an OTP via email method, they need to activate it by entering a code sent to their email address.",
+          "VSO": "When a user adds an OTP via SMS method, they need to activate it by entering a code sent to their phone number.",
           "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },

@@ -894,7 +894,7 @@
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
       "OTPSMS": "OTP avec SMS",
-      "OTPEMAIL": "OTP cone-mail",
+      "OTPEMAIL": "OTP avec e-mail",
       "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP ?",
       "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
@@ -1613,7 +1613,7 @@
         "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
         "7": "OTP - SMS",
-        "8": "OTP -e-mail"
+        "8": "OTP - e-mail"
       },
       "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
