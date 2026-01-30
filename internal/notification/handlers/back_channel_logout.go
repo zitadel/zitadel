@@ -2,25 +2,15 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"slices"
-	"sync"
-	"time"
-
-	"github.com/zitadel/oidc/v3/pkg/crypto"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/oidc/sign"
-	"github.com/zitadel/zitadel/internal/command"
-	zcrypto "github.com/zitadel/zitadel/internal/crypto"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/notification/channels/set"
+	"github.com/zitadel/zitadel/internal/notification/backchannel"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
-	"github.com/zitadel/zitadel/internal/notification/types"
+	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -32,33 +22,22 @@ const (
 )
 
 type backChannelLogoutNotifier struct {
-	commands         *command.Commands
-	queries          *NotificationQueries
-	eventstore       *eventstore.Eventstore
-	keyEncryptionAlg zcrypto.EncryptionAlgorithm
-	channels         types.ChannelChains
-	idGenerator      id.Generator
-	tokenLifetime    time.Duration
+	queries     *NotificationQueries
+	queue       Queue
+	maxAttempts uint8
 }
 
 func NewBackChannelLogoutNotifier(
 	ctx context.Context,
 	config handler.Config,
-	commands *command.Commands,
 	queries *NotificationQueries,
-	es *eventstore.Eventstore,
-	keyEncryptionAlg zcrypto.EncryptionAlgorithm,
-	channels types.ChannelChains,
-	tokenLifetime time.Duration,
+	queue Queue,
+	maxAttempts uint8,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &backChannelLogoutNotifier{
-		commands:         commands,
-		queries:          queries,
-		eventstore:       es,
-		keyEncryptionAlg: keyEncryptionAlg,
-		channels:         channels,
-		tokenLifetime:    tokenLifetime,
-		idGenerator:      id.SonyFlakeGenerator(),
+		queries:     queries,
+		queue:       queue,
+		maxAttempts: maxAttempts,
 	})
 
 }
@@ -106,7 +85,20 @@ func (u *backChannelLogoutNotifier) reduceUserSignedOut(event eventstore.Event) 
 		if e.SessionID == "" {
 			return nil
 		}
-		return u.terminateSession(ctx, e.SessionID, e)
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		return u.queue.Insert(ctx,
+			&backchannel.LogoutRequest{
+				Aggregate:           e.Aggregate(),
+				SessionID:           e.SessionID,
+				TriggeredAtOrigin:   http_util.DomainContext(ctx).Origin(),
+				TriggeringEventType: event.Type(),
+			},
+			queue.WithQueueName(backchannel.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -124,7 +116,20 @@ func (u *backChannelLogoutNotifier) reduceSessionTerminated(event eventstore.Eve
 		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
 			return nil
 		}
-		return u.terminateSession(ctx, e.Aggregate().ID, e)
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		return u.queue.Insert(ctx,
+			&backchannel.LogoutRequest{
+				Aggregate:           e.Aggregate(),
+				SessionID:           e.Aggregate().ID,
+				TriggeredAtOrigin:   http_util.DomainContext(ctx).Origin(),
+				TriggeringEventType: event.Type(),
+			},
+			queue.WithQueueName(backchannel.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
 	}), nil
 }
 
@@ -133,74 +138,6 @@ type backChannelLogoutSession struct {
 
 	// sessions contain a map of oidc session IDs and their corresponding clientID
 	sessions []backChannelLogoutOIDCSessions
-}
-
-func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id string, e eventstore.Event) error {
-	sessions := &backChannelLogoutSession{sessionID: id}
-	err := u.eventstore.FilterToQueryReducer(ctx, sessions)
-	if err != nil {
-		return err
-	}
-
-	ctx, err = u.queries.Origin(ctx, e)
-	if err != nil {
-		return err
-	}
-
-	getSigner := sign.GetSignerOnce(u.queries.GetActiveSigningWebKey)
-
-	var wg sync.WaitGroup
-	wg.Add(len(sessions.sessions))
-	errs := make([]error, 0, len(sessions.sessions))
-	for _, oidcSession := range sessions.sessions {
-		go func(oidcSession *backChannelLogoutOIDCSessions) {
-			defer wg.Done()
-			err := u.sendLogoutToken(ctx, oidcSession, e, getSigner)
-			if err != nil {
-				errs = append(errs, err)
-				return
-			}
-			err = u.commands.BackChannelLogoutSent(ctx, oidcSession.SessionID, oidcSession.OIDCSessionID, e.Aggregate().InstanceID)
-			if err != nil {
-				errs = append(errs, err)
-			}
-		}(&oidcSession)
-	}
-	wg.Wait()
-	return errors.Join(errs...)
-}
-
-func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner sign.SignerFunc) error {
-	token, err := u.logoutToken(ctx, oidcSession, getSigner)
-	if err != nil {
-		return err
-	}
-	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e.Type()).WithoutTemplate()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner sign.SignerFunc) (string, error) {
-	jwtID, err := u.idGenerator.Next()
-	if err != nil {
-		return "", err
-	}
-	token := oidc.NewLogoutTokenClaims(
-		http_utils.DomainContext(ctx).Origin(),
-		oidcSession.UserID,
-		oidc.Audience{oidcSession.ClientID},
-		time.Now().Add(u.tokenLifetime),
-		jwtID,
-		oidcSession.SessionID,
-		time.Second,
-	)
-	signer, _, err := getSigner(ctx)
-	if err != nil {
-		return "", err
-	}
-	return crypto.Sign(token, signer)
 }
 
 type LogoutTokenMessage struct {

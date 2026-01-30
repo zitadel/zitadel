@@ -24,4 +24,5 @@ type Commands interface {
 	InviteCodeSent(ctx context.Context, orgID, userID string) error
 	UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error
 	MilestonePushed(ctx context.Context, instanceID string, msType milestone.Type, endpoints []string) error
+	BackChannelLogoutSent(ctx context.Context, id, oidcSessionID, instanceID string) (err error)
 }
