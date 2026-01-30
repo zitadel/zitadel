@@ -60,6 +60,7 @@ type DefaultPaths struct {
 	PasswordSetPath string
 	EmailCodePath   string
 	OTPEmailPath    string
+	PasskeySetPath  string
 }
 
 func (c *Config) defaultBaseURL(ctx context.Context) string {
@@ -89,6 +90,13 @@ func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
 		return ""
 	}
 	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
+}
+func (c *Config) DefaultPasskeySetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasskeySetPath
 }
 
 const (
