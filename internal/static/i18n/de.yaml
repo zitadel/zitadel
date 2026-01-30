@@ -152,6 +152,7 @@ Errors:
       NotSet: Benutzer hat kein Passwort gesetzt
       NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
       NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt. Siehe https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Kennwort kann ohne Bestätigungstoken oder aktuelles Kennwort nicht geändert werden
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
