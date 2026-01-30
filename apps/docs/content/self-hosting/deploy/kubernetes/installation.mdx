@@ -122,12 +122,12 @@ zitadel:
         Database: "zitadel"
         User:
           Username: "zitadel"
-        SSL:
-          Mode: "verify-full"
+          SSL:
+            Mode: "verify-full"
         Admin:
           Username: "postgres"
-        SSL:
-          Mode: "verify-full"
+          SSL:
+            Mode: "verify-full"
     FirstInstance:
       Org:
         Human:
@@ -146,14 +146,14 @@ ingress:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
   hosts:
-  - host: zitadel.example.com
-    paths:
-    - path: /
-      pathType: Prefix
+    - host: zitadel.example.com
+      paths:
+        - path: /
+          pathType: Prefix
   tls:
-  - secretName: zitadel-tls
-    hosts:
-    - zitadel.example.com
+    - secretName: zitadel-tls
+      hosts:
+        - zitadel.example.com
 
 podDisruptionBudget:
   enabled: true

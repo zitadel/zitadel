@@ -64,7 +64,7 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-    - ALL
+      - ALL
 ```
 
 ## Zitadel Settings
@@ -261,15 +261,15 @@ autoscaling:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 10
-        periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
       policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 15
+        - type: Percent
+          value: 100
+          periodSeconds: 15
 ```
 
 ### Pod Disruption Budget
@@ -292,15 +292,15 @@ Pod anti-affinity rules tell Kubernetes to schedule Zitadel pods on different no
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - zitadel
-        topologyKey: kubernetes.io/hostname
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - zitadel
+          topologyKey: kubernetes.io/hostname
 ```
 
 The `preferredDuringSchedulingIgnoredDuringExecution` rule is a soft preference. Kubernetes will try to spread pods across nodes, but will still schedule pods on the same node if no other nodes are available. For stricter requirements, you can use `requiredDuringSchedulingIgnoredDuringExecution` instead.

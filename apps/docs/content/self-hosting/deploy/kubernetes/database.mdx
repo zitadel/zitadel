@@ -25,13 +25,13 @@ zitadel:
         User:
           Username: "zitadel"
           Password: "your-password"
-        SSL:
-          Mode: "disable"
+          SSL:
+            Mode: "disable"
         Admin:
           Username: "postgres"
           Password: "your-admin-password"
-        SSL:
-          Mode: "disable"
+          SSL:
+            Mode: "disable"
 ```
 
 The `SSL.Mode: "disable"` setting turns off TLS entirely. Traffic between Zitadel and PostgreSQL is unencrypted.
@@ -51,12 +51,12 @@ zitadel:
         Database: "zitadel"
         User:
           Username: "zitadel"
-        SSL:
-          Mode: "require"
+          SSL:
+            Mode: "require"
         Admin:
           Username: "postgres"
-        SSL:
-          Mode: "require"
+          SSL:
+            Mode: "require"
 ```
 
 Create a secret for the database passwords:
@@ -92,12 +92,12 @@ zitadel:
         Database: "zitadel"
         User:
           Username: "zitadel"
-        SSL:
-          Mode: "verify-full"
+          SSL:
+            Mode: "verify-full"
         Admin:
           Username: "postgres"
-        SSL:
-          Mode: "verify-full"
+          SSL:
+            Mode: "verify-full"
 ```
 
 Create a secret containing the CA certificate:

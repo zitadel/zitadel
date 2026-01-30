@@ -16,12 +16,12 @@ Zitadel can push traces to an [OpenTelemetry Collector](https://opentelemetry.io
 
 ```yaml
 env:
-- name: ZITADEL_TRACING_TYPE
-  value: "otel"
-- name: ZITADEL_TRACING_ENDPOINT
-  value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
-- name: ZITADEL_TRACING_SERVICENAME
-  value: "zitadel"
+  - name: ZITADEL_TRACING_TYPE
+    value: "otel"
+  - name: ZITADEL_TRACING_ENDPOINT
+    value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
+  - name: ZITADEL_TRACING_SERVICENAME
+    value: "zitadel"
 ```
 
 The `ZITADEL_TRACING_ENDPOINT` should point to your OpenTelemetry Collector's gRPC receiver, typically listening on port 4317. The collector can then forward traces to your preferred backend such as [Jaeger](https://www.jaegertracing.io/), [Grafana Tempo](https://grafana.com/oss/tempo/), or [OpenObserve](https://openobserve.ai/).
