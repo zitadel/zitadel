@@ -342,13 +342,13 @@ Errors:
         NotFound: Application key not found
     RequiredFieldsMissing: Some required fields are missing
     Grant:
-      AlreadyExists: Project grant already exists
-      NotFound: Grant not found
-      Invalid: Project grant is invalid
-      NotExisting: Project grant doesn't exist
+      AlreadyExists: Project Grant already exists
+      NotFound: Project Grant not found
+      Invalid: Project Grant is invalid
+      NotExisting: Project Grant doesn't exist
       HasNotExistingRole: One role doesn't exist on project
-      NotActive: Project grant is not active
-      NotInactive: Project grant is not inactive
+      NotActive: Project Grant is not active
+      NotInactive: Project Grant is not inactive
   IAM:
     NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:

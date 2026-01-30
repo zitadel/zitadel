@@ -2063,17 +2063,17 @@
       "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
-        "TITLE": "Create Organization Grant",
+        "TITLE": "Create Project Grant",
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
-        "SEL_ROLES": "Select the roles you want to be added to the grant",
+        "SEL_ROLES": "Select the roles you want to be added to the project grant",
         "SEL_USER": "Select users",
         "SEL_ORG": "Search an organization",
         "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
         "SEL_ORG_FORMFIELD": "Organization",
-        "FOR_ORG": "The grant is created for:"
+        "FOR_ORG": "The project grant is created for:"
       },
       "DETAIL": {
         "TITLE": "Project Grant",
@@ -2107,16 +2107,16 @@
       "NOROLES": "No roles",
       "TYPE": "Type",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
-        "PROJECTGRANTADDED": "Project grant created.",
-        "PROJECTGRANTCHANGED": "Project grant changed.",
+        "PROJECTGRANTUSERGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTADDED": "Project Grant created.",
+        "PROJECTGRANTCHANGED": "Project Grant changed.",
         "PROJECTGRANTMEMBERADDED": "Grant manager added.",
         "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
         "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
         "PROJECTGRANTUPDATED": "Project Grant updated"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Delete project grant",
+        "DELETE_TITLE": "Delete Project Grant",
         "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
       },
       "ROLES": "Project Roles"
@@ -2131,7 +2131,7 @@
       "ADDNEWLINE": "Add additional role",
       "KEY": "Key",
       "TITLE": "Roles",
-      "DESCRIPTION": "Define some roles which can be used to create project-grants.",
+      "DESCRIPTION": "Define some roles which can be used to create project grants.",
       "NAME": "Name",
       "DISPLAY_NAME": "Display Name",
       "GROUP": "Group",
