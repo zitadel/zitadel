@@ -2677,7 +2677,8 @@
             "DESCRIPTION": "Aplikasi Halaman Tunggal (SPA) dan secara umum semua kerangka JS dijalankan di browser"
           }
         }
-      }
+      },
+      "BACKCHANNELLOOGUTURI": "Back-Channel Logout URI"
     },
     "API": {
       "INFO": {
