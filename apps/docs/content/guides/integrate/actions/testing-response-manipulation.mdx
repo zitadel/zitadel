@@ -294,5 +294,5 @@ the [Sent information Response](./usage#sent-information-response) payload descr
 ## Conclusion
 
 You have successfully set up a target and execution to manipulate API responses in your ZITADEL instance.
-This feature can now be used to add necessary information for clients including the new login UI.
+This feature can now be used to add necessary information for applications including the new login UI.
 Find more information about the actions feature in the [API documentation](/concepts/features/actions_v2).

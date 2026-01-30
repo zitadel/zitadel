@@ -49,7 +49,7 @@ This section details the migrated resources, including any breaking changes and 
 ### General Changes
 
 #### Sunsetting OpenAPI/REST Support in Favor of Connect RPC
-While our v1 API already offered gRPC, it also provided a parallel REST/OpenAPI interface for clients who preferred making traditional HTTP calls.
+While our v1 API already offered gRPC, it also provided a parallel REST/OpenAPI interface for applications who preferred making traditional HTTP calls.
 
 In our v2 API, we are consolidating our efforts to provide a more streamlined and efficient development experience.
 The primary change is the removal of the OpenAPI/REST interface.
@@ -62,10 +62,10 @@ For teams already using gRPC, your transition will be minimal.
 For teams who were using the v1 REST API, migrating to v2 will involve adopting one of the following methods:
 
 - Native gRPC: For the highest performance and to leverage features like bi-directional streaming.
-- Connect RPC: For making CRUD-like (Create, Read, Update, Delete) calls over HTTP. This is the recommended path for most clients migrating from our v1 REST API.
+- Connect RPC: For making CRUD-like (Create, Read, Update, Delete) calls over HTTP. This is the recommended path for most applications migrating from our v1 REST API.
 
 A significant advantage of this new architecture remains the automatic generation of client libraries.
-Based on our .proto service definitions, you can generate type-safe clients for your specific programming language, whether you use native gRPC or Connect RPC.
+Based on our .proto service definitions, you can generate type-safe applications for your specific programming language, whether you use native gRPC or Connect RPC.
 This eliminates the need to write boilerplate code for handling HTTP requests and parsing responses, leading to a more streamlined and less error-prone development process.
 
 #### Contextual Information in the Request Body

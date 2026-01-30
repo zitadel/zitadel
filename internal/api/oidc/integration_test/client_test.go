@@ -257,14 +257,14 @@ func TestServer_VerifyClient(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "native client success",
+			name: "native application success",
 			client: clientDetails{
 				authReqClientID: nativeClient.GetClientId(),
 				clientID:        nativeClient.GetClientId(),
 			},
 		},
 		{
-			name: "web client basic secret empty error",
+			name: "web application basic secret empty error",
 			client: clientDetails{
 				authReqClientID: basicWebClient.GetClientId(),
 				clientID:        basicWebClient.GetClientId(),
@@ -273,7 +273,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "web client basic secret invalid error",
+			name: "web application basic secret invalid error",
 			client: clientDetails{
 				authReqClientID: basicWebClient.GetClientId(),
 				clientID:        basicWebClient.GetClientId(),
@@ -282,7 +282,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "web client basic secret success",
+			name: "web application basic secret success",
 			client: clientDetails{
 				authReqClientID: basicWebClient.GetClientId(),
 				clientID:        basicWebClient.GetClientId(),
@@ -290,7 +290,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			},
 		},
 		{
-			name: "web client JWT profile empty assertion error",
+			name: "web application JWT profile empty assertion error",
 			client: clientDetails{
 				authReqClientID: jwtWebClient.GetClientId(),
 				clientID:        jwtWebClient.GetClientId(),
@@ -298,7 +298,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "web client JWT profile invalid assertion error",
+			name: "web application JWT profile invalid assertion error",
 			client: clientDetails{
 				authReqClientID: jwtWebClient.GetClientId(),
 				clientID:        jwtWebClient.GetClientId(),
@@ -307,7 +307,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "web client JWT profile success",
+			name: "web application JWT profile success",
 			client: clientDetails{
 				authReqClientID: jwtWebClient.GetClientId(),
 				clientID:        jwtWebClient.GetClientId(),
