@@ -37,18 +37,18 @@ type UserRepository interface {
 type userConditions interface {
 	PrimaryKeyCondition(instanceID, userID string) database.Condition
 	InstanceIDCondition(instanceID string) database.Condition
-	OrgIDCondition(orgID string) database.Condition
+	OrganizationIDCondition(orgID string) database.Condition
 	IDCondition(userID string) database.Condition
 	UsernameCondition(op database.TextOperation, username string) database.Condition
 	StateCondition(state UserState) database.Condition
 	TypeCondition(userType UserType) database.Condition
 	LoginNameCondition(op database.TextOperation, loginName string) database.Condition
 
-	userMetadataConditions
+	ExistsMetadata(condition database.Condition) database.Condition
+	MetadataConditions() UserMetadataConditions
 }
 
-type userMetadataConditions interface {
-	ExistsMetadata(condition database.Condition) database.Condition
+type UserMetadataConditions interface {
 	MetadataKeyCondition(op database.TextOperation, key string) database.Condition
 	MetadataValueCondition(op database.BytesOperation, value []byte) database.Condition
 }
@@ -74,6 +74,8 @@ type userChanges interface {
 
 type userColumns interface {
 	PrimaryKeyColumns() []database.Column
+	InstanceIDColumn() database.Column
+	IDColumn() database.Column
 	UsernameColumn() database.Column
 	StateColumn() database.Column
 	TypeColumn() database.Column
@@ -101,15 +103,17 @@ type humanConditions interface {
 	EmailCondition(op database.TextOperation, email string) database.Condition
 	PhoneCondition(op database.TextOperation, phone string) database.Condition
 	PasskeyIDCondition(passkeyID string) database.Condition
-	IdentityProviderIDCondition(idpID string) database.Condition
+	LinkedIdentityProviderIDCondition(idpID string) database.Condition
 	ProvidedUserIDCondition(providedUserID string) database.Condition
 	ProvidedUsernameCondition(username string) database.Condition
 
-	humanPasskeyConditions
+	ExistsPasskey(condition database.Condition) database.Condition
+	PasskeyConditions() HumanPasskeyConditions
 }
 
 type humanChanges interface {
 	userChanges
+
 	// SetFirstName sets the first name field
 	SetFirstName(firstName string) database.Change
 	// SetLastName sets the last name field
@@ -127,26 +131,34 @@ type humanChanges interface {
 	// SetAvatarKey sets the avatar key field
 	// If avatarKey is nil, it will be set to NULL in the database
 	SetAvatarKey(avatarKey *string) database.Change
-	// SetMultifactorInitializationSkippedAt sets the multifactor initialization skipped at field
-	SetMultifactorInitializationSkippedAt(skippedAt time.Time) database.Change
-
-	// SetPassword sets the password based on the verification
-	SetPassword(verification VerificationType) database.Change
-	// SetPasswordChangeRequired sets whether a password change is required
-	SetPasswordChangeRequired(required bool) database.Change
-	// CheckPassword sets the password check based on the check type
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckPassword(check PasswordCheckType) database.Change
+	// SkipMultifactorInitializationAt sets the multifactor initialization skipped at field
+	SkipMultifactorInitializationAt(skippedAt time.Time) database.Change
+	// SkipMultifactorInitializationAt sets the multifactor initialization skipped at field
+	SkipMultifactorInitialization() database.Change
 
 	// SetVerification sets the verification based on the verification type
-	SetVerification(id string, verification VerificationType) database.Change
+	SetVerification(verification VerificationType) database.Change
 
+	humanPasswordChanges
 	humanEmailChanges
 	humanPhoneChanges
 	humanTOTPChanges
 	identityProviderLinkChanges
 	humanPasskeyChanges
+}
+
+type humanPasswordChanges interface {
+	// SetPassword sets the password based on the verification
+	SetPassword(verification VerificationType) database.Change
+	// SetPasswordChangeRequired sets whether a password change is required
+	SetPasswordChangeRequired(required bool) database.Change
+	// SetLastSuccessfulPasswordCheck sets the last successful password check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulPasswordCheck(checkedAt time.Time) database.Change
+	// IncrementPasswordFailedAttempts increments the password failed attempts
+	IncrementPasswordFailedAttempts() database.Change
+	// ResetPasswordFailedAttempts resets the password failed attempts
+	ResetPasswordFailedAttempts() database.Change
 }
 
 type humanEmailChanges interface {
@@ -156,11 +168,6 @@ type humanEmailChanges interface {
 	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
-	// CheckEmailOTP sets the email OTP based on the check
-	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckEmailOTP(check CheckType) database.Change
 	// EnableEmailOTPAt enables the email OTP
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
@@ -168,6 +175,13 @@ type humanEmailChanges interface {
 	EnableEmailOTP() database.Change
 	// DisableEmailOTP clears the enabled at time
 	DisableEmailOTP() database.Change
+	// SetLastSuccessfulEmailOTPCheck sets the last successful email OTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulEmailOTPCheck(checkedAt time.Time) database.Change
+	// IncrementEmailOTPFailedAttempts increments the email OTP failed attempts
+	IncrementEmailOTPFailedAttempts() database.Change
+	// ResetEmailOTPFailedAttempts resets the email OTP failed attempts
+	ResetEmailOTPFailedAttempts() database.Change
 }
 
 type humanPhoneChanges interface {
@@ -179,11 +193,6 @@ type humanPhoneChanges interface {
 	SetPhone(verification VerificationType) database.Change
 	// RemovePhone removes the phone number
 	RemovePhone() database.Change
-	// CheckSMSOTP sets the SMS OTP based on the check
-	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	CheckSMSOTP(check CheckType) database.Change
 	// EnableSMSOTPAt enables the SMS OTP
 	// If enabledAt is zero, it will be set to NOW()
 	EnableSMSOTPAt(enabledAt time.Time) database.Change
@@ -191,28 +200,32 @@ type humanPhoneChanges interface {
 	EnableSMSOTP() database.Change
 	// DisableSMSOTP clears the enabled at time
 	DisableSMSOTP() database.Change
+	// SetLastSuccessfulSMSOTPCheck sets the last successful SMS OTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulSMSOTPCheck(checkedAt time.Time) database.Change
+	// IncrementPhoneOTPFailedAttempts increments the phone OTP failed attempts
+	IncrementPhoneOTPFailedAttempts() database.Change
+	// ResetPhoneOTPFailedAttempts resets the phone OTP failed attempts
+	ResetPhoneOTPFailedAttempts() database.Change
 }
 
 type humanTOTPChanges interface {
-	// SetTOTP changes the TOTP secret based on the verification
-	// 	* [VerificationTypeInit] to initialize totp verification, previously verified totp remains verified
-	// 	* [VerificationTypeVerified] to mark totp as verified, a verification must exist
-	// 	* [VerificationTypeUpdate] to update totp verification, a verification must exist (e.g. resend code)
-	// 	* [VerificationTypeSkipped] to skip totp verification, existing verification is removed (e.g. admin set totp)
-	SetTOTP(verification VerificationType) database.Change
-	// SetTOTPCheck sets the TOTP check based on the check type
-	//  * [CheckTypeFailed] increments failed attempts
-	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
-	//  * [CheckTypeInit] is not allowed for TOTP
-	CheckTOTP(check CheckType) database.Change
+	// SetTOTP changes the TOTP secret and verification timestamp
+	SetTOTPSecret(secret []byte) database.Change
+	// SetTOTPVerifiedAt sets the TOTP verified at time
+	// If verifiedAt is zero, it will be set to NOW()
+	SetTOTPVerifiedAt(verifiedAt time.Time) database.Change
 	// RemoveTOTP removes the TOTP
 	RemoveTOTP() database.Change
+	// SetLastSuccessfulTOTPCheck sets the last successful TOTP check time
+	// If checkedAt is zero, it will be set to NOW()
+	SetLastSuccessfulTOTPCheck(checkedAt time.Time) database.Change
 }
 
 type identityProviderLinkChanges interface {
 	// AddIdentityProviderLink adds or updates an identity provider link
 	AddIdentityProviderLink(link *IdentityProviderLink) database.Change
-	UpdateIdentityProviderLink(changes ...database.Change) database.Change
+	UpdateIdentityProviderLink(condition database.Condition, changes ...database.Change) database.Change
 	// RemoveIdentityProviderLink removes an identity provider link based on the condition
 	RemoveIdentityProviderLink(providerID, providedUserID string) database.Change
 
@@ -256,7 +269,7 @@ type machineChanges interface {
 	// nil will set the secret to NULL in the database
 	SetSecret(secret *string) database.Change
 	// SetAccessTokenType sets the personal access token type field
-	SetAccessTokenType(tokenType PersonalAccessTokenType) database.Change
+	SetAccessTokenType(tokenType AccessTokenType) database.Change
 
 	// AddKey adds a key for the machine user
 	AddKey(key *MachineKey) database.Change
@@ -273,7 +286,7 @@ type machineColumns interface {
 	userColumns
 }
 
-type humanPasskeyConditions interface {
+type HumanPasskeyConditions interface {
 	PasskeyIDCondition(passkeyID string) database.Condition
 	PasskeyKeyIDCondition(keyID string) database.Condition
 	PasskeyChallengeCondition(challenge string) database.Condition
