@@ -26,13 +26,15 @@ console.log(`[fetch-docs] CONTENT_DIR: ${CONTENT_DIR}`);
 // --- Helper Functions ---
 
 // Sanitize logs to prevent log injection (CWE-117)
-function safeLog(str) {
+export function safeLog(str) {
   return str ? String(str).replace(/[\n\r]/g, '') : '';
 }
 
 // Validate refs to prevent command injection or unsafe URL construction
-function isValidRef(ref) {
+export function isValidRef(ref) {
   // Allow alphanumeric, dots, dashes, underscores, and slashes (for branches like fix/foo)
+  // But explicitly disallow ".." to prevent traversal
+  if (ref.includes('..')) return false;
   return /^[a-zA-Z0-9._\-/]+$/.test(ref);
 }
 
@@ -43,16 +45,26 @@ function getCurrentRef() {
 
   if (process.env.VERCEL_GIT_COMMIT_REF) {
     const ref = process.env.VERCEL_GIT_COMMIT_REF;
-    console.log(`[ref] Detected Vercel Branch: ${safeLog(ref)}`);
-    cachedRef = ref;
-    return cachedRef;
+    if (!isValidRef(ref)) {
+       console.warn(`[ref] Invalid VERCEL_GIT_COMMIT_REF: ${safeLog(ref)}, falling through...`);
+    } else {
+       console.log(`[ref] Detected Vercel Branch: ${safeLog(ref)}`);
+       cachedRef = ref;
+       return cachedRef;
+    }
   }
+
   if (process.env.GITHUB_REF_NAME) {
     const ref = process.env.GITHUB_REF_NAME;
-    console.log(`[ref] Detected GitHub Action Branch: ${safeLog(ref)}`);
-    cachedRef = ref;
-    return cachedRef;
+    if (!isValidRef(ref)) {
+       console.warn(`[ref] Invalid GITHUB_REF_NAME: ${safeLog(ref)}, falling through...`);
+    } else {
+       console.log(`[ref] Detected GitHub Action Branch: ${safeLog(ref)}`);
+       cachedRef = ref;
+       return cachedRef;
+    }
   }
+
   try {
     const branch = execSync('git branch --show-current').toString().trim();
     if (branch) {
@@ -222,9 +234,7 @@ async function downloadVersion(tag, sourceRef) {
         fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
     } else {
          // Fallback warning
-         if (!fs.existsSync(join(tempDir, 'apps/docs/content'))) {
-            console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${safeLog(sourceRef)})`);
-         }
+         console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${safeLog(sourceRef)})`);
     }
     
     // Handle external files
@@ -258,7 +268,15 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     console.log(`[local] Reading local file content for: ${repoPath}`);
     const repoRoot = resolve(ROOT_DIR, '../..');
     
-    const normalizedRepoPath = repoPath.replace(/\\/g, '/');
+    let decodedRepoPath;
+    try {
+        decodedRepoPath = decodeURIComponent(repoPath.replace(/\\/g, '/'));
+    } catch (e) {
+        // If decoding fails (malformed escape sequences), fall back to original
+        decodedRepoPath = repoPath;
+    }
+    const normalizedRepoPath = decodedRepoPath.replace(/\\/g, '/');
+
     const localPath = resolve(repoRoot, normalizedRepoPath);
     
     // Secure Check: Ensure the resolved path actually starts with the repo root
@@ -461,7 +479,8 @@ async function run() {
         console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
     } else {
         await downloadVersion(tag, sourceRef);
-        await fixRelativeImports(contentDest, tag);
+        // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
+        await fixRelativeImports(contentDest, sourceRef);
     }
   }));
 

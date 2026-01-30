@@ -2,7 +2,7 @@ import { test, describe, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
-import { getCurrentRef, resetCache, downloadFileContent, downloadVersion } from './fetch-remote-content.mjs';
+import { getCurrentRef, resetCache, downloadFileContent, isValidRef, safeLog } from './fetch-remote-content.mjs';
 
 const TEST_TMP_DIR = path.join(process.cwd(), '.test-tmp');
 const MOCK_REPO_ROOT = path.join(TEST_TMP_DIR, 'mock-repo');
@@ -37,15 +37,46 @@ describe('fetch-remote-content', () => {
     }
   });
 
+  // --- Helper Tests ---
+  describe('isValidRef', () => {
+      test('accepts valid alphanumeric refs', () => {
+          assert.strictEqual(isValidRef('main'), true);
+          assert.strictEqual(isValidRef('v1.0.0'), true);
+          assert.strictEqual(isValidRef('feature/new-docs'), true);
+          assert.strictEqual(isValidRef('fix_bug-123'), true);
+      });
+
+      test('rejects malicious refs', () => {
+          assert.strictEqual(isValidRef('; rm -rf'), false);
+          assert.strictEqual(isValidRef('main && echo pwned'), false);
+          assert.strictEqual(isValidRef('../parent'), false); // contains .. which isn't allowed in regex
+      });
+  });
+
+  describe('safeLog', () => {
+      test('strips newlines', () => {
+          assert.strictEqual(safeLog('valid'), 'valid');
+          assert.strictEqual(safeLog('malicious\nlog'), 'maliciouslog');
+          assert.strictEqual(safeLog('malicious\r\nlog'), 'maliciouslog');
+      });
+  });
+
   // --- getCurrentRef Tests ---
   describe('getCurrentRef', () => {
-    test('returns VERCEL_GIT_COMMIT_REF if set', () => {
+    test('returns VERCEL_GIT_COMMIT_REF if set and valid', () => {
       process.env.VERCEL_GIT_COMMIT_REF = 'vercel-branch';
       delete process.env.GITHUB_REF_NAME;
       assert.strictEqual(getCurrentRef(), 'vercel-branch');
     });
 
-    test('returns GITHUB_REF_NAME if set', () => {
+    test('ignores invalid VERCEL_GIT_COMMIT_REF', () => {
+        // Should fall through to GITHUB or git command
+        process.env.VERCEL_GIT_COMMIT_REF = 'invalid;cmd'; 
+        process.env.GITHUB_REF_NAME = 'valid-github';
+        assert.strictEqual(getCurrentRef(), 'valid-github');
+    });
+
+    test('returns GITHUB_REF_NAME if set and valid', () => {
       delete process.env.VERCEL_GIT_COMMIT_REF;
       process.env.GITHUB_REF_NAME = 'github-branch';
       assert.strictEqual(getCurrentRef(), 'github-branch');
@@ -57,13 +88,18 @@ describe('fetch-remote-content', () => {
     
     test('refuses traversal attempts (..)', async () => {
         // We expect this to return null and log a warning
-        // This validates the new startsWith security check
         const content = await downloadFileContent('main', '../secrets/passwd');
         assert.strictEqual(content, null);
     });
     
     test('refuses absolute paths', async () => {
         const content = await downloadFileContent('main', '/etc/passwd');
+        assert.strictEqual(content, null);
+    });
+
+    test('refuses encoded traversal attempts', async () => {
+        // %2e%2e is ..
+        const content = await downloadFileContent('main', '%2e%2e/secrets/passwd');
         assert.strictEqual(content, null);
     });
 
