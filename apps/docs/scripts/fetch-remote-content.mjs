@@ -111,51 +111,6 @@ async function downloadVersion(tag, sourceRef) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
 
-  const tarArgs = [
-    '-xz',
-    '-C', tempDir,
-    `--strip-components=1`,
-    `zitadel-${sourceRef.replace(/\//g, '-')}/apps/docs/content`, // GitHub archive naming usually matches ref name with slashes replaced? No, usually zitadel-ref. For tags it might vary.
-    // Actually, GitHub archives top folder is usually `repo-ref`. 
-    // For `v4.10.0` -> `zitadel-4.10.0`. For `fuma-docs` -> `zitadel-fuma-docs`.
-    // We should probably rely on wildcard or just strict assumption.
-    // Let's use a wildcard for the top directory since we strip it anyway?
-    // wait, --strip-components=1 removes the top level folder, whatever it is.
-    // BUT we are explicitly listing paths INSIDE that folder to extract.
-    // `tar` requires separate arguments for paths.
-    // If we don't know the exact top folder name, we can't restrict extraction efficiently without wildcards.
-    // BUT standard `tar` doesn't always support wildcards in extraction list nicely.
-    // Strategy: Extract the whole thing? No, too big.
-    // Solution: The top folder name is predictable.
-    // Branch: `zitadel-<branch-name>`
-    // Tag: `zitadel-<tag-name>` (usually without 'v' if tag has 'v'? No, usually matches tag exactly).
-    // Let's refine the top folder guess.
-  ];
-
-  // GitHub archive folder name logic:
-  // Refs/heads/fuma-docs -> zitadel-fuma-docs
-  // Refs/tags/v4.10.0 -> zitadel-4.10.0 (often strips 'v'?) OR zitadel-v4.10.0?
-  // It's inconsistent. 
-  // Better approach: Download and list first? Or extract everything and move?
-  // Let's try to extract specific paths but use a wildcard if possible?
-  // Actually, preventing the extract of the whole repo is good.
-  // Let's guess:
-  let topFolder = `zitadel-${sourceRef}`;
-  // Tags often strip 'v' in the folder name if using 'archive/vX.Y.Z.tar.gz' vs 'archive/refs/tags/vX.Y.Z.tar.gz'
-  // using refs/tags/... generally preserves it or uses the tag name.
-  // Let's try to just extract *apps/docs/content* with a wildcard pattern if supported?
-  // `*/apps/docs/content`
-
-  // Update tarArgs to be safer with wildcards if using GNU tar, but macos bsdtar differs.
-  // Safest: Extract all, then filter? Repository is large.
-  // Let's stick to the previous code's assumption but make it dynamic.
-  // Previous code: `zitadel-${MOCK_REF}/...`
-  // If sourceRef is 'v4.10.0', try `zitadel-4.10.0` or `zitadel-v4.10.0`.
-  // Let's just assume `zitadel-${sourceRef}` or `zitadel-${sourceRef.replace(/^v/, '')}`
-
-  // Hack: We can peak at the first file entries? No.
-  // Let's just try to extract `*/apps/docs/content` using --wildcards if on linux (which we are).
-
   const tarArgsWildcard = [
     '-xz',
     '-C', tempDir,
@@ -201,12 +156,6 @@ async function downloadVersion(tag, sourceRef) {
   if (fs.existsSync(join(tempDir, 'apps/docs/content'))) {
     fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
   } else {
-    // Fallback: sometimes unzipping structure might differ if wildcards matched differently?
-    // Check if there is only one folder in tempDir?
-    // With strip-components=1 and wildcards, it "should" land in tempDir/apps/docs/content directly 
-    // IF the wildcards matched `topfolder/apps/docs/content`.
-    // If `apps/docs/content` is not there, check for `content` root?
-    // Let's verify commonly used structure.
     if (!fs.existsSync(join(tempDir, 'apps/docs/content'))) {
       console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${sourceRef})`);
     }
@@ -230,8 +179,6 @@ async function downloadVersion(tag, sourceRef) {
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 }
-
-
 
 async function downloadFileContent(tagOrBranch, repoPath) {
   const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
@@ -344,20 +291,6 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
         changed = true;
         return `${p1}${rewritten}${p3}`;
       }
-
-      // External file handling (legacy logic preserved/adapted)
-      // If rewritePath returned null, maybe it is the "external download" case?
-      // Let's implement the external download check here if rewritePath didn't handle it.
-      // ... (The original logic specifically looked for `../../../../../cmd` etc)
-      // We can incorporate it into rewritePath or do it here.
-
-      // Let's check for the cmd/defaults.yaml case explicitly if rewritePath failed
-      if (p2.includes('/cmd/')) {
-        // Re-use logic for downloading external files? 
-        // It's cleaner to put it in rewritePath, but I need async. replace does not support async.
-        // This function 'fixRelativeImports' is async. I can collect matches first.
-      }
-
       return match;
     });
 
@@ -500,8 +433,10 @@ async function run() {
   await Promise.all(others.map(async (tag) => {
     let sourceRef = tag;
 
-    // Explicit logic for version 4.10.0 to use active branch
-    if (tag === FALLBACK_VERSION || tag === '4.10.0') {
+    // Explicit logic for version 4.10.x to use active branch (Faking 4.10.x)
+    // This prevents fetching incompatible legacy docs for 4.10.1 etc.
+    if (tag === FALLBACK_VERSION || (semver.major(tag) === 4 && semver.minor(tag) === 10)) {
+      console.log(`[fake-override] Version ${tag} matches 4.10.x. Using fallback source (main/current) instead of tag.`);
       sourceRef = getFallbackSource();
     }
 
