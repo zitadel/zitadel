@@ -34,7 +34,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		Details:         object.DomainToDetailsPb(f.Details),
 		LoginDefaultOrg: featureSourceToFlagPb(&f.LoginDefaultOrg),
 		UserSchema:      featureSourceToFlagPb(&f.UserSchema),
-		OidcTokenExchange: &feature_pb.FeatureFlag{ //nolint:staticcheck TODO: remove in next major version
+		OidcTokenExchange: &feature_pb.FeatureFlag{ // TODO: remove in next major version
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
@@ -71,7 +71,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		Details:         object.DomainToDetailsPb(f.Details),
 		LoginDefaultOrg: featureSourceToFlagPb(&f.LoginDefaultOrg),
 		UserSchema:      featureSourceToFlagPb(&f.UserSchema),
-		OidcTokenExchange: &feature_pb.FeatureFlag{ //nolint:staticcheck TODO: remove in next major version
+		OidcTokenExchange: &feature_pb.FeatureFlag{ // TODO: remove in next major version
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
