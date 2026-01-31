@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: Data ogiltig för användarschema
   TokenExchange:
-    FeatureDisabled: Token Exchange-funktionen är inaktiverad för din instans. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token saknas
       Invalid: Token är ogiltig
@@ -618,7 +617,6 @@ Errors:
     ActiveDelete: Det går inte att ta bort aktiv webbnyckel
     Config: Ogiltig webbnyckelkonfiguration
     Duplicate: Webnyckel-ID är inte unikt
-    FeatureDisabled: Webnyckelfunktion inaktiverad
     NoActive: Ingen aktiv webbnyckel hittades
     NotFound: Webnyckel hittades inte
 

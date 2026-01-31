@@ -1776,7 +1776,6 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 	type fields struct {
 		LoginDefaultOrg                *bool
 		UserSchema                     *bool
-		TokenExchange                  *bool
 		ImprovedPerformance            []feature.ImprovedPerformanceType
 		DebugOIDCParentError           *bool
 		OIDCSingleV1SessionTermination *bool
@@ -1806,7 +1805,6 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 			fields: fields{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
 				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 				DebugOIDCParentError:           gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(false),
@@ -1818,7 +1816,6 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 			want: &InstanceFeatures{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(false),
-				TokenExchange:                  gu.Ptr(true),
 				ImprovedPerformance:            []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 				DebugOIDCParentError:           gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(false),
@@ -1875,7 +1872,6 @@ func TestInstanceSetupFeatures_ToInstanceFeatures(t *testing.T) {
 			f := &InstanceSetupFeatures{
 				LoginDefaultOrg:                tc.fields.LoginDefaultOrg,
 				UserSchema:                     tc.fields.UserSchema,
-				TokenExchange:                  tc.fields.TokenExchange,
 				ImprovedPerformance:            tc.fields.ImprovedPerformance,
 				DebugOIDCParentError:           tc.fields.DebugOIDCParentError,
 				OIDCSingleV1SessionTermination: tc.fields.OIDCSingleV1SessionTermination,

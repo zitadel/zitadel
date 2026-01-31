@@ -17,40 +17,11 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
-
-func setTokenExchangeFeature(t *testing.T, instance *integration.Instance, value bool) {
-	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	_, err := instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
-		OidcTokenExchange: proto.Bool(value),
-	})
-	require.NoError(t, err)
-	retryDuration := time.Minute
-	if ctxDeadline, ok := iamCTX.Deadline(); ok {
-		retryDuration = time.Until(ctxDeadline)
-	}
-	require.EventuallyWithT(t,
-		func(ttt *assert.CollectT) {
-			f, err := instance.Client.FeatureV2.GetInstanceFeatures(iamCTX, &feature.GetInstanceFeaturesRequest{
-				Inheritance: true,
-			})
-			assert.NoError(ttt, err)
-			if f.OidcTokenExchange.GetEnabled() {
-				return
-			}
-		},
-		retryDuration,
-		time.Second,
-		"timed out waiting for ensuring instance feature")
-	time.Sleep(time.Second)
-}
 
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -150,11 +121,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	_, orgImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "ORG_ADMIN_IMPERSONATOR")
 	serviceUserID, noPermPAT := createMachineUserPATWithMembership(ctx, t, instance)
 
-	// test that feature is disabled per default
 	teResp, err := tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
-	require.Error(t, err)
-	setTokenExchangeFeature(t, instance, true)
-	teResp, err = tokenexchange.ExchangeToken(ctx, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
 	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
@@ -361,7 +328,6 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	userResp := instance.CreateHumanUser(ctx)
 
 	// exchange some tokens for later use
-	setTokenExchangeFeature(t, instance, true)
 	setImpersonationPolicy(t, instance, true)
 
 	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
@@ -593,7 +559,6 @@ func TestImpersonation_API_Call(t *testing.T) {
 	resourceServer, err := instance.CreateResourceServerJWTProfile(ctx, keyData)
 	require.NoError(t, err)
 
-	setTokenExchangeFeature(t, instance, true)
 	setImpersonationPolicy(t, instance, true)
 
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "IAM_ADMIN_IMPERSONATOR")

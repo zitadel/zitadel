@@ -599,7 +599,6 @@ Errors:
     NotInactive: Skema Pengguna tidak aktif
     NotExists: Skema Pengguna tidak ada
   TokenExchange:
-    FeatureDisabled: 'Fitur Token Exchange dinonaktifkan untuk instance Anda. '
     Token:
       Missing: Tokennya hilang
       Invalid: Token tidak valid
@@ -613,7 +612,6 @@ Errors:
     ActiveDelete: Tidak dapat menghapus kunci web yang aktif
     Config: Konfigurasi kunci web tidak valid
     Duplicate: ID kunci web tidak unik
-    FeatureDisabled: Fitur kunci web dinonaktifkan
     NoActive: Tidak ditemukan kunci web aktif
     NotFound: Kunci web tidak ditemukan
 

@@ -64,7 +64,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceUserSchemaEventType,
-			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
@@ -92,7 +91,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	}
 	m.instance.LoginDefaultOrg = m.system.LoginDefaultOrg
 	m.instance.UserSchema = m.system.UserSchema
-	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.EnableBackChannelLogout = m.system.EnableBackChannelLogout
@@ -112,8 +110,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.LoginDefaultOrg.set(level, event.Value)
 	case feature.KeyUserSchema:
 		features.UserSchema.set(level, event.Value)
-	case feature.KeyTokenExchange:
-		features.TokenExchange.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:

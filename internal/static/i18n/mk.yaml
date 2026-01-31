@@ -603,7 +603,6 @@ Errors:
     Data:
       Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
-    FeatureDisabled: Функцијата за размена на токени е оневозможена на вашиот пример. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Недостасува токен
       Invalid: Токенот е неважечки
@@ -617,7 +616,6 @@ Errors:
     ActiveDelete: Не може да се избрише активниот веб-клуч
     Config: Неважечка конфигурација на веб-клуч
     Duplicate: ID на веб-клучот не е единствен
-    FeatureDisabled: Функцијата за веб-клуч е оневозможена
     NoActive: Не е пронајден активен веб-клуч
     NotFound: Веб-клучот не е пронајден
 

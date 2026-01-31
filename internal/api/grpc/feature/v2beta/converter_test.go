@@ -20,14 +20,12 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetSystemFeaturesRequest{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
-		OidcTokenExchange:              gu.Ptr(true),
 		ImprovedPerformance:            nil,
 		OidcSingleV1SessionTermination: gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
-		TokenExchange:                  gu.Ptr(true),
 		ImprovedPerformance:            nil,
 		OIDCSingleV1SessionTermination: gu.Ptr(true),
 	}
@@ -49,10 +47,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
-		},
-		TokenExchange: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: false,
 		},
 		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
 			Level: feature.LevelSystem,
@@ -78,7 +72,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		OidcTokenExchange: &feature_pb.FeatureFlag{
-			Enabled: false,
+			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
@@ -98,14 +92,12 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetInstanceFeaturesRequest{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
-		OidcTokenExchange:              gu.Ptr(true),
 		ImprovedPerformance:            nil,
 		OidcSingleV1SessionTermination: gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
-		TokenExchange:                  gu.Ptr(true),
 		ImprovedPerformance:            nil,
 		OIDCSingleV1SessionTermination: gu.Ptr(true),
 	}
@@ -127,10 +119,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
-		},
-		TokenExchange: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: false,
 		},
 		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
 			Level: feature.LevelSystem,
@@ -156,7 +144,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		OidcTokenExchange: &feature_pb.FeatureFlag{
-			Enabled: false,
+			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{

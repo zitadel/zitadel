@@ -1635,8 +1635,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organizzazione predefinita per l'accesso",
       "LOGINDEFAULTORG_DESCRIPTION": "L'interfaccia di accesso utilizzerà le impostazioni dell'organizzazione predefinita (e non dell'istanza) se non è impostato alcun contesto organizzativo.",
-      "OIDCTOKENEXCHANGE": "Scambio token OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Abilita il tipo di concessione sperimentale urn:ietf:params:oauth:grant-type:token-exchange per il punto finale del token OIDC. Lo scambio di token può essere utilizzato per richiedere token con uno scopo inferiore o impersonare altri utenti. Consultare la policy di sicurezza per consentire l'impersonificazione su un'istanza.",
       "USERSCHEMA": "Schema utente",
       "USERSCHEMA_DESCRIPTION": "Gli schemi utente consentono di gestire gli schemi di dati degli utenti. Se la flag è attivata, sarà possibile utilizzare la nuova API e le sue funzionalità.",
       "ACTIONS": "Azioni",
