@@ -532,7 +532,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				logging.WithError(ctx, err).DebugContext(ctx, "state already locked")
+				logging.WithError(ctx, err).Debug( "state already locked")
 				err = nil
 				additionalIteration = false
 			}
@@ -558,7 +558,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			logging.OnError(ctx, rollbackErr).DebugContext(ctx, "unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Debug( "unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -625,7 +625,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	lastProcessedIndex, err := h.executeStatements(ctx, tx, statements)
-	logging.OnError(ctx, err).DebugContext(ctx, "execution of statements failed", "lastProcessedIndex", lastProcessedIndex)
+	logging.OnError(ctx, err).Debug( "execution of statements failed", "lastProcessedIndex", lastProcessedIndex)
 	if lastProcessedIndex < 0 {
 		return false, err
 	}
@@ -656,7 +656,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
-		logging.WithError(ctx, err).DebugContext(ctx, "filter eventstore failed")
+		logging.WithError(ctx, err).Debug( "filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)
@@ -725,15 +725,15 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 
 	_, err = tx.ExecContext(ctx, "SAVEPOINT exec_stmt")
 	if err != nil {
-		logging.WithError(ctx, err).DebugContext(ctx, "create savepoint failed")
+		logging.WithError(ctx, err).Debug( "create savepoint failed")
 		return err
 	}
 
 	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
-		logging.WithError(ctx, err).ErrorContext(ctx, "statement execution failed")
+		logging.WithError(ctx, err).Error("statement execution failed")
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
-		logging.OnError(ctx, rollbackErr).DebugContext(ctx, "rollback to savepoint failed")
+		logging.OnError(ctx, rollbackErr).Debug( "rollback to savepoint failed")
 
 		shouldContinue := h.handleFailedStmt(ctx, tx, failureFromStatement(statement, err))
 		if shouldContinue {

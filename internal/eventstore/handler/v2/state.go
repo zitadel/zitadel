@@ -56,7 +56,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		offset,
 	)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		logging.WithError(ctx, err).DebugContext(ctx, "unable to query current state")
+		logging.WithError(ctx, err).Debug("unable to query current state")
 		return nil, err
 	}
 

@@ -26,9 +26,11 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"os"
 
 	slogctx "github.com/veqryn/slog-context"
 
+	"github.com/zitadel/sloggcp"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -125,24 +127,61 @@ func Error(ctx context.Context, msg string, args ...any) {
 
 // WithError adds an error attribute to the logger from the context and returns the new logger.
 // If the error is not a [zerrors.ZitadelError], it is wrapped in a generic ZitadelError with kind [zerrors.KindUnknown].
-func WithError(ctx context.Context, err error) *slog.Logger {
+func WithError(ctx context.Context, err error) *ErrorContextLogger {
 	var target *zerrors.ZitadelError
 	if !errors.As(err, &target) {
 		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-Ao5ch", "an unknown error occurred", 1)
 	}
-	return slogctx.FromCtx(ctx).With(slogctx.Err(target))
+	return &ErrorContextLogger{
+		ctx:    ctx,
+		logger: slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+	}
 }
 
 // OnError adds an error attribute to the logger from the context and returns the new logger
 // if the error is not nil. If the error is nil, a no-op logger is returned.
 // If the error is not a [zerrors.ZitadelError], it is wrapped in a generic ZitadelError with kind [zerrors.KindUnknown].
-func OnError(ctx context.Context, err error) *slog.Logger {
+func OnError(ctx context.Context, err error) *ErrorContextLogger {
 	if err == nil {
-		return noop
+		return &ErrorContextLogger{ctx, noop}
 	}
 	var target *zerrors.ZitadelError
 	if !errors.As(err, &target) {
 		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-ii6Pi", "an unknown error occurred", 1)
 	}
-	return slogctx.FromCtx(ctx).With(slogctx.Err(target))
+	return &ErrorContextLogger{
+		ctx:    ctx,
+		logger: slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+	}
+}
+
+type ErrorContextLogger struct {
+	ctx    context.Context
+	logger *slog.Logger
+}
+
+func (l *ErrorContextLogger) Debug(msg string, args ...any) {
+	l.logger.DebugContext(l.ctx, msg, args...)
+}
+
+func (l *ErrorContextLogger) Info(msg string, args ...any) {
+	l.logger.InfoContext(l.ctx, msg, args...)
+}
+
+func (l *ErrorContextLogger) Warn(msg string, args ...any) {
+	l.logger.WarnContext(l.ctx, msg, args...)
+}
+
+func (l *ErrorContextLogger) Error(msg string, args ...any) {
+	l.logger.ErrorContext(l.ctx, msg, args...)
+}
+
+func (l *ErrorContextLogger) Panic(msg string, args ...any) {
+	l.logger.Log(l.ctx, sloggcp.LevelAlert, msg, args...)
+	panic(msg)
+}
+
+func (l *ErrorContextLogger) Fatal(msg string, args ...any) {
+	l.logger.Log(l.ctx, sloggcp.LevelEmergency, msg, args...)
+	os.Exit(1)
 }

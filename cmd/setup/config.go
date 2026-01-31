@@ -194,7 +194,7 @@ func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
 	for _, file := range stepFiles {
 		v.SetConfigFile(file)
 		err := v.MergeInConfig()
-		logging.OnError(ctx, err).WarnContext(ctx, "unable to read setup file", "file", file)
+		logging.OnError(ctx, err).Warn("unable to read setup file", "file", file)
 	}
 
 	steps := new(Steps)

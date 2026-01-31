@@ -23,7 +23,7 @@ func verifyCmd() *cobra.Command {
 		Short: "counts if source and dest have the same amount of entries",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror verify command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror verify command failed")
 			}()
 			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
@@ -55,11 +55,11 @@ var schemas = []string{
 
 func verifyMigration(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	panicOnError(ctx, err, "unable to connect to source database")
+	logging.OnError(ctx, err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	panicOnError(ctx, err, "unable to connect to destination database")
+	logging.OnError(ctx, err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
 	for _, schema := range schemas {
@@ -93,7 +93,7 @@ func getTables(ctx context.Context, dest *database.DB, schema string) (tables []
 		"SELECT CONCAT(schemaname, '.', tablename) FROM pg_tables WHERE schemaname = $1",
 		schema,
 	)
-	panicOnError(ctx, err, "unable to query tables")
+	logging.OnError(ctx, err).Fatal("unable to query tables")
 	return tables
 }
 
@@ -113,7 +113,7 @@ func getViews(ctx context.Context, dest *database.DB, schema string) (tables []s
 		"SELECT CONCAT(schemaname, '.', viewname) FROM pg_views WHERE schemaname = $1",
 		schema,
 	)
-	panicOnError(ctx, err, "unable to query views")
+	logging.OnError(ctx, err).Fatal("unable to query views")
 	return tables
 }
 
@@ -135,7 +135,7 @@ func countEntries(ctx context.Context, client *database.DB, table string) (count
 		},
 		fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, instanceClause),
 	)
-	panicOnError(ctx, err, "unable to count")
+	logging.OnError(ctx, err).Fatal("unable to count")
 
 	return count
 }

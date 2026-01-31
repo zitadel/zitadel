@@ -23,7 +23,7 @@ func NewCleanup() *cobra.Command {
 		Long:  `cleans up migration if they got stuck`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel setup cleanup command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel setup cleanup command failed")
 			}()
 			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {

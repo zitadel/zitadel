@@ -38,7 +38,7 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 	}
 	defer func() {
 		closeErr := conn.Close()
-		logging.OnError(ctx, closeErr).DebugContext(ctx, "failed to release connection")
+		logging.OnError(ctx, closeErr).Debug("failed to release connection")
 		// Force the pool to reopen connections to apply the new types
 		mig.dbClient.Pool.Reset()
 	}()

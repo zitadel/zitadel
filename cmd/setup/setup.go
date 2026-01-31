@@ -63,7 +63,7 @@ Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel setup command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel setup command failed")
 			}()
 
 			err = tls.ModeFromFlag(cmd)
@@ -148,7 +148,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		if !errors.Is(setupErr, context.Canceled) {
 			// If Setup failed for some other reason than the context being cancelled,
 			// then this could be a fatal error we should not retry
-			panicOnError(ctx, setupErr, "setup failed, skipping cleanup")
+			logging.OnError(ctx, setupErr).Fatal("setup failed, skipping cleanup")
 		}
 
 		// if we're in the middle of long-running setup, run cleanup before exiting
@@ -159,12 +159,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		defer cleanupCancel()
 
 		err = Cleanup(cleanupCtx, config)
-		panicOnError(ctx, err, "setup cleanup failed")
+		logging.OnError(ctx, err).Fatal("setup cleanup failed")
 	}()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
-	panicOnError(ctx, err, "unable to connect to database")
+	logging.OnError(ctx, err).Fatal("unable to connect to database")
 	defer dbClient.Close()
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
@@ -173,7 +173,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
-	panicOnError(ctx, err, "unable to start eventstore")
+	logging.OnError(ctx, err).Fatal("unable to start eventstore")
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
@@ -256,7 +256,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
-	panicOnError(ctx, err, "unable to start projections")
+	logging.OnError(ctx, err).Fatal("unable to start projections")
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -395,7 +395,7 @@ func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventsto
 			"hint", pgErr.Hint,
 		)
 	}
-	panicOnError(ctx, err, errorMsg, logFields...)
+	logging.OnError(ctx, err).Fatal(errorMsg, logFields...)
 }
 
 // readStmt reads a single file from the embedded FS,
@@ -446,10 +446,10 @@ func startCommandsQueries(
 	*auth_view.View,
 ) {
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
-	panicOnError(ctx, err, "unable to start key storage")
+	logging.OnError(ctx, err).Fatal("unable to start key storage")
 
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
-	panicOnError(ctx, err, "unable to ensure encryption keys")
+	logging.OnError(ctx, err).Fatal("unable to ensure encryption keys")
 
 	err = projection.Create(
 		ctx,
@@ -464,13 +464,13 @@ func startCommandsQueries(
 		keys.SAML,
 		config.SystemAPIUsers,
 	)
-	panicOnError(ctx, err, "unable to start projections")
+	logging.OnError(ctx, err).Fatal("unable to start projections")
 
 	staticStorage, err := config.AssetStorage.NewStorage(dbClient.DB)
-	panicOnError(ctx, err, "unable to start asset storage")
+	logging.OnError(ctx, err).Fatal("unable to start asset storage")
 
 	adminView, err := admin_view.StartView(dbClient)
-	panicOnError(ctx, err, "unable to start admin view")
+	logging.OnError(ctx, err).Fatal("unable to start admin view")
 	admin_handler.Register(ctx,
 		admin_handler.Config{
 			Client:                dbClient,
@@ -485,7 +485,7 @@ func startCommandsQueries(
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
-	panicOnError(ctx, err, "unable to start caches")
+	logging.OnError(ctx, err).Fatal("unable to start caches")
 
 	queries, err := query.StartQueries(
 		ctx,
@@ -514,10 +514,10 @@ func startCommandsQueries(
 		nil, // not needed for projections
 		false,
 	)
-	panicOnError(ctx, err, "unable to start queries")
+	logging.OnError(ctx, err).Fatal("unable to start queries")
 
 	authView, err := auth_view.StartView(dbClient, keys.OIDC, queries, eventstoreClient)
-	panicOnError(ctx, err, "unable to start auth view")
+	logging.OnError(ctx, err).Fatal("unable to start auth view")
 	auth_handler.Register(ctx,
 		auth_handler.Config{
 			Client:                dbClient,
@@ -530,7 +530,7 @@ func startCommandsQueries(
 	)
 
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
-	panicOnError(ctx, err, "unable to start authz repo")
+	logging.OnError(ctx, err).Fatal("unable to start authz repo")
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
@@ -568,12 +568,12 @@ func startCommandsQueries(
 		nil,
 		nil,
 	)
-	panicOnError(ctx, err, "unable to start commands")
+	logging.OnError(ctx, err).Fatal("unable to start commands")
 
 	q, err := queue.NewQueue(&queue.Config{
 		Client: dbClient,
 	})
-	panicOnError(ctx, err, "unable to init queue")
+	logging.OnError(ctx, err).Fatal("unable to init queue")
 
 	notify_handler.Register(
 		ctx,
@@ -608,28 +608,21 @@ func initProjections(
 ) {
 	for _, p := range projection.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
-		panicOnError(ctx, err, "projection migration failed", "name", p.String())
+		logging.OnError(ctx, err).Fatal("projection migration failed", "name", p.String())
 	}
 
 	for _, p := range admin_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
-		panicOnError(ctx, err, "admin schema migration failed", "name", p.String())
+		logging.OnError(ctx, err).Fatal("admin schema migration failed", "name", p.String())
 	}
 
 	for _, p := range auth_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
-		panicOnError(ctx, err, "auth schema migration failed", "name", p.String())
+		logging.OnError(ctx, err).Fatal("auth schema migration failed", "name", p.String())
 	}
 
 	for _, p := range notify_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)
-		panicOnError(ctx, err, "notification migration failed", "name", p.String())
-	}
-}
-
-func panicOnError(ctx context.Context, err error, logMsg string, args ...any) {
-	logging.OnError(ctx, err).ErrorContext(ctx, logMsg, args...)
-	if err != nil {
-		panic(err)
+		logging.OnError(ctx, err).Fatal("notification migration failed", "name", p.String())
 	}
 }

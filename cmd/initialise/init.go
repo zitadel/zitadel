@@ -47,7 +47,7 @@ The user provided by flags needs privileges to
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel init command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel init command failed")
 			}()
 			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {

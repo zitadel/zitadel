@@ -35,7 +35,7 @@ ZITADEL needs to be initialized and set up with the --for-mirror flag
 Migrate only copies events2 and unique constraints`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror eventstore command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror eventstore command failed")
 			}()
 
 			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
@@ -65,11 +65,11 @@ Migrate only copies events2 and unique constraints`,
 
 func copyEventstore(ctx context.Context, config *Migration) {
 	sourceClient, err := db.Connect(config.Source, false)
-	panicOnError(ctx, err, "unable to connect to source database")
+	logging.OnError(ctx, err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := db.Connect(config.Destination, false)
-	panicOnError(ctx, err, "unable to connect to destination database")
+	logging.OnError(ctx, err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
 	copyEvents(ctx, sourceClient, destClient, config.EventBulkSize)
@@ -93,20 +93,20 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	reader, writer := io.Pipe()
 
 	migrationID, err := id.SonyFlakeGenerator().Next()
-	panicOnError(ctx, err, "unable to generate migration id")
+	logging.OnError(ctx, err).Fatal("unable to generate migration id")
 
 	sourceConn, err := source.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire source connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire source connection")
 
 	destConn, err := dest.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire dest connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire dest connection")
 
 	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
 		MaxRetries: 3,
 	}))
 
 	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
-	panicOnError(ctx, err, "unable to query latest successful migration")
+	logging.OnError(ctx, err).Fatal("unable to query latest successful migration")
 
 	var maxPosition decimal.Decimal
 	err = source.QueryRowContext(ctx,
@@ -115,7 +115,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 		},
 		"SELECT MAX(position) FROM eventstore.events2 "+instanceClause(),
 	)
-	panicOnError(ctx, err, "unable to query max position from source")
+	logging.OnError(ctx, err).Fatal("unable to query max position from source")
 	logging.Info(ctx, "start event migration", "from", previousMigration.Position, "to", maxPosition)
 
 	nextPos := make(chan bool, 1)
@@ -202,7 +202,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 			pgErr := new(pgconn.PgError)
 			errors.As(err, &pgErr)
 
-			logging.WithError(ctx, err).ErrorContext(ctx, "unable to copy events into destination", "pg_err_details", pgErr.Detail)
+			logging.WithError(ctx, err).Error("unable to copy events into destination", "pg_err_details", pgErr.Detail)
 			return zerrors.ThrowUnknown(err, "MIGRA-DTHi7", "unable to copy events into destination")
 		}
 
@@ -225,12 +225,12 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 	if err != nil {
 		logging.WithError(ctx, err).Error("unable to mirror events")
 		err := writeMigrationFailed(ctx, es, id, source, err)
-		panicOnError(ctx, err, "unable to write failed event")
+		logging.OnError(ctx, err).Fatal("unable to write failed event")
 		return
 	}
 
 	err = writeMigrationSucceeded(ctx, es, id, source, position)
-	panicOnError(ctx, err, "unable to write succeeded event")
+	logging.OnError(ctx, err).Fatal("unable to write succeeded event")
 }
 
 func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
@@ -240,7 +240,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	errs := make(chan error, 1)
 
 	sourceConn, err := source.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire source connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire source connection")
 
 	go func() {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
@@ -258,7 +258,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire dest connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire dest connection")
 
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
@@ -280,7 +280,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 
 		return err
 	})
-	panicOnError(ctx, err, "unable to copy unique constraints to destination")
-	panicOnError(ctx, <-errs, "unable to copy unique constraints from source")
+	logging.OnError(ctx, err).Fatal("unable to copy unique constraints to destination")
+	logging.OnError(ctx, <-errs).Fatal("unable to copy unique constraints from source")
 	logging.Info(ctx, "unique constraints migrated", "took", time.Since(start), "count", eventCount)
 }

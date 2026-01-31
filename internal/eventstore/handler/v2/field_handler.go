@@ -94,7 +94,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				logging.WithError(ctx, err).DebugContext(ctx, "state already locked")
+				logging.WithError(ctx, err).Debug("state already locked")
 				err = nil
 				additionalIteration = false
 			}
@@ -118,7 +118,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			logging.OnError(ctx, rollbackErr).DebugContext(ctx, "unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Debug("unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -174,7 +174,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
-		logging.OnError(ctx, err).DebugContext(ctx, "filter eventstore failed")
+		logging.OnError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)

@@ -50,7 +50,7 @@ func (mig *CorrectProjectOwners) Execute(ctx context.Context, _ eventstore.Event
 			continue
 		}
 		_, err = projection.ProjectGrantProjection.Trigger(ctx)
-		logging.OnError(ctx, err).DebugContext(ctx, "failed triggering project grant projection to update owners")
+		logging.OnError(ctx, err).Debug("failed triggering project grant projection to update owners")
 	}
 	return nil
 }

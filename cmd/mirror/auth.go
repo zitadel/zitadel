@@ -25,7 +25,7 @@ ZITADEL needs to be initialized and set up with the --for-mirror flag
 Only auth requests are mirrored`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror auth command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror auth command failed")
 			}()
 			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
@@ -53,11 +53,11 @@ Only auth requests are mirrored`,
 
 func copyAuth(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	panicOnError(ctx, err, "unable to connect to source database")
+	logging.OnError(ctx, err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	panicOnError(ctx, err, "unable to connect to destination database")
+	logging.OnError(ctx, err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
 	copyAuthRequests(ctx, sourceClient, destClient, config.MaxAuthRequestAge)
@@ -68,10 +68,10 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 
 	logging.Info(ctx, "creating index on auth.auth_requests.change_date to speed up copy in source database")
 	_, err := source.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
-	panicOnError(ctx, err, "unable to create index on auth.auth_requests.change_date")
+	logging.OnError(ctx, err).Fatal("unable to create index on auth.auth_requests.change_date")
 
 	sourceConn, err := source.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -88,7 +88,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire connection")
 	defer destConn.Close()
 
 	var affected int64
@@ -107,7 +107,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 
 		return err
 	})
-	panicOnError(ctx, err, "unable to copy auth requests to destination")
-	panicOnError(ctx, <-errs, "unable to copy auth requests from source")
+	logging.OnError(ctx, err).Fatal("unable to copy auth requests to destination")
+	logging.OnError(ctx, <-errs).Fatal("unable to copy auth requests from source")
 	logging.Info(ctx, "auth requests migrated", "took", time.Since(start), "count", affected)
 }

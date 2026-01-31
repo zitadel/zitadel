@@ -2,7 +2,6 @@ package mirror
 
 import (
 	"bytes"
-	"context"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -39,7 +38,7 @@ Order of execution:
 5. verify`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror (sub)command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror (sub)command failed")
 			}()
 
 			err = viper.MergeConfig(bytes.NewBuffer(defaultConfig))
@@ -49,13 +48,13 @@ Order of execution:
 			for _, file := range *configFiles {
 				viper.SetConfigFile(file)
 				err := viper.MergeInConfig()
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "unable to read config file")
+				logging.OnError(cmd.Context(), err).Error("unable to read config file")
 			}
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror command failed")
 			}()
 
 			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
@@ -129,11 +128,4 @@ func instanceClause() string {
 
 	// COPY does not allow parameters so we need to set them directly
 	return "WHERE instance_id IN (" + strings.Join(instanceIDs, ", ") + ")"
-}
-
-func panicOnError(ctx context.Context, err error, logMsg string) {
-	logging.OnError(ctx, err).ErrorContext(ctx, logMsg)
-	if err != nil {
-		panic(err)
-	}
 }

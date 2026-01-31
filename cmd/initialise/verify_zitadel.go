@@ -26,7 +26,7 @@ Prerequisites:
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel verify zitadel command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel verify zitadel command failed")
 			}()
 			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
@@ -109,7 +109,7 @@ func createEncryptionKeys(ctx context.Context, db database.Beginner) error {
 	}
 	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
 		rollbackErr := tx.Rollback()
-		logging.WithError(ctx, rollbackErr).ErrorContext(ctx, "rollback failed")
+		logging.WithError(ctx, rollbackErr).Error("rollback failed")
 		return err
 	}
 
@@ -124,7 +124,7 @@ func createEvents(ctx context.Context, conn *sql.Conn) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.WithError(ctx, rollbackErr).ErrorContext(ctx, "rollback failed")
+			logging.WithError(ctx, rollbackErr).Error("rollback failed")
 			return
 		}
 		err = tx.Commit()

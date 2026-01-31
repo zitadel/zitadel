@@ -28,7 +28,7 @@ Requirements:
 - postgreSQL`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel start-from-init command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel start-from-init command failed")
 			}()
 
 			err = tls.ModeFromFlag(cmd)

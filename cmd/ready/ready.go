@@ -23,7 +23,7 @@ func New() *cobra.Command {
 			// Overwrite context with ready stream for logging
 			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel ready command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel ready command failed")
 			}()
 			config, shutdown, err := newConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
@@ -49,7 +49,7 @@ func ready(ctx context.Context, config *Config) bool {
 	httpClient := http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
 	res, err := httpClient.Get(scheme + "://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
 	if err != nil {
-		logging.WithError(ctx, err).WarnContext(ctx, "get request failed")
+		logging.WithError(ctx, err).Warn("get request failed")
 		return false
 	}
 	defer res.Body.Close()

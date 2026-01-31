@@ -27,7 +27,7 @@ Requirements:
 `,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel start-from-setup command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel start-from-setup command failed")
 			}()
 
 			err = tls.ModeFromFlag(cmd)

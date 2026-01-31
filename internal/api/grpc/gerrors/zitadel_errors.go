@@ -32,7 +32,7 @@ func ZITADELToGRPCError(ctx context.Context, err error) error {
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
-		logging.WithError(ctx, err).DebugContext(ctx, "unable to add detail", "logID", "GRPC-gIeRw")
+		logging.WithError(ctx, err).Debug("unable to add detail", "logID", "GRPC-gIeRw")
 		return status.New(code, msg).Err()
 	}
 

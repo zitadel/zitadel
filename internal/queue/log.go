@@ -31,7 +31,7 @@ func (m *logMiddleware) InsertMany(
 	ctx = logging.ToCtx(ctx, m.logger)
 	results, err := doInner(ctx)
 	if err != nil {
-		logging.WithError(ctx, err).ErrorContext(ctx, "insert many error")
+		logging.WithError(ctx, err).Error("insert many error")
 		return results, err
 	}
 	logging.Info(ctx, "jobs inserted",
@@ -57,7 +57,7 @@ func (m *logMiddleware) Work(
 	ctx = logging.ToCtx(ctx, m.logger)
 	ctx = logging.With(ctx, attributesFromJobRow(job)...)
 	if err := doInner(ctx); err != nil {
-		logging.WithError(ctx, err).WarnContext(ctx, "job processing error")
+		logging.WithError(ctx, err).Warn("job processing error")
 		return err
 	}
 	logging.Info(ctx, "job processed successfully",

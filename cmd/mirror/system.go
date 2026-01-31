@@ -24,7 +24,7 @@ ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defer func() {
-				logging.OnError(cmd.Context(), err).ErrorContext(cmd.Context(), "zitadel mirror system command failed")
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror system command failed")
 			}()
 			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
 			if err != nil {
@@ -52,11 +52,11 @@ Only keys and assets are mirrored`,
 
 func copySystem(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	panicOnError(ctx, err, "unable to connect to source database")
+	logging.OnError(ctx, err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	panicOnError(ctx, err, "unable to connect to destination database")
+	logging.OnError(ctx, err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
 	copyAssets(ctx, sourceClient, destClient)
@@ -68,7 +68,7 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire source connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire source connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -86,7 +86,7 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire dest connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire dest connection")
 	defer destConn.Close()
 
 	var assetCount int64
@@ -105,8 +105,8 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	panicOnError(ctx, err, "unable to copy assets to destination")
-	panicOnError(ctx, <-errs, "unable to copy assets from source")
+	logging.OnError(ctx, err).Fatal("unable to copy assets to destination")
+	logging.OnError(ctx, <-errs).Fatal("unable to copy assets from source")
 	logging.Info(ctx, "assets migrated", "took", time.Since(start), "count", assetCount)
 }
 
@@ -115,7 +115,7 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire source connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire source connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -133,7 +133,7 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	panicOnError(ctx, err, "unable to acquire dest connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire dest connection")
 	defer destConn.Close()
 
 	var keyCount int64
@@ -152,7 +152,7 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	panicOnError(ctx, err, "unable to copy encryption keys to destination")
-	panicOnError(ctx, <-errs, "unable to copy encryption keys from source")
+	logging.OnError(ctx, err).Fatal("unable to copy encryption keys to destination")
+	logging.OnError(ctx, <-errs).Fatal("unable to copy encryption keys from source")
 	logging.Info(ctx, "encryption keys migrated", "took", time.Since(start), "count", keyCount)
 }
