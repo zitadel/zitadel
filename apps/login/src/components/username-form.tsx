@@ -72,14 +72,17 @@ export function UsernameForm({
       });
 
     if (res && "redirect" in res && res.redirect) {
+      // Keep loading state true during redirect
       return router.push(res.redirect);
     }
 
     if (res && "error" in res && res.error) {
       setError(res.error);
+      setLoading(false);
       return;
     }
 
+    setLoading(false);
     return res;
   }
 
