@@ -8,7 +8,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -42,7 +42,7 @@ import (
 
 type Config struct {
 	Instrumentation     instrumentation.Config
-	Log                 *logging.Config
+	Log                 *old_logging.Config
 	Port                uint16
 	ExternalPort        uint16
 	ExternalDomain      string
@@ -103,6 +103,7 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	config.Instrumentation.Trace.SetLegacyConfig(config.Tracing)
 	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
+	config.Instrumentation.Log.SetLegacyConfig(config.Log)
 	config.Instrumentation.Profile.SetLegacyConfig(config.Profiler)
 	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
 	if err != nil {

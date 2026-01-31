@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
+	"log/slog"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -23,6 +26,14 @@ type failure struct {
 	aggregateType eventstore.AggregateType
 	eventDate     time.Time
 	err           error
+}
+
+func (f *failure) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.Uint64("sequence", f.sequence),
+		slog.String("instance", f.instance),
+		slog.String("aggregate_id", f.aggregateID),
+	)
 }
 
 func failureFromEvent(event eventstore.Event, err error) *failure {
@@ -47,15 +58,16 @@ func failureFromStatement(statement *Statement, err error) *failure {
 	}
 }
 
-func (h *Handler) handleFailedStmt(tx *sql.Tx, f *failure) (shouldContinue bool) {
+func (h *Handler) handleFailedStmt(ctx context.Context, tx *sql.Tx, f *failure) (shouldContinue bool) {
+	ctx = logging.With(ctx, "failure", f)
 	failureCount, err := h.failureCount(tx, f)
 	if err != nil {
-		h.logFailure(f).WithError(err).Warn("unable to get failure count")
+		logging.Warn(ctx, "unable to get failure count", "err", err)
 		return false
 	}
 	failureCount += 1
 	err = h.setFailureCount(tx, failureCount, f)
-	h.logFailure(f).OnError(err).Warn("unable to update failure count")
+	logging.OnError(ctx, err).Warn("unable to update failure count")
 
 	return failureCount >= h.maxFailureCount
 }

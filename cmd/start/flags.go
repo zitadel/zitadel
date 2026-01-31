@@ -1,10 +1,12 @@
 package start
 
 import (
+	"log/slog"
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -22,10 +24,12 @@ func init() {
 
 func startFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlagSet(startFlagSet)
-	logging.OnError(
-		viper.BindPFlags(startFlagSet),
-	).Fatal("start flags")
 
+	err := viper.BindPFlags(startFlagSet)
+	if err != nil {
+		slog.Error("start flags", "err", err)
+		os.Exit(1)
+	}
 	tls.AddTLSModeFlag(cmd)
 	key.AddMasterKeyFlag(cmd)
 }

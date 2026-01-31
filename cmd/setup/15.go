@@ -4,8 +4,7 @@ import (
 	"context"
 	"embed"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -25,7 +24,7 @@ func (mig *CurrentProjectionState) Execute(ctx context.Context, _ eventstore.Eve
 		return err
 	}
 	for _, stmt := range statements {
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		logging.Info(ctx, "execute statement", "file", stmt.file, "migration", mig.String())
 		_, err = mig.dbClient.ExecContext(ctx, stmt.query)
 		if err != nil {
 			return err

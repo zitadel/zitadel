@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	slogctx "github.com/veqryn/slog-context"
-
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -17,7 +16,7 @@ func ZitadelErrorToHTTPStatusCode(ctx context.Context, err error) (statusCode in
 	statusCode, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	slogctx.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
+	slogctx.Log(ctx, lvl, msg, "err", err) // use slgctx directly to avoid import cycle
 	if statusCode == statusUnknown {
 		return http.StatusInternalServerError, false
 	}
