@@ -64,7 +64,7 @@ func Register(
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
 	if !notificationWorkerConfig.LegacyEnabled {
-		queue.AddWorkers(handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+		queue.AddWorkers(ctx, handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
 	}
 }
 

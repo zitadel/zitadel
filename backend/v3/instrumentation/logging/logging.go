@@ -44,8 +44,7 @@ const (
 	StreamRequest      = instrumentation.StreamRequest      // API request handling.
 	StreamEventPusher  = instrumentation.StreamEventPusher  // Event pushing to the database (not implemented yet).
 	StreamEventHandler = instrumentation.StreamEventHandler // Event handling and processing.
-	StreamAction       = instrumentation.StreamAction       // Execution target workers (actions v2).
-	StreamNotification = instrumentation.StreamNotification // Notification sending workers.
+	StreamQueue        = instrumentation.StreamQueue        // Queue operations and job processing.
 )
 
 var noop = slog.New(slog.DiscardHandler)
@@ -67,6 +66,12 @@ func New(stream Stream, args ...any) *slog.Logger {
 // An existing logger in the context will be replaced.
 func NewCtx(ctx context.Context, stream Stream, args ...any) context.Context {
 	logger := New(stream, args...)
+	return ToCtx(ctx, logger)
+}
+
+// ToCtx adds the given logger to the context.
+// See [slogctx.NewCtx].
+func ToCtx(ctx context.Context, logger *slog.Logger) context.Context {
 	return slogctx.NewCtx(ctx, logger)
 }
 
@@ -123,9 +128,9 @@ func Error(ctx context.Context, msg string, args ...any) {
 func WithError(ctx context.Context, err error) *slog.Logger {
 	var target *zerrors.ZitadelError
 	if !errors.As(err, &target) {
-		err = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-Ao5ch", "an unknown error occurred", 1)
+		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-Ao5ch", "an unknown error occurred", 1)
 	}
-	return slogctx.FromCtx(ctx).With(slogctx.Err(err))
+	return slogctx.FromCtx(ctx).With(slogctx.Err(target))
 }
 
 // OnError adds an error attribute to the logger from the context and returns the new logger
@@ -137,7 +142,7 @@ func OnError(ctx context.Context, err error) *slog.Logger {
 	}
 	var target *zerrors.ZitadelError
 	if !errors.As(err, &target) {
-		err = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-ii6Pi", "an unknown error occurred", 1)
+		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-ii6Pi", "an unknown error occurred", 1)
 	}
-	return slogctx.FromCtx(ctx).With(slogctx.Err(err))
+	return slogctx.FromCtx(ctx).With(slogctx.Err(target))
 }

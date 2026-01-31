@@ -342,6 +342,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	notification.Start(ctx)
 
 	execution.Register(
+		ctx,
 		config.Executions,
 		q,
 		keys.Target,
@@ -359,7 +360,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 
 	// the scheduler / periodic jobs need to be started after the queue already runs
-	if err = serviceping.Start(config.ServicePing, q); err != nil {
+	if err = serviceping.Start(ctx, config.ServicePing, q); err != nil {
 		return err
 	}
 

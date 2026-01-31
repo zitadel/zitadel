@@ -11,8 +11,7 @@ const (
 	StreamRequest                    // API request handling.
 	StreamEventPusher                // Event pushing to the database (not implemented yet).
 	StreamEventHandler               // Event handling and processing.
-	StreamAction                     // Execution target workers (actions v2).
-	StreamNotification               // Notification sending workers.
+	StreamQueue                      // Queue operations and job processing.
 )
 
 var enabledStreams sync.Map

@@ -51,7 +51,7 @@ type LogConfig struct {
 }
 
 func (c *LogConfig) SetLegacyConfig(lc *old_logging.Config) {
-	if lc == nil || c.Format.isDisabled() {
+	if lc == nil || !c.Format.isDisabled() {
 		return
 	}
 	err := c.Level.UnmarshalText([]byte(lc.Level))
@@ -103,6 +103,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
 	}
 
+	EnableStreams(cfg.Streams...)
 	zerrors.EnableReportLocation(cfg.Errors.ReportLocation)
 	zerrors.EnableStackTrace(cfg.Errors.StackTrace)
 

@@ -9,5 +9,5 @@ import (
 func TestStream(t *testing.T) {
 	EnableStreams(StreamRuntime)
 	assert.True(t, IsStreamEnabled(StreamRuntime))
-	assert.False(t, IsStreamEnabled(StreamAction))
+	assert.False(t, IsStreamEnabled(StreamQueue))
 }
