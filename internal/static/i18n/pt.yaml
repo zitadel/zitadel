@@ -768,11 +768,11 @@ EventTypes:
             succeeded: Verificação de OTP de autenticação multifator bem-sucedida
             failed: Verificação de OTP de autenticação multifator falhou
           sms:
-            added: Adicionado SMS OTP multifator
-            removed: SMS OTP multifator removido
+            added: Adicionado OTP SMS multifator
+            removed: OTP SMS multifator removido
             code:
-              added: Adicionado código SMS OTP multifator
-              sent: Código SMS OTP multifator enviado
+              added: Adicionado código OTP SMS multifator
+              sent: Código OTP SMS multifator enviado
             check:
               succeeded: Verificação multifator OTP SMS bem-sucedida
               failed: Falha na verificação multifator OTP SMS

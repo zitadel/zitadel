@@ -768,23 +768,23 @@ EventTypes:
             succeeded: Pemeriksaan OTP multifaktor berhasil
             failed: Pemeriksaan OTP multifaktor gagal
           sms:
-            added: SMS OTP multifaktor ditambahkan
-            removed: SMS OTP multifaktor dihapus
+            added: OTP SMS multifaktor ditambahkan
+            removed: OTP SMS multifaktor dihapus
             code:
-              added: Kode SMS OTP multifaktor ditambahkan
-              sent: Kode SMS OTP multifaktor terkirim
+              added: Kode OTP SMS multifaktor ditambahkan
+              sent: Kode OTP SMS multifaktor terkirim
             check:
-              succeeded: Pengecekan SMS OTP multifaktor berhasil
-              failed: Pemeriksaan SMS OTP multifaktor gagal
+              succeeded: Pengecekan OTP SMS multifaktor berhasil
+              failed: Pemeriksaan OTP SMS multifaktor gagal
           email:
-            added: Email OTP Multifaktor ditambahkan
-            removed: Email OTP Multifaktor dihapus
+            added: OTP Email Multifaktor ditambahkan
+            removed: OTP Email Multifaktor dihapus
             code:
-              added: Kode Email OTP multifaktor ditambahkan
-              sent: Kode Email OTP multifaktor terkirim
+              added: Kode OTP Email multifaktor ditambahkan
+              sent: Kode OTP Email multifaktor terkirim
             check:
-              succeeded: Pemeriksaan Email OTP Multifaktor berhasil
-              failed: Pemeriksaan Email OTP multifaktor gagal
+              succeeded: Pemeriksaan OTP Email Multifaktor berhasil
+              failed: Pemeriksaan OTP Email multifaktor gagal
         u2f:
           token:
             added: Token U2F Multifaktor ditambahkan

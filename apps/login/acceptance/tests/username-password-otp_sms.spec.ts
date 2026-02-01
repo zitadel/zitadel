@@ -31,9 +31,9 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   },
 });
 
-test.skip("DOESN'T WORK: username, password and sms otp login, enter code manually", async ({ user, page }) => {
-  // Given sms otp is enabled on the organization of the user
-  // Given the user has only sms otp configured as second factor
+test.skip("DOESN'T WORK: username, password and OTP SMS login, enter code manually", async ({ user, page }) => {
+  // Given OTP SMS is enabled on the organization of the user
+  // Given the user has only OTP SMS configured as second factor
   // User enters username
   // User enters password
   // User receives a sms with a verification code
@@ -43,9 +43,9 @@ test.skip("DOESN'T WORK: username, password and sms otp login, enter code manual
   await loginScreenExpect(page, user.getFullName());
 });
 
-test.skip("DOESN'T WORK: username, password and sms otp login, resend code", async ({ user, page }) => {
-  // Given sms otp is enabled on the organization of the user
-  // Given the user has only sms otp configured as second factor
+test.skip("DOESN'T WORK: username, password and OTP SMS login, resend code", async ({ user, page }) => {
+  // Given OTP SMS is enabled on the organization of the user
+  // Given the user has only OTP SMS configured as second factor
   // User enters username
   // User enters password
   // User receives a sms with a verification code
@@ -56,9 +56,9 @@ test.skip("DOESN'T WORK: username, password and sms otp login, resend code", asy
   await loginScreenExpect(page, user.getFullName());
 });
 
-test("username, password and sms otp login, wrong code", async ({ user, page }) => {
-  // Given sms otp is enabled on the organization of the user
-  // Given the user has only sms otp configured as second factor
+test("username, password and OTP SMS login, wrong code", async ({ user, page }) => {
+  // Given OTP SMS is enabled on the organization of the user
+  // Given the user has only OTP SMS configured as second factor
   // User enters username
   // User enters password
   // User receives a sms with a verification code
