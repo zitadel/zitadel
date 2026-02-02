@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: "Datos no válidos para el esquema de usuario"
   TokenExchange:
-    FeatureDisabled: "La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features"
     Token:
       Missing: "Falta la ficha"
       Invalid: "El token no es válido"
@@ -618,9 +617,9 @@ Errors:
     ActiveDelete: "No se puede eliminar la clave web activa"
     Config: "Configuración de clave web no válida"
     Duplicate: "ID de clave web no único"
-    FeatureDisabled: "Función de clave web deshabilitada"
     NoActive: "No se encontró ninguna clave web activa"
     NotFound: "Clave web no encontrada"
+
 AggregateTypes:
   action: "Acción"
   instance: "Instancia"

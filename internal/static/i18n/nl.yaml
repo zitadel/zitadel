@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: "Податоците не се валидни за корисничка шема"
   TokenExchange:
-    FeatureDisabled: "De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features"
     Token:
       Missing: "Token ontbreekt"
       Invalid: "Token is ongeldig"
@@ -618,9 +617,9 @@ Errors:
     ActiveDelete: "Kan actieve websleutel niet verwijderen"
     Config: "Ongeldige websleutelconfiguratie"
     Duplicate: "Websleutel-ID niet uniek"
-    FeatureDisabled: "Websleutelfunctie uitgeschakeld"
     NoActive: "Geen actieve websleutel gevonden"
     NotFound: "Websleutel niet gevonden"
+
 AggregateTypes:
   action: "Actie"
   instance: "Instantie"

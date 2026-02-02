@@ -600,7 +600,6 @@ Errors:
     Data:
       Invalid: "البيانات غير صالحة لمخطط المستخدم"
   TokenExchange:
-    FeatureDisabled: "ميزة تبادل الرموز معطلة للمثيل الخاص بك. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features"
     Token:
       Missing: "الرمز مفقود"
       Invalid: "الرمز غير صالح"
@@ -614,9 +613,9 @@ Errors:
     ActiveDelete: "لا يمكن حذف مفتاح ويب نشط"
     Config: "تكوين مفتاح الويب غير صالح"
     Duplicate: "معرف مفتاح الويب ليس فريداً"
-    FeatureDisabled: "ميزة مفتاح الويب معطلة"
     NoActive: "لم يتم العثور على مفتاح ويب نشط"
     NotFound: "مفتاح الويب غير موجود"
+
 AggregateTypes:
   action: "إجراء"
   instance: "مثيل"

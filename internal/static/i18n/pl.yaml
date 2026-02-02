@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: "Nieprawidłowe dane dla schematu użytkownika"
   TokenExchange:
-    FeatureDisabled: "Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features"
     Token:
       Missing: "Brak tokena"
       Invalid: "Token jest nieprawidłowy"
@@ -618,9 +617,9 @@ Errors:
     ActiveDelete: "Nie można usunąć aktywnego klucza internetowego"
     Config: "Nieprawidłowa konfiguracja klucza internetowego"
     Duplicate: "Identyfikator klucza internetowego nie jest unikalny"
-    FeatureDisabled: "Funkcja klucza internetowego jest wyłączona"
     NoActive: "Nie znaleziono aktywnego klucza internetowego"
     NotFound: "Nie znaleziono klucza internetowego"
+
 AggregateTypes:
   action: "Działanie"
   instance: "Instancja"
