@@ -420,7 +420,7 @@
     "ORGANIZATION": "组织",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
-    "PROJECTGRANTS": "授予",
+    "PROJECTGRANTS": "项目授权",
     "ROLES": "角色",
     "GRANTEDPROJECT": "已授予的项目",
     "HUMANUSERS": "用户",
@@ -2185,7 +2185,7 @@
       "DEACTIVATED": "已停用。",
       "CREATED": "项目已创建。",
       "UPDATED": "项目已修改。",
-      "GRANTUPDATED": "授权已更新。",
+      "GRANTUPDATED": "项目授权已更改。",
       "DELETED": "项目已删除"
     }
   },

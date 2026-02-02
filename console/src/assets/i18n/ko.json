@@ -420,7 +420,7 @@
     "ORGANIZATION": "조직",
     "PROJECT": "프로젝트",
     "PROJECTOVERVIEW": "개요",
-    "PROJECTGRANTS": "권한 부여",
+    "PROJECTGRANTS": "프로젝트 권한",
     "ROLES": "역할",
     "GRANTEDPROJECT": "부여된 프로젝트",
     "HUMANUSERS": "사용자",
@@ -2182,7 +2182,7 @@
       "DEACTIVATED": "비활성화되었습니다.",
       "CREATED": "프로젝트가 생성되었습니다.",
       "UPDATED": "프로젝트가 변경되었습니다.",
-      "GRANTUPDATED": "권한이 변경되었습니다.",
+      "GRANTUPDATED": "프로젝트 권한이 변경되었습니다.",
       "DELETED": "프로젝트가 삭제되었습니다."
     }
   },

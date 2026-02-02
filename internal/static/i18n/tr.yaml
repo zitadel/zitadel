@@ -343,7 +343,7 @@ Errors:
     RequiredFieldsMissing: Bazı gerekli alanlar eksik
     Grant:
       AlreadyExists: Proje yetkisi zaten mevcut
-      NotFound: Yetki bulunamadı
+      NotFound: Proje yetkisi bulunamadı
       Invalid: Proje yetkisi geçersiz
       NotExisting: Proje yetkisi mevcut değil
       HasNotExistingRole: Projede bulunmayan bir rol var

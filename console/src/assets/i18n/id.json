@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisasi",
     "PROJECT": "Proyek",
     "PROJECTOVERVIEW": "Ringkasan",
-    "PROJECTGRANTS": "Hibah",
+    "PROJECTGRANTS": "Izin proyek",
     "ROLES": "Peran",
     "GRANTEDPROJECT": "Proyek yang Diberikan",
     "HUMANUSERS": "Pengguna",
@@ -2180,7 +2180,7 @@
       "DEACTIVATED": "Dinonaktifkan.",
       "CREATED": "Proyek dibuat.",
       "UPDATED": "Proyek berubah.",
-      "GRANTUPDATED": "Hibah berubah.",
+      "GRANTUPDATED": "Izin proyek telah diubah.",
       "DELETED": "Proyek dihapus."
     }
   },

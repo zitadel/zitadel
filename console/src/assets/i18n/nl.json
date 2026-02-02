@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisatie",
     "PROJECT": "Projecten",
     "PROJECTOVERVIEW": "Overzicht",
-    "PROJECTGRANTS": "Subsidies",
+    "PROJECTGRANTS": "Projecttoewijzingen",
     "ROLES": "Rollen",
     "GRANTEDPROJECT": "Verleende projecten",
     "HUMANUSERS": "Gebruikers",
@@ -2182,7 +2182,7 @@
       "DEACTIVATED": "Gedeactiveerd.",
       "CREATED": "Project gecreëerd.",
       "UPDATED": "Project gewijzigd.",
-      "GRANTUPDATED": "Verlening gewijzigd.",
+      "GRANTUPDATED": "Projecttoewijzing gewijzigd.",
       "DELETED": "Project verwijderd."
     }
   },

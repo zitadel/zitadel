@@ -420,7 +420,7 @@
     "ORGANIZATION": "組織",
     "PROJECT": "プロジェクト",
     "PROJECTOVERVIEW": "概要",
-    "PROJECTGRANTS": "グラント",
+    "PROJECTGRANTS": "プロジェクト権限",
     "ROLES": "ロール",
     "GRANTEDPROJECT": "グラントされたプロジェクト",
     "HUMANUSERS": "ユーザー",
@@ -2182,7 +2182,7 @@
       "DEACTIVATED": "非アクティブになりました。",
       "CREATED": "プロジェクトが作成されました。",
       "UPDATED": "プロジェクトが変更されました。",
-      "GRANTUPDATED": "グラントが変更されました。",
+      "GRANTUPDATED": "プロジェクト権限が変更されました。",
       "DELETED": "プロジェクトが削除されました。"
     }
   },

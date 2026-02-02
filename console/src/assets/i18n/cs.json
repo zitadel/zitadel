@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizace",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Přehled",
-    "PROJECTGRANTS": "Pověření",
+    "PROJECTGRANTS": "Grantové projekty",
     "ROLES": "Role",
     "GRANTEDPROJECT": "Pověřené projekty",
     "HUMANUSERS": "Uživatelé",
@@ -2183,7 +2183,7 @@
       "DEACTIVATED": "Deaktivováno.",
       "CREATED": "Projekt vytvořen.",
       "UPDATED": "Projekt změněn.",
-      "GRANTUPDATED": "Povolení změněno.",
+      "GRANTUPDATED": "Grant projektu změněno.",
       "DELETED": "Projekt smazán."
     }
   },

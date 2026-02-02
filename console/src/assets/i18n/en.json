@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organization",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
-    "PROJECTGRANTS": "Grants",
+    "PROJECTGRANTS": "Project Grants",
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
@@ -2186,7 +2186,7 @@
       "DEACTIVATED": "Deactivated.",
       "CREATED": "Project created.",
       "UPDATED": "Project changed.",
-      "GRANTUPDATED": "Grant changed.",
+      "GRANTUPDATED": "Project Grant changed.",
       "DELETED": "Project deleted."
     }
   },

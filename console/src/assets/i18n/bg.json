@@ -420,7 +420,7 @@
     "ORGANIZATION": "Организация",
     "PROJECT": "Проекти",
     "PROJECTOVERVIEW": "Преглед",
-    "PROJECTGRANTS": "Грантове",
+    "PROJECTGRANTS": "Проектни грантове",
     "ROLES": "Роли",
     "GRANTEDPROJECT": "Предоставени проекти",
     "HUMANUSERS": "Потребители",
@@ -2187,7 +2187,7 @@
       "DEACTIVATED": "Деактивиран.",
       "CREATED": "Проектът е създаден.",
       "UPDATED": "Проектът е променен.",
-      "GRANTUPDATED": "Грант се промени.",
+      "GRANTUPDATED": "Грантът за проект се промени.",
       "DELETED": "Проектът е изтрит."
     }
   },

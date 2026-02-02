@@ -419,7 +419,7 @@
     "DOMAINS": "Домены",
     "PROJECT": "Проекты",
     "PROJECTOVERVIEW": "Обзор",
-    "PROJECTGRANTS": "Допуски",
+    "PROJECTGRANTS": "Гранты проекта",
     "ROLES": "Роли",
     "GRANTEDPROJECT": "Допуски проектов",
     "HUMANUSERS": "Пользователи",
@@ -2265,7 +2265,7 @@
       "DEACTIVATED": "Деактивировано.",
       "CREATED": "Проект создан.",
       "UPDATED": "Проект изменён.",
-      "GRANTUPDATED": "Допуск изменён.",
+      "GRANTUPDATED": "Грант проекта изменён.",
       "DELETED": "Проект удалён."
     }
   },

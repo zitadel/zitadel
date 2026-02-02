@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizație",
     "PROJECT": "Proiecte",
     "PROJECTOVERVIEW": "Prezentare generală",
-    "PROJECTGRANTS": "Granturi",
+    "PROJECTGRANTS": "Granturi de proiect",
     "ROLES": "Roluri",
     "GRANTEDPROJECT": "Proiecte acordate",
     "HUMANUSERS": "Utilizatori",
@@ -2180,7 +2180,7 @@
       "DEACTIVATED": "Dezactivat.",
       "CREATED": "Proiect creat.",
       "UPDATED": "Proiect modificat.",
-      "GRANTUPDATED": "Grant modificat.",
+      "GRANTUPDATED": "Grantul proiectului a fost modificat.",
       "DELETED": "Proiect șters."
     }
   },

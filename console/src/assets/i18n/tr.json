@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizasyon",
     "PROJECT": "Projeler",
     "PROJECTOVERVIEW": "Genel Bakış",
-    "PROJECTGRANTS": "Yetkilendirmeler",
+    "PROJECTGRANTS": "Proje yetkileri",
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Verilen Projeler",
     "HUMANUSERS": "Kullanıcılar",
@@ -2185,7 +2185,7 @@
       "DEACTIVATED": "Devre dışı bırakıldı.",
       "CREATED": "Proje oluşturuldu.",
       "UPDATED": "Proje değiştirildi.",
-      "GRANTUPDATED": "Yetki değiştirildi.",
+      "GRANTUPDATED": "Proje yetkisi değiştirildi.",
       "DELETED": "Proje silindi."
     }
   },

@@ -342,7 +342,7 @@ Errors:
     RequiredFieldsMissing: Certains champs obligatoires sont manquants
     Grant:
       AlreadyExists: La subvention du projet existe déjà
-      NotFound: Subvention non trouvée
+      NotFound: Subvention du projet non trouvée
       Invalid: La subvention du projet n'est pas valide
       NotExisting: La subvention de projet n'existe pas
       HasNotExistingRole: Un rôle n'existe pas sur le projet

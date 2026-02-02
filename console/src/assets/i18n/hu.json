@@ -420,7 +420,7 @@
     "ORGANIZATION": "Szervezet",
     "PROJECT": "Projektek",
     "PROJECTOVERVIEW": "Áttekintés",
-    "PROJECTGRANTS": "Támogatások",
+    "PROJECTGRANTS": "Projektengedélyek",
     "ROLES": "Szerepkörök",
     "GRANTEDPROJECT": "Megadott Projektek",
     "HUMANUSERS": "Felhasználók",
@@ -2180,7 +2180,7 @@
       "DEACTIVATED": "Deaktiválva.",
       "CREATED": "Projekt létrehozva.",
       "UPDATED": "Projekt megváltoztatva.",
-      "GRANTUPDATED": "Jogosultság megváltoztatva.",
+      "GRANTUPDATED": "A projektengedély megváltozott.",
       "DELETED": "Projekt törölve."
     }
   },

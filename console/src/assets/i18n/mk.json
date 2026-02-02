@@ -420,7 +420,7 @@
     "ORGANIZATION": "Организација",
     "PROJECT": "Проекти",
     "PROJECTOVERVIEW": "Преглед",
-    "PROJECTGRANTS": "Овластувања",
+    "PROJECTGRANTS": "Проектни грантови",
     "ROLES": "Улоги",
     "GRANTEDPROJECT": "Доделени проекти",
     "HUMANUSERS": "Корисници",
@@ -2185,7 +2185,7 @@
       "DEACTIVATED": "Деактивирано.",
       "CREATED": "Проектот е креиран.",
       "UPDATED": "Проектот е променет.",
-      "GRANTUPDATED": "Доделувањето е променето.",
+      "GRANTUPDATED": "Проектниот грант е променет.",
       "DELETED": "Проектот е избришан."
     }
   },

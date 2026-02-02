@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organización",
     "PROJECT": "Proyectos",
     "PROJECTOVERVIEW": "Resumen",
-    "PROJECTGRANTS": "Concesiones",
+    "PROJECTGRANTS": "Concesiones del proyecto",
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Proyecto concedido",
     "HUMANUSERS": "Usuarios",
@@ -2183,7 +2183,7 @@
       "DEACTIVATED": "Desactivado.",
       "CREATED": "Proyecto creado.",
       "UPDATED": "Proyecto modificado.",
-      "GRANTUPDATED": "Concesión modificada.",
+      "GRANTUPDATED": "Concesión del proyecto modificada.",
       "DELETED": "Proyecto borrado."
     }
   },

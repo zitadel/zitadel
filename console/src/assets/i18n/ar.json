@@ -420,7 +420,7 @@
     "ORGANIZATION": "المنظمة",
     "PROJECT": "المشاريع",
     "PROJECTOVERVIEW": "نظرة عامة",
-    "PROJECTGRANTS": "المنح",
+    "PROJECTGRANTS": "منح المشاريع",
     "ROLES": "الأدوار",
     "GRANTEDPROJECT": "المشاريع الممنوحة",
     "HUMANUSERS": "المستخدمون",
@@ -2178,7 +2178,7 @@
       "DEACTIVATED": "تم التعطيل.",
       "CREATED": "تم إنشاء المشروع.",
       "UPDATED": "تم تغيير المشروع.",
-      "GRANTUPDATED": "تم تغيير المنح.",
+      "GRANTUPDATED": "تم تغيير منحة المشروع.",
       "DELETED": "تم حذف المشروع."
     }
   },

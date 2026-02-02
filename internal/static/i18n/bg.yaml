@@ -344,7 +344,7 @@ Errors:
     RequiredFieldsMissing: Някои задължителни полета липсват
     Grant:
       AlreadyExists: Вече съществува субсидия за проекта
-      NotFound: Грантът не е намерен
+      NotFound: Грантът за проект не е намерен
       Invalid: Грантът за проект е невалиден
       NotExisting: Безвъзмездна помощ за проекта не съществува
       HasNotExistingRole: Една роля не съществува в проекта

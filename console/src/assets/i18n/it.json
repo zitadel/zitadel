@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organizzazione",
     "PROJECT": "Progetti",
     "PROJECTOVERVIEW": "Progetto",
-    "PROJECTGRANTS": "Organizzazioni ammissibili",
+    "PROJECTGRANTS": "Permessi di progetto",
     "ROLES": "Ruoli",
     "GRANTEDPROJECT": "Progetto delegato",
     "HUMANUSERS": "Utenti",
@@ -2182,7 +2182,7 @@
       "DEACTIVATED": "Disattivato con successo.",
       "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
-      "GRANTUPDATED": "Grant cambiato con successo.",
+      "GRANTUPDATED": "Grant del progetto cambiato con successo.",
       "DELETED": "Progetto eliminato con successo."
     }
   },

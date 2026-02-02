@@ -420,7 +420,7 @@
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projekt",
     "PROJECTOVERVIEW": "Översikt",
-    "PROJECTGRANTS": "Beviljanden",
+    "PROJECTGRANTS": "Projekttilldelningar",
     "ROLES": "Roller",
     "GRANTEDPROJECT": "Beviljade Projekt",
     "HUMANUSERS": "Användare",
@@ -2186,7 +2186,7 @@
       "DEACTIVATED": "Inaktiverad.",
       "CREATED": "Projekt skapat.",
       "UPDATED": "Projekt ändrat.",
-      "GRANTUPDATED": "Bidrag ändrat.",
+      "GRANTUPDATED": "Projekttilldelning ändrat.",
       "DELETED": "Projekt borttaget."
     }
   },
