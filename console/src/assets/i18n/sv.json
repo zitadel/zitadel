@@ -1639,8 +1639,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation för inloggning",
       "LOGINDEFAULTORG_DESCRIPTION": "Inloggningsgränssnittet kommer att använda inställningarna för standardorganisationen (och inte från instansen) om ingen organisationskontext är inställd",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivera den experimentella urn:ietf:params:oauth:grant-type:token-exchange grant-typen för OIDC-tokenändpunkten. Tokenutbyte kan användas för att begära tokens med en mindre omfattning eller impersonera andra användare. Se säkerhetspolicyn för att tillåta impersonation på en instans.",
       "USERSCHEMA": "Användarschema",
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",

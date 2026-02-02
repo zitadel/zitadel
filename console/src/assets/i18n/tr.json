@@ -1638,8 +1638,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Giriş Varsayılan Org",
       "LOGINDEFAULTORG_DESCRIPTION": "Organizasyon bağlamı ayarlanmadıysa, giriş UI'ı varsayılan org'un ayarlarını (örnektekini değil) kullanacaktır",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC token uç noktası için deneysel urn:ietf:params:oauth:grant-type:token-exchange grant türünü etkinleştirin. Token değişimi, daha az kapsamlı token'lar talep etmek veya diğer kullanıcıların kimliğine bürünmek için kullanılabilir. Bir örnekte kimliğe bürünmeye izin vermek için güvenlik politikasına bakın.",
       "USERSCHEMA": "Kullanıcı Şeması",
       "USERSCHEMA_DESCRIPTION": "Kullanıcı Şemaları, kullanıcının veri şemalarını yönetmeye izin verir. Bayrak etkinleştirilirse, yeni API'yi ve özelliklerini kullanabileceksiniz.",
       "ACTIONS": "Eylemler",
