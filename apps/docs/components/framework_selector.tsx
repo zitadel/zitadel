@@ -4,8 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { Tabs } from 'fumadocs-ui/components/tabs';
 import { ReactNode, Suspense, useMemo } from 'react';
 
-const FRAMEWORKS = ['angular', 'flutter', 'go', 'nextjs', 'react', 'vue'];
-const DISPLAY_NAMES = ['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js'];
+const FRAMEWORKS = ['angular', 'flutter', 'go', 'nextjs', 'react', 'symfony','vue'];
+const DISPLAY_NAMES = ['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Symfony','Vue.js'];
 
 function FrameworkSelectorInner({ children }: { children: ReactNode }) {
     const searchParams = useSearchParams();

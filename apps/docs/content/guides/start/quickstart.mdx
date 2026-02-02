@@ -10,10 +10,7 @@ import { FrameworkSelector } from '@/components/framework_selector';
 import AppConfig from './_app_config.mdx';
 import AppValues from './_app_values.mdx';
 
-This sample app implements the [OIDC PKCE](/guides/integrate/login/oidc/login-users) flow for secure authentication.
-- Login: Exchanges a code challenge for an access token via ZITADEL.
-- Authorize: Uses the token to retrieve profile data from the userinfo endpoint.
-- Logout: Clears the local session and revokes the token.
+In this guide, you’ll set up a Zitadel account and authenticate your first example application.
 
 ## Get Started with ZITADEL Cloud
 
@@ -103,6 +100,12 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:3000/">
         </AppConfig>
     </Tab>
+    <Tab value="Symfony">
+        <AppConfig
+            redirectUrl="http://localhost:8000/login_check"
+            postLogoutRedirectUrl="http://localhost:8000/logout">
+        </AppConfig>
+    </Tab>
     <Tab value="Vue.js">
         <AppConfig
             redirectUrl="http://localhost:5173/auth/signin/zitadel"
@@ -130,6 +133,9 @@ ZITADEL automatically configures the best security settings for your selected fr
     </Tab>
     <Tab value="React">
         <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Symfony">
+        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
     </Tab>
     <Tab value="Vue.js">
         <AppValues valueCount="three" clientSecret={false} projectID={true}></AppValues>
@@ -164,18 +170,23 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="Next.js">
-        - [Node.js](https://nodejs.org/): v16 or later.
+        - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="React">
-        - [Node.js](https://nodejs.org/): v16 or later.
+        - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
-        - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
+        - [Yarn](https://yarnpkg.com/)
+    </Tab>
+    <Tab value="Symfony">
+        - [PHP](https://www.php.net/)
+        - [Composer](https://getcomposer.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
     </Tab>
     <Tab value="Vue.js">
-        - [Node.js](https://nodejs.org/): v16 or later.
+        - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
-        - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
+        - [Yarn](https://yarnpkg.com/)
     </Tab>
 </FrameworkSelector>
 
@@ -210,6 +221,12 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         git clone [https://github.com/zitadel/zitadel-react.git](https://github.com/zitadel/zitadel-react.git)
         cd zitadel-react
+        ```
+    </Tab>
+    <Tab value="Symfony">
+        ```bash
+        git clone [https://github.com/zitadel/example-auth-symfony.git](https://github.com/zitadel/example-auth-symfony.git)
+        cd example-auth-symfony
         ```
     </Tab>
     <Tab value="Vue.js">
@@ -279,6 +296,20 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     };
         ```
     </Tab>
+    <Tab value="Symfony">
+
+        1. Copy+past the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
+
+        ```bash
+        PORT=3000
+        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
+        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        ```
+    </Tab>
     <Tab value="Vue.js">
         Open .env and update the config object with the **Issuer**, **Client ID** and **PROJECT_ID** you collected in Step 5.
 
@@ -300,7 +331,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         npm run dev
         ```
 
-        Your app will be live at `http://localhost:4200`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:4200`.
 
         ![Angular Example App](../../../public/img/guides/quickstart/angular_example_app.png)
     </Tab>
@@ -310,7 +341,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         flutter run -d chrome --web-port=4444 --dart-define zitadel_url=[zitadel_issuer] --dart-define zitadel_client_id=[zitadel_client_id]
         ```
 
-        Your app will be live at `http://localhost:4444`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:4444`.
 
         ![Flutter Example App](../../../public/img/guides/quickstart/flutter_example_app.png)
     </Tab>
@@ -320,7 +351,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         go run example/app/app.go --domain [zitadel_domain] --key XKv2Lqd7YAq13NUZVUWZEWZeruqyzViM --clientID [zitadel_client_id] --redirectURI http://localhost:8089/auth/callback
         ```
 
-        Your app will be live at `http://localhost:8089`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:8089`.
 
         ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
     </Tab>
@@ -331,7 +362,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         npm run dev
         ```
 
-        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:3000`.
 
         ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
 
@@ -349,9 +380,19 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         yarn start
         ```
 
-        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:3000`.
 
         ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+    </Tab>
+    <Tab value="Symfony">
+        ```bash
+        composer install
+        composer run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`.
+
+        ![Angular Example App](../../../public/img/guides/quickstart/symfony_example_app.png)
     </Tab>
     <Tab value="Vue.js">
         ```bash
@@ -359,7 +400,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         yarn dev
         ```
 
-        Your app will be live at `http://localhost:5173`. Click Login to test the full PKCE flow!
+        Your app will be live at `http://localhost:5173`.
 
         ![Vue Example App](../../../public/img/guides/quickstart/vue_example_app.png)
     </Tab>
