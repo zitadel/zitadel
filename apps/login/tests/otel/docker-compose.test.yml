@@ -41,6 +41,7 @@ services:
       - OTEL_SERVICE_NAME=zitadel-login-test
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_EXPORTER_OTLP_HEADERS=x-test-header=test-value-123,x-another-header=another-value
       - OTEL_LOG_LEVEL=info
       - OTEL_METRICS_EXPORT_INTERVAL_MS=5000
       - ZITADEL_API_URL=http://mock-zitadel:8080

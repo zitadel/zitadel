@@ -216,6 +216,66 @@ describe("OpenTelemetry Integration", () => {
   });
 
   it(
+    "should include correct service name in telemetry resource attributes",
+    async () => {
+      // Wait for traces to be exported
+      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
+      const hasTraces = await waitForFile(tracesFile, 10, 1000);
+      expect(hasTraces).toBe(true);
+
+      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
+
+      // Verify service.name matches OTEL_SERVICE_NAME from docker-compose.test.yml
+      expect(tracesContent).toContain('"service.name"');
+      expect(tracesContent).toContain('"zitadel-login-test"');
+
+      // Verify service.version is present
+      expect(tracesContent).toContain('"service.version"');
+    },
+    30000,
+  );
+
+  it(
+    "should include GCP Cloud Run resource attributes in telemetry",
+    async () => {
+      // The docker-compose.test.yml sets GCP env vars:
+      // GOOGLE_CLOUD_PROJECT=test-project-123
+      // K_SERVICE=zitadel-login
+      // K_REVISION=zitadel-login-00001-abc
+      // K_CONFIGURATION=zitadel-login
+      // GOOGLE_CLOUD_REGION=us-central1
+
+      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
+      const hasTraces = await waitForFile(tracesFile, 10, 1000);
+      expect(hasTraces).toBe(true);
+
+      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
+
+      // Verify GCP Cloud Run attributes are present
+      expect(tracesContent).toContain('"cloud.provider"');
+      expect(tracesContent).toContain('"gcp"');
+
+      expect(tracesContent).toContain('"cloud.platform"');
+      expect(tracesContent).toContain('"gcp_cloud_run"');
+
+      expect(tracesContent).toContain('"cloud.account.id"');
+      expect(tracesContent).toContain('"test-project-123"');
+
+      expect(tracesContent).toContain('"faas.name"');
+      expect(tracesContent).toContain('"zitadel-login"');
+
+      expect(tracesContent).toContain('"faas.version"');
+      expect(tracesContent).toContain('"zitadel-login-00001-abc"');
+
+      expect(tracesContent).toContain('"cloud.region"');
+      expect(tracesContent).toContain('"us-central1"');
+
+      console.log("GCP Cloud Run resource attributes verified in telemetry");
+    },
+    30000,
+  );
+
+  it(
     "should expose Node.js runtime metrics via Prometheus",
     async () => {
       // Wait for runtime metrics to be collected (monitoringPrecision is 5000ms)
