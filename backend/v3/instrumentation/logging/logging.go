@@ -133,8 +133,9 @@ func WithError(ctx context.Context, err error) *ErrorContextLogger {
 		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-Ao5ch", "an unknown error occurred", 1)
 	}
 	return &ErrorContextLogger{
-		ctx:    ctx,
-		logger: slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+		ctx:          ctx,
+		logger:       slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+		canTerminate: false,
 	}
 }
 
@@ -143,21 +144,23 @@ func WithError(ctx context.Context, err error) *ErrorContextLogger {
 // If the error is not a [zerrors.ZitadelError], it is wrapped in a generic ZitadelError with kind [zerrors.KindUnknown].
 func OnError(ctx context.Context, err error) *ErrorContextLogger {
 	if err == nil {
-		return &ErrorContextLogger{ctx, noop}
+		return &ErrorContextLogger{ctx, noop, false}
 	}
 	var target *zerrors.ZitadelError
 	if !errors.As(err, &target) {
 		target = zerrors.CreateZitadelError(zerrors.KindUnknown, err, "LOG-ii6Pi", "an unknown error occurred", 1)
 	}
 	return &ErrorContextLogger{
-		ctx:    ctx,
-		logger: slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+		ctx:          ctx,
+		logger:       slogctx.FromCtx(ctx).With(slogctx.Err(target)),
+		canTerminate: true,
 	}
 }
 
 type ErrorContextLogger struct {
-	ctx    context.Context
-	logger *slog.Logger
+	ctx          context.Context
+	logger       *slog.Logger
+	canTerminate bool
 }
 
 func (l *ErrorContextLogger) Debug(msg string, args ...any) {
@@ -178,10 +181,14 @@ func (l *ErrorContextLogger) Error(msg string, args ...any) {
 
 func (l *ErrorContextLogger) Panic(msg string, args ...any) {
 	l.logger.Log(l.ctx, sloggcp.LevelAlert, msg, args...)
-	panic(msg)
+	if l.canTerminate {
+		panic(msg)
+	}
 }
 
 func (l *ErrorContextLogger) Fatal(msg string, args ...any) {
 	l.logger.Log(l.ctx, sloggcp.LevelEmergency, msg, args...)
-	os.Exit(1)
+	if l.canTerminate {
+		os.Exit(1)
+	}
 }

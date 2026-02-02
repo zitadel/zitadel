@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -28,7 +29,7 @@ type LogFormat int
 //go:generate enumer -type=LogFormat -trimprefix=LogFormat -text -linecomment -transform=snake
 const (
 	// Empty line comment sets empty string of unspecified value
-	LogFormatUndefined LogFormat = iota //
+	LogFormatUnspecified LogFormat = iota //
 	LogFormatDisabled
 	LogFormatText
 	LogFormatJSON
@@ -38,12 +39,13 @@ const (
 )
 
 func (f LogFormat) isDisabled() bool {
-	return f == LogFormatUndefined || f == LogFormatDisabled
+	return f == LogFormatUnspecified || f == LogFormatDisabled
 }
 
 type LogConfig struct {
 	Level     slog.Level
 	Streams   []Stream
+	Mask      MaskConfig
 	Format    LogFormat
 	AddSource bool
 	Errors    ErrorConfig
@@ -65,6 +67,34 @@ func (c *LogConfig) SetLegacyConfig(lc *old_logging.Config) {
 	c.AddSource = lc.AddSource
 }
 
+func (c LogConfig) replacer() replacer {
+	var replacers []replacer
+	if len(c.Mask.Keys) > 0 {
+		replacers = append(replacers, c.Mask.replacer())
+	}
+	if c.Format == LogFormatGCP {
+		replacers = append(replacers, sloggcp.ReplaceAttr)
+	}
+	if c.Format == LogFormatGCPErrorReporting {
+		replacers = append(replacers, errReplacer())
+	}
+	return chainReplacers(replacers...)
+}
+
+type MaskConfig struct {
+	Keys  []string
+	Value string
+}
+
+func (c MaskConfig) replacer() replacer {
+	return func(_ []string, a slog.Attr) slog.Attr {
+		if slices.Contains(c.Keys, a.Key) {
+			a.Value = slog.StringValue(c.Value)
+		}
+		return a
+	}
+}
+
 type ErrorConfig struct {
 	ReportLocation bool
 	StackTrace     bool
@@ -81,12 +111,14 @@ type ErrorConfig struct {
 //   - Request details, such as method and path.
 func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	options := &slog.HandlerOptions{
-		AddSource: cfg.AddSource,
-		Level:     cfg.Level,
+		AddSource:   cfg.AddSource,
+		Level:       cfg.Level,
+		ReplaceAttr: cfg.replacer(),
 	}
+
 	var stdErrHandler slog.Handler
 	switch cfg.Format {
-	case LogFormatUndefined:
+	case LogFormatUnspecified:
 		return // uses default slog logger
 	case LogFormatDisabled:
 		stdErrHandler = slog.DiscardHandler
@@ -95,11 +127,9 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	case LogFormatJSON:
 		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
 	case LogFormatGCP:
-		options.ReplaceAttr = sloggcp.ReplaceAttr
 		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
 	case LogFormatGCPErrorReporting:
 		zerrors.GCPErrorReportingEnabled(true)
-		options.ReplaceAttr = replaceErrAttr
 		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
 	}
 
@@ -257,10 +287,22 @@ func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) 
 	return nil
 }
 
-// replaceErrAttr renames the "err" attribute to the Google Cloud Platform compatible error key.
-func replaceErrAttr(groups []string, a slog.Attr) slog.Attr {
-	if len(groups) == 0 && a.Key == "err" {
-		a.Key = sloggcp.ErrorKey
+type replacer func(groups []string, a slog.Attr) slog.Attr
+
+func chainReplacers(replacers ...replacer) replacer {
+	return func(groups []string, a slog.Attr) slog.Attr {
+		for _, r := range replacers {
+			a = r(groups, a)
+		}
+		return a
 	}
-	return a
+}
+
+func errReplacer() replacer {
+	return func(groups []string, a slog.Attr) slog.Attr {
+		if len(groups) == 0 && a.Key == "err" {
+			a.Key = sloggcp.ErrorKey
+		}
+		return a
+	}
 }
