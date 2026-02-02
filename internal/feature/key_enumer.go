@@ -10,8 +10,8 @@ import (
 const (
 	_KeyName_0      = "unspecifiedlogin_default_org"
 	_KeyLowerName_0 = "unspecifiedlogin_default_org"
-	_KeyName_1      = "user_schematoken_exchange"
-	_KeyLowerName_1 = "user_schematoken_exchange"
+	_KeyName_1      = "user_schema"
+	_KeyLowerName_1 = "user_schema"
 	_KeyName_2      = "improved_performance"
 	_KeyLowerName_2 = "improved_performance"
 	_KeyName_3      = "debug_oidc_parent_erroroidc_single_v1_session_termination"
@@ -22,7 +22,7 @@ const (
 
 var (
 	_KeyIndex_0 = [...]uint8{0, 11, 28}
-	_KeyIndex_1 = [...]uint8{0, 11, 25}
+	_KeyIndex_1 = [...]uint8{0, 11}
 	_KeyIndex_2 = [...]uint8{0, 20}
 	_KeyIndex_3 = [...]uint8{0, 23, 57}
 	_KeyIndex_4 = [...]uint8{0, 26, 34, 53, 87, 111}
@@ -32,9 +32,8 @@ func (i Key) String() string {
 	switch {
 	case 0 <= i && i <= 1:
 		return _KeyName_0[_KeyIndex_0[i]:_KeyIndex_0[i+1]]
-	case 4 <= i && i <= 5:
-		i -= 4
-		return _KeyName_1[_KeyIndex_1[i]:_KeyIndex_1[i+1]]
+	case i == 4:
+		return _KeyName_1
 	case i == 7:
 		return _KeyName_2
 	case 9 <= i && i <= 10:
@@ -55,7 +54,6 @@ func _KeyNoOp() {
 	_ = x[KeyUnspecified-(0)]
 	_ = x[KeyLoginDefaultOrg-(1)]
 	_ = x[KeyUserSchema-(4)]
-	_ = x[KeyTokenExchange-(5)]
 	_ = x[KeyImprovedPerformance-(7)]
 	_ = x[KeyDebugOIDCParentError-(9)]
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
@@ -66,7 +64,7 @@ func _KeyNoOp() {
 	_ = x[KeyEnableRelationalTables-(16)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyManagementConsoleUseV2UserApi, KeyEnableRelationalTables}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyManagementConsoleUseV2UserApi, KeyEnableRelationalTables}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName_0[0:11]:        KeyUnspecified,
@@ -75,8 +73,6 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName_0[11:28]:  KeyLoginDefaultOrg,
 	_KeyName_1[0:11]:        KeyUserSchema,
 	_KeyLowerName_1[0:11]:   KeyUserSchema,
-	_KeyName_1[11:25]:       KeyTokenExchange,
-	_KeyLowerName_1[11:25]:  KeyTokenExchange,
 	_KeyName_2[0:20]:        KeyImprovedPerformance,
 	_KeyLowerName_2[0:20]:   KeyImprovedPerformance,
 	_KeyName_3[0:23]:        KeyDebugOIDCParentError,
@@ -99,7 +95,6 @@ var _KeyNames = []string{
 	_KeyName_0[0:11],
 	_KeyName_0[11:28],
 	_KeyName_1[0:11],
-	_KeyName_1[11:25],
 	_KeyName_2[0:20],
 	_KeyName_3[0:23],
 	_KeyName_3[23:57],

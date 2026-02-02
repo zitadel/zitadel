@@ -602,7 +602,6 @@ Errors:
     Data:
       Invalid: Data neplatná pro uživatelské schéma
   TokenExchange:
-    FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token chybí
       Invalid: Token je neplatný
@@ -616,7 +615,6 @@ Errors:
     ActiveDelete: Aktivní webový klíč nelze smazat
     Config: Neplatná konfigurace webového klíče
     Duplicate: ID webového klíče není jedinečné
-    FeatureDisabled: Funkce webového klíče je zakázána
     NoActive: Nebyl nalezen žádný aktivní webový klíč
     NotFound: Webový klíč nebyl nalezen
 

@@ -1,0 +1,287 @@
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/docs/fonts/lato/Lato-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 700;
+  src: url(/docs/fonts/lato/Lato-Bold.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 400;
+  src: url(/docs/fonts/lato/Lato-Italic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 700;
+  src: url(/docs/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+}
+
+/* Custom Zitadel Variables */
+:root {
+  --font-family-base: "Lato", sans-serif;
+
+  /* Custom Gradients/Colors used in utility classes */
+  --get-started: #ff2069;
+  --get-started-bg-hover: #7e21ce;
+
+  --apiauthbackground: linear-gradient(40deg, #a9d9ca 30%, #b4d5cb);
+  --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
+  --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
+  --apisystembackground: linear-gradient(40deg, #c7a6928e, #c7a6928e);
+  --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  --overlaycolor: #6c90b420;
+  --gigibannerbackground: white;
+  --gigibannerforeground: black;
+  --footer-border: rgba(0, 0, 0, 0.12);
+  --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #ff2069;
+
+  --font-color-strong: #000000;
+}
+
+:root[class~="dark"],
+[data-theme="dark"] {
+  --get-started: #ff1f69;
+  --get-started-bg: #dddddd;
+  /* approximated from previous var(--ifm-font-color-base) */
+
+  --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
+  --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
+  --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
+  --apisystembackground: linear-gradient(40deg, #6e695090, #6e695090);
+  --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
+  --overlaycolor: #ffffff15;
+  --gigibannerbackground: #7e21ce;
+  --gigibannerforeground: white;
+  --footer-border: rgba(255, 255, 255, 0.12);
+  --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #ffffff;
+
+  --font-color-strong: #ffffff;
+}
+
+/* Utilities */
+
+.tile-wrapper {
+  margin: 0 -8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.get-started {
+  border-radius: 50vw;
+  border: 2px solid var(--get-started);
+  background-color: var(--get-started);
+  color: white;
+  /* Fixed white for better contrast on pink */
+}
+
+.get-started:hover {
+  background-color: var(--get-started-bg-hover);
+  color: white;
+}
+
+.apicard-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.padding-top--md {
+  padding-top: 3rem !important;
+}
+
+/* Custom rounded icons */
+.custom-rounded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-right: 1rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.custom-rounded svg {
+  fill: white;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.custom-rounded i {
+  color: white;
+}
+
+.custom-rounded-start {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.custom-rounded-password {
+  background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+}
+
+.custom-rounded-login,
+.custom-rounded-register {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.custom-rounded-privatelabel,
+.custom-rounded-phone,
+.custom-rounded-email,
+.custom-rounded-storage,
+.custom-rounded-service {
+  background: linear-gradient(40deg, #ff2069 30%, #cc1a54);
+}
+
+.custom-rounded-split {
+  background: linear-gradient(40deg, #ff2069, #cc1a54);
+}
+
+.custom-rounded-texts,
+.custom-rounded-help,
+.custom-rounded-architecture {
+  background: linear-gradient(40deg, #dc2626 30%, #db2777);
+}
+
+.custom-rounded-system,
+.custom-rounded-apis,
+.custom-rounded-policy,
+.custom-rounded-instance {
+  background: linear-gradient(40deg, #1f2937, #111827);
+}
+
+/* B2B styles */
+.b2borg,
+.b2bproject,
+.b2bapp,
+.b2buser {
+  border-radius: 1rem;
+  background: var(--overlaycolor);
+  padding: 1rem;
+}
+
+.b2buser {
+  margin-top: 1rem;
+}
+
+.b2borg span,
+.b2bproject span,
+.b2bapp span,
+.b2buser span {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.flexrowbetween {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+
+.arrowright {
+  height: 2rem;
+  width: auto;
+  align-self: center;
+  min-width: 2rem;
+}
+
+.b2bprojectrole {
+  margin: 1rem 0 0 1rem !important;
+}
+
+/* Table styles */
+table th {
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+/* Alert styles */
+.alert {
+  font-size: 14px;
+  border: none;
+  font-weight: 600;
+}
+
+p strong {
+  color: var(--font-color-strong);
+}
+
+/* API Method Colors - Adapted for Fumadocs if needed, or keeping as utility classes */
+.api-method {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Helper classes for light/dark mode visibility */
+.hideondark {
+  display: block !important;
+}
+
+:root[class~="dark"] .hideondark {
+  display: none !important;
+}
+
+.hideonlight {
+  display: none !important;
+}
+
+:root[class~="dark"] .hideonlight {
+  display: block !important;
+}
+
+/* Player wrapper */
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25%;
+  margin-bottom: 2rem;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Deprecation styles */
+.card:has(.zitadel-lifecycle-deprecated) {
+  position: relative;
+}
+
+.card:has(.zitadel-lifecycle-deprecated)::after {
+  content: "DEPRECATED";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ef444420;
+  /* fallback danger color */
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zitadel-lifecycle-deprecated {
+  text-decoration: line-through;
+}
+
+table#zitadel-versions td {
+  vertical-align: top;
+}
