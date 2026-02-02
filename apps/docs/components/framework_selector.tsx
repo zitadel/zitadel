@@ -19,7 +19,7 @@ function FrameworkSelectorInner({ children }: { children: ReactNode }) {
         const index = FRAMEWORKS.findIndex(f => 
             f === sanitizedQuery || f.replace(/[\s.]/g, '') === sanitizedQuery
         );
-
+        sessionStorage.setItem('framework-select', sanitizedQuery);
         return index === -1 ? 0 : index;
     }, [searchParams]);
 
