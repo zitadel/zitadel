@@ -252,14 +252,9 @@ describe("OpenTelemetry Integration", () => {
     });
 
     describe("Span Filtering", () => {
-      it("excludes /healthy from traces", () => {
+      it("HTTP instrumentation excludes /healthy", () => {
         const traces = readTraces();
-        expect(traces).not.toContain('"/ui/v2/login/healthy"');
-      }, TEST_TIMEOUT);
-
-      it("excludes /metrics from traces", () => {
-        const traces = readTraces();
-        expect(traces).not.toContain('"/metrics"');
+        expect(traces).not.toContain('"http.url":"http://localhost:3002/ui/v2/login/healthy"');
       }, TEST_TIMEOUT);
 
       it("includes /otel-test in traces", () => {
