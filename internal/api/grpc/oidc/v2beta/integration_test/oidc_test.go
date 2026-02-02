@@ -50,7 +50,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 			ctx: CTXLoginClient,
 		},
 		{
-			name: "without login application, no permission",
+			name: "without login client, no permission",
 			dep: func() (time.Time, string, error) {
 				client, err := Instance.CreateOIDCClientLoginVersion(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
 				require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "without login application, with permission",
+			name: "without login client, with permission",
 			dep: func() (time.Time, string, error) {
 				client, err := Instance.CreateOIDCClientLoginVersion(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
 				require.NoError(t, err)

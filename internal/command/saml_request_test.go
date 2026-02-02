@@ -213,7 +213,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"wrong login application / not permitted",
+			"wrong login client / not permitted",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -459,7 +459,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login application check",
+			"linked with login client check",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -623,7 +623,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login application check, application permission check",
+			"linked with login client check, application permission check",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -706,7 +706,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login application check, no application permission",
+			"linked with login client check, no application permission",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(

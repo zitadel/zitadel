@@ -259,7 +259,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 		},
 		{
-			"wrong login application / not permitted",
+			"wrong login client / not permitted",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -546,7 +546,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login application check",
+			"linked with login client check",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
