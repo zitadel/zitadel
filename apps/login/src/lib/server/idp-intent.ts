@@ -14,9 +14,10 @@ import {
   getDefaultOrg,
   updateHuman,
   ServiceConfig,
+  getSession
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
-import { Code, ConnectError, create } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
@@ -24,7 +25,6 @@ import {
   AddHumanUserRequestSchema,
   UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getSession } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/lib/cookies";
 import { createNewSessionFromIdpIntent } from "./idp";
 import { getTranslations } from "next-intl/server";
@@ -32,6 +32,16 @@ import crypto from "crypto";
 import { getFingerprintIdCookie } from "../fingerprint";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
+
+/**
+ * Gets a valid userName from IDP information.
+ * Falls back to userId if userName is empty or undefined.
+ * This ensures we always have a valid userName (1-200 characters) as required by the API.
+ */
+function getValidUserName(idpInformation: { userName?: string; userId: string }): string {
+  const userName = idpInformation.userName?.trim();
+  return userName && userName.length > 0 ? userName : idpInformation.userId;
+}
 
 async function resolveOrganizationForUser({
   organization,
@@ -233,7 +243,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         idp: {
           id: intent.idpInformation!.idpId,
           userId: intent.idpInformation!.userId,
-          userName: intent.idpInformation!.userName,
+          userName: getValidUserName(intent.idpInformation!),
         },
         userId: resolvedUserId,
       });
@@ -264,7 +274,8 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       console.error("[IDP Process] Error linking IDP:", error);
       const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
       let params = buildRedirectParams({ error: errorMessage });
-      if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
+      // Code 6 = ALREADY_EXISTS in gRPC status codes
+      if ((error as any)?.code === 6) {
         params = buildRedirectParams({ error: "external_idp_taken" });
       }
       return { redirect: `/idp/${provider}/linking-failed?${params}` };
@@ -391,7 +402,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           idp: {
             id: idpInformation!.idpId,
             userId: idpInformation!.userId,
-            userName: idpInformation!.userName,
+            userName: getValidUserName(idpInformation!),
           },
           userId: foundUser.userId,
         });

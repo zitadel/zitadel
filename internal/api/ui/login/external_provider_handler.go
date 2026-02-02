@@ -1470,13 +1470,22 @@ type federatedLogoutData struct {
 }
 
 const (
-	federatedLogoutDataSessionID = "sessionID"
+	federatedLogoutDataSessionID  = "sessionID"
+	federatedLogoutV2DataLogoutID = "logoutID"
 )
 
 func ExternalLogoutPath(sessionID string) string {
 	v := url.Values{}
 	v.Set(federatedLogoutDataSessionID, sessionID)
 	return HandlerPrefix + EndpointExternalLogout + "?" + v.Encode()
+}
+
+// FederatedLogoutV2Path returns the path to the Login V2 federated logout page
+// This path will be used by the Login V2 UI to handle federated logout
+func FederatedLogoutV2Path(logoutID string) string {
+	v := url.Values{}
+	v.Set(federatedLogoutV2DataLogoutID, logoutID)
+	return HandlerPrefix + "/logout/federated?" + v.Encode()
 }
 
 // handleExternalLogout is called when a user signed out of ZITADEL with a federated logout
