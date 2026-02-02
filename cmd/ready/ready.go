@@ -31,7 +31,9 @@ func New() *cobra.Command {
 			}
 			// Set logger again to include changes from config
 			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
-			defer shutdown(cmd.Context())
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			if ready(cmd.Context(), config) {
 				return nil
 			}

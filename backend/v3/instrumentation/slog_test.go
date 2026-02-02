@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	old_logging "github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 	"github.com/zitadel/sloggcp"
 )
 

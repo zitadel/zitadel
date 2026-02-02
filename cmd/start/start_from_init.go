@@ -53,7 +53,10 @@ Requirements:
 				err = errors.Join(err, shutdown(initCtx))
 			}()
 
-			initialise.InitAll(initCtx, initConfig)
+			err = initialise.InitAll(initCtx, initConfig)
+			if err != nil {
+				return err
+			}
 
 			err = setup.BindInitProjections(cmd)
 			if err != nil {

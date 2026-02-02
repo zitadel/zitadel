@@ -12,7 +12,7 @@ import (
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
-	old_logging "github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 	"github.com/zitadel/sloggcp"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"

@@ -8,7 +8,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	old_logging "github.com/zitadel/logging"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/hooks"
