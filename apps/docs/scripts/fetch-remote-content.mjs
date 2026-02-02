@@ -107,9 +107,12 @@ function filterVersions(tags) {
     .filter(v => {
       const valid = semver.valid(v);
       if (!valid) return false;
+      // Strict cutoff: Do not fetch or build anything older (including that version)
       return semver.gt(v, CUTOFF);
     })
     .sort((a, b) => semver.rcompare(a, b));
+
+  console.log(`Found ${versions.length} versions matching criteria.`);
 
   const groups = new Map();
   for (const v of versions) {
@@ -158,7 +161,7 @@ async function downloadVersion(tag, sourceRef) {
 
   const currentRef = getCurrentRef();
   const isLocal = sourceRef === currentRef;
-  const tempDir = join(ROOT_DIR, `.temp/${tag}`);
+  const tempDir = join(ROOT_DIR, `.temp/${tag}`); // Extract to tag-specific temp to avoid collisions
   fs.mkdirSync(tempDir, { recursive: true });
 
   try {
@@ -200,13 +203,20 @@ async function downloadVersion(tag, sourceRef) {
         const tarArgsWildcard = [
             '-xz',
             '-C', tempDir,
-            '--strip-components=1',
-            '--wildcards',
+            '--strip-components=1'
+        ];
+
+        // GNU tar (Linux) requires --wildcards for patterns, BSD tar (macOS) does not support it (and uses patterns by default)
+        if (process.platform !== 'darwin') {
+            tarArgsWildcard.push('--wildcards');
+        }
+
+        tarArgsWildcard.push(
             '*/apps/docs/content',
             '*/apps/docs/public',
             '*/cmd/defaults.yaml',
             '*/cmd/setup/steps.yaml'
-        ];
+        );
 
         await new Promise((resolve, reject) => {
             const tar = spawn('tar', tarArgsWildcard);
@@ -293,7 +303,6 @@ async function downloadFileContent(tagOrBranch, repoPath) {
     return null;
   }
 
-  // Sanitize inputs for fetch
   if (!isValidRef(tagOrBranch)) return null;
 
   const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
@@ -305,123 +314,152 @@ async function downloadFileContent(tagOrBranch, repoPath) {
 async function fixRelativeImports(versionDir, tagOrBranch) {
     if (!fs.existsSync(versionDir)) return;
     const files = fs.readdirSync(versionDir, { recursive: true });
-    
-    for (const file of files) {
-        const filePath = join(versionDir, file);
-        if (!fs.statSync(filePath).isFile()) continue;
-        if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) continue;
 
-        let content = fs.readFileSync(filePath, 'utf8');
-        let changed = false;
+  // We'll traverse all files to fix links/imports
+  for (const file of files) {
+    const filePath = join(versionDir, file);
+    if (!fs.statSync(filePath).isFile()) continue;
+    if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) continue;
 
-        const rewritePath = (originalRelPath) => {
-             const versionFolder = path.basename(versionDir);
-             const relativePathInContent = filePath.split(join('content', versionFolder))[1];
-             if (!relativePathInContent) return null; 
+    let content = fs.readFileSync(filePath, 'utf8');
+    let changed = false;
 
-             const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
-             const originalDir = dirname(originalFilePath);
-             const absoluteTarget = resolve(originalDir, originalRelPath);
-             const projectRoot = resolve(ROOT_DIR, '../..');
-             
-             if (absoluteTarget.startsWith(PUBLIC_DIR)) {
-                 const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1);
-                 const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
-                 const newRelPath = path.relative(dirname(filePath), newTargetAbs);
-                 return newRelPath.split(path.sep).join('/');
-             }
-             
-             if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PUBLIC_DIR)) {
-                  return null; 
-             }
-             if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
-                 return null;
-             }
+    const rewritePath = (originalRelPath) => {
+      const versionFolder = path.basename(versionDir);
+      const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+      if (!relativePathInContent) return null;
 
-              if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
-                   const newRelPath = path.relative(dirname(filePath), absoluteTarget);
-                   return newRelPath.split(path.sep).join('/');
-              }
-              return null;
-        };
+      const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+      const originalDir = dirname(originalFilePath);
+      const absoluteTarget = resolve(originalDir, originalRelPath);
+      const projectRoot = resolve(ROOT_DIR, '../..');
 
-        const importRegex = /(import\s+.*?\s+from\s+['"])([^'"]+)(['"])/g;
-        content = content.replace(importRegex, (match, p1, p2, p3) => {
-             if (!p2.startsWith('.')) return match;
-             const rewritten = rewritePath(p2);
-             if (rewritten && rewritten !== p2) {
-                 changed = true;
-                 return `${p1}${rewritten}${p3}`;
-             }
-             return match;
-        });
-        
-        const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
-        content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
-             if (!p2.startsWith('.')) return match;
-             const rewritten = rewritePath(p2);
-             if (rewritten && rewritten !== p2) {
-                 changed = true;
-                 return `${p1}${rewritten}${p3}`;
-             }
-             return match;
-        });
+      if (absoluteTarget.startsWith(PUBLIC_DIR)) {
+        const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1);
+        const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
+        const newRelPath = path.relative(dirname(filePath), newTargetAbs);
+        return newRelPath.split(path.sep).join('/');
+      }
 
-        const htmlAttrRegex = /(src|href)=['"]([^'"]+)['"]/g;
-        content = content.replace(htmlAttrRegex, (match, attr, val) => {
-             if (!val.startsWith('.')) return match;
-             const rewritten = rewritePath(val);
-             if (rewritten && rewritten !== val) {
-                 changed = true;
-                 const quote = match.includes("'") ? "'" : '"';
-                 return `${attr}=${quote}${rewritten}${quote}`;
-             }
-             return match;
-        });
-        
-        // Scan for external files to download
-        const importRegexForDownload = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
-        let match;
-        while ((match = importRegexForDownload.exec(content)) !== null) {
-              const relPath = match[1];
-              const versionFolder = path.basename(versionDir);
-              const relativePathInContent = filePath.split(join('content', versionFolder))[1];
-              const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
-              const absoluteImportTarget = resolve(dirname(originalFilePath), relPath);
-              const projectRoot = resolve(ROOT_DIR, '../..');
-              
-              if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
-                    const repoRoot = resolve(ROOT_DIR, '../..');
-                    let relativeToRepoRoot;
-                    if (absoluteImportTarget.startsWith(join(repoRoot, 'apps'))) {
-                        relativeToRepoRoot = absoluteImportTarget.replace(join(repoRoot, 'apps') + '/', '');
-                    } else {
-                        relativeToRepoRoot = absoluteImportTarget.replace(repoRoot + '/', '');
-                    }
-                    
-                    const localPathInVersion = join(versionDir, '_external', relativeToRepoRoot);
-                   
-                   if (!fs.existsSync(localPathInVersion)) {
-                      console.log(`[fix-imports] Downloading external: ${relativeToRepoRoot}`);
-                      const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot);
-                      if (fileContent) {
-                          fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
-                          fs.writeFileSync(localPathInVersion, fileContent);
-                      }
-                   }
-                   
-                   const newRelPath = path.relative(dirname(filePath), localPathInVersion).split(path.sep).join('/');
-                   const finalPath = newRelPath.startsWith('.') ? newRelPath : './' + newRelPath;
-                   const newImport = match[0].replace(relPath, finalPath);
-                   content = content.replace(match[0], newImport);
-                   changed = true;
-              }
-        }
-        
-        if (changed) {
-            fs.writeFileSync(filePath, content);
-        }
+      if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PUBLIC_DIR)) {
+        return null;
+      }
+      if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
+        return null;
+      }
+
+      if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
+        const newRelPath = path.relative(dirname(filePath), absoluteTarget);
+        return newRelPath.split(path.sep).join('/');
+      }
+      return null;
+    };
+
+    function PublicOrRootPublic(p) {
+      return PUBLIC_DIR;
     }
+    }
+
+    // --- Replacements ---
+
+    // 1. Imports: import ... from '...'
+    // We capture the path: group 2
+    const importRegex = /(import\s+.*?\s+from\s+['"])([^'"]+)(['"])/g;
+    content = content.replace(importRegex, (match, p1, p2, p3) => {
+      if (!p2.startsWith('.')) return match; // Only relative
+      const rewritten = rewritePath(p2);
+      if (rewritten && rewritten !== p2) {
+        changed = true;
+        return `${p1}${rewritten}${p3}`;
+      }
+      return match;
+    });
+
+    // 2. Markdown Images: ![alt](src)
+    const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
+    content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
+      if (!p2.startsWith('.')) return match;
+      const rewritten = rewritePath(p2);
+      if (rewritten && rewritten !== p2) {
+        changed = true;
+        return `${p1}${rewritten}${p3}`;
+      }
+      return match;
+    });
+
+    // 3. HTML Attributes: src="..." or href="..."
+    // Naive regex, but likely sufficient for MDX
+    const htmlAttrRegex = /(src|href)=['"]([^'"]+)['"]/g;
+    content = content.replace(htmlAttrRegex, (match, attr, val) => {
+      if (!val.startsWith('.')) return match;
+      const rewritten = rewritePath(val);
+      if (rewritten && rewritten !== val) {
+        changed = true;
+        // reconstruct match
+        const quote = match.includes("'") ? "'" : '"';
+        return `${attr}=${quote}${rewritten}${quote}`;
+      }
+      return match;
+    });
+
+    // --- Special handling for the "download external file" case ---
+    // The previous regex replacement structure prevents async operations.
+    // We have to scan for external files separately or before replacing, OR use a synchronous download (not ideal)
+    // OR rely on the existing synchronous logic for rewriting if we pre-download them.
+
+    // Let's perform a SCAN for strictly external files (like ../cmd/defaults.yaml) first
+    // Reuse original logic for downloading
+    const importRegexForDownload = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
+    let match;
+    while ((match = importRegexForDownload.exec(content)) !== null) {
+      const relPath = match[1];
+      const versionFolder = path.basename(versionDir);
+      const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+      const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+      const absoluteImportTarget = resolve(dirname(originalFilePath), relPath);
+      const projectRoot = resolve(ROOT_DIR, '../..');
+
+      // If it points to cmd/ or similar external
+      if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
+        const repoRoot = resolve(ROOT_DIR, '../..');
+
+        // The original imports were relative to docs/content, not apps/docs/content.
+        // We need to account for the extra 'apps/' level.
+        let relativeToRepoRoot;
+        if (absoluteImportTarget.startsWith(join(repoRoot, 'apps'))) {
+          // If it resolved to apps/cmd/defaults.yaml, it should be cmd/defaults.yaml
+          relativeToRepoRoot = absoluteImportTarget.replace(join(repoRoot, 'apps') + '/', '');
+        } else {
+          relativeToRepoRoot = absoluteImportTarget.replace(repoRoot + '/', '');
+        }
+
+        const localPathInVersion = join(versionDir, '_external', relativeToRepoRoot);
+
+        // Download if missing
+        if (!fs.existsSync(localPathInVersion)) {
+          console.log(`[fix-imports] Downloading external: ${relativeToRepoRoot}`);
+          const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot); // existing function
+          if (fileContent) {
+            fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
+            fs.writeFileSync(localPathInVersion, fileContent);
+          }
+        }
+
+        // Rewrite to local path
+        const newRelPath = path.relative(dirname(filePath), localPathInVersion).split(path.sep).join('/');
+        const finalPath = newRelPath.startsWith('.') ? newRelPath : './' + newRelPath;
+        // Perform replacement
+        const newImport = match[0].replace(relPath, finalPath);
+        content = content.replace(match[0], newImport);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      console.log(`[fix-relative] Updated ${file}`);
+      fs.writeFileSync(filePath, content);
+    }
+  }
 }
 
 function getLocalVersion() {
@@ -439,44 +477,52 @@ function getLocalVersion() {
     if (branch === 'main' || branch === 'master') {
         return { label: 'ZITADEL Docs', isUnreleased: false };
     }
+
     try {
         const tag = execSync('git describe --tags --abbrev=0').toString().trim();
         if (semver.valid(tag) && semver.gt(tag, CUTOFF)) {
             return { label: tag, isUnreleased: false };
         }
-    } catch (e) {}
+    } catch (e) { }
 
-    return { label: 'v4.11.0', isUnreleased: true }; 
+    return { label: 'v4.11.0', isUnreleased: true };
 }
 
 async function run() {
   console.log('Starting version discovery...');
   const tags = await fetchTags();
   const selectedTags = filterVersions(tags);
-  
+
   let localVer = getLocalVersion();
   let others = selectedTags;
 
   console.log(`Latest version (Local): ${localVer.label} (Unreleased: ${localVer.isUnreleased})`);
-  
+
+  // Conditional Fallback: If no versions found > 4.10.0, inject v4.10.0
   if (others.length === 0) {
-      console.log(`[fallback] No versions found strictly > ${CUTOFF}. Injecting ${FALLBACK_VERSION} as fallback.`);
-      others.push(FALLBACK_VERSION);
+    console.log(`[fallback] No versions found strictly > ${CUTOFF}. Injecting ${FALLBACK_VERSION} as fallback.`);
+    others.push(FALLBACK_VERSION);
   }
 
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
   await Promise.all(others.map(async (tag) => {
     let sourceRef = tag;
-    if (tag === FALLBACK_VERSION || tag === '4.10.0') {
-         sourceRef = getCurrentRef();
+
+    // Explicit logic for version 4.10.x to use active branch (Faking 4.10.x)
+    // This prevents fetching incompatible legacy docs for 4.10.1 etc.
+    if (tag === FALLBACK_VERSION || (semver.major(tag) === 4 && semver.minor(tag) === 10)) {
+      console.log(`[fake-override] Version ${tag} matches 4.10.x. Using fallback source (main/current) instead of tag.`);
+      sourceRef = getCurrentRef();
     }
-    
+
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
     const contentDest = join(CONTENT_DIR, versionSlug);
-    
+
+    // Simple cache check: if directory exists and looks populated, skip
+    // We could check for a specific file like meta.json or similar if we wanted to be more robust
     if (fs.existsSync(contentDest)) {
-        console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
+      console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
     } else {
         await downloadVersion(tag, sourceRef);
         // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
@@ -485,12 +531,12 @@ async function run() {
   }));
 
   const versionsJson = [
-    { 
-      param: 'latest', 
-      label: localVer.isUnreleased ? `${localVer.label} (Unreleased)` : `${localVer.label} (Latest)`, 
-      url: '/docs', 
-      ref: 'local', 
-      refType: 'local' 
+    {
+      param: 'latest',
+      label: localVer.isUnreleased ? `${localVer.label} (Unreleased)` : `${localVer.label} (Latest)`,
+      url: '/docs',
+      ref: 'local',
+      refType: 'local'
     }
   ];
 
@@ -498,13 +544,13 @@ async function run() {
     const v = `v${semver.major(tag)}.${semver.minor(tag)}`;
     const versionSlug = `v${semver.major(tag)}${semver.minor(tag)}x`;
     const targetUrl = `https://docs-git-${versionSlug}-zitadel.vercel.app/docs`;
-    versionsJson.push({ 
-        param: v, 
-        label: v, 
-        url: `/docs/${v}`, 
-        ref: tag, 
-        refType: 'tag',
-        target: targetUrl
+    versionsJson.push({
+      param: v,
+      label: v,
+      url: `/docs/${v}`,
+      ref: tag,
+      refType: 'tag',
+      target: targetUrl
     });
   }
 

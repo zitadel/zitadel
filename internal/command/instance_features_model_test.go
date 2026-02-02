@@ -39,15 +39,6 @@ func Test_reduceInstanceFeature(t *testing.T) {
 			expected: &InstanceFeatures{LoginDefaultOrg: gu.Ptr(true)},
 		},
 		{
-			name: "token exchange",
-			args: args{
-				features: &InstanceFeatures{},
-				key:      feature.KeyTokenExchange,
-				value:    true,
-			},
-			expected: &InstanceFeatures{TokenExchange: gu.Ptr(true)},
-		},
-		{
 			name: "user schema",
 			args: args{
 				features: &InstanceFeatures{},
