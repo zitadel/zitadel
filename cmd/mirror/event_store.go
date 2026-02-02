@@ -47,11 +47,6 @@ Migrate only copies events2 and unique constraints`,
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
-			defer func() {
-				if recErr, ok := recover().(error); ok {
-					err = recErr
-				}
-			}()
 			copyEventstore(cmd.Context(), config)
 			return nil
 		},

@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-	"github.com/zitadel/sloggcp"
 	"golang.org/x/exp/constraints"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
@@ -579,8 +578,8 @@ func NewJSONCol(name string, value interface{}) Column {
 	marshalled, err := json.Marshal(value)
 	if err != nil {
 		err = zerrors.ThrowInternal(err, "V2-aez5X", "unable to marshal column")
-		logging.New(logging.StreamEventHandler).Log(context.Background(), sloggcp.LevelCritical, "unable to marshal column", "column", name, "err", err)
-		panic(err)
+		ctx := logging.NewCtx(context.Background(), logging.StreamEventHandler)
+		logging.OnError(ctx, err).Panic("unable to marshal column", "column", name, "err", err)
 	}
 
 	return NewCol(name, marshalled)

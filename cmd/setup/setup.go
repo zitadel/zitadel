@@ -129,11 +129,6 @@ func bindForMirror(cmd *cobra.Command) error {
 
 func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) (err error) {
 	logging.Info(ctx, "setup started")
-	defer func() {
-		if recErr, ok := recover().(error); ok {
-			err = recErr
-		}
-	}()
 	var setupErr error
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 
@@ -165,7 +160,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	i18n.MustLoadSupportedLanguagesFromDir()
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(ctx, err).Fatal("unable to connect to database")
-	defer dbClient.Close()
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	esV3 := new_es.NewEventstore(dbClient)

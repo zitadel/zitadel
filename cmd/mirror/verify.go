@@ -34,11 +34,6 @@ func verifyCmd() *cobra.Command {
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
-			defer func() {
-				if recErr, ok := recover().(error); ok {
-					err = recErr
-				}
-			}()
 			verifyMigration(cmd.Context(), config)
 			return nil
 		},

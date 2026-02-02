@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"errors"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -48,10 +48,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	if err != nil {
-		logger.Error("unable to read default config", "err", err)
-		os.Exit(1)
-	}
+	logging.OnError(context.Background(), err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
@@ -77,8 +74,6 @@ func initConfig() {
 	for _, file := range configFiles {
 		viper.SetConfigFile(file)
 		err := viper.MergeInConfig()
-		if err != nil {
-			logger.Warn("unable to read config file", "file", file, "err", err)
-		}
+		logging.OnError(context.Background(), err).Warn("unable to read config file", "file", file)
 	}
 }

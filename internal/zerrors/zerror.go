@@ -144,7 +144,6 @@ func CreateZitadelError(kind Kind, parent error, id, message string, skip int) *
 	}
 
 	if enableReportLocation.Load() {
-		// skip 2: newZitadelError + Create / Throw function.
 		err.reportLocation = sloggcp.NewReportLocation(skip + 1)
 	}
 	if enableStackTrace.Load() {

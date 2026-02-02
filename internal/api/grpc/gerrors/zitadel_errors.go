@@ -26,13 +26,13 @@ func ZITADELToGRPCError(ctx context.Context, err error) error {
 	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	logging.FromCtx(ctx).Log(ctx, lvl, msg, "err", err, "code", code)
+	logging.Log(ctx, lvl, msg, "err", err, "code", code)
 
 	errorInfo := getErrorInfo(id, key, err)
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
-		logging.WithError(ctx, err).Debug("unable to add detail", "logID", "GRPC-gIeRw")
+		logging.WithError(ctx, err).Debug("unable to add error detail")
 		return status.New(code, msg).Err()
 	}
 
@@ -53,7 +53,7 @@ func ZITADELToConnectError(ctx context.Context, err error) error {
 	code, key, id, lvl := extractError(err)
 	msg := key
 	msg += " (" + id + ")"
-	logging.FromCtx(ctx).Log(ctx, lvl, msg, "err", err)
+	logging.Log(ctx, lvl, msg, "err", err)
 
 	errorInfo := getErrorInfo(id, key, err)
 

@@ -72,12 +72,6 @@ func projectionsCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("unable to read master key: %w", err)
 			}
-
-			defer func() {
-				if recErr, ok := recover().(error); ok {
-					err = recErr
-				}
-			}()
 			projections(cmd.Context(), config, masterKey)
 			return nil
 		},

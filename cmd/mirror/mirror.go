@@ -80,12 +80,6 @@ Order of execution:
 			copySystem(cmd.Context(), config)
 			copyAuth(cmd.Context(), config)
 			copyEventstore(cmd.Context(), config)
-
-			defer func() {
-				if recErr, ok := recover().(error); ok {
-					err = recErr
-				}
-			}()
 			projections(cmd.Context(), projectionConfig, masterKey)
 			return nil
 		},

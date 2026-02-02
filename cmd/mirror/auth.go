@@ -36,11 +36,6 @@ Only auth requests are mirrored`,
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
-			defer func() {
-				if recErr, ok := recover().(error); ok {
-					err = recErr
-				}
-			}()
 			copyAuth(cmd.Context(), config)
 			return nil
 		},
