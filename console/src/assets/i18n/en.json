@@ -46,7 +46,7 @@
     },
     "USERS": {
       "TITLE": "Users",
-      "DESCRIPTION": "A user is a human or a machine that can access your applications.",
+      "DESCRIPTION": "A user is a User (Human) or a machine that can access your applications.",
       "HUMANS": {
         "TITLE": "Users",
         "DESCRIPTION": "Users authenticate interactively in a browser session with a login prompt.",
