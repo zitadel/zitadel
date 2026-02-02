@@ -2,20 +2,22 @@
 title: The ZITADEL Quick Start Guide
 description: Learn how to integrate OIDC PKCE authentication in React using ZITADEL in under 5 minutes.
 sidebar_label: Quick Start Guide
-keywords: [ZITADEL, React, OIDC, PKCE, Authentication, Identity Management]
-framework: React
-stack: Node.js
+keywords: [ZITADEL, OIDC, PKCE, Authentication, Identity Management]
 ---
 
-import { ResponsivePlayer } from "@/components/player";
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import AppConfig from './_app_config.mdx';
+import AppValues from './_app_values.mdx';
 
 This sample app implements the [OIDC PKCE](/guides/integrate/login/oidc/login-users) flow for secure authentication.
 - Login: Exchanges a code challenge for an access token via ZITADEL.
 - Authorize: Uses the token to retrieve profile data from the userinfo endpoint.
 - Logout: Clears the local session and revokes the token.
+
 ## Get Started with ZITADEL Cloud
 
 Set up your ZITADEL account and organization to begin managing identities for your applications.
+
 ### 1. Create your Account and Organization
 
 You first need access to the ZITADEL Cloud Customer Portal.
@@ -32,7 +34,7 @@ This is the administrative hub for managing your billing, teams, and instances.
 
 Complete the brief onboarding questions.
 This data helps us prioritize the development of new features, SDKs, and integrations that matter most to our community.
-![](../../../public/img/guides/quickstart/onboarding_questions.png)
+![Onboarding Questions](../../../public/img/guides/quickstart/onboarding_questions.png)
 
 ### 3. Create your ZITADEL instance
 
@@ -48,10 +50,12 @@ Follow these steps to deploy your first instance:
 5. **Deploy**: Review your configuration and click Create Instance.
 
 ![Create Instance](../../../public/img/guides/quickstart/cloud_create_instance.png)
+
 ### 4. Create your Project and Application
 
 In ZITADEL, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
 This allows multiple apps (like a React frontend and a Go backend) to share the same roles and authorizations.
+
 #### Launch the Management Console
 
 Click **Create your app**. This opens the Management Console for your instance in a new tab.
@@ -62,27 +66,73 @@ Log in using the Admin credentials you just created.
 - **Name**: Enter a name (e.g., Project1).
 - **Framework**: Select React (or choose Other if your stack isn't listed).
 - **Continue**: Click the Continue button.
-![](../../../public/img/guides/quickstart/create_project_react.png)
+![Project Name and Framework/Language](../../../public/img/guides/quickstart/create_project_react.png)
 
 #### Step 2: Review Default Configuration
 ZITADEL automatically configures the best security settings for your selected framework.
-- **Auth Strategy**: [Authorization Code Flow](/apis/openidoauth/grant-types#authorization-code) with [PKCE](/apis/openidoauth/grant-types#authorization-code). This modern standard ensures tokens are exchanged securely without needing a client secret in your frontend.
-- **Redirect URIs**: These define where users return after authentication:
-  - Redirect URI: http://localhost:3000/callback (Landing page after login)
-  - Post Logout URI: http://localhost:3000/ (Landing page after logout)
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
+        <AppConfig
+            redirectUrl="http://localhost:3000/auth/callback"
+            postLogoutRedirectUrl="http://localhost:3000/signedout">
+        </AppConfig>
+    </Tab>
+    <Tab value="Flutter">
+        <AppConfig
+            redirectUrl="http://localhost:4444/auth.html, com.example.zitadelflutter"
+            postLogoutRedirectUrl="http://localhost:4444, com.example.zitadelflutter">
+        </AppConfig>
+    </Tab>
+    <Tab value="Go">
+        <AppConfig
+            redirectUrl="http://localhost:8089/auth/callback"
+            postLogoutRedirectUrl="http://localhost:8089">
+        </AppConfig>
+    </Tab>
+    <Tab value="Next.js">
+        <AppConfig
+            redirectUrl="http://localhost:3000/api/auth/callback/zitadel"
+            postLogoutRedirectUrl="http://localhost:3000/api/auth/logout/callback">
+        </AppConfig>
+    </Tab>
+    <Tab value="React">
+        <AppConfig
+            redirectUrl="http://localhost:3000/callback"
+            postLogoutRedirectUrl="http://localhost:3000/">
+        </AppConfig>
+    </Tab>
+    <Tab value="Vue.js">
+        <AppConfig
+            redirectUrl="http://localhost:5173/auth/signinwin/zitadel"
+            postLogoutRedirectUrl="http://localhost:5173/">
+        </AppConfig>
+    </Tab>
+</Tabs>
 
-![](../../../public/img/guides/quickstart/project_config_overview_react.png)
+![Project Configuration Overview](../../../public/img/guides/quickstart/project_config_overview_react.png)
 
 ### 5. Collect your Integration Keys
-To connect your React application to ZITADEL, you need two primary configuration values.
-These are typically stored as environment variables in your project.
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Flutter">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Go">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Next.js">
+        <AppValues valueCount="three" clientSecret={true} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="React">
+        <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
+    </Tab>
+    <Tab value="Vue.js">
+        <AppValues valueCount="three" clientSecret={false} projectID={true}></AppValues>
+    </Tab>
+</Tabs>
 
-1. **Client ID** Navigate to Configurations in the left sidebar. This is the unique public identifier for your React application.
-![Get Client ID](../../../public/img/guides/quickstart/project_client_id.png)
-2. **Issuer URL** Click on URLs in the left sidebar to find your **Discovery Endpoint**.
-- The Value: Copy the issuer URL (e.g., https://your-instance.zitadel.cloud).
-- Why it matters: ZITADEL supports OIDC Discovery. By providing just the Issuer URL to your SDK, the library automatically finds the login, logout, and token endpoints for you.
-![Get URLs](../../../public/img/guides/quickstart/project_urls.png)
 
 ## Integrate ZITADEL into your React App
 ### How the Authentication Flow Works

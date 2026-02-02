@@ -12,8 +12,8 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
     .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:4200/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:4200']),
+    .setRedirectUrisList(['http://localhost:4200/auth/callback'])
+    .setPostLogoutRedirectUrisList(['http://localhost:4200/signedout']),
   ['react']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_USER_AGENT)
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
@@ -80,11 +80,11 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setPostLogoutRedirectUrisList(['http://localhost:3000']),
   ['client-go']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
-    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
+    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
     .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:8080/auth/callback'])
-    .setPostLogoutRedirectUrisList(['http://localhost:8080']),
+    .setRedirectUrisList(['http://localhost:8089/auth/callback'])
+    .setPostLogoutRedirectUrisList(['http://localhost:8089']),
   ['client-ruby']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
