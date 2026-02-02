@@ -605,7 +605,6 @@ Errors:
     Data:
       Invalid: Dati non validi per lo schema utente
   TokenExchange:
-    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Manca il gettone
       Invalid: Il token non è valido
@@ -619,7 +618,6 @@ Errors:
     ActiveDelete: Impossibile eliminare la chiave Web attiva
     Config: Configurazione chiave Web non valida
     Duplicate: ID chiave Web non univoco
-    FeatureDisabled: Funzione chiave Web disabilitata
     NoActive: Nessuna chiave Web attiva trovata
     NotFound: Chiave Web non trovata
 

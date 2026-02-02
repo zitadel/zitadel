@@ -1,6 +1,6 @@
 ---
 title: Impersonation and delegation using Token Exchange
-sidebar_label: Token Exchange [Beta]
+sidebar_label: Token Exchange
 ---
 
 import TokenExchangeTypes from "../../apis/openidoauth/_token_exchange_types.mdx";
@@ -9,17 +9,11 @@ import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_respon
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
 
-:::info
-Token Exchange is currently an [experimental beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
-
-Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1333448892083208262)!
-:::
-
 In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
 
-- Integrate your app with the [OIDC flow](/docs/guides/integrate/login/oidc/login-users) to obtain tokens
-- [Claims](/docs/apis/openidoauth/claims)
-- [Scope](/docs/apis/openidoauth/scopes)
+- Integrate your app with the [OIDC flow](/guides/integrate/login/oidc/login-users) to obtain tokens
+- [Claims](/apis/openidoauth/claims)
+- [Scope](/apis/openidoauth/scopes)
 - Audience
 
 ## The basics
@@ -30,7 +24,7 @@ Token Exchange is a complex and broad subject. Before we get our hands dirty wit
 
 Token Exchange offers a range of possibilities for providing and requesting different token types. The existence of the various `*_token_type` fields in the request and response data helps defining which tokens we are sending, which ones we wish to receive and finally which one(s) we did receive in the response.
 
-<TokenExchangeTypes />
+<TokenExchangeTypes components={props.components}  />
 
 #### Access Token type
 
@@ -49,7 +43,7 @@ When requesting an access token, token exchange will always return an opaque tok
 urn:ietf:params:oauth:token-type:refresh_token
 ```
 
-At the moment we do not support sending refresh tokens as part of the Token Exchange grant. Instead, use the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant).
+At the moment we do not support sending refresh tokens as part of the Token Exchange grant. Instead, use the [`refresh_token` grant](/apis/openidoauth/endpoints#refresh-token-grant).
 
 #### ID Token type
 
@@ -71,7 +65,7 @@ urn:ietf:params:oauth:token-type:jwt
 
 The JWT token type caries a double meaning.
 
-When used as a `subject_token_type`, ZITADEL will try to verify the `subject_token` in a similar way as a JWT Profile. The `sub` field of the JWT is used to set the subject of the requested token. Currently we only allow self-signed JWT as `subject_token` in combination with a valid `actor_token` for impersonation. A self-signed JWT is not enough to obtain other token types from the Token Exchange Grant. You will need to use the [JWT Profile grant](/docs/apis/openidoauth/endpoints#jwt-profile-grant) instead.
+When used as a `subject_token_type`, ZITADEL will try to verify the `subject_token` in a similar way as a JWT Profile. The `sub` field of the JWT is used to set the subject of the requested token. Currently we only allow self-signed JWT as `subject_token` in combination with a valid `actor_token` for impersonation. A self-signed JWT is not enough to obtain other token types from the Token Exchange Grant. You will need to use the [JWT Profile grant](/apis/openidoauth/endpoints#jwt-profile-grant) instead.
 
 When used as a `requested_token_type`, ZITADEL will return an access token as JWT.
 
@@ -90,7 +84,7 @@ Sending only the user ID in the `subject_token` is not allowed and will result i
 
 The details supplied in the request changes how Token Exchange operates. While the standard is very permissive, we need to clarify how ZITADEL implements it.
 
-<TokenExchangeRequest />
+<TokenExchangeRequest components={props.components}  />
 
 #### Subject token
 
@@ -106,7 +100,6 @@ The actor parameters are optional and enable impersonation and delegation. At ZI
 
 Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned.
 
-
 #### Requested token type
 
 The `requested_token_type` is an optional field that tells ZITADEL the type of token that is requested for the `access_token` response field. Note that the response can also contain ID and refresh tokens, based on [scope](#scope), even if the requested token type was an access token.
@@ -119,7 +112,7 @@ Currently ZITADEL supports requesting of:
 
 #### Scope
 
-[Scope](/docs/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
+[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
 
 When scope is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any scope (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have a scope.
 
@@ -140,7 +133,7 @@ ZITADEL does not yet support Resource Indicators. Supplying this parameter will 
 
 The response schema looks very similar to the model of other token endpoint responses. The RFC attempts to reuse the same fields, however they might have different contents then they lead you to believe. This can lead to confusing situations, so be sure to read this section!
 
-<TokenExchangeResponse />
+<TokenExchangeResponse components={props.components}  />
 
 #### Access token
 
@@ -159,7 +152,7 @@ The `issued_token_type` contains one of the [token types](#token-types) describe
 
 #### Refresh token
 
-The `refresh_token` may contain a new refresh token that can be used to refresh the `access_token` at a later moment. ZITADEL does not allow using refresh tokens in the Token Exchange grant. Refresh tokens can be used for the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant) instead, including ones obtained through Token Exchange.
+The `refresh_token` may contain a new refresh token that can be used to refresh the `access_token` at a later moment. ZITADEL does not allow using refresh tokens in the Token Exchange grant. Refresh tokens can be used for the [`refresh_token` grant](/apis/openidoauth/endpoints#refresh-token-grant) instead, including ones obtained through Token Exchange.
 
 A refresh token can be obtained by setting the `offline_access` [scope](#scope) in the request or applicable token.
 
@@ -185,31 +178,15 @@ First we will cover "simple" Token Exchange which only involves exchanging the `
 
 These preparation steps are needed for all Token Exchange interaction, including impersonation.
 
-#### Feature API
-
-As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
-
-```bash
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/features/instance' \
--H 'Content-Type: application/json' \
--H 'Accept: application/json' \
--H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \
---data-raw '{
-  "oidcTokenExchange": true
-}'
-```
-
-If you are self-hosting, you can also enable the feature for the complete system (all instances) using the [set system level features](/docs/apis/resources/feature_service_v2/feature-service-set-system-features) endpoint.
-
 #### Application
 
 Next we need to select an application that is allowed to perform Token Exchange. As with the other grant types, we need to enable the `urn:ietf:params:oauth:grant-type:token-exchange` grant type.
 
-:::important
+<Callout>
 ZITADEL allows any application to use Token Exchange, however we strongly recommend to only configure confidential clients (using either client credentials or JWT assertion) with the Token Exchange grant type. This is because there is some trust placed in the application when it comes to defining scope and that it obtained tokens in a legitimate way. For example, if the app possesses a token of an admin user with impersonation permissions it can obtain tokens for any other user in your instance. It is your responsibility to make sure the application can be trusted with this kind of powers. If you configure a public client with the Token Exchange grant, you risk a leaked token can be used by an attacker who knows the client ID of a granted public client.
-:::
+</Callout>
 
-![Screenshot showing enabling of Token Exchange grant on a ZITADEL application](/img/guides/token-exchange/app-token-exchange-grant.png)
+![](../../../public/img/guides/token-exchange/app-token-exchange-grant.png)
 
 #### Organization layout
 
@@ -218,7 +195,7 @@ For this example we have the following projects in our organization:
 - **portal** contains the end user interfaces. In this case a web-app that initiated user login and performs operations on other APIs. The web-app has the token exchange grant type enabled;
 - **aggregates** a project that contains APIs of low privilege which aggregate public data to return to the user;
 - **settings** a project that contains APIs for settings and other privileged operations;
-- **ZITADEL** the build-in project used for the zitadel console and APIs;
+- **ZITADEL** the build-in project used for the zitadel management console and APIs;
 
 #### Authenticated user tokens
 
@@ -314,7 +291,7 @@ This gives the following response:
 }
 ```
 
-As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/docs/apis/openidoauth/endpoints#introspection_endpoint) call with the access token. Note we use the credentials of the API here:
+As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/apis/openidoauth/endpoints#introspection-endpoint) call with the access token. Note we use the credentials of the API here:
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/introspect' \
@@ -421,11 +398,11 @@ Doing similar request you can:
 
 ### Request an ID token example
 
-In the following example we exchange the intitial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
+In the following example we exchange the initial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
 
-:::info
-You can also obtain an ID token in the `id_token` response field by requestion an access token and the `openid` scope.
-:::
+<Callout type="info">
+You can also obtain an ID token in the `id_token` response field by requesting an access token and the `openid` scope.
+</Callout>
 
 ```bash
 curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
@@ -455,9 +432,9 @@ This gives us a response with the ID token in the `access_token` field and the `
 
 With impersonation we can let one user assume the role of another user.
 
-:::info
+<Callout>
 Currently impersonated tokens cannot be used for the ZITADEL API. This is to prevent privilege escalation where a impersonator could become an IAM owner, for example. We might enable the use of impersonated tokens in the future.
-:::
+</Callout>
 
 ### Preparation
 
@@ -467,11 +444,11 @@ We continue with the same application and project layout from the above examples
 
 If you want to impersonate users by Token Exchange, the security settings of the instance must be configured to allow this. Go to "Default settings" and in the sidebar select "Security Settings". Enable the "Allow Impersonation" setting.
 
-![Screenshot showing enabling of the impersonation security setting](/img/guides/token-exchange/instance-security-impersonation.png)
+![](../../../public/img/guides/token-exchange/instance-security-impersonation.png)
 
 #### Impersonation permissions
 
-Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/docs/guides/manage/console/managers):
+Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/guides/manage/console/managers):
 
 | Name                   | Role                      | Description                                                       |
 | ---------------------- | ------------------------- | ----------------------------------------------------------------- |
@@ -482,7 +459,7 @@ Next we need to configure which users are allowed to impersonate other users. ZI
 
  In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
 
-![Screenshot showing assignment of an impersonator role](/img/guides/token-exchange/org-role-end-user-impersonator.png)
+![](../../../public/img/guides/token-exchange/org-role-end-user-impersonator.png)
 
 #### Authenticated impersonator tokens
 
@@ -567,7 +544,7 @@ Will give the following response:
 }
 ```
 
-In the access token [claims](/docs/apis/openidoauth/claims) we can see that the subject and audience are taken from the `subject_token`. The `act` claim contains the subject and issuer of the `actor_token`, so we can always determine the impersonator that obtained the token.
+In the access token [claims](/apis/openidoauth/claims) we can see that the subject and audience are taken from the `subject_token`. The `act` claim contains the subject and issuer of the `actor_token`, so we can always determine the impersonator that obtained the token.
 
 ```json
 {
@@ -598,9 +575,9 @@ The previous example required us to have an active token of the user we want to 
 
 ZITADEL allows passing a user ID as the `subject_token`, along with a valid `actor_token`. This is an addition to enable this specific use-case.
 
-:::info
+<Callout>
 User ID as subject token is an experimental addition and is provided pending evaluation of our community. This method might be considered insecure and trust is fully placed into the app making the request. This might be removed in the future.
-:::
+</Callout>
 
 In the following example we are again requesting a JWT access token. Instead of a token, we use the user ID of the end-user in the `subject_token` field and adjust the `subject_token_type` accordingly. As the user ID does not carry any scope and the impersonator / actor does not have a profile, we need to add some scopes to the request in order to receive an ID token with profile and email information.
 
@@ -829,7 +806,7 @@ And the `subject_token`:
 }
 ```
 
-In both cases the issuer is the web application, the audience must be the zitadel domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
+In both cases the issuer is the web application, the audience must be the Custom Domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
 
 Response:
 
@@ -871,7 +848,7 @@ And again the access token claims:
 
 ### Other usage examples
 
-Above we gave some of the most staightforward usecases. Of course, you can combine these examples to:
+Above we gave some of the most straightforward use cases. Of course, you can combine these examples to:
 
 - Impersonate and change the token type
 - Impersonate and change scope
@@ -880,13 +857,13 @@ Above we gave some of the most staightforward usecases. Of course, you can combi
 
 ## Audit trail
 
-In the user view of the console we can see whenever a new access token is created for a user.
+In the user view of the management console we can see whenever a new access token is created for a user.
 The existing `Access Token created` event is also used in the case of a token exchange.
 When there was an `actor_token` present during token exchange, we also log a `User impersonated` event.
 
-![Screenshot showing the user audit log with token creation and impersonation](/img/guides/token-exchange/user-audit-log.png)
+![](../../../public/img/guides/token-exchange/user-audit-log.png)
 
-In the [instance event list](/docs/concepts/eventstore/overview) the `User impersonated` carries the actor in the payload:
+In the [instance event list](/concepts/eventstore/overview) the `User impersonated` carries the actor in the payload:
 
 ```json
 {
@@ -901,4 +878,4 @@ In the [instance event list](/docs/concepts/eventstore/overview) the `User imper
 ## Finishing notes
 
 The current implementation of the Token Exchange grant was our first iteration on the subject.
-We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this pupose.
+We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this purpose.

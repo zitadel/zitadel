@@ -88,12 +88,12 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemEnableBackChannelLogout, true,
+						feature_v2.SystemPermissionCheckV2, true,
 					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				EnableBackChannelLogout: gu.Ptr(true),
+				PermissionCheckV2: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},

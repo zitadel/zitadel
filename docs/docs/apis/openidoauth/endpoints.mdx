@@ -3,8 +3,6 @@ title: OpenID Connect Endpoints in ZITADEL
 sidebar_label: OpenID Connect Endpoints
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
 import TokenExchangeRequest from "./_token_exchange_request.mdx";
 import TokenExchangeResponse from "./_token_exchange_response.mdx";
 import TokenExchangeTypes from "./_token_exchange_types.mdx";
@@ -12,17 +10,17 @@ import TokenExchangeTypes from "./_token_exchange_types.mdx";
 ## OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located within the issuer domain.
-This would give us `{your_domain}/.well-known/openid-configuration`.
+This would give us `${CUSTOM_DOMAIN}/.well-known/openid-configuration`.
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
 ## authorization_endpoint
 
-`{your_domain}/oauth/v2/authorize`
+`${CUSTOM_DOMAIN}/oauth/v2/authorize`
 
-:::note
+<Callout>
 The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
-:::
+</Callout>
 
 The authorization_endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected to this endpoint to
 authenticate the user in exchange for an authorization_code (authorization code flow) or tokens (implicit flow).
@@ -50,15 +48,15 @@ authenticate the user in exchange for an authorization_code (authorization code 
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
-| scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
+| scope         | `openid` is required, see [Scopes](./scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
 
-:::important
+<Callout>
 Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued,
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`.
 
-Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or [introspection_endpoint](#introspection_endpoint) the retrieve these claims
-or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
-:::
+Send the access_token to the [userinfo_endpoint](#userinfo-endpoint) or [introspection_endpoint](#introspection-endpoint) the retrieve these claims
+or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Management Console) to true.
+</Callout>
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -72,13 +70,13 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 no additional parameters required
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 no additional parameters required
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 | Parameter             | Description                                           |
 | --------------------- | ----------------------------------------------------- |
@@ -87,10 +85,10 @@ no additional parameters required
 
 see PKCE guide for more information
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 no additional parameters required
-</TabItem>
+</Tab>
 </Tabs>
 
 ### Additional parameters
@@ -108,15 +106,15 @@ no additional parameters required
 
 #### Response modes
 
-ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is choosen based on the configured Response Type of the application.
+ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is chosen based on the configured Response Type of the application.
 As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest):
 
 > The use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
 
 | Response Mode | Description                                                                                                                                                                                                                                                                                                                     |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/docs/guides/manage/console/applications#web).                                                                                                                                     |
-| fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/docs/guides/manage/console/applications#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
+| query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/guides/manage/console/applications-overview#web).                                                                                                                                     |
+| fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/guides/manage/console/applications-overview#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
 | form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
 
 [^1]: Implements [OAuth 2.0 Form Post Response Mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
@@ -147,10 +145,10 @@ When your `response_type` was either `id_token` or `id_token token` and no error
 
 Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
-:::note
+<Callout>
 If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
 the error will be display directly to the user on the auth server
-:::
+</Callout>
 
 | Property          | Description                                                          |
 | ----------------- | -------------------------------------------------------------------- |
@@ -158,13 +156,12 @@ the error will be display directly to the user on the auth server
 | error_description | Description of the error type or additional information of the error |
 | state             | Unmodified `state` parameter from the request                        |
 
-#### Possible errors {#authorize-errors}
-
+#### Possible errors
 | error_type                | Possible reason                                                                                                                                                                                                                                                                                    |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                                                                                                                                                  |
 | invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                                                                                                                                                  |
-| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration.                                                                                                                       |
+| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Management Console that the requested `response_type` is allowed in your application configuration.                                                                                                                       |
 | unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                                                                                                                                             |
 | server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                                                                                                                                        |
 | interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction. |
@@ -172,7 +169,7 @@ the error will be display directly to the user on the auth server
 
 ## token_endpoint
 
-`{your_domain}/oauth/v2/token`
+`${CUSTOM_DOMAIN}/oauth/v2/token`
 
 The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`.
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
@@ -202,12 +199,12 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -216,8 +213,8 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` and `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
@@ -226,21 +223,20 @@ Send your `client_id` and `code_verifier` for us to recompute the `code_challeng
 | client_id     | client_id of the application                                 |
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a client assertion as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
-#### Successful code response {#token-code-response}
-
+#### Successful code response
 | Property      | Description                                                                           |
 | ------------- | ------------------------------------------------------------------------------------- |
 | access_token  | An `access_token` as JWT or opaque token                                              |
@@ -257,19 +253,18 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | Parameter  | Description                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
-| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants) |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
+| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](./grant-types#using-jw-ts-as-authorization-grants) |
+| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data assertion=eyJhbGciOiJSUzI1Ni...
 ```
 
-#### Successful JWT profile response {#token-jwt-response}
-
+#### Successful JWT profile response
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
 | access_token | An `access_token` as JWT or opaque token                                              |
@@ -281,7 +276,7 @@ curl --request POST \
 ### Refresh token grant
 
 To request a new `access_token` without user interaction, you can use the `refresh_token` grant.
-See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
+See [offline_access Scope](./scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
 #### Required request parameters
 
@@ -289,7 +284,7 @@ See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | grant_type    | Must be `refresh_token`                                                                                                                                                                                                                                                                                         |
 | refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request.                                                                                                                                                                                                                    |
-| scope         | [Scopes](scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
+| scope         | [Scopes](./scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -303,12 +298,12 @@ Depending on your authorization method you will have to provide additional param
         {label: 'private_key_jwt', value: 'private_key_jwt'},
     ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -317,26 +312,25 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
-#### Successful refresh token response {#token-refresh-response}
-
+#### Successful refresh token response
 | Property      | Description                                                                           |
 | ------------- | ------------------------------------------------------------------------------------- |
 | access_token  | An `access_token` as JWT or opaque token                                              |
@@ -353,14 +347,14 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | Parameter  | Description                                                                                                |
 | ---------- | ---------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `client_credentials`                                                                               |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
+| scope      | [Scopes](./scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
 
 Additionally, you need to authenticate your client by either sending `client_id` and `client_secret` as Basic Auth Header.
-Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -374,9 +368,9 @@ Or you can also send your `client_id` and `client_secret` as parameters in the b
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=client_credentials \
   --data client_id=${CLIENT_ID} \
@@ -384,8 +378,7 @@ curl --request POST \
   --data scope=openid profile
 ```
 
-#### Successful client credentials response {#token-client-credentials-response}
-
+#### Successful client credentials response
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
 | access_token | An `access_token` as JWT or opaque token                                              |
@@ -395,15 +388,11 @@ curl --request POST \
 
 ### Token Exchange grant
 
-The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. ZITADEL also provides a [token exchange guide](/docs/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
-
-:::info
-Token Exchange is currently an experimental [beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](/docs/guides/integrate/token-exchange#feature-api) before using it.
-:::
+The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. ZITADEL also provides a [token exchange guide](/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
 
 #### Request parameters
 
-<TokenExchangeRequest />
+<TokenExchangeRequest components={props.components}  />
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
@@ -418,12 +407,12 @@ Depending on your authorization method you will have to provide additional param
     ]}
 >
 
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -432,31 +421,30 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
-</TabItem>
+</Tab>
 </Tabs>
 
-#### Successful token exchange response {#token-exchange-response}
-
-<TokenExchangeResponse />
+#### Successful token exchange response
+<TokenExchangeResponse components={props.components}  />
 
 #### Token types
 
-<TokenExchangeTypes />
+<TokenExchangeTypes components={props.components}  />
 
 ### Error response
 
@@ -472,7 +460,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ## introspection_endpoint
 
-`{your_domain}/oauth/v2/introspect`
+`${CUSTOM_DOMAIN}/oauth/v2/introspect`
 
 This endpoint enables clients to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
 this endpoint will check if the token is not revoked (by client or logout).
@@ -491,43 +479,42 @@ values={[
 {label: 'private_key_jwt', value: 'private_key_jwt'},
 ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to build it correctly.
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/introspect \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic {your_basic_auth_header}' \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 
-<TabItem value="private_key_jwt">
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](./authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/introspect \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 </Tabs>
 
-### Successful introspection response {#introspect-response}
-
+### Successful introspection response
 Upon successful authorization of the client a response with the boolean `active` is returned, indicating if the provided token
 is active and the requesting client is part of the token audience.
 
@@ -547,45 +534,42 @@ If `active` is **true**, further information will be provided:
 | username   | ZITADEL's login name of the user. Consist of `username@primarydomain` |
 
 Additionally and depending on the granted scopes, information about the authorized user is provided.
-Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
-### Error response {#introspect-error-response}
-
+### Error response
 If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 ## userinfo_endpoint
 
-`{your_domain}/oidc/v1/userinfo`
+`${CUSTOM_DOMAIN}/oidc/v1/userinfo`
 
 This endpoint will return information about the authorized user.
 
 Send the `access_token` of the **user** (not the client) as Bearer Token in the `authorization` header:
 
-```BASH
+```bash
 curl --request GET \
-  --url {your_domain}/oidc/v1/userinfo
+  --url ${CUSTOM_DOMAIN}/oidc/v1/userinfo
   --header 'Authorization: Bearer dsfdsjk29fm2as...'
 ```
 
-### Successful userinfo response {#userinfo-response}
-
+### Successful userinfo response
 If the `access_token` is valid, the information about the user depending on the granted scopes is returned.
-Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
+Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
-### Error response {#userinfo-error-response}
-
+### Error response
 If the token is invalid or expired, an HTTP 401 will be returned.
 
 ## revocation_endpoint
 
-`{your_domain}/oauth/v2/revoke`
+`${CUSTOM_DOMAIN}/oauth/v2/revoke`
 
 This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
-:::important
+<Callout>
 If you revoke an `access_token` only the specific token will be revoked. When revoking a `refresh_token`,
 the corresponding `access_token` will be revoked as well.
-:::
+</Callout>
 
 | Parameter | Description                      |
 | --------- | -------------------------------- |
@@ -603,12 +587,12 @@ values={[
 {label: 'private_key_jwt', value: 'private_key_jwt'},
 ]}
 >
-<TabItem value="client_secret_basic">
+<Tab value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to construct a request correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](./authn-methods#client-secret-basic) on how to construct a request correctly.
 
-</TabItem>
-<TabItem value="client_secret_post">
+</Tab>
+<Tab value="client_secret_post">
 
 Send your `client_id` and `client_secret` as parameters in the body:
 
@@ -617,8 +601,8 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
-</TabItem>
-<TabItem value="none">
+</Tab>
+<Tab value="none">
 
 Send your `client_id` as parameters in the body:
 
@@ -626,31 +610,31 @@ Send your `client_id` as parameters in the body:
 | --------- | ---------------------------- |
 | client_id | client_id of the application |
 
-</TabItem>
-<TabItem value="private_key_jwt">
+</Tab>
+<Tab value="private_key_jwt">
 
 Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
 | Parameter             | Description                                                                                                   |
 | --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](./authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                              |
 
-```BASH
+```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/revoke \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/revoke \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
 ```
 
-</TabItem>
+</Tab>
 </Tabs>
 
 ## end_session_endpoint
 
-`{your_domain}/oidc/v1/end_session`
+`${CUSTOM_DOMAIN}/oidc/v1/end_session`
 
 The endpoint has to be opened in the user agent (browser) to terminate the user sessions.
 
@@ -672,19 +656,19 @@ If neither an `id_token_hint` nor a `client_id` parameter is provided, the `post
 
 ## jwks_uri
 
-`{your_domain}/oauth/v2/keys`
+`${CUSTOM_DOMAIN}/oauth/v2/keys`
 
 The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
-The alternative would be to validate tokens with the [introspection endpoint](#introspection_endpoint).
+The alternative would be to validate tokens with the [introspection endpoint](#introspection-endpoint).
 
 ### Key rotation
 
 Keys are automatically rotated on a regular basis or on demand, meaning keys can change in irregular intervals.
 ZITADEL ensures that a proper `kid` is set with each key.
 
-:::info Keys rotate without prior notice
+<Callout title="Keys rotate without prior notice">
 Be aware that these keys can be rotated without any prior notice.
-:::
+</Callout>
 
 ### Caching
 

@@ -11,7 +11,6 @@ type InstanceFeatures struct {
 	Details                        *domain.ObjectDetails
 	LoginDefaultOrg                FeatureSource[bool]
 	UserSchema                     FeatureSource[bool]
-	TokenExchange                  FeatureSource[bool]
 	ImprovedPerformance            FeatureSource[[]feature.ImprovedPerformanceType]
 	DebugOIDCParentError           FeatureSource[bool]
 	OIDCSingleV1SessionTermination FeatureSource[bool]

@@ -605,7 +605,6 @@ Errors:
     Data:
       Invalid: Données non valides pour le schéma utilisateur
   TokenExchange:
-    FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Le jeton est manquant
       Invalid: Le jeton n'est pas valide
@@ -619,7 +618,6 @@ Errors:
     ActiveDelete: Impossible de supprimer la clé Web active
     Config: Configuration de clé Web non valide
     Duplicate: L'ID de clé Web n'est pas unique
-    FeatureDisabled: Fonctionnalité de clé Web désactivée
     NoActive: Aucune clé Web active trouvée
     NotFound: Clé Web introuvable
 

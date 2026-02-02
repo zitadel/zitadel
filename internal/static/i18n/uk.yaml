@@ -594,7 +594,6 @@ Errors:
     Data:
       Invalid: Дані недійсні для схеми користувача
   TokenExchange:
-    FeatureDisabled: Функція обміну токенів вимкнена для вашого інстансу. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Токен відсутній
       Invalid: Токен недійсний
@@ -608,7 +607,6 @@ Errors:
     ActiveDelete: Неможливо видалити активний веб-ключ
     Config: Недійсна конфігурація веб-ключа
     Duplicate: Ідентифікатор веб-ключа не унікальний
-    FeatureDisabled: Функція веб-ключа вимкнена
     NoActive: Активний веб-ключ не знайдено
     NotFound: Веб-ключ не знайдено
 
