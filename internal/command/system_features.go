@@ -11,7 +11,6 @@ import (
 
 type SystemFeatures struct {
 	LoginDefaultOrg                *bool
-	TokenExchange                  *bool
 	UserSchema                     *bool
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	OIDCSingleV1SessionTermination *bool
@@ -24,7 +23,6 @@ type SystemFeatures struct {
 func (m *SystemFeatures) isEmpty() bool {
 	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
-		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
