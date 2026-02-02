@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	slogctx "github.com/veqryn/slog-context"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 

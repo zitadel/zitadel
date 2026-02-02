@@ -8,6 +8,7 @@ import (
 
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/rivertype"
+
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 )
 

@@ -31,8 +31,8 @@ import (
 	"time"
 
 	slogctx "github.com/veqryn/slog-context"
-
 	"github.com/zitadel/sloggcp"
+
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/zerrors"
