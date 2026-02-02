@@ -1,6 +1,6 @@
 ---
 title: Impersonation and delegation using Token Exchange
-sidebar_label: Token Exchange [Beta]
+sidebar_label: Token Exchange
 ---
 
 import TokenExchangeTypes from "../../apis/openidoauth/_token_exchange_types.mdx";
@@ -8,12 +8,6 @@ import TokenExchangeRequest from "../../apis/openidoauth/_token_exchange_request
 import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_response.mdx";
 
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
-
-<Callout type="info">
-Token Exchange is currently an [experimental beta](https://help.zitadel.com/zitadel-software-release-cycle#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
-
-Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1333448892083208262)!
-</Callout>
 
 In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
 
@@ -183,22 +177,6 @@ First we will cover "simple" Token Exchange which only involves exchanging the `
 ### Preparation
 
 These preparation steps are needed for all Token Exchange interaction, including impersonation.
-
-#### Feature API
-
-As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
-
-```bash
-curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/features/instance' \
--H 'Content-Type: application/json' \
--H 'Accept: application/json' \
--H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \
---data-raw '{
-  "oidcTokenExchange": true
-}'
-```
-
-If you are self-hosting, you can also enable the feature for the complete system (all instances) using the [set system level features](/reference/api/feature/zitadel.feature.v2.FeatureService.SetSystemFeatures) endpoint.
 
 #### Application
 
