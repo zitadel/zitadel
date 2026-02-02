@@ -6,14 +6,14 @@ with domain as (
 ), instance_features as (
 	select i.*
 	from domain d
-	join projections.instance_features3 i on d.instance_id = i.instance_id
+	join projections.instance_features4 i on d.instance_id = i.instance_id
 ), features as (
 	select instance_id, json_object_agg(
 		coalesce(i.key, s.key),
 		coalesce(i.value, s.value)
 	) features
 	from domain d
-	cross join projections.system_features2 s
+	cross join projections.system_features3 s
 	full outer join instance_features i using (instance_id, key)
 	group by instance_id
 ), external_domains as (
