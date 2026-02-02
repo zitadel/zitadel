@@ -1,9 +1,12 @@
 package saml
 
 import (
+	"bytes"
+	"compress/flate"
 	"context"
 	"encoding/base64"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -12,6 +15,7 @@ import (
 	"github.com/beevik/etree"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -171,6 +175,24 @@ func (s *Session) auth(r *http.Request) (idp.Auth, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// SAML request LOGIN! - Log decoded SAML AuthnRequest for debugging
+		parsedURL, _ := url.Parse(redirectURL.String())
+		if parsedURL != nil {
+			encodedRequest := parsedURL.Query().Get("SAMLRequest")
+			decodedXML := decodeSAMLRequestForLogin(encodedRequest)
+			logging.WithFields(
+				"SAML_TYPE", "SAML request LOGIN!",
+				"binding", "HTTP-Redirect",
+				"requestID", authReq.ID,
+				"destination", authReq.Destination,
+				"issuer", s.ServiceProvider.ServiceProvider.EntityID,
+				"encodedRequest", encodedRequest,
+				"decodedXML", decodedXML,
+				"redirectURL", redirectURL.String(),
+			).Info("SAML request LOGIN! - AuthnRequest generated")
+		}
+
 		return idp.Redirect(redirectURL.String())
 	}
 	if binding == saml.HTTPPostBinding {
@@ -181,6 +203,18 @@ func (s *Session) auth(r *http.Request) (idp.Auth, error) {
 			return nil, err
 		}
 		encodedReqBuf := base64.StdEncoding.EncodeToString(reqBuf)
+
+		// SAML request LOGIN! - Log SAML AuthnRequest for POST binding
+		logging.WithFields(
+			"SAML_TYPE", "SAML request LOGIN!",
+			"binding", "HTTP-POST",
+			"requestID", authReq.ID,
+			"destination", authReq.Destination,
+			"issuer", s.ServiceProvider.ServiceProvider.EntityID,
+			"encodedRequest", encodedReqBuf,
+			"decodedXML", string(reqBuf),
+		).Info("SAML request LOGIN! - AuthnRequest generated (POST binding)")
+
 		return idp.Form(authReq.Destination,
 			map[string]string{
 				"SAMLRequest": encodedReqBuf,
@@ -188,4 +222,28 @@ func (s *Session) auth(r *http.Request) (idp.Auth, error) {
 			})
 	}
 	return nil, zerrors.ThrowInvalidArgument(nil, "SAML-Eoi24", "Errors.Intent.Invalid")
+}
+
+// decodeSAMLRequestForLogin decodes a SAML request from base64+deflate encoding for logging purposes
+func decodeSAMLRequestForLogin(encoded string) string {
+	if encoded == "" {
+		return "<empty>"
+	}
+
+	// Base64 decode
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return "<base64 decode error: " + err.Error() + ">"
+	}
+
+	// Inflate (decompress)
+	reader := flate.NewReader(bytes.NewReader(decoded))
+	defer reader.Close()
+
+	decompressed, err := io.ReadAll(reader)
+	if err != nil {
+		return "<inflate error: " + err.Error() + ">"
+	}
+
+	return string(decompressed)
 }
