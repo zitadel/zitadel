@@ -27,6 +27,8 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+	"runtime"
+	"time"
 
 	slogctx "github.com/veqryn/slog-context"
 
@@ -98,31 +100,31 @@ func WithGroup(ctx context.Context, name string) context.Context {
 // Log logs a message with the given level and arguments using the logger from the context.
 // See [slogctx.Log].
 func Log(ctx context.Context, level slog.Level, msg string, args ...any) {
-	slogctx.Log(ctx, level, msg, args...)
+	log(ctx, FromCtx(ctx), level, msg, 1, args...)
 }
 
 // Debug logs a debug message using the logger from the context.
 // See [slogctx.Debug].
 func Debug(ctx context.Context, msg string, args ...any) {
-	slogctx.Debug(ctx, msg, args...)
+	log(ctx, FromCtx(ctx), slog.LevelDebug, msg, 1, args...)
 }
 
 // Info logs an info message using the logger from the context.
 // See [slogctx.Info].
 func Info(ctx context.Context, msg string, args ...any) {
-	slogctx.Info(ctx, msg, args...)
+	log(ctx, FromCtx(ctx), slog.LevelInfo, msg, 1, args...)
 }
 
 // Warn logs a warning message using the logger from the context.
 // See [slogctx.Warn].
 func Warn(ctx context.Context, msg string, args ...any) {
-	slogctx.Warn(ctx, msg, args...)
+	log(ctx, FromCtx(ctx), slog.LevelWarn, msg, 1, args...)
 }
 
 // Error logs an error message using the logger from the context.
 // See [slogctx.Error].
 func Error(ctx context.Context, msg string, args ...any) {
-	slogctx.Error(ctx, msg, args...)
+	log(ctx, FromCtx(ctx), slog.LevelError, msg, 1, args...)
 }
 
 // WithError adds an error attribute to the logger from the context and returns the new logger.
@@ -135,7 +137,7 @@ func WithError(ctx context.Context, err error) *ErrorContextLogger {
 	return &ErrorContextLogger{
 		ctx:          ctx,
 		logger:       slogctx.FromCtx(ctx).With(slogctx.Err(target)),
-		canTerminate: false,
+		canTerminate: true,
 	}
 }
 
@@ -158,37 +160,62 @@ func OnError(ctx context.Context, err error) *ErrorContextLogger {
 }
 
 type ErrorContextLogger struct {
-	ctx          context.Context
-	logger       *slog.Logger
+	ctx    context.Context
+	logger *slog.Logger
+	// canTerminate sets whether Panic/Fatal should actually call panic or os.Exit.
+	// False when OnError returned a no-op logger, true in all other cases.
 	canTerminate bool
 }
 
 func (l *ErrorContextLogger) Debug(msg string, args ...any) {
-	l.logger.DebugContext(l.ctx, msg, args...)
+	log(l.ctx, l.logger, slog.LevelDebug, msg, 1, args...)
 }
 
 func (l *ErrorContextLogger) Info(msg string, args ...any) {
-	l.logger.InfoContext(l.ctx, msg, args...)
+	log(l.ctx, l.logger, slog.LevelInfo, msg, 1, args...)
 }
 
 func (l *ErrorContextLogger) Warn(msg string, args ...any) {
-	l.logger.WarnContext(l.ctx, msg, args...)
+	log(l.ctx, l.logger, slog.LevelWarn, msg, 1, args...)
 }
 
 func (l *ErrorContextLogger) Error(msg string, args ...any) {
-	l.logger.ErrorContext(l.ctx, msg, args...)
+	log(l.ctx, l.logger, slog.LevelError, msg, 1, args...)
 }
 
+// Panic logs a [sloggcp.LevelAlert] leveled message and panics.
+// If the logger was created via [OnError] with a nil error, this method does nothing.
 func (l *ErrorContextLogger) Panic(msg string, args ...any) {
-	l.logger.Log(l.ctx, sloggcp.LevelAlert, msg, args...)
+	log(l.ctx, l.logger, sloggcp.LevelAlert, msg, 1, args...)
 	if l.canTerminate {
 		panic(msg)
 	}
 }
 
+// Fatal logs a [sloggcp.LevelEmergency] leveled message and exits the application with code 1.
+// If the logger was created via [OnError] with a nil error, this method does nothing.
 func (l *ErrorContextLogger) Fatal(msg string, args ...any) {
-	l.logger.Log(l.ctx, sloggcp.LevelEmergency, msg, args...)
+	log(l.ctx, l.logger, sloggcp.LevelEmergency, msg, 1, args...)
 	if l.canTerminate {
-		os.Exit(1)
+		exit(1)
 	}
+}
+
+// exit is a variable to allow testing of Fatal without exiting the test process.
+var exit = os.Exit
+
+// log is a helper function that logs a message with the given level and arguments using the provided logger.
+func log(ctx context.Context, logger *slog.Logger, level slog.Level, msg string, skip int, args ...any) {
+	handler := logger.Handler()
+	if !handler.Enabled(ctx, level) {
+		return
+	}
+	var pcs [1]uintptr
+	if instrumentation.IsAddSourceEnabled() {
+		runtime.Callers(skip+2, pcs[:])
+
+	}
+	r := slog.NewRecord(time.Now(), level, msg, pcs[0])
+	r.Add(args...)
+	_ = logger.Handler().Handle(ctx, r)
 }

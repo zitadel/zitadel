@@ -7,6 +7,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"connectrpc.com/connect"
@@ -100,6 +101,12 @@ type ErrorConfig struct {
 	StackTrace     bool
 }
 
+var addSourceEnabled atomic.Bool
+
+func IsAddSourceEnabled() bool {
+	return addSourceEnabled.Load()
+}
+
 // setLogger configures the global slog logger.
 // Logs are sent to [os.Stderr] and/or the [log.LoggerProvider].
 //
@@ -115,6 +122,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		Level:       cfg.Level,
 		ReplaceAttr: cfg.replacer(),
 	}
+	addSourceEnabled.Store(cfg.AddSource)
 
 	var stdErrHandler slog.Handler
 	switch cfg.Format {

@@ -2,9 +2,11 @@ package logging
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"os"
 	"sync"
 	"testing"
 
@@ -321,6 +323,260 @@ func TestOnError(t *testing.T) {
 			got, err := done()
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestErrorContextLogger_Debug(t *testing.T) {
+	done := prepareDefaultLogger()
+	ctx := NewCtx(
+		t.Context(),
+		StreamRuntime,
+	)
+	WithError(ctx, nil).Debug("test message", slog.String("foo", "bar"))
+	want := &testLogEntry{
+		Level: "DEBUG",
+		Msg:   "test message",
+		Err: &testLogError{
+			Kind:    "Unknown",
+			Parent:  "",
+			Message: "an unknown error occurred",
+			ID:      "LOG-Ao5ch",
+		},
+		Foo: "bar",
+	}
+	got, err := done()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestErrorContextLogger_Info(t *testing.T) {
+	done := prepareDefaultLogger()
+	ctx := NewCtx(
+		t.Context(),
+		StreamRuntime,
+	)
+	WithError(ctx, nil).Info("test message", slog.String("foo", "bar"))
+	want := &testLogEntry{
+		Level: "INFO",
+		Msg:   "test message",
+		Err: &testLogError{
+			Kind:    "Unknown",
+			Parent:  "",
+			Message: "an unknown error occurred",
+			ID:      "LOG-Ao5ch",
+		},
+		Foo: "bar",
+	}
+	got, err := done()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestErrorContextLogger_Warn(t *testing.T) {
+	done := prepareDefaultLogger()
+	ctx := NewCtx(
+		t.Context(),
+		StreamRuntime,
+	)
+	WithError(ctx, nil).Warn("test message", slog.String("foo", "bar"))
+	want := &testLogEntry{
+		Level: "WARN",
+		Msg:   "test message",
+		Err: &testLogError{
+			Kind:    "Unknown",
+			Parent:  "",
+			Message: "an unknown error occurred",
+			ID:      "LOG-Ao5ch",
+		},
+		Foo: "bar",
+	}
+	got, err := done()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestErrorContextLogger_Error(t *testing.T) {
+	done := prepareDefaultLogger()
+	ctx := NewCtx(
+		t.Context(),
+		StreamRuntime,
+	)
+	WithError(ctx, nil).Error("test message", slog.String("foo", "bar"))
+	want := &testLogEntry{
+		Level: "ERROR",
+		Msg:   "test message",
+		Err: &testLogError{
+			Kind:    "Unknown",
+			Parent:  "",
+			Message: "an unknown error occurred",
+			ID:      "LOG-Ao5ch",
+		},
+		Foo: "bar",
+	}
+	got, err := done()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestErrorContextLogger_Panic(t *testing.T) {
+	tests := []struct {
+		name      string
+		construct func(context.Context, error) *ErrorContextLogger
+		err       error
+		want      *testLogEntry
+		wantPanic any
+	}{
+		{
+			name:      "with zitadel error",
+			construct: WithError,
+			err: zerrors.CreateZitadelError(
+				zerrors.KindNotFound,
+				errors.New("parent error"),
+				"ZIT-404",
+				"resource not found",
+				0,
+			),
+			want: &testLogEntry{
+				Level: "ERROR+4",
+				Msg:   "test message",
+				Err: &testLogError{
+					Kind:    "NotFound",
+					Parent:  "parent error",
+					Message: "resource not found",
+					ID:      "ZIT-404",
+				},
+				Foo: "bar",
+			},
+			wantPanic: "test message",
+		},
+		{
+			name:      "on nil error",
+			construct: OnError,
+			err:       nil,
+			want:      nil,
+			wantPanic: nil,
+		},
+		{
+			name:      "on non-zitadel error",
+			construct: OnError,
+			err:       errors.New("some error"),
+			want: &testLogEntry{
+				Level: "ERROR+4",
+				Msg:   "test message",
+				Err: &testLogError{
+					Kind:    "Unknown",
+					Parent:  "some error",
+					Message: "an unknown error occurred",
+					ID:      "LOG-ii6Pi",
+				},
+				Foo: "bar",
+			},
+			wantPanic: "test message",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			done := prepareDefaultLogger()
+			ctx := NewCtx(
+				t.Context(),
+				StreamRuntime,
+			)
+			var (
+				gotPanic any
+				gotEntry *testLogEntry
+				err      error
+			)
+
+			// need to check in defer because of panic
+			defer func() {
+				gotPanic = recover()
+				gotEntry, err = done()
+				require.NoError(t, err)
+				assert.Equal(t, tt.want, gotEntry)
+				assert.Equal(t, tt.wantPanic, gotPanic)
+			}()
+			tt.construct(ctx, tt.err).Panic("test message", slog.String("foo", "bar"))
+		})
+	}
+}
+
+func TestErrorContextLogger_Fatal(t *testing.T) {
+	tests := []struct {
+		name      string
+		construct func(context.Context, error) *ErrorContextLogger
+		err       error
+		want      *testLogEntry
+		wantExit  int
+	}{
+		{
+			name:      "with zitadel error",
+			construct: WithError,
+			err: zerrors.CreateZitadelError(
+				zerrors.KindNotFound,
+				errors.New("parent error"),
+				"ZIT-404",
+				"resource not found",
+				0,
+			),
+			want: &testLogEntry{
+				Level: "ERROR+6",
+				Msg:   "test message",
+				Err: &testLogError{
+					Kind:    "NotFound",
+					Parent:  "parent error",
+					Message: "resource not found",
+					ID:      "ZIT-404",
+				},
+				Foo: "bar",
+			},
+			wantExit: 1,
+		},
+		{
+			name:      "on nil error",
+			construct: OnError,
+			err:       nil,
+			want:      nil,
+			wantExit:  0,
+		},
+		{
+			name:      "on non-zitadel error",
+			construct: OnError,
+			err:       errors.New("some error"),
+			want: &testLogEntry{
+				Level: "ERROR+6",
+				Msg:   "test message",
+				Err: &testLogError{
+					Kind:    "Unknown",
+					Parent:  "some error",
+					Message: "an unknown error occurred",
+					ID:      "LOG-ii6Pi",
+				},
+				Foo: "bar",
+			},
+			wantExit: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			done := prepareDefaultLogger()
+			ctx := NewCtx(
+				t.Context(),
+				StreamRuntime,
+			)
+			var gotExit int
+			exit = func(code int) {
+				gotExit = code
+			}
+			defer func() {
+				exit = os.Exit
+			}()
+
+			tt.construct(ctx, tt.err).Fatal("test message", slog.String("foo", "bar"))
+			gotEntry, err := done()
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, gotEntry)
+			assert.Equal(t, tt.wantExit, gotExit)
 		})
 	}
 }
