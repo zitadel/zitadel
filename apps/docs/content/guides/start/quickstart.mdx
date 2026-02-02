@@ -5,7 +5,8 @@ sidebar_label: Quick Start Guide
 keywords: [ZITADEL, OIDC, PKCE, Authentication, Identity Management]
 ---
 
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Tab } from 'fumadocs-ui/components/tabs';
+import { FrameworkSelector } from '@/components/framework_selector';
 import AppConfig from './_app_config.mdx';
 import AppValues from './_app_values.mdx';
 
@@ -70,7 +71,8 @@ Log in using the Admin credentials you just created.
 
 #### Step 2: Review Default Configuration
 ZITADEL automatically configures the best security settings for your selected framework.
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+
+<FrameworkSelector>
     <Tab value="Angular">
         <AppConfig
             redirectUrl="http://localhost:3000/auth/callback"
@@ -107,12 +109,13 @@ ZITADEL automatically configures the best security settings for your selected fr
             postLogoutRedirectUrl="http://localhost:5173/">
         </AppConfig>
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 ![Project Configuration Overview](../../../public/img/guides/quickstart/project_config_overview_react.png)
 
 ### 5. Collect your Integration Keys
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+
+<FrameworkSelector>
     <Tab value="Angular">
         <AppValues valueCount="two" clientSecret={false} projectID={false}></AppValues>
     </Tab>
@@ -131,7 +134,7 @@ ZITADEL automatically configures the best security settings for your selected fr
     <Tab value="Vue.js">
         <AppValues valueCount="three" clientSecret={false} projectID={true}></AppValues>
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 
 ## Integrate ZITADEL into your App
@@ -147,7 +150,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
 ### 1. Prerequisites
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+<FrameworkSelector>
     <Tab value="Angular">
         - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
@@ -174,26 +177,26 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
         - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 ### 2. Get the Example Project
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+<FrameworkSelector>
     <Tab value="Angular">
         ```bash
-        git clone https://github.com/zitadel/example-auth-angular.git
+        git clone [https://github.com/zitadel/example-auth-angular.git](https://github.com/zitadel/example-auth-angular.git)
         cd example-auth-angular
         ```
     </Tab>
     <Tab value="Flutter">
         ```bash
-        git clone https://github.com/zitadel/zitadel_flutter.git
+        git clone [https://github.com/zitadel/zitadel_flutter.git](https://github.com/zitadel/zitadel_flutter.git)
         cd zitadel_flutter
         ```
     </Tab>
     <Tab value="Go">
         ```bash
-        git clone https://github.com/zitadel/zitadel-go.git
+        git clone [https://github.com/zitadel/zitadel-go.git](https://github.com/zitadel/zitadel-go.git)
         cd zitadel_go
         ```
     </Tab>
@@ -205,21 +208,21 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="React">
         ```bash
-        git clone https://github.com/zitadel/zitadel-react.git
+        git clone [https://github.com/zitadel/zitadel-react.git](https://github.com/zitadel/zitadel-react.git)
         cd zitadel-react
         ```
     </Tab>
     <Tab value="Vue.js">
         ```bash
-        git clone https://github.com/zitadel/zitadel-vue.git
+        git clone [https://github.com/zitadel/zitadel-vue.git](https://github.com/zitadel/zitadel-vue.git)
         cd zitadel-vue
         ```
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 ### 3. Configure your Credentials
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+<FrameworkSelector>
     <Tab value="Angular">
 
         1. Copy+past the .env.example to .env.local
@@ -251,7 +254,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         PORT=3000
         SESSION_SECRET="your-very-secret-and-strong-session-key"
         SESSION_DURATION=3600
-        ZITADEL_DOMAIN="https://your-instance.zitadel.cloud/"
+        ZITADEL_DOMAIN="[https://your-instance.zitadel.cloud/](https://your-instance.zitadel.cloud/)"
         ZITADEL_CLIENT_ID="zitadel-client-id"
         ZITADEL_CLIENT_SECRET="zitadel-client-secret"
         ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
@@ -267,7 +270,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ```typescript
         const config: ZitadelConfig = {
-        authority: "https://your-instance.zitadel.cloud", // Your Issuer URL
+        authority: "[https://your-instance.zitadel.cloud](https://your-instance.zitadel.cloud)", // Your Issuer URL
         client_id: "YOUR_CLIENT_ID",                      // Your Client ID
         redirect_uri: "http://localhost:3000/callback",
         post_logout_redirect_uri: "http://localhost:3000",
@@ -282,15 +285,15 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```bash
         VITE_ZITADEL_PROJECT_RESOURCE_ID=
         VITE_ZITADEL_CLIENT_ID=YOUR_CLIENT_ID
-        VITE_ZITADEL_ISSUER=https://your-instance.zitadel.cloud/
+        VITE_ZITADEL_ISSUER=[https://your-instance.zitadel.cloud/](https://your-instance.zitadel.cloud/)
         ```
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 
 ### 4. Build and Run
 
-<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+<FrameworkSelector>
     <Tab value="Angular">
         ```bash
         npm install
@@ -360,7 +363,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
         ![Vue Example App](../../../public/img/guides/quickstart/vue_example_app.png)
     </Tab>
-</Tabs>
+</FrameworkSelector>
 
 ## Success! 🚀
 You’ve successfully integrated ZITADEL into an application.
