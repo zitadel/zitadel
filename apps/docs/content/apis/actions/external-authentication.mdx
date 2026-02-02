@@ -2,13 +2,13 @@
 title: External Authentication Flow
 ---
 
-This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers/introduction).
+This flow is executed if the User (Human) logs in using an [identity provider](/guides/integrate/identity-providers/introduction).
 
 The flow is represented by the following Ids in the API: `FLOW_TYPE_EXTERNAL_AUTHENTICATION` and `1`
 
 ## Post Authentication
 
-A user has authenticated externally. ZITADEL retrieved and mapped the external information.
+A User (Human) has authenticated externally. ZITADEL retrieved and mapped the external information.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_AUTHENTICATION` or `1`.
 
@@ -68,7 +68,7 @@ The first parameter contains the following fields
 
 ## Pre Creation
 
-A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
+A User (Human) selected **Register** on the overview page after external authentication. ZITADEL did not create the User (Human) yet.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CREATION` or `2`.
 
@@ -103,12 +103,12 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
     Sets the username
   - `setEmail(string)`
     Sets the email
-  - `setEmailVerified(bool)`
-    If true the email set is verified without user interaction
-  - `setPhone(string)`
+  - `setEmailVerified(bool)`  
+    If true the email set is verified without User (Human) interaction
+  - `setPhone(string)`  
     Sets the phone number
-  - `setPhoneVerified(bool)`
-    If true the phone number set is verified without user interaction
+  - `setPhoneVerified(bool)`  
+    If true the phone number set is verified without User (Human) interaction
   - `v1`
     - `user`
       - `appendMetadata(string, Any)`
@@ -116,7 +116,7 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
 
 ## Post Creation
 
-A user selected **Register** on the overview page after external authentication and ZITADEL successfully created the user.
+A User (Human) selected **Register** on the overview page after external authentication and ZITADEL successfully created the user.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_CREATION` or `3`.
 

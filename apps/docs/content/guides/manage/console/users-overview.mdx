@@ -8,14 +8,14 @@ import CreateUser from './_create-user.mdx';
 
 ## Overview
 
-ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **Human Users** (interactive) and **Service Users** (machine-to-machine).
+ZITADEL supports authentication and authorization for different user types. We mainly differentiate between **Users (Human)** (interactive) and **Service Users** (machine-to-machine).
 
 <img src="/docs/img/guides/console/usersmenu.png" width="420px" alt="User types" />
 
 ## Types of Users
 
-### Human Users
-Human users represent actual people who log in via an interactive interface (e.g., a login page).
+### Users (Human)
+Users (Human) represent actual people who log in via an interactive interface (e.g., a login page).
 * **Profile:** Has an email address, password, and optional profile data (phone, nickname, gender, language).
 * **Authentication:** Can authenticate via password, multiple factors (MFA), or passwordless authentication (Passkeys).
 * **Flow:** The application redirects the user to ZITADEL, which handles the credentials and issues a token to the application.
@@ -40,7 +40,7 @@ In a multi-tenancy architecture, users are typically isolated within [Organizati
 However, using [External User Grants](../../../concepts/features/external-user-grant), an organization can invite users from *another* organization to access their projects. These invited users are referred to as **External Users** within the context of the inviting organization.
 
 ### Managers
-Any user—whether Human or Service User—can be assigned an [Administrator Role](/concepts/structure/managers).
+Any user—whether User (Human) or Service User—can be assigned an [Administrator Role](/concepts/structure/managers).
 A user with an administrator role is not just an end-user of your application but also has permissions to manage specific aspects of the ZITADEL instance, organization, or project (e.g., `ORG_OWNER`, `PROJECT_OWNER`).
 
 ## Considerations

@@ -8,7 +8,7 @@ For these tasks we either provide a user interface, or the tasks can be initiate
 
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
-- `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators, etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
+- `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators, etc. There are certain actions that can be executed pre-login, yet others require the User (Human) to have a valid session.
 - `Managers` are users with a [special administrator role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization-i-18-n).
@@ -32,11 +32,11 @@ Allows anonymous users and authenticated users, who are not yet in the given org
 - Mandatory profile fields
 - Set password
 - Accept terms of service and privacy policy
-- User receives an email with a one-time code for verification purpose
-- User has to enter the one-time code to finish registration
-- User can re-request a new one-time code
+- User (Human) receives an email with a one-time code for verification purpose
+- User (Human) has to enter the one-time code to finish registration
+- User (Human) can re-request a new one-time code
 
-The user is prompted on the first login to set up MFA.
+The User (Human) is prompted on the first login to set up MFA.
 This step can be made mandatory if MFA is enforced in the login policy.
 
 ### Existing Identity / SSO / Social Login
@@ -45,15 +45,15 @@ Anonymous users and authenticated users, who are not yet in the given organizati
 An external identity provider can be a Social Login Provider or a pre-configured identity provider.
 
 - Information from the external identity provider is used to pre-fill the profile information
-- User can update the profile information
+- User (Human) can update the profile information
 - An account is created within ZITADEL and linked with the external identity provider
 
 #### Account Linking
 
-When you log in with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options:
+When you log in with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The User (Human) is presented with two options:
 
 - Create a new account: A new account will be created as stated above
-- Autolink: The user is prompted to log in with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now log in with either the local account or any of the linked external accounts.
+- Autolink: The User (Human) is prompted to log in with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A User (Human) can now log in with either the local account or any of the linked external accounts.
 
 ## Login
 
@@ -61,9 +61,9 @@ When you log in with an external identity provider, and the user does not exist 
 
 Given an external identity provider is configured on the instance or on the organization, then:
 
-- the user will be shown a button for each identity provider as an alternative to log in with a [local account](#local-account)
-- when clicking the button, the user will be redirected to the identity provider
-- after successful login, the user will be redirected to the application
+- the User (Human) will be shown a button for each identity provider as an alternative to log in with a [local account](#local-account)
+- when clicking the button, the User (Human) will be redirected to the identity provider
+- after successful login, the User (Human) will be redirected to the application
 
 ### Machines
 
@@ -78,7 +78,7 @@ A client can also implement this by calling the [specific endpoint](/apis/openid
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM_DOMAIN/ui/console/users/me_.
+ZITADEL provides a self-service UI for the User (Human) profile out-of-the box under the path _$CUSTOM_DOMAIN/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password
@@ -113,17 +113,17 @@ Users can change their profile information. This includes
 ### Email Verification
 
 Users can change their email address.
-The user receives a one-time password and can verify control over the given email address.
+The User (Human) receives a one-time password and can verify control over the given email address.
 
 ### Phone Verification
 
 Users can change their phone number.
-The user receives a one-time password and can verify control over the given phone number.
+The User (Human) receives a one-time password and can verify control over the given phone number.
 
 ### Identity providers
 
 Users can create a connection between a [local user account](#local-account) and an [external identity](#existing-identity--sso--social-login).
-The user can log in with any of the linked accounts.
+The User (Human) can log in with any of the linked accounts.
 [Linking of external accounts](#account-linking) is done during the login process.
 
 ## Managers
@@ -136,7 +136,7 @@ Thus, we will explain service for two of the most common scenarios in ZITADEL:
 - `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
 
 A list of [Administrator Roles](../../guides/manage/console/managers#roles) is available with a description of permissions.
-Managers can be assigned to both human users and service users, e.g., for managing certain tasks programmatically.
+Managers can be assigned to both Users (Human) and service users, e.g., for managing certain tasks programmatically.
 
 ### Managers in isolation
 

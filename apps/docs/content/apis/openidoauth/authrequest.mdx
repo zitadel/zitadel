@@ -15,7 +15,7 @@ An OpenID Connect (OIDC) [authentication request](https://openid.net/specs/openi
 
 ## Why this OIDC playground?
 
-Currently ZITADEL requires human users to authenticate trough the hosted login page.
+Currently ZITADEL requires Users (Human) to authenticate trough the hosted login page.
 Your application should initiate a login by issuing an authentication request and redirecting the user to the login page. You can customize the behavior of ZITADEL by providing additional parameters and scopes in the request.
 
 This playground should help you to initially craft an authentication request and to explore the behavior of ZITADEL in more depth.
@@ -70,17 +70,17 @@ More in the [documentation](/apis/openidoauth/authn-methods) about authenticatio
   should be prompted on login. For example:
   <ul>
     <li>
-      <code>select_account</code>: user is prompted to select one of the
+      <code>select_account</code>: User (Human) is prompted to select one of the
       existing sessions or create a new one
     </li>
     <li>
       <code>create</code>: present the register form
     </li>
     <li>
-      <code>login</code>: requires the user to re-authenticate
+      <code>login</code>: requires the User (Human) to re-authenticate
     </li>
     <li>
-      <code>none</code>: user must be authenticated without interaction, an
+      <code>none</code>: User (Human) must be authenticated without interaction, an
       error is returned otherwise; use for silent-refresh
     </li>
   </ul>

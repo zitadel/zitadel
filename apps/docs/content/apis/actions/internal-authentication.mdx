@@ -2,13 +2,13 @@
 title: Internal Authentication Flow
 ---
 
-This flow is executed if the user logs in using the login UI hosted by ZITADEL.
+This flow is executed if the User (Human) logs in using the login UI hosted by ZITADEL.
 
 The flow is represented by the following Ids in the API: `3`
 
 ## Post Authentication
 
-A user has authenticated directly at ZITADEL.
+A User (Human) has authenticated directly at ZITADEL.
 ZITADEL validated the users inputs for password, one-time password or passkey.
 Each validation step triggers the action.
 
@@ -36,8 +36,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_A
 
 ## Pre Creation
 
-A user registers directly at ZITADEL.
-ZITADEL did not create the user yet.
+A User (Human) registers directly at ZITADEL.
+ZITADEL did not create the User (Human) yet.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CREATION` or `2`.
 
@@ -83,7 +83,7 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
 
 ## Post Creation
 
-A user registers directly at ZITADEL.
+A User (Human) registers directly at ZITADEL.  
 ZITADEL successfully created the user.
 
 The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_CREATION` or `3`.

@@ -62,14 +62,14 @@ The Command Side has some unique requirements, these include:
 ##### Command Handler
 
 The command handler receives all operations who alter a resource managed by Zitadel.
-For example if a user changes his name. The API Layer will pass the instruction received through the API call to the command handler for further processing.
+For example if a User (Human) changes his name. The API Layer will pass the instruction received through the API call to the command handler for further processing.
 The command handler is then responsible of creating the necessary commands.
 After creating the commands the command hand them down to the command validation.
 
 ##### Command Validation
 
 With the received commands the command validation will execute the business logic to verify if a certain action can take place.
-For example if the user really can change his name is verified in the command validation.
+For example if the User (Human) really can change his name is verified in the command validation.
 If this succeeds the command validation will create the events that reflect the changes.
 These events now are being handed down to the storage layer for storage.
 

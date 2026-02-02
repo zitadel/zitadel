@@ -12,7 +12,7 @@ This guide explains ZITADEL service users and their role in facilitating secure 
 Service users in ZITADEL represent **non-human entities** within your system.
 They are ideal for scenarios involving secure communication between applications, particularly when interacting with backend services or APIs.
 Service users in combination with [Manager](/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example, to manage user resources.
-Unlike regular human users, service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
+Unlike regular Users (Human), service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
 
 ## Benefits of using Service Users
 
@@ -23,7 +23,7 @@ Unlike regular human users, service users don't rely on traditional login method
 
 ### Segregated authorization
 
-Manage authorization for service users separately from human users, providing an extra layer of control.
+Manage authorization for service users separately from Users (Human), providing an extra layer of control.
 
 ### API and backend access
 
@@ -84,7 +84,7 @@ This method is still available in ZITADEL but is generally considered less secur
 ### Personal Access Tokens (PATs)
 
 * **Ready-to-use tokens:** Generated for specific service users and can be directly included in the authorization header of API requests.
-* **Currently available only for machine users** (service users) and not regular human users.
+* **Currently available only for machine users** (service users) and not regular Users (Human).
 
 Follow our guide on using [personal access tokens](./personal-access-token) to get started authenticating service users and clients.
 
