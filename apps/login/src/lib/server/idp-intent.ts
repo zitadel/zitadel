@@ -25,13 +25,23 @@ import {
   AddHumanUserRequestSchema,
   UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
+
+/**
+ * Gets a valid userName from IDP information.
+ * Falls back to userId if userName is empty or undefined.
+ * This ensures we always have a valid userName (1-200 characters) as required by the API.
+ */
+function getValidUserName(idpInformation: { userName?: string; userId: string }): string {
+  const userName = idpInformation.userName?.trim();
+  return userName && userName.length > 0 ? userName : idpInformation.userId;
+}
 
 async function resolveOrganizationForUser({
   organization,
@@ -233,7 +243,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         idp: {
           id: intent.idpInformation!.idpId,
           userId: intent.idpInformation!.userId,
-          userName: intent.idpInformation!.userName,
+          userName: getValidUserName(intent.idpInformation!),
         },
         userId: resolvedUserId,
       });
@@ -401,7 +411,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           idp: {
             id: idpInformation!.idpId,
             userId: idpInformation!.userId,
-            userName: idpInformation!.userName,
+            userName: getValidUserName(idpInformation!),
           },
           userId: foundUser.userId,
         });
