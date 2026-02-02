@@ -16,55 +16,73 @@ const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
 
 /**
- * Polls a URL until it returns a successful response.
+ * Polls a health endpoint until it returns HTTP 200.
+ * Used to wait for Docker services to become ready.
+ *
+ * @param url - The health check URL to poll
+ * @param maxAttempts - Maximum number of polling attempts (default: 30)
+ * @param delayMs - Delay between attempts in milliseconds (default: 2000)
+ * @returns true if service became healthy, false if max attempts exceeded
  */
 async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       const response = await fetch(url);
       if (response.ok) return true;
-    } catch {}
-    await new Promise((r) => setTimeout(r, delayMs));
+    } catch {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
   }
   return false;
 }
 
 /**
- * Polls until a file exists and has content.
+ * Polls for a file to exist and contain data.
+ * Used to wait for OTLP collector to write exported telemetry.
+ *
+ * @param filePath - Absolute path to the file
+ * @param maxAttempts - Maximum number of polling attempts (default: 30)
+ * @param delayMs - Delay between attempts in milliseconds (default: 1000)
+ * @returns true if file exists with content, false if max attempts exceeded
  */
 async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       if (fs.statSync(filePath).size > 0) return true;
-    } catch {}
-    await new Promise((r) => setTimeout(r, delayMs));
+    } catch {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
   }
   return false;
 }
 
 /**
- * Reads the exported traces JSON file.
+ * Reads the traces.json file exported by the OTLP collector.
+ * Contains all trace spans in OTLP JSON format.
  */
 function readTraces(): string {
   return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
 }
 
 /**
- * Reads the exported metrics JSON file.
+ * Reads the metrics.json file exported by the OTLP collector.
+ * Contains all metrics in OTLP JSON format.
  */
 function readMetrics(): string {
   return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
 }
 
 /**
- * Reads the exported logs JSON file.
+ * Reads the logs.json file exported by the OTLP collector.
+ * Contains all log records in OTLP JSON format.
  */
 function readLogs(): string {
   return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
 }
 
 /**
- * Fetches Prometheus metrics text.
+ * Fetches metrics from the Prometheus scraping endpoint.
+ * Returns metrics in Prometheus text exposition format.
  */
 async function fetchPrometheusMetrics(): Promise<string> {
   const response = await fetch(PROMETHEUS_URL);
@@ -72,7 +90,8 @@ async function fetchPrometheusMetrics(): Promise<string> {
 }
 
 /**
- * Fetches captured headers from mock Zitadel server.
+ * Retrieves HTTP headers captured by the mock Zitadel server.
+ * Used to verify trace context propagation to backend gRPC calls.
  */
 async function fetchCapturedHeaders(): Promise<Array<{ traceparent: string | null; url: string; method: string }>> {
   const filePath = path.join(OUTPUT_DIR, "captured-headers.json");
@@ -88,7 +107,9 @@ describe("OpenTelemetry Integration", () => {
   beforeAll(async () => {
     try {
       execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
-    } catch {}
+    } catch {
+      // Container cleanup may fail if not running
+    }
 
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
@@ -114,7 +135,9 @@ describe("OpenTelemetry Integration", () => {
   afterAll(async () => {
     try {
       execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
-    } catch {}
+    } catch {
+      // Container cleanup may fail if already stopped
+    }
   }, DOCKER_TIMEOUT);
 
   describe("Traces", () => {
@@ -123,63 +146,63 @@ describe("OpenTelemetry Integration", () => {
         expect(readTraces().length).toBeGreaterThan(0);
       }, TEST_TIMEOUT);
 
-      it("exports spans with valid trace IDs", () => {
+      it("contains valid trace IDs", () => {
         expect(readTraces()).toMatch(/"traceId":"[a-f0-9]{32}"/);
       }, TEST_TIMEOUT);
 
-      it("exports spans with valid span IDs", () => {
+      it("contains valid span IDs", () => {
         expect(readTraces()).toMatch(/"spanId":"[a-f0-9]{16}"/);
       }, TEST_TIMEOUT);
 
-      it("exports spans with start timestamps", () => {
+      it("contains start timestamps", () => {
         expect(readTraces()).toContain("startTimeUnixNano");
       }, TEST_TIMEOUT);
 
-      it("exports spans with end timestamps", () => {
+      it("contains end timestamps", () => {
         expect(readTraces()).toContain("endTimeUnixNano");
       }, TEST_TIMEOUT);
 
-      it("exports spans with status", () => {
+      it("contains span status", () => {
         expect(readTraces()).toContain('"status"');
       }, TEST_TIMEOUT);
 
-      it("exports spans with kind", () => {
+      it("contains span kind", () => {
         expect(readTraces()).toContain('"kind"');
       }, TEST_TIMEOUT);
 
-      it("exports custom test spans", () => {
+      it("contains custom test spans", () => {
         expect(readTraces()).toContain("test-span");
       }, TEST_TIMEOUT);
     });
 
     describe("Span Attributes", () => {
-      it("includes http.method attribute", () => {
+      it("contains http.method", () => {
         expect(readTraces()).toContain('"http.method"');
       }, TEST_TIMEOUT);
 
-      it("includes http.url attribute", () => {
+      it("contains http.url", () => {
         expect(readTraces()).toContain('"http.url"');
       }, TEST_TIMEOUT);
 
-      it("includes http.status_code attribute", () => {
+      it("contains http.status_code", () => {
         expect(readTraces()).toContain('"http.status_code"');
       }, TEST_TIMEOUT);
 
-      it("includes http.target attribute", () => {
+      it("contains http.target", () => {
         expect(readTraces()).toContain('"http.target"');
       }, TEST_TIMEOUT);
 
-      it("includes net.host.name attribute", () => {
+      it("contains net.host.name", () => {
         expect(readTraces()).toContain('"net.host.name"');
       }, TEST_TIMEOUT);
 
-      it("includes net.host.port attribute", () => {
+      it("contains net.host.port", () => {
         expect(readTraces()).toContain('"net.host.port"');
       }, TEST_TIMEOUT);
     });
 
     describe("Trace Propagation", () => {
-      it("propagates traceparent to gRPC calls", async () => {
+      it("propagates traceparent to gRPC", async () => {
         const requests = await fetchCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
         expect(grpcCalls.length).toBeGreaterThan(0);
@@ -203,7 +226,7 @@ describe("OpenTelemetry Integration", () => {
         grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/-01$/));
       }, TEST_TIMEOUT);
 
-      it("maintains trace ID across related calls", async () => {
+      it("maintains trace ID consistency", async () => {
         const requests = await fetchCapturedHeaders();
         const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
         const traceIds = grpcCalls.map((r) => r.traceparent!.split("-")[1]);
@@ -213,59 +236,59 @@ describe("OpenTelemetry Integration", () => {
     });
 
     describe("Resource Attributes", () => {
-      it("includes service.name", () => {
+      it("contains service.name", () => {
         expect(readTraces()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("includes service.version", () => {
+      it("contains service.version", () => {
         expect(readTraces()).toContain('"service.version"');
       }, TEST_TIMEOUT);
 
-      it("includes deployment.environment", () => {
+      it("contains deployment.environment", () => {
         expect(readTraces()).toContain('"deployment.environment"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.name", () => {
+      it("contains process.runtime.name", () => {
         expect(readTraces()).toContain('"nodejs"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.version", () => {
+      it("contains process.runtime.version", () => {
         expect(readTraces()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.provider", () => {
+      it("contains cloud.provider", () => {
         expect(readTraces()).toContain('"gcp"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.platform", () => {
+      it("contains cloud.platform", () => {
         expect(readTraces()).toContain('"gcp_cloud_run"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.account.id", () => {
+      it("contains cloud.account.id", () => {
         expect(readTraces()).toContain('"test-project-123"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.region", () => {
+      it("contains cloud.region", () => {
         expect(readTraces()).toContain('"us-central1"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.resource_id", () => {
+      it("contains cloud.resource_id", () => {
         expect(readTraces()).toContain('"cloud.resource_id"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.name", () => {
+      it("contains faas.name", () => {
         expect(readTraces()).toContain('"faas.name"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.version", () => {
+      it("contains faas.version", () => {
         expect(readTraces()).toContain('"zitadel-login-00001-abc"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.instance", () => {
+      it("contains faas.instance", () => {
         expect(readTraces()).toContain('"faas.instance"');
       }, TEST_TIMEOUT);
 
-      it("includes container.id when available", () => {
+      it("contains container.id when available", () => {
         const traces = readTraces();
         if (traces.includes('"container.id"')) {
           expect(traces).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
@@ -280,11 +303,11 @@ describe("OpenTelemetry Integration", () => {
         expect(readMetrics().length).toBeGreaterThan(0);
       }, TEST_TIMEOUT);
 
-      it("exports metrics with timestamps", () => {
+      it("contains timestamps", () => {
         expect(readMetrics()).toContain("timeUnixNano");
       }, TEST_TIMEOUT);
 
-      it("exports metrics with data points", () => {
+      it("contains data points", () => {
         expect(readMetrics()).toContain("dataPoints");
       }, TEST_TIMEOUT);
     });
@@ -372,59 +395,59 @@ describe("OpenTelemetry Integration", () => {
     });
 
     describe("Resource Attributes", () => {
-      it("includes service.name", () => {
+      it("contains service.name", () => {
         expect(readMetrics()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("includes service.version", () => {
+      it("contains service.version", () => {
         expect(readMetrics()).toContain('"service.version"');
       }, TEST_TIMEOUT);
 
-      it("includes deployment.environment", () => {
+      it("contains deployment.environment", () => {
         expect(readMetrics()).toContain('"deployment.environment"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.name", () => {
+      it("contains process.runtime.name", () => {
         expect(readMetrics()).toContain('"nodejs"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.version", () => {
+      it("contains process.runtime.version", () => {
         expect(readMetrics()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.provider", () => {
+      it("contains cloud.provider", () => {
         expect(readMetrics()).toContain('"gcp"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.platform", () => {
+      it("contains cloud.platform", () => {
         expect(readMetrics()).toContain('"gcp_cloud_run"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.account.id", () => {
+      it("contains cloud.account.id", () => {
         expect(readMetrics()).toContain('"test-project-123"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.region", () => {
+      it("contains cloud.region", () => {
         expect(readMetrics()).toContain('"us-central1"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.resource_id", () => {
+      it("contains cloud.resource_id", () => {
         expect(readMetrics()).toContain('"cloud.resource_id"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.name", () => {
+      it("contains faas.name", () => {
         expect(readMetrics()).toContain('"faas.name"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.version", () => {
+      it("contains faas.version", () => {
         expect(readMetrics()).toContain('"zitadel-login-00001-abc"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.instance", () => {
+      it("contains faas.instance", () => {
         expect(readMetrics()).toContain('"faas.instance"');
       }, TEST_TIMEOUT);
 
-      it("includes container.id when available", () => {
+      it("contains container.id when available", () => {
         const metrics = readMetrics();
         if (metrics.includes('"container.id"')) {
           expect(metrics).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
@@ -439,73 +462,73 @@ describe("OpenTelemetry Integration", () => {
         expect(readLogs().length).toBeGreaterThan(0);
       }, TEST_TIMEOUT);
 
-      it("exports logs with timestamps", () => {
+      it("contains timestamps", () => {
         expect(readLogs()).toContain("timeUnixNano");
       }, TEST_TIMEOUT);
 
-      it("exports logs with severity", () => {
+      it("contains severity", () => {
         expect(readLogs()).toContain("severityNumber");
       }, TEST_TIMEOUT);
 
-      it("exports logs with body", () => {
+      it("contains body", () => {
         expect(readLogs()).toContain("body");
       }, TEST_TIMEOUT);
     });
 
     describe("Resource Attributes", () => {
-      it("includes service.name", () => {
+      it("contains service.name", () => {
         expect(readLogs()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("includes service.version", () => {
+      it("contains service.version", () => {
         expect(readLogs()).toContain('"service.version"');
       }, TEST_TIMEOUT);
 
-      it("includes deployment.environment", () => {
+      it("contains deployment.environment", () => {
         expect(readLogs()).toContain('"deployment.environment"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.name", () => {
+      it("contains process.runtime.name", () => {
         expect(readLogs()).toContain('"nodejs"');
       }, TEST_TIMEOUT);
 
-      it("includes process.runtime.version", () => {
+      it("contains process.runtime.version", () => {
         expect(readLogs()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.provider", () => {
+      it("contains cloud.provider", () => {
         expect(readLogs()).toContain('"gcp"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.platform", () => {
+      it("contains cloud.platform", () => {
         expect(readLogs()).toContain('"gcp_cloud_run"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.account.id", () => {
+      it("contains cloud.account.id", () => {
         expect(readLogs()).toContain('"test-project-123"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.region", () => {
+      it("contains cloud.region", () => {
         expect(readLogs()).toContain('"us-central1"');
       }, TEST_TIMEOUT);
 
-      it("includes cloud.resource_id", () => {
+      it("contains cloud.resource_id", () => {
         expect(readLogs()).toContain('"cloud.resource_id"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.name", () => {
+      it("contains faas.name", () => {
         expect(readLogs()).toContain('"faas.name"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.version", () => {
+      it("contains faas.version", () => {
         expect(readLogs()).toContain('"zitadel-login-00001-abc"');
       }, TEST_TIMEOUT);
 
-      it("includes faas.instance", () => {
+      it("contains faas.instance", () => {
         expect(readLogs()).toContain('"faas.instance"');
       }, TEST_TIMEOUT);
 
-      it("includes container.id when available", () => {
+      it("contains container.id when available", () => {
         const logs = readLogs();
         if (logs.includes('"container.id"')) {
           expect(logs).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
