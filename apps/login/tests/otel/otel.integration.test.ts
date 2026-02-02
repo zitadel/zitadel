@@ -6,630 +6,511 @@ import * as path from "path";
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
+
 const APP_URL = "http://localhost:3000";
 const PROMETHEUS_URL = "http://localhost:9464/metrics";
 const COLLECTOR_HEALTH_URL = "http://localhost:13133";
-// HTTP/2 port for gRPC (not used directly by tests)
-const MOCK_ZITADEL_GRPC_URL = "http://localhost:8080";
-// HTTP/1.1 port for health checks and captured headers endpoint
 const MOCK_ZITADEL_URL = "http://localhost:7432";
-const CAPTURED_HEADERS_FILE = path.join(OUTPUT_DIR, "captured-headers.json");
 
-// Timeout for Docker operations
-const DOCKER_TIMEOUT = 180000; // 3 minutes
+const DOCKER_TIMEOUT = 180000;
+const TEST_TIMEOUT = 30000;
 
-async function waitForService(
-  url: string,
-  maxAttempts = 30,
-  delayMs = 2000,
-): Promise<boolean> {
+/**
+ * Polls a URL until it returns a successful response.
+ */
+async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       const response = await fetch(url);
-      if (response.ok) {
-        return true;
-      }
-    } catch {
-      // Service not ready yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+      if (response.ok) return true;
+    } catch {}
+    await new Promise((r) => setTimeout(r, delayMs));
   }
   return false;
 }
 
-async function waitForFile(
-  filePath: string,
-  maxAttempts = 30,
-  delayMs = 1000,
-): Promise<boolean> {
+/**
+ * Polls until a file exists and has content.
+ */
+async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      const stats = fs.statSync(filePath);
-      if (stats.size > 0) {
-        return true;
-      }
-    } catch {
-      // File not ready yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+      if (fs.statSync(filePath).size > 0) return true;
+    } catch {}
+    await new Promise((r) => setTimeout(r, delayMs));
   }
   return false;
+}
+
+/**
+ * Reads the exported traces JSON file.
+ */
+function readTraces(): string {
+  return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
+}
+
+/**
+ * Reads the exported metrics JSON file.
+ */
+function readMetrics(): string {
+  return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
+}
+
+/**
+ * Reads the exported logs JSON file.
+ */
+function readLogs(): string {
+  return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
+}
+
+/**
+ * Fetches Prometheus metrics text.
+ */
+async function fetchPrometheusMetrics(): Promise<string> {
+  const response = await fetch(PROMETHEUS_URL);
+  return response.text();
+}
+
+/**
+ * Fetches captured headers from mock Zitadel server.
+ */
+async function fetchCapturedHeaders(): Promise<Array<{ traceparent: string | null; url: string; method: string }>> {
+  const filePath = path.join(OUTPUT_DIR, "captured-headers.json");
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch {
+    const response = await fetch(`${MOCK_ZITADEL_URL}/captured-headers`);
+    return response.json();
+  }
 }
 
 describe("OpenTelemetry Integration", () => {
   beforeAll(async () => {
-    // Clean up any existing containers
     try {
-      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, {
-        stdio: "pipe",
-        cwd: TEST_DIR,
-      });
-    } catch {
-      // Ignore errors if containers don't exist
-    }
+      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
+    } catch {}
 
-    // Create output directory
-    if (!fs.existsSync(OUTPUT_DIR)) {
-      fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-    }
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
 
-    // Start the test environment
-    console.log("Starting Docker Compose environment...");
-    execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, {
-      stdio: "inherit",
-      cwd: TEST_DIR,
-    });
+    const collectorReady = await waitForService(COLLECTOR_HEALTH_URL);
+    if (!collectorReady) throw new Error("OTEL collector failed to start");
 
-    // Wait for the collector to be healthy
-    console.log("Waiting for OTEL collector to be healthy...");
-    const isCollectorHealthy = await waitForService(
-      COLLECTOR_HEALTH_URL,
-      30,
-      2000,
-    );
-    if (!isCollectorHealthy) {
-      throw new Error("OTEL collector failed to become healthy");
-    }
-    console.log("OTEL collector is healthy!");
+    const mockReady = await waitForService(`${MOCK_ZITADEL_URL}/health`);
+    if (!mockReady) throw new Error("Mock Zitadel failed to start");
 
-    // Wait for mock Zitadel server to be healthy
-    console.log("Waiting for mock Zitadel server to be healthy...");
-    const isMockZitadelHealthy = await waitForService(
-      `${MOCK_ZITADEL_URL}/health`,
-      30,
-      2000,
-    );
-    if (!isMockZitadelHealthy) {
-      throw new Error("Mock Zitadel server failed to become healthy");
-    }
-    console.log("Mock Zitadel server is healthy!");
+    const appReady = await waitForService(`${APP_URL}/ui/v2/login/healthy`, 60);
+    if (!appReady) throw new Error("Login app failed to start");
 
-    // Wait for the app to be healthy
-    console.log("Waiting for login app to be healthy...");
-    const isHealthy = await waitForService(
-      `${APP_URL}/ui/v2/login/healthy`,
-      60,
-      2000,
-    );
-    if (!isHealthy) {
-      throw new Error("Login app failed to become healthy");
-    }
+    await fetch(`${APP_URL}/ui/v2/login/otel-test`);
+    await fetch(`${APP_URL}/ui/v2/login/loginname`, { redirect: "manual" });
+    await fetch(`${APP_URL}/ui/v2/login/healthy`);
+    await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
 
-    console.log("Login app is healthy!");
+    await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
+    await new Promise((r) => setTimeout(r, 35000));
   }, DOCKER_TIMEOUT);
 
   afterAll(async () => {
-    // Stop and remove containers
-    console.log("Stopping Docker Compose environment...");
     try {
-      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, {
-        stdio: "pipe",
-        cwd: TEST_DIR,
-      });
-    } catch (error) {
-      console.error("Error stopping containers:", error);
-    }
+      execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "pipe", cwd: TEST_DIR });
+    } catch {}
   }, DOCKER_TIMEOUT);
 
-  it(
-    "should export traces to collector",
-    async () => {
-      // Call the otel-test endpoint
-      const response = await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-      expect(response.status).toBe(200);
+  describe("Traces", () => {
+    describe("OTLP Export", () => {
+      it("exports spans to collector", () => {
+        expect(readTraces().length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
 
-      const data = await response.json();
-      expect(data.status).toBe("ok");
-      expect(data.traceId).toBeDefined();
-      expect(data.traceId.length).toBe(32); // Valid trace ID is 32 hex chars
-      expect(data.spanId).toBeDefined();
+      it("exports spans with valid trace IDs", () => {
+        expect(readTraces()).toMatch(/"traceId":"[a-f0-9]{32}"/);
+      }, TEST_TIMEOUT);
 
-      console.log("Received trace ID:", data.traceId);
+      it("exports spans with valid span IDs", () => {
+        expect(readTraces()).toMatch(/"spanId":"[a-f0-9]{16}"/);
+      }, TEST_TIMEOUT);
 
-      // Wait for traces to be exported to file
-      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
-      const hasTraces = await waitForFile(tracesFile, 30, 1000);
-      expect(hasTraces).toBe(true);
+      it("exports spans with start timestamps", () => {
+        expect(readTraces()).toContain("startTimeUnixNano");
+      }, TEST_TIMEOUT);
 
-      // Verify traces contain our test span
-      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
-      expect(tracesContent).toContain("otel-test");
-    },
-    60000,
-  );
+      it("exports spans with end timestamps", () => {
+        expect(readTraces()).toContain("endTimeUnixNano");
+      }, TEST_TIMEOUT);
 
-  it(
-    "should export metrics to collector",
-    async () => {
-      // Call the test endpoint multiple times to generate metrics
-      for (let i = 0; i < 3; i++) {
-        await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
+      it("exports spans with status", () => {
+        expect(readTraces()).toContain('"status"');
+      }, TEST_TIMEOUT);
 
-      // Wait for metrics to be exported (metrics are exported every 30 seconds by default)
-      // We'll wait a bit longer to ensure they're flushed
-      await new Promise((resolve) => setTimeout(resolve, 35000));
+      it("exports spans with kind", () => {
+        expect(readTraces()).toContain('"kind"');
+      }, TEST_TIMEOUT);
 
-      const metricsFile = path.join(OUTPUT_DIR, "metrics.json");
-      const hasMetrics = await waitForFile(metricsFile, 10, 2000);
+      it("exports custom test spans", () => {
+        expect(readTraces()).toContain("test-span");
+      }, TEST_TIMEOUT);
+    });
 
-      if (hasMetrics) {
-        const metricsContent = fs.readFileSync(metricsFile, "utf-8");
-        console.log("Metrics exported successfully");
-        expect(metricsContent.length).toBeGreaterThan(0);
-      } else {
-        // Metrics may take longer to export, so we'll just warn
-        console.warn("Metrics file not found within timeout");
-      }
-    },
-    120000,
-  );
+    describe("Span Attributes", () => {
+      it("includes http.method attribute", () => {
+        expect(readTraces()).toContain('"http.method"');
+      }, TEST_TIMEOUT);
 
-  it(
-    "should export logs to collector",
-    async () => {
-      // Call the test endpoint to generate logs
-      await fetch(`${APP_URL}/ui/v2/login/otel-test`);
+      it("includes http.url attribute", () => {
+        expect(readTraces()).toContain('"http.url"');
+      }, TEST_TIMEOUT);
 
-      // Wait for logs to be exported
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      it("includes http.status_code attribute", () => {
+        expect(readTraces()).toContain('"http.status_code"');
+      }, TEST_TIMEOUT);
 
-      const logsFile = path.join(OUTPUT_DIR, "logs.json");
-      const hasLogs = await waitForFile(logsFile, 30, 1000);
+      it("includes http.target attribute", () => {
+        expect(readTraces()).toContain('"http.target"');
+      }, TEST_TIMEOUT);
 
-      if (hasLogs) {
-        const logsContent = fs.readFileSync(logsFile, "utf-8");
-        console.log("Logs exported successfully");
-        expect(logsContent).toContain("otel-test");
-      } else {
-        // Logs may not be exported depending on Winston configuration
-        console.warn("Logs file not found within timeout");
-      }
-    },
-    60000,
-  );
+      it("includes net.host.name attribute", () => {
+        expect(readTraces()).toContain('"net.host.name"');
+      }, TEST_TIMEOUT);
 
-  it("should respond to health check", async () => {
-    const response = await fetch(`${APP_URL}/ui/v2/login/healthy`);
-    expect(response.status).toBe(200);
+      it("includes net.host.port attribute", () => {
+        expect(readTraces()).toContain('"net.host.port"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Trace Propagation", () => {
+      it("propagates traceparent to gRPC calls", async () => {
+        const requests = await fetchCapturedHeaders();
+        const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
+        expect(grpcCalls.length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
+
+      it("uses W3C traceparent format", async () => {
+        const requests = await fetchCapturedHeaders();
+        const grpcCalls = requests.filter((r) => r.traceparent !== null);
+        grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/));
+      }, TEST_TIMEOUT);
+
+      it("uses traceparent version 00", async () => {
+        const requests = await fetchCapturedHeaders();
+        const grpcCalls = requests.filter((r) => r.traceparent !== null);
+        grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/^00-/));
+      }, TEST_TIMEOUT);
+
+      it("sets sampled flag to 01", async () => {
+        const requests = await fetchCapturedHeaders();
+        const grpcCalls = requests.filter((r) => r.traceparent !== null);
+        grpcCalls.forEach((r) => expect(r.traceparent).toMatch(/-01$/));
+      }, TEST_TIMEOUT);
+
+      it("maintains trace ID across related calls", async () => {
+        const requests = await fetchCapturedHeaders();
+        const grpcCalls = requests.filter((r) => r.method === "POST" && r.traceparent !== null);
+        const traceIds = grpcCalls.map((r) => r.traceparent!.split("-")[1]);
+        const uniqueIds = new Set(traceIds);
+        expect(uniqueIds.size).toBeLessThan(traceIds.length);
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Resource Attributes", () => {
+      it("includes service.name", () => {
+        expect(readTraces()).toContain('"zitadel-login-test"');
+      }, TEST_TIMEOUT);
+
+      it("includes service.version", () => {
+        expect(readTraces()).toContain('"service.version"');
+      }, TEST_TIMEOUT);
+
+      it("includes deployment.environment", () => {
+        expect(readTraces()).toContain('"deployment.environment"');
+      }, TEST_TIMEOUT);
+
+      it("includes process.runtime.name", () => {
+        expect(readTraces()).toContain('"nodejs"');
+      }, TEST_TIMEOUT);
+
+      it("includes process.runtime.version", () => {
+        expect(readTraces()).toContain('"process.runtime.version"');
+      }, TEST_TIMEOUT);
+
+      it("includes cloud.provider", () => {
+        expect(readTraces()).toContain('"gcp"');
+      }, TEST_TIMEOUT);
+
+      it("includes cloud.platform", () => {
+        expect(readTraces()).toContain('"gcp_cloud_run"');
+      }, TEST_TIMEOUT);
+
+      it("includes cloud.account.id", () => {
+        expect(readTraces()).toContain('"test-project-123"');
+      }, TEST_TIMEOUT);
+
+      it("includes cloud.region", () => {
+        expect(readTraces()).toContain('"us-central1"');
+      }, TEST_TIMEOUT);
+
+      it("includes cloud.resource_id", () => {
+        expect(readTraces()).toContain('"cloud.resource_id"');
+      }, TEST_TIMEOUT);
+
+      it("includes faas.name", () => {
+        expect(readTraces()).toContain('"faas.name"');
+      }, TEST_TIMEOUT);
+
+      it("includes faas.version", () => {
+        expect(readTraces()).toContain('"zitadel-login-00001-abc"');
+      }, TEST_TIMEOUT);
+
+      it("includes faas.instance", () => {
+        expect(readTraces()).toContain('"faas.instance"');
+      }, TEST_TIMEOUT);
+
+      it("includes container.id when available", () => {
+        const traces = readTraces();
+        if (traces.includes('"container.id"')) {
+          expect(traces).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
+        }
+      }, TEST_TIMEOUT);
+    });
   });
 
-  it(
-    "should include correct service name in telemetry resource attributes",
-    async () => {
-      // Wait for traces to be exported
-      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
-      const hasTraces = await waitForFile(tracesFile, 10, 1000);
-      expect(hasTraces).toBe(true);
+  describe("Metrics", () => {
+    describe("OTLP Export", () => {
+      it("exports metrics to collector", () => {
+        expect(readMetrics().length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
 
-      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
+      it("exports metrics with timestamps", () => {
+        expect(readMetrics()).toContain("timeUnixNano");
+      }, TEST_TIMEOUT);
 
-      // Verify service.name matches OTEL_SERVICE_NAME from docker-compose.test.yml
-      expect(tracesContent).toContain('"service.name"');
-      expect(tracesContent).toContain('"zitadel-login-test"');
+      it("exports metrics with data points", () => {
+        expect(readMetrics()).toContain("dataPoints");
+      }, TEST_TIMEOUT);
+    });
 
-      // Verify service.version is present
-      expect(tracesContent).toContain('"service.version"');
-    },
-    30000,
-  );
+    describe("Prometheus Endpoint", () => {
+      it("returns HTTP 200", async () => {
+        const response = await fetch(PROMETHEUS_URL);
+        expect(response.status).toBe(200);
+      }, TEST_TIMEOUT);
 
-  it(
-    "should include GCP Cloud Run resource attributes in telemetry",
-    async () => {
-      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
-      const hasTraces = await waitForFile(tracesFile, 10, 1000);
-      expect(hasTraces).toBe(true);
+      it("returns text/plain content type", async () => {
+        const response = await fetch(PROMETHEUS_URL);
+        expect(response.headers.get("content-type")).toContain("text/plain");
+      }, TEST_TIMEOUT);
+    });
 
-      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
+    describe("Runtime Metrics", () => {
+      it("exposes nodejs_eventloop_utilization", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("nodejs_eventloop_utilization");
+      }, TEST_TIMEOUT);
 
-      // Verify GCP Cloud Run attributes from docker-compose.test.yml env vars
-      expect(tracesContent).toContain('"cloud.provider"');
-      expect(tracesContent).toContain('"gcp"');
+      it("exposes nodejs_eventloop_delay", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("nodejs_eventloop_delay");
+      }, TEST_TIMEOUT);
 
-      expect(tracesContent).toContain('"cloud.platform"');
-      expect(tracesContent).toContain('"gcp_cloud_run"');
+      it("exposes v8js_memory_heap_used", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("v8js_memory_heap_used");
+      }, TEST_TIMEOUT);
 
-      expect(tracesContent).toContain('"cloud.account.id"');
-      expect(tracesContent).toContain('"test-project-123"');
+      it("exposes v8js_memory_heap_limit", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("v8js_memory_heap_limit");
+      }, TEST_TIMEOUT);
 
-      expect(tracesContent).toContain('"faas.name"');
-      expect(tracesContent).toContain('"zitadel-login"');
+      it("exposes v8js_gc_duration", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("v8js_gc_duration");
+      }, TEST_TIMEOUT);
+    });
 
-      expect(tracesContent).toContain('"faas.version"');
-      expect(tracesContent).toContain('"zitadel-login-00001-abc"');
+    describe("HTTP Metrics", () => {
+      it("exposes http_server_duration", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_duration");
+      }, TEST_TIMEOUT);
 
-      expect(tracesContent).toContain('"cloud.region"');
-      expect(tracesContent).toContain('"us-central1"');
+      it("exposes http_server_duration_sum", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_sum");
+      }, TEST_TIMEOUT);
 
-      console.log("GCP Cloud Run resource attributes verified in telemetry");
-    },
-    30000,
-  );
+      it("exposes http_server_duration_count", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_count");
+      }, TEST_TIMEOUT);
 
-  it(
-    "should detect container.id when available in Docker environment",
-    async () => {
-      const tracesFile = path.join(OUTPUT_DIR, "traces.json");
-      const hasTraces = await waitForFile(tracesFile, 10, 1000);
-      expect(hasTraces).toBe(true);
+      it("exposes http_server_duration_bucket", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_duration_bucket");
+      }, TEST_TIMEOUT);
 
-      const tracesContent = fs.readFileSync(tracesFile, "utf-8");
+      it("records status code 200", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('http_status_code="200"');
+      }, TEST_TIMEOUT);
 
-      // Container detection depends on cgroup format (v1 vs v2) and may not work in all environments
-      const hasContainerId = tracesContent.includes('"container.id"');
+      it("records status code 404", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('http_status_code="404"');
+      }, TEST_TIMEOUT);
 
-      if (hasContainerId) {
-        // When detected, container ID should be a 64-char hex string
-        const containerIdMatch = tracesContent.match(/"container\.id"[^"]*"([a-f0-9]{64})"/);
-        expect(containerIdMatch).not.toBeNull();
-        console.log(`Container ID detected: ${containerIdMatch![1].substring(0, 12)}...`);
-      } else {
-        // Container detection is not available in this environment (cgroup v2 or other reasons)
-        console.log("Container ID not detected (cgroup format may not be supported)");
-      }
+      it("records HTTP GET method", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('http_method="GET"');
+      }, TEST_TIMEOUT);
+    });
 
-      // Test passes either way - we're verifying the detector runs without error
-      expect(true).toBe(true);
-    },
-    30000,
-  );
+    describe("Application Metrics", () => {
+      it("exposes http_server_requests_total", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_requests_total");
+      }, TEST_TIMEOUT);
 
-  it(
-    "should expose Node.js runtime metrics via Prometheus",
-    async () => {
-      // Wait for runtime metrics to be collected (monitoringPrecision is 5000ms)
-      await new Promise((resolve) => setTimeout(resolve, 6000));
+      it("exposes http_server_active_requests", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_active_requests");
+      }, TEST_TIMEOUT);
 
-      const response = await fetch(PROMETHEUS_URL);
-      expect(response.status).toBe(200);
+      it("exposes login_auth_attempts_total", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("login_auth_attempts_total");
+      }, TEST_TIMEOUT);
 
-      const metricsText = await response.text();
+      it("exposes login_session_creation_duration", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("login_session_creation_duration");
+      }, TEST_TIMEOUT);
+    });
 
-      // Verify event loop metrics from @opentelemetry/instrumentation-runtime-node
-      expect(metricsText).toContain("nodejs_eventloop_utilization");
-      expect(metricsText).toContain("nodejs_eventloop_delay_mean");
-      expect(metricsText).toContain("nodejs_eventloop_time");
+    describe("Resource Attributes", () => {
+      it("includes service.name", () => {
+        expect(readMetrics()).toContain('"zitadel-login-test"');
+      }, TEST_TIMEOUT);
 
-      // Verify V8 memory metrics
-      expect(metricsText).toContain("v8js_memory_heap_used");
-      expect(metricsText).toContain("v8js_memory_heap_limit");
+      it("includes service.version", () => {
+        expect(readMetrics()).toContain('"service.version"');
+      }, TEST_TIMEOUT);
 
-      // Verify V8 GC metrics
-      expect(metricsText).toContain("v8js_gc_duration");
+      it("includes deployment.environment", () => {
+        expect(readMetrics()).toContain('"deployment.environment"');
+      }, TEST_TIMEOUT);
 
-      console.log("Node.js runtime metrics are being exported correctly");
-    },
-    30000,
-  );
+      it("includes process.runtime.name", () => {
+        expect(readMetrics()).toContain('"nodejs"');
+      }, TEST_TIMEOUT);
 
-  it(
-    "should expose custom application metrics via Prometheus",
-    async () => {
-      // Generate some traffic to produce custom metrics
-      for (let i = 0; i < 3; i++) {
-        await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-      }
+      it("includes process.runtime.version", () => {
+        expect(readMetrics()).toContain('"process.runtime.version"');
+      }, TEST_TIMEOUT);
 
-      const response = await fetch(PROMETHEUS_URL);
-      expect(response.status).toBe(200);
+      it("includes cloud.provider", () => {
+        expect(readMetrics()).toContain('"gcp"');
+      }, TEST_TIMEOUT);
 
-      const metricsText = await response.text();
+      it("includes cloud.platform", () => {
+        expect(readMetrics()).toContain('"gcp_cloud_run"');
+      }, TEST_TIMEOUT);
 
-      // Verify custom metrics from metrics.ts
-      expect(metricsText).toContain("http_server_requests_total");
-      expect(metricsText).toContain("http_server_request_duration_seconds");
-      expect(metricsText).toContain("http_server_active_requests");
-      expect(metricsText).toContain("login_auth_attempts_total");
-      expect(metricsText).toContain("login_auth_successes_total");
-      expect(metricsText).toContain("login_session_creation_duration_seconds");
+      it("includes cloud.account.id", () => {
+        expect(readMetrics()).toContain('"test-project-123"');
+      }, TEST_TIMEOUT);
 
-      console.log("Custom application metrics are being exported correctly");
-    },
-    30000,
-  );
+      it("includes cloud.region", () => {
+        expect(readMetrics()).toContain('"us-central1"');
+      }, TEST_TIMEOUT);
 
-  it(
-    "should record accurate request duration in http_server_duration metric",
-    async () => {
-      // Helper to parse metrics for a specific HTTP status code 200 (successful requests)
-      // We look for metrics with http_status_code="200" to filter out redirects/errors
-      const parseMetricsForStatus200 = (metricsText: string) => {
-        // Find all http_server_duration_sum lines and extract those with status 200
-        const lines = metricsText.split("\n");
-        let totalSum = 0;
-        let totalCount = 0;
+      it("includes cloud.resource_id", () => {
+        expect(readMetrics()).toContain('"cloud.resource_id"');
+      }, TEST_TIMEOUT);
 
-        for (const line of lines) {
-          if (
-            line.includes("http_server_duration_sum") &&
-            line.includes('http_status_code="200"')
-          ) {
-            const match = line.match(/\}\s+([\d.]+)/);
-            if (match) {
-              totalSum += parseFloat(match[1]);
-            }
-          }
-          if (
-            line.includes("http_server_duration_count") &&
-            line.includes('http_status_code="200"')
-          ) {
-            const match = line.match(/\}\s+(\d+)/);
-            if (match) {
-              totalCount += parseInt(match[1], 10);
-            }
-          }
+      it("includes faas.name", () => {
+        expect(readMetrics()).toContain('"faas.name"');
+      }, TEST_TIMEOUT);
+
+      it("includes faas.version", () => {
+        expect(readMetrics()).toContain('"zitadel-login-00001-abc"');
+      }, TEST_TIMEOUT);
+
+      it("includes faas.instance", () => {
+        expect(readMetrics()).toContain('"faas.instance"');
+      }, TEST_TIMEOUT);
+
+      it("includes container.id when available", () => {
+        const metrics = readMetrics();
+        if (metrics.includes('"container.id"')) {
+          expect(metrics).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
         }
+      }, TEST_TIMEOUT);
+    });
+  });
 
-        return { sum: totalSum, count: totalCount };
-      };
+  describe("Logs", () => {
+    describe("OTLP Export", () => {
+      it("exports logs to collector", () => {
+        expect(readLogs().length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
 
-      // Get metrics BEFORE the request
-      const beforeResponse = await fetch(PROMETHEUS_URL);
-      const beforeMetrics = parseMetricsForStatus200(await beforeResponse.text());
+      it("exports logs with timestamps", () => {
+        expect(readLogs()).toContain("timeUnixNano");
+      }, TEST_TIMEOUT);
 
-      // Make a request and measure the actual response time
-      const startTime = performance.now();
-      const response = await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-      const endTime = performance.now();
-      const actualDurationMs = endTime - startTime;
+      it("exports logs with severity", () => {
+        expect(readLogs()).toContain("severityNumber");
+      }, TEST_TIMEOUT);
 
-      expect(response.status).toBe(200);
+      it("exports logs with body", () => {
+        expect(readLogs()).toContain("body");
+      }, TEST_TIMEOUT);
+    });
 
-      // Wait for metrics to be collected
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    describe("Resource Attributes", () => {
+      it("includes service.name", () => {
+        expect(readLogs()).toContain('"zitadel-login-test"');
+      }, TEST_TIMEOUT);
 
-      // Get metrics AFTER the request
-      const afterResponse = await fetch(PROMETHEUS_URL);
-      const afterMetrics = parseMetricsForStatus200(await afterResponse.text());
+      it("includes service.version", () => {
+        expect(readLogs()).toContain('"service.version"');
+      }, TEST_TIMEOUT);
 
-      // Calculate the delta (just this request's contribution)
-      const deltaSumMs = afterMetrics.sum - beforeMetrics.sum;
-      const deltaCount = afterMetrics.count - beforeMetrics.count;
+      it("includes deployment.environment", () => {
+        expect(readLogs()).toContain('"deployment.environment"');
+      }, TEST_TIMEOUT);
 
-      expect(deltaCount).toBeGreaterThanOrEqual(1);
+      it("includes process.runtime.name", () => {
+        expect(readLogs()).toContain('"nodejs"');
+      }, TEST_TIMEOUT);
 
-      // The metric is in milliseconds (old semantic conventions use ms)
-      const serverDurationMs = deltaSumMs / deltaCount;
+      it("includes process.runtime.version", () => {
+        expect(readLogs()).toContain('"process.runtime.version"');
+      }, TEST_TIMEOUT);
 
-      console.log(
-        `Request timing: client measured ${actualDurationMs.toFixed(2)}ms, ` +
-          `server reported ${serverDurationMs.toFixed(2)}ms ` +
-          `(delta: sum=${deltaSumMs.toFixed(2)}ms, count=${deltaCount})`,
-      );
+      it("includes cloud.provider", () => {
+        expect(readLogs()).toContain('"gcp"');
+      }, TEST_TIMEOUT);
 
-      // The server-side duration should be:
-      // 1. Greater than 0 (something was measured)
-      // 2. Less than or equal to client time + tolerance (server can't take longer than total round-trip)
-      // 3. Within a reasonable range (0.1ms to 5 seconds)
-      expect(serverDurationMs).toBeGreaterThan(0);
-      expect(serverDurationMs).toBeLessThanOrEqual(actualDurationMs + 100); // 100ms tolerance for timing variance
-      expect(serverDurationMs).toBeGreaterThan(0.1); // At least 0.1ms
-      expect(serverDurationMs).toBeLessThan(5000); // Less than 5 seconds
+      it("includes cloud.platform", () => {
+        expect(readLogs()).toContain('"gcp_cloud_run"');
+      }, TEST_TIMEOUT);
 
-      // Verify the metric is in a reasonable range for a simple HTTP request
-      // Most requests should complete in under 500ms
-      expect(serverDurationMs).toBeLessThan(500);
-    },
-    30000,
-  );
+      it("includes cloud.account.id", () => {
+        expect(readLogs()).toContain('"test-project-123"');
+      }, TEST_TIMEOUT);
 
-  it(
-    "should instrument all page loads with HTTP metrics",
-    async () => {
-      // Make requests to various application pages (these will return redirects or errors
-      // since we don't have a valid session, but they should still be instrumented)
-      const pagesToTest = [
-        "/ui/v2/login/login", // Login page
-        "/ui/v2/login/register", // Register page
-        "/ui/v2/login/password", // Password page
-        "/ui/v2/login/passkey", // Passkey page
-      ];
+      it("includes cloud.region", () => {
+        expect(readLogs()).toContain('"us-central1"');
+      }, TEST_TIMEOUT);
 
-      for (const page of pagesToTest) {
-        await fetch(`${APP_URL}${page}`, { redirect: "manual" });
-      }
+      it("includes cloud.resource_id", () => {
+        expect(readLogs()).toContain('"cloud.resource_id"');
+      }, TEST_TIMEOUT);
 
-      // Wait for metrics to be collected
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      it("includes faas.name", () => {
+        expect(readLogs()).toContain('"faas.name"');
+      }, TEST_TIMEOUT);
 
-      // Verify http_server_duration metric is recorded (auto-instrumented by @opentelemetry/instrumentation-http)
-      const prometheusResponse = await fetch(PROMETHEUS_URL);
-      expect(prometheusResponse.status).toBe(200);
-      const metricsText = await prometheusResponse.text();
+      it("includes faas.version", () => {
+        expect(readLogs()).toContain('"zitadel-login-00001-abc"');
+      }, TEST_TIMEOUT);
 
-      // The http_server_duration metric should exist and have recorded requests
-      expect(metricsText).toContain("http_server_duration");
+      it("includes faas.instance", () => {
+        expect(readLogs()).toContain('"faas.instance"');
+      }, TEST_TIMEOUT);
 
-      // Verify the metric has count > 0 (requests were recorded)
-      // This confirms that HTTP instrumentation is working for all page loads
-      const durationCountMatch = metricsText.match(
-        /http_server_duration_count\{[^}]*\}\s+(\d+)/,
-      );
-      expect(durationCountMatch).not.toBeNull();
-      const requestCount = parseInt(durationCountMatch![1], 10);
-      expect(requestCount).toBeGreaterThanOrEqual(pagesToTest.length);
-
-      console.log(
-        `All page loads are being instrumented with HTTP metrics (${requestCount} requests recorded)`,
-      );
-    },
-    30000,
-  );
-
-  it(
-    "should instrument different HTTP status codes correctly",
-    async () => {
-      // Helper to extract status code counts from metrics
-      const getStatusCodeCounts = (
-        metricsText: string,
-      ): Record<string, number> => {
-        const counts: Record<string, number> = {};
-        const lines = metricsText.split("\n");
-
-        for (const line of lines) {
-          // Match http_server_duration_count with http_status_code label
-          const match = line.match(
-            /http_server_duration_count\{[^}]*http_status_code="(\d+)"[^}]*\}\s+(\d+)/,
-          );
-          if (match) {
-            const statusCode = match[1];
-            const count = parseInt(match[2], 10);
-            counts[statusCode] = (counts[statusCode] || 0) + count;
-          }
+      it("includes container.id when available", () => {
+        const logs = readLogs();
+        if (logs.includes('"container.id"')) {
+          expect(logs).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
         }
-        return counts;
-      };
-
-      // Get baseline metrics
-      const beforeResponse = await fetch(PROMETHEUS_URL);
-      const beforeCounts = getStatusCodeCounts(await beforeResponse.text());
-
-      // Generate requests with different expected status codes:
-
-      // 1. 200 OK - health check endpoint
-      const healthyResponse = await fetch(`${APP_URL}/ui/v2/login/healthy`);
-      expect(healthyResponse.status).toBe(200);
-
-      // 2. 200 OK - otel-test endpoint
-      const otelResponse = await fetch(`${APP_URL}/ui/v2/login/otel-test`);
-      expect(otelResponse.status).toBe(200);
-
-      // 3. 404 Not Found - non-existent route
-      const notFoundResponse = await fetch(
-        `${APP_URL}/ui/v2/login/this-route-does-not-exist-12345`,
-      );
-      expect(notFoundResponse.status).toBe(404);
-
-      // Wait for metrics to be collected
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Get metrics after requests
-      const afterResponse = await fetch(PROMETHEUS_URL);
-      const afterText = await afterResponse.text();
-      const afterCounts = getStatusCodeCounts(afterText);
-
-      // Verify we have metrics for different status codes
-      console.log("Status code counts before:", beforeCounts);
-      console.log("Status code counts after:", afterCounts);
-
-      // Check that 200 status code is recorded (from healthy and otel-test)
-      expect(afterCounts["200"]).toBeGreaterThan(beforeCounts["200"] || 0);
-
-      // Check that 404 is recorded
-      expect(afterCounts["404"]).toBeGreaterThan(beforeCounts["404"] || 0);
-
-      // Verify the http_status_code label exists in the metrics output
-      expect(afterText).toContain('http_status_code="200"');
-      expect(afterText).toContain('http_status_code="404"');
-
-      // Verify multiple distinct status codes are being tracked
-      const distinctStatusCodes = Object.keys(afterCounts);
-      expect(distinctStatusCodes.length).toBeGreaterThanOrEqual(2);
-
-      console.log(
-        "HTTP status codes are being instrumented correctly:",
-        distinctStatusCodes.sort().join(", "),
-      );
-    },
-    30000,
-  );
-
-  describe("Trace Propagation", () => {
-    it(
-      "should propagate traceparent headers to backend gRPC calls",
-      async () => {
-        // Load a page that triggers gRPC calls to the Zitadel backend
-        // The loginname page fetches settings from Zitadel (getDefaultOrg,
-        // getLoginSettings, getActiveIdentityProviders, getBrandingSettings)
-        const response = await fetch(`${APP_URL}/ui/v2/login/loginname`, {
-          redirect: "manual",
-        });
-
-        console.log(`Loginname page response status: ${response.status}`);
-
-        // Wait a moment for the mock server to write captured headers
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Read captured headers from the file (written by mock server)
-        let capturedRequests: Array<{ traceparent: string | null; url: string; method: string }> = [];
-        try {
-          const capturedContent = fs.readFileSync(CAPTURED_HEADERS_FILE, "utf-8");
-          capturedRequests = JSON.parse(capturedContent);
-        } catch (err) {
-          // If file doesn't exist, try the endpoint
-          console.log("File not found, trying endpoint...");
-          const capturedResponse = await fetch(`${MOCK_ZITADEL_URL}/captured-headers`);
-          capturedRequests = await capturedResponse.json();
-        }
-
-        console.log(`Captured ${capturedRequests.length} requests to mock Zitadel`);
-
-        // Filter for gRPC calls only (POST requests, not health checks)
-        const grpcRequests = capturedRequests.filter(
-          (req) => req.method === "POST"
-        );
-        console.log(`Found ${grpcRequests.length} gRPC calls`);
-
-        // Verify gRPC calls have traceparent headers
-        const requestsWithTrace = grpcRequests.filter(
-          (req) => req.traceparent !== null,
-        );
-
-        // Should have at least one gRPC call with traceparent
-        expect(grpcRequests.length).toBeGreaterThan(0);
-        expect(requestsWithTrace.length).toBeGreaterThan(0);
-
-        // Verify traceparent format: version-traceid-parentid-flags
-        const traceparentRegex = /^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/;
-        for (const req of requestsWithTrace) {
-          expect(req.traceparent).toMatch(traceparentRegex);
-          console.log(`Request ${req.url}: traceparent=${req.traceparent}`);
-        }
-
-        // Verify trace ID consistency - gRPC calls from the same page load share a trace ID
-        // Group calls by trace ID and verify each group has at least 2 calls
-        if (requestsWithTrace.length >= 2) {
-          const traceIds = requestsWithTrace.map((req) => req.traceparent!.split("-")[1]);
-          const traceIdCounts = new Map<string, number>();
-          for (const id of traceIds) {
-            traceIdCounts.set(id, (traceIdCounts.get(id) || 0) + 1);
-          }
-          // Each trace ID should have at least 2 gRPC calls (loginname makes 2+ calls)
-          const validGroups = Array.from(traceIdCounts.values()).filter((count) => count >= 2);
-          expect(validGroups.length).toBeGreaterThan(0);
-          console.log(`Trace ID consistency verified: ${validGroups.length} page loads with 2+ gRPC calls each`);
-        }
-
-        console.log(
-          `Trace propagation verified: ${requestsWithTrace.length}/${capturedRequests.length} requests have traceparent`,
-        );
-      },
-      30000,
-    );
-
-    // Note: Trace ID consistency is already verified in the test above
-    // (all gRPC calls from a single page load share the same trace ID)
+      }, TEST_TIMEOUT);
+    });
   });
 });
