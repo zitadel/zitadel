@@ -1,11 +1,11 @@
 DO
 $do$
 BEGIN
-   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.objects'::REGCLASS::OID AND relpersistence = 'u') THEN
+   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.objects'::REGCLASS AND relpersistence = 'u') THEN
         ALTER TABLE IF EXISTS cache.objects
             SET LOGGED;
    END IF;
-   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.string_keys'::REGCLASS::OID AND relpersistence = 'u') THEN
+   IF EXISTS (SELECT 1 FROM pg_class WHERE oid = 'cache.string_keys'::REGCLASS AND relpersistence = 'u') THEN
         ALTER TABLE IF EXISTS cache.string_keys
             SET LOGGED;
    END IF;
