@@ -1,35 +1,12 @@
-// NextJS instrumentation entry point
-// This file is automatically loaded by NextJS and must export a `register` function
-//
-// Exports all three OTEL signals:
-// - Traces: via OTLP HTTP push (auto-configured from OTEL_EXPORTER_OTLP_ENDPOINT)
-// - Metrics: via OTLP HTTP push AND Prometheus scraping endpoint
-// - Logs: via OTLP HTTP push (automatic with Winston instrumentation)
-//
-// Standard OTEL environment variables (automatically handled by SDK):
-// - OTEL_SERVICE_NAME: Service name for telemetry
-// - OTEL_EXPORTER_OTLP_ENDPOINT: OTLP collector endpoint
-// - OTEL_EXPORTER_OTLP_HEADERS: Headers for OTLP requests (key=value,key2=value2)
-// - OTEL_EXPORTER_OTLP_PROTOCOL: Protocol (http/protobuf, http/json, grpc)
-// - OTEL_RESOURCE_ATTRIBUTES: Additional resource attributes
-//
-// Custom environment variables:
-// - OTEL_LOG_LEVEL: Diagnostic log level (debug, info, warn, error)
-// - OTEL_METRICS_PORT: Port for Prometheus metrics scraping (default: 9464)
-// - OTEL_METRICS_EXPORT_INTERVAL_MS: Metrics export interval for OTLP (default: 30000)
-//
-// GCP Cloud Run environment variables (auto-detected for resource attributes):
-// - K_SERVICE, K_REVISION, K_CONFIGURATION
-// - GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_REGION
+// OpenTelemetry instrumentation for Next.js
+// Configures traces, metrics, and logs export via OTLP and Prometheus
 
 import type { LoggerProvider } from "@opentelemetry/sdk-logs";
 import type { MetricReader } from "@opentelemetry/sdk-metrics";
 
 let _loggerProvider: LoggerProvider | null = null;
 
-/**
- * Detect GCP Cloud Run resource attributes from environment variables
- */
+/** Detect GCP Cloud Run resource attributes from environment variables */
 function getGcpResourceAttributes(): Record<string, string> {
   const attributes: Record<string, string> = {};
 
@@ -64,21 +41,11 @@ function getGcpResourceAttributes(): Record<string, string> {
   return attributes;
 }
 
-/**
- * Initialize OpenTelemetry with:
- * - Traces: OTLP HTTP push (if OTEL_EXPORTER_OTLP_ENDPOINT is set)
- * - Metrics: OTLP HTTP push + Prometheus scraping
- * - Logs: OTLP HTTP push (via Winston instrumentation)
- *
- * OTLP exporters automatically read configuration from standard environment variables:
- * - OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS, etc.
- */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== "nodejs") {
     return;
   }
 
-  // Dynamic imports to avoid webpack bundling issues with Node.js-only modules
   const { NodeTracerProvider } = await import("@opentelemetry/sdk-trace-node");
   const { BatchSpanProcessor } = await import("@opentelemetry/sdk-trace-base");
   const { OTLPTraceExporter } = await import("@opentelemetry/exporter-trace-otlp-http");
@@ -96,13 +63,12 @@ export async function register(): Promise<void> {
   const { HttpInstrumentation } = await import("@opentelemetry/instrumentation-http");
   const { WinstonInstrumentation } = await import("@opentelemetry/instrumentation-winston");
   const { RuntimeNodeInstrumentation } = await import("@opentelemetry/instrumentation-runtime-node");
+  const { containerDetector } = await import("@opentelemetry/resource-detector-container");
 
-  // Check if OTLP export is enabled (exporters auto-read endpoint from env)
   const otlpEnabled = !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
   const serviceName = process.env.OTEL_SERVICE_NAME || "zitadel-login";
   const metricsPort = parseInt(process.env.OTEL_METRICS_PORT || "9464", 10);
 
-  // Enable OTEL diagnostics in debug mode
   if (process.env.OTEL_LOG_LEVEL === "debug") {
     diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
   }
@@ -110,7 +76,22 @@ export async function register(): Promise<void> {
   const gcpAttributes = getGcpResourceAttributes();
   const gcpDetected = Object.keys(gcpAttributes).length > 0;
 
-  // Build resource with service info and detected attributes
+  let containerAttributes: Record<string, string> = {};
+  try {
+    const detectedContainer = containerDetector.detect();
+    const attrs = await detectedContainer.attributes;
+    if (attrs && typeof attrs === "object") {
+      for (const [key, value] of Object.entries(attrs)) {
+        if (typeof value === "string") {
+          containerAttributes[key] = value;
+        }
+      }
+    }
+  } catch {
+    // Fails silently outside containerized environments
+  }
+  const containerDetected = Object.keys(containerAttributes).length > 0;
+
   const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: serviceName,
     [ATTR_SERVICE_VERSION]: process.env.npm_package_version || "1.0.0",
@@ -119,14 +100,14 @@ export async function register(): Promise<void> {
     "process.runtime.version": process.version,
     ...(process.env.HOSTNAME && { "host.name": process.env.HOSTNAME }),
     ...gcpAttributes,
+    ...containerAttributes,
   });
 
   console.log(
-    `OTEL: Initializing (service: ${serviceName}, OTLP: ${otlpEnabled ? "enabled" : "disabled"}, Prometheus: :${metricsPort}/metrics, GCP: ${gcpDetected})`,
+    `OTEL: Initializing (service: ${serviceName}, OTLP: ${otlpEnabled ? "enabled" : "disabled"}, Prometheus: :${metricsPort}/metrics, GCP: ${gcpDetected}, Container: ${containerDetected})`,
   );
 
-  // ============ TRACES ============
-  // OTLPTraceExporter automatically reads from OTEL_EXPORTER_OTLP_* env vars
+  // Traces
   const spanProcessors = otlpEnabled ? [new BatchSpanProcessor(new OTLPTraceExporter())] : [];
 
   const tracerProvider = new NodeTracerProvider({ resource, spanProcessors });
@@ -136,21 +117,18 @@ export async function register(): Promise<void> {
     console.log("OTEL: Trace OTLP exporter initialized");
   }
 
-  // ============ PROPAGATION ============
+  // Propagation
   propagation.setGlobalPropagator(
     new CompositePropagator({
       propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
     }),
   );
 
-  // ============ METRICS ============
+  // Metrics
   const metricReaders: MetricReader[] = [];
-
-  // Prometheus exporter for scraping (always enabled)
   metricReaders.push(new PrometheusExporter({ port: metricsPort }));
   console.log(`OTEL: Prometheus metrics available on port ${metricsPort} at /metrics`);
 
-  // OTLPMetricExporter automatically reads from OTEL_EXPORTER_OTLP_* env vars
   if (otlpEnabled) {
     const metricsInterval = parseInt(process.env.OTEL_METRICS_EXPORT_INTERVAL_MS || "30000", 10);
     metricReaders.push(
@@ -165,8 +143,7 @@ export async function register(): Promise<void> {
   const meterProvider = new MeterProvider({ resource, readers: metricReaders });
   metrics.setGlobalMeterProvider(meterProvider);
 
-  // ============ LOGS ============
-  // OTLPLogExporter automatically reads from OTEL_EXPORTER_OTLP_* env vars
+  // Logs
   const logRecordProcessors = otlpEnabled ? [new BatchLogRecordProcessor(new OTLPLogExporter())] : [];
 
   const loggerProvider = new LoggerProvider({ resource, processors: logRecordProcessors });
@@ -177,7 +154,7 @@ export async function register(): Promise<void> {
     console.log("OTEL: Log OTLP exporter initialized");
   }
 
-  // ============ INSTRUMENTATIONS ============
+  // Instrumentations
   registerInstrumentations({
     tracerProvider,
     meterProvider,
@@ -200,7 +177,7 @@ export async function register(): Promise<void> {
 
   console.log("OTEL: Instrumentation complete");
 
-  // ============ GRACEFUL SHUTDOWN ============
+  // Shutdown
   const shutdown = async () => {
     console.log("OTEL: Shutting down...");
     try {
@@ -215,9 +192,6 @@ export async function register(): Promise<void> {
   process.on("SIGINT", shutdown);
 }
 
-/**
- * Get the OTEL LoggerProvider for direct log emission if needed
- */
 export function getLoggerProvider(): LoggerProvider | null {
   return _loggerProvider;
 }

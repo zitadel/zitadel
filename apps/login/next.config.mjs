@@ -61,6 +61,7 @@ const nextConfig = {
     '@opentelemetry/instrumentation-runtime-node',
     '@opentelemetry/winston-transport',
     '@opentelemetry/core',
+    '@opentelemetry/resource-detector-container',
   ],
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
