@@ -33,7 +33,7 @@
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.25"
+			"version": "1.25.3"
 		},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
 		"ghcr.io/schlich/devcontainer-features/cypress:1": {
