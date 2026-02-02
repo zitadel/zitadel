@@ -174,17 +174,22 @@ export async function register(): Promise<void> {
   );
 
   // ============ TRACES ============
-  const tracerProvider = new NodeTracerProvider({ resource });
+  const spanProcessors = endpoint
+    ? [
+        new BatchSpanProcessor(
+          new OTLPTraceExporter({
+            url: `${endpoint}/v1/traces`,
+            headers,
+          }),
+        ),
+      ]
+    : [];
 
   if (endpoint) {
-    const traceExporter = new OTLPTraceExporter({
-      url: `${endpoint}/v1/traces`,
-      headers,
-    });
-    tracerProvider.addSpanProcessor(new BatchSpanProcessor(traceExporter));
     console.log("OTEL: Trace OTLP exporter initialized");
   }
 
+  const tracerProvider = new NodeTracerProvider({ resource, spanProcessors });
   tracerProvider.register();
   console.log("OTEL: Trace provider registered");
 
@@ -229,18 +234,23 @@ export async function register(): Promise<void> {
   console.log("OTEL: Meter provider registered");
 
   // ============ LOGS ============
-  const loggerProvider = new LoggerProvider({ resource });
-  _loggerProvider = loggerProvider;
+  const logRecordProcessors = endpoint
+    ? [
+        new BatchLogRecordProcessor(
+          new OTLPLogExporter({
+            url: `${endpoint}/v1/logs`,
+            headers,
+          }),
+        ),
+      ]
+    : [];
 
   if (endpoint) {
-    const logExporter = new OTLPLogExporter({
-      url: `${endpoint}/v1/logs`,
-      headers,
-    });
-    loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
     console.log("OTEL: Log OTLP exporter initialized");
   }
 
+  const loggerProvider = new LoggerProvider({ resource, processors: logRecordProcessors });
+  _loggerProvider = loggerProvider;
   logs.setGlobalLoggerProvider(loggerProvider);
   console.log("OTEL: Log provider registered");
 
