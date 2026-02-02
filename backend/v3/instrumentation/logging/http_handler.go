@@ -1,9 +1,12 @@
 package logging
 
 import (
+	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http.Handler {
@@ -13,13 +16,22 @@ func NewHandler(next http.Handler, service string, ignoredPrefix ...string) http
 			next.ServeHTTP(w, r)
 			return
 		}
+		start := time.Now()
 		ctx := NewCtx(r.Context(), StreamRequest)
-		ctx = instrumentation.SetHttpRequestDetails(ctx, service, r)
+		ctx = instrumentation.SetRequestID(ctx, start)
 		sw := &statusWriter{ResponseWriter: w}
 
 		next.ServeHTTP(sw, r.WithContext(ctx))
 
-		Info(ctx, "http request", "status", sw.status)
+		Info(ctx, "request served",
+			slog.String("protocol", "http"),
+			slog.Any("domain", http_util.DomainContext(ctx)),
+			slog.String("service", service),
+			slog.String("http_method", r.Method), // gRPC always uses POST
+			slog.String("path", r.URL.Path),
+			slog.Int("status", sw.status),
+			slog.Duration("duration", time.Since(start)),
+		)
 	})
 }
 

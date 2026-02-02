@@ -2,14 +2,18 @@ package logging
 
 import (
 	"context"
+	"log/slog"
+	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func NewGrpcInterceptor(ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
@@ -19,16 +23,32 @@ func NewGrpcInterceptor(ignoredMethodSuffixes ...string) grpc.UnaryServerInterce
 		}) {
 			return next(ctx, req)
 		}
-
+		start := time.Now()
 		ctx = NewCtx(ctx, StreamRequest)
-		ctx = instrumentation.SetGrpcRequestDetails(ctx, info)
+		ctx = instrumentation.SetRequestID(ctx, start)
 
 		resp, err := next(ctx, req)
 		var code codes.Code
 		if err != nil {
 			code = status.Code(err)
 		}
-		Info(ctx, "gRPC request", "code", code)
+		Info(ctx, "request served",
+			slog.String("protocol", "grpc"),
+			slog.Any("domain", http_util.DomainContext(ctx)),
+			slog.String("service", serviceFromRPCMethod(info.FullMethod)),
+			slog.String("http_method", http.MethodPost), // gRPC always uses POST
+			slog.String("path", info.FullMethod),
+			slog.Any("code", code),
+			slog.Duration("duration", time.Since(start)),
+		)
 		return resp, err
 	}
+}
+
+func serviceFromRPCMethod(fullMethod string) string {
+	parts := strings.Split(fullMethod, "/")
+	if len(parts) >= 2 {
+		return parts[1]
+	}
+	return "unknown"
 }

@@ -3,14 +3,11 @@ package instrumentation
 import (
 	"context"
 	"log/slog"
-	"net/http"
 	"os"
 	"slices"
-	"strings"
 	"sync/atomic"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
@@ -19,9 +16,7 @@ import (
 	"github.com/zitadel/sloggcp"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/sdk/log"
-	"google.golang.org/grpc"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -150,8 +145,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
 				instanceExtractor,
-				domainExtractor,
-				requestExtractor,
+				requestIDExtractor,
 				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
@@ -174,19 +168,6 @@ const (
 	ProtocolGrpc    = "grpc"
 )
 
-// SetHttpRequestDetails adds static details to each context aware log entry.
-func SetHttpRequestDetails(ctx context.Context, service string, request *http.Request) context.Context {
-	now := time.Now()
-	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
-		protocol:    ProtocolHttp,
-		service:     service,
-		http_method: request.Method,
-		path:        request.URL.Path,
-		requestID:   xid.NewWithTime(now),
-		start:       now,
-	})
-}
-
 // Instance is a minimal interface for logging the instance ID.
 type Instance interface {
 	InstanceID() string
@@ -197,78 +178,18 @@ func SetInstance(ctx context.Context, instance Instance) context.Context {
 	return context.WithValue(ctx, ctxKeyInstance, instance)
 }
 
-// SetConnectRequestDetails adds static details to each context aware log entry.
-func SetConnectRequestDetails(ctx context.Context, request connect.AnyRequest) context.Context {
-	now := time.Now()
-	spec := request.Spec()
-	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
-		protocol:    ProtocolConnect,
-		service:     serviceFromRPCMethod(spec.Procedure),
-		http_method: request.HTTPMethod(),
-		path:        spec.Procedure,
-		requestID:   xid.NewWithTime(now),
-		start:       now,
-	})
-}
-
-func SetGrpcRequestDetails(ctx context.Context, info *grpc.UnaryServerInfo) context.Context {
-	now := time.Now()
-	return context.WithValue(ctx, ctxKeyRequestDetails, &requestDetails{
-		protocol:    ProtocolGrpc,
-		service:     serviceFromRPCMethod(info.FullMethod),
-		http_method: http.MethodPost, // gRPC always uses POST
-		path:        info.FullMethod,
-		requestID:   xid.NewWithTime(now),
-		start:       now,
-	})
+// SetRequest generates a new [xid.ID] based on the passed request timestamp
+// and adds it to the context.
+func SetRequestID(ctx context.Context, ts time.Time) context.Context {
+	return context.WithValue(ctx, ctxKeyRequestID, xid.NewWithTime(ts))
 }
 
 type ctxKeyType int
 
 const (
-	ctxKeyRequestDetails ctxKeyType = iota
+	ctxKeyRequestID ctxKeyType = iota
 	ctxKeyInstance
 )
-
-type requestDetails struct {
-	protocol    string
-	service     string
-	http_method string
-	path        string
-	requestID   xid.ID
-	start       time.Time
-}
-
-func (r *requestDetails) attrs() []slog.Attr {
-	attrs := make([]slog.Attr, 0, 6)
-	if r.protocol != "" {
-		attrs = append(attrs, slog.String("protocol", r.protocol))
-	}
-	if r.service != "" {
-		attrs = append(attrs, slog.String("service", r.service))
-	}
-	if r.http_method != "" {
-		attrs = append(attrs, slog.String("http_method", r.http_method))
-	}
-	if r.path != "" {
-		attrs = append(attrs, slog.String("path", r.path))
-	}
-	if !r.requestID.IsZero() {
-		attrs = append(attrs, slog.String("request_id", r.requestID.String()))
-	}
-	if !r.start.IsZero() {
-		attrs = append(attrs, slog.Duration("duration", time.Since(r.start)))
-	}
-	return attrs
-}
-
-func serviceFromRPCMethod(fullMethod string) string {
-	parts := strings.Split(fullMethod, "/")
-	if len(parts) >= 2 {
-		return parts[1]
-	}
-	return "unknown"
-}
 
 // instanceExtractor sets the instance ID from [Instance] to a log entry.
 func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
@@ -280,17 +201,12 @@ func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string)
 	return nil
 }
 
-// domainExtractor sets the sanitized request hosts from [http_util.DomainCtx] to a log entry.
-func domainExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	return []slog.Attr{
-		slog.Any("domain", http_util.DomainContext(ctx)),
-	}
-}
-
-// requestExtractor sets the request details from [requestDetails] to a log entry.
-func requestExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := ctx.Value(ctxKeyRequestDetails).(*requestDetails); ok {
-		return r.attrs()
+// requestIDExtractor sets the request XID to a log entry.
+func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
+	if r, ok := ctx.Value(ctxKeyRequestID).(xid.ID); ok {
+		return []slog.Attr{
+			slog.String("request_id", r.String()),
+		}
 	}
 	return nil
 }
