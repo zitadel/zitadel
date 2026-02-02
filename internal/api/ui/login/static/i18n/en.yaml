@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalUserDescription: Login with an external user.
-  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The User (Human) must be a member of the {{.OrgName}} organization.
   RegisterButtonText: Register
   NextButtonText: Next
 
@@ -26,7 +26,7 @@ SelectAccount:
   OtherUser: Other User
   SessionState0: active
   SessionState1: Signed out
-  MustBeMemberOfOrg: The user must be a member of the {{.OrgName}} organization.
+  MustBeMemberOfOrg: The User (Human) must be a member of the {{.OrgName}} organization.
 
 Password:
   Title: Password
@@ -435,12 +435,12 @@ Errors:
     RequestTypeNotSupported: Request type is not supported
     MissingParameters: Required parameters missing
   User:
-    NotFound: User could not be found
-    AlreadyExists: User already exists
-    Inactive: User is inactive
-    NotFoundOnOrg: User could not be found on chosen organization
-    NotAllowedOrg: User is no member of the required organization
-    NotMatchingUserID: User and user in authrequest don't match
+    NotFound: User (Human) could not be found
+    AlreadyExists: User (Human) already exists
+    Inactive: User (Human) is inactive
+    NotFoundOnOrg: User (Human) could not be found on chosen organization
+    NotAllowedOrg: User (Human) is no member of the required organization
+    NotMatchingUserID: User (Human) and user in authrequest don't match
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
@@ -507,7 +507,7 @@ Errors:
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
     Locked: User is locked
     SomethingWentWrong: Something went wrong
-    NotActive: User is not active
+    NotActive: User (Human) is not active
     ExternalIDP:
       IDPTypeNotImplemented: IDP Type is not implemented
       NotAllowed: External Login Provider not allowed
@@ -515,15 +515,15 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
       NoExternalUserData: No external User Data received
-      CreationNotAllowed: Creation of a new user is not allowed on this provider
+      CreationNotAllowed: Creation of a new User (Human) is not allowed on this provider
       LinkingNotAllowed: Linking of a user is not allowed on this provider
       NoOptionAllowed: Neither creation of linking is allowed on this provider. Please contact your administrator.
       LoginFailedSwitchLocal: |
         Login at External IDP failed. Falling back to local login.
                 
         Error details: {{.Details}}
-    GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
-    ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
+    GrantRequired: Login not possible. The User (Human) is required to have at least one grant on the application. Please contact your administrator.
+    ProjectRequired: Login not possible. The organization of the User (Human) must be granted to the project. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
   IAM:
