@@ -199,6 +199,124 @@ describe("OpenTelemetry Integration", () => {
       it("contains net.host.port", () => {
         expect(readTraces()).toContain('"net.host.port"');
       }, TEST_TIMEOUT);
+
+      it("contains custom test.attribute", () => {
+        expect(readTraces()).toContain('"test.attribute"');
+      }, TEST_TIMEOUT);
+
+      it("contains custom test.timestamp", () => {
+        expect(readTraces()).toContain('"test.timestamp"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Span Status", () => {
+      it("contains status code OK", () => {
+        expect(readTraces()).toContain('"code":1');
+      }, TEST_TIMEOUT);
+
+      it("contains status code ERROR", () => {
+        expect(readTraces()).toContain('"code":2');
+      }, TEST_TIMEOUT);
+
+      it("contains error message on failed spans", () => {
+        expect(readTraces()).toContain('"message"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Span Hierarchy", () => {
+      it("contains parent span IDs", () => {
+        expect(readTraces()).toContain('"parentSpanId"');
+      }, TEST_TIMEOUT);
+
+      it("has child spans linked to parent", () => {
+        const traces = readTraces();
+        const parentMatches = traces.match(/"parentSpanId":"([a-f0-9]{16})"/g) || [];
+        expect(parentMatches.length).toBeGreaterThan(0);
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Span Filtering", () => {
+      it("excludes /healthy from traces", () => {
+        const traces = readTraces();
+        expect(traces).not.toContain('"/ui/v2/login/healthy"');
+      }, TEST_TIMEOUT);
+
+      it("excludes /metrics from traces", () => {
+        const traces = readTraces();
+        expect(traces).not.toContain('"/metrics"');
+      }, TEST_TIMEOUT);
+
+      it("includes /otel-test in traces", () => {
+        const traces = readTraces();
+        expect(traces).toContain("otel-test");
+      }, TEST_TIMEOUT);
+
+      it("includes /loginname in traces", () => {
+        const traces = readTraces();
+        expect(traces).toContain("loginname");
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Span Events", () => {
+      it("contains exception events", () => {
+        expect(readTraces()).toContain('"name":"exception"');
+      }, TEST_TIMEOUT);
+
+      it("contains exception.type attribute", () => {
+        expect(readTraces()).toContain('"exception.type"');
+      }, TEST_TIMEOUT);
+
+      it("contains exception.message attribute", () => {
+        expect(readTraces()).toContain('"exception.message"');
+      }, TEST_TIMEOUT);
+
+      it("contains exception.stacktrace attribute", () => {
+        expect(readTraces()).toContain('"exception.stacktrace"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("gRPC Spans", () => {
+      it("contains rpc.system attribute", () => {
+        expect(readTraces()).toContain('"rpc.system"');
+      }, TEST_TIMEOUT);
+
+      it("contains rpc.service attribute", () => {
+        expect(readTraces()).toContain('"rpc.service"');
+      }, TEST_TIMEOUT);
+
+      it("contains rpc.method attribute", () => {
+        expect(readTraces()).toContain('"rpc.method"');
+      }, TEST_TIMEOUT);
+
+      it("contains server.address attribute", () => {
+        expect(readTraces()).toContain('"server.address"');
+      }, TEST_TIMEOUT);
+
+      it("contains rpc.grpc.status_code attribute", () => {
+        expect(readTraces()).toContain('"rpc.grpc.status_code"');
+      }, TEST_TIMEOUT);
+
+      it("identifies grpc as rpc system", () => {
+        expect(readTraces()).toContain('"grpc"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("HTTP Status Codes", () => {
+      it("records HTTP 200 status", () => {
+        expect(readTraces()).toContain('"intValue":"200"');
+      }, TEST_TIMEOUT);
+
+      it("records HTTP 404 status", () => {
+        expect(readTraces()).toContain('"intValue":"404"');
+      }, TEST_TIMEOUT);
+
+      it("records OK status text", () => {
+        expect(readTraces()).toContain('"OK"');
+      }, TEST_TIMEOUT);
+
+      it("records NOT FOUND status text", () => {
+        expect(readTraces()).toContain('"NOT FOUND"');
+      }, TEST_TIMEOUT);
     });
 
     describe("Trace Propagation", () => {
@@ -293,6 +411,10 @@ describe("OpenTelemetry Integration", () => {
         if (traces.includes('"container.id"')) {
           expect(traces).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
         }
+      }, TEST_TIMEOUT);
+
+      it("contains host.name from HOSTNAME env var", () => {
+        expect(readTraces()).toContain('"host.name"');
       }, TEST_TIMEOUT);
     });
   });
@@ -389,8 +511,48 @@ describe("OpenTelemetry Integration", () => {
         expect(await fetchPrometheusMetrics()).toContain("login_auth_attempts_total");
       }, TEST_TIMEOUT);
 
+      it("exposes login_auth_successes_total", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("login_auth_successes_total");
+      }, TEST_TIMEOUT);
+
       it("exposes login_session_creation_duration", async () => {
         expect(await fetchPrometheusMetrics()).toContain("login_session_creation_duration");
+      }, TEST_TIMEOUT);
+
+      it("exposes http_server_response_status_total", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_response_status_total");
+      }, TEST_TIMEOUT);
+
+      it("exposes http_server_request_duration_seconds", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("http_server_request_duration_seconds");
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Custom Test Metrics", () => {
+      it("exposes otel_test_requests_total", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("otel_test_requests_total");
+      }, TEST_TIMEOUT);
+
+      it("exposes otel_test_duration_seconds", async () => {
+        expect(await fetchPrometheusMetrics()).toContain("otel_test_duration_seconds");
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Metric Labels", () => {
+      it("includes method label on auth metrics", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('method="test"');
+      }, TEST_TIMEOUT);
+
+      it("includes organization label on auth metrics", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('organization="test-org"');
+      }, TEST_TIMEOUT);
+
+      it("includes route label on request metrics", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('route="/otel-test"');
+      }, TEST_TIMEOUT);
+
+      it("includes success label on session metrics", async () => {
+        expect(await fetchPrometheusMetrics()).toContain('success="true"');
       }, TEST_TIMEOUT);
     });
 
@@ -453,6 +615,10 @@ describe("OpenTelemetry Integration", () => {
           expect(metrics).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
         }
       }, TEST_TIMEOUT);
+
+      it("contains host.name from HOSTNAME env var", () => {
+        expect(readMetrics()).toContain('"host.name"');
+      }, TEST_TIMEOUT);
     });
   });
 
@@ -472,6 +638,77 @@ describe("OpenTelemetry Integration", () => {
 
       it("contains body", () => {
         expect(readLogs()).toContain("body");
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Log Content", () => {
+      it("contains OTEL test log message", () => {
+        expect(readLogs()).toContain("OTEL test endpoint called");
+      }, TEST_TIMEOUT);
+
+      it("contains test completed log message", () => {
+        expect(readLogs()).toContain("OTEL test completed successfully");
+      }, TEST_TIMEOUT);
+
+      it("contains INFO severity level", () => {
+        const logs = readLogs();
+        expect(logs).toContain('"severityText":"info"');
+      }, TEST_TIMEOUT);
+
+      it("contains severity number 9 for INFO", () => {
+        expect(readLogs()).toContain('"severityNumber":9');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Log-Trace Correlation", () => {
+      it("includes traceId in log records", () => {
+        expect(readLogs()).toContain('"traceId"');
+      }, TEST_TIMEOUT);
+
+      it("includes spanId in log records", () => {
+        expect(readLogs()).toContain('"spanId"');
+      }, TEST_TIMEOUT);
+
+      it("has valid trace ID format", () => {
+        expect(readLogs()).toMatch(/"traceId":"[a-f0-9]{32}"/);
+      }, TEST_TIMEOUT);
+
+      it("has valid span ID format", () => {
+        expect(readLogs()).toMatch(/"spanId":"[a-f0-9]{16}"/);
+      }, TEST_TIMEOUT);
+
+      it("includes trace_id attribute", () => {
+        expect(readLogs()).toContain('"trace_id"');
+      }, TEST_TIMEOUT);
+
+      it("includes span_id attribute", () => {
+        expect(readLogs()).toContain('"span_id"');
+      }, TEST_TIMEOUT);
+
+      it("includes trace_flags attribute", () => {
+        expect(readLogs()).toContain('"trace_flags"');
+      }, TEST_TIMEOUT);
+    });
+
+    describe("Log Attributes", () => {
+      it("includes context attribute", () => {
+        expect(readLogs()).toContain('"context"');
+      }, TEST_TIMEOUT);
+
+      it("includes service attribute", () => {
+        expect(readLogs()).toContain('"service"');
+      }, TEST_TIMEOUT);
+
+      it("includes timestamp attribute", () => {
+        expect(readLogs()).toContain('"timestamp"');
+      }, TEST_TIMEOUT);
+
+      it("includes custom test attribute", () => {
+        expect(readLogs()).toContain('"test"');
+      }, TEST_TIMEOUT);
+
+      it("includes duration attribute", () => {
+        expect(readLogs()).toContain('"duration"');
       }, TEST_TIMEOUT);
     });
 
@@ -533,6 +770,10 @@ describe("OpenTelemetry Integration", () => {
         if (logs.includes('"container.id"')) {
           expect(logs).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
         }
+      }, TEST_TIMEOUT);
+
+      it("contains host.name from HOSTNAME env var", () => {
+        expect(readLogs()).toContain('"host.name"');
       }, TEST_TIMEOUT);
     });
   });
