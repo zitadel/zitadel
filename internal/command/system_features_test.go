@@ -289,7 +289,6 @@ func TestSystemFeatures_isEmpty(t *testing.T) {
 		{name: "empty features", sysFeatures: &SystemFeatures{}, want: true},
 		{name: "LoginDefaultOrg set", sysFeatures: &SystemFeatures{LoginDefaultOrg: gu.Ptr(true)}, want: false},
 		{name: "UserSchema set", sysFeatures: &SystemFeatures{UserSchema: gu.Ptr(true)}, want: false},
-		{name: "TokenExchange set", sysFeatures: &SystemFeatures{TokenExchange: gu.Ptr(true)}, want: false},
 		{name: "ImprovedPerformance set", sysFeatures: &SystemFeatures{ImprovedPerformance: []feature.ImprovedPerformanceType{}}, want: false},
 		{name: "OIDCSingleV1SessionTermination set", sysFeatures: &SystemFeatures{OIDCSingleV1SessionTermination: gu.Ptr(true)}, want: false},
 		{name: "EnableBackChannelLogout set", sysFeatures: &SystemFeatures{EnableBackChannelLogout: gu.Ptr(true)}, want: false},
