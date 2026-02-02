@@ -17,10 +17,10 @@ Actions v2 will always be executed if available, even if the feature flag is swi
 
 ## Why Actions?
 ZITADEL can't anticipate or solve every possible business rule and integration requirement for all users. Here are some examples:
-- A business requires domain-specific data validation before a user can be created or authenticated.
-- A business needs to automate tasks, such as assigning roles to users based on their ADFS 2016+ groups.
-- A business needs to store metadata on a user, which is used for integrating applications.
-- A business needs to restrict which users are allowed to register to a certain organization by their email domains.
+- A business requires domain-specific data validation before a User (Human) can be created or authenticated.
+- A business needs to automate tasks, such as assigning roles to Users (Human) based on their ADFS 2016+ groups.
+- A business needs to store metadata on a User (Human), which is used for integrating applications.
+- A business needs to restrict which Users (Human) are allowed to register to a certain organization by their email domains.
 
 With Actions, ZITADEL provides a way to address such scenarios.
 
@@ -36,7 +36,7 @@ Possible conditions for the Execution:
 - **Request:** Reacts to or manipulates requests to ZITADEL, for example, by adding information to newly created users.
 - **Response:** Reacts to or manipulates responses from ZITADEL, for example, provisioning newly created users to other systems.
 - **Function:** Reacts to various functions in ZITADEL, replacing [Actions](/concepts/features/actions).
-- **Event:** Reacts to different events created in ZITADEL, for example, to inform someone if a user gets locked.
+- **Event:** Reacts to different events created in ZITADEL, for example, to inform someone if a User (Human) gets locked.
 
 <Callout>
 Currently, defined Actions v2 will be executed in addition to [Actions](/concepts/features/actions).

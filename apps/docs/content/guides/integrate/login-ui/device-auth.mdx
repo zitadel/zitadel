@@ -14,7 +14,7 @@ The following flow shows you the different components you need to enable OAuth2 
 3. ZITADEL parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
 4. ZITADEL returns the device authorization response
 5. Your application presents the `user_code` and `verification_uri` or maybe even renders a QR code with the `verification_uri_complete` for the user to scan
-6. Your application starts a polling mechanism to check if the user has approved the device authorization request on the token endpoint
+6. Your application starts a polling mechanism to check if the User (Human) has approved the device authorization request on the token endpoint
 7. When the user opens the browser at the verification_uri, he can enter the user_code, or it's automatically filled in, if they scan the QR code
 8. Request the device authorization request from the ZITADEL API using the user_code
 9. Your login UI allows to approve or deny the device request
@@ -23,7 +23,7 @@ The following flow shows you the different components you need to enable OAuth2 
     1. Authorize the device authorization request by sending the session and the previously retrieved id of the device authorization request to the ZITADEL API
     2. In case they denied, deny the device authorization from the ZITADEL API using the previously retrieved id of the device authorization request
 12. Notify the user that they can close the window now and return to the application.
-13. Your applications request to the token endpoint now receives the tokens or an error if the user denied the request.
+13. Your applications request to the token endpoint now receives the tokens or an error if the User (Human) denied the request.
 
 ## Example
 
@@ -138,7 +138,7 @@ If you don't get any error back, the request succeeded, and you can notify the u
 
 ### Deny the Device Authorization Request
 
-If the user denies the device authorization request, you can deny the request by sending the following request:
+If the User (Human) denies the device authorization request, you can deny the request by sending the following request:
 
 ```bash
 curl --request POST \

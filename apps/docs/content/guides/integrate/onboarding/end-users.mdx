@@ -33,8 +33,8 @@ OpenID Connect (OIDC) allows you to control the initial screen by sending a [pro
 With the `prompt=create`, the registration form/options will directly be shown to the user.
 You can test the impact of the different prompts on your login UI in our [OIDC Playground](https://zitadel.com/playgrounds/oidc).
 
-Per default a user will be registered to the default organization.
-By sending the scope below in your authorization request you can choose the organization to which the user will be added.
+Per default a User (Human) will be registered to the default organization.
+By sending the scope below in your authorization request you can choose the organization to which the User (Human) will be added.
 
 ```
 urn:zitadel:iam:org:id:{id}
@@ -45,17 +45,17 @@ You won't be able to directly influence which page (login or registration) is sh
 
 #### Choose Registration Option
 
-If an organization allows local user registration as well as registration with a social or enterprise login, the user can choose an option to register.
+If an organization allows local user registration as well as registration with a social or enterprise login, the User (Human) can choose an option to register.
 
-As soon as users click the "register" button, they will be presented with a screen showing the different registration options.
+As soon as Users (Human) click the "register" button, they will be presented with a screen showing the different registration options.
 
 <img
   src="/docs/img/guides/solution-scenarios/register-options.png"
   alt="Register Options"
 />
 
-After that, the user can select either local user registration or an external provider.
-By pressing the button of an external provider, the user will directly be redirected to the provider for consent.
+After that, the User (Human) can select either local user registration or an external provider.
+By pressing the button of an external provider, the User (Human) will directly be redirected to the provider for consent.
 
 <Callout>
 The options are dependent on the settings of the organization.
@@ -72,7 +72,7 @@ You will now see the register button on the login screen.
   alt="Register End User"
 />
 
-If nothing else is specified, a user will be registered to the default organization.
+If nothing else is specified, a User (Human) will be registered to the default organization.
 
 <img
   src="/docs/img/guides/solution-scenarios/default-organization.png"
@@ -87,7 +87,7 @@ The users will be registered to the given organization.
 urn:zitadel:iam:org:id:{id}
 ```
 
-If the user chooses to register a local account, the register form will be shown.
+If the User (Human) chooses to register a local account, the register form will be shown.
 All the mandatory fields like first name, last name, e-mail and password have to be filled.
 You can only setup authentication with the built-in form.
 

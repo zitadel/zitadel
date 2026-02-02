@@ -160,7 +160,7 @@ curl --request PATCH \
 ### Add Phone Number
 
 When the user has decided to register the phone number to get a code as a second factor, the first step is to add a verified phone number to the user.
-If the user already has a verified phone number you can skip this step.
+If the User (Human) already has a verified phone number you can skip this step.
 
 When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
 If ZITADEL should do it, make sure that you have registered an [SMS Provider](/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
@@ -227,7 +227,7 @@ curl --request POST \
 ### Check User
 
 To be able to check the SMS Code you need a session with a checked user.
-When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
+When creating the session you can already start the sms challenge, this will only be executed if the User (Human) check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
 More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)
@@ -315,7 +315,7 @@ curl --request POST \
 ### Check User
 
 To be able to check the Email Code you need a session with a checked user.
-When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
+When creating the session you can already start the sms challenge, this will only be executed if the User (Human) check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
 More detailed information about the API: [Create new session Documentation](/reference/api/session/zitadel.session.v2.SessionService.CreateSession)

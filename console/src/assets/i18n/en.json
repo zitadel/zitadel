@@ -217,15 +217,15 @@
         "DESCRIPTION": "Customize the texts of your notification email or SMS messages. If you want to disable some of the languages, restrict them in your instances language settings.",
         "TYPE_DESCRIPTIONS": {
           "DC": "When you claim a domain for your organization, users who don't use this domain in their login name will be prompted to change their login name to match the claimed domain.",
-          "INIT": "When a user is created, they will receive an email with a link to set their password.",
-          "PC": "When a user changes their password, they will receive a notification about the change if you have enabled this in the notification settings.",
-          "PL": "When a user adds a passkey authentication method, they need to activate it by clicking a link in an email.",
-          "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
-          "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
-          "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
-          "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
-          "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
+          "INIT": "When a User (Human) is created, they will receive an email with a link to set their password.",
+          "PC": "When a User (Human) changes their password, they will receive a notification about the change if you have enabled this in the notification settings.",
+          "PL": "When a User (Human) adds a passkey authentication method, they need to activate it by clicking a link in an email.",
+          "PR": "When a User (Human) resets their password, they will receive an email with a link to set a new password.",
+          "VE": "When a User (Human) changes their email address, they will receive an email with a link to verify the new address.",
+          "VP": "When a User (Human) changes their phone number, they will receive an SMS with a code to verify the new number.",
+          "VEO": "When a User (Human) adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
+          "VSO": "When a User (Human) adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "IU": "When a User (Human) invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
       "LOGIN_TEXTS": {

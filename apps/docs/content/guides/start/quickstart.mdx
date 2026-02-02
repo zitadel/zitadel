@@ -87,8 +87,8 @@ These are typically stored as environment variables in your project.
 ## Integrate ZITADEL into your React App
 ### How the Authentication Flow Works
 ZITADEL handles the complexity of the OIDC handshake so your app stays secure without manual token management.
-1. **Login**: App redirects the user to ZITADEL with a PKCE challenge.
-2. **Auth**: User authenticates on the ZITADEL hosted login page.
+1. **Login**: App redirects the User (Human) to ZITADEL with a PKCE challenge.
+2. **Auth**: User (Human) authenticates on the ZITADEL hosted login page.
 3. **Exchange**: ZITADEL returns an Auth Code, which the app exchanges for an Access Token.
 4. **Tokens**: The app shows the Access and ID Token
 5. **Logout**: The app clears local tokens and terminates the ZITADEL session.

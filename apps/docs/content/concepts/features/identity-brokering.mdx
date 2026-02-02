@@ -25,18 +25,18 @@ Compatibility across various IdPs is ensured by using industry standard protocol
 A service provider that specializes in brokering access control between multiple service providers (also referred to as relying parties) is called an identity broker.
 Federated identity management is an arrangement that is made between two or more such identity brokers across organizations.
 
-For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL.
-Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if the user is already registered) or a new one with the claims provided by Google.
+For example, if Google is configured as an identity provider in your organization, the User (Human) will get the option to use his Google Account on the Login Screen of ZITADEL.
+Because Google is registered as a trusted identity provider, the User (Human) will be able to login in with the Google account after the User (Human) is linked with an existing ZITADEL account (if the User (Human) is already registered) or a new one with the claims provided by Google.
 
 ![](../../../public/img/concepts/features/identity-brokering.png)
 
 The schema is a very simplified version, but shows the essential steps for identity brokering
 
-1. An unauthenticated user wants to use the alpha.com's application.
-2. The application redirects the user to alpha.com's identity provider (IdP).
-3. Based on the user's tenants configuration the IdP presents the configured identity providers, or redirects the user directly to the primary external IdP. The user authenticates with their external identity provider (eg, Entra ID).
-4. After the authentication, the user is redirected back to alpha.com's identity provider. If the user doesn't exist in the IdP the user will be created just-in-time and linked to the external identity provider for future reference.
-5. As with a local authentication, the IdP issues a token to the user that can be used to access the application. The IdP redirects the user, which is now authenticated, eventually to the application.
+1. An unauthenticated User (Human) wants to use the alpha.com's application.
+2. The application redirects the User (Human) to alpha.com's identity provider (IdP).
+3. Based on the User (Human)'s tenants configuration the IdP presents the configured identity providers, or redirects the User (Human) directly to the primary external IdP. The User (Human) authenticates with their external identity provider (eg, Entra ID).
+4. After the authentication, the User (Human) is redirected back to alpha.com's identity provider. If the User (Human) doesn't exist in the IdP the User (Human) will be created just-in-time and linked to the external identity provider for future reference.
+5. As with a local authentication, the IdP issues a token to the User (Human) that can be used to access the application. The IdP redirects the User (Human), which is now authenticated, eventually to the application.
 
 ## Is single-sign-on (SSO) the same as identity brokering?
 

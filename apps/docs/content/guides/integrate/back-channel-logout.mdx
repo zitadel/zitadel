@@ -36,7 +36,7 @@ This allows the client to also invalidate the user's session without the need fo
 5. Your application will be called on the registered callback path (redirect_uri) for the authorization code exchange.
 See [OIDC Flow](/guides/integrate/login/oidc/login-users) for more details.
 On successful exchange, an SSO session will be created.
-6. If the user opens another application,
+6. If the User (Human) opens another application,
 7. the application will also create an authorization request to the authorization endpoint.
 8. ZITADEL can then reuse the existing SSO session and will not ask the user to authenticate again and directly return the code for exchange.
 See [OIDC Flow](/guides/integrate/login/oidc/login-users) again for details.
