@@ -13,6 +13,17 @@ const PORT = process.env.PORT || 8080;
 const OUTPUT_DIR = process.env.OUTPUT_DIR || "/tmp/otel";
 const HEADERS_FILE = path.join(OUTPUT_DIR, "captured-headers.json");
 
+// Safely stringify JSON to reduce XSS risk when reflecting user input
+function safeJsonStringify(value) {
+  const json = JSON.stringify(value, null, 2);
+  // Escape characters that could lead to script execution if misinterpreted as HTML/JS
+  return json
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\//g, "\\/");
+}
+
 // Store captured requests
 const capturedRequests = [];
 
@@ -64,32 +75,32 @@ function handleRequest(stream, headers, isHttp2 = true) {
 
   // Health check
   if (url.includes("/health") || url === "/") {
-    sendResponse(200, "application/json", JSON.stringify({ status: "ok" }));
+    sendResponse(200, "application/json", safeJsonStringify({ status: "ok" }));
     return;
   }
 
   // Return captured headers (for debugging)
   if (url === "/captured-headers") {
-    sendResponse(200, "application/json", JSON.stringify(capturedRequests, null, 2));
+    sendResponse(200, "application/json", safeJsonStringify(capturedRequests));
     return;
   }
 
   // Mock Connect/gRPC responses
   // These are minimal responses to prevent the login app from crashing
   if (url.includes("GetLoginSettings") || url.includes("SettingsService")) {
-    sendResponse(200, "application/json", JSON.stringify({ settings: {} }));
+    sendResponse(200, "application/json", safeJsonStringify({ settings: {} }));
   } else if (url.includes("GetBrandingSettings")) {
-    sendResponse(200, "application/json", JSON.stringify({ settings: {} }));
+    sendResponse(200, "application/json", safeJsonStringify({ settings: {} }));
   } else if (url.includes("SessionService") || url.includes("Session")) {
-    sendResponse(200, "application/json", JSON.stringify({ session: {} }));
+    sendResponse(200, "application/json", safeJsonStringify({ session: {} }));
   } else if (url.includes("UserService") || url.includes("User")) {
-    sendResponse(200, "application/json", JSON.stringify({ user: {} }));
+    sendResponse(200, "application/json", safeJsonStringify({ user: {} }));
   } else if (url.includes("OrganizationService") || url.includes("Organization")) {
-    sendResponse(200, "application/json", JSON.stringify({ result: [] }));
+    sendResponse(200, "application/json", safeJsonStringify({ result: [] }));
   } else if (url.includes("IdentityProviderService") || url.includes("IdentityProvider")) {
-    sendResponse(200, "application/json", JSON.stringify({ identityProviders: [] }));
+    sendResponse(200, "application/json", safeJsonStringify({ identityProviders: [] }));
   } else {
-    sendResponse(200, "application/json", JSON.stringify({}));
+    sendResponse(200, "application/json", safeJsonStringify({}));
   }
 }
 
