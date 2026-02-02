@@ -1,14 +1,15 @@
 services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
+    user: "0:0"
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./output:/tmp/otel
     ports:
-      - "4318:4318" # OTLP HTTP
-      - "8888:8888" # Prometheus metrics exposed by collector
-      - "13133:13133" # Health check
+      - "4319:4318" # OTLP HTTP
+      - "8889:8888" # Prometheus metrics exposed by collector
+      - "13134:13133" # Health check
 
   mock-zitadel:
     image: node:20-alpine
@@ -21,8 +22,8 @@ services:
       - PORT=8080
       - OUTPUT_DIR=/tmp/otel
     ports:
-      - "8080:8080"   # HTTP/2 for gRPC
-      - "7432:7432"   # HTTP/1.1 for health checks
+      - "8081:8080"   # HTTP/2 for gRPC
+      - "7433:7432"   # HTTP/1.1 for health checks
     healthcheck:
       test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:7432/health"]
       interval: 5s
@@ -55,8 +56,8 @@ services:
       - K_CONFIGURATION=zitadel-login
       - GOOGLE_CLOUD_REGION=us-central1
     ports:
-      - "3000:3000"
-      - "9464:9464"
+      - "3002:3000"
+      - "9465:9464"
     depends_on:
       otel-collector:
         condition: service_started
