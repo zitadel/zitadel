@@ -134,8 +134,10 @@ ZITADEL automatically configures the best security settings for your selected fr
 </Tabs>
 
 
-## Integrate ZITADEL into your React App
+## Integrate ZITADEL into your App
+
 ### How the Authentication Flow Works
+
 ZITADEL handles the complexity of the OIDC handshake so your app stays secure without manual token management.
 1. **Login**: App redirects the user to ZITADEL with a PKCE challenge.
 2. **Auth**: User authenticates on the ZITADEL hosted login page.
@@ -144,57 +146,227 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 5. **Logout**: The app clears local tokens and terminates the ZITADEL session.
 
 ### 1. Prerequisites
-- [Node.js](https://nodejs.org/): v16 or later.
-- Code Editor: [VS Code](https://code.visualstudio.com/) or similar
-- [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
+
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
+        - [Node.js](https://nodejs.org/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Flutter">
+        - [Flutter](https://docs.flutter.dev/install)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Go">
+        - [Go](https://go.dev/)
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="Next.js">
+        - [Node.js](https://nodejs.org/): v16 or later.
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+    </Tab>
+    <Tab value="React">
+        - [Node.js](https://nodejs.org/): v16 or later.
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
+    </Tab>
+    <Tab value="Vue.js">
+        - [Node.js](https://nodejs.org/): v16 or later.
+        - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
+        - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
+    </Tab>
+</Tabs>
 
 ### 2. Get the Example Project
 
-Clone the repository and move into the project directory:
-```bash
-git clone https://github.com/zitadel/zitadel-react.git
-cd zitadel-react```
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
+        ```bash
+        git clone https://github.com/zitadel/example-auth-angular.git
+        cd example-auth-angular
+        ```
+    </Tab>
+    <Tab value="Flutter">
+        ```bash
+        git clone https://github.com/zitadel/zitadel_flutter.git
+        cd zitadel_flutter
+        ```
+    </Tab>
+    <Tab value="Go">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-go.git
+        cd zitadel_go
+        ```
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        git clone git@github.com:zitadel/example-auth-nextjs.git
+        cd example-auth-nextjs
+        ```
+    </Tab>
+    <Tab value="React">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-react.git
+        cd zitadel-react
+        ```
+    </Tab>
+    <Tab value="Vue.js">
+        ```bash
+        git clone https://github.com/zitadel/zitadel-vue.git
+        cd zitadel-vue
+        ```
+    </Tab>
+</Tabs>
 
-### 3. Build and Install
+### 3. Configure your Credentials
 
-Since this repo contains the SDK source, you need to build the library before running the example:
-```bash
-# Build the SDK library
-cd lib && yarn install && yarn build
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
 
-# Install example app dependencies
-cd .. && yarn install```
+        1. Copy+past the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
-### 4. Configure your Credentials
+        ```bash
+        PORT=3000
+        NG_APP_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        NG_APP_ZITADEL_CLIENT_ID="your-client-id"
+        NG_APP_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        NG_APP_ZITADEL_POST_LOGOUT_URL="http://localhost:3000/auth/logout/callback"
+        NG_APP_ZITADEL_POST_LOGIN_URL="/profile"
+        ```
+    </Tab>
+    <Tab value="Flutter">
+        No action required for this step.
+        The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Go">
+        No action required for this step.
+        The issuer and client Id will be passed directly when running the app (next step)
+    </Tab>
+    <Tab value="Next.js">
+        1. Copy+past the .env.example to .env.local
+        2. Update the ZITADEL_CLIENT_ID, ZITADEL_CLIENT_SECRET and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
-Open src/App.tsx and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        SESSION_SECRET="your-very-secret-and-strong-session-key"
+        SESSION_DURATION=3600
+        ZITADEL_DOMAIN="https://your-instance.zitadel.cloud/"
+        ZITADEL_CLIENT_ID="zitadel-client-id"
+        ZITADEL_CLIENT_SECRET="zitadel-client-secret"
+        ZITADEL_CALLBACK_URL="http://localhost:3000/api/auth/callback/zitadel"
+        ZITADEL_POST_LOGIN_URL="/profile"
+        ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+        NEXTAUTH_URL="http://localhost:3000"
 
-```typescript
-const config: ZitadelConfig = {
-    authority: "https://your-instance.zitadel.cloud", // Your Issuer URL
-    client_id: "YOUR_CLIENT_ID",                      // Your Client ID
-    redirect_uri: "http://localhost:3000/callback",
-    post_logout_redirect_uri: "http://localhost:3000",
-    response_type: 'code',
-    scope: 'openid profile email'
-};
-```
+        ```
+    </Tab>
+    <Tab value="React">
 
-### 5. Run the Application
+        Open src/App.tsx and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
 
-Start your development server:
-```bash
-yarn start
-```
+        ```typescript
+        const config: ZitadelConfig = {
+        authority: "https://your-instance.zitadel.cloud", // Your Issuer URL
+        client_id: "YOUR_CLIENT_ID",                      // Your Client ID
+        redirect_uri: "http://localhost:3000/callback",
+        post_logout_redirect_uri: "http://localhost:3000",
+        response_type: 'code',
+        scope: 'openid profile email'
+    };
+        ```
+    </Tab>
+    <Tab value="Vue.js">
+        Open .env and update the config object with the **Issuer**, **Client ID** and **PROJECT_ID** you collected in Step 5.
 
-Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+        ```bash
+        VITE_ZITADEL_PROJECT_RESOURCE_ID=
+        VITE_ZITADEL_CLIENT_ID=YOUR_CLIENT_ID
+        VITE_ZITADEL_ISSUER=https://your-instance.zitadel.cloud/
+        ```
+    </Tab>
+</Tabs>
 
-![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+
+### 4. Build and Run
+
+<Tabs items={['Angular', 'Flutter', 'Go', 'Next.js', 'React', 'Vue.js']} groupId="framework-select">
+    <Tab value="Angular">
+        ```bash
+        npm install
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:4200`. Click Login to test the full PKCE flow!
+
+        ![Angular Example App](../../../public/img/guides/quickstart/angular_example_app.png)
+    </Tab>
+    <Tab value="Flutter">
+        Make sure to replace the [zitadel_issuer] and [zitadel_client_id] with your own value before running the command
+        ```bash
+        flutter run -d chrome --web-port=4444 --dart-define zitadel_url=[zitadel_issuer] --dart-define zitadel_client_id=[zitadel_client_id]
+        ```
+
+        Your app will be live at `http://localhost:4444`. Click Login to test the full PKCE flow!
+
+        ![Flutter Example App](../../../public/img/guides/quickstart/flutter_example_app.png)
+    </Tab>
+    <Tab value="Go">
+        Make sure to replace the [zitadel_domain] (use the domain from the issuer without the https://) and [zitadel_client_id] with your own value before running the command
+        ```bash
+        go run example/app/app.go --domain [zitadel_domain] --key XKv2Lqd7YAq13NUZVUWZEWZeruqyzViM --clientID [zitadel_client_id] --redirectURI http://localhost:8089/auth/callback
+        ```
+
+        Your app will be live at `http://localhost:8089`. Click Login to test the full PKCE flow!
+
+        ![Go Example App](../../../public/img/guides/quickstart/go_example_app.png)
+    </Tab>
+    <Tab value="Next.js">
+        ```bash
+        npm install
+
+        npm run dev
+        ```
+
+        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+
+        ![Next.js Example App](../../../public/img/guides/quickstart/next_example_app.png)
+
+    </Tab>
+    <Tab value="React">
+        Since this repo contains the SDK source, you need to build the library before running the example:
+
+        ```bash
+        # Build the SDK library
+        cd lib && yarn install && yarn build
+
+        # Install example app dependencies
+        cd .. && yarn install
+
+        yarn start
+        ```
+
+        Your app will be live at `http://localhost:3000`. Click Login to test the full PKCE flow!
+
+        ![React Example App](../../../public/img/guides/quickstart/react_example_app.png)
+    </Tab>
+    <Tab value="Vue.js">
+        ```bash
+        yarn install
+        yarn dev
+        ```
+
+        Your app will be live at `http://localhost:5173`. Click Login to test the full PKCE flow!
+
+        ![Vue Example App](../../../public/img/guides/quickstart/vue_example_app.png)
+    </Tab>
+</Tabs>
 
 ## Success! 🚀
-You’ve successfully integrated ZITADEL into a React application.
+You’ve successfully integrated ZITADEL into an application.
 
 ### What’s next?
+- [**Example Applications**](/examples/introduction): Find more comprehensive guides and examples for the different frameworks
 - [**SSO**](/guides/integrate/services): Learn how to add SSO to your services
 - [**Customize the UI**](/guides/manage/customize/branding): Make the login page your own with Branding.
 - [**Explore the API**](/apis/introduction): Check out the ZITADEL API Reference for advanced integrations.
