@@ -7,10 +7,10 @@ const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
 
-const APP_URL = "http://localhost:3000";
-const PROMETHEUS_URL = "http://localhost:9464/metrics";
-const COLLECTOR_HEALTH_URL = "http://localhost:13133";
-const MOCK_ZITADEL_URL = "http://localhost:7432";
+const APP_URL = "http://localhost:3002";
+const PROMETHEUS_URL = "http://localhost:9465/metrics";
+const COLLECTOR_HEALTH_URL = "http://localhost:13134";
+const MOCK_ZITADEL_URL = "http://localhost:7433";
 
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
@@ -28,11 +28,17 @@ async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Pr
   for (let i = 0; i < maxAttempts; i++) {
     try {
       const response = await fetch(url);
-      if (response.ok) return true;
-    } catch {
+      if (response.ok) {
+        console.log(`[waitForService] ${url} is ready (attempt ${i + 1})`);
+        return true;
+      }
+      console.log(`[waitForService] ${url} returned ${response.status} (attempt ${i + 1})`);
+    } catch (error) {
+      console.log(`[waitForService] ${url} failed: ${error instanceof Error ? error.message : error} (attempt ${i + 1})`);
       await new Promise((r) => setTimeout(r, delayMs));
     }
   }
+  console.log(`[waitForService] ${url} timed out after ${maxAttempts} attempts`);
   return false;
 }
 
@@ -113,6 +119,16 @@ describe("OpenTelemetry Integration", () => {
 
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
+
+    // Debug: show container status and logs
+    try {
+      const psOutput = execSync(`docker compose -f ${COMPOSE_FILE} ps -a`, { cwd: TEST_DIR, encoding: "utf-8" });
+      console.log("[DEBUG] Container status:\n", psOutput);
+      const logsOutput = execSync(`docker compose -f ${COMPOSE_FILE} logs otel-collector`, { cwd: TEST_DIR, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+      console.log("[DEBUG] Collector logs:\n", logsOutput);
+    } catch (e) {
+      console.log("[DEBUG] Failed to get container info:", e instanceof Error ? e.message : e);
+    }
 
     const collectorReady = await waitForService(COLLECTOR_HEALTH_URL);
     if (!collectorReady) throw new Error("OTEL collector failed to start");
