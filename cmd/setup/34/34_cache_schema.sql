@@ -11,6 +11,9 @@ create table if not exists cache.objects (
 )
 partition by list (cache_name);
 
+create unlogged table if not exists cache.objects_default 
+    PARTITION OF cache.objects DEFAULT;
+
 create table if not exists cache.string_keys(
     cache_name varchar not null check (cache_name <> ''),
     index_id integer not null check (index_id > 0),
@@ -27,3 +30,6 @@ partition by list (cache_name);
 
 create index if not exists string_keys_object_id_idx
     on cache.string_keys (cache_name, object_id); -- for delete cascade
+
+create unlogged table if not exists cache.string_keys_default 
+    PARTITION OF cache.string_keys DEFAULT;
