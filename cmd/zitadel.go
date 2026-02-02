@@ -27,8 +27,6 @@ var (
 
 	//go:embed defaults.yaml
 	defaultConfig []byte
-
-	logger = logging.New(logging.StreamRuntime)
 )
 
 func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
