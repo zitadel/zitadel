@@ -58,6 +58,7 @@ const nextConfig = {
     '@opentelemetry/instrumentation',
     '@opentelemetry/instrumentation-http',
     '@opentelemetry/instrumentation-winston',
+    '@opentelemetry/instrumentation-runtime-node',
     '@opentelemetry/winston-transport',
     '@opentelemetry/core',
   ],

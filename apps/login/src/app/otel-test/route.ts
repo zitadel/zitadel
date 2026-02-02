@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { trace, metrics } from "@opentelemetry/api";
+import { trace, metrics, SpanStatusCode } from "@opentelemetry/api";
 import { createLogger } from "@/lib/logger";
 import {
   recordAuthAttempt,
@@ -57,7 +57,7 @@ export async function GET() {
     recordRequestEnd(startTime, 200, "/otel-test");
     recordSessionCreationDuration(startTime, true);
 
-    span.setStatus({ code: 1 }); // OK status
+    span.setStatus({ code: SpanStatusCode.OK });
     span.end();
 
     logger.info("OTEL test completed successfully", {
@@ -80,7 +80,7 @@ export async function GET() {
     recordSessionCreationDuration(startTime, false);
 
     logger.error("OTEL test failed", { error });
-    span.setStatus({ code: 2, message: String(error) }); // ERROR status
+    span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
     span.end();
 
     return NextResponse.json(

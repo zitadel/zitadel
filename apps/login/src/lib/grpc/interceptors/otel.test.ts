@@ -1,5 +1,5 @@
 import { SpanKind, SpanStatusCode } from "@opentelemetry/api";
-import { Resource } from "@opentelemetry/resources";
+import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -10,7 +10,7 @@ import { otelGrpcInterceptor } from "./otel";
 
 const exporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
-  resource: new Resource({ "service.name": "test-zitadel-client" }),
+  resource: resourceFromAttributes({ "service.name": "test-zitadel-client" }),
   spanProcessors: [new SimpleSpanProcessor(exporter)],
 });
 provider.register();

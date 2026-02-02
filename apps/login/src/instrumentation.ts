@@ -29,6 +29,7 @@
 // webpack bundling issues with Node.js-only modules like 'http'
 
 import type { LoggerProvider } from "@opentelemetry/sdk-logs";
+import type { MetricReader } from "@opentelemetry/sdk-metrics";
 
 // Store provider for external access
 let _loggerProvider: LoggerProvider | null = null;
@@ -133,7 +134,7 @@ export async function register(): Promise<void> {
   const { PrometheusExporter } = await import(/* webpackIgnore: true */ "@opentelemetry/exporter-prometheus");
   const { LoggerProvider, BatchLogRecordProcessor } = await import("@opentelemetry/sdk-logs");
   const { OTLPLogExporter } = await import("@opentelemetry/exporter-logs-otlp-http");
-  const { Resource } = await import("@opentelemetry/resources");
+  const { resourceFromAttributes } = await import("@opentelemetry/resources");
   const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } = await import("@opentelemetry/semantic-conventions");
   const { metrics, diag, DiagConsoleLogger, DiagLogLevel, propagation } = await import("@opentelemetry/api");
   const { logs } = await import("@opentelemetry/api-logs");
@@ -160,7 +161,7 @@ export async function register(): Promise<void> {
   const hostAttributes = getHostAttributes();
   const gcpDetected = Object.keys(gcpAttributes).length > 0;
 
-  const resource = new Resource({
+  const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: serviceName,
     [ATTR_SERVICE_VERSION]: process.env.npm_package_version || "1.0.0",
     "deployment.environment": process.env.NODE_ENV || "development",
@@ -197,13 +198,12 @@ export async function register(): Promise<void> {
   console.log("OTEL: W3C trace context and baggage propagation enabled");
 
   // ============ METRICS ============
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const metricReaders: any[] = [];
+  const metricReaders: MetricReader[] = [];
 
   // Prometheus exporter for scraping (always enabled)
   const prometheusExporter = new PrometheusExporter({ port: metricsPort });
   metricReaders.push(prometheusExporter);
-  console.log(`OTEL: Prometheus metrics at http://0.0.0.0:${metricsPort}/metrics`);
+  console.log(`OTEL: Prometheus metrics available on port ${metricsPort} at /metrics`);
 
   // OTLP exporter for push (if endpoint configured)
   if (endpoint) {

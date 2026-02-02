@@ -41,13 +41,19 @@ const parseHostname = (url: string | undefined): string => {
   }
 };
 
+const isGrpcError = (err: unknown): err is GrpcError => {
+  return err instanceof Error && "code" in err;
+};
+
 const handleError = (span: Span, err: unknown): never => {
-  const error = err as GrpcError;
-  span.recordException(error);
-  if (error.code !== undefined) {
-    span.setAttribute("rpc.grpc.status_code", error.code);
+  const errorMessage = err instanceof Error ? err.message : String(err);
+  if (err instanceof Error) {
+    span.recordException(err);
   }
-  span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
+  if (isGrpcError(err) && err.code !== undefined) {
+    span.setAttribute("rpc.grpc.status_code", err.code);
+  }
+  span.setStatus({ code: SpanStatusCode.ERROR, message: errorMessage });
   throw err;
 };
 
