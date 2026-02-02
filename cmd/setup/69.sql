@@ -13,7 +13,7 @@ BEGIN
    CREATE UNLOGGED TABLE IF NOT EXISTS cache.objects_default 
         PARTITION OF cache.objects DEFAULT;
 
-    CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default 
+   CREATE UNLOGGED TABLE IF NOT EXISTS cache.string_keys_default 
         PARTITION OF cache.string_keys DEFAULT;
 END
 $do$
