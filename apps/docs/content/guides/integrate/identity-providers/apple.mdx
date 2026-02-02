@@ -10,16 +10,20 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-<Intro components={props.components}  provider="Apple"/>
+<Intro provider="Apple"/>
 
 ## Open the Apple Identity Provider Template
 
-<IDPsOverview components={props.components}  templates="Apple"/>
+<IDPsOverview templates="Apple"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it in the Apple service later.
 
-![](../../../../public/img/guides/zitadel_apple_create_provider.png)
+:::note
+For Apple, the callback URL ends with `/form` (e.g., `.../callback/form` or `.../idps/callback/form`) because Apple uses a Form Post to return the authorization response.
+:::
+
+![Apple Provider](/img/guides/zitadel_apple_create_provider.png)
 
 ## Apple Configuration
 
@@ -43,7 +47,7 @@ You will have to paste it in the Apple service later.
  - Example domain for `https://acme-gzoe4x.zitadel.cloud` would look like this:  `acme-gzoe4x.zitadel.cloud`
 8. [Paste the ZITADEL Callback URL you copied before](#open-the-apple-identity-provider-template) to the Return URLs
 
-![](../../../../public/img/guides/apple_service_create.png)
+![Apple Service](/img/guides/apple_service_create.png)
 
 ### Register a new key
 
@@ -67,22 +71,22 @@ A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `name` and `email` are prefilled. This information will be taken to create/update the user within ZITADEL.
 
-<GeneralConfigDescription components={props.components}  provider_account="Apple account" />
+<GeneralConfigDescription provider_account="Apple account" />
 
 ### Activate IdP
 
-<Activate components={props.components} />
+<Activate/>
 
-![](../../../../public/img/guides/zitadel_activate_apple.png)
+![Activate the Apple Provider](/img/guides/zitadel_activate_apple.png)
 
 ### Ensure your Login Policy allows External IDPs
 
-<CustomLoginPolicy components={props.components} />
+<CustomLoginPolicy/>
 
 ## Test the setup
 
-<TestSetup components={props.components}  loginscreen="your Apple login"/>
+<TestSetup loginscreen="your Apple login"/>
 
-![](../../../../public/img/guides/zitadel_login_apple.png)
+![Apple Button](/img/guides/zitadel_login_apple.png)
 
-![](../../../../public/img/guides/apple_login.png)
+![Apple Login](/img/guides/apple_login.png)

@@ -99,19 +99,21 @@ export class ProviderNextService {
     );
   }
 
-  callbackUrls(): Observable<CopyUrl[]> {
+  callbackUrls(suffix: string = ""): Observable<CopyUrl[]> {
     return this.env.env.pipe(
       combineLatestWith(this.loginV2BaseUri$),
       map(([env, loginV2BaseUri]) => [
         {
           label: 'Login V1 Callback URL',
-          url: `${env.issuer}/ui/login/login/externalidp/callback`,
+          url: `${env.issuer}/ui/login/login/externalidp/callback${suffix}`,
         },
         {
           label: 'Login V2 Callback URL',
           // if we don't have a loginV2BaseUri we provide a placeholder url so the user knows what to fill in
           // this is not ideal but better than nothing
-          url: loginV2BaseUri ? `${loginV2BaseUri}idps/callback` : '{LOGIN V2 Hostname}/idps/callback',
+          url: loginV2BaseUri
+            ? `${loginV2BaseUri}${loginV2BaseUri.endsWith('/') ? '' : '/'}idps/callback${suffix}`
+            : `{LOGIN V2 Hostname}/idps/callback${suffix}`,
         },
       ]),
     );

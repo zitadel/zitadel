@@ -72,7 +72,7 @@ export class ProviderAppleComponent {
     this.service$,
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
-  public copyUrls$ = this.nextSvc.callbackUrls();
+  public copyUrls$ = this.nextSvc.callbackUrls('/form');
 
   constructor(
     private authService: GrpcAuthService,
