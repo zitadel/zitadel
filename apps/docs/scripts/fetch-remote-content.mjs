@@ -32,10 +32,10 @@ export function safeLog(str) {
 
 // Validate refs to prevent command injection or unsafe URL construction
 export function isValidRef(ref) {
-  // Allow alphanumeric, dots, dashes, underscores, and slashes (for branches like fix/foo)
+  // Allow alphanumeric, dots, dashes, underscores, slashes, @ (dependabot), and +
   // But explicitly disallow ".." to prevent traversal
   if (ref.includes('..')) return false;
-  return /^[a-zA-Z0-9._\-/]+$/.test(ref);
+  return /^[a-zA-Z0-9._\-/@+]+$/.test(ref);
 }
 
 // Caches result to avoid redundant git/env checks.
@@ -100,7 +100,7 @@ async function fetchTags() {
   return tags;
 }
 
-function filterVersions(tags) {
+export function filterVersions(tags) {
   console.log(`Filtering tags with cutoff strictly > ${CUTOFF}...`);
   const versions = tags
     .map(t => t.name)
@@ -312,8 +312,39 @@ async function downloadFileContent(tagOrBranch, repoPath) {
 }
 
 async function fixRelativeImports(versionDir, tagOrBranch) {
-    if (!fs.existsSync(versionDir)) return;
-    const files = fs.readdirSync(versionDir, { recursive: true });
+  if (!fs.existsSync(versionDir)) return;
+  const files = fs.readdirSync(versionDir, { recursive: true });
+
+  const rewritePath = (filePath, originalRelPath) => {
+    const versionFolder = path.basename(versionDir);
+    const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+    if (!relativePathInContent) return null;
+
+    const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+    const originalDir = dirname(originalFilePath);
+    const absoluteTarget = resolve(originalDir, originalRelPath);
+    const projectRoot = resolve(ROOT_DIR, '../..');
+
+    if (absoluteTarget.startsWith(PUBLIC_DIR)) {
+      const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1);
+      const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
+      const newRelPath = path.relative(dirname(filePath), newTargetAbs);
+      return newRelPath.split(path.sep).join('/');
+    }
+
+    if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PUBLIC_DIR)) {
+      return null;
+    }
+    if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
+      return null;
+    }
+
+    if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
+      const newRelPath = path.relative(dirname(filePath), absoluteTarget);
+      return newRelPath.split(path.sep).join('/');
+    }
+    return null;
+  };
 
   // We'll traverse all files to fix links/imports
   for (const file of files) {
@@ -324,50 +355,13 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     let content = fs.readFileSync(filePath, 'utf8');
     let changed = false;
 
-    const rewritePath = (originalRelPath) => {
-      const versionFolder = path.basename(versionDir);
-      const relativePathInContent = filePath.split(join('content', versionFolder))[1];
-      if (!relativePathInContent) return null;
-
-      const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
-      const originalDir = dirname(originalFilePath);
-      const absoluteTarget = resolve(originalDir, originalRelPath);
-      const projectRoot = resolve(ROOT_DIR, '../..');
-
-      if (absoluteTarget.startsWith(PUBLIC_DIR)) {
-        const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1);
-        const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
-        const newRelPath = path.relative(dirname(filePath), newTargetAbs);
-        return newRelPath.split(path.sep).join('/');
-      }
-
-      if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PUBLIC_DIR)) {
-        return null;
-      }
-      if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
-        return null;
-      }
-
-      if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
-        const newRelPath = path.relative(dirname(filePath), absoluteTarget);
-        return newRelPath.split(path.sep).join('/');
-      }
-      return null;
-    };
-
-    function PublicOrRootPublic(p) {
-      return PUBLIC_DIR;
-    }
-    }
-
     // --- Replacements ---
 
     // 1. Imports: import ... from '...'
-    // We capture the path: group 2
     const importRegex = /(import\s+.*?\s+from\s+['"])([^'"]+)(['"])/g;
     content = content.replace(importRegex, (match, p1, p2, p3) => {
       if (!p2.startsWith('.')) return match; // Only relative
-      const rewritten = rewritePath(p2);
+      const rewritten = rewritePath(filePath, p2);
       if (rewritten && rewritten !== p2) {
         changed = true;
         return `${p1}${rewritten}${p3}`;
@@ -379,7 +373,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
     content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
       if (!p2.startsWith('.')) return match;
-      const rewritten = rewritePath(p2);
+      const rewritten = rewritePath(filePath, p2);
       if (rewritten && rewritten !== p2) {
         changed = true;
         return `${p1}${rewritten}${p3}`;
@@ -388,14 +382,12 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     });
 
     // 3. HTML Attributes: src="..." or href="..."
-    // Naive regex, but likely sufficient for MDX
     const htmlAttrRegex = /(src|href)=['"]([^'"]+)['"]/g;
     content = content.replace(htmlAttrRegex, (match, attr, val) => {
       if (!val.startsWith('.')) return match;
-      const rewritten = rewritePath(val);
+      const rewritten = rewritePath(filePath, val);
       if (rewritten && rewritten !== val) {
         changed = true;
-        // reconstruct match
         const quote = match.includes("'") ? "'" : '"';
         return `${attr}=${quote}${rewritten}${quote}`;
       }
@@ -403,12 +395,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     });
 
     // --- Special handling for the "download external file" case ---
-    // The previous regex replacement structure prevents async operations.
-    // We have to scan for external files separately or before replacing, OR use a synchronous download (not ideal)
-    // OR rely on the existing synchronous logic for rewriting if we pre-download them.
-
-    // Let's perform a SCAN for strictly external files (like ../cmd/defaults.yaml) first
-    // Reuse original logic for downloading
+    // Scan for strictly external files (like ../cmd/defaults.yaml) first
     const importRegexForDownload = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
     let match;
     while ((match = importRegexForDownload.exec(content)) !== null) {
@@ -423,11 +410,8 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
       if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
         const repoRoot = resolve(ROOT_DIR, '../..');
 
-        // The original imports were relative to docs/content, not apps/docs/content.
-        // We need to account for the extra 'apps/' level.
         let relativeToRepoRoot;
         if (absoluteImportTarget.startsWith(join(repoRoot, 'apps'))) {
-          // If it resolved to apps/cmd/defaults.yaml, it should be cmd/defaults.yaml
           relativeToRepoRoot = absoluteImportTarget.replace(join(repoRoot, 'apps') + '/', '');
         } else {
           relativeToRepoRoot = absoluteImportTarget.replace(repoRoot + '/', '');
@@ -438,7 +422,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
         // Download if missing
         if (!fs.existsSync(localPathInVersion)) {
           console.log(`[fix-imports] Downloading external: ${relativeToRepoRoot}`);
-          const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot); // existing function
+          const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot);
           if (fileContent) {
             fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
             fs.writeFileSync(localPathInVersion, fileContent);

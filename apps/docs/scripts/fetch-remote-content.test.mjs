@@ -44,6 +44,8 @@ describe('fetch-remote-content', () => {
           assert.strictEqual(isValidRef('v1.0.0'), true);
           assert.strictEqual(isValidRef('feature/new-docs'), true);
           assert.strictEqual(isValidRef('fix_bug-123'), true);
+          assert.strictEqual(isValidRef('dependabot/npm_and_yarn/@types/react'), true);
+          assert.strictEqual(isValidRef('build+test'), true);
       });
 
       test('rejects malicious refs', () => {
@@ -117,6 +119,30 @@ describe('fetch-remote-content', () => {
         // Validation check for command injection protection
         const content = await downloadFileContent('invalid; rm -rf', 'README.md');
         assert.strictEqual(content, null);
+    });
+  });
+
+  // --- filterVersions Tests ---
+  describe('filterVersions', () => {
+    test('filters versions older than CUTOFF (4.10.0)', async () => {
+        const { filterVersions } = await import('./fetch-remote-content.mjs');
+        const tags = [
+            { name: 'v4.9.0' },
+            { name: 'v4.10.0' }, // Matches cutoff strictly > 4.10.0? No, gt is strict.
+            { name: 'v4.11.0' },
+            { name: 'v5.0.0-alpha' },
+            { name: 'invalid' }
+        ];
+        
+        const result = filterVersions(tags);
+        // Expect only v4.11.0 and v5.0.0-alpha, but slice(0, 3) logic applies
+        // If gt(4.10.0), then 4.10.0 is excluded.
+        // sort is rcompare (descending).
+        // 5.0.0-alpha, 4.11.0
+        
+        assert.ok(result.includes('v4.11.0'));
+        assert.ok(!result.includes('v4.10.0'));
+        assert.ok(!result.includes('v4.9.0'));
     });
   });
 
