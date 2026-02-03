@@ -1,21 +1,29 @@
-export interface AmazonRegionsEndpoints {
-  'US East (Ohio)': string;
-  'US East (N. Virginia)': string;
-  'US West (N. California)': string;
-  'US West (Oregon)': string;
-  'Asia Pacific (Mumbai)': string;
-  'Asia Pacific (Osaka)': string;
-  'Asia Pacific (Seoul)': string;
-  'Asia Pacific (Singapore)': string;
-  'Asia Pacific (Sydney)': string;
-  'Asia Pacific (Tokyo)': string;
-  'Canada (Central)': string;
-  'Europe (Frankfurt)': string;
-  'Europe (London)': string;
-  'Europe (Paris)': string;
-  'Europe (Stockholm)': string;
-  'South America (São Paulo)': string;
-}
+type ProviderDefaultSettings = {
+  name: string;
+  host?: string;
+  ports?: {
+    unencryptedPort?: number;
+    encryptedPort: number;
+  };
+  auth?:
+    | {
+        case: 'plain';
+        user: {
+          value: string;
+          placeholder: string;
+        };
+        password: {
+          value: string;
+          placeholder: string;
+        };
+      }
+    | {
+        case: 'xoauth2';
+        scopes: string;
+      };
+  senderEmailPlaceholder?: string;
+  image?: string;
+};
 
 const amazonEndpoints = {
   'US East (Ohio)': 'email-smtp.us-east-2.amazonaws.com',
@@ -35,158 +43,169 @@ const amazonEndpoints = {
   'Europe (Paris)': 'email-smtp.eu-west-3.amazonaws.com',
   'Europe (Stockholm)': 'email-smtp.eu-north-1.amazonaws.com',
   'South America (São Paulo)': 'email-smtp.sa-east-1.amazonaws.com',
-};
+} as const;
 
-export interface ProviderDefaultSettings {
-  name: string;
-  regions?: AmazonRegionsEndpoints;
-  multiHostsLabel?: string;
-  requiredTls: boolean;
-  host?: string;
-  unencryptedPort?: number;
-  encryptedPort?: number;
-  user: {
-    value: string;
-    placeholder: string;
-  };
-  password: {
-    value: string;
-    placeholder: string;
-  };
-  senderEmailPlaceholder?: string;
-  image?: string;
-  routerLinkElement: string;
-}
-
-export const AmazonSESDefaultSettings: ProviderDefaultSettings = {
+export const amazon = {
   name: 'amazon SES',
   regions: amazonEndpoints,
-  multiHostsLabel: 'Choose your region',
-  requiredTls: true,
-  encryptedPort: 587,
+  ports: {
+    encryptedPort: 587,
+  },
   user: { value: '', placeholder: 'your Amazon SES credentials for this region' },
   password: { value: '', placeholder: 'your Amazon SES credentials for this region' },
   image: './assets/images/smtp/aws-ses.svg',
-  routerLinkElement: 'aws-ses',
-};
+} as const;
 
-export const GoogleDefaultSettings: ProviderDefaultSettings = {
+amazon satisfies ProviderDefaultSettings;
+
+export const google = {
   name: 'google',
   requiredTls: true,
   host: 'smtp.gmail.com',
-  unencryptedPort: 587,
-  encryptedPort: 587,
-  user: { value: '', placeholder: 'your complete Google Workspace email address' },
-  password: { value: '', placeholder: 'your complete Google Workspace password' },
+  ports: {
+    encryptedPort: 587,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'your complete Google Workspace email address' },
+    password: { value: '', placeholder: 'your complete Google Workspace password' },
+  },
   image: './assets/images/smtp/google.png',
-  routerLinkElement: 'google',
-};
+} as const;
 
-export const MailgunDefaultSettings: ProviderDefaultSettings = {
+google satisfies ProviderDefaultSettings;
+
+export const mailgun = {
   name: 'mailgun',
   requiredTls: false,
   host: 'smtp.mailgun.org',
-  unencryptedPort: 587,
-  encryptedPort: 465,
-  user: { value: '', placeholder: 'postmaster@YOURDOMAIN' },
-  password: { value: '', placeholder: 'Your mailgun smtp password' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 465,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'postmaster@YOURDOMAIN' },
+    password: { value: '', placeholder: 'Your mailgun smtp password' },
+  },
   image: './assets/images/smtp/mailgun.svg',
-  routerLinkElement: 'mailgun',
-};
+} as const;
 
-export const MailjetDefaultSettings: ProviderDefaultSettings = {
+mailgun satisfies ProviderDefaultSettings;
+
+export const mailjet = {
   name: 'mailjet',
   requiredTls: false,
   host: 'in-v3.mailjet.com',
-  unencryptedPort: 587,
-  encryptedPort: 465,
-  user: { value: '', placeholder: 'Your Mailjet API key' },
-  password: { value: '', placeholder: 'Your Mailjet Secret key' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 465,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'Your Mailjet API key' },
+    password: { value: '', placeholder: 'Your Mailjet Secret key' },
+  },
   image: './assets/images/smtp/mailjet.svg',
   senderEmailPlaceholder: 'An authorized domain or email address',
-  routerLinkElement: 'mailjet',
-};
+} as const;
 
-export const PostmarkDefaultSettings: ProviderDefaultSettings = {
+mailgun satisfies ProviderDefaultSettings;
+
+export const postmark = {
   name: 'postmark',
   requiredTls: false,
   host: 'smtp.postmarkapp.com',
-  unencryptedPort: 587,
-  encryptedPort: 587,
-  user: { value: '', placeholder: 'Your Server API token' },
-  password: { value: '', placeholder: 'Your Server API token' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 587,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'Your Server API token' },
+    password: { value: '', placeholder: 'Your Server API token' },
+  },
   image: './assets/images/smtp/postmark.png',
   senderEmailPlaceholder: 'An authorized domain or email address',
-  routerLinkElement: 'postmark',
-};
+} as const;
 
-export const SendgridDefaultSettings: ProviderDefaultSettings = {
+postmark satisfies ProviderDefaultSettings;
+
+export const sendgrid = {
   name: 'sendgrid',
   requiredTls: false,
   host: 'smtp.sendgrid.net',
-  unencryptedPort: 587,
-  encryptedPort: 465,
-  user: { value: 'apikey', placeholder: '' },
-  password: { value: '', placeholder: ' Your SendGrid API Key' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 465,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: 'apikey', placeholder: '' },
+    password: { value: '', placeholder: ' Your SendGrid API Key' },
+  },
   image: './assets/images/smtp/sendgrid.png',
-  routerLinkElement: 'sendgrid',
-};
+} as const;
 
-export const MailchimpDefaultSettings: ProviderDefaultSettings = {
+sendgrid satisfies ProviderDefaultSettings;
+
+export const mailchimp = {
   name: 'mailchimp',
   requiredTls: false,
   host: 'smtp.mandrillapp.com',
-  unencryptedPort: 587,
-  encryptedPort: 465,
-  user: { value: '', placeholder: 'Your Mailchimp primary contact email' },
-  password: { value: '', placeholder: 'Your Mailchimp Transactional API key' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 465,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'Your Mailchimp primary contact email' },
+    password: { value: '', placeholder: 'Your Mailchimp Transactional API key' },
+  },
   image: './assets/images/smtp/mailchimp.svg',
   senderEmailPlaceholder: 'An authorized domain or email address',
-  routerLinkElement: 'mailchimp',
-};
+} as const;
 
-export const BrevoDefaultSettings: ProviderDefaultSettings = {
+mailchimp satisfies ProviderDefaultSettings;
+
+export const brevo = {
   name: 'brevo',
   requiredTls: false,
   host: 'smtp-relay.sendinblue.com',
-  unencryptedPort: 587,
-  encryptedPort: 465,
-  user: { value: '', placeholder: 'Your SMTP login email address' },
-  password: { value: '', placeholder: 'Your SMTP key' },
+  ports: {
+    unencryptedPort: 587,
+    encryptedPort: 465,
+  },
+  auth: {
+    case: 'plain',
+    user: { value: '', placeholder: 'Your SMTP login email address' },
+    password: { value: '', placeholder: 'Your SMTP key' },
+  },
   image: './assets/images/smtp/brevo.svg',
-  routerLinkElement: 'brevo',
-};
+} as const;
 
-export const OutlookDefaultSettings: ProviderDefaultSettings = {
+brevo satisfies ProviderDefaultSettings;
+
+export const outlook = {
   name: 'outlook.com',
   requiredTls: true,
   host: 'smtp-mail.outlook.com',
-  unencryptedPort: 587,
-  encryptedPort: 587,
-  user: { value: '', placeholder: 'Your outlook.com email address' },
-  password: { value: '', placeholder: 'Your outlook.com password' },
+  ports: {
+    encryptedPort: 587,
+  },
+  auth: {
+    case: 'xoauth2',
+    scopes: 'https://outlook.office.com/SMTP.Send',
+  },
   image: './assets/images/smtp/outlook.svg',
   senderEmailPlaceholder: 'Your outlook.com email address',
-  routerLinkElement: 'outlook',
-};
+} as const;
 
-export const GenericDefaultSettings: ProviderDefaultSettings = {
+outlook satisfies ProviderDefaultSettings;
+
+export const generic = {
   name: 'generic',
   requiredTls: false,
-  user: { value: '', placeholder: 'your SMTP user' },
-  password: { value: '', placeholder: 'your SMTP password' },
-  routerLinkElement: 'generic',
-};
+} as const;
 
-export const SMTPKnownProviders = [
-  AmazonSESDefaultSettings,
-  BrevoDefaultSettings,
-  // GoogleDefaultSettings,
-  MailgunDefaultSettings,
-  MailchimpDefaultSettings,
-  MailjetDefaultSettings,
-  PostmarkDefaultSettings,
-  SendgridDefaultSettings,
-  OutlookDefaultSettings,
-  GenericDefaultSettings,
-];
+generic satisfies ProviderDefaultSettings;

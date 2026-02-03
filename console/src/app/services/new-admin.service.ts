@@ -6,6 +6,8 @@ import {
   GetMyInstanceResponse,
   SetUpOrgRequestSchema,
   SetUpOrgResponse,
+  TestEmailProviderSMTPRequestSchema,
+  TestSMTPConfigRequestSchema,
 } from '@zitadel/proto/zitadel/admin_pb';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { NewAuthService } from './new-auth.service';
@@ -21,7 +23,7 @@ export class NewAdminService {
     private readonly userService: UserService,
   ) {}
 
-  public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>): Promise<SetUpOrgResponse> {
+  public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>) {
     return this.grpcService.adminNew.setUpOrg(req);
   }
 
@@ -40,5 +42,9 @@ export class NewAdminService {
       queryFn: async () => this.getMyInstance(),
       enabled: (listMyZitadelPermissionsQuery.data() ?? []).includes('iam.write'),
     }));
+  }
+
+  public testEmailProviderSMTP(req: MessageInitShape<typeof TestEmailProviderSMTPRequestSchema>) {
+    return this.grpcService.adminNew.testEmailProviderSMTP(req);
   }
 }
