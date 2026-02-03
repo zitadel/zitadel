@@ -5,12 +5,12 @@ The **Login App** (`apps/login`) provides the user interface for authentication 
 
 ## Key Technology
 - **Framework**: Next.js (React).
-- **Styling**: TailwindCSS (check project for specific config).
+- **Styling**: TailwindCSS, configured via `apps/login/tailwind.config.mjs`.
 - **Data Fetching**: Primarily server-side interaction with ZITADEL APIs via `@zitadel/client` or direct gRPC calls where applicable.
 - **Language**: TypeScript.
 
 ## Architecture & Conventions
-- **Pages**: Uses Next.js App Router or Pages Router (Verify in `src/`).
+- **Routing**: Uses the Next.js App Router (routes are defined under `src/app/`).
 - **Composability**: Components should be small and reusable.
 - **State**: Critical authentication state is often managed via URL parameters (Auth Requests) and cookies/sessions.
 

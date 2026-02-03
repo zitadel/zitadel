@@ -11,7 +11,7 @@ The **Docs App** (`apps/docs`) hosts the ZITADEL documentation. It has recently 
 ## Content Conventions
 - **Frontmatter**: Ensure standard Fumadocs frontmatter is used (title, description).
 - **Links**: Use absolute paths or standard MDX linking.
-- **Components**: specific MDX components may be available for callouts, code blocks, etc.
+- **Components**: Use only MDX components that are documented in the official Fumadocs MDX component reference and any project-specific MDX component documentation in this repo; do not introduce or rely on undocumented components.
 
 ## Development Commands
 - **Dev Server**: `pnpm nx run @zitadel/docs:dev`
