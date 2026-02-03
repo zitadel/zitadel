@@ -16,7 +16,7 @@ import (
 func (u userHuman) SetPhone(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
-		return u.verification.setInit(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.phoneVerificationIDColumn())
+		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.phoneVerificationIDColumn())
 	case *domain.VerificationTypeSkipped:
 		return u.verification.skipped(typ, u.phoneVerifiedAtColumn(), u.phoneColumn())
 	case *domain.VerificationTypeUpdate:

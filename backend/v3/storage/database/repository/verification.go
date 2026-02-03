@@ -30,7 +30,7 @@ func (v verification) verified(verified *domain.VerificationTypeVerified, existi
 	return database.NewChanges(
 		verifiedAtChange,
 		database.NewChangeToNull(pendingVerificationID),
-		database.NewChangeToStatement(value, func(builder *database.StatementBuilder) {
+		database.NewCTEChange(func(builder *database.StatementBuilder) {
 			builder.WriteString("DELETE FROM ")
 			builder.WriteString(v.qualifiedTableName())
 			builder.WriteString(" USING ")
@@ -40,7 +40,7 @@ func (v verification) verified(verified *domain.VerificationTypeVerified, existi
 				database.NewColumnCondition(v.idColumn(), pendingVerificationID),
 			))
 			builder.WriteString(" RETURNING value")
-		}),
+		}, nil),
 	)
 }
 
@@ -70,7 +70,7 @@ func (v verification) failed(existingTableName string, instanceID, verificationI
 	}, nil)
 }
 
-func (v verification) setInit(init *domain.VerificationTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
+func (v verification) init(init *domain.VerificationTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
 	return database.NewCTEChange(func(builder *database.StatementBuilder) {
 		var (
 			createdAt any = database.NowInstruction
@@ -97,30 +97,6 @@ func (v verification) setInit(init *domain.VerificationTypeInit, existingTableNa
 			builder.WriteString(name)
 		})
 	})
-}
-
-func (v verification) init(init *domain.VerificationTypeInit, existingTableName string) database.CTEChange {
-	return database.NewCTEChange(func(builder *database.StatementBuilder) {
-		var (
-			createdAt any = database.NowInstruction
-			expiry    any = database.NullInstruction
-			id        any = database.DefaultInstruction
-		)
-		if !init.CreatedAt.IsZero() {
-			createdAt = init.CreatedAt
-		}
-		if init.Expiry != nil {
-			expiry = *init.Expiry
-		}
-		if init.ID != nil {
-			id = *init.ID
-		}
-		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, id, value, code, created_at, expiry) SELECT instance_id, id, ")
-		builder.WriteArgs(id, init.Value, init.Code, createdAt, expiry)
-		builder.WriteString(" FROM ")
-		builder.WriteString(existingTableName)
-		builder.WriteString(" RETURNING id")
-	}, nil)
 }
 
 func (v verification) update(update *domain.VerificationTypeUpdate, existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
