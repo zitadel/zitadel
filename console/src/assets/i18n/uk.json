@@ -2684,7 +2684,7 @@
           }
         }
       },
-      "BACKCHANNELLOOGUTURI": "URI виходу з зворотного каналу"
+      "BACKCHANNELLOOGOUTURI": "URI виходу з зворотного каналу"
     },
     "API": {
       "INFO": {

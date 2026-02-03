@@ -2674,7 +2674,7 @@
           }
         }
       },
-      "BACKCHANNELLOOGUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية"
+      "BACKCHANNELLOOGOUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية"
     },
     "API": {
       "INFO": {

@@ -2759,7 +2759,7 @@
           }
         }
       },
-      "BACKCHANNELLOOGUTURI": "URI выхода из системы через резервный канал"
+      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал"
     },
     "API": {
       "INFO": {

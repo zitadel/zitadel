@@ -2678,7 +2678,7 @@
           }
         }
       },
-      "BACKCHANNELLOOGUTURI": "백채널 로그아웃 URI"
+      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI"
     },
     "API": {
       "INFO": {
