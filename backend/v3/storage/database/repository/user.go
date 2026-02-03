@@ -44,7 +44,6 @@ var existingUser = user{tableName: "existing_user"}
 
 // Create implements [domain.UserRepository.Create].
 func (u user) Create(ctx context.Context, client database.QueryExecutor, user *domain.User) error {
-
 	var create func(context.Context, *database.StatementBuilder, database.QueryExecutor, *domain.User) error
 	switch {
 	case user.Human != nil:

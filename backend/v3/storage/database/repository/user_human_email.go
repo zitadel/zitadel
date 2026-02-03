@@ -16,7 +16,7 @@ import (
 func (u userHuman) SetEmail(verification domain.VerificationType) database.Change {
 	switch typ := verification.(type) {
 	case *domain.VerificationTypeInit:
-		return u.verification.init(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.emailVerificationIDColumn())
+		return u.verification.setInit(typ, existingHumanUser.unqualifiedTableName(), existingHumanUser.emailVerificationIDColumn())
 	case *domain.VerificationTypeSkipped:
 		return u.verification.skipped(typ, u.emailVerifiedAtColumn(), u.EmailColumn())
 	case *domain.VerificationTypeUpdate:

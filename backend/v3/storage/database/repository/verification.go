@@ -70,11 +70,12 @@ func (v verification) failed(existingTableName string, instanceID, verificationI
 	}, nil)
 }
 
-func (v verification) init(init *domain.VerificationTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
+func (v verification) setInit(init *domain.VerificationTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
 	return database.NewCTEChange(func(builder *database.StatementBuilder) {
 		var (
 			createdAt any = database.NowInstruction
 			expiry    any = database.NullInstruction
+			id        any = database.DefaultInstruction
 		)
 		if !init.CreatedAt.IsZero() {
 			createdAt = init.CreatedAt
@@ -82,8 +83,11 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 		if init.Expiry != nil {
 			expiry = *init.Expiry
 		}
-		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
-		builder.WriteArgs(init.Value, init.Code, createdAt, expiry)
+		if init.ID != nil {
+			id = *init.ID
+		}
+		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, id, value, code, created_at, expiry) SELECT instance_id, id, ")
+		builder.WriteArgs(id, init.Value, init.Code, createdAt, expiry)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		builder.WriteString(" RETURNING id")
@@ -95,11 +99,12 @@ func (v verification) init(init *domain.VerificationTypeInit, existingTableName 
 	})
 }
 
-func (v verification) initCheck(init *domain.CheckTypeInit, existingTableName string, verificationID database.Column) database.CTEChange {
+func (v verification) init(init *domain.VerificationTypeInit, existingTableName string) database.CTEChange {
 	return database.NewCTEChange(func(builder *database.StatementBuilder) {
 		var (
 			createdAt any = database.NowInstruction
 			expiry    any = database.NullInstruction
+			id        any = database.DefaultInstruction
 		)
 		if !init.CreatedAt.IsZero() {
 			createdAt = init.CreatedAt
@@ -107,17 +112,15 @@ func (v verification) initCheck(init *domain.CheckTypeInit, existingTableName st
 		if init.Expiry != nil {
 			expiry = *init.Expiry
 		}
-		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, code, created_at, expiry) SELECT instance_id, id, ")
-		builder.WriteArgs(init.Code, createdAt, expiry)
+		if init.ID != nil {
+			id = *init.ID
+		}
+		builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, id, value, code, created_at, expiry) SELECT instance_id, id, ")
+		builder.WriteArgs(id, init.Value, init.Code, createdAt, expiry)
 		builder.WriteString(" FROM ")
 		builder.WriteString(existingTableName)
 		builder.WriteString(" RETURNING id")
-	}, func(name string) database.Change {
-		return database.NewChangeToStatement(verificationID, func(builder *database.StatementBuilder) {
-			builder.WriteString("SELECT id FROM ")
-			builder.WriteString(name)
-		})
-	})
+	}, nil)
 }
 
 func (v verification) update(update *domain.VerificationTypeUpdate, existingTableName string, instanceID, verificationID database.Column) database.CTEChange {
@@ -144,74 +147,6 @@ func (v verification) update(update *domain.VerificationTypeUpdate, existingTabl
 		))
 	}, nil)
 }
-
-func (v verification) succeeded(succeeded *domain.CheckTypeSucceeded, lastSuccessfulCheck, verificationID database.Column) database.Changes {
-	lastSucceededChange := database.NewChange(lastSuccessfulCheck, database.NowInstruction)
-	if !succeeded.SucceededAt.IsZero() {
-		lastSucceededChange = database.NewChange(lastSuccessfulCheck, succeeded.SucceededAt)
-	}
-	return database.NewChanges(
-		lastSucceededChange,
-		database.NewChangeToNull(verificationID),
-	)
-}
-
-// func (v verification) userVerification(builder *database.StatementBuilder, verificationType domain.VerificationType) database.Change {
-// 	switch typ := verificationType.(type) {
-// 	case *domain.VerificationTypeSkipped:
-// 		return v.skipped(typ, userHuman)
-// 	case *domain.VerificationTypeFailed:
-// 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-// 			builder.WriteString("UPDATE ")
-// 			builder.WriteString(u.verification.qualifiedTableName())
-// 			builder.WriteString(" SET ")
-// 			database.NewIncrementColumnChange(u.verification.failedAttemptsColumn())
-// 			builder.WriteString(" FROM ")
-// 			builder.WriteString(existingHumanUser.unqualifiedTableName())
-// 			writeCondition(builder, database.And(
-// 				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-// 				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailOTPVerificationIDColumn()),
-// 			))
-// 		}, nil)
-// 	case *domain.VerificationTypeInit:
-// 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-// 			builder.WriteString("INSERT INTO zitadel.verifications(instance_id, user_id, value, code, created_at, expiry) SELECT instance_id, id, ")
-// 			builder.WriteArgs(typ.Value, typ.Code, typ.CreatedAt, typ.Expiry)
-// 			builder.WriteString(" FROM ")
-// 			builder.WriteString(existingHumanUser.unqualifiedTableName())
-// 			builder.WriteString(" RETURNING id")
-// 		}, func(name string) database.Change {
-// 			return database.NewChangeToStatement(u.emailVerificationIDColumn(), func(builder *database.StatementBuilder) {
-// 				builder.WriteString("SELECT id FROM ")
-// 				builder.WriteString(name)
-// 			})
-// 		})
-// 	case *domain.VerificationTypeUpdate:
-// 		changes := make(database.Changes, 0, 3)
-// 		if typ.Value != nil {
-// 			changes = append(changes, database.NewChange(u.EmailColumn(), *typ.Value))
-// 		}
-// 		if typ.Code != nil {
-// 			changes = append(changes, database.NewChange(u.verification.codeColumn(), typ.Code))
-// 		}
-// 		if typ.Expiry != nil {
-// 			changes = append(changes, database.NewChange(u.verification.expiryColumn(), *typ.Expiry))
-// 		}
-// 		return database.NewCTEChange(func(builder *database.StatementBuilder) {
-// 			builder.WriteString("UPDATE ")
-// 			builder.WriteString(u.verification.qualifiedTableName())
-// 			builder.WriteString(" SET ")
-// 			changes.Write(builder)
-// 			builder.WriteString(" FROM ")
-// 			builder.WriteString(existingHumanUser.unqualifiedTableName())
-// 			writeCondition(builder, database.And(
-// 				database.NewColumnCondition(u.verification.instanceIDColumn(), existingHumanUser.InstanceIDColumn()),
-// 				database.NewColumnCondition(u.verification.idColumn(), existingHumanUser.emailVerificationIDColumn()),
-// 			))
-// 		}, nil)
-// 	}
-// 	panic(fmt.Sprintf("type not allowed for email verification change %T", verification))
-// }
 
 // -------------------------------------------------------------
 // columns
