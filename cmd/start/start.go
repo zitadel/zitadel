@@ -137,12 +137,10 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			config, shutdown, err := NewConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
@@ -71,7 +72,7 @@ type InitProjections struct {
 	BulkLimit        uint64
 }
 
-func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
+func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -96,14 +97,15 @@ func NewConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 
 	config.Instrumentation.Metric.SetLegacyConfig(config.Metrics)
 	config.Instrumentation.Log.SetLegacyConfig(config.Log)
-	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
 
 	err = config.Log.SetLogger()
 	if err != nil {
-		err = errors.Join(err, shutdown(ctx))
+		err = errors.Join(err, shutdown(cmd.Context()))
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 

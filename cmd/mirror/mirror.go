@@ -57,17 +57,15 @@ Order of execution:
 				logging.OnError(cmd.Context(), err).Error("zitadel mirror command failed")
 			}()
 
-			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := newMigrationConfig(cmd, viper.GetViper())
 			if err != nil {
 				return fmt.Errorf("unable to create migration config: %w", err)
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
 
-			projectionConfig, _, err := newProjectionsConfig(cmd.Context(), viper.GetViper())
+			projectionConfig, _, err := newProjectionsConfig(cmd, viper.GetViper())
 			if err != nil {
 				return fmt.Errorf("unable to create projections config: %w", err)
 			}

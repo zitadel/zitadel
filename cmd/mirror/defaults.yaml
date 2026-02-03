@@ -82,6 +82,10 @@ Instrumentation:
       ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
       # Adds stack traces to logged errors.
       StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
+    # Exporter configures where the OTEL formatted logs are exported to.
+    # You typically want to disable this unless you have a OTEL collector setup.
+    # Enabling stdOut or stdErr here will result in duplicate logs (of different format)
+    # if there's also a Format set above.
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables OTEL log exporter

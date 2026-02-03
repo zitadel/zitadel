@@ -1,15 +1,16 @@
 package ready
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
@@ -22,7 +23,7 @@ type Config struct {
 	TLS             network.TLS
 }
 
-func newConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
+func newConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.ShutdownFunc, error) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -46,10 +47,11 @@ func newConfig(ctx context.Context, v *viper.Viper) (*Config, instrumentation.Sh
 		return nil, nil, fmt.Errorf("unable to set logger: %w", err)
 	}
 
-	shutdown, err := instrumentation.Start(ctx, config.Instrumentation)
+	shutdown, err := instrumentation.Start(cmd.Context(), config.Instrumentation)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 
 	return config, shutdown, nil
 }

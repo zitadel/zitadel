@@ -25,12 +25,10 @@ func New() *cobra.Command {
 			defer func() {
 				logging.OnError(cmd.Context(), err).Error("zitadel ready command failed")
 			}()
-			config, shutdown, err := newConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := newConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()

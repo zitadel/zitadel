@@ -27,12 +27,10 @@ Only auth requests are mirrored`,
 			defer func() {
 				logging.OnError(cmd.Context(), err).Error("zitadel mirror auth command failed")
 			}()
-			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := newMigrationConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()

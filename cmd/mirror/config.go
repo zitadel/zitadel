@@ -1,16 +1,17 @@
 package mirror
 
 import (
-	"context"
 	_ "embed"
 	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	old_logging "github.com/zitadel/logging" //nolint:staticcheck
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -39,13 +40,13 @@ var (
 	defaultConfig []byte
 )
 
-func newMigrationConfig(ctx context.Context, v *viper.Viper) (*Migration, instrumentation.ShutdownFunc, error) {
+func newMigrationConfig(cmd *cobra.Command, v *viper.Viper) (*Migration, instrumentation.ShutdownFunc, error) {
 	config := new(Migration)
 	err := newConfig(v, config)
 	if err != nil {
 		return nil, nil, err
 	}
-	shutdown, err := startInstrumentation(ctx, config.Instrumentation, config.Log)
+	shutdown, err := startInstrumentation(cmd, config.Instrumentation, config.Log)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -53,13 +54,13 @@ func newMigrationConfig(ctx context.Context, v *viper.Viper) (*Migration, instru
 	return config, shutdown, nil
 }
 
-func newProjectionsConfig(ctx context.Context, v *viper.Viper) (*ProjectionsConfig, instrumentation.ShutdownFunc, error) {
+func newProjectionsConfig(cmd *cobra.Command, v *viper.Viper) (*ProjectionsConfig, instrumentation.ShutdownFunc, error) {
 	config := new(ProjectionsConfig)
 	err := newConfig(v, config)
 	if err != nil {
 		return nil, nil, err
 	}
-	shutdown, err := startInstrumentation(ctx, config.Instrumentation, config.Log)
+	shutdown, err := startInstrumentation(cmd, config.Instrumentation, config.Log)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -67,9 +68,9 @@ func newProjectionsConfig(ctx context.Context, v *viper.Viper) (*ProjectionsConf
 	return config, shutdown, nil
 }
 
-func startInstrumentation(ctx context.Context, cfg instrumentation.Config, logConfig *old_logging.Config) (instrumentation.ShutdownFunc, error) {
+func startInstrumentation(cmd *cobra.Command, cfg instrumentation.Config, logConfig *old_logging.Config) (instrumentation.ShutdownFunc, error) {
 	cfg.Log.SetLegacyConfig(logConfig)
-	shutdown, err := instrumentation.Start(ctx, cfg)
+	shutdown, err := instrumentation.Start(cmd.Context(), cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
@@ -78,6 +79,7 @@ func startInstrumentation(ctx context.Context, cfg instrumentation.Config, logCo
 	if err != nil {
 		return nil, fmt.Errorf("unable to set logger: %w", err)
 	}
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 	return shutdown, nil
 }
 

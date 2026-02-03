@@ -41,17 +41,15 @@ Requirements:
 				return fmt.Errorf("no master key provided: %w", err)
 			}
 
-			initCtx, cancel := context.WithCancel(cmd.Context())
-			defer cancel()
-			initConfig, shutdown, err := initialise.NewConfig(initCtx, viper.GetViper())
+			initConfig, shutdown, err := initialise.NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
-				err = errors.Join(err, shutdown(initCtx))
+				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
+			initCtx, cancel := context.WithCancel(cmd.Context())
+			defer cancel()
 
 			err = initialise.InitAll(initCtx, initConfig)
 			if err != nil {
@@ -63,7 +61,7 @@ Requirements:
 				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
 			}
 
-			setupConfig, _, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			setupConfig, _, err := setup.NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
@@ -80,7 +78,7 @@ Requirements:
 				return err
 			}
 
-			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
+			startConfig, _, err := NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}

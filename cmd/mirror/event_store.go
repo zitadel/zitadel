@@ -38,12 +38,10 @@ Migrate only copies events2 and unique constraints`,
 				logging.OnError(cmd.Context(), err).Error("zitadel mirror eventstore command failed")
 			}()
 
-			config, shutdown, err := newMigrationConfig(cmd.Context(), viper.GetViper())
+			config, shutdown, err := newMigrationConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()

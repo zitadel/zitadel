@@ -45,12 +45,10 @@ Requirements:
 				return err
 			}
 
-			setupConfig, shutdown, err := setup.NewConfig(cmd.Context(), viper.GetViper())
+			setupConfig, shutdown, err := setup.NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
-			// Set logger again to include changes from config
-			cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 			defer func() {
 				err = errors.Join(err, shutdown(cmd.Context()))
 			}()
@@ -67,7 +65,7 @@ Requirements:
 				return err
 			}
 
-			startConfig, _, err := NewConfig(cmd.Context(), viper.GetViper())
+			startConfig, _, err := NewConfig(cmd, viper.GetViper())
 			if err != nil {
 				return err
 			}
