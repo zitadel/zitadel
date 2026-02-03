@@ -14,41 +14,41 @@ const nextConfig = {
   },
   async redirects() {
     try {
-        const redirectsPath = new URL('./redirects.json', import.meta.url);
-        const redirectsContent = await fs.readFile(redirectsPath, 'utf-8');
-        const generatedRedirects = JSON.parse(redirectsContent);
-        
-        return [
-          ...generatedRedirects,
-          {
-            source: '/',
-            destination: '/docs',
-            basePath: false,
-            permanent: false,
-          },
-          {
-            source: '/img/:path*',
-            destination: '/docs/img/:path*',
-            basePath: false,
-            permanent: false,
-          },
-        ];
+      const redirectsPath = new URL('./redirects.json', import.meta.url);
+      const redirectsContent = await fs.readFile(redirectsPath, 'utf-8');
+      const generatedRedirects = JSON.parse(redirectsContent);
+
+      return [
+        ...generatedRedirects,
+        {
+          source: '/',
+          destination: '/docs',
+          basePath: false,
+          permanent: false,
+        },
+        {
+          source: '/img/:path*',
+          destination: '/docs/img/:path*',
+          basePath: false,
+          permanent: false,
+        },
+      ];
     } catch (e) {
-        console.warn('Could not load redirects.json', e);
-        return [
-            {
-              source: '/',
-              destination: '/docs',
-              basePath: false,
-              permanent: false,
-            },
-            {
-              source: '/img/:path*',
-              destination: '/docs/img/:path*',
-              basePath: false,
-              permanent: false,
-            },
-        ];
+      console.warn('Could not load redirects.json', e);
+      return [
+        {
+          source: '/',
+          destination: '/docs',
+          basePath: false,
+          permanent: false,
+        },
+        {
+          source: '/img/:path*',
+          destination: '/docs/img/:path*',
+          basePath: false,
+          permanent: false,
+        },
+      ];
     }
   },
   async rewrites() {

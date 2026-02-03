@@ -33,7 +33,6 @@ const FEATURE_KEYS = [
   // 'improvedPerformance',
   'loginDefaultOrg',
   'oidcSingleV1SessionTermination',
-  'oidcTokenExchange',
   'permissionCheckV2',
   'userSchema',
   'enableRelationalTables',
