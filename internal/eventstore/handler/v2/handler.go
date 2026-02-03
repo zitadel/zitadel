@@ -308,13 +308,13 @@ func randomizeStart(min, maxSeconds float64) time.Duration {
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
+	defer logging.Info(ctx, "handler has shutdown")
 	queue := make(chan eventstore.Event, 100)
 	subscription := eventstore.SubscribeEventTypes(queue, h.eventTypes)
 	for {
 		select {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
-			logging.Debug(ctx, "shutdown")
 			return
 		case event := <-queue:
 			events := checkAdditionalEvents(queue, event)
@@ -327,7 +327,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 				}
 				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
 				if _, err := h.Trigger(queueCtx); err != nil {
-					logging.Debug(queueCtx, "trigger of queued event failed", "err", err)
+					logging.Warn(queueCtx, "trigger of queued event failed", "err", err)
 					continue
 				}
 				solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
@@ -475,9 +475,6 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 			wg.Done()
 		}
 		wg.Wait()
-		if err != nil {
-			logging.Info(ctx, "process events failed", "err", err)
-		}
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
@@ -532,7 +529,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				logging.WithError(ctx, err).Debug("state already locked")
+				logging.WithError(ctx, err).Info("another handler is already updating this projection")
 				err = nil
 				additionalIteration = false
 			}
@@ -558,7 +555,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			logging.OnError(ctx, rollbackErr).Debug("unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -578,7 +575,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	if !hasLocked {
-		logging.Debug(ctx, "skip execution, projection already locked")
+		logging.Info(ctx, "another handler is already updating this projection")
 		return false, nil
 	}
 

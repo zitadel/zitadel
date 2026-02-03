@@ -80,7 +80,6 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 			wg.Done()
 		}
 		wg.Wait()
-		logging.OnError(ctx, err).Info("process events failed")
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return err
@@ -94,7 +93,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				logging.WithError(ctx, err).Debug("state already locked")
+				logging.WithError(ctx, err).Info("another handler is already updating this projection")
 				err = nil
 				additionalIteration = false
 			}
@@ -118,7 +117,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			logging.OnError(ctx, rollbackErr).Debug("unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()

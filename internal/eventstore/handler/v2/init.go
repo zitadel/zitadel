@@ -204,7 +204,7 @@ func (h *Handler) Init(ctx context.Context) error {
 		next, err := execute(ctx, tx, h.projection.Name())
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
-				logging.Debug(ctx, "unable to rollback", "err", rollbackErr)
+				logging.Error(ctx, "unable to rollback", "err", rollbackErr)
 			}
 			return err
 		}
