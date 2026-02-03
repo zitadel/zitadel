@@ -10,7 +10,8 @@
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go",
-            "{workspaceRoot}/internal/**/*.yaml"
+            "{workspaceRoot}/internal/**/*.yaml",
+            "{workspaceRoot}/internal/**/*.json"
         ],
         "runtime": [
             "sources",
