@@ -321,9 +321,21 @@ describe("OpenTelemetry Integration", () => {
 
     describe("Span Filtering", () => {
       it("HTTP instrumentation excludes /healthy", () => {
-        const traces = readTraces();
-        // Check that no trace contains /healthy path (with dynamic port)
-        expect(traces).not.toContain("/ui/v2/login/healthy");
+        const traces = JSON.parse(readTraces());
+        // Find spans from @opentelemetry/instrumentation-http scope
+        const httpSpans = traces.resourceSpans
+          .flatMap((rs: { scopeSpans: Array<{ scope: { name: string }; spans: unknown[] }> }) => rs.scopeSpans)
+          .filter((ss: { scope: { name: string } }) => ss.scope.name === "@opentelemetry/instrumentation-http")
+          .flatMap((ss: { spans: unknown[] }) => ss.spans);
+        // Verify no HTTP instrumentation spans contain /healthy
+        const healthySpans = httpSpans.filter(
+          (s: { attributes?: Array<{ key: string; value: { stringValue?: string } }> }) =>
+            s.attributes?.some(
+              (a: { key: string; value: { stringValue?: string } }) =>
+                a.key === "http.target" && a.value.stringValue?.includes("/healthy"),
+            ),
+        );
+        expect(healthySpans).toHaveLength(0);
       }, TEST_TIMEOUT);
 
       it("includes /otel-test in traces", () => {
