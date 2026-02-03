@@ -5,14 +5,25 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
+	internal_db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 type pgxPool struct {
 	*pgxpool.Pool
+}
+
+// InternalDB implements [database.PoolTest].
+func (p *pgxPool) InternalDB() *internal_db.DB {
+	return &internal_db.DB{
+		DB:       stdlib.OpenDBFromPool(p.Pool),
+		Database: p,
+		Pool:     p.Pool,
+	}
 }
 
 // DatabaseName implements [database.PoolTest].

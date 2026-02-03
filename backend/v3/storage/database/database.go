@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -24,6 +26,7 @@ type PoolTest interface {
 	dialect.Database
 	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context, typeRegistration func(ctx context.Context, conn *pgx.Conn) error) error
+	InternalDB() *database.DB
 }
 
 // Connection is a single database connection which can be released back to the pool.
