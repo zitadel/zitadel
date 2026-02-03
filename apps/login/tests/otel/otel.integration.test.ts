@@ -54,11 +54,20 @@ async function waitForService(url: string, maxAttempts = 30, delayMs = 2000): Pr
 async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      if (fs.statSync(filePath).size > 0) return true;
+      const stat = fs.statSync(filePath);
+      if (stat.size > 0) {
+        console.log(`[waitForFile] ${path.basename(filePath)} ready (${stat.size} bytes, attempt ${i + 1})`);
+        return true;
+      }
+      console.log(`[waitForFile] ${path.basename(filePath)} exists but empty (attempt ${i + 1})`);
     } catch {
-      await new Promise((r) => setTimeout(r, delayMs));
+      if (i === 0 || i % 10 === 0) {
+        console.log(`[waitForFile] ${path.basename(filePath)} not found (attempt ${i + 1})`);
+      }
     }
+    await new Promise((r) => setTimeout(r, delayMs));
   }
+  console.log(`[waitForFile] ${path.basename(filePath)} timed out after ${maxAttempts} attempts`);
   return false;
 }
 
@@ -67,7 +76,11 @@ async function waitForFile(filePath: string, maxAttempts = 30, delayMs = 1000): 
  * Contains all trace spans in OTLP JSON format.
  */
 function readTraces(): string {
-  return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "traces.json"), "utf-8");
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -75,7 +88,11 @@ function readTraces(): string {
  * Contains all metrics in OTLP JSON format.
  */
 function readMetrics(): string {
-  return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "metrics.json"), "utf-8");
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -83,7 +100,11 @@ function readMetrics(): string {
  * Contains all log records in OTLP JSON format.
  */
 function readLogs(): string {
-  return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
+  try {
+    return fs.readFileSync(path.join(OUTPUT_DIR, "logs.json"), "utf-8");
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -117,6 +138,10 @@ describe("OpenTelemetry Integration", () => {
       // Container cleanup may fail if not running
     }
 
+    // Clean output directory to ensure fresh data
+    if (fs.existsSync(OUTPUT_DIR)) {
+      fs.rmSync(OUTPUT_DIR, { recursive: true });
+    }
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
 
@@ -144,8 +169,17 @@ describe("OpenTelemetry Integration", () => {
     await fetch(`${APP_URL}/ui/v2/login/healthy`);
     await fetch(`${APP_URL}/ui/v2/login/this-does-not-exist-404`);
 
-    await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
-    await new Promise((r) => setTimeout(r, 35000));
+    // Wait for batch processors to flush, collector to write files,
+    // and Docker volume sync (can be slow on macOS)
+    await new Promise((r) => setTimeout(r, 15000));
+
+    // Wait for telemetry files to be written
+    const tracesReady = await waitForFile(path.join(OUTPUT_DIR, "traces.json"));
+    if (!tracesReady) throw new Error("Traces file not found");
+    const logsReady = await waitForFile(path.join(OUTPUT_DIR, "logs.json"));
+    if (!logsReady) throw new Error("Logs file not found");
+    const metricsReady = await waitForFile(path.join(OUTPUT_DIR, "metrics.json"), 60, 1000);
+    if (!metricsReady) throw new Error("Metrics file not found");
   }, DOCKER_TIMEOUT);
 
   afterAll(async () => {
@@ -369,12 +403,8 @@ describe("OpenTelemetry Integration", () => {
         expect(readTraces()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("contains service.version", () => {
-        expect(readTraces()).toContain('"service.version"');
-      }, TEST_TIMEOUT);
-
-      it("contains deployment.environment", () => {
-        expect(readTraces()).toContain('"deployment.environment"');
+      it("contains deployment.environment.name", () => {
+        expect(readTraces()).toContain('"deployment.environment.name"');
       }, TEST_TIMEOUT);
 
       it("contains process.runtime.name", () => {
@@ -385,47 +415,20 @@ describe("OpenTelemetry Integration", () => {
         expect(readTraces()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.provider", () => {
-        expect(readTraces()).toContain('"gcp"');
+      it("contains container.id when running in container", () => {
+        expect(readTraces()).toContain('"container.id"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.platform", () => {
-        expect(readTraces()).toContain('"gcp_cloud_run"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.account.id", () => {
-        expect(readTraces()).toContain('"test-project-123"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.region", () => {
-        expect(readTraces()).toContain('"us-central1"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.resource_id", () => {
-        expect(readTraces()).toContain('"cloud.resource_id"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.name", () => {
-        expect(readTraces()).toContain('"faas.name"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.version", () => {
-        expect(readTraces()).toContain('"zitadel-login-00001-abc"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.instance", () => {
-        expect(readTraces()).toContain('"faas.instance"');
-      }, TEST_TIMEOUT);
-
-      it("contains container.id when available", () => {
-        const traces = readTraces();
-        if (traces.includes('"container.id"')) {
-          expect(traces).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
-        }
-      }, TEST_TIMEOUT);
-
-      it("contains host.name from HOSTNAME env var", () => {
+      it("contains host.name", () => {
         expect(readTraces()).toContain('"host.name"');
+      }, TEST_TIMEOUT);
+
+      it("contains host.arch", () => {
+        expect(readTraces()).toContain('"host.arch"');
+      }, TEST_TIMEOUT);
+
+      it("contains process.pid", () => {
+        expect(readTraces()).toContain('"process.pid"');
       }, TEST_TIMEOUT);
     });
   });
@@ -572,12 +575,8 @@ describe("OpenTelemetry Integration", () => {
         expect(readMetrics()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("contains service.version", () => {
-        expect(readMetrics()).toContain('"service.version"');
-      }, TEST_TIMEOUT);
-
-      it("contains deployment.environment", () => {
-        expect(readMetrics()).toContain('"deployment.environment"');
+      it("contains deployment.environment.name", () => {
+        expect(readMetrics()).toContain('"deployment.environment.name"');
       }, TEST_TIMEOUT);
 
       it("contains process.runtime.name", () => {
@@ -588,47 +587,20 @@ describe("OpenTelemetry Integration", () => {
         expect(readMetrics()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.provider", () => {
-        expect(readMetrics()).toContain('"gcp"');
+      it("contains container.id when running in container", () => {
+        expect(readMetrics()).toContain('"container.id"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.platform", () => {
-        expect(readMetrics()).toContain('"gcp_cloud_run"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.account.id", () => {
-        expect(readMetrics()).toContain('"test-project-123"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.region", () => {
-        expect(readMetrics()).toContain('"us-central1"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.resource_id", () => {
-        expect(readMetrics()).toContain('"cloud.resource_id"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.name", () => {
-        expect(readMetrics()).toContain('"faas.name"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.version", () => {
-        expect(readMetrics()).toContain('"zitadel-login-00001-abc"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.instance", () => {
-        expect(readMetrics()).toContain('"faas.instance"');
-      }, TEST_TIMEOUT);
-
-      it("contains container.id when available", () => {
-        const metrics = readMetrics();
-        if (metrics.includes('"container.id"')) {
-          expect(metrics).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
-        }
-      }, TEST_TIMEOUT);
-
-      it("contains host.name from HOSTNAME env var", () => {
+      it("contains host.name", () => {
         expect(readMetrics()).toContain('"host.name"');
+      }, TEST_TIMEOUT);
+
+      it("contains host.arch", () => {
+        expect(readMetrics()).toContain('"host.arch"');
+      }, TEST_TIMEOUT);
+
+      it("contains process.pid", () => {
+        expect(readMetrics()).toContain('"process.pid"');
       }, TEST_TIMEOUT);
     });
   });
@@ -728,12 +700,8 @@ describe("OpenTelemetry Integration", () => {
         expect(readLogs()).toContain('"zitadel-login-test"');
       }, TEST_TIMEOUT);
 
-      it("contains service.version", () => {
-        expect(readLogs()).toContain('"service.version"');
-      }, TEST_TIMEOUT);
-
-      it("contains deployment.environment", () => {
-        expect(readLogs()).toContain('"deployment.environment"');
+      it("contains deployment.environment.name", () => {
+        expect(readLogs()).toContain('"deployment.environment.name"');
       }, TEST_TIMEOUT);
 
       it("contains process.runtime.name", () => {
@@ -744,47 +712,20 @@ describe("OpenTelemetry Integration", () => {
         expect(readLogs()).toContain('"process.runtime.version"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.provider", () => {
-        expect(readLogs()).toContain('"gcp"');
+      it("contains container.id when running in container", () => {
+        expect(readLogs()).toContain('"container.id"');
       }, TEST_TIMEOUT);
 
-      it("contains cloud.platform", () => {
-        expect(readLogs()).toContain('"gcp_cloud_run"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.account.id", () => {
-        expect(readLogs()).toContain('"test-project-123"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.region", () => {
-        expect(readLogs()).toContain('"us-central1"');
-      }, TEST_TIMEOUT);
-
-      it("contains cloud.resource_id", () => {
-        expect(readLogs()).toContain('"cloud.resource_id"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.name", () => {
-        expect(readLogs()).toContain('"faas.name"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.version", () => {
-        expect(readLogs()).toContain('"zitadel-login-00001-abc"');
-      }, TEST_TIMEOUT);
-
-      it("contains faas.instance", () => {
-        expect(readLogs()).toContain('"faas.instance"');
-      }, TEST_TIMEOUT);
-
-      it("contains container.id when available", () => {
-        const logs = readLogs();
-        if (logs.includes('"container.id"')) {
-          expect(logs).toMatch(/"container\.id"[^"]*"[a-f0-9]{64}"/);
-        }
-      }, TEST_TIMEOUT);
-
-      it("contains host.name from HOSTNAME env var", () => {
+      it("contains host.name", () => {
         expect(readLogs()).toContain('"host.name"');
+      }, TEST_TIMEOUT);
+
+      it("contains host.arch", () => {
+        expect(readLogs()).toContain('"host.arch"');
+      }, TEST_TIMEOUT);
+
+      it("contains process.pid", () => {
+        expect(readLogs()).toContain('"process.pid"');
       }, TEST_TIMEOUT);
     });
   });

@@ -44,7 +44,11 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_EXPORTER_OTLP_HEADERS=x-test-header=test-value-123,x-another-header=another-value
       - OTEL_LOG_LEVEL=info
-      - OTEL_METRICS_EXPORT_INTERVAL_MS=5000
+      - OTEL_METRICS_EXPORTER=otlp,prometheus
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_PROMETHEUS_PORT=9464
+      - OTEL_BSP_SCHEDULE_DELAY=1000
+      - OTEL_METRIC_EXPORT_INTERVAL=5000
       - ZITADEL_API_URL=http://mock-zitadel:8080
       # Required for gRPC authentication - any non-empty token works with mock server
       - ZITADEL_SERVICE_USER_TOKEN=test-token-for-otel-integration-tests
