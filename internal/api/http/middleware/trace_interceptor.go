@@ -3,8 +3,10 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 )
 
 func DefaultTraceHandler(handler http.Handler) http.Handler {
@@ -13,6 +15,16 @@ func DefaultTraceHandler(handler http.Handler) http.Handler {
 
 func TraceHandler(ignoredPrefix ...string) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
-		return tracing.NewHandler(handler, ignoredPrefix...)
+		return otelhttp.NewHandler(handler,
+			"zitadel",
+			otelhttp.WithFilter(instrumentation.RequestFilter(ignoredPrefix...)),
+			otelhttp.WithPublicEndpoint(),
+			otelhttp.WithSpanNameFormatter(spanNameFormatter),
+			otelhttp.WithMeterProvider(otel.GetMeterProvider()),
+		)
 	}
+}
+
+func spanNameFormatter(_ string, r *http.Request) string {
+	return r.URL.Path
 }
