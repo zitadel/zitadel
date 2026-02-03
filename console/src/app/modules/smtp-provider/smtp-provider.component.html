@@ -1,25 +1,27 @@
+@let state = this.state();
 <cnsl-create-layout
   title="{{
-    id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.STEPS.TITLE' | translate: { value: providerDefaultSetting.name })
+    id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.STEPS.TITLE' | translate: { value: state.providerDefaults.name })
   }}"
   [createSteps]="4"
-  [currentCreateStep]="currentCreateStep"
-  (closed)="close()"
+  [currentCreateStep]="currentCreateStep()"
+  (closed)="location.back()"
 >
   <div class="wizard-header">
-    <img
-      class="smtp-logo"
-      src="{{ providerDefaultSetting.image }}"
-      alt="{{ providerDefaultSetting.name }}"
-      *ngIf="providerDefaultSetting.name !== 'generic'"
-    />
-    <div class="smtp-icon" *ngIf="providerDefaultSetting.name === 'generic'">
-      <mat-icon class="icon" svgIcon="mdi_smtp" alt="providerDefaultSetting.name" />
+    @if ("image" in state.providerDefaults) {
+      <img
+        class="smtp-logo"
+        [src]="state.providerDefaults.image"
+        [alt]="state.providerDefaults.name"
+      />
+    }
+    <div class="smtp-icon" *ngIf="state.providerDefaults.name === 'generic'">
+      <mat-icon class="icon" svgIcon="mdi_smtp" alt="providerDefaultSetting.name"/>
     </div>
     <h2>
       {{
         !id
-          ? ('SMTP.CREATE.STEPS.CREATE_DESC_TITLE' | translate: { value: providerDefaultSetting.name | titlecase })
+          ? ('SMTP.CREATE.STEPS.CREATE_DESC_TITLE' | translate: {value: state.providerDefaults.name | titlecase})
           : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate)
       }}
     </h2>
@@ -35,62 +37,114 @@
   >
     <mat-step [editable]="true">
       <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
-      <form [formGroup]="firstFormGroup" autocomplete="off">
-        <mat-checkbox class="smtp-checkbox" formControlName="tls" (change)="toggleTLS($event)" data-e2e="tls-checkbox">
+      <form [formGroup]="state.form" autocomplete="off">
+        <mat-checkbox class="smtp-checkbox" [formControl]="state.form.controls.tls" data-e2e="tls-checkbox"
+                      (change)="toggleTls($event)">
           {{ 'SETTING.SMTP.TLS' | translate }}
         </mat-checkbox>
 
-        <cnsl-form-field class="smtp-form-field" *ngIf="providerDefaultSetting.regions">
-          <cnsl-label>{{ providerDefaultSetting.multiHostsLabel }}</cnsl-label>
-          <mat-select formControlName="region">
-            <mat-option *ngFor="let region of providerDefaultSetting.regions | keyvalue" [value]="region.value">
-              {{ region.key }}
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
-
         <cnsl-form-field class="smtp-form-field" label="Description">
           <cnsl-label>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</cnsl-label>
-          <input cnslInput name="description" formControlName="description" placeholder="description" />
+          <input cnslInput name="description" [formControl]="state.form.controls.description"
+                 placeholder="description"/>
         </cnsl-form-field>
 
-        <cnsl-form-field class="smtp-form-field" label="Host And Port">
-          <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
-          <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="host:port" required />
-        </cnsl-form-field>
+        @if (state.case === "region") {
+          <cnsl-form-field class="smtp-form-field">
+            <cnsl-label>Select your Region</cnsl-label>
+            <mat-select [formControl]="state.form.controls.region">
+              <mat-option *ngFor="let region of state.providerDefaults.regions | keyvalue" [value]="region.value">
+                {{ region.key }}
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+        }
 
-        <cnsl-form-field class="smtp-form-field" label="User">
-          <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
-          <input
-            id="smtp-user"
-            cnslInput
-            name="smtp-user"
-            autocomplete="smtp-user"
-            formControlName="user"
-            placeholder="{{ providerDefaultSetting.user.placeholder }}"
-            required
-          />
-        </cnsl-form-field>
+        @if (state.case === "host") {
+          <cnsl-form-field class="smtp-form-field" label="Host And Port">
+            <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
+            <input cnslInput name="hostAndPort" [formControl]="state.form.controls.hostAndPort" placeholder="host:port"
+                   required/>
+          </cnsl-form-field>
+        }
 
-        <cnsl-form-field class="smtp-form-field" label="Password">
-          <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
-          <input
-            id="smtp-password"
-            cnslInput
-            name="smtp-password"
-            autocomplete="off webauthn"
-            formControlName="password"
-            placeholder="{{ hasSMTPConfig ? '****************' : providerDefaultSetting.password.placeholder }}"
-            type="password"
-            required="{{ !hasSMTPConfig }}"
-          />
-        </cnsl-form-field>
+        <mat-checkbox class="smtp-checkbox" [formControl]="state.form.controls.xoauth2">
+          xoauth2
+        </mat-checkbox>
+
+        @let auth = this.auth();
+        @if ("tokenEndpoint" in auth.controls) {
+          <cnsl-form-field class="smtp-form-field" label="tokenEndpoint">
+            <cnsl-label>tokenEndpoint</cnsl-label>
+            <input
+              cnslInput
+              name="token-endpoint"
+              [formControl]="auth.controls.tokenEndpoint"
+              required
+            />
+          </cnsl-form-field>
+          <cnsl-form-field class="smtp-form-field" label="scopes">
+            <cnsl-label>scopes comma sepereated</cnsl-label>
+            <input
+              cnslInput
+              name="scopes"
+              [formControl]="auth.controls.scopes"
+              required
+            />
+          </cnsl-form-field>
+          <cnsl-form-field class="smtp-form-field" label="clientId">
+            <cnsl-label>clientId</cnsl-label>
+            <input
+              cnslInput
+              name="client-id"
+              [formControl]="auth.controls.clientId"
+              required
+            />
+          </cnsl-form-field>
+          <cnsl-form-field class="smtp-form-field" label="clientSecret">
+            <cnsl-label>clientSecret</cnsl-label>
+            <input
+              cnslInput
+              name="client-id"
+              [formControl]="auth.controls.clientSecret"
+              required
+            />
+          </cnsl-form-field>
+        } @else {
+          <cnsl-form-field class="smtp-form-field" label="User">
+            <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+            <input
+              id="smtp-user"
+              cnslInput
+              name="smtp-user"
+              autocomplete="smtp-user"
+              [formControl]="auth.controls.user"
+              [placeholder]="'auth' in state.providerDefaults && state.providerDefaults.auth.case === 'plain' ? state.providerDefaults.auth.user.placeholder : ''"
+              required
+            />
+          </cnsl-form-field>
+
+          <cnsl-form-field class="smtp-form-field" label="Password">
+            <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
+            <input
+              id="smtp-password"
+              cnslInput
+              name="smtp-password"
+              autocomplete="off webauthn"
+              [formControl]="auth.controls.password"
+              [placeholder]="'auth' in state.providerDefaults && state.providerDefaults.auth.case === 'plain' ? state.providerDefaults.auth.password.placeholder : ''"
+              type="password"
+              required="{{ !hasSMTPConfig }}"
+            />
+          </cnsl-form-field>
+
+        }
       </form>
 
       <div class="smtp-create-actions">
         <button
           mat-raised-button
-          [disabled]="firstFormGroup.invalid"
+          [disabled]="state.form.invalid || auth.invalid"
           color="primary"
           matStepperNext
           data-e2e="continue-to-2nd-form"
@@ -110,19 +164,20 @@
             cnslInput
             name="senderAddress"
             formControlName="senderAddress"
-            placeholder="{{ senderEmailPlaceholder }}"
+            [placeholder]="senderEmailPlaceholder()"
             required
           />
         </cnsl-form-field>
 
         <cnsl-form-field class="smtp-form-field" label="Sender Name">
           <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
-          <input cnslInput name="senderName" formControlName="senderName" placeholder="Zitadel" required />
+          <input cnslInput name="senderName" formControlName="senderName" placeholder="Zitadel" required/>
         </cnsl-form-field>
 
         <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
           <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
-          <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" placeholder="replyto@example.com" />
+          <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress"
+                 placeholder="replyto@example.com"/>
         </cnsl-form-field>
       </form>
 
@@ -149,7 +204,8 @@
               <h2 class="title">{{ 'SMTP.CREATE.STEPS.TEST.TITLE' | translate }}</h2>
             </div>
             <div class="right">
-              <button color="primary" mat-raised-button class="continue-button" (click)="testEmailConfiguration()">
+              <button color="primary" mat-raised-button class="continue-button"
+                      (click)="testEmailConfiguration.mutate()">
                 {{ 'ACTIONS.TEST' | translate }}
               </button>
             </div>
@@ -158,23 +214,28 @@
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_EMAIL' | translate }}</cnsl-label>
             <input
+              [disabled]="emailQuery.isLoading()"
               cnslInput
-              [(ngModel)]="email"
+              (ngModelChange)="email.set($event)"
+              [ngModel]="email()"
               [ngModelOptions]="{ standalone: true }"
               data-e2e="email-test-dialog-input"
             />
           </cnsl-form-field>
 
-          <div class="is-loading" *ngIf="isLoading()">
+          <div class="is-loading" *ngIf="testEmailConfiguration.isPending()">
+            hoi
             <mat-spinner diameter="50"></mat-spinner>
           </div>
 
-          <cnsl-form-field class="formfield" *ngIf="testResult">
+          <cnsl-form-field class="formfield"
+                           *ngIf="testEmailConfiguration.isError() || testEmailConfiguration.isSuccess()">
             <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_RESULT' | translate }}</cnsl-label>
+            @let error = testEmailConfiguration.error();
             <textarea
               cnslInput
               class="{{ resultClass }}"
-              [(ngModel)]="testResult"
+              [ngModel]="error ? error.message : ('SMTP.CREATE.STEPS.TEST.RESULT' | translate)"
               [ngModelOptions]="{ standalone: true }"
             ></textarea>
           </cnsl-form-field>
@@ -187,9 +248,8 @@
             class="create-button"
             color="primary"
             data-e2e="create-button"
-            (click)="savePolicy(stepper)"
             [disabled]="
-              firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
+              state.form.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
             "
           >
             {{ !hasSMTPConfig ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
@@ -267,7 +327,8 @@
 
         <div class="smtp-create-actions">
           <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-          <button mat-raised-button class="create-button" color="primary" data-e2e="close-button" (click)="close()">
+          <button mat-raised-button class="create-button" color="primary" data-e2e="close-button"
+                  (click)="location.back()">
             {{ 'ACTIONS.CLOSE' | translate }}
           </button>
         </div>
