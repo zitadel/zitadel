@@ -1430,6 +1430,8 @@ service UserService {
   // Deprecated: [Update the users password](/docs/reference/api/user/zitadel.user.v2.UserService.UpdateUser) instead.
   //
   // Change the password of a user with either a verification code or the current password..
+  //
+  // Organization Admins can change passwords for their users without verification code or current password
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password"

@@ -152,7 +152,9 @@ Errors:
       NotSet: O usuário não definiu uma senha
       NotChanged: A nova senha não pode ser igual à sua senha atual
       NotSupported: Codificação hash da senha não suportada. Confira https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
-    PasswordComplexityPolicy:
+      NoVerificationTokenOrCurrentPassword: Não é possível alterar a palavra-passe sem o token de verificação ou a palavra-passe atual
+      PasswordComplexityrolicy: Não é possível alterar a palavra-passe sem o token de verificação ou a palavra-passe atual
+    PasswordComplexityPolrcy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
       MinLengthNotAllowed: O comprimento mínimo fornecido não é permitido

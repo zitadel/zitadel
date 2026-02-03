@@ -152,6 +152,7 @@ Errors:
       NotSet: Användare har inte ställt in ett lösenord
       NotChanged: Nytt lösenord kan inte vara samma som ditt nuvarande lösenord
       NotSupported: Lösenordshash-kodning stöds inte. Kolla https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Kan inte ändra lösenord utan verifieringstoken eller aktuellt lösenord
     PasswordComplexityPolicy:
       NotFound: Lösenordspolicy hittades inte
       MinLength: Lösenordet är för kort

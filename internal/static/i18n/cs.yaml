@@ -152,6 +152,7 @@ Errors:
       NotSet: Uživatel nenastavil heslo
       NotChanged: Nové heslo nesmí být stejné jako současné heslo
       NotSupported: Kódování hash hesla není podporováno. Podívejte se na https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+      NoVerificationTokenOrCurrentPassword: Nelze změnit heslo bez ověřovacího tokenu nebo aktuálního hesla
     PasswordComplexityPolicy:
       NotFound: Politika složitosti hesla nenalezena
       MinLength: Heslo je příliš krátké
