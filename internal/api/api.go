@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"os"
 	"sort"
 	"strings"
 
@@ -132,13 +133,16 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(
+	otelOpts := []otelconnect.Option{
 		otelconnect.WithTracerProvider(otel.GetTracerProvider()),
 		otelconnect.WithMeterProvider(otel.GetMeterProvider()),
 		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
 		otelconnect.WithoutServerPeerAttributes(),
-		otelconnect.WithTrustRemote(),
-	)
+	}
+	if os.Getenv("OTEL_TRUST_REMOTE_SPANS") == "true" {
+		otelOpts = append(otelOpts, otelconnect.WithTrustRemote())
+	}
+	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(otelOpts...)
 	if err != nil {
 		return nil, err
 	}
