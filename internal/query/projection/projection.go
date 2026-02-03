@@ -127,26 +127,24 @@ var (
 	fields      []*handler.FieldHandler
 )
 
-func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
-	projectionConfig = handler.Config{
-		Client:              sqlClient,
-		Eventstore:          es,
-		BulkLimit:           uint16(config.BulkLimit),
-		RequeueEvery:        config.RequeueEvery,
-		MaxFailureCount:     config.MaxFailureCount,
-		RetryFailedAfter:    config.RetryFailedAfter,
-		TransactionDuration: config.TransactionDuration,
-		ActiveInstancer:     config.ActiveInstancer,
-	}
+func InitRelationalTables(ctx context.Context, config Config) {
+	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
+	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
+	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
+	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
+	SettingsRelationalProjection = newSettingsRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["settings_relational"]))
+	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
+	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
+	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
+	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
+	AuthorizationRelationalProjection = newAuthorizationRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authorizations_relational"]))
+	ProjectGrantRelationalProjection = newProjectGrantRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_relational"]))
+	SessionRelationalProjection = newSessionRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["session_relational"]))
+	// TODO(adlerhurst): Uncomment once users table is created and FK can be enforced
+	// IDPIntentRelationalProjection = newIDPIntentRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_intent_relational"]))
+}
 
-	if config.MaxParallelTriggers == 0 {
-		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
-	}
-	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
-		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
-	}
-	handler.StartWorkerPool(config.MaxParallelTriggers)
-
+func InitProjections(ctx context.Context, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) {
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
 	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
@@ -209,35 +207,59 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
 	HostedLoginTranslationProjection = newHostedLoginTranslationProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["hosted_login_translation"]))
 	OrganizationSettingsProjection = newOrganizationSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_settings"]))
-
-	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
-	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
-	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
-	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
-	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
-	// Don't forget to add the new field handler to [ProjectInstanceFields]
-
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
+}
 
-	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
-	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
-	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
-	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
-	SettingsRelationalProjection = newSettingsRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["settings_relational"]))
-	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
-	ProjectRelationalProjection = newProjectRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects_relational"]))
-	ProjectRoleRelationalProjection = newProjectRoleRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles_relational"]))
-	OrganizationMetadataRelationalProjection = newOrgMetadataRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_metadata_relational"]))
-	AuthorizationRelationalProjection = newAuthorizationRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authorizations_relational"]))
-	ProjectGrantRelationalProjection = newProjectGrantRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_relational"]))
-	SessionRelationalProjection = newSessionRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["session_relational"]))
-	// TODO(adlerhurst): Uncomment once users table is created and FK can be enforced
-	// IDPIntentRelationalProjection = newIDPIntentRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_intent_relational"]))
+func initFields(projectionConfig handler.Config, customization map[string]CustomConfig) {
+	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, customization[fieldsProjectGrant]))
+	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, customization[fieldsOrgDomainVerified]))
+	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, customization[fieldsInstanceDomain]))
+	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, customization[fieldsMemberships]))
+	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, customization[fieldsPermission]))
+	// Don't forget to add the new field handler to [ProjectInstanceFields]
+}
+
+// CreateAll initializes both ES projection handlers and relational table ones
+func CreateAll(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) {
+	creationBootstrap(sqlClient, es, &config)
+
+	InitProjections(ctx, config, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	initFields(projectionConfig, config.Customizations)
+
+	InitRelationalTables(ctx, config)
 
 	newProjectionsList()
+	newRelationalTablesList()
 	newFieldsList()
-	return nil
+}
+
+func creationBootstrap(sqlClient *database.DB, es handler.EventStore, config *Config) {
+	projectionConfig = handler.Config{
+		Client:              sqlClient,
+		Eventstore:          es,
+		BulkLimit:           uint16(config.BulkLimit),
+		RequeueEvery:        config.RequeueEvery,
+		MaxFailureCount:     config.MaxFailureCount,
+		RetryFailedAfter:    config.RetryFailedAfter,
+		TransactionDuration: config.TransactionDuration,
+		ActiveInstancer:     config.ActiveInstancer,
+	}
+
+	if config.MaxParallelTriggers == 0 {
+		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
+	}
+	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
+		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
+	}
+	handler.StartWorkerPool(config.MaxParallelTriggers)
+}
+
+// CreateAll initializes relational table handlers
+func CreateRelational(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config) {
+	creationBootstrap(sqlClient, es, &config)
+	InitRelationalTables(ctx, config)
+	newRelationalTablesList()
 }
 
 func Projections() []projection {
@@ -353,7 +375,7 @@ func newFieldsList() {
 //
 // Event handlers NotificationsProjection, NotificationsQuotaProjection and NotificationsProjection are not added here, because they do not reduce to database statements
 func newProjectionsList() {
-	projections = []projection{
+	projectionList := []projection{
 		OrgProjection,
 		OrgMetadataProjection,
 		ActionProjection,
@@ -418,7 +440,18 @@ func newProjectionsList() {
 		OrganizationSettingsProjection,
 		GroupProjection,
 		GroupUsersProjection,
+	}
 
+	if len(projections) == 0 {
+		projections = projectionList
+		return
+	}
+	projections = append(projections, projectionList...)
+}
+
+// newRelationalTablesList adds to the projections singleton the relational tables
+func newRelationalTablesList() {
+	relTables := []projection{
 		InstanceRelationalProjection,
 		OrganizationRelationalProjection,
 		InstanceDomainRelationalProjection,
@@ -434,4 +467,9 @@ func newProjectionsList() {
 		// TODO(adlerhurst): Uncomment once users table is created and FK can be enforced
 		// IDPIntentRelationalProjection,
 	}
+	if len(projections) == 0 {
+		projections = relTables
+		return
+	}
+	projections = append(projections, relTables...)
 }
