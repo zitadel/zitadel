@@ -887,7 +887,7 @@
       "ADD": "Add Factor",
       "OTP": "Authenticator App for TOTP",
       "OTP_DIALOG_TITLE": "Add OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
+      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the TOTP method.",
       "U2F": "Passkey",
       "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
