@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/zitadel/internal/i18n"
 )
 

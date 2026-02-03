@@ -3,9 +3,10 @@ package middleware
 import (
 	"net/http"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/zitadel/zitadel/backend/v3/instrumentation"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func MetricsHandler(metricTypes []metrics.MetricType, ignoredMethods ...string) func(http.Handler) http.Handler {
