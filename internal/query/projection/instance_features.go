@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	InstanceFeatureTable = "projections.instance_features3"
+	InstanceFeatureTable = "projections.instance_features4"
 
 	InstanceFeatureInstanceIDCol   = "instance_id"
 	InstanceFeatureKeyCol          = "key"
@@ -66,10 +66,6 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 			{
 				Event:  feature_v2.InstanceUserSchemaEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceTokenExchangeEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
