@@ -47,7 +47,7 @@
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotCreateSession": "Kullanıcı için oturum oluşturulamadı",
       "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
-      "localAuthenticationNotAllowed": "Kullanıcı adı ve şifre izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
       "passkeysNotAllowed": "Passkey'ler izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
       "couldNotFindIdentityProvider": "Kimlik sağlayıcı bulunamadı.",
       "userNotActive": "Kullanıcı aktif değil. Daha fazla bilgi için yöneticinizle iletişime geçin."
