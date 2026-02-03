@@ -173,7 +173,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     return response;
   }
 
-  function setCodeAndContinue(values: Inputs, organization?: string) {
+  function setCodeAndContinue(values: Inputs) {
     return submitCode(values, organization).then(async (response) => {
       if (response && "sessionId" in response) {
         setLoading(true);
@@ -259,9 +259,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
             className="self-end"
             variant={ButtonVariants.Primary}
             disabled={loading || !formState.isValid}
-            onClick={handleSubmit((e) => {
-              setCodeAndContinue(e, organization);
-            })}
+            onClick={handleSubmit(setCodeAndContinue)}
             data-testid="submit-button"
           >
             {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="otp" />
