@@ -324,6 +324,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		config.Notifications,
+		config.OIDC.BackChannelLogoutConfig(),
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -336,8 +337,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
-		keys.OIDC,
-		config.OIDC.DefaultBackChannelLogoutLifetime,
 		q,
 	)
 	notification.Start(ctx)
