@@ -7,9 +7,9 @@ services:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./output:/tmp/otel
     ports:
-      - "4319:4318" # OTLP HTTP
-      - "8889:8888" # Prometheus metrics exposed by collector
-      - "13134:13133" # Health check
+      - "4318" # OTLP HTTP (dynamic host port)
+      - "8888" # Prometheus metrics exposed by collector (dynamic host port)
+      - "13133" # Health check (dynamic host port)
 
   mock-zitadel:
     image: node:20-alpine
@@ -22,8 +22,8 @@ services:
       - PORT=8080
       - OUTPUT_DIR=/tmp/otel
     ports:
-      - "8081:8080"   # HTTP/2 for gRPC
-      - "7433:7432"   # HTTP/1.1 for health checks
+      - "8080" # HTTP/2 for gRPC (dynamic host port)
+      - "7432" # HTTP/1.1 for health checks (dynamic host port)
     healthcheck:
       test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:7432/health"]
       interval: 5s
@@ -60,8 +60,8 @@ services:
       - K_CONFIGURATION=zitadel-login
       - GOOGLE_CLOUD_REGION=us-central1
     ports:
-      - "3002:3000"
-      - "9465:9464"
+      - "3000" # App port (dynamic host port)
+      - "9464" # Prometheus metrics (dynamic host port)
     depends_on:
       otel-collector:
         condition: service_started

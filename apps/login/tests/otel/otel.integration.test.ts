@@ -7,13 +7,31 @@ const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
 const OUTPUT_DIR = path.join(TEST_DIR, "output");
 const COMPOSE_FILE = path.join(TEST_DIR, "docker-compose.test.yml");
 
-const APP_URL = "http://localhost:3002";
-const PROMETHEUS_URL = "http://localhost:9465/metrics";
-const COLLECTOR_HEALTH_URL = "http://localhost:13134";
-const MOCK_ZITADEL_URL = "http://localhost:7433";
-
 const DOCKER_TIMEOUT = 180000;
 const TEST_TIMEOUT = 30000;
+
+// Dynamic port discovery - populated in beforeAll
+let APP_URL = "";
+let PROMETHEUS_URL = "";
+let COLLECTOR_HEALTH_URL = "";
+let MOCK_ZITADEL_URL = "";
+
+/**
+ * Gets the dynamically assigned host port for a service/container port.
+ * Uses `docker compose port` to discover the actual bound port.
+ */
+function getHostPort(service: string, containerPort: number): number {
+  const output = execSync(`docker compose -f ${COMPOSE_FILE} port ${service} ${containerPort}`, {
+    cwd: TEST_DIR,
+    encoding: "utf-8",
+  }).trim();
+  // Output format: 0.0.0.0:12345 or [::]:12345
+  const match = output.match(/:(\d+)$/);
+  if (!match) {
+    throw new Error(`Failed to parse port from: ${output}`);
+  }
+  return parseInt(match[1], 10);
+}
 
 /**
  * Polls a health endpoint until it returns HTTP 200.
@@ -144,6 +162,22 @@ describe("OpenTelemetry Integration", () => {
     }
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     execSync(`docker compose -f ${COMPOSE_FILE} up -d --build`, { stdio: "inherit", cwd: TEST_DIR });
+
+    // Discover dynamically assigned ports
+    const appPort = getHostPort("login-app", 3000);
+    const prometheusPort = getHostPort("login-app", 9464);
+    const collectorHealthPort = getHostPort("otel-collector", 13133);
+    const mockZitadelHealthPort = getHostPort("mock-zitadel", 7432);
+
+    APP_URL = `http://localhost:${appPort}`;
+    PROMETHEUS_URL = `http://localhost:${prometheusPort}/metrics`;
+    COLLECTOR_HEALTH_URL = `http://localhost:${collectorHealthPort}`;
+    MOCK_ZITADEL_URL = `http://localhost:${mockZitadelHealthPort}`;
+
+    console.log(`[PORTS] APP_URL: ${APP_URL}`);
+    console.log(`[PORTS] PROMETHEUS_URL: ${PROMETHEUS_URL}`);
+    console.log(`[PORTS] COLLECTOR_HEALTH_URL: ${COLLECTOR_HEALTH_URL}`);
+    console.log(`[PORTS] MOCK_ZITADEL_URL: ${MOCK_ZITADEL_URL}`);
 
     // Debug: show container status and logs
     try {
@@ -288,7 +322,8 @@ describe("OpenTelemetry Integration", () => {
     describe("Span Filtering", () => {
       it("HTTP instrumentation excludes /healthy", () => {
         const traces = readTraces();
-        expect(traces).not.toContain('"http.url":"http://localhost:3002/ui/v2/login/healthy"');
+        // Check that no trace contains /healthy path (with dynamic port)
+        expect(traces).not.toContain("/ui/v2/login/healthy");
       }, TEST_TIMEOUT);
 
       it("includes /otel-test in traces", () => {
