@@ -152,7 +152,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		defer cleanupCancel()
 
 		err = Cleanup(cleanupCtx, config)
-		logging.OnError(ctx, err).Fatal("setup cleanup failed")
+		logging.OnError(ctx, err).Error("setup cleanup failed")
 	}()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
@@ -248,7 +248,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
-	logging.OnError(ctx, err).Fatal("unable to start projections")
+	if err != nil {
+		return fmt.Errorf("unable to create projections: %w", err)
+	}
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -301,7 +303,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
 	} {
-		executeMigration(ctx, eventstoreClient, step, "migration failed")
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
@@ -340,7 +345,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
 	for _, repeatableStep := range repeatableSteps {
-		executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		setupErr = executeMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	// These steps are executed after the repeatable steps because they add fields projections
@@ -359,20 +367,26 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s66SessionRecoveryCodeCheckedAt,
 		steps.s68TargetAddPayloadTypeColumn,
 	} {
-		executeMigration(ctx, eventstoreClient, step, "migration failed")
+		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
+		if setupErr != nil {
+			return
+		}
 	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
 	if !config.ForMirror && config.InitProjections.Enabled {
-		initProjections(ctx, eventstoreClient)
+		setupErr = initProjections(ctx, eventstoreClient)
+		if setupErr != nil {
+			return
+		}
 	}
 	return nil
 }
 
-func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
+func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) error {
 	err := migration.Migrate(ctx, eventstoreClient, step)
 	if err == nil {
-		return
+		return nil
 	}
 	logFields := []any{
 		"name", step.String(),
@@ -387,7 +401,8 @@ func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventsto
 			"hint", pgErr.Hint,
 		)
 	}
-	logging.OnError(ctx, err).Fatal(errorMsg, logFields...)
+	logging.WithError(ctx, err).Error(errorMsg, logFields...)
+	return err
 }
 
 // readStmt reads a single file from the embedded FS,
@@ -597,24 +612,34 @@ func startCommandsQueries(
 func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
-) {
+) error {
 	for _, p := range projection.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.OnError(ctx, err).Fatal("projection migration failed", "name", p.String())
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithError(ctx, err).Error("projection migration failed", "name", p.String())
+			return err
+		}
 	}
 
 	for _, p := range admin_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.OnError(ctx, err).Fatal("admin schema migration failed", "name", p.String())
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithError(ctx, err).Error("admin schema migration failed", "name", p.String())
+			return err
+		}
 	}
 
 	for _, p := range auth_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.OnError(ctx, err).Fatal("auth schema migration failed", "name", p.String())
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithError(ctx, err).Error("auth schema migration failed", "name", p.String())
+			return err
+		}
 	}
 
 	for _, p := range notify_handler.Projections() {
-		err := migration.Migrate(ctx, eventstoreClient, p)
-		logging.OnError(ctx, err).Fatal("notification migration failed", "name", p.String())
+		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
+			logging.WithError(ctx, err).Error("notification migration failed", "name", p.String())
+			return err
+		}
 	}
+
+	return nil
 }
