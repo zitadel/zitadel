@@ -7,7 +7,7 @@ import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/chall
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -52,23 +52,10 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  useEffect(() => {
-    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
-      initialized.current = true;
-      setLoading(true);
-      updateSessionForOTPChallenge()
-        .then((response) => {
-          if (response?.error) {
-            setError(response.error);
-          }
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, []);
-
-  async function updateSessionForOTPChallenge(): Promise<{ error?: string; [key: string]: any }> {
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<{
+    error?: string;
+    [key: string]: any;
+  }> => {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -114,7 +101,23 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     }
 
     return response;
-  }
+  }, [method, host, requestId, loginName, sessionId, organization]);
+
+  useEffect(() => {
+    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
+      initialized.current = true;
+      setLoading(true);
+      updateSessionForOTPChallenge()
+        .then((response) => {
+          if (response?.error) {
+            setError(response.error);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [updateSessionForOTPChallenge, method, code]);
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
