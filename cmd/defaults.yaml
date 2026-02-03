@@ -2,6 +2,9 @@ Instrumentation:
   ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
   Trace:
     Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    # Trust incoming trace context from remote services for distributed tracing.
+    # Enable only in controlled environments; defaults to false for security.
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
     Exporter:
       # The following exporter types are supported:
       # "none": Disables trace exporting
