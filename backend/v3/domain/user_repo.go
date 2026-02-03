@@ -156,12 +156,12 @@ type humanEmailChanges interface {
 	// 	* [VerificationTypeUpdate] to update email verification, a verification must exist (e.g. resend code)
 	// 	* [VerificationTypeSkipped] to skip email verification, existing verification is removed (e.g. admin set email)
 	SetEmail(verification VerificationType) database.Change
-	// CheckEmailOTP sets the OTP email based on the check
+	// CheckEmailOTP sets the OTP Email based on the check
 	//  * [CheckTypeInit] to initialize a new check, previous check is overwritten
 	//  * [CheckTypeFailed] increments failed attempts
 	//  * [CheckTypeSucceeded] to mark the check as succeeded, removes the check and updates verified at time
 	CheckEmailOTP(check CheckType) database.Change
-	// EnableEmailOTPAt enables the OTP email
+	// EnableEmailOTPAt enables the OTP Email
 	// If enabledAt is zero, it will be set to NOW()
 	EnableEmailOTPAt(enabledAt time.Time) database.Change
 	// EnableEmailOTP sets the enabled at time to NOW()
