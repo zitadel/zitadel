@@ -2434,7 +2434,7 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP by Authenticator App (TOTP)",
+      "1": "TOTP (Authenticator App)",
       "2": "Passkey",
       "3": "OTP by Email (OTP Email)",
       "4": "OTP by SMS (OTP SMS)",
