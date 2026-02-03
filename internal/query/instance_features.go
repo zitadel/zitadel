@@ -11,14 +11,13 @@ type InstanceFeatures struct {
 	Details                        *domain.ObjectDetails
 	LoginDefaultOrg                FeatureSource[bool]
 	UserSchema                     FeatureSource[bool]
-	TokenExchange                  FeatureSource[bool]
 	ImprovedPerformance            FeatureSource[[]feature.ImprovedPerformanceType]
 	DebugOIDCParentError           FeatureSource[bool]
 	OIDCSingleV1SessionTermination FeatureSource[bool]
 	EnableBackChannelLogout        FeatureSource[bool]
 	LoginV2                        FeatureSource[*feature.LoginV2]
 	PermissionCheckV2              FeatureSource[bool]
-	ConsoleUseV2UserApi            FeatureSource[bool]
+	ManagementConsoleUseV2UserApi  FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
 }
 

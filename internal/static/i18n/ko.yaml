@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: TLS를 사용하여 SMTP 서버에 연결할 수 없습니다. 포트 또는 방화벽 문제를 확인하십시오...
     CouldNotCreateClient: smtp 클라이언트를 생성할 수 없습니다
     CouldNotStartTLS: TLS를 시작할 수 없습니다
-    CouldNotAuth: smtp 인증을 추가할 수 없습니다. 사용자 이름과 비밀번호가 정확한지 확인하십시오. 정확하다면 제공자가 ZITADEL에서 지원하지 않는 인증 방법을 요구할 수 있습니다
+    CouldNotAuth: smtp 인증을 추가할 수 없습니다. 사용자 이름과 비밀번호가 정확한지 확인하십시오. 정확하다면 제공자가 Zitadel에서 지원하지 않는 인증 방법을 요구할 수 있습니다
     CouldNotSetSender: 발신자를 설정할 수 없습니다
     CouldNotSetRecipient: 수신자를 설정할 수 없습니다
   SMTPConfig:
@@ -209,7 +209,7 @@ Errors:
     NotFound: 조직을 찾을 수 없습니다
     NotChanged: 조직이 변경되지 않았습니다
     DefaultOrgNotDeletable: 기본 조직은 삭제할 수 없습니다
-    ZitadelOrgNotDeletable: ZITADEL 프로젝트가 포함된 조직은 삭제할 수 없습니다
+    ZitadelOrgNotDeletable: Zitadel 프로젝트가 포함된 조직은 삭제할 수 없습니다
     InvalidDomain: 유효하지 않은 도메인입니다
     DomainMissing: 도메인이 누락되었습니다
     DomainNotOnOrg: 조직에 도메인이 존재하지 않습니다
@@ -605,7 +605,6 @@ Errors:
     Data:
       Invalid: 사용자 스키마에 대한 데이터가 유효하지 않습니다
   TokenExchange:
-    FeatureDisabled: 토큰 교환 기능이 인스턴스에서 비활성화되어 있습니다. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: 토큰이 누락되었습니다
       Invalid: 토큰이 유효하지 않습니다
@@ -619,7 +618,6 @@ Errors:
     ActiveDelete: 활성 웹 키를 삭제할 수 없습니다
     Config: 웹 키 설정이 유효하지 않습니다
     Duplicate: 웹 키 ID가 고유하지 않습니다
-    FeatureDisabled: 웹 키 기능이 비활성화되었습니다
     NoActive: 활성 웹 키가 없습니다
     NotFound: 웹 키를 찾을 수 없습니다
 
@@ -1116,20 +1114,20 @@ EventTypes:
         changed: 비밀번호 잠금 정책 변경됨
   iam:
     setup:
-      started: ZITADEL 설정 시작됨
-      done: ZITADEL 설정 완료됨
+      started: Zitadel 설정 시작됨
+      done: Zitadel 설정 완료됨
     global:
       org:
         set: 글로벌 조직 설정됨
     project:
       iam:
-        set: ZITADEL 프로젝트 설정됨
+        set: Zitadel 프로젝트 설정됨
     member:
-      added: ZITADEL 멤버 추가됨
-      changed: ZITADEL 멤버 변경됨
-      removed: ZITADEL 멤버 삭제됨
+      added: Zitadel 멤버 추가됨
+      changed: Zitadel 멤버 변경됨
+      removed: Zitadel 멤버 삭제됨
       cascade:
-        removed: ZITADEL 멤버 연쇄 삭제됨
+        removed: Zitadel 멤버 연쇄 삭제됨
     idp:
       config:
         added: IDP 설정 추가됨
@@ -1242,9 +1240,9 @@ EventTypes:
       removed: 도메인 삭제됨
     iam:
       console:
-        set: ZITADEL 콘솔 애플리케이션 설정됨
+        set: Zitadel 관리 콘솔 애플리케이션 설정됨
       project:
-        set: ZITADEL 프로젝트 설정됨
+        set: Zitadel 프로젝트 설정됨
     mail:
       template:
         added: 이메일 템플릿 추가됨

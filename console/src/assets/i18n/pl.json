@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "ZITADEL",
+  "APP_NAME": "Zitadel",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadane",
     "HOME": {
-      "TITLE": "Rozpocznij pracę z ZITADEL",
+      "TITLE": "Rozpocznij pracę z Zitadel",
       "NEXT": {
         "TITLE": "Twoje kolejne kroki",
         "DESCRIPTION": "Wykonaj następujące kroki, aby zabezpieczyć swoją aplikację.",
@@ -19,11 +19,11 @@
         },
         "DOCS": {
           "TITLE": "Dokumentacja",
-          "DESCRIPTION": "Zapoznaj się z bazą wiedzy ZITADEL, aby zaznajomić się z podstawowymi pojęciami i pomysłami. Dowiedz się, jak działa ZITADEL i jak z niego korzystać."
+          "DESCRIPTION": "Zapoznaj się z bazą wiedzy Zitadel, aby zaznajomić się z podstawowymi pojęciami i pomysłami. Dowiedz się, jak działa Zitadel i jak z niego korzystać."
         },
         "EXAMPLES": {
           "TITLE": "Przykłady i zestawy narzędzi do tworzenia oprogramowania",
-          "DESCRIPTION": "Przeglądaj nasze przykłady i SDK, aby używać ZITADEL razem z ulubionymi językami programowania i narzędziami."
+          "DESCRIPTION": "Przeglądaj nasze przykłady i SDK, aby używać Zitadel razem z ulubionymi językami programowania i narzędziami."
         }
       }
     },
@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Akcje",
-      "DESCRIPTION": "Uruchom niestandardowy kod podczas zdarzeń, które mają miejsce, gdy użytkownicy uwierzytelniają się w ZITADEL. Automatyzuj swoje procesy, wzbogać metadane i tokeny użytkowników lub powiadamiaj zewnętrzne systemy.",
+      "DESCRIPTION": "Uruchom niestandardowy kod podczas zdarzeń, które mają miejsce, gdy użytkownicy uwierzytelniają się w Zitadel. Automatyzuj swoje procesy, wzbogać metadane i tokeny użytkowników lub powiadamiaj zewnętrzne systemy.",
       "SCRIPTS": {
         "TITLE": "Skrypty",
         "DESCRIPTION": "Napisz swój kod JavaScript raz i uruchom go w wielu przepływach."
@@ -97,23 +97,23 @@
         "NEXT": "Co teraz?",
         "SAML": {
           "TITLE": "Skonfiguruj swojego dostawcę tożsamości SAML",
-          "DESCRIPTION": "ZITADEL jest skonfigurowany. Teraz potrzebna jest konfiguracja twojego dostawcy tożsamości SAML. Większość dostawców pozwala na załadowanie całego pliku metadanych ZITADEL XML. Inni dostawcy wymagają podania tylko niektórych konkretnych adresów URL, takich jak na przykład identyfikator podmiotu (URL metadanych), URL usługi odbiorczej asercji (ACS) lub URL wylogowania pojedynczego."
+          "DESCRIPTION": "Zitadel jest skonfigurowany. Teraz potrzebna jest konfiguracja twojego dostawcy tożsamości SAML. Większość dostawców pozwala na załadowanie całego pliku metadanych Zitadel XML. Inni dostawcy wymagają podania tylko niektórych konkretnych adresów URL, takich jak na przykład identyfikator podmiotu (URL metadanych), URL usługi odbiorczej asercji (ACS) lub URL wylogowania pojedynczego."
         },
         "CALLBACK": {
           "TITLE": "Skonfiguruj swojego dostawcę tożsamości {{ provider }}",
-          "DESCRIPTION": "Zanim będziesz mógł skonfigurować ZITADEL, przekaż ten URL do swojego dostawcy tożsamości, aby umożliwić przekierowanie przeglądarki z powrotem do ZITADEL po uwierzytelnieniu."
+          "DESCRIPTION": "Zanim będziesz mógł skonfigurować Zitadel, przekaż ten URL do swojego dostawcy tożsamości, aby umożliwić przekierowanie przeglądarki z powrotem do Zitadel po uwierzytelnieniu."
         },
         "JWT": {
           "TITLE": "Użyj JWT jako federacyjnych tożsamości",
-          "DESCRIPTION": "Dostawca tożsamości JWT umożliwia używanie istniejących tokenów JWT jako federacyjnych tożsamości. Ta funkcjonalność jest przydatna, jeśli masz już wydawcę tokenów JWT. Dzięki IdP JWT możesz używać tych JWT do tworzenia i aktualizowania użytkowników w ZITADEL na bieżąco."
+          "DESCRIPTION": "Dostawca tożsamości JWT umożliwia używanie istniejących tokenów JWT jako federacyjnych tożsamości. Ta funkcjonalność jest przydatna, jeśli masz już wydawcę tokenów JWT. Dzięki IdP JWT możesz używać tych JWT do tworzenia i aktualizowania użytkowników w Zitadel na bieżąco."
         },
         "LDAP": {
-          "TITLE": "Skonfiguruj ZITADEL do połączenia z twoim dostawcą tożsamości LDAP",
-          "DESCRIPTION": "Podaj szczegóły połączenia z twoim serwerem LDAP i skonfiguruj mapowanie atrybutów LDAP do atrybutów ZITADEL."
+          "TITLE": "Skonfiguruj Zitadel do połączenia z twoim dostawcą tożsamości LDAP",
+          "DESCRIPTION": "Podaj szczegóły połączenia z twoim serwerem LDAP i skonfiguruj mapowanie atrybutów LDAP do atrybutów Zitadel."
         },
         "AUTOFILL": {
           "TITLE": "Automatyczne wypełnianie danych użytkownika",
-          "DESCRIPTION": "Użyj akcji, aby poprawić doświadczenie użytkowników. Możesz wstępnie wypełnić formularz rejestracyjny ZITADEL wartościami z dostawcy tożsamości."
+          "DESCRIPTION": "Użyj akcji, aby poprawić doświadczenie użytkowników. Możesz wstępnie wypełnić formularz rejestracyjny Zitadel wartościami z dostawcy tożsamości."
         },
         "ACTIVATE": {
           "TITLE": "Aktywuj IdP",
@@ -130,7 +130,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linki zewnętrzne",
-        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli lub ustaw je puste, aby ukryć ten przycisk."
+        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli zarządzania. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli zarządzania lub ustaw je puste, aby ukryć ten przycisk."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Ustawienia SMTP",
@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Ustawienia SMS",
-        "DESCRIPTION": "Aby odblokować wszystkie funkcje ZITADEL, skonfiguruj Twilio do wysyłania wiadomości SMS do użytkowników."
+        "DESCRIPTION": "Aby odblokować wszystkie funkcje Zitadel, skonfiguruj Twilio do wysyłania wiadomości SMS do użytkowników."
       },
       "IAM_EVENTS": {
         "TITLE": "Wydarzenia",
@@ -146,7 +146,7 @@
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Nieudane Wydarzenia",
-        "DESCRIPTION": "Ta strona pokazuje wszystkie nieudane wydarzenia w twojej instancji. Jeśli ZITADEL nie zachowuje się zgodnie z oczekiwaniami, zawsze najpierw sprawdź tę listę."
+        "DESCRIPTION": "Ta strona pokazuje wszystkie nieudane wydarzenia w twojej instancji. Jeśli Zitadel nie zachowuje się zgodnie z oczekiwaniami, zawsze najpierw sprawdź tę listę."
       },
       "IAM_VIEWS": {
         "TITLE": "Widoki",
@@ -162,7 +162,7 @@
       },
       "SECURITY": {
         "TITLE": "Ustawienia Bezpieczeństwa",
-        "DESCRIPTION": "Włącz funkcje ZITADEL, które mogą mieć wpływ na bezpieczeństwo. Naprawdę powinieneś wiedzieć, co robisz, zanim zmienisz te ustawienia."
+        "DESCRIPTION": "Włącz funkcje Zitadel, które mogą mieć wpływ na bezpieczeństwo. Naprawdę powinieneś wiedzieć, co robisz, zanim zmienisz te ustawienia."
       },
       "OIDC": {
         "TITLE": "Ustawienia OpenID Connect",
@@ -187,7 +187,7 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Zarządzaj swoimi kluczami internetowymi OIDC, aby bezpiecznie podpisywać i weryfikować tokeny w swojej instancji ZITADEL.",
+        "DESCRIPTION": "Zarządzaj swoimi kluczami internetowymi OIDC, aby bezpiecznie podpisywać i weryfikować tokeny w swojej instancji Zitadel.",
         "TABLE": {
           "TITLE": "Aktywne i Przyszłe Klucze Internetowe",
           "DESCRIPTION": "Twoje aktywne i nadchodzące klucze internetowe. Aktywacja nowego klucza spowoduje dezaktywację obecnego.",
@@ -200,7 +200,7 @@
         },
         "CREATE": {
           "TITLE": "Utwórz nowy klucz internetowy",
-          "DESCRIPTION": "Utworzenie nowego klucza internetowego doda go do Twojej listy. ZITADEL domyślnie używa kluczy RSA2048 z haszowaniem SHA256.",
+          "DESCRIPTION": "Utworzenie nowego klucza internetowego doda go do Twojej listy. Zitadel domyślnie używa kluczy RSA2048 z haszowaniem SHA256.",
           "KEY_TYPE": "Typ klucza",
           "BITS": "Bity",
           "HASHER": "Haszowanie",
@@ -234,7 +234,7 @@
       },
       "DOMAINS": {
         "TITLE": "Ustawienia domen",
-        "DESCRIPTION": "Zdefiniuj ograniczenia dla swoich domen i skonfiguruj wzorce nazw logowania. ZITADEL wybiera organizację użytkownika, jak tylko wpisze swoją nazwę logowania. Dlatego nazwy logowania muszą być unikalne we wszystkich organizacjach. Jeśli masz użytkowników, którzy mają konta w wielu domenach, możesz zapewnić unikalność, dodając do nazw logowania domenę organizacji.",
+        "DESCRIPTION": "Zdefiniuj ograniczenia dla swoich domen i skonfiguruj wzorce nazw logowania. Zitadel wybiera organizację użytkownika, jak tylko wpisze swoją nazwę logowania. Dlatego nazwy logowania muszą być unikalne we wszystkich organizacjach. Jeśli masz użytkowników, którzy mają konta w wielu domenach, możesz zapewnić unikalność, dodając do nazw logowania domenę organizacji.",
         "REQUIRE_VERIFICATION": {
           "TITLE": "Wymagaj weryfikacji własnych domen",
           "DESCRIPTION": "Jeśli to jest włączone, domeny organizacji muszą być zweryfikowane, zanim będą mogły być używane do odkrywania domen lub dodawania sufiksu do nazwy użytkownika."
@@ -295,7 +295,7 @@
           },
           "EXTERNAL_LOGIN_ALLOWED": {
             "TITLE": "Dozwolone logowanie zewnętrzne",
-            "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą zewnętrznego dostawcy tożsamości zamiast używać użytkownika ZITADEL do logowania."
+            "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą zewnętrznego dostawcy tożsamości zamiast używać użytkownika Zitadel do logowania."
           },
           "HIDE_PASSWORD_RESET": {
             "TITLE": "Ukryte resetowanie hasła",
@@ -339,18 +339,18 @@
     }
   },
   "HOME": {
-    "WELCOME": "Rozpocznij pracę z ZITADEL",
-    "DISCLAIMER": "ZITADEL traktuje Twoje dane poufnie i bezpiecznie.",
+    "WELCOME": "Rozpocznij pracę z Zitadel",
+    "DISCLAIMER": "Zitadel traktuje Twoje dane poufnie i bezpiecznie.",
     "DISCLAIMERLINK": "Dalsze informacje",
     "DOCUMENTATION": {
-      "DESCRIPTION": "Szybko rozpocznij pracę z ZITADEL."
+      "DESCRIPTION": "Szybko rozpocznij pracę z Zitadel."
     },
     "GETSTARTED": {
-      "DESCRIPTION": "Szybko rozpocznij pracę z ZITADEL."
+      "DESCRIPTION": "Szybko rozpocznij pracę z Zitadel."
     },
     "QUICKSTARTS": {
       "LABEL": "Pierwsze kroki",
-      "DESCRIPTION": "Szybko rozpocznij pracę z ZITADEL."
+      "DESCRIPTION": "Szybko rozpocznij pracę z Zitadel."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Skróty",
@@ -366,7 +366,7 @@
     "COMPLETED": "zakończone",
     "DISMISS": "zamknąć",
     "CARD": {
-      "TITLE": "Uruchom swój ZITADEL",
+      "TITLE": "Uruchom swój Zitadel",
       "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
     },
     "MILESTONES": {
@@ -392,7 +392,7 @@
       },
       "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
         "title": "Zaloguj się do swojej aplikacji",
-        "description": "Zintegruj swoją aplikację z ZITADEL w celu uwierzytelniania i przetestuj ją, logując się za pomocą swojego użytkownika administratora.",
+        "description": "Zintegruj swoją aplikację z Zitadel w celu uwierzytelniania i przetestuj ją, logując się za pomocą swojego użytkownika administratora.",
         "action": "Zaloguj się"
       },
       "user.human.added": {
@@ -438,8 +438,8 @@
     "CUSTOMERPORTAL": "Portal klienta"
   },
   "QUICKSTART": {
-    "TITLE": "Zintegruj ZITADEL ze swoją aplikacją",
-    "DESCRIPTION": "Zintegruj ZITADEL ze swoją aplikacją lub skorzystaj z jednego z naszych przykładów, aby rozpocząć pracę w ciągu kilku minut",
+    "TITLE": "Zintegruj Zitadel ze swoją aplikacją",
+    "DESCRIPTION": "Zintegruj Zitadel ze swoją aplikacją lub skorzystaj z jednego z naszych przykładów, aby rozpocząć pracę w ciągu kilku minut",
     "BTN_START": "Utwórz aplikację",
     "BTN_LEARNMORE": "Dowiedz się więcej",
     "CREATEPROJECTFORAPP": "Utwórz projekt {{value}}",
@@ -743,7 +743,7 @@
     },
     "EXHAUSTED": {
       "TITLE": "Twoja instancja jest zablokowana.",
-      "DESCRIPTION": "Poproś administratora swojej instancji ZITADEL o aktualizację subskrypcji."
+      "DESCRIPTION": "Poproś administratora swojej instancji Zitadel o aktualizację subskrypcji."
     },
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
@@ -840,7 +840,7 @@
       "NAME": "Nazwa",
       "EMPTY": "Brak ustawionego urządzenia",
       "TITLE": "Uwierzytelnianie passkey",
-      "DESCRIPTION": "Dodaj Metody Uwierzytelniania oparte na WebAuthn, aby zalogować się do ZITADEL passkey.",
+      "DESCRIPTION": "Dodaj Metody Uwierzytelniania oparte na WebAuthn, aby zalogować się do Zitadel passkey.",
       "MANAGE_DESCRIPTION": "Zarządzaj drugim czynnikiem uwierzytelniania swoich użytkowników.",
       "U2F": "Dodaj metodę",
       "U2F_DIALOG_TITLE": "Zweryfikuj uwierzytelniającego",
@@ -1159,7 +1159,7 @@
       "SECRETREMOVED": "Sekret usunięty pomyślnie!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "Role administratora ZITADEL",
+      "TITLE": "Role administratora Zitadel",
       "DESCRIPTION": "To są wszystkie uprawnienia członków użytkownika. Możesz je również modyfikować na stronach szczegółów organizacji, projektu lub IAM.",
       "ORGCONTEXT": "Widzisz wszystkie organizacje i projekty, które są związane z aktualnie wybraną organizacją.",
       "USERCONTEXT": "Widzisz wszystkie organizacje i projekty, do których masz dostęp. Włączając inne organizacje.",
@@ -1225,7 +1225,7 @@
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Ostrzeżenie",
-      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
+      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli zarządzania, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
     },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
@@ -1267,7 +1267,7 @@
     },
     "EVENTSTORE": {
       "TITLE": "Administracja magazynem IAM",
-      "DESCRIPTION": "Zarządzaj swoimi widokami ZITADEL i nieudanymi zdarzeniami."
+      "DESCRIPTION": "Zarządzaj swoimi widokami Zitadel i nieudanymi zdarzeniami."
     },
     "MEMBER": {
       "TITLE": "Managerowie",
@@ -1411,7 +1411,7 @@
         "VERIFICATION_HTTP_URL_LABEL": "Oczekiwany adres URL:",
         "VERIFICATION_HTTP_FILE_LABEL": "Plik weryfikacyjny:",
         "VERIFICATION_SKIP": "Możesz na razie pominąć weryfikację i kontynuować tworzenie organizacji, jednak aby móc korzystać z domeny, ten krok musi zostać ukończony!",
-        "VERIFICATION_VALIDATION_DESC": "Nie usuwaj kodu weryfikacyjnego, ponieważ ZITADEL będzie od czasu do czasu ponownie sprawdzał własność Twojej domeny.",
+        "VERIFICATION_VALIDATION_DESC": "Nie usuwaj kodu weryfikacyjnego, ponieważ Zitadel będzie od czasu do czasu ponownie sprawdzał własność Twojej domeny.",
         "VERIFICATION_NEWTOKEN_TITLE": "Poproś o nowy token",
         "VERIFICATION_VALIDATION_ONGOING": "Wybrano metodę {{ value }} do weryfikacji Twojej domeny. Kliknij przycisk, aby uruchomić kontrolę weryfikacyjną lub zresetować proces weryfikacji.",
         "VERIFICATION_SUCCESSFUL": "Domena pomyślnie zweryfikowana!",
@@ -1634,8 +1634,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Domyślna Organizacja Logowania",
       "LOGINDEFAULTORG_DESCRIPTION": "Jeśli nie ustawiono kontekstu organizacji, interfejs logowania będzie używać ustawień domyślnej organizacji (a nie instancji)",
-      "OIDCTOKENEXCHANGE": "Wymiana Tokenów OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Włącz eksperymentalny typ grantu urn:ietf:params:oauth:grant-type:token-exchange dla punktu końcowego tokena OIDC. Wymiana tokenów może być używana do żądania tokenów o mniejszym zakresie lub podszywania się za innych użytkowników. Aby zezwolić na podszywanie się na instancji, zapoznaj się z polityką bezpieczeństwa.",
       "USERSCHEMA": "Schemat Użytkownika",
       "USERSCHEMA_DESCRIPTION": "Schematy użytkowników umożliwiają zarządzanie schematami danych użytkowników. Jeśli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
       "ACTIONS": "Akcje",
@@ -1659,8 +1657,8 @@
         "DISABLED": "„Wyłączony” jest dziedziczone"
       },
       "RESET": "Ustaw wszystko na dziedziczone",
-      "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli do tworzenia użytkowników",
-      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
+      "CONSOLEUSEV2USERAPI": "Użyj API V2 w konsoli zarządzania do tworzenia użytkowników",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola zarządzania używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
       "LOGINV2": "Logowanie V2",
       "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
       "LOGINV2_BASEURI": "Podstawowy URI",
@@ -1707,7 +1705,7 @@
       "RELEASE": "Zwolnij",
       "DROPFONT": "Upuść plik czcionki tutaj",
       "RELEASEFONT": "Zwolnij",
-      "USEOFLOGO": "Twój logo będzie używane w logowaniu oraz wiadomościach e-mail, natomiast ikona jest używana do mniejszych elementów interfejsu użytkownika, takich jak w przełączniku organizacji w konsoli",
+      "USEOFLOGO": "Twój logo będzie używane w logowaniu oraz wiadomościach e-mail, natomiast ikona jest używana do mniejszych elementów interfejsu użytkownika, takich jak w przełączniku organizacji w konsoli zarządzania",
       "MAXSIZE": "Maksymalny rozmiar jest ograniczony do 524kB",
       "EMAILNOSVG": "Format pliku SVG nie jest obsługiwany w wiadomościach e-mail. Dlatego prześlij swoje logo w formacie PNG lub innym obsługiwanym formacie.",
       "MAXSIZEEXCEEDED": "Przekroczony maksymalny rozmiar 524kB.",
@@ -1723,7 +1721,7 @@
       },
       "PREVIEW": {
         "TITLE": "Logowanie",
-        "SECOND": "Zaloguj się za pomocą swojego konta ZITADEL.",
+        "SECOND": "Zaloguj się za pomocą swojego konta Zitadel.",
         "ERROR": "Nie znaleziono użytkownika!",
         "PRIMARYBUTTON": "Dalej",
         "SECONDARYBUTTON": "Zarejestruj"
@@ -1763,9 +1761,9 @@
       "POLICYLINK": "Link do polityki prywatności",
       "HELPLINK": "Link do pomocy",
       "SUPPORTEMAIL": "E-mail wsparcia",
-      "DOCSLINK": "Link do Dokumentów (Console)",
-      "CUSTOMLINK": "Link niestandardowy (Console)",
-      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Console)",
+      "DOCSLINK": "Link do Dokumentów (Konsola Zarządzania)",
+      "CUSTOMLINK": "Link niestandardowy (Konsola Zarządzania)",
+      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Konsola Zarządzania)",
       "SAVED": "Pomyślnie zapisano!",
       "RESET_TITLE": "Przywróć wartości domyślne",
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?"
@@ -1919,7 +1917,7 @@
       "DEFAULTREDIRECTURI_DESC": "Określa, dokąd użytkownik zostanie przekierowany, jeśli logowanie rozpocznie się bez kontekstu aplikacji (np. z poczty e-mail)",
       "ERRORMSGPOPUP": "Pokazuj błąd w oknie dialogowym",
       "DISABLEWATERMARK": "Ukryj znak wodny",
-      "DISABLEWATERMARK_DESC": "Ukrywa znak wodny 'Powered by ZITADEL' na interfejsie logowania"
+      "DISABLEWATERMARK_DESC": "Ukrywa znak wodny 'Powered by Zitadel' na interfejsie logowania"
     },
     "RESET": "Przywróć domyślne dla instancji",
     "CREATECUSTOM": "Utwórz własną politykę",
@@ -1973,7 +1971,7 @@
       "CREATE_DESC": "Wprowadź nazwę projektu.",
       "ROLE": "Rola",
       "NOITEMS": "Brak projektów",
-      "ZITADELPROJECT": "To należy do projektu ZITADEL. Uwaga: Jeśli wprowadzisz zmiany, ZITADEL może nie działać zgodnie z oczekiwaniami.",
+      "ZITADELPROJECT": "To należy do projektu Zitadel. Uwaga: Jeśli wprowadzisz zmiany, Zitadel może nie działać zgodnie z oczekiwaniami.",
       "TYPE": {
         "OWNED": "Własne Projekty",
         "OWNED_SINGULAR": "Własny Projekt",
@@ -2353,7 +2351,7 @@
     "DELETE_SELECTION_TITLE": "Usuń dostawcę tożsamości",
     "DELETE_SELECTION_DESCRIPTION": "Zamierzasz usunąć dostawcę tożsamości. Spowoduje to nieodwracalne zmiany. Czy na pewno chcesz to zrobić?",
     "FEDERATEDLOGOUTENABLED": "Włączono federacyjne wylogowanie",
-    "FEDERATEDLOGOUTENABLED_DESC": "Po włączeniu, użytkownik zostanie również wylogowany z IdP, jeśli zakończy sesję w ZITADEL.",
+    "FEDERATEDLOGOUTENABLED_DESC": "Po włączeniu, użytkownik zostanie również wylogowany z IdP, jeśli zakończy sesję w Zitadel.",
     "EMPTY": "Brak dostawcy tożsamości dostępnego",
     "OIDC": {
       "GENERAL": "Informacje ogólne",
@@ -2437,7 +2435,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Dostawca SMTP",
-      "DESCRIPTION": "To są dostawcy SMTP dla Twojej instancji ZITADEL. Aktywuj ten, którego chcesz używać do wysyłania powiadomień do użytkowników.",
+      "DESCRIPTION": "To są dostawcy SMTP dla Twojej instancji Zitadel. Aktywuj ten, którego chcesz używać do wysyłania powiadomień do użytkowników.",
       "EMPTY": "Brak dostępnego dostawcy SMTP",
       "ACTIVATED": "Aktywowany",
       "ACTIVATE": "Aktywuj dostawcę",
@@ -2469,11 +2467,11 @@
         "NEXT_STEPS": "Następne kroki",
         "ACTIVATE": {
           "TITLE": "Aktywuj swojego dostawcę SMTP",
-          "DESCRIPTION": "ZITADEL nie może używać tego dostawcy SMTP do wysyłania powiadomień, dopóki go nie aktywujesz. Jeśli aktywujesz tego dostawcę, każdy inny aktywny dostawca zostanie teraz dezaktywowany."
+          "DESCRIPTION": "Zitadel nie może używać tego dostawcy SMTP do wysyłania powiadomień, dopóki go nie aktywujesz. Jeśli aktywujesz tego dostawcę, każdy inny aktywny dostawca zostanie teraz dezaktywowany."
         },
         "DEACTIVATE": {
           "TITLE": "Dezaktywuj swojego dostawcę SMTP",
-          "DESCRIPTION": "Jeśli dezaktywujesz tego dostawcę SMTP, ZITADEL nie będzie mógł go używać do wysyłania powiadomień, dopóki nie aktywujesz go ponownie."
+          "DESCRIPTION": "Jeśli dezaktywujesz tego dostawcę SMTP, Zitadel nie będzie mógł go używać do wysyłania powiadomień, dopóki nie aktywujesz go ponownie."
         },
         "SAVE_SETTINGS": "Zapisz swoje ustawienia",
         "TEST": {

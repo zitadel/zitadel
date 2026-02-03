@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: Es konnte keine Verbindung zum SMTP-Server über TLS hergestellt werden, überprüfen Sie den Port, Firewall-Probleme ...
     CouldNotCreateClient: Der SMTP-Client konnte nicht erstellt werden
     CouldNotStartTLS: TLS konnte nicht gestartet werden
-    CouldNotAuth: Die SMTP-Authentifizierung konnte nicht hinzugefügt werden. Überprüfen Sie, ob sowohl Ihr Benutzername als auch Ihr Passwort korrekt sind. Wenn sie korrekt sind, erfordert Ihr Anbieter möglicherweise eine Authentifizierungsmethode, die von ZITADEL nicht unterstützt wird
+    CouldNotAuth: Die SMTP-Authentifizierung konnte nicht hinzugefügt werden. Überprüfen Sie, ob sowohl Ihr Benutzername als auch Ihr Passwort korrekt sind. Wenn sie korrekt sind, erfordert Ihr Anbieter möglicherweise eine Authentifizierungsmethode, die von Zitadel nicht unterstützt wird
     CouldNotSetSender: Absender konnte nicht eingestellt werden
     CouldNotSetRecipient: Der Empfänger konnte nicht festgelegt werden
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organisation konnte nicht gefunden werden
     NotChanged: Organisation wurde nicht verändert
     DefaultOrgNotDeletable: Default Organisation kann nicht gelöscht werden
-    ZitadelOrgNotDeletable: Organisation mit ZITADEL Projekt kann nicht gelöscht werden
+    ZitadelOrgNotDeletable: Organisation mit Zitadel Projekt kann nicht gelöscht werden
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: Daten für Benutzerschema ungültig
   TokenExchange:
-    FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token fehlt
       Invalid: Token ist ungültig
@@ -618,7 +617,6 @@ Errors:
     ActiveDelete: Aktiver Webschlüssel kann nicht gelöscht werden
     Config: Ungültige Webschlüsselkonfiguration
     Duplicate: Webschlüssel-ID nicht eindeutig
-    FeatureDisabled: Webschlüsselfunktion deaktiviert
     NoActive: Kein aktiver Webschlüssel gefunden
     NotFound: Webschlüssel nicht gefunden
 
@@ -1115,20 +1113,20 @@ EventTypes:
         changed: Passwortaussperrrichtlinie geändert
   iam:
     setup:
-      started: ZITADEL Initialisierung gestartet
-      done: ZITADEL Initialisierung abgeschlossen
+      started: Zitadel Initialisierung gestartet
+      done: Zitadel Initialisierung abgeschlossen
     global:
       org:
-        set: Globale Organisation von ZITADEL gesetzt
+        set: Globale Organisation von Zitadel gesetzt
     project:
       iam:
-        set: ZITADEL Projekt gesetzt
+        set: Zitadel Projekt gesetzt
     member:
-      added: ZITADEL Mitglied hinzugefügt
-      changed: ZITADEL Mitglied geändert
-      removed: ZITADEL Mitglied entfernt
+      added: Zitadel Mitglied hinzugefügt
+      changed: Zitadel Mitglied geändert
+      removed: Zitadel Mitglied entfernt
       cascade:
-        removed: ZITADEL Mitglied kaskadiert entfernt
+        removed: Zitadel Mitglied kaskadiert entfernt
     idp:
       config:
         added: IDP Konfiguration hinzugefügt
@@ -1241,9 +1239,9 @@ EventTypes:
       removed: Domain gelöscht
     iam:
       console:
-        set: ZITADEL Console Applikation gesetzt
+        set: Zitadel Management Console Applikation gesetzt
       project:
-        set: ZITADEL Projekt gesetzt
+        set: Zitadel Projekt gesetzt
     mail:
       template:
         added: E-Mail Vorlage hinzugefügt

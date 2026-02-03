@@ -15,7 +15,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2;internal_permission";
 
 // InternalPermissionService provides methods to manage permissions for resource
-// and their management in ZITADEL itself also known as "administrators".
+// and their management in Zitadel itself also known as "administrators".
 //
 // If you want to manage permissions and roles within your project or application,
 // please use the AuthorizationsService.

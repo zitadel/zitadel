@@ -2,7 +2,7 @@ Login:
   Title: Добро пожаловать!
   Description: Введите свои данные для входа.
   TitleLinking: Вход для привязки пользователей
-  DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к учётной записи ZITADEL.
+  DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к учётной записи Zitadel.
   LoginNameLabel: Логин
   UsernamePlaceHolder: логин
   LoginnamePlaceHolder: username@domain

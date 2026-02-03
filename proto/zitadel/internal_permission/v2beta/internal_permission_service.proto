@@ -107,7 +107,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 
 // InternalPermissionService provides methods to manage permissions for resource
-// and their management in ZITADEL itself.
+// and their management in Zitadel itself.
 //
 // If you want to manage permissions and roles within your project or application,
 // please use the AuthorizationsService.

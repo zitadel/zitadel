@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: could not contact with the SMTP server using TLS, check the port, firewall issues...
     CouldNotCreateClient: could not create smtp client
     CouldNotStartTLS: could not start tls
-    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by ZITADEL
+    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by Zitadel
     CouldNotSetSender: could not set sender
     CouldNotSetRecipient: could not set recipient
   SMTPConfig:
@@ -209,7 +209,7 @@ Errors:
     NotFound: Organisation not found
     NotChanged: Organisation not changed
     DefaultOrgNotDeletable: Default Organisation must not be deleted
-    ZitadelOrgNotDeletable: Organisation with ZITADEL project must not be deleted
+    ZitadelOrgNotDeletable: Organisation with Zitadel project must not be deleted
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organization
@@ -605,7 +605,6 @@ Errors:
     Data:
       Invalid: Data invalid for User Schema
   TokenExchange:
-    FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token is missing
       Invalid: Token is invalid
@@ -619,7 +618,6 @@ Errors:
     ActiveDelete: Cannot delete active web key
     Config: Invalid web key config
     Duplicate: Web key ID not unique
-    FeatureDisabled: Web key feature disabled
     NoActive: No active web key found
     NotFound: Web key not found
 
@@ -1116,20 +1114,20 @@ EventTypes:
         changed: Password lockout policy changed
   iam:
     setup:
-      started: ZITADEL setup started
-      done: ZITADEL setup done
+      started: Zitadel setup started
+      done: Zitadel setup done
     global:
       org:
         set: Global org set
     project:
       iam:
-        set: ZITADEL project set
+        set: Zitadel project set
     member:
-      added: ZITADEL member added
-      changed: ZITADEL member changed
-      removed: ZITADEL member removed
+      added: Zitadel member added
+      changed: Zitadel member changed
+      removed: Zitadel member removed
       cascade:
-        removed: ZITADEL member cascade removed
+        removed: Zitadel member cascade removed
     idp:
       config:
         added: IDP configuration added
@@ -1242,9 +1240,9 @@ EventTypes:
       removed: Domain removed
     iam:
       console:
-        set: ZITADEL Console application set
+        set: Zitadel Management Console application set
       project:
-        set: ZITADEL project set
+        set: Zitadel project set
     mail:
       template:
         added: E-Mail template added

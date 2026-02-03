@@ -216,7 +216,7 @@
         "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
       },
       "title": "Registrieren",
-      "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+      "description": "Erstellen Sie Ihr Zitadel-Konto.",
       "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
       "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
       "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
@@ -549,7 +549,7 @@
         "description": "Provide email, first and last name to register."
       },
       "title": "Register",
-      "description": "Create your ZITADEL account.",
+      "description": "Create your Zitadel account.",
       "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
       "selectMethod": "Select the method you would like to authenticate",
       "agreeTo": "To register you must agree to the terms and conditions",
@@ -882,7 +882,7 @@
         "description": "No se proporcionaron datos suficientes para el registro."
       },
       "title": "Registrarse",
-      "description": "Crea tu cuenta ZITADEL.",
+      "description": "Crea tu cuenta Zitadel.",
       "noMethodAvailableWarning": "No hay métodos de autenticación disponibles. Por favor, contacta a tu administrador.",
       "selectMethod": "Selecciona el método con el que deseas autenticarte",
       "agreeTo": "Para registrarte debes aceptar los términos y condiciones",
@@ -1215,7 +1215,7 @@
         "description": "Inserisci i tuoi dati per registrarti."
       },
       "title": "Registrati",
-      "description": "Crea il tuo account ZITADEL.",
+      "description": "Crea il tuo account Zitadel.",
       "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
       "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
       "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
@@ -1646,7 +1646,7 @@
         "description": "Geef e-mail, voornaam en achternaam op om te registreren."
       },
       "title": "Registreren",
-      "description": "Maak jouw ZITADEL-account aan.",
+      "description": "Maak jouw Zitadel-account aan.",
       "noMethodAvailableWarning": "Geen authenticatiemethode beschikbaar. Neem contact op met jouw beheerder.",
       "selectMethod": "Selecteer de methode waarmee u wilt verifiëren",
       "agreeTo": "Om te registreren moet u akkoord gaan met de voorwaarden",
@@ -2002,7 +2002,7 @@
         "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
       },
       "title": "Rejestracja",
-      "description": "Utwórz konto ZITADEL.",
+      "description": "Utwórz konto Zitadel.",
       "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
       "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
       "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
@@ -2335,7 +2335,7 @@
         "description": "Укажите email, имя и фамилию для регистрации."
       },
       "title": "Регистрация",
-      "description": "Создайте свой аккаунт ZITADEL.",
+      "description": "Создайте свой аккаунт Zitadel.",
       "noMethodAvailableWarning": "Нет доступных методов аутентификации. Обратитесь к администратору.",
       "selectMethod": "Выберите метод аутентификации",
       "agreeTo": "Для регистрации необходимо принять условия:",
@@ -2668,7 +2668,7 @@
         "description": "请提供所有必需的数据。"
       },
       "title": "注册",
-      "description": "创建您的 ZITADEL 账户。",
+      "description": "创建您的 Zitadel 账户。",
       "noMethodAvailableWarning": "没有可用的认证方法。请联系您的系统管理员。",
       "selectMethod": "选择您想使用的认证方法",
       "agreeTo": "注册即表示您同意条款和条件",
@@ -2923,7 +2923,7 @@
         "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
       },
       "title": "Kayıt Ol",
-      "description": "ZITADEL hesabınızı oluşturun.",
+      "description": "Zitadel hesabınızı oluşturun.",
       "selectMethod": "Kimlik doğrulamak istediğiniz yöntemi seçin",
       "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",
       "termsOfService": "Hizmet Şartları",
@@ -3223,7 +3223,7 @@
         "description": "Вкажіть електронну пошту, ім'я та прізвище для реєстрації."
       },
       "title": "Реєстрація",
-      "description": "Створіть свій обліковий запис ZITADEL.",
+      "description": "Створіть свій обліковий запис Zitadel.",
       "noMethodAvailableWarning": "Немає доступного методу автентифікації. Будь ласка, зверніться до адміністратора.",
       "selectMethod": "Виберіть метод автентифікації",
       "agreeTo": "Для реєстрації ви повинні погодитися з умовами та положеннями",

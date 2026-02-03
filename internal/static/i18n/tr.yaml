@@ -62,7 +62,7 @@ Errors:
     CouldNotDialTLS: TLS kullanarak SMTP sunucusuna bağlanılamadı, port ve güvenlik duvarı sorunlarını kontrol edin...
     CouldNotCreateClient: smtp istemcisi oluşturulamadı
     CouldNotStartTLS: tls başlatılamadı
-    CouldNotAuth: smtp kimlik doğrulaması eklenemedi, kullanıcı adı ve şifrenizin doğru olup olmadığını kontrol edin, doğruysa sağlayıcınız ZITADEL tarafından desteklenmeyen bir kimlik doğrulama yöntemi gerektirebilir
+    CouldNotAuth: smtp kimlik doğrulaması eklenemedi, kullanıcı adı ve şifrenizin doğru olup olmadığını kontrol edin, doğruysa sağlayıcınız Zitadel tarafından desteklenmeyen bir kimlik doğrulama yöntemi gerektirebilir
     CouldNotSetSender: gönderen ayarlanamadı
     CouldNotSetRecipient: alıcı ayarlanamadı
   SMTPConfig:
@@ -209,7 +209,7 @@ Errors:
     NotFound: Organizasyon bulunamadı
     NotChanged: Organizasyon değişmedi
     DefaultOrgNotDeletable: Varsayılan Organizasyon silinmemeli
-    ZitadelOrgNotDeletable: ZITADEL projesi olan organizasyon silinmemeli
+    ZitadelOrgNotDeletable: Zitadel projesi olan organizasyon silinmemeli
     InvalidDomain: Geçersiz domain
     DomainMissing: Domain eksik
     DomainNotOnOrg: Domain organizasyonda mevcut değil
@@ -605,7 +605,6 @@ Errors:
     Data:
       Invalid: Kullanıcı Şeması için veri geçersiz
   TokenExchange:
-    FeatureDisabled: Token Exchange özelliği instance'ınız için devre dışı. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token eksik
       Invalid: Token geçersiz
@@ -619,7 +618,6 @@ Errors:
     ActiveDelete: Aktif web anahtarı silinemez
     Config: Geçersiz web anahtarı yapılandırması
     Duplicate: Web anahtarı ID benzersiz değil
-    FeatureDisabled: Web anahtarı özelliği devre dışı
     NoActive: Aktif web anahtarı bulunamadı
     NotFound: Web anahtarı bulunamadı
 
@@ -1116,20 +1114,20 @@ EventTypes:
         changed: Şifre kilitleme politikası değiştirildi
   iam:
     setup:
-      started: ZITADEL kurulumu başlatıldı
-      done: ZITADEL kurulumu tamamlandı
+      started: Zitadel kurulumu başlatıldı
+      done: Zitadel kurulumu tamamlandı
     global:
       org:
         set: Global organizasyon ayarlandı
     project:
       iam:
-        set: ZITADEL projesi ayarlandı
+        set: Zitadel projesi ayarlandı
     member:
-      added: ZITADEL üyesi eklendi
-      changed: ZITADEL üyesi değiştirildi
-      removed: ZITADEL üyesi kaldırıldı
+      added: Zitadel üyesi eklendi
+      changed: Zitadel üyesi değiştirildi
+      removed: Zitadel üyesi kaldırıldı
       cascade:
-        removed: ZITADEL üyesi basamaklı kaldırıldı
+        removed: Zitadel üyesi basamaklı kaldırıldı
     idp:
       config:
         added: IDP yapılandırması eklendi
@@ -1242,9 +1240,9 @@ EventTypes:
       removed: Domain kaldırıldı
     iam:
       console:
-        set: ZITADEL Konsol uygulaması ayarlandı
+        set: Zitadel Yönetim Konsolu uygulaması ayarlandı
       project:
-        set: ZITADEL projesi ayarlandı
+        set: Zitadel projesi ayarlandı
     mail:
       template:
         added: E-Posta şablonu eklendi

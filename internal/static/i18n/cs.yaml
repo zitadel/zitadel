@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: nelze se spojit se serverem SMTP pomocí TLS, zkontrolovat port, problémy s firewallem...
     CouldNotCreateClient: nelze vytvořit smtp klienta
     CouldNotStartTLS: nelze spustit tls
-    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou ZITADEL nepodporuje
+    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou Zitadel nepodporuje
     CouldNotSetSender: nelze nastavit odesílatele
     CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organizace nenalezena
     NotChanged: Organizace nezměněna
     DefaultOrgNotDeletable: Výchozí organizace nesmí být smazána
-    ZitadelOrgNotDeletable: Organizaci s projektem ZITADEL nelze smazat
+    ZitadelOrgNotDeletable: Organizaci s projektem Zitadel nelze smazat
     InvalidDomain: Neplatná doména
     DomainMissing: Doména chybí
     DomainNotOnOrg: Doména v organizaci neexistuje
@@ -602,7 +602,6 @@ Errors:
     Data:
       Invalid: Data neplatná pro uživatelské schéma
   TokenExchange:
-    FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token chybí
       Invalid: Token je neplatný
@@ -616,7 +615,6 @@ Errors:
     ActiveDelete: Aktivní webový klíč nelze smazat
     Config: Neplatná konfigurace webového klíče
     Duplicate: ID webového klíče není jedinečné
-    FeatureDisabled: Funkce webového klíče je zakázána
     NoActive: Nebyl nalezen žádný aktivní webový klíč
     NotFound: Webový klíč nebyl nalezen
 
@@ -1113,20 +1111,20 @@ EventTypes:
         changed: Politika uzamčení hesla změněna
   iam:
     setup:
-      started: Nastavení ZITADEL zahájeno
-      done: Nastavení ZITADEL dokončeno
+      started: Nastavení Zitadel zahájeno
+      done: Nastavení Zitadel dokončeno
     global:
       org:
         set: Globální organizace nastavena
     project:
       iam:
-        set: Projekt ZITADEL nastaven
+        set: Projekt Zitadel nastaven
     member:
-      added: Člen ZITADEL přidán
-      changed: Člen ZITADEL změněn
-      removed: Člen ZITADEL odstraněn
+      added: Člen Zitadel přidán
+      changed: Člen Zitadel změněn
+      removed: Člen Zitadel odstraněn
       cascade:
-        removed: Člen ZITADEL kaskádově odstraněn
+        removed: Člen Zitadel kaskádově odstraněn
     idp:
       config:
         added: Konfigurace IDP přidána
@@ -1239,9 +1237,9 @@ EventTypes:
       removed: Doména odstraněna
     iam:
       console:
-        set: Aplikace ZITADEL Console nastavena
+        set: Aplikace Zitadel Konzole pro správu nastavena
       project:
-        set: Projekt ZITADEL nastaven
+        set: Projekt Zitadel nastaven
     mail:
       template:
         added: Šablona e-mailu přidána

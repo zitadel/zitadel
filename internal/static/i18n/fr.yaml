@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: Impossible de contacter le serveur SMTP via TLS, vérifiez le port, problèmes de pare-feu...
     CouldNotCreateClient: impossible de créer un client SMTP
     CouldNotStartTLS: je n'ai pas pu démarrer tls
-    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par ZITADEL.
+    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par Zitadel.
     CouldNotSetSender: impossible de définir l'expéditeur
     CouldNotSetRecipient: impossible de définir le destinataire
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Organisation non trouvée
     NotChanged: L'organisation n'a pas changé
     DefaultOrgNotDeletable: L'organisation par défault ne doit pas être supprimée
-    ZitadelOrgNotDeletable: L'organisation avec ZITADEL project ne doit pas être supprimée
+    ZitadelOrgNotDeletable: L'organisation avec Zitadel project ne doit pas être supprimée
     InvalidDomain: Domaine non valide
     DomainMissing: Domaine manquant
     DomainNotOnOrg: Le domaine n'existe pas dans l'organisation
@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: Données non valides pour le schéma utilisateur
   TokenExchange:
-    FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Le jeton est manquant
       Invalid: Le jeton n'est pas valide
@@ -618,7 +617,6 @@ Errors:
     ActiveDelete: Impossible de supprimer la clé Web active
     Config: Configuration de clé Web non valide
     Duplicate: L'ID de clé Web n'est pas unique
-    FeatureDisabled: Fonctionnalité de clé Web désactivée
     NoActive: Aucune clé Web active trouvée
     NotFound: Clé Web introuvable
 
@@ -1110,20 +1108,20 @@ EventTypes:
         changed: Modification de la politique de verrouillage des mots de passe
   iam:
     setup:
-      started: L'installation de ZITADEL a commencé
-      done: Installation de ZITADEL terminée
+      started: L'installation de Zitadel a commencé
+      done: Installation de Zitadel terminée
     global:
       org:
         set: Global org set
     lockout:
       iam:
-        set: set du projet ZITADEL
+        set: set du projet Zitadel
     member:
-      added: ZITADEL membre ajouté
-      changed: membre de ZITADEL modifié
-      removed: membre ZITADEL supprimé
+      added: Zitadel membre ajouté
+      changed: membre de Zitadel modifié
+      removed: membre Zitadel supprimé
       cascade:
-        removed: Membre ZITADEL supprimé en cascade
+        removed: Membre Zitadel supprimé en cascade
     idp:
       config:
         added: Ajout de la configuration IDP
@@ -1236,9 +1234,9 @@ EventTypes:
       removed: Domaine supprimé
     iam:
       console:
-        set: Ensemble d'applications Console ZITADEL
+        set: Ensemble d'applications Console de gestion Zitadel
       project:
-        set: ZITADEL project set
+        set: Zitadel project set
     mail:
       template:
         added: Modèle de courrier électronique ajouté

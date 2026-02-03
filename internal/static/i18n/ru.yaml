@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: не удалось связаться с SMTP-сервером с помощью TLS, проверьте порт, проблемы с брандмауэром...
     CouldNotCreateClient: не удалось создать smtp-клиент
     CouldNotStartTLS: не удалось запустить тлс
-    CouldNotAuth: не удалось добавить аутентификацию smtp, проверьте правильность вашего пользователя и пароля. Если они верны, возможно, ваш провайдер требует метод аутентификации, не поддерживаемый ZITADEL
+    CouldNotAuth: не удалось добавить аутентификацию smtp, проверьте правильность вашего пользователя и пароля. Если они верны, возможно, ваш провайдер требует метод аутентификации, не поддерживаемый Zitadel
     CouldNotSetSender: не удалось установить отправителя
     CouldNotSetRecipient: не удалось установить получателя
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Организация не найдена
     NotChanged: Организация не изменена
     DefaultOrgNotDeletable: Организация по умолчанию не может быть удалена
-    ZitadelOrgNotDeletable: Невозможно удалить организацию с проектом ZITADEL
+    ZitadelOrgNotDeletable: Невозможно удалить организацию с проектом Zitadel
     InvalidDomain: Неверный домен
     DomainMissing: Домен отсутствует
     DomainNotOnOrg: Домен не существует в организации
@@ -593,7 +593,6 @@ Errors:
     Data:
       Invalid: Данные недействительны для схемы пользователя
   TokenExchange:
-    FeatureDisabled: Функция обмена токенами отключена для вашего экземпляра. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Токен отсутствует
       Invalid: Токен недействителен
@@ -607,7 +606,6 @@ Errors:
     ActiveDelete: Невозможно удалить активный веб-ключ
     Config: Неверная конфигурация веб-ключа
     Duplicate: Идентификатор веб-ключа не уникален
-    FeatureDisabled: Функция веб-ключа отключена
     NoActive: Активный веб-ключ не найден
     NotFound: Веб-ключ не найден
 
@@ -1101,20 +1099,20 @@ EventTypes:
         changed: Политика блокировки пароля изменена
   iam:
     setup:
-      started: Настройка ZITADEL начата
-      done: Настройка ZITADEL завершена
+      started: Настройка Zitadel начата
+      done: Настройка Zitadel завершена
     global:
       org:
         set: Глобальная организация установлена
     project:
       iam:
-        set: Проект ZITADEL установлен
+        set: Проект Zitadel установлен
     member:
-      added: Участник ZITADEL добавлен
-      changed: Участник ZITADEL изменён
-      removed: Участник ZITADEL удалён
+      added: Участник Zitadel добавлен
+      changed: Участник Zitadel изменён
+      removed: Участник Zitadel удалён
       cascade:
-        removed: Каскад участников ZITADEL удалён
+        removed: Каскад участников Zitadel удалён
     idp:
       config:
         added: Конфигурация поставщика идентификационных данных добавлена
@@ -1227,9 +1225,9 @@ EventTypes:
       removed: Домен удалён
     iam:
       console:
-        set: Приложение консоли ZITADEL установлено
+        set: Набор приложений консоли управления Zitadel
       project:
-        set: Проект ZITADEL установлен
+        set: Проект Zitadel установлен
     mail:
       template:
         added: Образец электронной почты добавлен

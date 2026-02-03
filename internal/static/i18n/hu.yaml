@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: nem sikerült TLS használatával kapcsolatba lépni az SMTP szerverrel, ellenőrizd a portot, tűzfal problémák...
     CouldNotCreateClient: nem sikerült létrehozni az smtp klienst
     CouldNotStartTLS: nem sikerült elindítani a tls-t
-    CouldNotAuth: nem sikerült hozzáadni az smtp hitelesítést, ellenőrizd, hogy a felhasználóneved és a jelszavad helyes-e, ha igen, lehet, hogy a szolgáltatód olyan hitelesítési módot kér, amelyet a ZITADEL nem támogat
+    CouldNotAuth: nem sikerült hozzáadni az smtp hitelesítést, ellenőrizd, hogy a felhasználóneved és a jelszavad helyes-e, ha igen, lehet, hogy a szolgáltatód olyan hitelesítési módot kér, amelyet a Zitadel nem támogat
     CouldNotSetSender: nem sikerült beállítani a feladót
     CouldNotSetRecipient: nem sikerült beállítani a címzettet
   SMTPConfig:
@@ -208,7 +208,7 @@ Errors:
     NotFound: Szervezet nem található
     NotChanged: A szervezet nem változott
     DefaultOrgNotDeletable: Az alapértelmezett szervezetet nem szabad törölni
-    ZitadelOrgNotDeletable: A ZITADEL projekttel rendelkező szervezetet nem szabad törölni
+    ZitadelOrgNotDeletable: A Zitadel projekttel rendelkező szervezetet nem szabad törölni
     InvalidDomain: Érvénytelen domain
     DomainMissing: Hiányzó domain
     DomainNotOnOrg: A domain nem létezik a szervezeten
@@ -604,7 +604,6 @@ Errors:
     Data:
       Invalid: Érvénytelen adat a User Schema-hoz
   TokenExchange:
-    FeatureDisabled: A Token Exchange funkció le van tiltva az példányod esetében. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: A token hiányzik
       Invalid: A token érvénytelen
@@ -618,7 +617,6 @@ Errors:
     ActiveDelete: Az aktív webkulcs nem törölhető
     Config: Érvénytelen webkulcs konfiguráció
     Duplicate: A webkulcs azonosító nem egyedi
-    FeatureDisabled: A webkulcs funkció le van tiltva
     NoActive: Aktív web kulcs nem található
     NotFound: Web kulcs nem található
 
@@ -1114,20 +1112,20 @@ EventTypes:
         changed: A jelszó kizárási irányelv megváltozott
   iam:
     setup:
-      started: A ZITADEL beállítás elindult
-      done: A ZITADEL beállítás befejeződött
+      started: A Zitadel beállítás elindult
+      done: A Zitadel beállítás befejeződött
     global:
       org:
         set: Globális szervezet beállítva
     project:
       iam:
-        set: A ZITADEL projekt beállítva
+        set: A Zitadel projekt beállítva
     member:
-      added: ZITADEL tag hozzáadva
-      changed: ZITADEL tag megváltoztatva
-      removed: ZITADEL tag eltávolítva
+      added: Zitadel tag hozzáadva
+      changed: Zitadel tag megváltoztatva
+      removed: Zitadel tag eltávolítva
       cascade:
-        removed: ZITADEL tag láncolt eltávolítva
+        removed: Zitadel tag láncolt eltávolítva
     idp:
       config:
         added: IDP konfiguráció hozzáadva
@@ -1240,9 +1238,9 @@ EventTypes:
       removed: Domain eltávolítva
     iam:
       console:
-        set: ZITADEL Konzolalkalmazás beállítva
+        set: Zitadel Felügyeleti Konzol alkalmazás beállítva
       project:
-        set: ZITADEL projekt beállítva
+        set: Zitadel projekt beállítva
     mail:
       template:
         added: E-Mail sablon hozzáadva

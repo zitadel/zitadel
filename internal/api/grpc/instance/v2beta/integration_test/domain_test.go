@@ -34,9 +34,12 @@ func TestAddCustomDomain(t *testing.T) {
 
 	relationalInst := integration.NewInstance(ctxWithSysAuthZ)
 	iamOwnerRelationalCtx := relationalInst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, relationalInst, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, relationalInst,
+		&feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
+		func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
+		},
+	)
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
