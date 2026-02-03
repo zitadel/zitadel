@@ -250,8 +250,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 
-	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
-	logging.OnError(err).Fatal("unable to start projections")
+	projection.CreateAll(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
@@ -458,7 +457,7 @@ func startCommandsQueries(
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	logging.OnError(err).Fatal("unable to ensure encryption keys")
 
-	err = projection.Create(
+	projection.CreateAll(
 		ctx,
 		dbClient,
 		eventstoreClient,
@@ -471,7 +470,6 @@ func startCommandsQueries(
 		keys.SAML,
 		config.SystemAPIUsers,
 	)
-	logging.OnError(err).Fatal("unable to start projections")
 
 	staticStorage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	logging.OnError(err).Fatal("unable to start asset storage")

@@ -204,8 +204,7 @@ func projections(
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
-	err = projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
-	logging.OnError(err).Fatal("unable to start projections")
+	projection.CreateAll(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
