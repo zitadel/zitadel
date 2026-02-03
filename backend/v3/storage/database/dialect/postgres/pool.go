@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
@@ -13,7 +15,13 @@ type pgxPool struct {
 	*pgxpool.Pool
 }
 
+// InternalDB implements [database.PoolTest].
+func (p *pgxPool) RawDB() *sql.DB {
+	return stdlib.OpenDBFromPool(p.Pool)
+}
+
 var _ database.Pool = (*pgxPool)(nil)
+var _ database.PoolTest = (*pgxPool)(nil)
 
 func PGxPool(pool *pgxpool.Pool) *pgxPool {
 	return &pgxPool{

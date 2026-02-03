@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 // Pool is a connection pool. e.g. pgxpool
@@ -20,6 +21,7 @@ type PoolTest interface {
 	Pool
 	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context) error
+	RawDB() *sql.DB
 }
 
 // Connection is a single database connection which can be released back to the pool.
