@@ -5,8 +5,10 @@ import { fileURLToPath } from 'url';
 import semver from 'semver';
 import { Readable } from 'stream';
 
-const FALLBACK_VERSION = 'v4.10.0'; // Temporary fallback until > 4.10.0 exists
-const FALLBACK_BRANCH = 'main'; // Primary branch to check for 4.10.0 content
+const FALLBACK_VERSION = 'v4.10.0';
+const FALLBACK_BRANCH = 'main';
+const REPO = 'zitadel/zitadel';
+const CUTOFF = '4.10.0';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -21,17 +23,70 @@ console.log(`[fetch-docs] ROOT_DIR: ${ROOT_DIR}`);
 console.log(`[fetch-docs] PROTO_DIR: ${PROTO_DIR}`);
 console.log(`[fetch-docs] CONTENT_DIR: ${CONTENT_DIR}`);
 
-const REPO = 'zitadel/zitadel';
-const CUTOFF = '4.10.0';
+// --- Helper Functions ---
+
+// Sanitize logs to prevent log injection (CWE-117)
+export function safeLog(str) {
+  return str ? String(str).replace(/[\n\r]/g, '') : '';
+}
+
+// Validate refs to prevent command injection or unsafe URL construction
+export function isValidRef(ref) {
+  // Allow alphanumeric, dots, dashes, underscores, slashes, @ (dependabot), and +
+  // But explicitly disallow ".." to prevent traversal
+  if (ref.includes('..')) return false;
+  return /^[a-zA-Z0-9._\-/@+]+$/.test(ref);
+}
+
+// Caches result to avoid redundant git/env checks.
+let cachedRef = null;
+function getCurrentRef() {
+  if (cachedRef) return cachedRef;
+
+  if (process.env.VERCEL_GIT_COMMIT_REF) {
+    const ref = process.env.VERCEL_GIT_COMMIT_REF;
+    if (!isValidRef(ref)) {
+       console.warn(`[ref] Invalid VERCEL_GIT_COMMIT_REF: ${safeLog(ref)}, falling through...`);
+    } else {
+       console.log(`[ref] Detected Vercel Branch: ${safeLog(ref)}`);
+       cachedRef = ref;
+       return cachedRef;
+    }
+  }
+
+  if (process.env.GITHUB_REF_NAME) {
+    const ref = process.env.GITHUB_REF_NAME;
+    if (!isValidRef(ref)) {
+       console.warn(`[ref] Invalid GITHUB_REF_NAME: ${safeLog(ref)}, falling through...`);
+    } else {
+       console.log(`[ref] Detected GitHub Action Branch: ${safeLog(ref)}`);
+       cachedRef = ref;
+       return cachedRef;
+    }
+  }
+
+  try {
+    const branch = execSync('git branch --show-current').toString().trim();
+    if (branch) {
+      cachedRef = branch;
+      return cachedRef;
+    }
+  } catch (e) {
+    // Ignore git errors
+  }
+  console.log(`[ref] Defaulting to ${FALLBACK_BRANCH}`);
+  cachedRef = FALLBACK_BRANCH;
+  return cachedRef;
+}
+
+export function resetCache() {
+  cachedRef = null;
+}
 
 async function fetchTags() {
   const token = process.env.GITHUB_TOKEN;
-  const headers = {
-    'User-Agent': 'node-fetch'
-  };
-  if (token) {
-    headers['Authorization'] = `token ${token}`;
-  }
+  const headers = { 'User-Agent': 'node-fetch' };
+  if (token) headers['Authorization'] = `token ${token}`;
 
   const url = `https://api.github.com/repos/${REPO}/tags?per_page=100`;
   console.log(`Fetching tags from ${url}...`);
@@ -45,7 +100,7 @@ async function fetchTags() {
   return tags;
 }
 
-function filterVersions(tags) {
+export function filterVersions(tags) {
   console.log(`Filtering tags with cutoff strictly > ${CUTOFF}...`);
   const versions = tags
     .map(t => t.name)
@@ -67,132 +122,229 @@ function filterVersions(tags) {
     }
   }
 
-  // User requested Highest + 2 minor versions below it = 3 versions total
   const result = Array.from(groups.values()).slice(0, 3);
   console.log(`Selected versions: ${result.join(', ')}`);
   return result;
 }
 
-// Helper to determine the best branch for v4.10.0 content
-function getFallbackSource() {
-  // Prioritize CI/CD Environment Variables
-  if (process.env.VERCEL_GIT_COMMIT_REF) {
-    console.log(`[fallback] Detected Vercel Branch: ${process.env.VERCEL_GIT_COMMIT_REF}`);
-    return process.env.VERCEL_GIT_COMMIT_REF;
-  }
-  if (process.env.GITHUB_REF_NAME) {
-    console.log(`[fallback] Detected GitHub Action Branch: ${process.env.GITHUB_REF_NAME}`);
-    return process.env.GITHUB_REF_NAME;
-  }
+// Safely copy a directory, avoiding recursive version folders
+function copyDirectorySafely(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
 
-  // Fallback for local dev if git is available
-  try {
-    const branch = execSync('git branch --show-current').toString().trim();
-    // if (branch) return branch; // DISABLED: Local branch might not be pushed to remote, causing 404
-  } catch (e) {
-    // Ignore git errors
-  }
+  const items = fs.readdirSync(src);
+  // Matches v4.10, v4.10.0, etc.
+  const versionDirPattern = /^v\d+(\.\d+){1,2}$/;
 
-  console.log(`[fallback] Defaulting to ${FALLBACK_BRANCH}`);
-  return FALLBACK_BRANCH;
+  for (const item of items) {
+    // Avoid copying versioned folders to prevent recursion
+    let isVersionDir = false;
+    try {
+      if (versionDirPattern.test(item) && fs.statSync(join(src, item)).isDirectory()) {
+        isVersionDir = true;
+      }
+    } catch (e) {
+      // Ignore stat errors
+    }
+
+    if (isVersionDir) continue;
+    if (item === 'versions.json') continue; // Skip manifest
+
+    fs.cpSync(join(src, item), join(dest, item), { recursive: true });
+  }
 }
 
-// sourceRef: Can be a tag (v1.2.3) or a branch (main, fuma-docs)
 async function downloadVersion(tag, sourceRef) {
-  const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
-  const typeSegment = isBranch ? 'heads' : 'tags';
-  const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
+  if (!isValidRef(sourceRef)) {
+     throw new Error(`Invalid sourceRef: ${safeLog(sourceRef)}`);
+  }
 
+  const currentRef = getCurrentRef();
+  const isLocal = sourceRef === currentRef;
   const tempDir = join(ROOT_DIR, `.temp/${tag}`); // Extract to tag-specific temp to avoid collisions
   fs.mkdirSync(tempDir, { recursive: true });
 
-  console.log(`Downloading content for ${tag} (using source: ${sourceRef})...`);
+  try {
+    if (isLocal) {
+        console.log(`[local] Copying local content for ${tag} (ref: ${safeLog(sourceRef)})...`);
+        
+        // Copy content
+        copyDirectorySafely(join(ROOT_DIR, 'content'), join(tempDir, 'apps/docs/content'));
+        
+        // Copy public
+        copyDirectorySafely(join(ROOT_DIR, 'public'), join(tempDir, 'apps/docs/public'));
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
+        // Copy external files
+        const repoRoot = resolve(ROOT_DIR, '../..');
+        const tempCmd = join(tempDir, 'cmd');
+        fs.mkdirSync(tempCmd, { recursive: true });
 
-  const tarArgsWildcard = [
-    '-xz',
-    '-C', tempDir,
-    '--strip-components=1'
-  ];
+        const defaultsPath = join(repoRoot, 'cmd/defaults.yaml');
+        if (fs.existsSync(defaultsPath)) {
+            fs.cpSync(defaultsPath, join(tempCmd, 'defaults.yaml'));
+        }
 
-  // GNU tar (Linux) requires --wildcards for patterns, BSD tar (macOS) does not support it (and uses patterns by default)
-  if (process.platform !== 'darwin') {
-    tarArgsWildcard.push('--wildcards');
-  }
+        const stepsPath = join(repoRoot, 'cmd/setup/steps.yaml');
+        if (fs.existsSync(stepsPath)) {
+            fs.mkdirSync(join(tempCmd, 'setup'), { recursive: true });
+            fs.cpSync(stepsPath, join(tempCmd, 'setup/steps.yaml'));
+        }
 
-  tarArgsWildcard.push(
-    '*/apps/docs/content',
-    '*/apps/docs/public',
-    '*/cmd/defaults.yaml',
-    '*/cmd/setup/steps.yaml'
-  );
+    } else {
+        const isBranch = sourceRef === 'main' || sourceRef === 'master' || !sourceRef.startsWith('v');
+        const typeSegment = isBranch ? 'heads' : 'tags';
+        const url = `https://github.com/${REPO}/archive/refs/${typeSegment}/${sourceRef}.tar.gz`;
 
-  await new Promise((resolve, reject) => {
-    const tar = spawn('tar', tarArgsWildcard);
-    Readable.fromWeb(res.body).pipe(tar.stdin);
-    tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
-    tar.stderr.on('data', d => {
-      const msg = d.toString();
-      if (!msg.includes('Not found in archive')) console.error(msg);
-    });
-  });
+        console.log(`Downloading content for ${tag} (using source: ${safeLog(sourceRef)})...`);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to download ${url}: ${res.statusText}`);
 
-  // Name normalization logic for destination
-  // If tag is 'v4.10.0', use only 'v4.10' for folder (matches current logic)
-  const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
+        // Build tar arguments to extract only the docs content directory from the GitHub archive.
+        const tarArgsWildcard = [
+            '-xz',
+            '-C', tempDir,
+            '--strip-components=1'
+        ];
 
-  const contentDest = join(CONTENT_DIR, versionSlug);
-  const publicDest = join(PUBLIC_DIR, versionSlug);
+        // GNU tar (Linux) requires --wildcards for patterns, BSD tar (macOS) does not support it (and uses patterns by default)
+        if (process.platform !== 'darwin') {
+            tarArgsWildcard.push('--wildcards');
+        }
 
-  fs.mkdirSync(dirname(contentDest), { recursive: true });
-  fs.mkdirSync(dirname(publicDest), { recursive: true });
+        tarArgsWildcard.push(
+            '*/apps/docs/content',
+            '*/apps/docs/public',
+            '*/cmd/defaults.yaml',
+            '*/cmd/setup/steps.yaml'
+        );
 
-  fs.rmSync(contentDest, { recursive: true, force: true });
-  fs.rmSync(publicDest, { recursive: true, force: true });
-
-  // Move content
-  if (fs.existsSync(join(tempDir, 'apps/docs/content'))) {
-    fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
-  } else {
-    if (!fs.existsSync(join(tempDir, 'apps/docs/content'))) {
-      console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${sourceRef})`);
+        await new Promise((resolve, reject) => {
+            const tar = spawn('tar', tarArgsWildcard);
+            Readable.fromWeb(res.body).pipe(tar.stdin);
+            tar.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`tar exited ${code}`))));
+            tar.stderr.on('data', d => {
+                const msg = d.toString();
+                if (!msg.includes('Not found in archive')) console.error(msg);
+            });
+        });
     }
-  }
 
-  // Handle external files (defaults.yaml etc)
-  const externalDir = join(contentDest, '_external/cmd');
-  fs.mkdirSync(externalDir, { recursive: true });
+    // Move to final destination
+    const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
+    const contentDest = join(CONTENT_DIR, versionSlug);
+    const publicDest = join(PUBLIC_DIR, versionSlug);
 
-  if (fs.existsSync(join(tempDir, 'cmd/defaults.yaml'))) {
-    fs.cpSync(join(tempDir, 'cmd/defaults.yaml'), join(externalDir, 'defaults.yaml'));
-  }
-  if (fs.existsSync(join(tempDir, 'cmd/setup/steps.yaml'))) {
-    fs.mkdirSync(join(externalDir, 'setup'), { recursive: true });
-    fs.cpSync(join(tempDir, 'cmd/setup/steps.yaml'), join(externalDir, 'setup/steps.yaml'));
-  }
+    fs.mkdirSync(dirname(contentDest), { recursive: true });
+    fs.mkdirSync(dirname(publicDest), { recursive: true });
 
-  if (fs.existsSync(join(tempDir, 'apps/docs/public'))) {
-    fs.renameSync(join(tempDir, 'apps/docs/public'), publicDest);
-  }
+    fs.rmSync(contentDest, { recursive: true, force: true });
+    fs.rmSync(publicDest, { recursive: true, force: true });
 
-  fs.rmSync(tempDir, { recursive: true, force: true });
+    if (fs.existsSync(join(tempDir, 'apps/docs/content'))) {
+        fs.renameSync(join(tempDir, 'apps/docs/content'), contentDest);
+    } else {
+         // Fallback warning
+         console.warn(`[warn] apps/docs/content not found in archive for ${tag} (ref: ${safeLog(sourceRef)})`);
+    }
+    
+    // Handle external files
+    const externalDir = join(contentDest, '_external/cmd');
+    fs.mkdirSync(externalDir, { recursive: true });
+    
+    if (fs.existsSync(join(tempDir, 'cmd/defaults.yaml'))) {
+        fs.cpSync(join(tempDir, 'cmd/defaults.yaml'), join(externalDir, 'defaults.yaml'));
+    }
+    if (fs.existsSync(join(tempDir, 'cmd/setup/steps.yaml'))) {
+        fs.mkdirSync(join(externalDir, 'setup'), { recursive: true });
+        fs.cpSync(join(tempDir, 'cmd/setup/steps.yaml'), join(externalDir, 'setup/steps.yaml'));
+    }
+
+    if (fs.existsSync(join(tempDir, 'apps/docs/public'))) {
+        fs.renameSync(join(tempDir, 'apps/docs/public'), publicDest);
+    }
+
+  } catch (err) {
+    console.error(`[error] Failed to process version ${tag}: ${err.message}`);
+    throw err;
+  } finally {
+    // Always clean up temp dir
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 }
 
 async function downloadFileContent(tagOrBranch, repoPath) {
-  const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    // Fallback for some repo structures if needed, or if file doesn't exist in that version
+  const currentRef = getCurrentRef();
+  if (tagOrBranch === currentRef) {
+    console.log(`[local] Reading local file content for: ${repoPath}`);
+    const repoRoot = resolve(ROOT_DIR, '../..');
+    
+    let decodedRepoPath;
+    try {
+        decodedRepoPath = decodeURIComponent(repoPath.replace(/\\/g, '/'));
+    } catch (e) {
+        // If decoding fails (malformed escape sequences), fall back to original
+        decodedRepoPath = repoPath;
+    }
+    const normalizedRepoPath = decodedRepoPath.replace(/\\/g, '/');
+
+    const localPath = resolve(repoRoot, normalizedRepoPath);
+    
+    // Secure Check: Ensure the resolved path actually starts with the repo root
+    // strict check including separator to avoid partial matches (e.g. /opt/repo matching /opt/repo-hack)
+    const secureRepoRoot = repoRoot.endsWith(path.sep) ? repoRoot : repoRoot + path.sep;
+    if (!localPath.startsWith(secureRepoRoot) && localPath !== repoRoot) {
+      console.warn(`[local] Refusing to read file outside repo root: ${localPath}`);
+      return null;
+    }
+
+    if (fs.existsSync(localPath)) {
+      return fs.readFileSync(localPath, 'utf8');
+    }
     return null;
   }
+
+  if (!isValidRef(tagOrBranch)) return null;
+
+  const url = `https://raw.githubusercontent.com/${REPO}/${tagOrBranch}/${repoPath}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
   return await res.text();
 }
 
 async function fixRelativeImports(versionDir, tagOrBranch) {
   if (!fs.existsSync(versionDir)) return;
   const files = fs.readdirSync(versionDir, { recursive: true });
+
+  const rewritePath = (filePath, originalRelPath) => {
+    const versionFolder = path.basename(versionDir);
+    const relativePathInContent = filePath.split(join('content', versionFolder))[1];
+    if (!relativePathInContent) return null;
+
+    const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
+    const originalDir = dirname(originalFilePath);
+    const absoluteTarget = resolve(originalDir, originalRelPath);
+    const projectRoot = resolve(ROOT_DIR, '../..');
+
+    if (absoluteTarget.startsWith(PUBLIC_DIR)) {
+      const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1);
+      const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
+      const newRelPath = path.relative(dirname(filePath), newTargetAbs);
+      return newRelPath.split(path.sep).join('/');
+    }
+
+    if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PUBLIC_DIR)) {
+      return null;
+    }
+    if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
+      return null;
+    }
+
+    if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
+      const newRelPath = path.relative(dirname(filePath), absoluteTarget);
+      return newRelPath.split(path.sep).join('/');
+    }
+    return null;
+  };
 
   // We'll traverse all files to fix links/imports
   for (const file of files) {
@@ -203,90 +355,13 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     let content = fs.readFileSync(filePath, 'utf8');
     let changed = false;
 
-    // Helper to rewrite a single path
-    // Returns null if no change needed, or the new string if changed
-    const rewritePath = (originalRelPath) => {
-      // 1. Resolve where it was originally pointing
-      const versionFolder = path.basename(versionDir);
-      const relativePathInContent = filePath.split(join('content', versionFolder))[1];
-      if (!relativePathInContent) return null; // Should not happen given logic
-
-      // The original file was at CONTENT_LATEST_DIR + relativePathInContent
-      const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);
-      const originalDir = dirname(originalFilePath);
-
-      // Resolve target
-      // Note: resolve() handles '..' correctly
-      const absoluteTarget = resolve(originalDir, originalRelPath);
-
-      const projectRoot = resolve(ROOT_DIR, '../..'); // Repo root (apps/docs/../..)
-
-      // 2. Determine where this target lives now
-      // Case A: It's in 'public' -> We moved public assets to 'public/<version>'
-      // Check if target starts with ROOT_DIR/public
-      if (absoluteTarget.startsWith(PUBLIC_DIR)) {
-        // It refers to a public asset.
-        // The NEW location of this asset is PUBLIC_DIR/<version>/<rest of path>
-        // But wait, PUBLIC_DIR is 'docs/public'.
-        // In downloadVersion, we move 'zitadel-xxx/docs/public' to 'docs/public/<version>'.
-        // So if original path was 'docs/public/img/foo.png', new path is 'docs/public/<version>/img/foo.png'.
-
-        const relToPublic = absoluteTarget.slice(PUBLIC_DIR.length + 1); // 'img/foo.png'
-        const newTargetAbs = join(PUBLIC_DIR, versionFolder, relToPublic);
-
-        // Now calculate relative path from the NEW file location to this NEW target
-        // New file is at 'filePath'
-        const newRelPath = path.relative(dirname(filePath), newTargetAbs);
-        return newRelPath.split(path.sep).join('/'); // Normalize to forward slashes
-      }
-
-      // Case B: It's in 'docs/content' (linking to another doc)
-      // If it's a relative link to another doc, we usually want to keep it relative
-      // content/<ver>/a.md -> content/<ver>/b.md is same relative relationship as content/a.md -> content/b.md
-      // UNLESS it crosses out of content?
-
-      // Case C: It's external (e.g. cmd/defaults.yaml)
-      // This is what the original code was handling.
-      // If it is NOT in docs/content, and NOT in docs/public, we treat it as external file to download.
-      if (absoluteTarget.startsWith(projectRoot) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteTarget.startsWith(PublicOrRootPublic(absoluteTarget))) {
-        // External file logic...
-        // For now, let's keep the original logic for downloading defaults.yaml
-        return null; // We handle this in the regex pass below specially or reuse this logic?
-      }
-
-      // Handle references to defaults.yaml or setup/steps.yaml specially
-      if (originalRelPath.includes('cmd/defaults.yaml') || originalRelPath.includes('cmd/setup/steps.yaml')) {
-        return null; // Let the external file handlers deal with it
-      }
-
-      // Case D: It's a relative link to, say, components/ or other things in docs/
-      // Original: docs/content/foo.md -> ../components/Bar
-      // New: docs/content/<ver>/foo.md -> ../../components/Bar
-      // We just need to recalculate relative path from NEW file to ORIGINAL target
-
-      // If it's pointing to something in docs/ (but not content/ or public/), like components/
-      if (absoluteTarget.startsWith(ROOT_DIR) && !absoluteTarget.startsWith(CONTENT_LATEST_DIR)) {
-        const newRelPath = path.relative(dirname(filePath), absoluteTarget);
-        return newRelPath.split(path.sep).join('/');
-      }
-
-      return null;
-    };
-
-    // Helper for detecting public dir properly
-    // The PUBLIC_DIR variable is 'docs/public'. But absoluteTarget might be resolved via 'src'
-    function PublicOrRootPublic(p) {
-      return PUBLIC_DIR;
-    }
-
     // --- Replacements ---
 
     // 1. Imports: import ... from '...'
-    // We capture the path: group 2
     const importRegex = /(import\s+.*?\s+from\s+['"])([^'"]+)(['"])/g;
     content = content.replace(importRegex, (match, p1, p2, p3) => {
       if (!p2.startsWith('.')) return match; // Only relative
-      const rewritten = rewritePath(p2);
+      const rewritten = rewritePath(filePath, p2);
       if (rewritten && rewritten !== p2) {
         changed = true;
         return `${p1}${rewritten}${p3}`;
@@ -298,7 +373,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     const mdImgRegex = /(!\[.*?\]\()([^\)]+)(\))/g;
     content = content.replace(mdImgRegex, (match, p1, p2, p3) => {
       if (!p2.startsWith('.')) return match;
-      const rewritten = rewritePath(p2);
+      const rewritten = rewritePath(filePath, p2);
       if (rewritten && rewritten !== p2) {
         changed = true;
         return `${p1}${rewritten}${p3}`;
@@ -307,14 +382,12 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     });
 
     // 3. HTML Attributes: src="..." or href="..."
-    // Naive regex, but likely sufficient for MDX
     const htmlAttrRegex = /(src|href)=['"]([^'"]+)['"]/g;
     content = content.replace(htmlAttrRegex, (match, attr, val) => {
       if (!val.startsWith('.')) return match;
-      const rewritten = rewritePath(val);
+      const rewritten = rewritePath(filePath, val);
       if (rewritten && rewritten !== val) {
         changed = true;
-        // reconstruct match
         const quote = match.includes("'") ? "'" : '"';
         return `${attr}=${quote}${rewritten}${quote}`;
       }
@@ -322,12 +395,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     });
 
     // --- Special handling for the "download external file" case ---
-    // The previous regex replacement structure prevents async operations.
-    // We have to scan for external files separately or before replacing, OR use a synchronous download (not ideal)
-    // OR rely on the existing synchronous logic for rewriting if we pre-download them.
-
-    // Let's perform a SCAN for strictly external files (like ../cmd/defaults.yaml) first
-    // Reuse original logic for downloading
+    // Scan for strictly external files (like ../cmd/defaults.yaml) first
     const importRegexForDownload = /import\s+.*\s+from\s+['"](\.\.\/(\.\.\/)+[^'"]+)['"]/g;
     let match;
     while ((match = importRegexForDownload.exec(content)) !== null) {
@@ -342,11 +410,8 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
       if (absoluteImportTarget.startsWith(projectRoot) && !absoluteImportTarget.startsWith(CONTENT_LATEST_DIR) && !absoluteImportTarget.startsWith(PUBLIC_DIR)) {
         const repoRoot = resolve(ROOT_DIR, '../..');
 
-        // The original imports were relative to docs/content, not apps/docs/content.
-        // We need to account for the extra 'apps/' level.
         let relativeToRepoRoot;
         if (absoluteImportTarget.startsWith(join(repoRoot, 'apps'))) {
-          // If it resolved to apps/cmd/defaults.yaml, it should be cmd/defaults.yaml
           relativeToRepoRoot = absoluteImportTarget.replace(join(repoRoot, 'apps') + '/', '');
         } else {
           relativeToRepoRoot = absoluteImportTarget.replace(repoRoot + '/', '');
@@ -357,7 +422,7 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
         // Download if missing
         if (!fs.existsSync(localPathInVersion)) {
           console.log(`[fix-imports] Downloading external: ${relativeToRepoRoot}`);
-          const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot); // existing function
+          const fileContent = await downloadFileContent(tagOrBranch, relativeToRepoRoot);
           if (fileContent) {
             fs.mkdirSync(dirname(localPathInVersion), { recursive: true });
             fs.writeFileSync(localPathInVersion, fileContent);
@@ -382,32 +447,29 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
 }
 
 function getLocalVersion() {
-  const isVercel = process.env.VERCEL === '1';
-  const vercelBranch = process.env.VERCEL_GIT_COMMIT_REF;
-
-  let branch = vercelBranch;
-  if (!branch) {
-    try {
-      branch = execSync('git branch --show-current').toString().trim();
-    } catch (e) { }
-  }
-
-  if (branch && branch !== 'main' && branch !== 'master') {
-    return { label: branch, isUnreleased: true };
-  }
-
-  if (branch === 'main' || branch === 'master') {
-    return { label: 'ZITADEL Docs', isUnreleased: false };
-  }
-
-  try {
-    const tag = execSync('git describe --tags --abbrev=0').toString().trim();
-    if (semver.valid(tag) && semver.gt(tag, CUTOFF)) {
-      return { label: tag, isUnreleased: false };
+    const vercelBranch = process.env.VERCEL_GIT_COMMIT_REF;
+    let branch = vercelBranch;
+    if (!branch) {
+        try {
+            branch = execSync('git branch --show-current').toString().trim();
+        } catch (e) {}
     }
-  } catch (e) { }
 
-  return { label: 'v4.11.0', isUnreleased: true };
+    if (branch && branch !== 'main' && branch !== 'master') {
+        return { label: branch, isUnreleased: true };
+    }
+    if (branch === 'main' || branch === 'master') {
+        return { label: 'ZITADEL Docs', isUnreleased: false };
+    }
+
+    try {
+        const tag = execSync('git describe --tags --abbrev=0').toString().trim();
+        if (semver.valid(tag) && semver.gt(tag, CUTOFF)) {
+            return { label: tag, isUnreleased: false };
+        }
+    } catch (e) { }
+
+    return { label: 'v4.11.0', isUnreleased: true };
 }
 
 async function run() {
@@ -416,7 +478,7 @@ async function run() {
   const selectedTags = filterVersions(tags);
 
   let localVer = getLocalVersion();
-  let others = selectedTags; // In our case, if local is latest, all filtered tags are others
+  let others = selectedTags;
 
   console.log(`Latest version (Local): ${localVer.label} (Unreleased: ${localVer.isUnreleased})`);
 
@@ -428,8 +490,6 @@ async function run() {
 
   console.log(`Older versions to fetch: ${others.join(', ') || 'None'}`);
 
-  // Download chosen versions
-  // Parallelize download and processing
   await Promise.all(others.map(async (tag) => {
     let sourceRef = tag;
 
@@ -437,7 +497,7 @@ async function run() {
     // This prevents fetching incompatible legacy docs for 4.10.1 etc.
     if (tag === FALLBACK_VERSION || (semver.major(tag) === 4 && semver.minor(tag) === 10)) {
       console.log(`[fake-override] Version ${tag} matches 4.10.x. Using fallback source (main/current) instead of tag.`);
-      sourceRef = getFallbackSource();
+      sourceRef = getCurrentRef();
     }
 
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
@@ -448,17 +508,12 @@ async function run() {
     if (fs.existsSync(contentDest)) {
       console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
     } else {
-      await downloadVersion(tag, sourceRef);
-      // Only fix imports if we just downloaded it (or maybe always run it? Safe to rerun)
-      // Rerunning fixRelativeImports is relatively cheap compared to download + tar extraction
-      // but let's stick to doing it only if we downloaded or if we force it.
-      // For now: Always fix imports to be safe, or just on new download. 
-      // Let's doing it on new download for speed.
-      await fixRelativeImports(contentDest, tag);
+        await downloadVersion(tag, sourceRef);
+        // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
+        await fixRelativeImports(contentDest, sourceRef);
     }
   }));
 
-  // Generate versions.json
   const versionsJson = [
     {
       param: 'latest',
@@ -487,7 +542,11 @@ async function run() {
   console.log('versions.json generated successfully.');
 }
 
-run().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  run().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+export { getCurrentRef, downloadVersion, downloadFileContent };
