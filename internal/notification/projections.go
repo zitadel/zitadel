@@ -57,7 +57,7 @@ func Register(
 		queue,
 		backChannelLogoutWorkerConfig.MaxAttempts,
 	))
-	queue.AddWorkers(handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
+	queue.AddWorkers(ctx, handlers.NewBackChannelLogoutWorker(commands, q, es, queue, c, backChannelLogoutWorkerConfig, id.SonyFlakeGenerator()))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
