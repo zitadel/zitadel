@@ -481,6 +481,7 @@ func startAPIs(
 		limitingAccessInterceptor,
 		keys.Target,
 		translator,
+		config.Instrumentation.Trace.TrustRemoteSpans,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)

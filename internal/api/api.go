@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
-	"os"
 	"sort"
 	"strings"
 
@@ -111,6 +110,7 @@ func New(
 	accessInterceptor *http_mw.AccessInterceptor,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
+	trustRemoteSpans bool,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -139,7 +139,7 @@ func New(
 		otelconnect.WithPropagator(otel.GetTextMapPropagator()),
 		otelconnect.WithoutServerPeerAttributes(),
 	}
-	if os.Getenv("OTEL_TRUST_REMOTE_SPANS") == "true" {
+	if trustRemoteSpans {
 		otelOpts = append(otelOpts, otelconnect.WithTrustRemote())
 	}
 	api.connectOTELInterceptor, err = otelconnect.NewInterceptor(otelOpts...)
