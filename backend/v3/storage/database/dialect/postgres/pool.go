@@ -8,10 +8,26 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres/migration"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 type pgxPool struct {
 	*pgxpool.Pool
+}
+
+// DatabaseName implements [database.PoolTest].
+func (p *pgxPool) DatabaseName() string {
+	return p.Config().ConnConfig.Database
+}
+
+// Type implements [database.PoolTest].
+func (p *pgxPool) Type() dialect.DatabaseType {
+	return dialect.DatabaseTypePostgres
+}
+
+// Username implements [database.PoolTest].
+func (p *pgxPool) Username() string {
+	return p.Config().ConnConfig.User
 }
 
 var _ database.Pool = (*pgxPool)(nil)
