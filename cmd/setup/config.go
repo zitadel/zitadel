@@ -177,6 +177,7 @@ type Steps struct {
 	s66SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
+	s69CacheTablesLogged                    *CacheTablesLogged
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
