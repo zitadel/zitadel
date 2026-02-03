@@ -582,10 +582,16 @@ Login:
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
   DefaultPaths:
     BasePath: "/ui/v2/login"
-    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    # PasswordSetPath is used to create the link for setting a password during user registration or password reset
+    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}" # ZITADEL_LOGIN_DEFAULTPATHS_PASSWORDSETPATH
+    # EmailCodePath is used to create the link for verifying the user's email address
     EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
-    OTPEmailPath: "/otp/email?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
+    # OTPEmailPath is used to create the link for verifying the user's OTP during login
+    OTPEmailPath: "/otp/email?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}"
+    # PasskeySetPath is used to create the link for adding a passkey to the user's account though the login UI
     PasskeySetPath: "/passkey/set?codeId={{.CodeID}}&code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    # DomainClaimedPath is used to create the link to the login UI after an organization has claimed a domain and the user's loginname was updated
+    DomainClaimedPath: "/loginname?organization={{.OrgID}}"
 
 Console:
   ShortCache:

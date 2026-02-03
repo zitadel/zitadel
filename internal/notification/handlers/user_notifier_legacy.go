@@ -577,7 +577,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
-			SendDomainClaimed(ctx, notifyUser, e.UserName)
+			SendDomainClaimed(ctx, notifyUser, e.UserName, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
 				// if the notification was canceled, we don't want to return the error, so there is no retry

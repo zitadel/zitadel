@@ -144,7 +144,7 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	agg := UserAggregateFromWriteModel(&wm.WriteModel)
 
 	if urlTmpl == "" {
-		urlTmpl = c.defaultPasskeySetURLTemplate(ctx)
+		urlTmpl = c.loginPaths.DefaultPasskeySetURLTemplate(ctx)
 	}
 
 	cmd := user.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, codeID, code.Crypted, code.Expiry, urlTmpl, returnCode)

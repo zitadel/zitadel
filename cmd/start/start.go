@@ -276,9 +276,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
-		config.Login.DefaultEmailCodeURLTemplate,
-		config.Login.DefaultPasswordSetURLTemplate,
-		config.Login.DefaultPasskeySetURLTemplate,
+		config.Login.DefaultPaths,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)

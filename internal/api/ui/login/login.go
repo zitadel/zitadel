@@ -56,14 +56,15 @@ type Config struct {
 }
 
 type DefaultPaths struct {
-	BasePath        string
-	PasswordSetPath string
-	EmailCodePath   string
-	OTPEmailPath    string
-	PasskeySetPath  string
+	BasePath          string
+	PasswordSetPath   string
+	EmailCodePath     string
+	OTPEmailPath      string
+	PasskeySetPath    string
+	DomainClaimedPath string
 }
 
-func (c *Config) defaultBaseURL(ctx context.Context) string {
+func (c *DefaultPaths) defaultBaseURL(ctx context.Context) string {
 	loginV2 := authz.GetInstance(ctx).Features().LoginV2
 	if loginV2.Required {
 		// use the origin as default
@@ -72,31 +73,41 @@ func (c *Config) defaultBaseURL(ctx context.Context) string {
 		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
 			baseURI = loginV2.BaseURI.String()
 		}
-		return baseURI + c.DefaultPaths.BasePath
+		return baseURI + c.BasePath
 	}
 	return ""
 }
 
-func (c *Config) DefaultEmailCodeURLTemplate(ctx context.Context) string {
+func (c *DefaultPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
 	if basePath == "" {
 		return ""
 	}
-	return basePath + c.DefaultPaths.EmailCodePath
+	return basePath + c.EmailCodePath
 }
-func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+
+func (c *DefaultPaths) DefaultPasswordSetURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
 	if basePath == "" {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
+	return c.defaultBaseURL(ctx) + c.PasswordSetPath
 }
-func (c *Config) DefaultPasskeySetURLTemplate(ctx context.Context) string {
+
+func (c *DefaultPaths) DefaultPasskeySetURLTemplate(ctx context.Context) string {
 	basePath := c.defaultBaseURL(ctx)
 	if basePath == "" {
 		return ""
 	}
-	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasskeySetPath
+	return c.defaultBaseURL(ctx) + c.PasskeySetPath
+}
+
+func (c *DefaultPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return c.defaultBaseURL(ctx) + c.DomainClaimedPath
 }
 
 const (

@@ -306,7 +306,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		}
 
 		if human.Email.URLTemplate == "" {
-			human.Email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+			human.Email.URLTemplate = c.loginPaths.DefaultEmailCodeURLTemplate(ctx)
 		}
 
 		return append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode, human.AuthRequestID)), nil
@@ -599,7 +599,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 			if err != nil {
 				return nil, nil, nil, err
 			}
-			events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, c.defaultEmailCodeURLTemplate(ctx), false, ""))
+			events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, c.loginPaths.DefaultEmailCodeURLTemplate(ctx), false, ""))
 		}
 	}
 
