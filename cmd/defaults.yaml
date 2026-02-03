@@ -2,6 +2,9 @@ Instrumentation:
   ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
   Trace:
     Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    # Trust incoming trace context from remote services for distributed tracing.
+    # Enable only in controlled environments; defaults to false for security.
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
     Exporter:
       # The following exporter types are supported:
       # "none": Disables trace exporting
@@ -647,8 +650,22 @@ OIDC:
   DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   # Internal cache age for public keys to speed up validations (e.g. id_token_hints) on the authorization endpoint.
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
-  # Lifetime of the token used to notify clients through OIDC back-channel logout when the feature is enabled and registered on the client.
+  # Lifetime of the token used to notify clients through OIDC back-channel logout.
+  # Deprecated: use BackChannelLogout.TokenLifetime instead
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
+  BackChannelLogout:
+    # The amount of workers processing the back-channel logout notifications.
+    # If set to 0, no notifications will be handled. This can be useful when running in
+    # multi binary / pod setup and allowing only certain executables to process the events.
+    Workers: 1 # ZITADEL_OIDC_BACKCHANNELLOGOUT_WORKERS
+    # The maximum duration a job can do it's work before it is considered as failed.
+    TransactionDuration: 10s # ZITADEL_OIDC_BACKCHANNELLOGOUT_TRANSACTIONDURATION
+    # Automatically cancel the notification after the amount of failed attempts
+    MaxAttempts: 3 # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXATTEMPTS
+    # Automatically cancel the notification if it cannot be handled within a specific time
+    MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
+    # Lifetime of the token used to notify clients through OIDC back-channel logout.
+    TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
 
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2

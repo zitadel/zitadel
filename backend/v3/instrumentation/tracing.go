@@ -22,8 +22,9 @@ import (
 )
 
 type TraceConfig struct {
-	Fraction float64
-	Exporter ExporterConfig
+	Fraction         float64
+	Exporter         ExporterConfig
+	TrustRemoteSpans bool
 }
 
 // TODO: remove for v5 release
