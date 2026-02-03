@@ -141,9 +141,10 @@ func WithError(ctx context.Context, err error) *ErrorContextLogger {
 	}
 }
 
-// OnError adds an error attribute to the logger from the context and returns the new logger
-// if the error is not nil. If the error is nil, a no-op logger is returned.
-// If the error is not a [zerrors.ZitadelError], it is wrapped in a generic ZitadelError with kind [zerrors.KindUnknown].
+// OnError returns a logger that includes the error as an attribute when err is non-nil.
+// If err is nil, it returns a no-op logger.
+// If err is not a [zerrors.ZitadelError], it is wrapped as a generic ZitadelError of kind [zerrors.KindUnknown].
+
 func OnError(ctx context.Context, err error) *ErrorContextLogger {
 	if err == nil {
 		return &ErrorContextLogger{ctx, noop, false}
