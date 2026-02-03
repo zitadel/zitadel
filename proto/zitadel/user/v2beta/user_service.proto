@@ -796,7 +796,7 @@ service UserService {
 
   // Add OTP SMS for a user
   //
-  // Add a new OTP SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
+  // Add a new OTP SMS factor to the authenticated user. OTP SMS will enable the user to verify an OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
@@ -849,7 +849,7 @@ service UserService {
 
   // Add OTP Email for a user
   //
-  // Add a new OTP Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor.
+  // Add a new OTP Email factor to the authenticated user. OTP Email will enable the user to verify an OTP with the latest verified email. The email has to be verified to add the second factor.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
