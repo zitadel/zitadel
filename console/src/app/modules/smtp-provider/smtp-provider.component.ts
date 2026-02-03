@@ -106,6 +106,7 @@ export class SMTPProviderComponent {
 
       const baseControls = {
         description: new FormControl<string>(providerDefaults.name, { nonNullable: true, validators: [requiredValidator] }),
+        user: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
         xoauth2: new FormControl<boolean>('auth' in providerDefaults && providerDefaults.auth.case === 'xoauth2', {
           nonNullable: true,
         }),
@@ -170,7 +171,6 @@ export class SMTPProviderComponent {
 
       if (!xoauth2) {
         return fb.group({
-          user: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
           password: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
         });
       }
@@ -352,7 +352,7 @@ export class SMTPProviderComponent {
       const state = this.state();
       const auth = this.auth().getRawValue();
 
-      const { tls } = state.form.getRawValue();
+      const { user, tls } = state.form.getRawValue();
       const { senderAddress, senderName } = this.secondFormGroup.getRawValue();
 
       const host =
@@ -384,7 +384,7 @@ export class SMTPProviderComponent {
         senderAddress,
         senderName,
         host,
-        user: 'user' in auth ? auth.user : undefined,
+        user,
         tls,
         receiverAddress: this.email(),
         Auth,

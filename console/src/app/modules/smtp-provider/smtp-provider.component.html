@@ -72,6 +72,19 @@
           xoauth2
         </mat-checkbox>
 
+        <cnsl-form-field class="smtp-form-field" label="User">
+          <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+          <input
+            id="smtp-user"
+            cnslInput
+            name="smtp-user"
+            autocomplete="smtp-user"
+            [formControl]="state.form.controls.user"
+            [placeholder]="'auth' in state.providerDefaults && state.providerDefaults.auth.case === 'plain' ? state.providerDefaults.auth.user.placeholder : ''"
+            required
+          />
+        </cnsl-form-field>
+
         @let auth = this.auth();
         @if ("tokenEndpoint" in auth.controls) {
           <cnsl-form-field class="smtp-form-field" label="tokenEndpoint">
@@ -111,19 +124,6 @@
             />
           </cnsl-form-field>
         } @else {
-          <cnsl-form-field class="smtp-form-field" label="User">
-            <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
-            <input
-              id="smtp-user"
-              cnslInput
-              name="smtp-user"
-              autocomplete="smtp-user"
-              [formControl]="auth.controls.user"
-              [placeholder]="'auth' in state.providerDefaults && state.providerDefaults.auth.case === 'plain' ? state.providerDefaults.auth.user.placeholder : ''"
-              required
-            />
-          </cnsl-form-field>
-
           <cnsl-form-field class="smtp-form-field" label="Password">
             <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
             <input
