@@ -35,7 +35,7 @@ func (m *logMiddleware) InsertMany(
 		logging.WithError(ctx, err).Error("insert many error")
 		return results, err
 	}
-	logging.Info(ctx, "jobs inserted",
+	logging.Debug(ctx, "jobs inserted",
 		slog.Int("count", len(results)),
 		slog.Duration("duration", time.Since(start)),
 	)
