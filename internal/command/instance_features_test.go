@@ -336,13 +336,6 @@ func TestInstanceFeatures_isEmpty(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "TokenExchange set",
-			features: &InstanceFeatures{
-				TokenExchange: gu.Ptr(true),
-			},
-			want: false,
-		},
-		{
 			name: "ImprovedPerformance set",
 			features: &InstanceFeatures{
 				ImprovedPerformance: []feature.ImprovedPerformanceType{},

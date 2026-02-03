@@ -133,7 +133,6 @@ type InstanceSetup struct {
 type InstanceSetupFeatures struct {
 	LoginDefaultOrg                *bool
 	UserSchema                     *bool
-	TokenExchange                  *bool
 	ImprovedPerformance            []feature.ImprovedPerformanceType
 	DebugOIDCParentError           *bool
 	OIDCSingleV1SessionTermination *bool
@@ -167,7 +166,6 @@ func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err e
 	return &InstanceFeatures{
 		LoginDefaultOrg:                f.LoginDefaultOrg,
 		UserSchema:                     f.UserSchema,
-		TokenExchange:                  f.TokenExchange,
 		ImprovedPerformance:            f.ImprovedPerformance,
 		DebugOIDCParentError:           f.DebugOIDCParentError,
 		OIDCSingleV1SessionTermination: f.OIDCSingleV1SessionTermination,
@@ -520,6 +518,14 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
+	var username string
+	var pwd []byte
+	if smtpConfig.SMTP.PlainAuth != nil {
+		username = smtpConfig.SMTP.PlainAuth.User
+		if smtpConfig.SMTP.PlainAuth != nil {
+			pwd = []byte(smtpConfig.SMTP.PlainAuth.Password)
+		}
+	}
 	*validations = append(*validations,
 		commands.prepareAddAndActivateSMTPConfig(
 			instanceAgg,
@@ -528,8 +534,8 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			smtpConfig.SMTP.User,
-			[]byte(smtpConfig.SMTP.Password),
+			username,
+			pwd,
 			smtpConfig.Tls,
 		),
 	)
