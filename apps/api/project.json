@@ -10,7 +10,8 @@
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go",
-            "{workspaceRoot}/internal/**/*.yaml"
+            "{workspaceRoot}/internal/**/*.yaml",
+            "{workspaceRoot}/internal/**/*.json"
         ],
         "runtime": [
             "sources",
@@ -344,7 +345,10 @@
                 "{workspaceRoot}/internal/statik/generate.go",
                 "{workspaceRoot}/internal/notification/statik/generate.go",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
-                "{workspaceRoot}/internal/api/ui/login/statik/generate.go"
+                "{workspaceRoot}/internal/api/ui/login/statik/generate.go",
+                "{workspaceRoot}/internal/static/**/*",
+                "{workspaceRoot}/internal/notification/static/**/*",
+                "{workspaceRoot}/internal/api/ui/login/static/**/*"
             ],
             "outputs": [
                 "{workspaceRoot}/internal/statik/statik.go",
