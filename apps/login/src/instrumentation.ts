@@ -76,8 +76,8 @@ export async function register(): Promise<void> {
   _loggerProvider = logs.getLoggerProvider();
 
   const shutdown = () => sdk.shutdown().catch(console.error);
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
 }
 
 export function getLoggerProvider(): LoggerProvider | null {
