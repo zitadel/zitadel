@@ -770,14 +770,14 @@ EventTypes:
             succeeded: "Sprawdzenie wielofaktorowego OTP zakończone powodzeniem"
             failed: "Sprawdzenie wielofaktorowego OTP nie powiodło się"
           sms:
-            added: "Dodano wieloskładnikowy SMS OTP"
-            removed: "Usunięto wieloskładnikowy SMS OTP"
+            added: "Dodano wieloskładnikowy OTP SMS"
+            removed: "Usunięto wieloskładnikowy OTP SMS"
             code:
-              added: "Dodano wieloczynnikowy kod SMS OTP"
+              added: "Dodano wieloczynnikowy kod OTP SMS"
               sent: "Wysłano kod SMS Multifactor OTP"
             check:
               succeeded: "Pomyślna weryfikacja wieloczynnikowego SMS-a OTP"
-              failed: "Wieloskładnikowa weryfikacja wiadomości SMS OTP nie powiodła się"
+              failed: "Wieloskładnikowa weryfikacja wiadomości OTP SMS nie powiodła się"
           email:
             added: "Dodano wieloskładnikowy e-mail OTP"
             removed: "Usunięto wieloskładnikowy e-mail OTP"

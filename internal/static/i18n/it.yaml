@@ -769,8 +769,8 @@ EventTypes:
             succeeded: "Controllo OTP riuscito"
             failed: "Controllo OTP fallito"
           sms:
-            added: "Aggiunto SMS OTP"
-            removed: "OTP SMS rimosso"
+            added: "Aggiunta SMS OTP"
+            removed: "SMS OTP rimossa"
             code:
               added: "Aggiunto codice OTP SMS"
               sent: "Codice OTP SMS inviato"
