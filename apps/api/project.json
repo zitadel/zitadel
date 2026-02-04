@@ -647,7 +647,7 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "docker buildx inspect multiarch || docker buildx create --name multiarch --driver docker-container --bootstrap --use"
+                    "docker buildx inspect multiarch >/dev/null 2>&1 || docker buildx create --name multiarch --driver docker-container --bootstrap --use"
                 ]
             }
         },
