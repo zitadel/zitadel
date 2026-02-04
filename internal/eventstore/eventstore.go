@@ -3,13 +3,14 @@ package eventstore
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"sort"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -30,6 +31,8 @@ type Eventstore struct {
 	pusher   Pusher
 	querier  Querier
 	searcher Searcher
+
+	logger *slog.Logger
 }
 
 var (
@@ -70,6 +73,7 @@ func NewEventstore(config *Config) *Eventstore {
 		pusher:   config.Pusher,
 		querier:  config.Querier,
 		searcher: config.Searcher,
+		logger:   logging.New(logging.StreamEventPusher),
 	}
 }
 
@@ -91,6 +95,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 // PushWithClient pushes the events in a single transaction using the provided database client
 // an event needs at least an aggregate
 func (es *Eventstore) PushWithClient(ctx context.Context, client database.ContextQueryExecuter, cmds ...Command) ([]Event, error) {
+	ctx = logging.ToCtx(ctx, es.logger)
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -100,6 +105,10 @@ func (es *Eventstore) PushWithClient(ctx context.Context, client database.Contex
 		events []Event
 		err    error
 	)
+	defer func() {
+		logging.OnError(ctx, err).Error("eventstore push failed")
+		logPushedEvents(ctx, events)
+	}()
 
 	// Retry when there is a collision of the sequence as part of the primary key.
 	// "duplicate key value violates unique constraint \"events2_pkey\" (SQLSTATE 23505)"
@@ -116,11 +125,11 @@ retry:
 			break retry
 		}
 		if pgErr.ConstraintName == "events2_pkey" && pgErr.SQLState() == "23505" {
-			logging.WithError(err).Info("eventstore push retry")
+			logging.WithError(ctx, err).Info("eventstore push retry")
 			continue
 		}
 		if pgErr.SQLState() == "CR000" || pgErr.SQLState() == "40001" {
-			logging.WithError(err).Info("eventstore push retry")
+			logging.WithError(ctx, err).Info("eventstore push retry")
 			continue
 		}
 		break retry
@@ -319,4 +328,10 @@ func appendAggregateType(typ AggregateType) {
 		return
 	}
 	aggregateTypes = append(aggregateTypes[:i], append([]string{string(typ)}, aggregateTypes[i:]...)...)
+}
+
+func logPushedEvents(ctx context.Context, events []Event) {
+	for _, event := range events {
+		logging.Info(ctx, "event pushed", "event", eventToLogValue(event))
+	}
 }
