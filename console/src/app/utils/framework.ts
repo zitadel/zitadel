@@ -104,8 +104,8 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)
     .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
-    .setRedirectUrisList(['http://localhost:8000/oidc/callback/'])
-    .setPostLogoutRedirectUrisList(['http://localhost:8000/oidc/logout/ ']),
+    .setRedirectUrisList(['http://localhost:3000/auth/callback'])
+    .setPostLogoutRedirectUrisList(['http://localhost:3000/auth/logout/callback']),
   // native
   ['flutter']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_NATIVE)
