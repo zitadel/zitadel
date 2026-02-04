@@ -56,10 +56,10 @@ Before you run the tests you need an initialized user. The tests don't implement
   setup: creates a machine user to create the auth request and session.  
   test: creates an auth request, a session and links the session to the auth request. Implementation of [this flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
 * `make otp_session`  
-  setup: creates 1 human user for each VU and adds email OTP to it  
-  test: creates a session based on the login name of the user, sets the email OTP challenge to the session and afterwards checks the OTP code
+  setup: creates 1 human user for each VU and adds OTP Email to it  
+  test: creates a session based on the login name of the user, sets the OTP Email challenge to the session and afterwards checks the OTP code
 * `make password_session`  
-  setup: creates 1 human user for each VU and adds email OTP to it  
+  setup: creates 1 human user for each VU and adds OTP Email to it  
   test: creates a session based on the login name of the user and checks for the password on a second step
 * `make machine_jwt_profile_grant`  
   setup: generates private/public key, creates machine users, adds a key  
