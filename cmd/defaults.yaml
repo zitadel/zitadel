@@ -46,14 +46,36 @@ Instrumentation:
   Log:
     # Log lines lower than this level are not emitted.
     Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Streams enable logging for specific parts of the application.
+    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+      - runtime # General runtime logs, such as startup and shutdown messages.
+      - request # Logs for incoming API and HTTP requests.
+      - event_handler # Logs for event handling in projections.
+      - queue # Logs for the job queue processing.
+      #- event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
+    # Mask replaces sensitive information with Value in logs matched by Key
+    Mask:
+      # Keys are the attribute keys to be masked in logs.
+      # Keys are unqualified attribute names and apply to all attributes with the specified name,
+      # regardless of their position in the attribute hierarchy.
+      # Eg. "some_key" matches "some_key" and "parent.some_key" etc.
+      # If the matched log attribute is a nested object or array,
+      # the entire structure is replaced with the specified Value.
+      Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
+        # - "first_name"
+        # - "last_name"
+      # Value is the string that replaces the original value of masked attributes.
+      Value: "****" # ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE
     # Enable printing structured logs to standard error in the specified format.
+    # When disabled, the legacy Log configuration is used.
+    # Important: when legacy Log is customized, please add a format and customize before upgrading to v5
     # The following formats are supported:
-    #   - "disabled": Disables logging
+    #   - "disabled": Disables logging (or fallback to legacy Log config)
     #   - "text": Logs are printed on StdErr as human-readable text
     #   - "json": Logs are printed on StdErr as JSON objects
-    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging. Need to configure GoogleProjectID below!
-    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting. Need to configure GoogleProjectID below!
-    Format: "text" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
