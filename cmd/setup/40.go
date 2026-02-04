@@ -10,8 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -39,7 +38,7 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 	}
 	defer func() {
 		closeErr := conn.Close()
-		logging.OnError(closeErr).Debug("failed to release connection")
+		logging.OnError(ctx, closeErr).Debug("failed to release connection")
 		// Force the pool to reopen connections to apply the new types
 		mig.dbClient.Pool.Reset()
 	}()
@@ -48,7 +47,7 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 		return err
 	}
 	for _, stmt := range statements {
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		logging.Info(ctx, "execute statement", "file", stmt.file, "migration", mig.String())
 		if _, err := conn.ExecContext(ctx, stmt.query); err != nil {
 			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
 		}

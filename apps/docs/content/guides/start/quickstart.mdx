@@ -13,9 +13,11 @@ This sample app implements the [OIDC PKCE](/guides/integrate/login/oidc/login-us
 - Login: Exchanges a code challenge for an access token via ZITADEL.
 - Authorize: Uses the token to retrieve profile data from the userinfo endpoint.
 - Logout: Clears the local session and revokes the token.
+
 ## Get Started with ZITADEL Cloud
 
 Set up your ZITADEL account and organization to begin managing identities for your applications.
+
 ### 1. Create your Account and Organization
 
 You first need access to the ZITADEL Cloud Customer Portal.
@@ -32,6 +34,7 @@ This is the administrative hub for managing your billing, teams, and instances.
 
 Complete the brief onboarding questions.
 This data helps us prioritize the development of new features, SDKs, and integrations that matter most to our community.
+
 ![](../../../public/img/guides/quickstart/onboarding_questions.png)
 
 ### 3. Create your ZITADEL instance
@@ -48,10 +51,12 @@ Follow these steps to deploy your first instance:
 5. **Deploy**: Review your configuration and click Create Instance.
 
 ![Create Instance](../../../public/img/guides/quickstart/cloud_create_instance.png)
+
 ### 4. Create your Project and Application
 
 In ZITADEL, [**Applications**](/guides/manage/console/applications-overview) are grouped into [**Projects**](/guides/manage/console/projects-overview).
-This allows multiple apps (like a React frontend and a Go backend) to share the same roles and authorizations.
+This allows multiple applications (like a React frontend and a Go backend) to share the same roles and authorizations.
+
 #### Launch the Management Console
 
 Click **Create your app**. This opens the Management Console for your instance in a new tab.
@@ -62,6 +67,7 @@ Log in using the Admin credentials you just created.
 - **Name**: Enter a name (e.g., Project1).
 - **Framework**: Select React (or choose Other if your stack isn't listed).
 - **Continue**: Click the Continue button.
+
 ![](../../../public/img/guides/quickstart/create_project_react.png)
 
 #### Step 2: Review Default Configuration
@@ -74,6 +80,7 @@ ZITADEL automatically configures the best security settings for your selected fr
 ![](../../../public/img/guides/quickstart/project_config_overview_react.png)
 
 ### 5. Collect your Integration Keys
+
 To connect your React application to ZITADEL, you need two primary configuration values.
 These are typically stored as environment variables in your project.
 
@@ -85,7 +92,9 @@ These are typically stored as environment variables in your project.
 ![Get URLs](../../../public/img/guides/quickstart/project_urls.png)
 
 ## Integrate ZITADEL into your React App
+
 ### How the Authentication Flow Works
+
 ZITADEL handles the complexity of the OIDC handshake so your app stays secure without manual token management.
 1. **Login**: App redirects the user to ZITADEL with a PKCE challenge.
 2. **Auth**: User authenticates on the ZITADEL hosted login page.
@@ -94,6 +103,7 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 5. **Logout**: The app clears local tokens and terminates the ZITADEL session.
 
 ### 1. Prerequisites
+
 - [Node.js](https://nodejs.org/): v16 or later.
 - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
 - [Yarn](https://yarnpkg.com/): This project uses Yarn for dependency management.
@@ -103,7 +113,8 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 Clone the repository and move into the project directory:
 ```bash
 git clone https://github.com/zitadel/zitadel-react.git
-cd zitadel-react```
+cd zitadel-react
+```
 
 ### 3. Build and Install
 
@@ -113,7 +124,8 @@ Since this repo contains the SDK source, you need to build the library before ru
 cd lib && yarn install && yarn build
 
 # Install example app dependencies
-cd .. && yarn install```
+cd .. && yarn install
+```
 
 ### 4. Configure your Credentials
 
