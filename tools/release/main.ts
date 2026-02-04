@@ -157,8 +157,9 @@ async function cmdRelease(argv: any) {
     const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
     const token = process.env.GITHUB_TOKEN;
     const octokit = token ? new Octokit({ auth: token }) : null;
-    const owner = 'zitadel';
-    const repo = 'zitadel';
+
+    // Dynamic owner/repo from env or default
+    const [owner, repo] = (process.env.GITHUB_REPOSITORY || 'zitadel/zitadel').split('/');
 
     // List Artifacts
     const artifactsDir = path.join(process.cwd(), '.artifacts/pack');
@@ -199,10 +200,14 @@ ${changelog}
                 const branch = getSanitizedBranch(); // or actual branch name
                 // Need actual branch name for query, not sanitized
                 const actualBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+
+                console.log(`[Debug] Looking for PRs for branch: ${actualBranch} in ${owner}/${repo}`);
+
                 if (actualBranch) {
                     const prs = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
                         owner, repo, head: `${owner}:${actualBranch}`, state: 'open'
                     });
+                    console.log(`[Debug] Found ${prs.data.length} PRs`);
                     if (prs.data.length > 0) {
                         prNumber = prs.data[0].number.toString();
                         console.log(`Found PR #${prNumber} for branch ${actualBranch}`);
@@ -243,6 +248,8 @@ ${changelog}
         } else {
             console.log('[Plan] No linked PR found. Skipping comment.');
         }
+    } else if (dryRun) {
+        console.warn('⚠️  Skipping PR comment check: GITHUB_TOKEN not found or configured.');
     }
 
     // 3. GitHub Release & Artifact Uploads (Live Mode Only)
