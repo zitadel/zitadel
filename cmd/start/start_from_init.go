@@ -71,9 +71,7 @@ Requirements:
 				return err
 			}
 
-			setupCtx, cancel := context.WithCancel(cmd.Context())
-			defer cancel()
-			err = setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
+			err = setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
 			if err != nil {
 				return err
 			}
