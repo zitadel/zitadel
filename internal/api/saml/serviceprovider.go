@@ -44,7 +44,7 @@ func (s *ServiceProvider) LoginURL(id string) string {
 	if s.SP.LoginBaseURI == nil || s.SP.LoginBaseURI.String() == "" {
 		return s.defaultLoginURLV2 + id
 	}
-	// for clients with a specific URI (internal or external) we only need to add the auth request id
+	// for applications with a specific URI (internal or external) we only need to add the auth request id
 	uri := s.SP.LoginBaseURI.JoinPath(LoginPath)
 	q := uri.Query()
 	q.Set(LoginSamlRequestParam, id)
