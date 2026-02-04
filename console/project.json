@@ -45,6 +45,28 @@
         "{projectRoot}/dist"
       ]
     },
+    "pack": {
+      "description": "Packages the Console build into an archive",
+      "dependsOn": [
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "env": {
+          "BUILD_DIR": "{projectRoot}/dist",
+          "PACK_DIR": "{workspaceRoot}/.artifacts/pack"
+        },
+        "commands": [
+          "mkdir -p ${PACK_DIR}",
+          "tar -czf ${PACK_DIR}/zitadel-console.tar.gz -C ${BUILD_DIR} ."
+        ]
+      },
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/.artifacts/pack/zitadel-console.tar.gz"
+      ]
+    },
     "dev": {
       "description": "Runs the Management Console in development mode with hot-reloading",
       "continuous": true,

@@ -18,9 +18,18 @@ import { hideBin } from 'yargs/helpers';
         })
         .parseAsync();
 
-    const version = process.env.ZITADEL_VERSION;
+    let version = process.env.ZITADEL_VERSION;
+
     if (!version) {
-        console.error('ZITADEL_VERSION not set.');
+        try {
+            version = fs.readFileSync(path.join(process.cwd(), '.artifacts/version'), 'utf-8').trim();
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    if (!version) {
+        console.error('ZITADEL_VERSION not set and .artifacts/version not found.');
         process.exit(1);
     }
 

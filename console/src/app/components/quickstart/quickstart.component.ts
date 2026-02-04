@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import frameworkDefinition from '../../../../../apps/docs/frameworks.json';
+import frameworkDefinition from '../../../../../packages/zitadel-common/src/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
 import type { getFramework } from '@netlify/build-info';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
