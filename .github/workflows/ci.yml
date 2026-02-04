@@ -4,8 +4,6 @@ on:
   push:
     tags-ignore:
       - "*"
-    branches:
-      - "nx-release-lean"
   pull_request:
   workflow_dispatch:
 

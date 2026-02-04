@@ -8,6 +8,12 @@ import * as path from 'path';
 (async () => {
     const argv = await yargs(hideBin(process.argv))
         .version(false) // disable default --version
+        .option('dryRun', {
+            alias: 'd',
+            type: 'boolean',
+            description: 'Whether or not to perform a dry-run of the release process, defaults to true',
+            default: true,
+        })
         .option('verbose', {
             description: 'Whether or not to enable verbose logging, defaults to false',
             type: 'boolean',
@@ -15,23 +21,21 @@ import * as path from 'path';
         })
         .parseAsync();
 
-    // logic: considered main only if explicitly on main branch.
-    // Local (no GITHUB_REF) will fall through to 'false' (Preview), satisfying "locally ... [preview] version".
     const isMain = process.env.GITHUB_REF === 'refs/heads/main';
-
-    const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request' || !isMain;
-
-    // We strictly dry-run in PR/Local to avoid git tagging side effects.
-    // On Main, we allow actual modifications (unless env var overrides, but for now we assume Main = Release).
-    const dryRun = isPR;
+    const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
+    const dryRun = argv.dryRun;
 
     console.log(`Running version task. isMain: ${isMain}, isPR: ${isPR}, dryRun: ${dryRun}`);
 
+    if (!process.env.GITHUB_TOKEN) {
+        console.warn('WARNING: GITHUB_TOKEN is not set.');
+    }
+
     try {
-        if (isPR) {
+        if (isPR || !isMain) {
             // Preview Version Logic
             const { workspaceVersion } = await releaseVersion({
-                dryRun: true, // Always valid for preview/calculation
+                dryRun: true, // Always true for previews
                 verbose: argv.verbose,
                 firstRelease: true,
             });
@@ -70,7 +74,7 @@ import * as path from 'path';
         } else {
             // Main Release Logic
             const { workspaceVersion } = await releaseVersion({
-                dryRun: false, // On Main, we effectively release
+                dryRun: dryRun,
                 verbose: argv.verbose,
             });
             console.log(`Release Version: ${workspaceVersion}`);

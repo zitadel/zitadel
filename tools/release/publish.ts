@@ -10,7 +10,7 @@ import { hideBin } from 'yargs/helpers';
         .option('dryRun', {
             alias: 'd',
             type: 'boolean',
-            default: false,
+            default: true,
         })
         .option('verbose', {
             type: 'boolean',
@@ -36,11 +36,15 @@ import { hideBin } from 'yargs/helpers';
     console.log(`Publishing version: ${version}`);
     const dryRun = argv.dryRun;
 
-    // Logic for Main vs PR detection
+    // Context detection for routing actions (what to do), not for safety (whether to do it)
     const isMain = process.env.GITHUB_REF === 'refs/heads/main';
-    const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request' || !isMain;
+    const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
 
     console.log(`Context - isMain: ${isMain}, isPR: ${isPR}, dryRun: ${dryRun}`);
+
+    if (!process.env.GITHUB_TOKEN) {
+        console.warn('WARNING: GITHUB_TOKEN is not set. GitHub interactions (release/comment) will be skipped.');
+    }
 
     const artifactsDir = path.join(process.cwd(), '.artifacts/pack');
     if (!fs.existsSync(artifactsDir)) {
@@ -93,7 +97,7 @@ import { hideBin } from 'yargs/helpers';
     const repo = 'zitadel';
 
     // 2. PR Logic: Comment on PR
-    if (isPR && octokit && process.env.GITHUB_EVENT_NAME === 'pull_request') {
+    if (isPR && octokit) {
         console.log('Posting comment to PR...');
         // Need PR number. GITHUB_REF for PR is refs/pull/:prNumber/merge
         const prNumber = process.env.GITHUB_REF?.split('/')[2];
