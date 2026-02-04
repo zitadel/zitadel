@@ -2057,17 +2057,17 @@
       "DESCRIPTION": "Permetti a un'altra organizzazione di usare il tuo progetto.",
       "EDITTITLE": "Configura ruoli",
       "CREATE": {
-        "TITLE": "Crea un org grant",
+        "TITLE": "Crea un permesso di progetto",
         "SEL_USERS": "Seleziona gli utenti a cui vuoi concedere l'accesso",
         "SEL_PROJECT": "Cerca un progetto",
-        "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
+        "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere al permesso di progetto",
         "SEL_USER": "Seleziona utenti",
         "SEL_ORG": "Cerca un'organizzazione",
         "SEL_ORG_DESC": "Cerca l'organizzazione da concedere.",
         "ORG_DESCRIPTION": "Stai per concedere un utente per l'organizzazione {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia il contesto nell'intestazione qui sopra per concedere un utente per un'altra organizzazione.",
         "SEL_ORG_FORMFIELD": "Organizzazione",
-        "FOR_ORG": "Org grant è creato per:"
+        "FOR_ORG": "Il permesso di progetto è creato per:"
       },
       "DETAIL": {
         "TITLE": "Organizzazione ammissibile",
@@ -2101,17 +2101,17 @@
       "NOROLES": "Nessun ruolo",
       "TYPE": "Tipo",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Project grant creato.",
-        "PROJECTGRANTADDED": "Project grant creato.",
-        "PROJECTGRANTCHANGED": "Project grant è stato cambiato.",
+        "PROJECTGRANTUSERGRANTADDED": "Permesso di progetto creato.",
+        "PROJECTGRANTADDED": "Permesso di progetto creato.",
+        "PROJECTGRANTCHANGED": "Il permesso di progetto è stato cambiato.",
         "PROJECTGRANTMEMBERADDED": "Grant manager aggiunto.",
         "PROJECTGRANTMEMBERCHANGED": "Grant manager cambiato.",
         "PROJECTGRANTMEMBERREMOVED": "Grant manager rimosso.",
-        "PROJECTGRANTUPDATED": "Project Grant cambiato."
+        "PROJECTGRANTUPDATED": "Permesso di progetto cambiato."
       },
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere progetto delegato",
-        "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un progetto delegato. La organizzazione ammissibile non potrà più usare il tuo progetto. Vuoi davvero continuare?"
+        "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un progetto delegato. Vuoi davvero continuare?"
       },
       "ROLES": "Ruoli del progetto"
     },
@@ -2125,7 +2125,7 @@
       "ADDNEWLINE": "Aggiungi un altro ruolo",
       "KEY": "Chiave",
       "TITLE": "Ruoli",
-      "DESCRIPTION": "Crea ruoli che possono essere usati per il project grant.",
+      "DESCRIPTION": "Crea ruoli che possono essere usati per il permesso di progetto.",
       "NAME": "Nome",
       "DISPLAY_NAME": "Displayname",
       "GROUP": "Gruppo",
@@ -2180,7 +2180,7 @@
       "DEACTIVATED": "Disattivato con successo.",
       "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
-      "GRANTUPDATED": "Grant del progetto cambiato con successo.",
+      "GRANTUPDATED": "Permesso di progetto cambiato con successo.",
       "DELETED": "Progetto eliminato con successo."
     }
   },
