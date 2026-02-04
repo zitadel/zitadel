@@ -42,7 +42,8 @@
         "{workspaceRoot}/pnpm-lock.yaml"
       ],
       "outputs": [
-        "{projectRoot}/dist"
+        "{projectRoot}/dist",
+        "{projectRoot}/.angular"
       ]
     },
     "archive": {

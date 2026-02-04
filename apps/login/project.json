@@ -36,7 +36,8 @@
         "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
-        "{projectRoot}/.next/standalone"
+        "{projectRoot}/.next/standalone",
+        "{projectRoot}/.next/cache"
       ]
     },
     "build-vercel": {
