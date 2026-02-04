@@ -27,6 +27,9 @@
                 "default",
                 "^production"
             ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts"
+            ],
             "options": {
                 "commands": [
                     "npx ts-node tools/release/publish.ts"
