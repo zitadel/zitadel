@@ -12,5 +12,5 @@ var (
 )
 
 func init() {
-	registerSQLMigration(7, up007OrgMetadataTable, down007OrgMetadataTable)
+	RegisterSQLMigration(7, up007OrgMetadataTable, down007OrgMetadataTable)
 }

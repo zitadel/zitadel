@@ -24,10 +24,21 @@ func Migrate(ctx context.Context, conn *pgx.Conn) error {
 	return migrator.Migrate(ctx)
 }
 
-func registerSQLMigration(sequence int32, up, down string) {
+func RegisterSQLMigration(sequence int32, up, down string) {
 	migrations = append(migrations, &migrate.Migration{
 		Sequence: sequence,
 		UpSQL:    up,
 		DownSQL:  down,
 	})
+}
+
+func RegisterSQLMigrationNoSequence(up, down string) {
+	lastMigIdx := max(len(migrations)-1, 0)
+
+	migrations = append(migrations, &migrate.Migration{
+		Sequence: migrations[lastMigIdx].Sequence + 1,
+		UpSQL:    up,
+		DownSQL:  down,
+	})
+
 }
