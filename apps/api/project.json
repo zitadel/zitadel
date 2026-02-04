@@ -343,11 +343,11 @@
                     "runtime": "go env GOARCH"
                 },
                 "{workspaceRoot}/internal/statik/generate.go",
+                "{workspaceRoot}/internal/static/**/*",
                 "{workspaceRoot}/internal/notification/statik/generate.go",
+                "{workspaceRoot}/internal/notification/static/**/*",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
                 "{workspaceRoot}/internal/api/ui/login/statik/generate.go",
-                "{workspaceRoot}/internal/static/**/*",
-                "{workspaceRoot}/internal/notification/static/**/*",
                 "{workspaceRoot}/internal/api/ui/login/static/**/*"
             ],
             "outputs": [
@@ -365,7 +365,7 @@
             "command": "mkdir -p apps/docs/content/apis/assets && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=apps/docs/content/apis/assets/assets.mdx",
             "cache": true,
             "inputs": [
-                "{workspaceRoot}/internal/api/assets/generator/asset_generator.go"
+                "{workspaceRoot}/internal/api/assets/generator/**/*"
             ],
             "outputs": [
                 "{workspaceRoot}/internal/api/assets/authz.go",
