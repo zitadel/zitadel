@@ -176,7 +176,6 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     <Tab value="React">
         - [Node.js](https://nodejs.org/)
         - Code Editor: [VS Code](https://code.visualstudio.com/) or similar
-        - [Yarn](https://yarnpkg.com/)
     </Tab>
     <Tab value="Symfony">
         - [PHP](https://www.php.net/)
@@ -218,8 +217,8 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
     </Tab>
     <Tab value="React">
         ```bash
-        git clone https://github.com/zitadel/zitadel-react.git
-        cd zitadel-react
+        git clone https://github.com/zitadel/example-auth-react.git
+        cd example-auth-react
         ```
     </Tab>
     <Tab value="Symfony">
@@ -281,18 +280,17 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
         ```
     </Tab>
     <Tab value="React">
+        1. Copy+paste the .env.example to .env
+        2. Update the ZITADEL_CLIENT_ID and ZITADEL_DOMAIN with the client id and issuer you collected in Step 5.
 
-        Open src/App.tsx and update the config object with the **Issuer** and **Client ID** you collected in Step 5.
-
-        ```typescript
-        const config: ZitadelConfig = {
-        authority: "[https://your-instance.zitadel.cloud](https://your-instance.zitadel.cloud)", // Your Issuer URL
-        client_id: "YOUR_CLIENT_ID",                      // Your Client ID
-        redirect_uri: "http://localhost:3000/callback",
-        post_logout_redirect_uri: "http://localhost:3000",
-        response_type: 'code',
-        scope: 'openid profile email'
-    };
+        ```bash
+        NODE_ENV=development
+        PORT=3000
+        VITE_ZITADEL_DOMAIN="https://your-zitadel-domain"
+        VITE_ZITADEL_CLIENT_ID="your-client-id"
+        VITE_ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+        VITE_ZITADEL_POST_LOGIN_URL="/profile"
+        VITE_ZITADEL_POST_LOGOUT_URL="http://localhost:3000"
         ```
     </Tab>
     <Tab value="Symfony">
@@ -372,16 +370,9 @@ ZITADEL handles the complexity of the OIDC handshake so your app stays secure wi
 
     </Tab>
     <Tab value="React">
-        Since this repo contains the SDK source, you need to build the library before running the example:
-
         ```bash
-        # Build the SDK library
-        cd lib && yarn install && yarn build
-
-        # Install example app dependencies
-        cd .. && yarn install
-
-        yarn start
+        npm install
+        npm run dev
         ```
 
         Your app will be live at `http://localhost:3000`.
