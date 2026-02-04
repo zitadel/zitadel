@@ -14,7 +14,10 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
-    "nx": "21.6.9",
+    "@nx/js": "^22.4.5",
+    "@types/node": "^25.2.0",
+    "nx": "22.4.5",
+    "octokit": "^5.0.5",
     "sass": "^1.97.1",
     "shiki": "^3.21.0",
     "wait-on": "^9.0.3"

@@ -1,0 +1,17 @@
+{
+    "name": "release-tools",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "tools/release",
+    "targets": {
+        "release-artifacts": {
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "npx ts-node tools/release/release-artifacts.ts"
+                ],
+                "passArgs": true
+            }
+        }
+    }
+}
