@@ -1,4 +1,4 @@
-import { releaseVersion } from 'nx/release/index.js';
+import { releaseVersion, releaseChangelog } from 'nx/release/index.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { execSync } from 'child_process';
@@ -79,8 +79,14 @@ async function cmdRelease(argv: any) {
     // we use nx release to handle tagging and changelogs
     let version: string | undefined;
 
+    // Try reading artifact first to reuse calculated version (avoid redundancy)
+    try {
+        version = fs.readFileSync(path.join(process.cwd(), '.artifacts/version'), 'utf-8').trim();
+    } catch (e) { }
+
     try {
         const result = await releaseVersion({
+            specifier: version, // Reuse version if available
             dryRun: dryRun,
             verbose: argv.verbose,
             gitCommit: true,
@@ -111,31 +117,109 @@ async function cmdRelease(argv: any) {
         process.exit(1);
     }
 
-    // 2. PR Comment (if PR and DryRun)
+    // 2. Changelog & PR Comment
+    // We try to generate the changelog to include in the preview
+    let changelog = '';
+    try {
+        const changelogResult = await releaseChangelog({
+            version: version,
+            dryRun: true,
+            verbose: argv.verbose,
+            gitCommit: false, // Don't commit in dry/preview usually
+            gitTag: false,
+        });
+        // nx release changelog usually returns env.CHANGELOG or prints to stdout.
+        // The programmatic API returns the changelog entry string if successful.
+        // NOTE: Types might vary, assuming string or object with contents.
+        if (typeof changelogResult === 'string') {
+            changelog = changelogResult;
+        } else if (changelogResult && (changelogResult as any).projectChangelogs) {
+            // Aggregate changelogs?
+            changelog = Object.values((changelogResult as any).projectChangelogs).map((c: any) => c.contents).join('\n\n');
+        }
+    } catch (e) {
+        console.warn('Could not generate changelog preview:', e);
+        changelog = '*(Changelog generation failed or no changes detected)*';
+    }
+
     const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
     const token = process.env.GITHUB_TOKEN;
     const octokit = token ? new Octokit({ auth: token }) : null;
     const owner = 'zitadel';
     const repo = 'zitadel';
 
-    if (isPR && dryRun && octokit) {
-        const prNumber = process.env.GITHUB_REF?.split('/')[2];
+    if (dryRun && octokit) {
+        let prNumber = process.env.GITHUB_REF?.split('/')[2];
+
+        // Robust PR finding if not triggered by PR event (e.g. push)
+        if ((!prNumber || isNaN(parseInt(prNumber))) && !isPR) {
+            try {
+                const branch = getSanitizedBranch(); // or actual branch name
+                // Need actual branch name for query, not sanitized
+                const actualBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+                if (actualBranch) {
+                    const prs = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
+                        owner, repo, head: `${owner}:${actualBranch}`, state: 'open'
+                    });
+                    if (prs.data.length > 0) {
+                        prNumber = prs.data[0].number.toString();
+                        console.log(`Found PR #${prNumber} for branch ${actualBranch}`);
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to lookup PR for branch:', e);
+            }
+        }
+
         if (prNumber && !isNaN(parseInt(prNumber))) {
+            // List Artifacts
+            const artifactsDir = path.join(process.cwd(), '.artifacts/pack');
+            let artifactList = '*(No artifacts found)*';
+            if (fs.existsSync(artifactsDir)) {
+                const files = fs.readdirSync(artifactsDir).filter(f => f.endsWith('.tar.gz') || f.endsWith('.zip') || f === 'checksums.txt');
+                if (files.length > 0) {
+                    artifactList = files.map(f => `- 📦 ${f}`).join('\n');
+                }
+            }
+
             const body = `### 🚀 Release Preview
 **Version**: \`${version}\`
 **Mode**: Plan (Dry-Run)
-**Artifacts**: Ready for build.
+
+#### 📦 Artifacts
+${artifactList}
+
+#### 📝 Changelog Preview
+${changelog}
 `;
-            console.log(`[Plan] Would comment on PR #${prNumber}: ${body}`);
-            // We could uncomment this to actually post the preview comment even in dry-run
+            console.log(`[Plan] Would comment on PR #${prNumber}`);
+
+            // Post or Update comment
             try {
-                await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
-                    owner, repo, issue_number: parseInt(prNumber), body,
+                // 1. Find existing comment
+                const Comments = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                    owner, repo, issue_number: parseInt(prNumber)
                 });
-                console.log(`Commented on PR #${prNumber}`);
+
+                // Look for a comment with our header
+                const existingComment = Comments.data.find((c: any) => c.body?.includes('### 🚀 Release Preview'));
+
+                if (existingComment) {
+                    await octokit.request('PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}', {
+                        owner, repo, comment_id: existingComment.id, body,
+                    });
+                    console.log(`✅ Updated existing comment on PR #${prNumber}`);
+                } else {
+                    await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                        owner, repo, issue_number: parseInt(prNumber), body,
+                    });
+                    console.log(`✅ Created new comment on PR #${prNumber}`);
+                }
             } catch (e) {
                 console.error('Failed to comment on PR:', e);
             }
+        } else {
+            console.log('[Plan] No linked PR found. Skipping comment.');
         }
     }
 
