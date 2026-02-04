@@ -5,8 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -43,7 +42,8 @@ type RepeatableMigration interface {
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
-	logging.WithFields("name", migration.String()).Info("verify migration")
+	ctx = logging.With(ctx, "name", migration.String())
+	logging.Info(ctx, "verify migration")
 
 	continueOnErr := func(err error) bool {
 		return false
@@ -66,12 +66,12 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return err
 	}
 
-	logging.WithFields("name", migration.String()).Info("starting migration")
+	logging.Info(ctx, "starting migration")
 	err = migration.Execute(ctx, startedEvent[0])
-	logging.WithFields("name", migration.String()).OnError(err).Error("migration failed")
+	logging.OnError(ctx, err).Error("migration failed")
 
 	_, pushErr := es.Push(ctx, setupDoneCmd(ctx, migration, err))
-	logging.WithFields("name", migration.String()).OnError(pushErr).Error("migration finish failed")
+	logging.OnError(ctx, pushErr).Error("migration finish failed")
 	if err != nil {
 		return err
 	}
@@ -129,8 +129,7 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 				if !errors.Is(err, errMigrationAlreadyStarted) {
 					return false, err
 				}
-				logging.WithFields("migration step", migration.String()).
-					Warn("migration already started, will check again in 5 seconds")
+				logging.Warn(ctx, "migration already started, will check again in 5 seconds")
 				timer.Reset(5 * time.Second)
 				break
 			}
