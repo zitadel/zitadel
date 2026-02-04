@@ -15,12 +15,12 @@
             ],
             "options": {
                 "commands": [
-                    "npx ts-node tools/release/version.ts"
+                    "npx ts-node tools/release/main.ts version"
                 ],
                 "passArgs": true
             }
         },
-        "publish": {
+        "release": {
             "executor": "nx:run-commands",
             "cache": true,
             "inputs": [
@@ -32,7 +32,7 @@
             ],
             "options": {
                 "commands": [
-                    "npx ts-node tools/release/publish.ts"
+                    "npx ts-node tools/release/main.ts release"
                 ],
                 "passArgs": true
             },

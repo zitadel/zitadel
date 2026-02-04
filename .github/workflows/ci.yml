@@ -54,7 +54,7 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm nx run @zitadel/release:publish
+        run: pnpm nx run @zitadel/release:release
       - run: ls -la .artifacts
       - run: ls -R .artifacts
       - name: Upload Release Artifacts

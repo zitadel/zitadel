@@ -132,7 +132,7 @@
       "description": "Stops the gRPC mock container used for integration tests.",
       "command": "nx run @zitadel/login-api-mock:down"
     },
-    "pack": {
+    "archive": {
       "description": "Packages the standalone Login application build into an archive",
       "dependsOn": [
         "build"
@@ -154,7 +154,7 @@
         "{workspaceRoot}/.artifacts/pack/zitadel-login.tar.gz"
       ]
     },
-    "docker-build": {
+    "pack-container": {
       "description": "Builds the ZITADEL Login Docker image",
       "dependsOn": [
         {
@@ -171,10 +171,10 @@
         "parallel": false
       }
     },
-    "docker-push": {
+    "publish-container": {
       "description": "Pushes the ZITADEL Login Docker image",
       "dependsOn": [
-        "docker-build"
+        "pack-container"
       ],
       "executor": "nx:run-commands",
       "options": {
@@ -183,6 +183,13 @@
         ],
         "parallel": false
       }
+    },
+    "pack": {
+      "description": "Aggregates all packaging tasks (Archive + Docker build)",
+      "dependsOn": [
+        "archive",
+        "pack-container"
+      ]
     }
   }
 }

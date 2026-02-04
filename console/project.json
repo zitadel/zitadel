@@ -45,7 +45,7 @@
         "{projectRoot}/dist"
       ]
     },
-    "pack": {
+    "archive": {
       "description": "Packages the Console build into an archive",
       "dependsOn": [
         "build"
@@ -65,6 +65,12 @@
       "cache": true,
       "outputs": [
         "{workspaceRoot}/.artifacts/pack/zitadel-console.tar.gz"
+      ]
+    },
+    "pack": {
+      "description": "Aggregates all packaging tasks",
+      "dependsOn": [
+        "archive"
       ]
     },
     "dev": {

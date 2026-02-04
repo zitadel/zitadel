@@ -386,25 +386,39 @@
             ],
             "command": "PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate ./..."
         },
-        "pack-platform": {
-            "description": "Cross-compiles the binary and packages it for the platform defined by GOOS and GOARCH environment variables. The version is taken from the ZITADEL_VERSION environment variable.",
+        "build-binary-base": {
+            "description": "Base target for cross-compiling the API binary. Do not run directly.",
             "executor": "nx:run-commands",
             "options": {
                 "parallel": false,
                 "commands": [
-                    "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "mkdir -p .artifacts/bin/$GOOS/$GOARCH",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'"
+                ]
+            }
+        },
+        "archive-base": {
+            "description": "Base target for creating release archives. Do not run directly.",
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "mkdir -p .artifacts/pack",
                     "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
                 ]
             }
         },
-        "pack-darwin-amd64": {
-            "description": "Packages the API for Darwin AMD64 (Intel) architecture",
+        "build-binary-linux-amd64": {
+            "description": "Cross-compiles the API for Linux AMD64",
             "dependsOn": [
                 "generate",
-                "build-console"
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
             ],
-            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:build-binary-base",
             "cache": true,
             "inputs": [
                 "pack",
@@ -413,55 +427,20 @@
                 }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz",
-                "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel"
-            ]
-        },
-        "pack-darwin-arm64": {
-            "description": "Packages the API for Darwin ARM64 (Apple Silicon) architecture",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:pack-platform",
-            "cache": true,
-            "inputs": [
-                "pack",
-                {
-                    "env": "ZITADEL_VERSION"
-                }
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz",
-                "{workspaceRoot}/.artifacts/bin/darwin/arm64/zitadel"
-            ]
-        },
-        "pack-linux-amd64": {
-            "description": "Packages the API for Linux AMD64 architecture",
-            "dependsOn": [
-                "generate",
-                "build-console"
-            ],
-            "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:pack-platform",
-            "cache": true,
-            "inputs": [
-                "pack",
-                {
-                    "env": "ZITADEL_VERSION"
-                }
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/linux/amd64/zitadel"
             ]
         },
-        "pack-linux-arm64": {
-            "description": "Packages the API for Linux ARM64 architecture",
+        "build-binary-linux-arm64": {
+            "description": "Cross-compiles the API for Linux ARM64",
             "dependsOn": [
                 "generate",
-                "build-console"
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
             ],
-            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:build-binary-base",
             "cache": true,
             "inputs": [
                 "pack",
@@ -470,17 +449,20 @@
                 }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/linux/arm64/zitadel"
             ]
         },
-        "pack-windows-amd64": {
-            "description": "Packages the API for Windows AMD64 architecture",
+        "build-binary-darwin-amd64": {
+            "description": "Cross-compiles the API for Darwin AMD64",
             "dependsOn": [
                 "generate",
-                "build-console"
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
             ],
-            "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:pack-platform",
+            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:build-binary-base",
             "cache": true,
             "inputs": [
                 "pack",
@@ -489,17 +471,64 @@
                 }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz",
+                "{workspaceRoot}/.artifacts/bin/darwin/amd64/zitadel"
+            ]
+        },
+        "build-binary-darwin-arm64": {
+            "description": "Cross-compiles the API for Darwin ARM64",
+            "dependsOn": [
+                "generate",
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
+            ],
+            "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:build-binary-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/darwin/arm64/zitadel"
+            ]
+        },
+        "build-binary-windows-amd64": {
+            "description": "Cross-compiles the API for Windows AMD64",
+            "dependsOn": [
+                "generate",
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
+            ],
+            "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:build-binary-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
                 "{workspaceRoot}/.artifacts/bin/windows/amd64/zitadel.exe"
             ]
         },
-        "pack-windows-arm64": {
-            "description": "Packages the API for Windows ARM64 architecture",
+        "build-binary-windows-arm64": {
+            "description": "Cross-compiles the API for Windows ARM64",
             "dependsOn": [
                 "generate",
-                "build-console"
+                "build-console",
+                {
+                    "projects": "@zitadel/release",
+                    "target": "version"
+                }
             ],
-            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:pack-platform",
+            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:build-binary-base",
             "cache": true,
             "inputs": [
                 "pack",
@@ -508,8 +537,109 @@
                 }
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz",
                 "{workspaceRoot}/.artifacts/bin/windows/arm64/zitadel.exe"
+            ]
+        },
+        "archive-linux-amd64": {
+            "description": "Packages the Linux AMD64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-linux-amd64"
+            ],
+            "command": "GOOS=linux GOARCH=amd64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-amd64.tar.gz"
+            ]
+        },
+        "archive-linux-arm64": {
+            "description": "Packages the Linux ARM64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-linux-arm64"
+            ],
+            "command": "GOOS=linux GOARCH=arm64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-linux-arm64.tar.gz"
+            ]
+        },
+        "archive-darwin-amd64": {
+            "description": "Packages the Darwin AMD64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-darwin-amd64"
+            ],
+            "command": "GOOS=darwin GOARCH=amd64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-amd64.tar.gz"
+            ]
+        },
+        "archive-darwin-arm64": {
+            "description": "Packages the Darwin ARM64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-darwin-arm64"
+            ],
+            "command": "GOOS=darwin GOARCH=arm64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-darwin-arm64.tar.gz"
+            ]
+        },
+        "archive-windows-amd64": {
+            "description": "Packages the Windows AMD64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-windows-amd64"
+            ],
+            "command": "GOOS=windows GOARCH=amd64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-amd64.tar.gz"
+            ]
+        },
+        "archive-windows-arm64": {
+            "description": "Packages the Windows ARM64 binary into a release archive",
+            "dependsOn": [
+                "build-binary-windows-arm64"
+            ],
+            "command": "GOOS=windows GOARCH=arm64 nx run @zitadel/api:archive-base",
+            "cache": true,
+            "inputs": [
+                "pack",
+                {
+                    "env": "ZITADEL_VERSION"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/pack/zitadel-windows-arm64.tar.gz"
             ]
         },
         "docker-repo": {
@@ -521,7 +651,7 @@
                 ]
             }
         },
-        "docker-build": {
+        "pack-container": {
             "description": "Builds the ZITADEL API Docker image for multiple architectures (without pushing)",
             "dependsOn": [
                 {
@@ -529,8 +659,8 @@
                     "target": "version"
                 },
                 "docker-repo",
-                "pack-linux-amd64",
-                "pack-linux-arm64"
+                "build-binary-linux-amd64",
+                "build-binary-linux-arm64"
             ],
             "executor": "nx:run-commands",
             "options": {
@@ -540,10 +670,10 @@
                 "parallel": false
             }
         },
-        "docker-push": {
+        "publish-container": {
             "description": "Builds and pushes the ZITADEL API Docker image",
             "dependsOn": [
-                "docker-build"
+                "pack-container"
             ],
             "executor": "nx:run-commands",
             "options": {
@@ -552,6 +682,18 @@
                 ],
                 "parallel": false
             }
+        },
+        "pack": {
+            "description": "Aggregates all packaging tasks (Archives + Docker build)",
+            "dependsOn": [
+                "archive-linux-amd64",
+                "archive-linux-arm64",
+                "archive-darwin-amd64",
+                "archive-darwin-arm64",
+                "archive-windows-amd64",
+                "archive-windows-arm64",
+                "pack-container"
+            ]
         }
     }
 }
