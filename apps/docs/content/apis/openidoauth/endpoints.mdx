@@ -44,7 +44,7 @@ authenticate the user in exchange for an authorization_code (authorization code 
 ### Required request parameters
 
 | Parameter     | Description                                                                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
@@ -94,7 +94,7 @@ no additional parameters required
 ### Additional parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **SHOULD** be provided when using prompt `none`.                                                                                                                                                                                                                                                                                                                                                                       |
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                       |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -124,7 +124,7 @@ As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openi
 When your `response_type` was `code` and no error occurred, the following response will be returned:
 
 | Property | Description                                                                   |
-| -------- | ----------------------------------------------------------------------------- |
+|----------|-------------------------------------------------------------------------------|
 | code     | Opaque string which will be necessary to request tokens on the token endpoint |
 | state    | Unmodified `state` parameter from the request                                 |
 
@@ -133,7 +133,7 @@ When your `response_type` was `code` and no error occurred, the following respon
 When your `response_type` was either `id_token` or `id_token token` and no error occurred, the following response will be returned:
 
 | Property     | Description                                                                           |
-| ------------ | ------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------|
 | access_token | Only returned if `response_type` included `token`                                     |
 | expires_in   | Number of second until the expiration of the `access_token`                           |
 | id_token     | An `id_token` of the authorized user                                                  |
@@ -265,6 +265,7 @@ curl --request POST \
 ```
 
 #### Successful JWT profile response
+
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
 | access_token | An `access_token` as JWT or opaque token                                              |
@@ -331,6 +332,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 </Tabs>
 
 #### Successful refresh token response
+
 | Property      | Description                                                                           |
 | ------------- | ------------------------------------------------------------------------------------- |
 | access_token  | An `access_token` as JWT or opaque token                                              |
@@ -379,6 +381,7 @@ curl --request POST \
 ```
 
 #### Successful client credentials response
+
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
 | access_token | An `access_token` as JWT or opaque token                                              |
@@ -440,6 +443,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 </Tabs>
 
 #### Successful token exchange response
+
 <TokenExchangeResponse components={props.components}  />
 
 #### Token types
@@ -537,6 +541,7 @@ Additionally and depending on the granted scopes, information about the authoriz
 Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
 ### Error response
+
 If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 ## userinfo_endpoint
@@ -554,6 +559,7 @@ curl --request GET \
 ```
 
 ### Successful userinfo response
+
 If the `access_token` is valid, the information about the user depending on the granted scopes is returned.
 Check the [Claims](./claims) page if a specific claims might be returned and for detailed description.
 
