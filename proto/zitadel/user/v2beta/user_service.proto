@@ -111,9 +111,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // Deprecated: use user service v2 instead. This service will be removed in the next major version of ZITADEL.
 service UserService {
 
-  // Create a new human user
+  // Create a new User (Human)
   //
-  // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
+  // Create/import a new User (Human). The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA)
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -145,7 +145,7 @@ service UserService {
 
   // User by ID
   //
-  // Returns the full user object (human or machine) including the profile, email, etc.
+  // Returns the full User (Human) or Service Account including the profile, email, etc.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {

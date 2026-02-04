@@ -28,7 +28,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 
 	t.Run("user grant added reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -37,7 +37,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant update reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -82,7 +82,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant deactivate reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		projectID := prepareProjectAndProjectRoles(t, orgID, nil)
@@ -112,7 +112,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant activate reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project
 		projectID := prepareProjectAndProjectRoles(t, orgID, nil)
@@ -148,7 +148,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user grant removed reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -179,7 +179,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("user removed reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -203,7 +203,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("project removed reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -227,7 +227,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 	})
 
 	t.Run("project role removed reduces", func(t *testing.T) {
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"
@@ -273,7 +273,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
 		createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1}, retryDuration, tick)
@@ -295,7 +295,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
 		})
 		require.NoError(t, err)
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1}, retryDuration, tick)
@@ -330,7 +330,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 			GrantedOrganizationId: grantedOrganization.OrganizationId,
 		})
 		require.NoError(t, err)
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, grantedOrganization.OrganizationId, integration.Email(), integration.Phone())
 		// create authorization with roles
 		createdAuthorization := createAndEnsureAuthorization(t, instanceID, grantedOrganization.OrganizationId, user.UserId, projectID, []string{role1, role2}, retryDuration, tick)
@@ -360,7 +360,7 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 		// create a new organization
 		orgName := integration.OrganizationName()
 		orgResp := Instance.CreateOrganization(CTX, orgName, integration.Email())
-		// create user
+		// create User (Human)
 		user := Instance.CreateHumanUserVerified(CTX, orgResp.OrganizationId, integration.Email(), integration.Phone())
 		// prepare project and project roles
 		role1, role2 := "role1", "role2"

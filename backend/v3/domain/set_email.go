@@ -6,7 +6,7 @@ package domain
 // 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 // )
 
-// // SetEmailCommand sets the email address of a user.
+// // SetEmailCommand sets the email address of a User (Human).
 // // If allows verification as a sub command.
 // // The verification command is executed after the email address is set.
 // // The verification command is executed in the same transaction as the email address update.
