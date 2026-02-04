@@ -4,6 +4,7 @@ import { hideBin } from 'yargs/helpers';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { DefaultArtifactClient } from '@actions/artifact';
 
 (async () => {
     const argv = await yargs(hideBin(process.argv))
@@ -24,12 +25,6 @@ import * as path from 'path';
     const isMain = process.env.GITHUB_REF === 'refs/heads/main';
     const isPR = process.env.GITHUB_EVENT_NAME === 'pull_request';
     const dryRun = argv.dryRun;
-
-    console.log(`Running version task. isMain: ${isMain}, isPR: ${isPR}, dryRun: ${dryRun}`);
-
-    if (!process.env.GITHUB_TOKEN) {
-        console.warn('WARNING: GITHUB_TOKEN is not set.');
-    }
 
     try {
         if (isPR || !isMain) {
@@ -92,6 +87,30 @@ import * as path from 'path';
 
             if (process.env.GITHUB_ENV) {
                 fs.appendFileSync(process.env.GITHUB_ENV, `ZITADEL_VERSION=${workspaceVersion}\n`);
+            }
+        }
+
+        // Upload version as artifact if in CI
+        if (process.env.GITHUB_ACTIONS) {
+            const versionToUpload = path.join('.artifacts', 'version');
+            if (fs.existsSync(versionToUpload)) {
+                console.log('Uploading version artifact to GitHub Actions...');
+                try {
+                    const artifactClient = new DefaultArtifactClient();
+                    const artifactName = `release-version`;
+                    await artifactClient.uploadArtifact(
+                        artifactName,
+                        [versionToUpload],
+                        process.cwd()
+                    );
+                    console.log(`Uploaded version artifact.`);
+                } catch (err: any) {
+                    if (err.message?.includes('ACTIONS_RUNTIME_TOKEN')) {
+                        console.warn('Skipping version artifact upload: ACTIONS_RUNTIME_TOKEN not available.');
+                    } else {
+                        console.error('Failed to upload version artifact:', err);
+                    }
+                }
             }
         }
 

@@ -56,7 +56,7 @@ import { hideBin } from 'yargs/helpers';
     const filePaths = files.map(f => path.join(artifactsDir, f));
 
     // 1. Upload to GitHub Actions Artifacts (Available in CI)
-    if (process.env.GITHUB_ACTIONS && !dryRun) {
+    if (process.env.GITHUB_ACTIONS) {
         console.log('Uploading to GitHub Actions Artifacts...');
         try {
             const artifactClient = new DefaultArtifactClient();
@@ -75,11 +75,7 @@ import { hideBin } from 'yargs/helpers';
             }
         }
     } else {
-        if (dryRun) {
-            console.log('[Dry-Run] Skipping GitHub Actions Artifact upload.');
-        } else {
-            console.log('Skipping GitHub Actions Artifact upload (not in GH Actions env).');
-        }
+        console.log('Skipping GitHub Actions Artifact upload (not in GH Actions env).');
     }
 
     // Octokit setup
